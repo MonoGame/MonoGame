@@ -2,17 +2,54 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
 using Windows.System;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.ViewManagement;
 
-namespace Microsoft.Xna.Framework.Windows8.GamerServices
+namespace Microsoft.Xna.Framework.Input
 {
+    public partial class KeyboardInput
+    {
+        private static readonly CoreDispatcher dispatcher;
+        private static TaskCompletionSource<string> tcs;
+        private static InputDialog inputDialog;
+
+        static KeyboardInput()
+        {
+            dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+        }
+
+        private static Task<string> PlatformShow(string title, string description, string defaultText, bool usePasswordMode)
+        {
+            tcs = new TaskCompletionSource<string>();
+            dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                async () =>
+                {
+                    inputDialog = new InputDialog();
+                    var result = await inputDialog.ShowAsync(title, description, defaultText, usePasswordMode);
+
+                    if (!tcs.Task.IsCompleted)
+                        tcs.SetResult(result);
+                });
+
+            return tcs.Task;
+        }
+
+        private static void PlatformSetResult(string result)
+        {
+            var task = inputDialog.CloseAsync();
+            tcs.SetResult(result);
+        }
+    }
+
+    #region Keyboard Input UI
     [TemplatePart(Name = LayoutRootPanelName, Type = typeof(Panel))]
     [TemplatePart(Name = ContentBorderName, Type = typeof(Border))]
     [TemplatePart(Name = InputTextBoxName, Type = typeof(TextBox))]
@@ -126,7 +163,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             get { return (Brush)GetValue(BackgroundScreenBrushProperty); }
             set { SetValue(BackgroundScreenBrushProperty, value); }
         }
-        
+
         public static readonly DependencyProperty BackgroundStripeBrushProperty =
             DependencyProperty.Register(
                 "BackgroundStripeBrush",
@@ -139,7 +176,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             get { return (Brush)GetValue(BackgroundStripeBrushProperty); }
             set { SetValue(BackgroundStripeBrushProperty, value); }
         }
-        
+
         public static readonly DependencyProperty TitleStyleProperty =
             DependencyProperty.Register(
                 "TitleStyle",
@@ -152,7 +189,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             get { return (Style)GetValue(TitleStyleProperty); }
             set { SetValue(TitleStyleProperty, value); }
         }
-        
+
         public static readonly DependencyProperty TextStyleProperty =
             DependencyProperty.Register(
                 "TextStyle",
@@ -179,7 +216,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             Style oldTextStyle, Style newTextStyle)
         {
         }
-        
+
         public static readonly DependencyProperty InputTextStyleProperty =
             DependencyProperty.Register(
                 "InputTextStyle",
@@ -196,8 +233,8 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
         public static readonly DependencyProperty InputPasswordStyleProperty =
             DependencyProperty.Register(
                 "InputPasswordStyle",
-                typeof (Style),
-                typeof (InputDialog),
+                typeof(Style),
+                typeof(InputDialog),
                 new PropertyMetadata(null));
 
         public Style InputPasswordStyle
@@ -205,7 +242,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             get { return (Style)GetValue(InputPasswordStyleProperty); }
             set { SetValue(InputPasswordStyleProperty, value); }
         }
-        
+
         public static readonly DependencyProperty IsLightDismissEnabledProperty =
             DependencyProperty.Register(
                 "IsLightDismissEnabled",
@@ -218,7 +255,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             get { return (bool)GetValue(IsLightDismissEnabledProperty); }
             set { SetValue(IsLightDismissEnabledProperty, value); }
         }
-        
+
         public static readonly DependencyProperty AwaitsCloseTransitionProperty =
             DependencyProperty.Register(
                 "AwaitsCloseTransition",
@@ -231,7 +268,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             get { return (bool)GetValue(AwaitsCloseTransitionProperty); }
             set { SetValue(AwaitsCloseTransitionProperty, value); }
         }
-        
+
         public static readonly DependencyProperty ButtonsPanelOrientationProperty =
             DependencyProperty.Register(
                 "ButtonsPanelOrientation",
@@ -244,7 +281,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             get { return (Orientation)GetValue(ButtonsPanelOrientationProperty); }
             set { SetValue(ButtonsPanelOrientationProperty, value); }
         }
-        
+
         public InputDialog()
         {
             DefaultStyleKey = typeof(InputDialog);
@@ -268,7 +305,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             _virtualKeyboardSlideAnimation = GetTemplateChild(VirtualKeyboardAnimationName) as DoubleAnimation;
             _blackStripeTransform = this.GetTemplateChild(BlackStripeTransformName) as TranslateTransform;
 
-            if (_layoutRoot != null) 
+            if (_layoutRoot != null)
                 _layoutRoot.Tapped += OnLayoutRootTapped;
             if (_inputTextBox != null && _inputPasswordBox != null)
             {
@@ -293,7 +330,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
                     _inputPasswordBox = null;
                 }
             }
-            if (_contentBorder != null) 
+            if (_contentBorder != null)
                 _contentBorder.Tapped += OnContentBorderTapped;
         }
 
@@ -345,7 +382,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
 
             Visibility = Visibility.Visible;
             _shown = true;
-            
+
             Window.Current.Content.KeyUp += OnGlobalKeyUp;
             _dismissTaskSource = new TaskCompletionSource<string>();
 
@@ -386,9 +423,9 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             }
 
             _dialogPopup.IsOpen = true;
-            
+
             await WaitForLayoutUpdateAsync(this);
-            
+
             _titleTextBlock.Text = title;
             _textTextBlock.Text = text;
             InputText = defaultText;
@@ -424,7 +461,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
                 _inputTextBox.Focus(FocusState.Programmatic);
             if (_inputPasswordBox != null)
                 _inputPasswordBox.Focus(FocusState.Programmatic);
-            
+
             ResizeLayoutRoot();
 
             // Show dialog
@@ -475,9 +512,11 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
 
         static async Task WaitForLayoutUpdateAsync(FrameworkElement frameworkElement)
         {
-            await EventAsync.FromEvent<object>(
-                eh => frameworkElement.LayoutUpdated += eh,
-                eh => frameworkElement.LayoutUpdated -= eh);
+            var tcs = new TaskCompletionSource<bool>();
+            EventHandler<object> eventHandler = (sender, args) => tcs.SetResult(true);
+            frameworkElement.LayoutUpdated += eventHandler;
+            await tcs.Task;
+            frameworkElement.LayoutUpdated -= eventHandler;
         }
 
         static IEnumerable<DependencyObject> GetDescendants(DependencyObject start)
@@ -549,7 +588,7 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             ResizeLayoutRoot();
         }
 
-        private async Task CloseAsync()
+        public async Task CloseAsync()
         {
             if (!_shown)
             {
@@ -717,4 +756,5 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             }
         }
     }
+    #endregion
 }
