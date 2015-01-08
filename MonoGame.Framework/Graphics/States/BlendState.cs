@@ -166,16 +166,46 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		private static readonly Utilities.ObjectFactoryWithReset<BlendState> _additive;
-        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _alphaBlend;
-        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _nonPremultiplied;
-        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _opaque;
+        public static BlendState Additive
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.Additive);
+                return GraphicsDeviceContext.Current.Additive.Value;
+            }
+        }
 
-        public static BlendState Additive { get { return _additive.Value; } }
-        public static BlendState AlphaBlend { get { return _alphaBlend.Value; } }
-        public static BlendState NonPremultiplied { get { return _nonPremultiplied.Value; } }
-        public static BlendState Opaque { get { return _opaque.Value; } }
-        
+        public static BlendState AlphaBlend
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.AlphaBlend);
+                return GraphicsDeviceContext.Current.AlphaBlend.Value;
+            }
+        }
+
+        public static BlendState NonPremultiplied
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.NonPremultiplied);
+                return GraphicsDeviceContext.Current.NonPremultiplied.Value; 
+            }
+        }
+
+        public static BlendState Opaque
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.Opaque);
+                return GraphicsDeviceContext.Current.Opaque.Value; 
+            }
+        }
+
         public BlendState() 
         {
             _targetBlendState = new TargetBlendState[4];
@@ -187,53 +217,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			_blendFactor = Color.White;
             _multiSampleMask = Int32.MaxValue;
             _independentBlendEnable = false;
-        }
-		
-		static BlendState() 
-        {
-            _additive = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState
-            {
-                Name = "BlendState.Additive",
-                ColorSourceBlend = Blend.SourceAlpha,
-                AlphaSourceBlend = Blend.SourceAlpha,
-                ColorDestinationBlend = Blend.One,
-                AlphaDestinationBlend = Blend.One
-            });
-			
-			_alphaBlend = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
-            {
-                Name = "BlendState.AlphaBlend",
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			});
-			
-			_nonPremultiplied = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState() 
-            {
-                Name = "BlendState.NonPremultiplied",
-				ColorSourceBlend = Blend.SourceAlpha,
-				AlphaSourceBlend = Blend.SourceAlpha,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			});
-			
-			_opaque = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
-            {
-                Name = "BlendState.Opaque",
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,			    
-				ColorDestinationBlend = Blend.Zero,
-				AlphaDestinationBlend = Blend.Zero
-			});
-		}
-
-        internal static void ResetStates()
-        {
-            _additive.Reset();
-            _alphaBlend.Reset();
-            _nonPremultiplied.Reset();
-            _opaque.Reset();
         }
 	}
 }

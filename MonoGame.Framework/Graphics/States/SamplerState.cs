@@ -18,84 +18,73 @@ using GetPName = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-  public partial class SamplerState : GraphicsResource
-  {
-        static SamplerState () 
+    public partial class SamplerState : GraphicsResource
+    {
+        public static SamplerState AnisotropicClamp
         {
-			_anisotropicClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
+            get
             {
-                Name = "SamplerState.AnisotropicClamp",
-				Filter = TextureFilter.Anisotropic,
-				AddressU = TextureAddressMode.Clamp,
-				AddressV = TextureAddressMode.Clamp,
-				AddressW = TextureAddressMode.Clamp,
-			});
-			
-			_anisotropicWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
-            {
-                Name = "SamplerState.AnisotropicWrap",
-				Filter = TextureFilter.Anisotropic,
-				AddressU = TextureAddressMode.Wrap,
-				AddressV = TextureAddressMode.Wrap,
-				AddressW = TextureAddressMode.Wrap,
-			});
-			
-			_linearClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
-            {
-                Name = "SamplerState.LinearClamp",
-				Filter = TextureFilter.Linear,
-				AddressU = TextureAddressMode.Clamp,
-				AddressV = TextureAddressMode.Clamp,
-				AddressW = TextureAddressMode.Clamp,
-			});
-			
-			_linearWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
-            {
-                Name = "SamplerState.LinearWrap",
-				Filter = TextureFilter.Linear,
-				AddressU = TextureAddressMode.Wrap,
-				AddressV = TextureAddressMode.Wrap,
-				AddressW = TextureAddressMode.Wrap,
-			});
-			
-			_pointClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
-            {
-                Name = "SamplerState.PointClamp",
-				Filter = TextureFilter.Point,
-				AddressU = TextureAddressMode.Clamp,
-				AddressV = TextureAddressMode.Clamp,
-				AddressW = TextureAddressMode.Clamp,
-			});
-			
-			_pointWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
-            {
-                Name = "SamplerState.PointWrap",
-				Filter = TextureFilter.Point,
-				AddressU = TextureAddressMode.Wrap,
-				AddressV = TextureAddressMode.Wrap,
-				AddressW = TextureAddressMode.Wrap,
-			});
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.AnisotropicClamp);
+                return GraphicsDeviceContext.Current.AnisotropicClamp.Value;
+            }
 		}
-		
-		private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _anisotropicClamp;
-        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _anisotropicWrap;
-        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _linearClamp;
-        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _linearWrap;
-        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _pointClamp;
-        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _pointWrap;
 
-        public static SamplerState AnisotropicClamp { get { return _anisotropicClamp.Value; } }
-        public static SamplerState AnisotropicWrap { get { return _anisotropicWrap.Value; } }
-        public static SamplerState LinearClamp { get { return _linearClamp.Value; } }
-        public static SamplerState LinearWrap { get { return _linearWrap.Value; } }
-        public static SamplerState PointClamp { get { return _pointClamp.Value; } }
-        public static SamplerState PointWrap { get { return _pointWrap.Value; } }
-        
+        public static SamplerState AnisotropicWrap
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.AnisotropicWrap);
+                return GraphicsDeviceContext.Current.AnisotropicWrap.Value;
+            }
+        }
+
+        public static SamplerState LinearClamp
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.LinearClamp);
+                return GraphicsDeviceContext.Current.LinearClamp.Value;
+            }
+        }
+
+        public static SamplerState LinearWrap
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.LinearWrap);
+                return GraphicsDeviceContext.Current.LinearWrap.Value;
+            }
+        }
+
+        public static SamplerState PointClamp
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.PointClamp);
+                return GraphicsDeviceContext.Current.PointClamp.Value;
+            }
+        }
+
+        public static SamplerState PointWrap
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.PointWrap);
+                return GraphicsDeviceContext.Current.PointWrap.Value;
+            }
+        }
+
         public TextureAddressMode AddressU { get; set; }
 		public TextureAddressMode AddressV { get; set; }
 		public TextureAddressMode AddressW { get; set; }
 		public TextureFilter Filter { get; set; }
-		
+
 		public int MaxAnisotropy { get; set; }
 		public int MaxMipLevel { get; set; }
 		public float MipMapLevelOfDetailBias { get; set; }
@@ -109,16 +98,6 @@ namespace Microsoft.Xna.Framework.Graphics
             this.MaxAnisotropy = 4;
             this.MaxMipLevel = 0;
             this.MipMapLevelOfDetailBias = 0.0f;
-        }
-
-        internal static void ResetStates()
-        {
-            _anisotropicClamp.Reset();
-            _anisotropicWrap.Reset();
-            _linearClamp.Reset();
-            _linearWrap.Reset();
-            _pointClamp.Reset();
-            _pointWrap.Reset();
         }
     }
 }

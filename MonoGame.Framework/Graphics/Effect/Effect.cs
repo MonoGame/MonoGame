@@ -102,24 +102,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // First look for it in the cache.
             //
-            Effect cloneSource;
-            if (!EffectCache.TryGetValue(effectKey, out cloneSource))
+            var cloneSource = graphicsDevice.Context.GetOrAddEffect(effectKey, delegate
             {
                 using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
-            	using (var reader = new BinaryReader(stream))
-            {
-                // Create one.
-                cloneSource = new Effect(graphicsDevice);
-                    cloneSource.ReadEffect(reader);
+                using (var reader = new BinaryReader(stream))
+                {
+                    // Create one.
+                    var newSource = new Effect(graphicsDevice);
+                    newSource.ReadEffect(reader);
 
-                // Cache the effect for later in its original unmodified state.
-                    EffectCache.Add(effectKey, cloneSource);
+                    // Return the new source will cache the effect for later in its original unmodified state.
+                    return newSource;
                 }
-            }
+            });
 
             // Clone it.
             _isClone = true;
-            Clone(cloneSource);
+            Clone(cloneSource as Effect);
         }
 
         private MGFXHeader ReadHeader(byte[] effectCode)
@@ -160,6 +159,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="cloneSource">The source effect to clone from.</param>
         private void Clone(Effect cloneSource)
         {
+            if (cloneSource == null)
+                throw new ArgumentNullException("cloneSource");
+
             Debug.Assert(_isClone, "Cannot clone into non-cloned effect!");
 
             // Copy the mutable members of the effect.
@@ -564,26 +566,6 @@ namespace Microsoft.Xna.Framework.Graphics
         
 #endif
         #endregion // Effect File Reader
-
-
-        #region Effect Cache        
-
-        /// <summary>
-        /// The cache of effects from unique byte streams.
-        /// </summary>
-        private static readonly Dictionary<int, Effect> EffectCache = new Dictionary<int, Effect>();
-
-        internal static void FlushCache()
-        {
-            // Dispose all the cached effects.
-            foreach (var effect in EffectCache)
-                effect.Value.Dispose();
-
-            // Clear the cache.
-            EffectCache.Clear();
-        }
-
-        #endregion // Effect Cache
 
 	}
 }

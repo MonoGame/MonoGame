@@ -16,14 +16,36 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool ScissorTestEnable { get; set; }
         public float SlopeScaleDepthBias { get; set; }
 
-		private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullClockwise;
-        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullCounterClockwise;
-        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullNone;
+        public static RasterizerState CullClockwise
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.CullClockwise);
+                return GraphicsDeviceContext.Current.CullClockwise.Value;
+            }
+        }
 
-        public static RasterizerState CullClockwise { get { return _cullClockwise.Value; } }
-        public static RasterizerState CullCounterClockwise { get { return _cullCounterClockwise.Value; } }
-        public static RasterizerState CullNone { get { return _cullNone.Value; } }
-        
+        public static RasterizerState CullCounterClockwise
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.CullCounterClockwise);
+                return GraphicsDeviceContext.Current.CullCounterClockwise.Value;
+            }
+        }
+
+        public static RasterizerState CullNone
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.CullNone);
+                return GraphicsDeviceContext.Current.CullNone.Value;
+            }
+        }
+
         public RasterizerState()
 		{
 			CullMode = CullMode.CullCounterClockwiseFace;
@@ -34,32 +56,5 @@ namespace Microsoft.Xna.Framework.Graphics
 			SlopeScaleDepthBias = 0;
 		}
 
-		static RasterizerState ()
-		{
-			_cullClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
-            {
-                Name = "RasterizerState.CullClockwise",
-				CullMode = CullMode.CullClockwiseFace
-			});
-
-			_cullCounterClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
-            {
-                Name = "RasterizerState.CullCounterClockwise",
-				CullMode = CullMode.CullCounterClockwiseFace
-			});
-
-			_cullNone = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
-            {
-                Name = "RasterizerState.CullNone",
-				CullMode = CullMode.None
-			});
-		}
-
-        internal static void ResetStates()
-        {
-            _cullClockwise.Reset();
-            _cullCounterClockwise.Reset();
-            _cullNone.Reset();
-        }
     }
 }

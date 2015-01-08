@@ -48,44 +48,35 @@ namespace Microsoft.Xna.Framework.Graphics
 			ReferenceStencil = 0;
 		}
 
-        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _default;
-        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _depthRead;
-        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _none;
-
-        public static DepthStencilState Default { get { return _default.Value; } }
-        public static DepthStencilState DepthRead { get { return _depthRead.Value; } }
-        public static DepthStencilState None { get { return _none.Value; } }
-		
-		static DepthStencilState ()
-		{
-			_default = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
-            {
-                Name = "DepthStencilState.Default",
-				DepthBufferEnable = true,
-				DepthBufferWriteEnable = true
-			});
-			
-			_depthRead = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
-            {
-                Name = "DepthStencilState.DepthRead",
-                DepthBufferEnable = true,
-				DepthBufferWriteEnable = false
-			});
-			
-			_none = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
-            {
-                Name = "DepthStencilState.None",
-                DepthBufferEnable = false,
-				DepthBufferWriteEnable = false
-			});
-		}
-
-        internal static void ResetStates()
+        public static DepthStencilState Default
         {
-            _default.Reset();
-            _depthRead.Reset();
-            _none.Reset();
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.Default);
+                return GraphicsDeviceContext.Current.Default.Value;
+            }
         }
+
+        public static DepthStencilState DepthRead
+        {
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.DepthRead);
+                return GraphicsDeviceContext.Current.DepthRead.Value;
+            }
+        }
+
+        public static DepthStencilState None
+		{
+            get
+            {
+                ThrowIfGraphicsDeviceContextNull();
+                DebugAssertGraphicsDeviceContext(GraphicsDeviceContext.Current.None);
+                return GraphicsDeviceContext.Current.None.Value;
+            }
+		}
 	}
 }
 

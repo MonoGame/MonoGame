@@ -40,6 +40,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -115,9 +116,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var target = resource.Target;
                     if (target != null)
+                    {
+                        // Do not dispose another device's graphics resource
+                        if (target is GraphicsResource)
+                        {
+                            if ((target as GraphicsResource).GraphicsDevice != GraphicsDeviceContext.Current.GraphicsDevice)
+                                continue;
+                        }
                         (target as IDisposable).Dispose();
+                    }
+
+                    // We can remove weak handle from collection safely since we have cloned resources dictionary
+                    resources.Remove(resource);
                 }
-                resources.Clear();
             }
         }
 
@@ -193,6 +204,23 @@ namespace Microsoft.Xna.Framework.Graphics
         public override string ToString()
         {
             return string.IsNullOrEmpty(Name) ? base.ToString() : Name;
+        }
+
+        protected static void ThrowIfGraphicsDeviceContextNull()
+        {
+            if (GraphicsDeviceContext.Current == null)
+                throw new InvalidOperationException("The graphics device context couldn't be null");
+        }
+
+        [Conditional("DEBUG")]
+        internal static void DebugAssertGraphicsDeviceContext<T>(Utilities.ObjectFactoryWithReset<T> objectFactoryWithReset)
+            where T : GraphicsResource, new()
+        {
+            var graphicsDeviceContext = GraphicsDeviceContext.Current;
+            var value = objectFactoryWithReset.Value;
+
+            Debug.Assert(graphicsDeviceContext != null, "The graphics device context couldn't be null");
+            Debug.Assert(value.GraphicsDevice == null || graphicsDeviceContext.GraphicsDevice == value.GraphicsDevice, "Bounded GraphicsResource is different from current graphics context");
         }
 	}
 }

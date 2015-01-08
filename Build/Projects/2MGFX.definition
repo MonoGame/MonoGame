@@ -55,6 +55,9 @@
     <Compile Include="..\..\MonoGame.Framework\ContainmentType.cs">
       <Link>MonoGame.Framework\ContainmentType.cs</Link>
     </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\GraphicsDeviceContext.cs">
+      <Link>MonoGame.Framework\GraphicsDeviceContext.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\ColorWriteChannels.cs">
       <Link>MonoGame.Framework\ColorWriteChannels.cs</Link>
     </Compile>
