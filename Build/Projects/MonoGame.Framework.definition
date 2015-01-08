@@ -802,9 +802,39 @@
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>PSMobile,Android,Ouya</ExcludePlatforms>
     </Compile>
+    <Compile Include="Input\KeyboardInput.cs">
+      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
-    <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Input\KeyState.cs" />    
+    <Compile Include="Input\MessageBox.cs">
+      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
@@ -817,9 +847,14 @@
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
     <Compile Include="Input\Touch\TouchQueue.cs">
-		<Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
-	</Compile>
-
+			<Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
+		</Compile>
+		
+    <Page Include="Themes\generic.xaml">
+			<Platforms>Windows8,WindowsPhone81</Platforms>
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+    </Page>
 
     <!-- Microsoft.Xna.Framework.Media -->
     <Compile Include="Media\Album.cs" />
