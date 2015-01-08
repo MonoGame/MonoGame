@@ -161,8 +161,6 @@ namespace Microsoft.Xna.Framework.GamerServices
         private static UIWindow _window;
         private static UIViewController _gameViewController;
 
-        private static double osVersion = 0.0f;
-
         [CLSCompliant(false)]
         public static GKMatch Match { get; private set; }
 
@@ -175,15 +173,6 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             if (!_isInitialised)
             {
-                var osVersionString = UIDevice.CurrentDevice.SystemVersion;
-                if (osVersionString.Contains(".") && osVersionString.IndexOf(".") != osVersionString.LastIndexOf("."))
-                {
-                    var parts = osVersionString.Split(char.Parse("."));
-                    osVersionString = parts[0] + "." + parts[1];
-                }
-
-                osVersion = double.Parse(osVersionString, System.Globalization.CultureInfo.InvariantCulture);
-
                 _window = (UIWindow)game.Services.GetService(typeof(UIWindow));
                 if (_window == null)
                     throw new InvalidOperationException(
@@ -422,7 +411,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 prevGestures = TouchPanel.EnabledGestures;
                 TouchPanel.EnabledGestures = GestureType.None;
 
-                if (osVersion < 6.0d)
+                if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                 {
                     // Show view controller the old way for iOS 5 and older
                     if (guideViewController == null)
@@ -449,7 +438,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         private static void HideViewController(UIViewController viewController)
         {
-            if (osVersion < 6.0d)
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
             {
 #pragma warning disable 618
                 // Disable DismissModalViewControllerAnimated warning, still need to support iOS 5 and older
@@ -472,7 +461,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers[0].IsSignedInToLive))
             {
-                if (osVersion < 6.0d)
+                if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                 {
                     // GKLeaderboardViewController for iOS 5 and older
                     var leaderboardController = new GKLeaderboardViewController();
@@ -510,7 +499,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers[0].IsSignedInToLive))
             {
-                if (osVersion < 6.0d)
+                if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                 {
                     // GKAchievementViewController for iOS 5 and older
                     var achievementController = new GKAchievementViewController();
