@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             try
             {
-                if (!UIDevice.CurrentDevice.CheckSystemVersion(4, 1))
+                if (UIDevice.CurrentDevice.CheckSystemVersion(4, 1))
                 {
                     UIApplication.SharedApplication.BeginInvokeOnMainThread(delegate
                     {
