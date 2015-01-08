@@ -20,11 +20,15 @@ Note that the MonoGame documentation project is currently a work in progress and
 
 [Rectangle.Contains(float,float)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_1) - float-based version of [Rectangle.Contains(int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains)
 
-[Rectangle.Contains(Vector2)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_3) - float-based version of [Rectangle.Contains(Point)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_2)
+[Rectangle.Contains(Vector2)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_4) - float-based version of [Rectangle.Contains(Point)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_2)
+
+[Rectangle.Contains(ref Vector2,out bool)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_5) - float-based version of [Rectangle.Contains(ref Point,out bool)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_3)
 
 [Rectangle.Offset(float,float)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset.html) - float-based version of [Rectangle.Offset(int,int)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_3.html)
 
-[Rectangle.Offset(Vector2)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_1.html) - float-based version of [Rectangle.Offset(Point)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_2.html)
+[Rectangle.Offset(Vector2)](http://www.monogame.net/docs/html/M_Milcrosoft_Xna_Framework_Rectangle_Offset_1.htm) - float-based version of [Rectangle.Offset(Point)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_2.html)
+
+[Rectangle.Size](http://www.monogame.net/docs/html/M_Milcrosoft_Xna_Framework_Rectangle_Size.htm) - this property is a [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point) which contains width and height of this rectangle.
 
 [Vector2.ToPoint()](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Vector2_ToPoint) - this is easy to use conversion from [Vector2](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Vector2) to [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point). Use it like this 
 
