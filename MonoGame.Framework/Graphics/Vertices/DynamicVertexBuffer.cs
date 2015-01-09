@@ -12,7 +12,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Special offset used internally by GraphicsDevice.DrawUserXXX() methods.
         /// </summary>
         internal int UserOffset;
-		
+
+        public bool IsContentLost { get { return IsDisposed; } }
+
         public DynamicVertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage)
             : base(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, true)
         {
