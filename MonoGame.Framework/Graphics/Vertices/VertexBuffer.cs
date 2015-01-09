@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class VertexBuffer : GraphicsResource
     {
-        internal bool _isDynamic;
+        private readonly bool _isDynamic;
 
 		public int VertexCount { get; private set; }
 		public VertexDeclaration VertexDeclaration { get; private set; }
@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic)
 		{
 			if (graphicsDevice == null)
-                throw new ArgumentNullException("Graphics Device Cannot Be null");
+                throw new ArgumentNullException("graphicsDevice");
 
             this.GraphicsDevice = graphicsDevice;
             this.VertexDeclaration = vertexDeclaration;
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
             if (data == null)
-                throw new ArgumentNullException("data", "This method does not accept null for this parameter.");
+                throw new ArgumentNullException("data");
             if (data.Length < (startIndex + elementCount))
                 throw new ArgumentOutOfRangeException("elementCount", "This parameter must be a valid index within the array.");
             if (BufferUsage == BufferUsage.WriteOnly)
@@ -96,13 +96,13 @@ namespace Microsoft.Xna.Framework.Graphics
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
         {
             if (data == null)
-                throw new ArgumentNullException("data is null");
+                throw new ArgumentNullException("data");
             if (data.Length < (startIndex + elementCount))
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 
             var bufferSize = VertexCount * VertexDeclaration.VertexStride;
             if ((vertexStride > bufferSize) || (vertexStride < VertexDeclaration.VertexStride))
-                throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
+                throw new ArgumentOutOfRangeException("vertexStride","One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
 
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, vertexStride, options, bufferSize, elementSizeInBytes);
