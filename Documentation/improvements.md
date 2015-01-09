@@ -1,6 +1,3 @@
-### WORK IN PROGRESS
-Note that the MonoGame documentation project is currently a work in progress and applies to the **latest development build** of MonoGame.
-
 ###This page describes new API features which is available in current development release and does not exist in XNA.
 
 ##Graphics and window routines
