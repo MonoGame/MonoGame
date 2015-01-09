@@ -21,9 +21,9 @@ var vector2 = point.ToVector2();
 
 [Rectangle.Contains(ref Vector2,out bool)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_1) - float-based version of [Rectangle.Contains(ref Point,out bool)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_3)
 
-[Rectangle.Offset(float,float)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_3.html) - float-based version of [Rectangle.Offset(int,int)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset.html)
+[Rectangle.Offset(float,float)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Offset_1) - float-based version of [Rectangle.Offset(int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Offset)
 
-[Rectangle.Offset(Vector2)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Offset_1) - float-based version of [Rectangle.Offset(Point)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_2.html)
+[Rectangle.Offset(Vector2)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Offset_3) - float-based version of [Rectangle.Offset(Point)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Offset_2)
 
 [Rectangle.Size](http://www.monogame.net/documentation/?page=P_Microsoft_Xna_Framework_Rectangle_Size) - this property is a [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point) which contains width and height of this rectangle.
 
