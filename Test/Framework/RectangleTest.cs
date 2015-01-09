@@ -65,24 +65,24 @@ namespace MonoGame.Tests.Framework
             var p4 = new Point(63, 63);
             var p5 = new Point(64, 64);
 
+            bool result;
+
+            rectangle.Contains(ref p1, out result);
+            Assert.AreEqual(false, result);
+            rectangle.Contains(ref p2, out result);
+            Assert.AreEqual(true, result);
+            rectangle.Contains(ref p3, out result);
+            Assert.AreEqual(true, result);
+            rectangle.Contains(ref p4, out result);
+            Assert.AreEqual(true, result);
+            rectangle.Contains(ref p5, out result);
+            Assert.AreEqual(false, result);
+
             Assert.AreEqual(false, rectangle.Contains(p1));
             Assert.AreEqual(true, rectangle.Contains(p2));
             Assert.AreEqual(true, rectangle.Contains(p3));
             Assert.AreEqual(true, rectangle.Contains(p4));
             Assert.AreEqual(false, rectangle.Contains(p5));
-
-            bool result;
-
-            rectangle.Contains(ref p1,out result);
-            Assert.AreEqual(false, result);
-            rectangle.Contains(ref p2, out result);
-            Assert.AreEqual(true, result); 
-            rectangle.Contains(ref p3, out result);
-            Assert.AreEqual(true, result); 
-            rectangle.Contains(ref p4, out result);
-            Assert.AreEqual(true, result);
-            rectangle.Contains(ref p5, out result);
-            Assert.AreEqual(false, result);
         }
 #if !XNA
         [Test]
@@ -96,12 +96,6 @@ namespace MonoGame.Tests.Framework
             var p4 = new Vector2(63, 63);
             var p5 = new Vector2(64, 64);
 
-            Assert.AreEqual(false, rectangle.Contains(p1));
-            Assert.AreEqual(true, rectangle.Contains(p2));
-            Assert.AreEqual(true, rectangle.Contains(p3));
-            Assert.AreEqual(true, rectangle.Contains(p4));
-            Assert.AreEqual(false, rectangle.Contains(p5));
-
             bool result;
 
             rectangle.Contains(ref p1, out result);
@@ -114,6 +108,12 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(true, result);
             rectangle.Contains(ref p5, out result);
             Assert.AreEqual(false, result);
+
+            Assert.AreEqual(false, rectangle.Contains(p1));
+            Assert.AreEqual(true, rectangle.Contains(p2));
+            Assert.AreEqual(true, rectangle.Contains(p3));
+            Assert.AreEqual(true, rectangle.Contains(p4));
+            Assert.AreEqual(false, rectangle.Contains(p5));
         }
 
         [Test]
@@ -152,6 +152,38 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(false, rectangle.Contains(x5, y5));
         }
 #endif
+        [Test]
+        public void ContainsRectangle()
+        {
+            var rectangle = new Rectangle(0, 0, 64, 64);
+            var rect1 = new Rectangle(-1, -1, 32, 32);
+            var rect2 = new Rectangle(0, 0, 32, 32);
+            var rect3 = new Rectangle(0, 0, 64, 64);
+            var rect4 = new Rectangle(1, 1, 64, 64);
+
+            bool result;
+
+            rectangle.Contains(ref rect1, out result);
+
+            Assert.AreEqual(false, result);
+
+            rectangle.Contains(ref rect2, out result);
+
+            Assert.AreEqual(true, result);
+
+            rectangle.Contains(ref rect3, out result);
+
+            Assert.AreEqual(true, result);
+
+            rectangle.Contains(ref rect4, out result);
+
+            Assert.AreEqual(false, result);
+
+            Assert.AreEqual(false, rectangle.Contains(rect1));
+            Assert.AreEqual(true, rectangle.Contains(rect2));
+            Assert.AreEqual(true, rectangle.Contains(rect3));
+            Assert.AreEqual(false, rectangle.Contains(rect4));
+        }
 
         [Test]
         public void Inflate()
@@ -173,21 +205,21 @@ namespace MonoGame.Tests.Framework
             var second = new Rectangle(-32, -32, 64, 64);
             var expected = new Rectangle(0, 0, 32, 32);
 
-            // Fist overload testing(forward and backward)
-
-            Assert.AreEqual(expected, Rectangle.Intersect(first, second));
-            Assert.AreEqual(expected, Rectangle.Intersect(second, first));
-
-            // Second overload testing(forward and backward)
+            // First overload testing(forward and backward)
 
             Rectangle result;
-            Rectangle.Intersect(ref first,ref second, out result);
+            Rectangle.Intersect(ref first, ref second, out result);
 
             Assert.AreEqual(expected, result);
 
             Rectangle.Intersect(ref second, ref first, out result);
 
             Assert.AreEqual(expected, result);
+
+            // Second overload testing(forward and backward)
+
+            Assert.AreEqual(expected, Rectangle.Intersect(first, second));
+            Assert.AreEqual(expected, Rectangle.Intersect(second, first));           
         }
 
         [Test]
@@ -197,21 +229,21 @@ namespace MonoGame.Tests.Framework
             var second = new Rectangle(0, 0, 64, 64);
             var expected = new Rectangle(-64, -64, 128, 128);
 
-            // Fist overload testing(forward and backward)
-
-            Assert.AreEqual(expected, Rectangle.Union(first, second));
-            Assert.AreEqual(expected, Rectangle.Union(second, first));
-
-            // Second overload testing(forward and backward)
+            // First overload testing(forward and backward)
 
             Rectangle result;
-            Rectangle.Union(ref first,ref second, out result);
+            Rectangle.Union(ref first, ref second, out result);
 
             Assert.AreEqual(expected, result);
 
             Rectangle.Union(ref second, ref first, out result);
 
             Assert.AreEqual(expected, result);
+
+            // Second overload testing(forward and backward)
+
+            Assert.AreEqual(expected, Rectangle.Union(first, second));
+            Assert.AreEqual(expected, Rectangle.Union(second, first));
         }
         
         [Test]

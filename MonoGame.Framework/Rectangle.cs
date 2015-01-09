@@ -290,6 +290,16 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Gets whether or not the provided <see cref="Rectangle"/> lies within the bounds of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Rectangle"/> to check for inclusion in this <see cref="Rectangle"/>.</param>
+        /// <param name="result"><c>true</c> if the provided <see cref="Rectangle"/>'s bounds lie entirely inside this <see cref="Rectangle"/>; <c>false</c> otherwise. As an output parameter.</param>
+        public void Contains(ref Rectangle value,out bool result)
+        {
+            result = ((((this.X <= value.X) && ((value.X + value.Width) <= (this.X + this.Width))) && (this.Y <= value.Y)) && ((value.Y + value.Height) <= (this.Y + this.Height)));
+        }
+
+        /// <summary>
         /// Compares whether current instance is equal to specified <see cref="Object"/>.
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare.</param>
