@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Color Deserialize(string[] inputs, ref int index)
         {
-            // NOTE: The value is serialized in BGRA format.
+            // NOTE: The value is serialized in ARGB format.
             var value = uint.Parse(inputs[index++], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             return new Color(   (int)(value >> 16 & 0xFF),
                                 (int)(value >> 8 & 0xFF),
@@ -28,12 +28,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(Color value, List<string> results)
         {
-            // NOTE: The value is serialized in BGRA format.
-            var packed = (uint)((value.R << 16) |
-                                (value.G << 8) |
-                                (value.B << 0) |
-                                (value.A << 24));
-            results.Add(XmlConvert.ToString(packed));
+            // NOTE: The value is serialized in ARGB format.
+            results.Add(string.Format("{0:X}{1:X}{2:X}{3:X}", value.A, value.R, value.G, value.B));
         }
     }
 }

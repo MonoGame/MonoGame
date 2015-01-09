@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(IntermediateWriter output, ExternalReference<T> value, ContentSerializerAttribute format)
         {
-            throw new NotImplementedException();
+            output.WriteExternalReference(value);
         }
     }
 }

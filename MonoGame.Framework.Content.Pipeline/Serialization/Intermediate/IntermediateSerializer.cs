@@ -46,15 +46,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             { "string", typeof(string) }
         };
 
+        private static readonly Dictionary<Type, string> _typeAliasesReverse;
+
+        static IntermediateSerializer()
+        {
+            _typeAliasesReverse = _typeAliases.ToDictionary(x => x.Value, x => x.Key);
+        }
+
+        private IntermediateSerializer()
+        {
+            _scannedObjects = new List<object>();
+        }
+
         /// <summary>
         /// Maps "ShortName:" -> "My.Namespace.LongName." for type lookups.
         /// </summary>
         private Dictionary<string, string> _namespaceLookup;
 
+        /// <summary>
+        /// Maps "My.Namespace.LongName" -> "ShortName" for type lookups.
+        /// </summary>
+        private Dictionary<string, AliasedNamespace> _namespaceLookupReverse;
+
+        private class AliasedNamespace
+        {
+            public string Alias;
+            public string TypePrefix;
+        }
+
         private Dictionary<Type, ContentTypeSerializer> _serializers;
 
         private Dictionary<Type, Type> _genericSerializerTypes;
 
+        private readonly List<object> _scannedObjects;
 
         public static T Deserialize<T>(XmlReader input, string referenceRelocationPath)
         {
@@ -169,15 +193,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var serializer = new IntermediateSerializer();
             var writer = new IntermediateWriter(serializer, output, referenceRelocationPath);
             output.WriteStartElement("XnaContent");
-            
-            // TODO: Write namespaces?
+
+            serializer.WriteNamespaces(output, value);
 
             // Write the asset.
             var format = new ContentSerializerAttribute { ElementName = "Asset" };
-            writer.WriteObject(value, format);
+            writer.WriteObjectInternal(value, format, serializer.GetTypeSerializer(typeof(T)), typeof(object));
 
-            // TODO: Write the shared resources and external 
-            // references here!
+            // Process the shared resources and external references.
+            writer.WriteSharedResources();
+            writer.WriteExternalReferences();
 
             // Close the XnaContent element.
             output.WriteEndElement();
@@ -199,6 +224,132 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 _namespaceLookup.Add(reader.LocalName + ":", reader.Value + ".");
             }
+        }
+
+        private void WriteNamespaces<T>(XmlWriter writer, T value)
+        {
+            // Maps "My.Namespace.LongName" -> "ShortName" for type lookups.
+            _namespaceLookupReverse = new Dictionary<string, AliasedNamespace>();
+
+            var childNamespaces = new List<string>();
+            ContentTypeSerializer.ChildCallback onScanChild = (contentTypeSerializer, child) =>
+            {
+                if (child == null)
+                    return;
+
+                var childType = child.GetType();
+
+                if (contentTypeSerializer.TargetType == childType)
+                    return;
+
+                if (_typeAliasesReverse.ContainsKey(childType))
+                    return;
+
+                var childNamespace = childType.Namespace;
+
+                if (string.IsNullOrEmpty(childNamespace))
+                    return;
+
+                childNamespaces.Add(childNamespace);
+            };
+
+            // Force top-level object type to be included.
+            onScanChild(GetTypeSerializer(typeof(object)), value);
+
+            var serializer = GetTypeSerializer(typeof(T));
+            serializer.ScanChildren(this, onScanChild, value);
+
+            childNamespaces = childNamespaces.Distinct().ToList();
+
+            // Do first pass to determinate what our aliases are.
+            var sortedChildNamespaces = new List<string>(childNamespaces);
+            sortedChildNamespaces.Sort();
+            var tempAliases = new Dictionary<string, string>();
+            foreach (var childNamespace in sortedChildNamespaces)
+            {
+                var alias = FindAlias(tempAliases, childNamespace);
+                if (alias != null)
+                    tempAliases.Add(childNamespace, alias);
+            }
+
+            // Do second pass to calculate the TypePrefix for each alias.
+            foreach (var childNamespace in childNamespaces)
+            {
+                var alias = FindAvailableAlias(tempAliases, childNamespace, childNamespace);
+                if (alias != null)
+                    _namespaceLookupReverse.Add(childNamespace, alias);
+            }
+
+            var writtenAliases = new List<string>();
+            foreach (var kvp in _namespaceLookupReverse)
+            {
+                if (!string.IsNullOrEmpty(kvp.Value.TypePrefix))
+                    continue;
+                if (!writtenAliases.Contains(kvp.Value.Alias))
+                    writer.WriteAttributeString("xmlns", kvp.Value.Alias, null, kvp.Key);
+                writtenAliases.Add(kvp.Value.Alias);
+            }
+        }
+
+        private string FindAlias(Dictionary<string, string> aliases, string childNamespace)
+        {
+            if (string.IsNullOrEmpty(childNamespace))
+                return null;
+
+            var alias = childNamespace.Substring(childNamespace.LastIndexOf('.') + 1);
+            if (aliases.All(x => x.Value != alias))
+                return alias;
+
+            // Find the longest parent namespace.
+            if (aliases.Any(x => childNamespace.StartsWith(x.Key)))
+            {
+                string longestParentNamespace = string.Empty;
+                foreach (var kvp in aliases)
+                {
+                    if (childNamespace.StartsWith(kvp.Key) && kvp.Key.Length > longestParentNamespace.Length)
+                        longestParentNamespace = kvp.Key;
+                }
+                return aliases[longestParentNamespace];
+            }
+
+            return null;
+        }
+
+        private AliasedNamespace FindAvailableAlias(Dictionary<string, string> tempAliases, string childNamespace, string originalNamespace)
+        {
+            string alias;
+            if (tempAliases.TryGetValue(childNamespace, out alias))
+            {
+                if (alias == childNamespace.Substring(childNamespace.LastIndexOf('.') + 1))
+                    return new AliasedNamespace
+                    {
+                        Alias = alias,
+                        TypePrefix = string.Empty
+                    };
+
+                var namespaceParent = tempAliases
+                    .Where(x => x.Value == alias)
+                    .Select(x => x.Key)
+                    .OrderBy(x => x.Length)
+                    .First();
+                return new AliasedNamespace
+                {
+                    Alias = alias,
+                    TypePrefix = GetRelativeNamespace(namespaceParent, childNamespace) + "."
+                };
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns just the portion <paramref name="@namespace"/> relative to <paramref name="namespaceParent"/>.
+        /// For example, given namespaceParent=Foo.Bar and @namespace=Foo.Bar.Baz, will return Baz.
+        /// </summary>
+        private static string GetRelativeNamespace(string namespaceParent, string @namespace)
+        {
+            if (@namespace.StartsWith(namespaceParent))
+                return @namespace.Substring(namespaceParent.Length + 1);
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -235,5 +386,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             return foundType;
         }
-    }        
+
+        /// <summary>
+        /// Gets the (potentially) aliased name for any type.
+        /// </summary>
+        internal string GetTypeName(Type type)
+        {
+            string typeName;
+
+            // Shortcut for friendly C# names
+            if (_typeAliasesReverse.TryGetValue(type, out typeName))
+                return typeName;
+
+            // Look for aliased namespace.
+            if (!string.IsNullOrEmpty(type.Namespace))
+            {
+                AliasedNamespace namespaceAlias;
+                if (_namespaceLookupReverse.TryGetValue(type.Namespace, out namespaceAlias))
+                    return namespaceAlias.Alias + ":" + namespaceAlias.TypePrefix + type.Name;
+            }
+
+            return type.FullName;
+        }
+
+        internal bool AlreadyScanned(object value)
+        {
+            if (_scannedObjects.Contains(value))
+                return true;
+            _scannedObjects.Add(value);
+            return false;
+        }
+    }
 }

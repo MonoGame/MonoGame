@@ -24,7 +24,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         protected internal override void Serialize(TimeSpan value, List<string> results)
         {
             results.Add(XmlConvert.ToString(value));
-            
         }
     }
 }
