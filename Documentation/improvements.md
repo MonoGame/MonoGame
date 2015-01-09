@@ -1,4 +1,4 @@
-###New API features which are available in current development release and does not exist in XNA.
+The new API features which are available in the current development release and does not exist in XNA.
 
 ##Graphics and window routines
 
