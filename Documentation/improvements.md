@@ -1,4 +1,4 @@
-###This page describes new API features which is available in current development release and does not exist in XNA.
+###New API features which are available in current development release and does not exist in XNA.
 
 ##Graphics and window routines
 
@@ -11,10 +11,10 @@
 [MathHelper.Clamp(int,int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_MathHelper_Clamp_1) - this overload clamps integers instead floats which could be useful in some cases. You dont need to convert like this MathHelper.Clamp((float)integer,(float)min,(float)max) anymore.
 
 [Point.ToVector2()](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Point_ToVector2) - this is easy to use conversion from [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point) to [Vector2](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Vector2). Use it like this 
-
-    Point point = new Point(10,10);
-    var vector2 = point.ToVector2();
-
+```
+Point point = new Point(10,10);
+var vector2 = point.ToVector2();
+```
 [Rectangle.Contains(float,float)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_1) - float-based version of [Rectangle.Contains(int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains)
 
 [Rectangle.Contains(Vector2)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_4) - float-based version of [Rectangle.Contains(Point)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_2)
@@ -29,13 +29,15 @@
 
 [Vector2.ToPoint()](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Vector2_ToPoint) - this is easy to use conversion from [Vector2](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Vector2) to [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point). Use it like this 
 
-    Vector2 vector2 = new Vector2(10.01f,10.99f);
-    var point = vector2.ToPoint(); // point will be 10,10. 
+```
+Vector2 vector2 = new Vector2(10.01f,10.99f);
+var point = vector2.ToPoint(); // point will be 10,10.
+```
 
 ##Input
 
 [MouseState.Position](http://www.monogame.net/documentation/?page=P_Microsoft_Xna_Framework_Input_MouseState_Position) - property which returns a [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point) which contains X and Y parameters of MouseState. Before this change it is harder to obtain mouse position in a good way. You can now write something like this
-
-    spriteBatch.Draw(texture,mouseState.Position.ToVector2(),Color.White);
-
- and it works fine - your sprite will be drawed under cursor.
+```
+spriteBatch.Draw(texture,mouseState.Position.ToVector2(),Color.White);
+```
+and it works fine - your sprite will be drawed under cursor.
