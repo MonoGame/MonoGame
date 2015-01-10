@@ -4,6 +4,9 @@
     <Texture>
       <Reference>#External1</Reference>
     </Texture>
+    <Texture2>
+      <Reference>#External1</Reference>
+    </Texture2>
     <Shader>
       <Reference>#External2</Reference>
     </Shader>

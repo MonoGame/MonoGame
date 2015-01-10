@@ -102,16 +102,18 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void TheBasics()
         {
+            var nestedObject = new NestedClass
+            {
+                Name = "Shawn",
+                IsEnglish = true
+            };
             SerializeAndAssert("01_TheBasics.xml", new TheBasics
             {
                 PublicField = 1,
                 InternalField = 0,
                 GetSetProperty = "Hello World",
-                Nested = new NestedClass
-                {
-                    Name = "Shawn",
-                    IsEnglish = true
-                }
+                Nested = nestedObject,
+                Nested2 = nestedObject
             });
         }
 
@@ -323,9 +325,11 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void ExternalReferences()
         {
+            var grassExternalReference = new ExternalReference<Texture2D>(Path.GetFullPath("Assets/Xml/grass.tga"));
             SerializeAndAssert("17_ExternalReferences.xml", new ExternalReferences
             {
-                Texture = new ExternalReference<Texture2D>(Path.GetFullPath("Assets/Xml/grass.tga")),
+                Texture = grassExternalReference,
+                Texture2 = grassExternalReference,
                 Shader = new ExternalReference<Effect>(Path.GetFullPath("Assets/Xml/foliage.fx"))
             });
         }

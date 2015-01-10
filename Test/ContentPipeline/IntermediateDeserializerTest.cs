@@ -114,6 +114,10 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.NotNull(theBasics.Nested);
                 Assert.AreEqual("Shawn", theBasics.Nested.Name);
                 Assert.AreEqual(true, theBasics.Nested.IsEnglish);
+                Assert.NotNull(theBasics.Nested2);
+                Assert.AreEqual("Shawn", theBasics.Nested2.Name);
+                Assert.AreEqual(true, theBasics.Nested2.IsEnglish);
+                Assert.AreNotSame(theBasics.Nested, theBasics.Nested2);
             });
         }
 
@@ -353,6 +357,9 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.NotNull(externalReferences.Texture);
                 Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.NotNull(externalReferences.Texture2);
+                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.AreNotSame(externalReferences.Texture, externalReferences.Texture2);
                 Assert.NotNull(externalReferences.Shader);
                 Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.fx"));
             });

@@ -31,7 +31,13 @@ public class TheBasics
 
     public string SetOnlyProperty { set; private get; }
 
-    public NestedClass Nested = new NestedClass();
+    public NestedClass Nested;
+    public NestedClass Nested2;
+
+    public TheBasics()
+    {
+        Nested = Nested2 = new NestedClass();
+    }
 }
 
 public class NestedClass
@@ -245,6 +251,7 @@ public class CircularLinked
 public class ExternalReferences
 {
     public ExternalReference<Texture2D> Texture;
+    public ExternalReference<Texture2D> Texture2;
     public ExternalReference<Effect> Shader;
 }
 #endregion

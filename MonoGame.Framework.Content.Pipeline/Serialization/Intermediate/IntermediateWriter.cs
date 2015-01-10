@@ -12,9 +12,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     public sealed class IntermediateWriter
     {
-        private readonly List<object> _writtenObjects;
+        private readonly Stack<object> _currentObjectStack;
         private readonly Dictionary<object, string> _sharedResources;
-        private readonly List<ExternalReference> _externalReferences;
+        private readonly Dictionary<object, ExternalReference> _externalReferences;
         private readonly string _filePath;
 
         internal IntermediateWriter(IntermediateSerializer serializer, XmlWriter xmlWriter, string filePath)
@@ -23,9 +23,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Xml = xmlWriter;
             _filePath = filePath;
 
-            _writtenObjects = new List<object>();
+            _currentObjectStack = new Stack<object>();
             _sharedResources = new Dictionary<object, string>();
-            _externalReferences = new List<ExternalReference>();
+            _externalReferences = new Dictionary<object, ExternalReference>();
         }
 
         public XmlWriter Xml { get; private set; }
@@ -34,13 +34,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public void WriteExternalReference<T>(ExternalReference<T> value)
         {
-            var externalReference = new ExternalReference
-            {
-                ID = "#External" + (_externalReferences.Count + 1),
-                TargetType = typeof(T).FullName,
-                FileName = MakeRelativePath(value.Filename)
-            };
-            _externalReferences.Add(externalReference);
+            ExternalReference externalReference;
+            if (!_externalReferences.TryGetValue(value, out externalReference))
+                _externalReferences.Add(value, externalReference = new ExternalReference
+                {
+                    ID = "#External" + (_externalReferences.Count + 1),
+                    TargetType = typeof(T).FullName,
+                    FileName = MakeRelativePath(value.Filename)
+                });
 
             Xml.WriteElementString("Reference", externalReference.ID);
         }
@@ -74,16 +75,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (format.Optional && (value == null || typeSerializer.ObjectIsEmpty(value)))
                 return;
 
+            var isReferenceObject = false;
+            if (value != null && !typeSerializer.TargetType.IsValueType)
+            {
+                if (_currentObjectStack.Contains(value))
+                    throw new InvalidOperationException("Cyclic reference found during serialization. You may be missing a [ContentSerializer(SharedResource=true)] attribute.");
+                _currentObjectStack.Push(value);
+                isReferenceObject = true;
+            }
+
             if (!format.FlattenContent)
             {
                 Xml.WriteStartElement(format.ElementName);
-
-                if (value != null && !typeSerializer.TargetType.IsValueType)
-                {
-                    if (_writtenObjects.Contains(value))
-                        throw new InvalidOperationException("Cyclic reference found during serialization. You may be missing a [ContentSerializer(SharedResource=true)] attribute.");
-                    _writtenObjects.Add(value);
-                }
 
                 if (value == null)
                 {
@@ -107,6 +110,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             if (!format.FlattenContent)
                 Xml.WriteEndElement();
+
+            if (isReferenceObject)
+                _currentObjectStack.Pop();
         }
 
         private static bool IsNullableType(Type type)
@@ -190,7 +196,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             Xml.WriteStartElement("ExternalReferences");
 
-            foreach (var externalReference in _externalReferences)
+            foreach (var externalReference in _externalReferences.Values)
             {
                 Xml.WriteStartElement("ExternalReference");
                 
