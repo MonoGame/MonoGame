@@ -123,13 +123,13 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (IndexElementSize)
             {
                 case IndexElementSize.SixteenBits:
-                    if (type != typeof(short) || type != typeof(ushort))
+                    if (type != typeof(short) && type != typeof(ushort))
                     {
                         throw new ArrayTypeMismatchException("Invalid type using when short or ushort need to be used.");
                     }
                     break;
                 case IndexElementSize.ThirtyTwoBits:
-                    if (type != typeof(int) || type != typeof(uint))
+                    if (type != typeof(int) && type != typeof(uint))
                     {
                         throw new ArrayTypeMismatchException("Invalid type using when int or uint need to be used.");
                     }
