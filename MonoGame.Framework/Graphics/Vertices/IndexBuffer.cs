@@ -119,22 +119,6 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data.Length < (startIndex + elementCount))
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 
-            var type = typeof (T);
-            switch (IndexElementSize)
-            {
-                case IndexElementSize.SixteenBits:
-                    if (type != typeof(short) && type != typeof(ushort))
-                    {
-                        throw new ArrayTypeMismatchException("Invalid type using when short or ushort need to be used.");
-                    }
-                    break;
-                case IndexElementSize.ThirtyTwoBits:
-                    if (type != typeof(int) && type != typeof(uint))
-                    {
-                        throw new ArrayTypeMismatchException("Invalid type using when int or uint need to be used.");
-                    }
-                    break;
-            }
             PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options);
         }
 	}
