@@ -85,7 +85,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Sets the vertex buffer data, specifying the index at which to start copying from the source data array,
-        /// the number of elements to copy from the source data array, and the space to leave between elements from the source data array.
+        /// the number of elements to copy from the source data array, 
+        /// and how far apart elements from the source data array should be when they are copied into the vertex buffer.
         /// </summary>
         /// <typeparam name="T">Type of elements in the data array.</typeparam>
         /// <param name="offsetInBytes">Offset in bytes from the beginning of the vertex buffer to the start of the copied data.</param>
@@ -95,7 +96,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
         /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/> 
         /// must be within the <paramref name="data"/> array bounds.</param>
-        /// <param name="vertexStride">The space to leave between elements copied from <paramref name="data"/>.
+        /// <param name="vertexStride">Specifies how far apart, in bytes, elements from <paramref name="data"/> should be when 
+        /// they are copied into the vertex buffer.
+        /// In almost all cases this should be <c>sizeof(T)</c>, to create a tightly-packed vertex buffer.
+        /// If you specify <c>sizeof(T)</c>, elements from <paramref name="data"/> will be copied into the 
+        /// vertex buffer with no padding between each element.
+        /// If you specify a value greater than <c>sizeof(T)</c>, elements from <paramref name="data"/> will be copied 
+        /// into the vertex buffer with padding between each element.
         /// If you specify <c>0</c> for this parameter, it will be treated as if you had specified <c>sizeof(T)</c>.
         /// With the exception of <c>0</c>, you must specify a value greater than or equal to <c>sizeof(T)</c>.</param>
         /// <example>
@@ -115,7 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </example>
         /// <remarks>
         /// If you provide a <c>byte[]</c> in the <paramref name="data"/> parameter, then you should almost certainly
-        /// set <paramref name="vertexStride"/> to <c>1</c>, to avoid leaving any space between the <c>byte</c> values
+        /// set <paramref name="vertexStride"/> to <c>1</c>, to avoid leaving any padding between the <c>byte</c> values
         /// when they are copied into the vertex buffer.
         /// </remarks>
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
