@@ -3,12 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.CodeDom;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NUnit.Framework.Constraints;
 
 namespace MonoGame.Tests.Visual
 {
@@ -168,6 +166,7 @@ namespace MonoGame.Tests.Visual
 
         //[TestCase(true)]
         [TestCase(false, 1, -1, false, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 0, 0, false, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 80, 0, true, null)]
         [TestCase(false, 80, 1, true, null)]
         [TestCase(false, 1, 2, true, null)]
@@ -199,6 +198,39 @@ namespace MonoGame.Tests.Visual
                     Assert.AreEqual(
                         savedDataBytes.Take(elementCount).ToArray(), 
                         readDataBytes.Take(elementCount).ToArray());
+                }
+            };
+            Game.RunOneFrame();
+        }
+
+        //[TestCase(true)]
+        [TestCase(false, 1, 20, true, null)]
+        [TestCase(false, 3, 20, true, null)]
+        [TestCase(false, 4, 0, true, null)]
+        [TestCase(false, 4, 16, false, typeof(ArgumentOutOfRangeException))]
+        [TestCase(false, 4, 20, true, null)]
+        [TestCase(false, 5, 20, false, typeof(ArgumentOutOfRangeException))]
+        public void SetDataStructWithElementCountAndVertexStride(bool dynamic, int elementCount, int vertexStride, bool shouldSucceed, Type expectedExceptionType)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = (dynamic)
+                    ? new DynamicVertexBuffer(Game.GraphicsDevice, typeof(VertexPositionTexture), savedData.Length,
+                        BufferUsage.None)
+                    : new VertexBuffer(Game.GraphicsDevice, typeof(VertexPositionTexture), savedData.Length,
+                        BufferUsage.None);
+
+                if (!shouldSucceed)
+                    Assert.Throws(expectedExceptionType, () => vertexBuffer.SetData(0, savedData, 0, elementCount, vertexStride));
+                else
+                {
+                    vertexBuffer.SetData(0, savedData, 0, elementCount, vertexStride);
+
+                    var readData = new VertexPositionTexture[savedData.Length];
+                    vertexBuffer.GetData(0, readData, 0, elementCount, vertexStride);
+                    Assert.AreEqual(
+                        savedData.Take(elementCount).ToArray(),
+                        readData.Take(elementCount).ToArray());
                 }
             };
             Game.RunOneFrame();
