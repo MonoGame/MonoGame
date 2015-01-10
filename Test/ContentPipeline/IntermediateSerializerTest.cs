@@ -70,6 +70,11 @@ namespace MonoGame.Tests.ContentPipeline
 
             var actualXml = Serialize(filePath, value);
 
+            // Normalize line endings - git on build server seems to set
+            // core.autocrlf to false.
+            expectedXml = expectedXml.Replace(Environment.NewLine, "\n");
+            actualXml = actualXml.Replace(Environment.NewLine, "\n");
+
             Assert.AreEqual(expectedXml, actualXml);
         }
 
