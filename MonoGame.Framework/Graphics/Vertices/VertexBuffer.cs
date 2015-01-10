@@ -54,13 +54,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+
+            if (vertexStride == 0)
+                vertexStride = elementSizeInBytes;
+
             if (data == null)
                 throw new ArgumentNullException("data", "This method does not accept null for this parameter.");
             if (data.Length < (startIndex + elementCount))
                 throw new ArgumentOutOfRangeException("elementCount", "This parameter must be a valid index within the array.");
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
-			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
+			if (elementCount > 1 && (elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
                 throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
 
             PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride);
@@ -85,26 +90,34 @@ namespace Microsoft.Xna.Framework.Graphics
         		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
 		}
 		
         public void SetData<T>(T[] data) where T : struct
         {
-            SetDataInternal<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.None);
+            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
         }
 
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
         {
             if (data == null)
-                throw new ArgumentNullException("data is null");
-            if (data.Length < (startIndex + elementCount))
-                throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
-
-            var bufferSize = VertexCount * VertexDeclaration.VertexStride;
-            if ((vertexStride > bufferSize) || (vertexStride < VertexDeclaration.VertexStride))
-                throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
+                throw new ArgumentNullException("data", "This method does not accept null for this parameter.");
 
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var bufferSize = VertexCount * VertexDeclaration.VertexStride;
+
+            if (vertexStride == 0)
+                vertexStride = elementSizeInBytes;
+
+            if (startIndex + elementCount > data.Length || elementCount <= 0)
+                throw new ArgumentOutOfRangeException("The array specified in the data parameter is not the correct size for the amount of data requested.");
+            if (elementCount > 1 && (elementCount * vertexStride > bufferSize))
+                throw new InvalidOperationException("The vertex stride is larger than the vertex buffer.");
+            if (vertexStride < elementSizeInBytes)
+                throw new ArgumentOutOfRangeException("The vertex stride must be greater than or equal to the size of the specified data (" + elementSizeInBytes + ").");            
+
             PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, vertexStride, options, bufferSize, elementSizeInBytes);
         }
     }
