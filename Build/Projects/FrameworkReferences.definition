@@ -3,8 +3,8 @@
 
   <Platform Type="iOS">
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
-    <Reference Include="OpenTK" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="OpenTK-1.0" />
   </Platform>
 
   <Platform Type="Linux">
