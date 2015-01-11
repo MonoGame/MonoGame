@@ -299,8 +299,7 @@ namespace Microsoft.Xna.Framework.Input
 
             var leftStick = c.LeftStick.ReadAxisPair(device);
             var rightStick = c.RightStick.ReadAxisPair(device);
-            GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(leftStick.X, leftStick.Y), new Vector2(rightStick.X, rightStick.Y));
-            sticks.ApplyDeadZone(deadZone, DeadZoneSize);
+            GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(leftStick.X, leftStick.Y), new Vector2(rightStick.X, rightStick.Y), deadZone);
             GamePadTriggers triggers = new GamePadTriggers(c.LeftTrigger.ReadFloat(device), c.RightTrigger.ReadFloat(device));
 			Buttons buttonState = ReadButtons(device, c, DeadZoneSize);
 			buttonState |= StickToButtons(sticks.Left, Buttons.LeftThumbstickLeft, Buttons.LeftThumbstickRight, Buttons.LeftThumbstickUp, Buttons.LeftThumbstickDown, DeadZoneSize);

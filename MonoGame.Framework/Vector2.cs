@@ -837,7 +837,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="Vector2"/>.</returns>
         public override string ToString()
         {
-            return "{{X:" + X + " Y:" + Y + "}}";
+            return "{X:" + X + " Y:" + Y + "}";
         }
 
         /// <summary>

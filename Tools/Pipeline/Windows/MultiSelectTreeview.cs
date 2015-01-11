@@ -586,7 +586,9 @@ namespace MonoGame.Tools.Pipeline
 			ClearSelectedNodes();
 			ToggleNode( node, true );
 			node.EnsureVisible();
-		}
+
+			OnAfterSelect( new TreeViewEventArgs( _selectedNode ) );
+        }
 
 		private void ToggleNode( TreeNode node, bool bSelectNode )
 		{

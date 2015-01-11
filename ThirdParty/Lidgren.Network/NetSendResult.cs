@@ -8,9 +8,9 @@ namespace Lidgren.Network
 	public enum NetSendResult
 	{
 		/// <summary>
-		/// Message failed to enqueue; for example if there's no connection in place
+		/// Message failed to enqueue because there is no connection
 		/// </summary>
-		Failed = 0,
+		FailedNotConnected = 0,
 
 		/// <summary>
 		/// Message was immediately sent

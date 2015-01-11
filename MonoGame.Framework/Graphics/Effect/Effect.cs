@@ -89,15 +89,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			// This might need to change slightly if/when we support
 			// shared constant buffers as 'new' should return unique
 			// effects without any shared instance state.
-            
+ 
+#if PSM 
+			var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
+			int headerSize=0;
+#else
             //Read the header
             MGFXHeader header = ReadHeader(effectCode);
+			var effectKey = header.EffectKey;
+			int headerSize = header.HeaderSize;
+#endif
+
             // First look for it in the cache.
             //
             Effect cloneSource;
-            if (!EffectCache.TryGetValue(header.EffectKey, out cloneSource))
+            if (!EffectCache.TryGetValue(effectKey, out cloneSource))
             {
-                using (var stream = new MemoryStream(effectCode, header.HeaderSize, effectCode.Length - header.HeaderSize, false))
+                using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
             	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
@@ -105,7 +113,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     cloneSource.ReadEffect(reader);
 
                 // Cache the effect for later in its original unmodified state.
-                    EffectCache.Add(header.EffectKey, cloneSource);
+                    EffectCache.Add(effectKey, cloneSource);
                 }
             }
 

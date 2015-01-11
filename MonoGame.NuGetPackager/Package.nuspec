@@ -2,20 +2,19 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>MonoGame</id>
-        <version>3.2.2</version>
+        <version>3.2.3</version>
         <title>MonoGame</title>
         <authors>Simon-darkside-Jackson,Michael Cummings</authors>
         <owners>MonoGameTeam</owners>
         <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
         <projectUrl>http://monogame.net/</projectUrl>
-        <iconUrl>http://www.monogame.net/wp-content/themes/monogame/images/monogame.png</iconUrl>
+        <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
       The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
-        <releaseNotes>Updated dev release - 21 May 2014 
-**Note, Contains Project templates for WinGL, Win8, WP8 
-new experimental iOS / Android / Mac now also included</releaseNotes>
+        <releaseNotes>Added the Windows Phone 8.1 template
+		Does not include additional setup for the Content Builder tool.  See the readme for MonoGame.Binaries for more information </releaseNotes>
         <copyright>Copyright  2013</copyright>
         <language>en-US</language>
         <dependencies>
@@ -40,6 +39,10 @@ new experimental iOS / Android / Mac now also included</releaseNotes>
         <file src="content\wp8\GamePage.xaml.cs.pp" target="content\wp8\GamePage.xaml.cs.pp" />
         <file src="content\wp8\GamePage.xaml.pp" target="content\wp8\GamePage.xaml.pp" />
         <file src="content\Game1.cs.pp" target="content\wp8\Game1.cs.pp" />
+        <file src="content\wpa81\App.xaml.cs.pp" target="content\wpa81\App.xaml.cs.pp" />
+        <file src="content\wpa81\GamePage.xaml.cs.pp" target="content\wpa81\GamePage.xaml.cs.pp" />
+        <file src="content\wpa81\GamePage.xaml.pp" target="content\wpa81\GamePage.xaml.pp" />
+        <file src="content\Game1.cs.pp" target="content\wpa81\Game1.cs.pp" />
 		<file src="readme\MonoGame\readme.txt" target="" />
     </files>
 </package>

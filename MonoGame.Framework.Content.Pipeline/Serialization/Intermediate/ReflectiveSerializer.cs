@@ -30,13 +30,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             info = new ElementInfo();
 
             // Are we ignoring this property?
-            if (ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute)) != null)
+            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null)
                 return false;
 
             var prop = member as PropertyInfo;
             var field = member as FieldInfo;
-            
-            var attrib = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
+
+            var attrib = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
             if (attrib != null)
             {
                 // Store the attribute for later use.

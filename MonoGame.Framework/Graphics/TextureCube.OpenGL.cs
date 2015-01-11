@@ -28,12 +28,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Threading.BlockOnUIThread(() =>
             {
-#if ANDROID
-			GL.GenTextures(1, ref this.glTexture);
-#else
             GL.GenTextures(1, out this.glTexture);
-#endif
-            GraphicsExtensions.CheckGLError();
+
+			GraphicsExtensions.CheckGLError();
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,

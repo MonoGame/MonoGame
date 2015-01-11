@@ -46,11 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 //GLExt.Oes.GenVertexArrays(1, out this.vao);
                 //GLExt.Oes.BindVertexArray(this.vao);
-#if ANDROID
-                GL.GenBuffers(1, ref this.vbo);
-#else
                 GL.GenBuffers(1, out this.vbo);
-#endif
                 GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
                 GraphicsExtensions.CheckGLError();
@@ -173,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                GraphicsDevice.AddDisposeAction(() =>
+                Threading.BlockOnUIThread(() =>
                 {
                     GL.DeleteBuffers(1, ref vbo);
                     GraphicsExtensions.CheckGLError();

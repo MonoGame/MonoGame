@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework
 
             // Do we need to initialize the window event handlers?
             if (_windowEvents == null && Window.Current != null)
-                _windowEvents = new InputEvents(Window.Current.CoreWindow, SharedGraphicsDeviceManager.Current.SwapChainBackgroundPanel);
+                _windowEvents = new InputEvents(Window.Current.CoreWindow, SharedGraphicsDeviceManager.Current.SwapChainBackgroundPanel, MetroGamePlatform.TouchQueue);
             if (_windowEvents != null)
                 _windowEvents.UpdateState();
 

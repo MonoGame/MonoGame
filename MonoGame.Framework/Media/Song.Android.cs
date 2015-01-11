@@ -20,6 +20,12 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan position;
         private Android.Net.Uri assetUri;
 
+        [CLSCompliant(false)]
+        public Android.Net.Uri AssetUri
+        {
+            get { return this.assetUri; }
+        }
+
         static Song()
         {
             _androidPlayer = new Android.Media.MediaPlayer();

@@ -2,20 +2,20 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>MonoGame.Binaries.Net</id>
-        <version>3.2.2-alpha</version>
+        <version>3.2.3-alpha</version>
         <title>MonoGame.Binaries.Net</title>
         <authors>Simon-darkside-Jackson,Michael Cummings</authors>
         <owners>MonoGameTeam</owners>
         <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
         <projectUrl>http://monogame.net/</projectUrl>
-        <iconUrl>http://www.monogame.net/wp-content/themes/monogame/images/monogame.png</iconUrl>
+        <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
       The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
-        <releaseNotes>Updated dev release - 21 May 2014 
+        <releaseNotes>Updated dev release - 10th December 2014 
 		This package is for the separated .Net and .GamerServices namespaces
-		Also included is the version of Lidgren for Monogame</releaseNotes>
+		Also included is the latest version of Lidgren for Monogame</releaseNotes>
         <copyright>Copyright  2013</copyright>
         <language>en-US</language>
 		<dependencies>
@@ -23,9 +23,9 @@
         </dependencies>
     </metadata>
     <files>
-        <file src="..\MonoGame.Framework\bin\Android\AnyCPU\Release\Lidgren.Network.dll" target="build\MonoAndroid\Lidgren.Network.dll" />
+        <file src="build\MonoAndroid\Lidgren.Network.dll" target="build\MonoAndroid\Lidgren.Network.dll" />
         <file src="build\MonoAndroid\MonoGame.Net.targets" target="build\MonoAndroid\MonoGame.Binaries.Net.targets" />
-        <file src="..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.Net.dll" target="build\MonoAndroid\MonoGame.Framework.Net.dll" />
+        <file src="build\MonoAndroid\MonoGame.Framework.Net.dll" target="build\MonoAndroid\MonoGame.Framework.Net.dll" />
         <file src="build\MonoMac\Lidgren.Network.dll" target="build\MonoMac\Lidgren.Network.dll" />
         <file src="build\MonoMac\MonoGame.Net.targets" target="build\MonoMac\MonoGame.Binaries.Net.targets" />
         <file src="build\MonoMac\MonoGame.Framework.Net.dll" target="build\MonoMac\MonoGame.Net.Framework.dll" />
@@ -55,6 +55,10 @@
         <file src="..\MonoGame.Framework\Bin\WindowsPhone\ARM\Release\MonoGame.Framework.Net.dll" target="build\wp8\ARM\MonoGame.Framework.Net.dll" />
         <file src="..\MonoGame.Framework\Bin\WindowsPhone\x86\Release\MonoGame.Framework.net.dll" target="build\wp8\x86\MonoGame.Framework.net.dll" />
         <file src="build\wp8\MonoGame.Net.targets" target="build\wp8\MonoGame.Binaries.Net.targets" />
+        <file src="..\MonoGame.Framework\Bin\WindowsPhone81\AnyCPU\Release\MonoGame.Framework.Net.dll" target="build\wpa81\AnyCPU\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\Bin\WindowsPhone81\AnyCPU\Release\MonoGame.Framework.Net.pri" target="build\wpa81\AnyCPU\MonoGame.Framework.Net.pri" />
+        <file src="..\MonoGame.Framework\Bin\WindowsPhone81\AnyCPU\Release\Themes\generic.xbf" target="build\wpa81\AnyCPU\MonoGame.Framework\Themes\Generic.xbf" />
+        <file src="build\wpa81\MonoGame.Net.targets" target="build\wpa81\MonoGame.Binaries.Net.targets" />
 		<file src="readme\MonoGame.Binaries.Net\readme.txt" target="" />
 	</files>
 </package>

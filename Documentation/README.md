@@ -14,12 +14,12 @@ First some general rules one should follow when contributing documentation to th
 Breaking these rules can result in your contribution being rejected.
 
 ## Getting Started
-TODO!
+You can create and edit documentation right from the web browser without needing to install Git or ever leave the GitHub site.
 
- - Fork the MonoGame repo.
- - Create a branch to work from.
- - Use the GitHub markup editor from the browser.
- - Submit pull requests early and often.
+ - [Fork the MonoGame repo](https://help.github.com/articles/fork-a-repo/).
+ - [Create a new branch](https://help.github.com/articles/creating-and-deleting-branches-within-your-repository/) from `develop` and make your changes only in that branch.
+ - [Create a new file](https://help.github.com/articles/creating-new-files/) or [edit an existing one](https://help.github.com/articles/editing-files-in-your-repository/) using the GitHub markup editor.
+ - [Submit pull requests](https://help.github.com/articles/creating-a-pull-request/) early and often to merge your documentation changes.
 
 ## Style Guide
 Before you contribute any documentation you should learn a bit about what we expect out of the different types of documentation.

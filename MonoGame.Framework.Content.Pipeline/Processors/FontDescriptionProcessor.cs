@@ -47,12 +47,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #endif
 				
 			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
-			var directories = new string[] { directory, 
-				"/Library/Fonts",
+
+			List<string> directories = new List<string>();
+			directories.Add(directory);
+			directories.Add("/Library/Fonts");
 #if WINDOWS
-				fontDirectory,
+			directories.Add(fontDirectory);
 #endif
-			};
+
+#if LINUX
+			directories.Add("/usr/share/fonts/truetype");
+			string[] subdirectories = Directory.GetDirectories ("/usr/share/fonts/truetype");
+
+			for(int i = 0;i < subdirectories.Length;i++)
+				directories.Add(subdirectories[i]);
+#endif
 
 			foreach( var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
@@ -92,7 +101,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
+			    var compressed = TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed;
+                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, compressed, compressed);
 
 				//systemBitmap.Save ("fontglyphs.png");
 
@@ -120,7 +130,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
 			    systemBitmap.Dispose();
 
-                if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed)
+                if (compressed)
                 {
                     GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
                 }

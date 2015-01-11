@@ -18,24 +18,22 @@ namespace Microsoft.Xna.Framework.Media
         private static AlbumCollection albumCollection;
         private static SongCollection songCollection;
 
-        static MediaLibrary()
-        {
-            musicFolder = KnownFolders.MusicLibrary;
-        }
-
         private void PlatformLoad(Action<int> progressCallback)
         {
-            List<StorageFile> files = new List<StorageFile>();
-            this.GetAllFiles(musicFolder, files);
-
-            List<Song> songList = new List<Song>();
-            List<Album> albumList = new List<Album>();
-
             Task.Run(async () =>
             {
-                Dictionary<string, Artist> artists = new Dictionary<string, Artist>();
-                Dictionary<string, Album> albums = new Dictionary<string, Album>();
-                Dictionary<string, Genre> genres = new Dictionary<string, Genre>();
+                if (musicFolder == null)
+                    musicFolder = KnownFolders.MusicLibrary;
+            
+                var files = new List<StorageFile>();
+                await this.GetAllFiles(musicFolder, files);
+
+                var songList = new List<Song>();
+                var albumList = new List<Album>();
+
+                var artists = new Dictionary<string, Artist>();
+                var albums = new Dictionary<string, Album>();
+                var genres = new Dictionary<string, Genre>();
 
                 var cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("MediaLibrary.cache", CreationCollisionOption.OpenIfExists);
                 var cache = new Dictionary<string, MusicProperties>();
@@ -118,23 +116,23 @@ namespace Microsoft.Xna.Framework.Media
                         }
                     }
                 }
+
+                if (progressCallback != null)
+                    progressCallback.Invoke(100);
+
+                albumCollection = new AlbumCollection(albumList);
+                songCollection = new SongCollection(songList);
             }).Wait();
-
-            if (progressCallback != null)
-                progressCallback.Invoke(100);
-
-            albumCollection = new AlbumCollection(albumList);
-            songCollection = new SongCollection(songList);
         }
 
-        private void GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
+        private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
         {
-            foreach (var file in Task.Run(async () => await storageFolder.GetFilesAsync()).Result)
+            foreach (var file in await storageFolder.GetFilesAsync())
                 if (file.ContentType.StartsWith("audio") && !file.ContentType.EndsWith("url"))
                     musicFiles.Add(file);
 
-            foreach (var folder in Task.Run(async () => await storageFolder.GetFoldersAsync()).Result)
-                this.GetAllFiles(folder, musicFiles);
+            foreach (var folder in await storageFolder.GetFoldersAsync())
+                await this.GetAllFiles(folder, musicFiles);
         }
 
         private AlbumCollection PlatformGetAlbums()

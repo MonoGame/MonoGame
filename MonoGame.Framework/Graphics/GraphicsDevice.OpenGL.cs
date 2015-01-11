@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             MaxTextureSlots = 16;
 
-#if ANDROID || IOS
+#if  IOS
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -333,7 +333,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if GLES && !ANGLE
+#if GLES && !ANGLE && !ANDROID
 			GL.Clear((uint)bufferMask);
 #else
 			GL.Clear(bufferMask);
@@ -372,7 +372,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// This allows GL resources to be disposed from other threads, such as the finalizer.
         /// </summary>
         /// <param name="disposeAction">The action to execute for the dispose.</param>
-        static internal void AddDisposeAction(Action disposeAction)
+        static private void AddDisposeAction(Action disposeAction)
         {
             if (disposeAction == null)
                 throw new ArgumentNullException("disposeAction");

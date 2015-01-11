@@ -70,6 +70,8 @@ namespace MonoGame.Tools.Pipeline
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
+            InitOutputWindowContextMenu();
+
             Form = this;
         }
 
@@ -91,6 +93,26 @@ namespace MonoGame.Tools.Pipeline
 
             _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
             _controller.Selection.Modified += OnSelectionModified;
+        }
+
+        private void InitOutputWindowContextMenu()
+        {
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem miCopy = new MenuItem("&Copy");
+            miCopy.Click += (o, a) =>
+            {
+                if (!string.IsNullOrEmpty(_outputWindow.SelectedText))
+                    Clipboard.SetText(_outputWindow.SelectedText);
+            };
+
+            MenuItem miSelectAll = new MenuItem("&Select all");
+            miSelectAll.Click += (o, a) => _outputWindow.SelectAll();
+
+            contextMenu.MenuItems.Add(miCopy);
+            contextMenu.MenuItems.Add(miSelectAll);
+
+            _outputWindow.ContextMenu = contextMenu;
         }
 
         public void OnTemplateDefined(ContentItemTemplate template)
@@ -175,34 +197,39 @@ namespace MonoGame.Tools.Pipeline
                 var node = _treeView.GetNodeAt(p);
                 if (node != null)
                 {
-                    if (!_treeView.SelectedNodes.Contains(node))
-                    {
-                        _treeView.SelectedNode = node;
-                    }
-
-                    if (node.Tag is ContentItem)
-                    {
-                        _treeAddItemMenuItem.Visible = false;
-                        _treeNewItemMenuItem.Visible = false;
-                    }
-                    else
-                    {
-                        _treeAddItemMenuItem.Visible = true;
-                        _treeNewItemMenuItem.Visible = true;
-                    }
-
-                    if (node.Tag is FolderItem)
-                    {
-                        _treeOpenFileMenuItem.Visible = false;
-                    }
-                    else
-                    {
-                        _treeOpenFileMenuItem.Visible = true;
-                    }
-
-                    _treeContextMenu.Show(_treeView, p);
+                    TreeViewShowContextMenu(node, p);
                 }
             }
+        }
+
+        private void TreeViewShowContextMenu(TreeNode node, Point contextMenuLocation)
+        {
+            if (!_treeView.SelectedNodes.Contains(node))
+            {
+                _treeView.SelectedNode = node;
+            }
+
+            if (node.Tag is ContentItem)
+            {
+                _treeAddItemMenuItem.Visible = false;
+                _treeNewItemMenuItem.Visible = false;
+            }
+            else
+            {
+                _treeAddItemMenuItem.Visible = true;
+                _treeNewItemMenuItem.Visible = true;
+            }
+
+            if (node.Tag is FolderItem)
+            {
+                _treeOpenFileMenuItem.Visible = false;
+            }
+            else
+            {
+                _treeOpenFileMenuItem.Visible = true;
+            }
+
+            _treeContextMenu.Show(_treeView, contextMenuLocation);
         }
 
         private void TreeViewOnNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs args)
@@ -223,14 +250,15 @@ namespace MonoGame.Tools.Pipeline
             foreach (var project in History.Default.ProjectHistory)
             {
                 var recentItem = new ToolStripMenuItem(project);
-                recentItem.Click += (sender, args) =>
-                {
-                    _controller.OpenProject(project);
-                };
+
+                // We need a local to make the delegate work correctly.
+                var localProject = project;
+                recentItem.Click += (sender, args) => _controller.OpenProject(localProject);
 
                 _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
             }
 
+            _openRecentMenuItem.Enabled = (_openRecentMenuItem.DropDownItems.Count >= 1);
         }
 
         public AskResult AskSaveOrCancel()
@@ -574,7 +602,7 @@ namespace MonoGame.Tools.Pipeline
             _controller.ImportProject();
         }
 
-        private void OnOpenProjectClick(object sender, System.EventArgs e)
+        private void OnOpenProjectClick(object sender, EventArgs e)
         {
             _controller.OpenProject();
         }
@@ -675,6 +703,18 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        private void TreeViewOnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Apps)
+            {
+                if (_treeView.SelectedNode != null)
+                {
+                    Point nodeCoords = _treeView.PointToScreen(_treeView.SelectedNode.Bounds.Location);
+                    TreeViewShowContextMenu(_treeView.SelectedNode, nodeCoords);
+                }
+            }
+        }
+
         private void MainMenuMenuActivate(object sender, EventArgs e)
         {
             UpdateMenus();
@@ -739,12 +779,13 @@ namespace MonoGame.Tools.Pipeline
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/documentation/");
+            Process.Start("http://www.monogame.net/documentation/?page=Pipeline");
         }
 
         private void AboutMenuItemClick(object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/about/");
+            var about = new AboutDialog();
+            about.Show();
         }
 
         private void OnAddItemClick(object sender, EventArgs e)

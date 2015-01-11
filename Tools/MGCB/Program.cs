@@ -29,13 +29,6 @@ namespace MGCB
             if (!parser.Parse(args))
                 return -1;           
             
-            // Do we have anything to do?
-            if (!content.HasWork)
-            {
-                parser.ShowUsage();
-                return 0;
-            }
-
             // Launch debugger if requested.
             if (content.LaunchDebugger)
                 System.Diagnostics.Debugger.Launch();

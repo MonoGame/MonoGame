@@ -38,10 +38,9 @@ namespace Microsoft.Xna.Framework.Content
                                          select p;
             return nonStaticPropertyInfos.ToArray();
 #else
-            var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            const BindingFlags attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             var allProps = type.GetProperties(attrs).ToList();
-
-            var props = allProps.FindAll(p => p.GetGetMethod() != null && p.GetGetMethod() == p.GetGetMethod().GetBaseDefinition()).ToArray();
+            var props = allProps.FindAll(p => p.GetGetMethod(true) != null && p.GetGetMethod(true) == p.GetGetMethod(true).GetBaseDefinition()).ToArray();
             return props;
 #endif
         }

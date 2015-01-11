@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -60,77 +61,76 @@ namespace Microsoft.Xna.Framework.Content
         {
             var property = member as PropertyInfo;
             var field = member as FieldInfo;
+            Debug.Assert(field != null || property != null);
 
-            // properties must have public get and set
-            if (property != null && (property.CanWrite == false || property.CanRead == false))
-                return null;
-
-            if (property != null && property.Name == "Item")
+            if (property != null)
             {
-                var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
-                var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
-
-                if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
-                    (setMethod != null && setMethod.GetParameters().Length > 0))
-                {
-                    /*
-                     * This is presumably a property like this[indexer] and this
-                     * should not get involved in the object deserialization
-                     * */
+                // Properties must have at least a getter.
+                if (property.CanRead == false)
                     return null;
+
+                // Skip over indexer properties.
+                if (property.Name == "Item")
+                {
+                    var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
+                    var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
+
+                    if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
+                        (setMethod != null && setMethod.GetParameters().Length > 0))
+                        return null;
                 }
             }
 
-            var attr = ReflectionHelpers.GetCustomAttribute(member, typeof (ContentSerializerIgnoreAttribute));
-            if (attr != null)
+            // Are we explicitly asked to ignore this item?
+            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null) 
                 return null;
 
-            var contentSerializerAttribute =
-                ReflectionHelpers.GetCustomAttribute(member, typeof (ContentSerializerAttribute)) as
-                ContentSerializerAttribute;
-
-            var isSharedResource = false;
-            if (contentSerializerAttribute != null)
-                isSharedResource = contentSerializerAttribute.SharedResource;
-            else
+            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
+            if (contentSerializerAttribute == null)
             {
                 if (property != null)
                 {
+                    // There is no ContentSerializerAttribute, so non-public
+                    // properties cannot be deserialized.
                     if (!ReflectionHelpers.PropertyIsPublic(property))
+                        return null;
+
+                    // If the read-only property has a type reader then
+                    // it is safe to deserialize into the existing type.
+                    if (!property.CanWrite && manager.GetTypeReader(property.PropertyType) == null)
                         return null;
                 }
                 else
                 {
+                    // There is no ContentSerializerAttribute, so non-public
+                    // fields cannot be deserialized.
                     if (!field.IsPublic)
                         return null;
 
                     // evolutional: Added check to skip initialise only fields
                     if (field.IsInitOnly)
                         return null;
-
-                    // Private fields can be serialized if they have ContentSerializerAttribute added to them
-                    if (field.IsPrivate && contentSerializerAttribute == null)
-                        return null;
                 }
             }
 
             Action<object, object> setter;
-            ContentTypeReader reader;
             Type elementType;
             if (property != null)
             {
                 elementType = property.PropertyType;
-                reader = manager.GetTypeReader(property.PropertyType);
-                setter = (o, v) => property.SetValue(o, v, null);
+                if (property.CanWrite)
+                    setter = (o, v) => property.SetValue(o, v, null);
+                else
+                    setter = (o, v) => { };
             }
             else
             {
                 elementType = field.FieldType;
-                reader = manager.GetTypeReader(field.FieldType);
                 setter = field.SetValue;
             }
 
-            if (isSharedResource)
+            // Shared resources get special treatment.
+            if (contentSerializerAttribute != null && contentSerializerAttribute.SharedResource)
             {
                 return (input, parent) =>
                 {
@@ -139,31 +139,26 @@ namespace Microsoft.Xna.Framework.Content
                 };
             }
 
-            Func<object> construct = () => null;
-            if (ReflectionHelpers.IsConcreteClass(elementType))
+            // We need to have a reader at this point.
+            var reader = manager.GetTypeReader(elementType);
+            if (reader == null)
+                throw new ContentLoadException(string.Format("Content reader could not be found for {0} type.", elementType.FullName));
+
+            // We use the construct delegate to pick the correct existing 
+            // object to be the target of deserialization.
+            Func<object, object> construct = parent => null;
+            if (property != null && !property.CanWrite)
+                construct = parent => property.GetValue(parent, null);
+            else if (ReflectionHelpers.IsConcreteClass(elementType))
             {
                 var constructor = elementType.GetDefaultConstructor();
                 if (constructor != null)
-                    construct = () => constructor.Invoke(null);
+                    construct = parent => constructor.Invoke(null);
             }
-
-            // Reading elements serialized as "object".
-            if (reader == null && elementType == typeof(object))
-            {
-                return (input, parent) =>
-                {
-                    var obj2 = input.ReadObject<object>();
-                    setter(parent, obj2);
-                };
-            }
-
-            // evolutional: Fix. We can get here and still be NULL, exit gracefully
-            if (reader == null)
-                return null;
 
             return (input, parent) =>
             {
-                var existing = construct();
+                var existing = construct(parent);
                 var obj2 = input.ReadObject(reader, existing);
                 setter(parent, obj2);
             };

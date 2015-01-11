@@ -189,8 +189,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// </summary>
         void WriteSharedResources()
         {
-            foreach (var resource in sharedResources)
+            for (int i = 0; i < sharedResources.Count; i++)
+            {
+                var resource = sharedResources[i];
                 WriteObject<object>(resource);
+            }
         }
 
         /// <summary>
@@ -299,15 +302,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This method can be called recursively with a null value.</remarks>
         public void WriteObject<T>(T value)
         {
-		if (value == null)
-			Write7BitEncodedInt (0);
-		else {
-			var elementWriter =  GetTypeWriter (value.GetType ());
-			var index = typeWriterMap[elementWriter.GetType ()];
-			// Because zero means null object, we add one to the index before writing it to the file
-			Write7BitEncodedInt (index + 1);
-			elementWriter.Write (this, value);
-		}
+            if (value == null)
+                Write7BitEncodedInt(0);
+            else
+            {
+                var typeWriter = GetTypeWriter(value.GetType());
+
+                // Because zero means null object, we add one to 
+                // the index before writing it to the file.
+                var index = typeWriterMap[typeWriter.GetType()];
+                Write7BitEncodedInt(index + 1);
+
+                typeWriter.Write(this, value);                
+            }
         }
 
         /// <summary>
@@ -325,22 +332,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             if (typeWriter == null)
                 throw new ArgumentNullException("typeWriter");
 
-            if (value == null)
-            {
-                // Zero means a null object
-                Write7BitEncodedInt(0);
-            }
+            if (typeWriter.TargetType.IsValueType)
+                typeWriter.Write(this, value);
             else
-            {
-		    Type objectType = typeof (T);
-            if (!objectType.IsValueType && !typeWriter.TargetType.IsValueType)
-            {
-			    var index = typeWriterMap[typeWriter.GetType ()];
-			    // Because zero means null object, we add one to the index before writing it to the file
-			    Write7BitEncodedInt (index + 1);
-		    }
-		    typeWriter.Write (this, value);
-            }
+                WriteObject(value);
         }
 
         /// <summary>
@@ -503,6 +498,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write(value.Y);
             Write(value.Width);
             Write(value.Height);
+        }
+
+        /// <summary>
+        /// Helper for checking if a type can be deserialized into an existing object.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <returns>True if the type can be deserialized into an existing object.</returns>
+        internal bool CanDeserializeIntoExistingObject(Type type)
+        {
+            var typeWriter = compiler.GetTypeWriter(type);
+            return typeWriter != null && typeWriter.CanDeserializeIntoExistingObject;
         }
     }
 }

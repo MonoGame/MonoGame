@@ -796,7 +796,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static int GetBoundTexture2D()
         {
             var prevTexture = 0;
-#if GLES && !ANGLE
+#if GLES && !ANGLE && !ANDROID
             GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
 #else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);

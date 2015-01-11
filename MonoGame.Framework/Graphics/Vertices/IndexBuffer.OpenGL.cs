@@ -45,11 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var sizeInBytes = IndexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
-#if ANDROID
-                GL.GenBuffers(1, ref ibo);
-#else
                 GL.GenBuffers(1, out ibo);
-#endif
                 GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
                 GraphicsExtensions.CheckGLError();
@@ -154,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                GraphicsDevice.AddDisposeAction(() =>
+                Threading.BlockOnUIThread(() =>
                 {
                     GL.DeleteBuffers(1, ref ibo);
                     GraphicsExtensions.CheckGLError();
