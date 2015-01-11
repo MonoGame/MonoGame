@@ -70,11 +70,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using MonoTouch.Foundation;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
-using MonoTouch.CoreAnimation;
-using MonoTouch.ObjCRuntime;
+using Foundation;
+using OpenGLES;
+using UIKit;
+using CoreAnimation;
+using ObjCRuntime;
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;

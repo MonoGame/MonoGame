@@ -12,9 +12,9 @@ using System.IO;
 using Windows.Storage.FileProperties;
 #elif IOS
 using System.Drawing;
-using MonoTouch.CoreGraphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using MediaPlayer;
+using UIKit;
 #elif ANDROID
 using Android.Graphics;
 using Android.Provider;
@@ -210,7 +210,7 @@ namespace Microsoft.Xna.Framework.Media
             if (height == 0)
                 height = (int)this.thumbnail.Bounds.Height;
 
-            return this.thumbnail.ImageWithSize(new SizeF(width, height)); // The result is usually a bit bigger than the requested size
+			return this.thumbnail.ImageWithSize(new CGSize(width, height));
         }
 #elif ANDROID
         [CLSCompliant(false)]

@@ -5,8 +5,9 @@
 using System;
 using System.Drawing;
 
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
+using UIKit;
+using Foundation;
+using CoreGraphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -30,10 +31,10 @@ namespace Microsoft.Xna.Framework
 
         public override void LoadView()
         {
-            RectangleF frame;
+			CGRect frame;
             if (ParentViewController != null && ParentViewController.View != null)
             {
-                frame = new RectangleF(PointF.Empty, ParentViewController.View.Frame.Size);
+				frame = new CGRect(CGPoint.Empty, ParentViewController.View.Frame.Size);
             }
             else
             {
@@ -43,11 +44,11 @@ namespace Microsoft.Xna.Framework
                 // iOS 8+ reports resolution correctly in all cases
                 if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft || InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
                 {
-                    frame = new RectangleF(0, 0, Math.Max(screen.Bounds.Width, screen.Bounds.Height), Math.Min(screen.Bounds.Width, screen.Bounds.Height));
+					frame = new CGRect(0, 0, (nfloat)Math.Max(screen.Bounds.Width, screen.Bounds.Height), (nfloat)Math.Min(screen.Bounds.Width, screen.Bounds.Height));
                 }
                 else
                 {
-                    frame = new RectangleF(0, 0, screen.Bounds.Width, screen.Bounds.Height);
+					frame = new CGRect(0, 0, screen.Bounds.Width, screen.Bounds.Height);
                 }
             }
 

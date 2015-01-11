@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Threading.BlockOnUIThread(() =>
             {
-#if IOS
+#if (IOS || ANDROID)
 			GL.GenTextures(1, ref this.glTexture);
 #else
             GL.GenTextures(1, out this.glTexture);

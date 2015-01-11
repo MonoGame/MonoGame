@@ -2,11 +2,11 @@ using System;
 using System.Runtime.InteropServices;
 
 #if IOS
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
-using MonoTouch.CoreFoundation;
-using MonoTouch.AudioToolbox;
-using MonoTouch.AudioUnit;
+using UIKit;
+using Foundation;
+using CoreFoundation;
+using AudioToolbox;
+using AudioUnit;
 
 using OpenTK.Audio.OpenAL;
 

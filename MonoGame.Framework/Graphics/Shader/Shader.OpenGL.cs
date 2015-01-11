@@ -90,7 +90,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (length > 0)
                 {
                     var logBuilder = new StringBuilder(length);
+					#if IOS
+					GL.GetShaderInfoLog(_shaderHandle, length, out length, logBuilder);
+					#else
 					GL.GetShaderInfoLog(_shaderHandle, length, ref length, logBuilder);
+					#endif
                     GraphicsExtensions.CheckGLError();
                     log = logBuilder.ToString();
                 }
