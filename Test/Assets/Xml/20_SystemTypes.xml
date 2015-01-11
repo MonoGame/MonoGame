@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
-
-  <Asset Type="MonoGame.Tests.ContentPipeline.SystemTypes">
-
+<XnaContent>
+  <Asset Type="SystemTypes">
     <TimeSpan>PT42.5S</TimeSpan>
-    
   </Asset>
-
 </XnaContent>
