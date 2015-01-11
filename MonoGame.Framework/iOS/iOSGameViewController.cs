@@ -108,9 +108,9 @@ namespace Microsoft.Xna.Framework
         bool _orientationChanged;
         UIInterfaceOrientation _prevOrientation;
 
-        public override void ViewWillTransitionToSize(SizeF toSize, IUIViewControllerTransitionCoordinator coordinator)
+		public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
         {
-            SizeF oldSize = View.Bounds.Size;
+			CGSize oldSize = View.Bounds.Size;
 
             if (oldSize != toSize)
             {
