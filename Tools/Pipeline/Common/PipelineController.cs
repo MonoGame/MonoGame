@@ -15,8 +15,8 @@ using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 namespace MonoGame.Tools.Pipeline
 {
     internal partial class PipelineController : IController
-	{
-		private FileSystemWatcher watcher;
+    {
+        private FileSystemWatcher watcher;
 
         private readonly IView _view;
         private PipelineProject _project;
@@ -47,7 +47,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool LaunchDebugger { get; set; }
 
-		public bool ProjectOpen { get; private set; }
+        public bool ProjectOpen { get; private set; }
 
         public bool ProjectDirty { get; set; }
 
@@ -223,22 +223,22 @@ namespace MonoGame.Tools.Pipeline
                 ProjectOpen = true;
                 ProjectDirty = false;
 
-				watcher = new FileSystemWatcher (Path.GetDirectoryName (projectFilePath));
-				watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.FileName;
-				watcher.Filter = "*.*";
-				watcher.IncludeSubdirectories = true;
-				watcher.Created += delegate(object sender, FileSystemEventArgs e) {
-					HandleCreated(e.FullPath);
-				};
-				watcher.Deleted += delegate(object sender, FileSystemEventArgs e) {
-					HandleDeleted(e.FullPath);
-				};
-				watcher.Renamed += delegate(object sender, RenamedEventArgs e) {
-					HandleDeleted(e.OldFullPath);
-					HandleCreated(e.FullPath);
-				};
+                watcher = new FileSystemWatcher (Path.GetDirectoryName (projectFilePath));
+                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.FileName;
+                watcher.Filter = "*.*";
+                watcher.IncludeSubdirectories = true;
+                watcher.Created += delegate(object sender, FileSystemEventArgs e) {
+                    HandleCreated(e.FullPath);
+                };
+                watcher.Deleted += delegate(object sender, FileSystemEventArgs e) {
+                    HandleDeleted(e.FullPath);
+                };
+                watcher.Renamed += delegate(object sender, RenamedEventArgs e) {
+                    HandleDeleted(e.OldFullPath);
+                    HandleCreated(e.FullPath);
+                };
 
-				watcher.EnableRaisingEvents = true;
+                watcher.EnableRaisingEvents = true;
 
                 History.Default.AddProjectHistory(projectFilePath);
                 History.Default.StartupProject = projectFilePath;
@@ -256,38 +256,38 @@ namespace MonoGame.Tools.Pipeline
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
-		}
+        }
 
-		void HandleCreated (string path)
-		{
-			SetExists (path, true);
-		}
+        void HandleCreated (string path)
+        {
+            SetExists (path, true);
+        }
 
-		void HandleDeleted (string path)
-		{
-			SetExists (path, false);
-		}
+        void HandleDeleted (string path)
+        {
+            SetExists (path, false);
+        }
 
-		void SetExists(string path, bool exist)
-		{
-			if (_project != null) {
-				var projectDir = _project.Location;
+        void SetExists(string path, bool exist)
+        {
+            if (_project != null) {
+                var projectDir = _project.Location;
 
-				#if WINDOWS
-				projectDir += "\\";
-				#else
-				projectDir += "/";
-				#endif
+                #if WINDOWS
+                projectDir += "\\";
+                #else
+                projectDir += "/";
+                #endif
 
-				IProjectItem item = GetItem (PathHelper.GetRelativePath (projectDir, path));
-				if (item != null) {
-					if (item.Exists == !exist) {
-						item.Exists = exist;
-						_view.ItemExistanceChanged (item);
-					}
-				}
-			}
-		}
+                IProjectItem item = GetItem (PathHelper.GetRelativePath (projectDir, path));
+                if (item != null) {
+                    if (item.Exists == !exist) {
+                        item.Exists = exist;
+                        _view.ItemExistanceChanged (item);
+                    }
+                }
+            }
+        }
 
         public void CloseProject()
         {
@@ -299,10 +299,10 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-			if (watcher != null) {
-				watcher.Dispose ();
-				watcher = null;
-			}
+            if (watcher != null) {
+                watcher.Dispose ();
+                watcher = null;
+            }
 
             ProjectOpen = false;
             ProjectDirty = false;
@@ -671,22 +671,22 @@ namespace MonoGame.Tools.Pipeline
             if (_project == null)
                 return filePath;
 
-			#if WINDOWS
+            #if WINDOWS
             filePath = filePath.Replace("/", "\\");
             if (filePath.StartsWith("\\"))
                 filePath = filePath.Substring(2);
-			#endif
+            #endif
 
             if (Path.IsPathRooted(filePath))
                 return filePath;
 
-			#if WINDOWS
+            #if WINDOWS
             return _project.Location + "\\" + filePath;
-			#endif
+            #endif
 
-			#if LINUX || MONOMAC
-			return _project.Location + "/" + filePath;
-			#endif
+            #if LINUX || MONOMAC
+            return _project.Location + "/" + filePath;
+            #endif
         }
     }
 }

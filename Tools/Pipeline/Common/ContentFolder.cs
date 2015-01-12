@@ -31,6 +31,6 @@ namespace MonoGame.Tools.Pipeline
         [Browsable(false)]
         public string Icon { get; set; }
 
-		public bool Exists { get; set; }
+        public bool Exists { get; set; }
     }
 }

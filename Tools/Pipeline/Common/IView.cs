@@ -54,6 +54,6 @@ namespace MonoGame.Tools.Pipeline
 
         Process CreateProcess(string exe, string commands);
 
-		void ItemExistanceChanged(IProjectItem item);
+        void ItemExistanceChanged(IProjectItem item);
     }
 }

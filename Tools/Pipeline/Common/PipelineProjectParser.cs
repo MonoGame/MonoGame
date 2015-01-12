@@ -143,9 +143,9 @@ namespace MonoGame.Tools.Pipeline
             var projectDir = ProjectDirectory;
 
 #if WINDOWS
-			projectDir += "\\";
+            projectDir += "\\";
 #else
-			projectDir += "/";
+            projectDir += "/";
 #endif
 
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
@@ -170,7 +170,7 @@ namespace MonoGame.Tools.Pipeline
                 ImporterName = Importer,
                 ProcessorName = Processor,
                 ProcessorParams = new OpaqueDataDictionary(),
-				Exists = File.Exists(projectDir + sourceFile)
+                Exists = File.Exists(projectDir + sourceFile)
             };
             _project.ContentItems.Add(item);
 
@@ -190,12 +190,12 @@ namespace MonoGame.Tools.Pipeline
         public void OnCopy(string sourceFile)
         {
             // Make sure the source file is relative to the project.
-			var projectDir = ProjectDirectory;
+            var projectDir = ProjectDirectory;
 
 #if WINDOWS
-			projectDir += "\\";
+            projectDir += "\\";
 #else
-			projectDir += "/";
+            projectDir += "/";
 #endif
 
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
@@ -211,7 +211,7 @@ namespace MonoGame.Tools.Pipeline
                 BuildAction = BuildAction.Copy,
                 OriginalPath = sourceFile,
                 ProcessorParams = new OpaqueDataDictionary(),
-				Exists = File.Exists(projectDir + sourceFile)
+                Exists = File.Exists(projectDir + sourceFile)
             };
             _project.ContentItems.Add(item);
 
