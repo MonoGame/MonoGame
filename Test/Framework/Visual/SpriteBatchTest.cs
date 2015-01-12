@@ -261,5 +261,53 @@ namespace MonoGame.Tests.Visual {
 		//_spriteBatch.End ();
 
 		//_spriteBatch.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
+
+        [Test]
+        public void DrawRequiresTexture()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                Assert.Throws<ArgumentNullException>(() => _spriteBatch.Draw(null, new Vector2(20, 20), Color.White));
+                _spriteBatch.End();
+            };
+            Game.Run();
+        }
+
+        [Test]
+        public void DrawWithTexture()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
+
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
+                _spriteBatch.End();
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
+            };
+            Game.Run();
+        }
+
+        [Test]
+        public void DrawWithTextureAlreadySet()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var texture2 = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+
+                Game.GraphicsDevice.Textures[0] = texture2;
+                Game.GraphicsDevice.Textures[1] = _texture;
+
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
+                _spriteBatch.End();
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
+                Assert.That(Game.GraphicsDevice.Textures[1], Is.SameAs(_texture));
+            };
+            Game.Run();
+        }
 	}
 }
