@@ -14,7 +14,10 @@ namespace MonoGame.Tools.Pipeline
 
 		public Gdk.Pixbuf ICON_BASE = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.settings.png");
 		public Gdk.Pixbuf ICON_FOLDER = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_closed.png");
-		public Gdk.Pixbuf ICON_OTHER = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.blueprint.png");
+		public Gdk.Pixbuf[] ICON_OTHER = new Gdk.Pixbuf[] { 
+			new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.blueprint.png"), 
+			new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.missing.png")
+		};
 
 		string basename;
 		TreeStore listStore;
@@ -131,9 +134,9 @@ namespace MonoGame.Tools.Pipeline
 			listStore.Clear ();
 		}
 
-		public void AddItem(TreeIter iter, string path)
+		public void AddItem(TreeIter iter, string path, bool exists)
 		{
-			Gdk.Pixbuf icon = ICON_OTHER;
+			Gdk.Pixbuf icon = ICON_OTHER[Convert.ToInt32(!exists)];
 
 			if (path.Contains ("/")) 
 				icon = ICON_FOLDER;
@@ -148,7 +151,7 @@ namespace MonoGame.Tools.Pipeline
 				for(int i = 2;i < split.Length;i++)
 					newpath += "/" + split[i];
 
-				AddItem (itr, newpath);
+				AddItem (itr, newpath, exists);
 			}
 		}
 
@@ -166,6 +169,25 @@ namespace MonoGame.Tools.Pipeline
 					RemoveItem (itr, newpath);
 				} else 
 					RemoveIterAndUneededParents (itr);
+			}
+		}
+
+		public void RefreshItem(TreeIter iter, string path, bool exists)
+		{
+			string[] split = path.Split ('/');
+			TreeIter itr;
+			if (!GetIter (iter, split [0], out itr))
+				return;
+
+			if (split.Length > 1) {
+				string newpath = split [1];
+				for (int i = 2; i < split.Length; i++)
+					newpath += "/" + split [i];
+
+				RefreshItem (itr, newpath, exists);
+			} else {
+				Gdk.Pixbuf icon = ICON_OTHER [Convert.ToInt32 (!exists)];
+				treeview1.Model.SetValue (itr, 0, icon);
 			}
 		}
 
@@ -246,7 +268,7 @@ namespace MonoGame.Tools.Pipeline
 
 			if(treeview1.Model.IterChildren (out oiter, iter)) {
 				do {
-					if ((Gdk.Pixbuf)treeview1.Model.GetValue (oiter, 0) == ICON_OTHER)
+					if ((Gdk.Pixbuf)treeview1.Model.GetValue (oiter, 0) == ICON_OTHER[0] || (Gdk.Pixbuf)treeview1.Model.GetValue (oiter, 0) == ICON_OTHER[1])
 						paths.Add (GetPathFromIter (oiter));
 					else
 						paths.AddRange (GetAllPaths (oiter));
@@ -265,7 +287,7 @@ namespace MonoGame.Tools.Pipeline
 			List<ContentItem> items = new List<ContentItem>();
 
 			for (int i = 0; i < path.Length; i++) {
-				if (icon [i] == ICON_OTHER) {
+				if (icon [i] == ICON_OTHER[0] || icon [i] == ICON_OTHER[1]) {
 					var item = window._controller.GetItem (path [i]) as ContentItem;
 					if(!items.Contains(item))
 						items.Add (item);
@@ -294,7 +316,7 @@ namespace MonoGame.Tools.Pipeline
 			List<ContentItem> items = new List<ContentItem>();
 
 			for (int i = 0; i < path.Length; i++) {
-				if (icon [i] == ICON_OTHER) {
+				if (icon [i] == ICON_OTHER[0] || icon [i] == ICON_OTHER[1]) {
 					var item = window._controller.GetItem (path [i]) as ContentItem;
 					if(!items.Contains(item))
 						items.Add (item);

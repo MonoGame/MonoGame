@@ -867,5 +867,9 @@ namespace MonoGame.Tools.Pipeline
 
             SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
         }
+
+        public void ItemExistanceChanged(IProjectItem item)
+        {
+        }
     }
 }
