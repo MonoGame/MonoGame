@@ -19,7 +19,7 @@ using Android.Media;
 #endif
 
 #if IOS
-using MonoTouch.AudioToolbox;
+using AudioToolbox;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio

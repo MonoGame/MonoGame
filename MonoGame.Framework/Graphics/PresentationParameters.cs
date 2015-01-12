@@ -47,7 +47,7 @@ using Windows.UI.Xaml.Controls;
 #if MONOMAC
 using MonoMac.AppKit;
 #elif IOS
-using MonoTouch.UIKit;
+using UIKit;
 using Microsoft.Xna.Framework.Input.Touch;
 #endif
 
