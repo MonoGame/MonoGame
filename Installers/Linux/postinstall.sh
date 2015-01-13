@@ -1,5 +1,10 @@
 #!/bin/sh
-echo "PLease make sure you are running this installer with sudo or as root."
+
+#check installation priviledge
+if [ "$(id -u)" != "0" ]; then
+	echo "Please make sure you are running this installer with sudo or as root." 1>&2
+	exit 1
+fi
 
 #installation
 DIR=$(pwd)
