@@ -3,7 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -79,7 +81,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 info.Serializer = serializer.GetTypeSerializer(prop.PropertyType);
                 if (prop.CanWrite)
                     info.Setter = (o, v) => prop.SetValue(o, v, null);
-                info.Getter = (o) => prop.GetValue(o, null);
+                info.Getter = o => prop.GetValue(o, null);
             }
             else if (field != null)
             {
@@ -179,17 +181,51 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public override bool ObjectIsEmpty(object value)
         {
-            throw new NotImplementedException(); 
+            if (_baseSerializer != null)
+                return _baseSerializer.ObjectIsEmpty(value);
+            return false;
         }
 
         protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, object value)
         {
-            throw new NotImplementedException();
+            if (serializer.AlreadyScanned(value))
+                return;
+
+            // First scan the base type.
+            if (_baseSerializer != null)
+                _baseSerializer.ScanChildren(serializer, callback, value);
+
+            // Now scan our own elements.
+            foreach (var info in _elements)
+            {
+                var elementValue = info.Getter(value);
+
+                callback(info.Serializer, elementValue);
+
+                var elementSerializer = info.Serializer;
+                if (elementValue != null)
+                    elementSerializer = serializer.GetTypeSerializer(elementValue.GetType());
+
+                elementSerializer.ScanChildren(serializer, callback, elementValue);
+            }
         }
 
         protected internal override void Serialize(IntermediateWriter output, object value, ContentSerializerAttribute format)
         {
-            throw new NotImplementedException();
+            // First serialize the base type.
+            if (_baseSerializer != null)
+                _baseSerializer.Serialize(output, value, format);
+
+            // Now serialize our own elements.
+            foreach (var info in _elements)
+            {
+                var elementValue = info.Getter(value);
+
+                if (info.Attribute.SharedResource)
+                    output.WriteSharedResource(elementValue, info.Attribute);
+                else
+                    output.WriteObjectInternal(elementValue, info.Attribute, info.Serializer, info.Serializer.TargetType);
+            }
         }
     }
 }

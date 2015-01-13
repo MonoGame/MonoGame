@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
@@ -21,6 +22,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             _listSerializer.Initialize(serializer);
         }
 
+        public override bool ObjectIsEmpty(T[] value)
+        {
+            return value.Length == 0;
+        }
+
+        protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, T[] value)
+        {
+            _listSerializer.ScanChildren(serializer, callback, new List<T>(value));
+        }
+
         protected internal override T[] Deserialize(IntermediateReader input, ContentSerializerAttribute format, T[] existingInstance)
         {
             var result = _listSerializer.Deserialize(input, format, null);
@@ -29,7 +40,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(IntermediateWriter output, T[] value, ContentSerializerAttribute format)
         {
-            throw new NotImplementedException();
+            _listSerializer.Serialize(output, new List<T>(value), format);
         }
     }
 }

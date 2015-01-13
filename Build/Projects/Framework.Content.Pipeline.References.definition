@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ExternalProject Name="Framework.Content.Pipeline.References">
-   
 
   <Platform Type="Linux">
-    <Binary
-      Name="NAudio"
-      Path="ThirdParty\Dependencies\NAudio\NAudio.dll" />
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
@@ -23,9 +19,6 @@
 
   <Platform Type="MacOS">
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
-    <Binary
-      Name="NAudio"
-      Path="ThirdParty\Dependencies\NAudio\NAudio.dll" />
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
@@ -51,9 +44,6 @@
     <Binary
       Name="SharpDX.D3DCompiler"
       Path="ThirdParty\Dependencies\SharpDX\Windows\SharpDX.D3DCompiler.dll" />
-    <Binary
-      Name="NAudio"
-      Path="ThirdParty\Dependencies\NAudio\NAudio.dll" />
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />

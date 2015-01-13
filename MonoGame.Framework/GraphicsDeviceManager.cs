@@ -326,7 +326,7 @@ namespace Microsoft.Xna.Framework
 #if MONOMAC
             presentationParameters.IsFullScreen = _wantFullScreen;
 #elif LINUX
-            presentationParameters.IsFullScreen = false;
+            presentationParameters.IsFullScreen = _wantFullScreen;
 #else
             // Set "full screen"  as default
             presentationParameters.IsFullScreen = true;

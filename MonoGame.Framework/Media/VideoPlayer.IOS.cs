@@ -4,9 +4,9 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using MediaPlayer;
+using Foundation;
+using UIKit;
 
 namespace Microsoft.Xna.Framework.Media
 {

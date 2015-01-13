@@ -15,254 +15,386 @@ namespace MonoGame.Tools.Pipeline
 	[System.ComponentModel.ToolboxItem (true)]
 	public partial class PropertiesView : Gtk.Bin
 	{
-		object currentObject;
-		PropertyGridTable properties;
-		PropertyGridTable processorParams;
+		List<object> currentObjects;
 		internal IController controller { get; set; }
+
+		string name;
+		string location;
 
 		public PropertiesView ()
 		{
 			this.Build ();
-
-			var vbox = new VBox ();
-			properties = new PropertyGridTable ();
-			processorParams = new PropertyGridTable ();
-
-			vbox.PackStart (properties, false, false,0);
-			vbox.PackStart (processorParams, false, false, 0);
-
-			scrolledwindow2.AddWithViewport (vbox);
 		}
 
-		protected void OnVbox1SizeAllocated (object o, SizeAllocatedArgs args)
+		public void Initalize(Gtk.Window window)
 		{
-			vpaned1.Position = vpaned1.Allocation.Height - 50;
+			propertygridtable1.Initalize (window);
 		}
 
-		public object CurrentObject { 
-			get { return currentObject; }
-			set { 
-				if (currentObject != value) {
-					currentObject = value;
-					Refresh ();
-				}
-			}
+		protected void OnTextview1SizeAllocated (object o, SizeAllocatedArgs args)
+		{
+			vpaned1.Position = vpaned1.Allocation.Height; //add -50 for correct size of description box
+		}
+
+		public void Load(List<object> cobjects, string name, string location)
+		{
+			this.name = name;
+			this.location = location;
+			if(cobjects != null)
+				this.currentObjects = cobjects;
+			else
+				this.currentObjects = null;
+			Refresh ();
+		}
+
+		private object CompareVariables(object a, object b)
+		{
+			if (a.ToString () == "???" || a.Equals(b))
+				return b;
+
+			return null;
 		}
 
 		public void Refresh() {
-			if (currentObject == null) {
-				properties.Clear ();
-				processorParams.Clear ();
+			propertygridtable1.Clear ();
+			propertygridtable1.AddEntry ("Name", name, PropertyGridTable.EntryType.Readonly);
+			propertygridtable1.AddEntry ("Location", location, PropertyGridTable.EntryType.Readonly);
+
+			if (currentObjects == null) {
+				propertygridtable1.Refresh ();
 				return;
 			}
 
-			var objectType = currentObject.GetType ();
+			var objectType = currentObjects[0].GetType ();
 			var props = objectType.GetProperties (BindingFlags.Instance | BindingFlags.Public);
 
-			properties.Clear ();
-			processorParams.Clear ();
-			uint currentLine = 0;
 			foreach (var p in props) {
 
 				var attrs = p.GetCustomAttributes(true).Where(x => x is BrowsableAttribute).Cast<BrowsableAttribute>();
-				if (attrs.Any (x => !x.Browsable))
+				if (attrs.Any (x => !x.Browsable) || p.Name == "Name" || p.Name == "Location")
 					continue;
 
+				object value = "???";
+				foreach (object o in currentObjects) 
+					value = CompareVariables (value, p.GetValue (o, null));
+
 				if (p.PropertyType == typeof(BuildAction)) {
+					if (value == null)
+						value = "";
+
+					Dictionary<string, object> data = Enum.GetValues (typeof(BuildAction))
+						.Cast<BuildAction> ()
+						.ToDictionary (t => t.ToString(), t => (object)t);
+					propertygridtable1.AddEntry (p.Name, value, 
+						PropertyGridTable.EntryType.Combo,(s,e) => { 
+							foreach (object o in currentObjects) 
+								p.SetValue(o, data[((string)((FalseWidget)s).newvalue)], null);
+							controller.OnProjectModified();
+						}, data);
 					continue;
 				}
 				if (p.PropertyType == typeof(List<string>)) {
-					processorParams.AddEntry (currentLine++, p.Name, p.GetValue (currentObject, null),
-						PropertyGridTable.EntryType.List);
+					if (value == null)
+						value = new List<string> ();
+
+					propertygridtable1.AddEntry (p.Name, value,
+						PropertyGridTable.EntryType.List ,(s,e) => { 
+							List<string> lines = new List<string>();
+
+							lines.AddRange(((string)((FalseWidget)s).newvalue).Replace("\r\n", "~").Split('~'));
+
+							foreach (object o in currentObjects) 
+								p.SetValue(o, lines, null);
+							controller.OnProjectModified();
+						});
+
 					continue;
 				}
 				if (p.PropertyType == typeof(GraphicsProfile)) {
+					if (value == null)
+						value = "";
+
 					Dictionary<string, object> data = Enum.GetValues (typeof(GraphicsProfile))
 						.Cast<GraphicsProfile> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
-					processorParams.AddEntry (currentLine++, p.Name, p.GetValue(currentObject,null), 
+					propertygridtable1.AddEntry (p.Name, value, 
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							var combo = (ComboBox)s;
-							p.SetValue(currentObject, data[combo.ActiveText],null);
+							foreach (object o in currentObjects) 
+								p.SetValue(o, data[((string)((FalseWidget)s).newvalue)], null);
 							controller.OnProjectModified();
 						}, data);
 					continue;
 				}
 				if (p.PropertyType == typeof(TP.TargetPlatform)) {
+					if (value == null)
+						value = "";
+
 					Dictionary<string, object> data = Enum.GetValues (typeof(TP.TargetPlatform))
 						.Cast<TP.TargetPlatform> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
-					processorParams.AddEntry (currentLine++, p.Name, p.GetValue(currentObject,null), 
+					propertygridtable1.AddEntry (p.Name, value, 
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							var combo = (ComboBox)s;
-							p.SetValue(currentObject, data[combo.ActiveText],null);
+							foreach (object o in currentObjects) 
+								p.SetValue(o, data[((string)((FalseWidget)s).newvalue)],null);
 							controller.OnProjectModified();
 						}, data);
 					continue;
 				}
 				if (p.PropertyType == typeof(string)) {
+					if (value == null)
+						value = "";
+
 					if (p.CanWrite)
-						properties.AddEntry (currentLine++, p.Name, p.GetValue(currentObject, null), 
+						propertygridtable1.AddEntry (p.Name, value, 
 							PropertyGridTable.EntryType.Text, (s,e) => { 
-								p.SetValue(currentObject, ((TextBuffer)s).Text,null);
+								foreach (object o in currentObjects) 
+									p.SetValue(o, ((string)((FalseWidget)s).newvalue), null);
+								controller.OnProjectModified();
 							});
 					else 
-						properties.AddEntry (currentLine++, p.Name, p.GetValue(currentObject,null), 
+						propertygridtable1.AddEntry (p.Name, value, 
 							PropertyGridTable.EntryType.Readonly);
 					continue;
 				}
 				if (p.PropertyType == typeof(bool)) {
-					properties.AddEntry (currentLine++, p.Name, p.GetValue(currentObject, null), 
+					if (value == null)
+						value = "";
+
+					propertygridtable1.AddEntry (p.Name, value, 
 						PropertyGridTable.EntryType.Check,(s,e) => { 
-							p.SetValue(currentObject, ((CheckButton)s).Active,null);
+							foreach (object o in currentObjects) 
+								p.SetValue(o, Convert.ToBoolean(((string)((FalseWidget)s).newvalue)), null);
+							controller.OnProjectModified();
 						});
 					continue;
 				}
 				if (p.PropertyType == typeof(ImporterTypeDescription)) {
 
-					var importer = (ImporterTypeDescription)p.GetValue(currentObject, null);
+					if (value == null)
+						value = "";
+
 					var data = PipelineTypes.Importers.ToDictionary (item => item.DisplayName, item => (object)item);
-					properties.AddEntry (currentLine++, p.Name, importer, 
+					propertygridtable1.AddEntry (p.Name, value, 
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							var combo = (ComboBox)s;
-							p.SetValue(currentObject, PipelineTypes.Importers[combo.Active],null);
-							controller.OnProjectModified();
+							foreach(ImporterTypeDescription itd in PipelineTypes.Importers)
+							{
+								if(itd.DisplayName == (string)((FalseWidget)s).newvalue)
+								{
+									foreach (object o in currentObjects) 
+										p.SetValue(o, itd, null);
+									controller.OnProjectModified();
+									Refresh ();
+									controller.OnProjectModified();
+									break;
+								}
+							}
 						}, data);
 					continue;
 				}
 				if (p.PropertyType == typeof(ProcessorTypeDescription)) {
-					var processor = (ProcessorTypeDescription)p.GetValue(currentObject, null);
-					var contentItem = (ContentItem)currentObject;
+					if (value == null)
+						value = "";
+
+					var contentItem = (ContentItem)currentObjects[0];
 					var data = PipelineTypes.Processors.ToDictionary (item => item.DisplayName, item => (object)item);
-					properties.AddEntry (currentLine++, p.Name, processor, 
+					propertygridtable1.AddEntry (p.Name, value, 
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							var combo = (ComboBox)s;
-							processor = PipelineTypes.Processors[combo.Active];
-							p.SetValue(currentObject, processor,null);
-							RefreshProcessorParams (processor, contentItem);
-							controller.OnProjectModified();
+							foreach(ProcessorTypeDescription ptd in PipelineTypes.Processors)
+							{
+								if(ptd.DisplayName == (string)((FalseWidget)s).newvalue)
+								{
+									foreach (object o in currentObjects) 
+										p.SetValue(o, ptd, null);
+									controller.OnProjectModified();
+									Refresh ();
+									controller.OnProjectModified();
+									break;
+								}
+							}
 						}, data);
 
-					RefreshProcessorParams (processor, contentItem);
+					if (value.ToString () != "") {
+
+						List<ProcessorTypeDescription> procs = new List<ProcessorTypeDescription> ();
+
+						foreach (object o in currentObjects)
+							procs.Add ((ProcessorTypeDescription)p.GetValue (o, null));
+
+						RefreshProcessorParams (procs, currentObjects);
+					}
 					continue;
 				}
 
-				properties.AddEntry (currentLine++, p.Name, null, PropertyGridTable.EntryType.Unkown);
+				propertygridtable1.AddEntry (p.Name, null, PropertyGridTable.EntryType.Unkown);
 
 			}
 
-			properties.QueueDraw ();
-			processorParams.QueueDraw ();
-			scrolledwindow2.QueueDraw ();
+			propertygridtable1.Refresh ();
 		}
 
-		void RefreshProcessorParams(ProcessorTypeDescription processor, ContentItem contentItem) {
-			processorParams.Clear ();
-			uint currentLine = 0;
-			foreach (var p1 in processor.Properties) {
+		void RefreshProcessorParams(List<ProcessorTypeDescription> processors, List<object> contentItems) {
+
+			if (processors.Count == 0)
+				return;
+
+			foreach (var p1 in processors[0].Properties) {
+
+				object value = "???";
+				foreach (object o in contentItems) 
+					value = CompareVariables (value, ((ContentItem)o).ProcessorParams[p1.Name]);
+
 				if (p1.Type == typeof(bool)) {
-					processorParams.AddEntry (currentLine++, p1.Name, contentItem.ProcessorParams[p1.Name], 
+					if (value == null)
+						value = "";
+
+					propertygridtable1.AddProcEntry (p1.Name, value, 
 						PropertyGridTable.EntryType.Check, (s,e) => { 
-							contentItem.ProcessorParams[p1.Name] = ((CheckButton)s).Active;
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = Convert.ToBoolean((string)((FalseWidget)s).newvalue);
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
 				if (p1.Type == typeof(string)) {
-					processorParams.AddEntry (currentLine++, p1.Name, contentItem.ProcessorParams[p1.Name], 
+					if (value == null)
+						value = "";
+
+					propertygridtable1.AddProcEntry (p1.Name, value, 
 						PropertyGridTable.EntryType.Text, (s,e) => { 
-							contentItem.ProcessorParams[p1.Name] = ((TextBuffer)s).Text;
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (string)((FalseWidget)s).newvalue;
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
 				if (p1.Type == typeof(char)) {
+					if (value == null)
+						value = "";
+
 					char c = ' ';
-					var v = contentItem.ProcessorParams [p1.Name];
+					var v = value;
 					char.TryParse (v.ToString(), out c);
-					processorParams.AddEntry (currentLine++, p1.Name, c, 
+
+					propertygridtable1.AddProcEntry (p1.Name, c, 
 						PropertyGridTable.EntryType.Text, (s,e) => { 
-							var tb = (TextBuffer)s;
-							if (!string.IsNullOrEmpty(tb.Text))
-								contentItem.ProcessorParams[p1.Name] = tb.Text[0];
-							else 
-								contentItem.ProcessorParams[p1.Name] = ' '.ToString();
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								if (!string.IsNullOrEmpty((string)((FalseWidget)s).newvalue))
+									((ContentItem)o).ProcessorParams[p1.Name] = ((string)((FalseWidget)s).newvalue)[0];
+								else 
+									((ContentItem)o).ProcessorParams[p1.Name] = ' '.ToString();
+
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
 				if (p1.Type == typeof(ConversionQuality)) {
-					var value = contentItem.ProcessorParams [p1.Name];
+					if (value == null)
+						value = "";
 					Dictionary<string, object> data = Enum.GetValues (typeof(ConversionQuality))
 						.Cast<ConversionQuality> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
 					var defaultValue = (ConversionQuality)p1.DefaultValue;
-					processorParams.AddEntry (currentLine++, p1.Name, (object)value ?? (object)defaultValue, 
+					propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue, 
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							var combo = (ComboBox)s;;
-							contentItem.ProcessorParams[p1.Name] = (ConversionQuality)data[combo.ActiveText];
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (ConversionQuality)data[(string)((FalseWidget)s).newvalue];
+								controller.OnItemModified ((ContentItem)o);
+							}
 						}, data);
 					continue;
 				}
 				if (p1.Type == typeof(MaterialProcessorDefaultEffect)) {
-					var value = contentItem.ProcessorParams [p1.Name];
+					if (value == null)
+						value = "";
 					Dictionary<string, object> data = Enum.GetValues (typeof(MaterialProcessorDefaultEffect))
 						.Cast<MaterialProcessorDefaultEffect> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
 					var defaultValue = (MaterialProcessorDefaultEffect)p1.DefaultValue;
-					processorParams.AddEntry (currentLine++, p1.Name, (object)value ?? (object)defaultValue,
+					propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue,
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							var combo = (ComboBox)s;;
-							contentItem.ProcessorParams[p1.Name] = (MaterialProcessorDefaultEffect)data[combo.ActiveText];
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (MaterialProcessorDefaultEffect)data[(string)((FalseWidget)s).newvalue];
+								controller.OnItemModified ((ContentItem)o);
+							}
 						}, data);
 					continue;
 				}
 				if (p1.Type == typeof(TextureProcessorOutputFormat)) {
-					var value = contentItem.ProcessorParams [p1.Name];
+					if (value == null)
+						value = "";
 					Dictionary<string, object> data = Enum.GetValues (typeof(TextureProcessorOutputFormat))
 						.Cast<TextureProcessorOutputFormat> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
 					var defaultValue = (TextureProcessorOutputFormat)p1.DefaultValue;
-					processorParams.AddEntry (currentLine++, p1.Name, (object)value ?? (object)defaultValue,
+					propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue,
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							var combo = (ComboBox)s;;
-							contentItem.ProcessorParams[p1.Name] = (TextureProcessorOutputFormat)data[combo.ActiveText];
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (TextureProcessorOutputFormat)data[(string)((FalseWidget)s).newvalue];
+								controller.OnItemModified ((ContentItem)o);
+							}
 						}, data);
 					continue;
 				}
 				if (p1.Type == typeof(Microsoft.Xna.Framework.Color)) {
-					processorParams.AddEntry (currentLine++, p1.Name, contentItem.ProcessorParams[p1.Name], 
+					if(value == null)
+						value = new Microsoft.Xna.Framework.Color();
+					propertygridtable1.AddProcEntry (p1.Name, value, 
 						PropertyGridTable.EntryType.Color, (s,e) => { 
-							var button = s as ColorButton;
-							var color = (Microsoft.Xna.Framework.Color)contentItem.ProcessorParams[p1.Name];
-							if (button != null) {
-								color.R = (byte)(button.Color.Red >> 8);
-								color.G = (byte)(button.Color.Green >> 8);
-								color.B = (byte)(button.Color.Blue >> 8);
-							} 
-							var scaleButton = s as ScaleButton;
-							if (scaleButton != null) {
-								color.A = (byte)scaleButton.Value;
+							foreach (object o in contentItems) 
+							{
+								try {
+									string[] cvalues = ((FalseWidget)s).newvalue.ToString().Replace (":", " ").Replace("}", " ").Split (' ');
+									Microsoft.Xna.Framework.Color color = new Microsoft.Xna.Framework.Color();
+
+									color.R = (byte)Convert.ToInt16 (cvalues [1]);
+									color.G = (byte)Convert.ToInt16 (cvalues [3]);
+									color.B = (byte)Convert.ToInt16 (cvalues [5]);
+									color.A = (byte)Convert.ToInt16 (cvalues [7]);
+
+									((ContentItem)o).ProcessorParams[p1.Name] = color;
+									controller.OnItemModified ((ContentItem)o);
+								}
+								catch { }
 							}
-							contentItem.ProcessorParams[p1.Name] = color;
-							controller.OnItemModified (contentItem);
 						});
 					continue;
 				}
 				if (p1.Type == typeof(Single)) {
-					processorParams.AddEntry (currentLine++, p1.Name, contentItem.ProcessorParams[p1.Name].ToString(), 
+					if(value == null)
+						value = "";
+					propertygridtable1.AddProcEntry (p1.Name, value.ToString(), 
 						PropertyGridTable.EntryType.Text, (s,e) => { 
-							contentItem.ProcessorParams[p1.Name] =  Single.Parse (((TextBuffer)s).Text).ToString();
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] =  Single.Parse ((string)((FalseWidget)s).newvalue).ToString();
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
-				processorParams.AddEntry (currentLine++, p1.Name, null, PropertyGridTable.EntryType.Unkown);
+				propertygridtable1.AddProcEntry (p1.Name, null, PropertyGridTable.EntryType.Unkown);
 			}
+		}
+
+		protected void OnButton15Clicked (object sender, EventArgs e)
+		{
+			propertygridtable1.sortgroup = true;
+			propertygridtable1.Refresh ();
+		}
+
+		protected void OnButton2Clicked (object sender, EventArgs e)
+		{
+			propertygridtable1.sortgroup = false;
+			propertygridtable1.Refresh ();
 		}
 	}
 }
-

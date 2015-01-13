@@ -49,11 +49,6 @@ namespace MonoGame.Tools.Pipeline
 			AllFilesFilter.Name = "All Files (*.*)";
 			AllFilesFilter.AddPattern ("*.*");
 
-			if (!String.IsNullOrEmpty(OpenProjectPath)) {
-				_controller.OpenProject(OpenProjectPath);
-				OpenProjectPath = null;
-			}
-
 			Widget[] widgets = menubar1.Children;
 			foreach (Widget w in widgets) {
 				if(((MenuItem)w).Name == "FileAction")
@@ -77,6 +72,8 @@ namespace MonoGame.Tools.Pipeline
 				menubar1.Hide ();
 				vbox2.Remove (menubar1);
 			}
+
+			propertiesview1.Initalize (this);
 		}
 			
 		void BuildMenu() {
@@ -103,9 +100,29 @@ namespace MonoGame.Tools.Pipeline
 #endif
 		}
 
+		public void OnShowEvent()
+		{
+			if (string.IsNullOrEmpty(OpenProjectPath))
+			{
+				var startupProject = History.Default.StartupProject;
+				if (!string.IsNullOrEmpty(startupProject) && System.IO.File.Exists(startupProject))                
+					OpenProjectPath = startupProject;                
+			}
+
+			History.Default.StartupProject = null;
+
+			if (!String.IsNullOrEmpty(OpenProjectPath)) {
+				_controller.OpenProject(OpenProjectPath);
+				OpenProjectPath = null;
+			}
+		}
+
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
 		{
-			Application.Quit ();
+			if (_controller.Exit ()) 
+				Application.Quit ();
+			else
+				a.RetVal = true;
 		}
 
 		#region IView implements
@@ -472,8 +489,8 @@ namespace MonoGame.Tools.Pipeline
 			RebuildAction.Sensitive = treerebuild.Sensitive;
 
 			CleanAction.Sensitive = projectOpenAndNotBuilding;
-			CancelBuildAction.Sensitive = false;
-			CancelBuildAction.Visible = false;
+			CancelBuildAction.Sensitive = !notBuilding;
+			CancelBuildAction.Visible = !notBuilding;
 
 			UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
 			UpdateRecentProjectList();
@@ -522,10 +539,12 @@ namespace MonoGame.Tools.Pipeline
 
 		protected void OnFileActionActivated (object sender, EventArgs e)
 		{
-			var notBuilding = !_controller.ProjectBuilding;
-			var projectOpen = _controller.ProjectOpen;
-			var projectOpenAndNotBuilding = projectOpen && notBuilding;
-			SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
+			UpdateMenus ();
+		}
+
+		protected void OnBuildActionActivated (object sender, EventArgs e)
+		{
+			UpdateMenus ();
 		}
 		#endregion
 	}
