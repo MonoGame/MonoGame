@@ -30,7 +30,8 @@ namespace MonoGame.Tools.Pipeline
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
         private const int FolderClosedIcon = 2;
-        private const int ProjectIcon = 3;        
+        private const int ProjectIcon = 3;
+        private const int MissedContentItemIcon = 4;        
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -61,6 +62,7 @@ namespace MonoGame.Tools.Pipeline
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.missing.png")));
             
             _treeView.ImageList = _treeIcons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
@@ -397,8 +399,11 @@ namespace MonoGame.Tools.Pipeline
 
             var node = parent.Add(string.Empty, item.Name, -1);
             node.Tag = item;
-            node.ImageIndex = ContentItemIcon;
+
+            node.ImageIndex = item.Exists ? ContentItemIcon : MissedContentItemIcon;
+
             node.SelectedImageIndex = ContentItemIcon;
+            item.Node = node;
 
             _treeView.SelectedNode = node;
 
@@ -866,6 +871,11 @@ namespace MonoGame.Tools.Pipeline
             IntPtr ptr_func = Marshal.GetFunctionPointerForDelegate(WordWrapCallbackEvent);
 
             SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
+        }
+
+        public void ItemExistanceChanged(IProjectItem item)
+        {
+            item.Node.ImageIndex = item.Exists ? ContentItemIcon : MissedContentItemIcon;
         }
     }
 }

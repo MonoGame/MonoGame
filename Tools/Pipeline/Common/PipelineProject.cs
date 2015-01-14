@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -58,6 +59,10 @@ namespace MonoGame.Tools.Pipeline
 
         [Browsable(false)]
         public string Icon { get; set; }
+
+        public bool Exists { get; set; }
+
+        public TreeNode Node { get; set; }
 
         #endregion
 
