@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework
         #region Private Fields
 
         private CurveContinuity _continuity;
-        private readonly float position;
+        private readonly float _position;
         private float _tangentIn;
         private float _tangentOut;
         private float _value;
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework
         [DataMember]
         public float Position
         {
-            get { return this.position; }
+            get { return this._position; }
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="continuity">Indicates whether the curve is discrete or continuous.</param>
         public CurveKey(float position, float value, float tangentIn, float tangentOut, CurveContinuity continuity)
         {
-            this.position = position;
+            this._position = position;
             this._value = value;
             this._tangentIn = tangentIn;
             this._tangentOut = tangentOut;
@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework
             if (object.Equals(value2, null))
                 return object.Equals(value1, null);
 
-            return (value1.position == value2.position)
+            return (value1._position == value2._position)
                 && (value1._value == value2._value)
                 && (value1._tangentIn == value2._tangentIn)
                 && (value1._tangentOut == value2._tangentOut)
@@ -170,14 +170,14 @@ namespace Microsoft.Xna.Framework
         /// <returns>A copy of this key.</returns>
         public CurveKey Clone()
         {
-            return new CurveKey(this.position, this._value, this._tangentIn, this._tangentOut, this._continuity);
+            return new CurveKey(this._position, this._value, this._tangentIn, this._tangentOut, this._continuity);
         }
 
         #region Inherited Methods
 
         public int CompareTo(CurveKey other)
         {
-            return this.position.CompareTo(other.position);
+            return this._position.CompareTo(other._position);
         }
 
         public bool Equals(CurveKey other)
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework
 
         public override int GetHashCode()
         {
-            return this.position.GetHashCode() ^ this._value.GetHashCode() ^ this._tangentIn.GetHashCode() ^
+            return this._position.GetHashCode() ^ this._value.GetHashCode() ^ this._tangentIn.GetHashCode() ^
                 this._tangentOut.GetHashCode() ^ this._continuity.GetHashCode();
         } 
 
