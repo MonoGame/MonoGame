@@ -53,15 +53,15 @@
     </Reference>
     <Reference Include="Mono.Posix" />
     <Reference Include="MonoDevelop.Core">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files %28x86%29\Xamarin Studio\bin\MonoDevelop.Core.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Xamarin Studio\bin\MonoDevelop.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files %28x86%29\Xamarin Studio\bin\MonoDevelop.Ide.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Xamarin Studio\bin\MonoDevelop.Ide.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files %28x86%29\Xamarin Studio\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Xamarin Studio\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
