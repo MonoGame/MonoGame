@@ -4,6 +4,7 @@
 
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -32,5 +33,10 @@ namespace MonoGame.Tools.Pipeline
         public string Icon { get; set; }
 
         public bool Exists { get; set; }
+
+        public TreeNode Node
+        {
+            get; set; 
+        }
     }
 }

@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Windows.Forms;
 using FolderSelect;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
@@ -136,6 +137,11 @@ namespace MonoGame.Tools.Pipeline
         {
             get { return _project.Exists; }
             set { _project.Exists = value; }
+        }
+
+        public TreeNode Node
+        {
+            get; set;
         }
 
         #endregion
