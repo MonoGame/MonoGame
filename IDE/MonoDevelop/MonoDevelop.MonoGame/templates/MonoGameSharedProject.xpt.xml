@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <Template>
 	<TemplateConfiguration>
-		<_Name>MonoGame Mobile Application (Shared Project) </_Name>
+		<_Name>MonoGame Application (Shared Project) </_Name>
 		<_Category>C#/MonoGame</_Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>

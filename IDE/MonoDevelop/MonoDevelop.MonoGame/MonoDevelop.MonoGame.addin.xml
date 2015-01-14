@@ -12,6 +12,7 @@
 		<Import file="templates/MonoGameContentBuilderTemplate.xpt.xml"/>
 		<!--- Generic Templates -->
 		<Import file="templates/MonoGameProject.xpt.xml" />
+		<Import file="templates/MonoGameSharedProject.xpt.xml" />
 		<!-- Windows Templates -->
 		<Import file="templates/MonoGameWindowsProject.xpt.xml" />
 		<Import file="templates/Common/AssemblyInfo.cs" />
@@ -66,7 +67,7 @@
 
 	<ConditionType id="IsWindows" type="MonoDevelop.MonoGame.MonoGameIsWindowsCondition" />
 	<ConditionType id="IsMac" type="MonoDevelop.MonoGame.MonoGameIsMacCondition" />
-	<ConditionType id="IsLinux" type="MonoDevelop.MonoGame.MonoGameIsLinxCondition" />
+	<ConditionType id="IsLinux" type="MonoDevelop.MonoGame.MonoGameIsLinuxCondition" />
 	
 	<Extension path="/MonoDevelop/Core/StockIcons">
 		<StockIcon stockid="monogame-project" file="icons/monogame-project-32.png" />
@@ -83,12 +84,17 @@
 	</Extension>
 	
 	<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+		<ProjectTemplate id="MonoGameSharedProject" file="templates/MonoGameSharedProject.xpt.xml" />
 		<Condition id="IsWindows">
 			<!-- DirectX Based Templates -->
 			<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
 		</Condition>
 		<Condition id="IsLinux">
 			<!--- Linux Templates -->
+			<ProjectTemplate id="MonoGameProject" file="templates/MonoGameProject.xpt.xml" />
+		</Condition>
+		<Condition id="IsMac">
+			<!--- Mac Templates -->
 			<ProjectTemplate id="MonoGameProject" file="templates/MonoGameProject.xpt.xml" />
 		</Condition>
 	</Extension>

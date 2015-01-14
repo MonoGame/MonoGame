@@ -17,17 +17,16 @@
 			<StartupProject>${ProjectName}</StartupProject>
 		</Options>
 		
-		<Project name = "${ProjectName}" directory = "." type = "Xamarin.iOS">
+		<Project name = "${ProjectName}" directory = "." type = "XamarinIOS">
 			<Options />
 			<References>
 				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />	
 				<Reference type="Gac" refto="Xamarin.iOS" />
-				<Reference type="Gac" refto="OpenTK" />
 			</References>
 			<Packages>
-				<Package id="MonoGame.Binaries" version="3.2.0" targetFramework="MonoTouch" />
+				<Package id="MonoGame.Binaries" version="3.2.0" targetFramework="Xamarin.iOS" />
 			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
