@@ -62,6 +62,10 @@
 		<Addin id="Ide" version="5.0" />
 		<Addin id="DesignerSupport" version="4.0" />
 	</Dependencies>
+
+	<ConditionType id="IsWindows" type="MonoDevelop.MonoGame.MonoGameIsWindowsCondition" />
+	<ConditionType id="IsMac" type="MonoDevelop.MonoGame.MonoGameIsMacCondition" />
+	<ConditionType id="IsLinux" type="MonoDevelop.MonoGame.MonoGameIsLinxCondition" />
 	
 	<Extension path="/MonoDevelop/Core/StockIcons">
 		<StockIcon stockid="monogame-project" file="icons/monogame-project-32.png" />
@@ -69,6 +73,7 @@
 
 	<Extension path="/MonoDevelop/ProjectModel/MSBuildItemTypes">
 		<DotNetProjectSubtype id="MonoGame" guid="{9b831fef-f496-498f-9fe8-180da5cb4258}" type="MonoDevelop.MonoGame.MonoGameProject">
+			<!-- Add MonoGame Specific Imports  -->
 		</DotNetProjectSubtype>
 	</Extension>
 
@@ -77,8 +82,14 @@
 	</Extension>
 	
 	<Extension path="/MonoDevelop/Ide/ProjectTemplates">
-		<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
-		<ProjectTemplate id="MonoGameProject" file="templates/MonoGameProject.xpt.xml" />
+		<Condition id="IsWindows">
+			<!-- DirectX Based Templates -->
+			<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
+		</Condition>
+		<Condition id="IsLinux">
+			<!--- Linux Templates -->
+			<ProjectTemplate id="MonoGameProject" file="templates/MonoGameProject.xpt.xml" />
+		</Condition>
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/FileTemplates">
