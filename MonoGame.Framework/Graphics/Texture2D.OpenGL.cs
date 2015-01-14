@@ -414,8 +414,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS || MONOMAC
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
-			var width = (int)cgImage.Width;
-			var height = (int)cgImage.Height;
+			var width = cgImage.Width;
+			var height = cgImage.Height;
 
             var data = new byte[width * height * 4];
 
@@ -428,7 +428,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Texture2D texture = null;
             Threading.BlockOnUIThread(() =>
             {
-                texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
+                texture = new Texture2D(graphicsDevice, (int)width, (int)height, false, SurfaceFormat.Color);
                 texture.SetData(data);
             });
 
