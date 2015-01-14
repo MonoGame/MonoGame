@@ -17,13 +17,13 @@
 			<StartupProject>${ProjectName}</StartupProject>
 		</Options>
 		
-		<Project name = "${ProjectName}" directory = "." type = "MonoTouch">
+		<Project name = "${ProjectName}" directory = "." type = "Xamarin.iOS">
 			<Options />
 			<References>
 				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />	
-				<Reference type="Gac" refto="monotouch" />
+				<Reference type="Gac" refto="Xamarin.iOS" />
 				<Reference type="Gac" refto="OpenTK" />
 			</References>
 			<Packages>

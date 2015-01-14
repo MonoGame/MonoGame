@@ -6,8 +6,8 @@ using System.Linq;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 #elif __IOS__
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 #endif
 using ${ProjectName};
 #endregion

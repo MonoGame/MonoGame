@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>MonoDevelop.MonoGame</RootNamespace>
     <AssemblyName>MonoDevelop.MonoGame</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

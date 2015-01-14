@@ -10,9 +10,10 @@
 	<Runtime>
 		<Import file="icons/monogame-project-32.png" />
 		<Import file="templates/MonoGameContentBuilderTemplate.xpt.xml"/>
+		<!--- Generic Templates -->
+		<Import file="templates/MonoGameProject.xpt.xml" />
 		<!-- Windows Templates -->
 		<Import file="templates/MonoGameWindowsProject.xpt.xml" />
-		<Import file="templates/MonoGameProject.xpt.xml" />
 		<Import file="templates/Common/AssemblyInfo.cs" />
 		<Import file="templates/Common/Game1.cs" />
 		<Import file="templates/Common/Icon-md.png" />

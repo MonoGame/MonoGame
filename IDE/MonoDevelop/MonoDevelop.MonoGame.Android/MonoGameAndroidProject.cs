@@ -18,6 +18,7 @@ namespace MonoDevelop.MonoGame.Android
 			base.PopulateSupportFileList (list, configuration);
 		}
 
+		[Obsolete]
 		public override string ProjectType {
 			get {
 				return "MonoGameAndroid";
