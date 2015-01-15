@@ -266,6 +266,9 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(2, mathTypes.Vector2Array.Length);
                 Assert.AreEqual(Vector2.Zero, mathTypes.Vector2Array[0]);
                 Assert.AreEqual(Vector2.One, mathTypes.Vector2Array[1]);
+                Assert.AreEqual(new Vector2(0,4), mathTypes.Vector2List[0]);
+                Assert.AreEqual(new Vector2(1,22), mathTypes.Vector2List[9]);
+                Assert.AreEqual(new Vector2(1, 22), mathTypes.Vector2ListSpaced[9]);
             });
         }
 
