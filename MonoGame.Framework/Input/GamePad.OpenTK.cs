@@ -43,9 +43,6 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
-		static bool running;		
-        static bool sdl;
-
         static Settings settings;
         static Settings Settings
         {
@@ -57,7 +54,6 @@ namespace Microsoft.Xna.Framework.Input
 
 		static void AutoConfig()
 		{
-			if (!sdl) return;
 #if DEBUG
 
             int num = 0;
@@ -170,7 +166,7 @@ namespace Microsoft.Xna.Framework.Input
 				Console.WriteLine("Number of PovHats for joystick: " + x + " - " + numhats);
 #endif
 
-				settings[x] = pc;
+                settings[x] = pc;
 			}
 		}
 
@@ -179,7 +175,7 @@ namespace Microsoft.Xna.Framework.Input
             if (settings == null)
             {
                 settings = new Settings();
-				AutoConfig();		
+                AutoConfig();		
             }
 
             return settings;
@@ -264,15 +260,18 @@ namespace Microsoft.Xna.Framework.Input
             var rightStick = c.RightStick.ReadAxisPair(device);
             GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(leftStick.X, leftStick.Y), new Vector2(rightStick.X, rightStick.Y), deadZone);
             GamePadTriggers triggers = new GamePadTriggers(c.LeftTrigger.ReadFloat(device), c.RightTrigger.ReadFloat(device));
-			Buttons buttonState = ReadButtons(device, c, DeadZoneSize);
+
+            Buttons buttonState = ReadButtons(device, c, DeadZoneSize);
 			buttonState |= StickToButtons(sticks.Left, Buttons.LeftThumbstickLeft, Buttons.LeftThumbstickRight, Buttons.LeftThumbstickUp, Buttons.LeftThumbstickDown, DeadZoneSize);
 			buttonState |= StickToButtons(sticks.Right, Buttons.RightThumbstickLeft, Buttons.RightThumbstickRight, Buttons.RightThumbstickUp, Buttons.RightThumbstickDown, DeadZoneSize);
 			buttonState |= TriggerToButton(triggers.Left, Buttons.LeftTrigger, DeadZoneSize);
 			buttonState |= TriggerToButton(triggers.Right, Buttons.RightTrigger, DeadZoneSize);
+
             GamePadButtons buttons = new GamePadButtons(buttonState);
             GamePadDPad dpad = new GamePadDPad(buttons.buttons);
 
             GamePadState g = new GamePadState(sticks, triggers, buttons, dpad);
+
             return g;
         }
 
