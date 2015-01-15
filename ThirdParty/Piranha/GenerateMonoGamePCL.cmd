@@ -1,0 +1,1 @@
+Piranha.exe make-portable-skeleton -i ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll -o ..\..\MonoGame.Framework\bin\PCL\MonoGame.Framework.dll -p ".NETPortable,Version=v4.0,Profile=Profile96"

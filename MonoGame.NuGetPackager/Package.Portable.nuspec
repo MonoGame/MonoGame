@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.Portable</id>
+        <version>3.2.3-alpha</version>
+        <title>MonoGame.Portable</title>
+        <authors>Simon-darkside-Jackson</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      This implementation is a PCL only version of MonoGame for use in Portable CLass Libraries.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes />
+        <copyright>Copyright  2013</copyright>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="..\MonoGame.Framework\Bin\PCL\MonoGame.Framework.dll" target="lib\portable-net40+sl50+win+wpa81+wp80+MonoAndroid10+MonoTouch10\MonoGame.Framework.dll" />
+        <file src="..\MonoGame.Framework\Bin\PCL\MonoGame.Framework.dll" target="lib\portable-net45+win+wpa81+Xamarin.iOS10+MonoAndroid10+MonoTouch10\MonoGame.Framework.dll" />
+        <file src="..\MonoGame.Framework\Bin\PCL\MonoGame.Framework.dll" target="lib\portable-win81+wpa81\MonoGame.Framework.dll" />
+        <file src="readme\MonoGame.Binaries\readme.txt" target="readme.txt" />
+    </files>
+</package>
