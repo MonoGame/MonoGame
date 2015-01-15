@@ -8,28 +8,28 @@ namespace MonoGame.Tests.Framework
 {
     class CurveKeyCollectionTest
     {
-        [Test]
-        public void TypeConverter()
-        {
-            var curveKeyCollection = new CurveKeyCollection
-            {
-                new CurveKey(0, 1),
-                new CurveKey(1, 2),
-                new CurveKey(3, 4)
-            };
+        //[Test]
+        //public void TypeConverter()
+        //{
+        //    var curveKeyCollection = new CurveKeyCollection
+        //    {
+        //        new CurveKey(0, 1),
+        //        new CurveKey(1, 2),
+        //        new CurveKey(3, 4)
+        //    };
 
-            // Gets the attributes for the instance.
+        //    // Gets the attributes for the instance.
 
-            var attributes = TypeDescriptor.GetAttributes(curveKeyCollection);
+        //    var attributes = TypeDescriptor.GetAttributes(curveKeyCollection);
 
-            // Assert.AreEqual(5, attributes.Count);
+        //    // Assert.AreEqual(5, attributes.Count);
 
-            for (var i = 0; i < attributes.Count; ++i)
-            {
-                Debug.WriteLine("attribute #" + i + " = " + attributes[i]);
-                Assert.AreEqual(false, attributes[i].IsDefaultAttribute());
-            }
-        }
+        //    for (var i = 0; i < attributes.Count; ++i)
+        //    {
+        //        Debug.WriteLine("attribute #" + i + " = " + attributes[i]);
+        //        Assert.AreEqual(false, attributes[i].IsDefaultAttribute());
+        //    }
+        //}
 
         [Test]
         public void Properties()

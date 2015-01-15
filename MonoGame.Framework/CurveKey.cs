@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Key point on the <see cref="Curve"/>.
     /// </summary>
-    [TypeConverter(typeof(ExpandableObjectConverter))]
+    // TODO : [TypeConverter(typeof(ExpandableObjectConverter))]
     [DataContract]
     public class CurveKey : IEquatable<CurveKey>, IComparable<CurveKey>
     {

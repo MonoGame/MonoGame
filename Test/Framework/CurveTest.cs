@@ -7,27 +7,27 @@ namespace MonoGame.Tests.Framework
 {
     class CurveTest
     {
-        [Test]
-        public void TypeConverter()
-        {
-            var curve = new Curve();
+        //[Test]
+        //public void TypeConverter()
+        //{
+        //    var curve = new Curve();
 
-            curve.Keys.Add(new CurveKey(0, 1));
-            curve.Keys.Add(new CurveKey(1, 2));
-            curve.Keys.Add(new CurveKey(3, 4));
+        //    curve.Keys.Add(new CurveKey(0, 1));
+        //    curve.Keys.Add(new CurveKey(1, 2));
+        //    curve.Keys.Add(new CurveKey(3, 4));
 
-            // Gets the attributes for the instance.
+        //    // Gets the attributes for the instance.
 
-            var attributes = TypeDescriptor.GetAttributes(curve);
+        //    var attributes = TypeDescriptor.GetAttributes(curve);
 
-            // Assert.AreEqual(2,attributes.Count);
+        //    // Assert.AreEqual(2,attributes.Count);
 
-            for (var i = 0; i < attributes.Count; ++i)
-            {
-                Console.WriteLine("attribute #" + i + " = " + attributes[i]);
-                Assert.AreEqual(false,attributes[i].IsDefaultAttribute());
-            }
-        }
+        //    for (var i = 0; i < attributes.Count; ++i)
+        //    {
+        //        Console.WriteLine("attribute #" + i + " = " + attributes[i]);
+        //        Assert.AreEqual(false,attributes[i].IsDefaultAttribute());
+        //    }
+        //}
 
         [Test]
         public void Clone()

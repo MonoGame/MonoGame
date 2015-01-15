@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// The collection of the <see cref="CurveKey"/> elements and a part of the <see cref="Curve"/> class.
     /// </summary>
-    [TypeConverter(typeof(ExpandableObjectConverter))]
+    // TODO : [TypeConverter(typeof(ExpandableObjectConverter))]
     [DataContract]
     public class CurveKeyCollection : ICollection<CurveKey>
     {
