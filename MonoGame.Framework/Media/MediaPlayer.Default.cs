@@ -5,8 +5,8 @@
 using System;
 
 #if IOS
-using MonoTouch.AudioToolbox;
-using MonoTouch.AVFoundation;
+using AudioToolbox;
+using AVFoundation;
 #endif
 
 namespace Microsoft.Xna.Framework.Media
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Media
 #if IOS
             bool isOtherAudioPlaying;
             AVAudioSession avAudioSession = AVAudioSession.SharedInstance();
-            if (avAudioSession.RespondsToSelector(new MonoTouch.ObjCRuntime.Selector("isOtherAudioPlaying")))
+            if (avAudioSession.RespondsToSelector(new ObjCRuntime.Selector("isOtherAudioPlaying")))
                 isOtherAudioPlaying = avAudioSession.OtherAudioPlaying; // iOS 6+
             else
                 isOtherAudioPlaying = AudioSession.OtherAudioIsPlaying;

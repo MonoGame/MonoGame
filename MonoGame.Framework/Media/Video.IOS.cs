@@ -5,8 +5,8 @@
 using System;
 using System.IO;
 
-using MonoTouch.MediaPlayer;
-using MonoTouch.Foundation;
+using MediaPlayer;
+using Foundation;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Media
             set
             {
                 var col = value.ToVector4();
-                return MovieView.MoviePlayer.BackgroundColor = MonoTouch.UIKit.UIColor(col.X, col.Y, col.Z, col.W);
+                return MovieView.MoviePlayer.BackgroundColor = UIKit.UIColor(col.X, col.Y, col.Z, col.W);
             }
         }
         */

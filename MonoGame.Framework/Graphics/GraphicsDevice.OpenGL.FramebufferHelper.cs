@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public bool SupportsBlitFramebuffer { get; private set; }
 #if IOS
-            internal const string OpenGLLibrary = MonoTouch.Constants.OpenGLESLibrary;
+			internal const string OpenGLLibrary = ObjCRuntime.Constants.OpenGLESLibrary;
 #elif ANDROID
             internal const string OpenGLLibrary = "libGLESv2.dll";
             [DllImport("libEGL.dll", EntryPoint = "eglGetProcAddress")]
@@ -183,10 +183,10 @@ namespace Microsoft.Xna.Framework.Graphics
             internal virtual void GenRenderbuffer(out int renderbuffer)
             {
                 renderbuffer = 0;
-#if !ANDROID
-                GL.GenRenderbuffers(1, ref renderbuffer);
-#else
+#if (ANDROID || IOS)
                 GL.GenRenderbuffers(1, out renderbuffer);
+#else
+                GL.GenRenderbuffers(1, ref renderbuffer);
 #endif
                 GraphicsExtensions.CheckGLError();
             }
@@ -215,10 +215,10 @@ namespace Microsoft.Xna.Framework.Graphics
             internal virtual void GenFramebuffer(out int framebuffer)
             {
                 framebuffer = 0;
-#if !ANDROID
-                GL.GenFramebuffers(1, ref framebuffer);
-#else
+#if (ANDROID || IOS)
                 GL.GenFramebuffers(1, out framebuffer);
+#else
+                GL.GenFramebuffers(1, ref framebuffer);
 #endif
                 GraphicsExtensions.CheckGLError();
             }

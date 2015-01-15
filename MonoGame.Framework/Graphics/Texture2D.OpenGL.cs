@@ -14,9 +14,9 @@ using MonoMac.Foundation;
 #endif
 
 #if IOS
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
+using UIKit;
+using CoreGraphics;
+using Foundation;
 #endif
 
 #if OPENGL
@@ -239,11 +239,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: check for data size and for non renderable formats (formats that can't be attached to FBO)
 
             var framebufferId = 0;
-#if !ANDROID
+			#if (IOS || ANDROID)
+			GL.GenFramebuffers(1, out framebufferId);
+			#else
             GL.GenFramebuffers(1, ref framebufferId);
-#else
-            GL.GenFramebuffers(1, out framebufferId);
-#endif
+			#endif
             GraphicsExtensions.CheckGLError();
             GL.BindFramebuffer(All.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
@@ -414,8 +414,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS || MONOMAC
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
-            var width = cgImage.Width;
-            var height = cgImage.Height;
+			var width = cgImage.Width;
+			var height = cgImage.Height;
 
             var data = new byte[width * height * 4];
 
@@ -428,7 +428,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Texture2D texture = null;
             Threading.BlockOnUIThread(() =>
             {
-                texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
+                texture = new Texture2D(graphicsDevice, (int)width, (int)height, false, SurfaceFormat.Color);
                 texture.SetData(data);
             });
 
@@ -610,11 +610,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (this.glTexture < 0)
             {
-#if IOS
-                GL.GenTextures(1, ref this.glTexture);
-#else
                 GL.GenTextures(1, out this.glTexture);
-#endif
                 GraphicsExtensions.CheckGLError();
 
                 // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either
