@@ -18,14 +18,14 @@
       </action>
       <action id="NewAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;n</property>
+        <property name="Accelerator">&lt;Control&gt;n</property>
         <property name="Label" translatable="yes">New...</property>
         <property name="ShortLabel" translatable="yes">New...</property>
         <signal name="Activated" handler="OnNewActionActivated" />
       </action>
       <action id="OpenAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;o</property>
+        <property name="Accelerator">&lt;Control&gt;o</property>
         <property name="Label" translatable="yes">Open...</property>
         <property name="ShortLabel" translatable="yes">Open...</property>
         <signal name="Activated" handler="OnOpenActionActivated" />
@@ -49,7 +49,7 @@
       </action>
       <action id="SaveAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;s</property>
+        <property name="Accelerator">&lt;Control&gt;s</property>
         <property name="Label" translatable="yes">Save</property>
         <property name="ShortLabel" translatable="yes">Save</property>
         <signal name="Activated" handler="OnSaveActionActivated" />
@@ -74,14 +74,14 @@
       </action>
       <action id="UndoAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;z</property>
+        <property name="Accelerator">&lt;Control&gt;z</property>
         <property name="Label" translatable="yes">Undo</property>
         <property name="ShortLabel" translatable="yes">Undo</property>
         <signal name="Activated" handler="OnUndoActionActivated" />
       </action>
       <action id="RedoAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;y</property>
+        <property name="Accelerator">&lt;Control&gt;y</property>
         <property name="Label" translatable="yes">Redo</property>
         <property name="ShortLabel" translatable="yes">Redo</property>
         <signal name="Activated" handler="OnRedoActionActivated" />
