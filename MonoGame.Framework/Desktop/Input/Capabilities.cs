@@ -46,14 +46,13 @@ namespace Microsoft.Xna.Framework.Input
 {
     public class Capabilities
     {
-        public Capabilities(IntPtr device)
+        public Capabilities(OpenTK.Input.JoystickCapabilities cap)
         {
             // TODO: Complete member initialization            
-            this.NumberOfAxis = Tao.Sdl.Sdl.SDL_JoystickNumAxes(device);
-            this.NumberOfButtons = Tao.Sdl.Sdl.SDL_JoystickNumButtons(device);
-            this.NumberOfPovHats = Tao.Sdl.Sdl.SDL_JoystickNumHats(device);
+            this.NumberOfAxis = cap.AxisCount;
+            this.NumberOfButtons = cap.ButtonCount;
+            this.NumberOfPovHats = cap.HatCount;
         }
-
 
         public int NumberOfAxis { get; private set; }
         public int NumberOfButtons { get; private set; }

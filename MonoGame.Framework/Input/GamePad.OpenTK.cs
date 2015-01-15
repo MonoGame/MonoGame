@@ -38,7 +38,6 @@ purpose and non-infringement.
 */
 #endregion License
 using System;
-using Tao.Sdl;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -58,18 +57,21 @@ namespace Microsoft.Xna.Framework.Input
 
 		static void AutoConfig()
 		{
-			Init();
 			if (!sdl) return;
 #if DEBUG
-			Console.WriteLine("Number of joysticks: " + Sdl.SDL_NumJoysticks());
+
+            int num = 0;
+
+            while(OpenTK.Input.Joystick.GetCapabilities(num).IsConnected)
+                num++;
+
+            Console.WriteLine("Number of joysticks: " + num);
 #endif			
 			// Limit to the first 4 sticks to avoid crashes
-			int numSticks = Math.Min (4,Sdl.SDL_NumJoysticks());
+            int numSticks = Math.Min (4, num);
 			for (int x = 0; x < numSticks; x++)
 			{
-
-				PadConfig pc = new PadConfig(Sdl.SDL_JoystickName(x), x);
-				devices[x] = Sdl.SDL_JoystickOpen(pc.Index);
+				PadConfig pc = new PadConfig("", x);
 
 				pc.Button_A.ID = 0;
 				pc.Button_A.Type = InputType.Button;
@@ -158,13 +160,13 @@ namespace Microsoft.Xna.Framework.Input
 				//pc.BigButton.Type = InputType.Button;
 
 #if DEBUG
-				int numbuttons = Sdl.SDL_JoystickNumButtons(devices[x]);
+                int numbuttons = OpenTK.Input.Joystick.GetCapabilities(x).ButtonCount;
 				Console.WriteLine("Number of buttons for joystick: " + x + " - " + numbuttons);
 
-				int numaxes = Sdl.SDL_JoystickNumAxes(devices[x]);
+                int numaxes = OpenTK.Input.Joystick.GetCapabilities(x).AxisCount;
 				Console.WriteLine("Number of axes for joystick: " + x + " - " + numaxes);
 
-				int numhats = Sdl.SDL_JoystickNumHats(devices[x]);
+                int numhats = OpenTK.Input.Joystick.GetCapabilities(x).HatCount;
 				Console.WriteLine("Number of PovHats for joystick: " + x + " - " + numhats);
 #endif
 
@@ -176,53 +178,14 @@ namespace Microsoft.Xna.Framework.Input
         {
             if (settings == null)
             {
-                    settings = new Settings();
-					AutoConfig();		
+                settings = new Settings();
+				AutoConfig();		
             }
-            else if (!running)
-            {
-                Init();
-                return settings;
-            }
-            if (!running)
-                Init();
+
             return settings;
         }
-        
 
-        static IntPtr[] devices = new IntPtr[4];
-        //Inits SDL and grabs the sticks
-        static void Init ()
-        {
-        	running = true;
-		    try 
-            {
-         	    Joystick.Init ();
-				sdl = true;
-			}
-			catch (Exception) 
-            {
-
-			}
-        	for (int i = 0; i < 4; i++)
-            {
-        		PadConfig pc = settings[i];
-        		if (pc != null)
-                {
-        			devices[i] = Sdl.SDL_JoystickOpen (pc.Index);
-			    }
-		    }
-
-
-        }
-        //Disposes of SDL
-        static void Cleanup()
-        {
-            Joystick.Cleanup();
-            running = false;
-        }
-
-        static Buttons ReadButtons(IntPtr device, PadConfig c, float deadZoneSize)
+        static Buttons ReadButtons(int device, PadConfig c, float deadZoneSize)
         {
             short DeadZone = (short)(deadZoneSize * short.MaxValue);
             Buttons b = (Buttons)0;
@@ -292,9 +255,9 @@ namespace Microsoft.Xna.Framework.Input
         static GamePadState ReadState(int index, GamePadDeadZone deadZone)
         {
             const float DeadZoneSize = 0.27f;
-            var device = devices[index];
+            var device = index;
             var c = Settings[index];
-            if (device == IntPtr.Zero || c == null)
+            if (c == null && OpenTK.Input.Joystick.GetCapabilities(index).IsConnected)
                 return GamePadState.Default;
 
             var leftStick = c.LeftStick.ReadAxisPair(device);
@@ -315,15 +278,14 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            var d = devices[index];
             var c = Settings[index];
 
-            if (c == null || ((c.JoystickName == null || c.JoystickName == string.Empty) && d == IntPtr.Zero))
+            if (c == null && OpenTK.Input.Joystick.GetCapabilities(index).IsConnected)
                 return new GamePadCapabilities();
 
             return new GamePadCapabilities()
             {
-                IsConnected = d != IntPtr.Zero,
+                IsConnected = OpenTK.Input.Joystick.GetCapabilities(index).IsConnected,
                 HasAButton = c.Button_A.Type != InputType.None,
                 HasBButton = c.Button_B.Type != InputType.None,
                 HasXButton = c.Button_X.Type != InputType.None,
@@ -355,8 +317,6 @@ namespace Microsoft.Xna.Framework.Input
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             PrepSettings();
-            if (sdl)
-				Sdl.SDL_JoystickUpdate();
             return ReadState(index, deadZoneMode);
         }
 

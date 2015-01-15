@@ -67,7 +67,6 @@ namespace Microsoft.Xna.Framework.Input
             this.Button_Back = new Input();
             this.LeftTrigger = new Input();
             this.RightTrigger = new Input();
-
         }
 
         public int Index { get { return index; } }
@@ -118,9 +117,7 @@ namespace Microsoft.Xna.Framework.Input
                         return this.Button_Start;
                 }
                 return null;
-
             }
         }
     }
-
 }

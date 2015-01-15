@@ -41,14 +41,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Tao.Sdl;
+using OpenTK;
 
 namespace Microsoft.Xna.Framework.Input
 {
     public class Joystick
     {
         private int id;
-        private IntPtr device;
         public bool Open { get; private set; }
         public string Name { get; private set; }
         public PadConfig Config { get; private set; }
@@ -58,10 +57,12 @@ namespace Microsoft.Xna.Framework.Input
         {
             // TODO: Complete member initialization
             this.id = id;
-            this.device = Tao.Sdl.Sdl.SDL_JoystickOpen(id);
+
+            var cap = OpenTK.Input.Joystick.GetCapabilities(id);
             this.Open = true;
-            this.Name = Tao.Sdl.Sdl.SDL_JoystickName(id);
-            this.Details = new Capabilities(this.device);
+
+            this.Name = "";
+            this.Details = new Capabilities(cap);
             this.Config = new PadConfig(this.Name, id);
             this.SetDefaults(this.Details);
         }
@@ -98,30 +99,17 @@ namespace Microsoft.Xna.Framework.Input
 
         public int ID { get { return id; } }
 
-        public static bool Init()
-        {
-            // only initialise the Joystick part of SDL
-            return Sdl.SDL_Init(Sdl.SDL_INIT_JOYSTICK) == 0;
-        }
-
         public static List<Joystick> GrabJoysticks()
         {
-            int num = Tao.Sdl.Sdl.SDL_NumJoysticks();
+            int num = 0;
             List<Joystick> list = new List<Joystick>();
-            Tao.Sdl.Sdl.SDL_JoystickEventState(0);
-            for (int i = 0; i < num; i++)
+
+            while (OpenTK.Input.Joystick.GetCapabilities(num).IsConnected)
             {
-                list.Add(new Joystick(i));
+                list.Add(new Joystick(num));
+                num++;
             }
             return list;
-
-        }
-
-
-
-        internal static void Cleanup()
-        {
-            throw new NotImplementedException();
         }
     }
 

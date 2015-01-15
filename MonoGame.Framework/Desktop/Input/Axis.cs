@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Input
         public Input Positive { get; set; }
         public InputType Type { get; set; }
 
-        public float ReadAxis(IntPtr device)
+        public float ReadAxis(int device)
         {
             return (this.Positive.ReadFloat(device) - this.Negative.ReadFloat(device));
         }
