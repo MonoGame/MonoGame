@@ -81,10 +81,10 @@ namespace MonoGame.Tools.Pipeline
 			w1.Add (this.FileAction, null);
 			this.NewAction = new global::Gtk.Action ("NewAction", global::Mono.Unix.Catalog.GetString ("New..."), null, null);
 			this.NewAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("New...");
-			w1.Add (this.NewAction, "<Primary><Mod2>n");
+			w1.Add (this.NewAction, "<Control>n");
 			this.OpenAction = new global::Gtk.Action ("OpenAction", global::Mono.Unix.Catalog.GetString ("Open..."), null, null);
 			this.OpenAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Open...");
-			w1.Add (this.OpenAction, "<Primary><Mod2>o");
+			w1.Add (this.OpenAction, "<Control>o");
 			this.OpenRecentAction = new global::Gtk.Action ("OpenRecentAction", global::Mono.Unix.Catalog.GetString ("Open Recent"), null, null);
 			this.OpenRecentAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Open Recent");
 			w1.Add (this.OpenRecentAction, null);
@@ -96,7 +96,7 @@ namespace MonoGame.Tools.Pipeline
 			w1.Add (this.ImportAction, null);
 			this.SaveAction = new global::Gtk.Action ("SaveAction", global::Mono.Unix.Catalog.GetString ("Save"), null, null);
 			this.SaveAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Save");
-			w1.Add (this.SaveAction, "<Primary><Mod2>s");
+			w1.Add (this.SaveAction, "<Control>s");
 			this.SaveAsAction = new global::Gtk.Action ("SaveAsAction", global::Mono.Unix.Catalog.GetString ("Save As..."), null, null);
 			this.SaveAsAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Save As...");
 			w1.Add (this.SaveAsAction, null);
@@ -109,10 +109,10 @@ namespace MonoGame.Tools.Pipeline
 			w1.Add (this.EditAction, null);
 			this.UndoAction = new global::Gtk.Action ("UndoAction", global::Mono.Unix.Catalog.GetString ("Undo"), null, null);
 			this.UndoAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Undo");
-			w1.Add (this.UndoAction, "<Primary><Mod2>z");
+			w1.Add (this.UndoAction, "<Control>z");
 			this.RedoAction = new global::Gtk.Action ("RedoAction", global::Mono.Unix.Catalog.GetString ("Redo"), null, null);
 			this.RedoAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Redo");
-			w1.Add (this.RedoAction, "<Primary><Mod2>y");
+			w1.Add (this.RedoAction, "<Control>y");
 			this.NewItemAction = new global::Gtk.Action ("NewItemAction", global::Mono.Unix.Catalog.GetString ("New Item..."), null, null);
 			this.NewItemAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("New Item...");
 			w1.Add (this.NewItemAction, null);
