@@ -243,9 +243,7 @@ namespace Microsoft.Xna.Framework {
 		private static CGSize SizeThatFitsWidth(UILabel label, nfloat width)
 		{
 			var font = label.Font;
-			return label.StringSize (
-				label.Text, font, new CGSize(width, font.LineHeight * label.Lines),
-				label.LineBreakMode);
+            return label.SizeThatFits(new CGSize(width, font.LineHeight * label.Lines));
 		}
 
 		private void DoneButton_Tapped (object sender, EventArgs e)

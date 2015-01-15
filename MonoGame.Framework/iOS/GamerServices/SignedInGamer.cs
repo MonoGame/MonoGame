@@ -9,6 +9,26 @@ using UIKit;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+    // iOS Unified API needs explicit conversion of DateTime/NSDate
+    // see http://developer.xamarin.com/guides/cross-platform/macios/unified/
+    public static class DateTimeNSDateConversions
+    {
+        public static DateTime NSDateToDateTime(this NSDate date)
+        {
+            DateTime reference = TimeZone.CurrentTimeZone.ToLocalTime( 
+                new DateTime(2001, 1, 1, 0, 0, 0) );
+            return reference.AddSeconds(date.SecondsSinceReferenceDate);
+        }
+
+        public static NSDate DateTimeToNSDate(this DateTime date)
+        {
+            DateTime reference = TimeZone.CurrentTimeZone.ToLocalTime(
+                new DateTime(2001, 1, 1, 0, 0, 0) );
+            return NSDate.FromTimeIntervalSinceReferenceDate(
+                (date - reference).TotalSeconds);
+        }
+    }
+
     public class SignedInGamer : Gamer
     {
         private GKLocalPlayer lp;
@@ -227,7 +247,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                                 if (ac.Key == a.Identifier)
                                 {
                                     ac.IsEarned = a.Completed;
-                                    ac.EarnedDateTime = a.LastReportedDate;
+                                    ac.EarnedDateTime = a.LastReportedDate.NSDateToDateTime();
                                 }
                             }															
                         }
