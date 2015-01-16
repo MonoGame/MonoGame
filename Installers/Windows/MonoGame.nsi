@@ -1,7 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
 !include "header.nsh"
-!define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
 ;Include Modern UI
@@ -14,8 +13,8 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
-Name '${APPNAME} ${INSTALLERVERSION}'
-OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
+Name '${APPNAME} SDK ${INSTALLERVERSION}'
+OutFile 'MonoGameSetup.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 !define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
 VIProductVersion "${INSTALLERVERSION}"
