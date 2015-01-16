@@ -185,20 +185,6 @@ namespace Microsoft.Xna.Framework.Input
                     }
                     return (axis > DeadZone);
                 case InputType.Button:
-
-                    if (this.ID == 8)
-                    {
-                        try
-                        {
-
-                        }
-                        catch
-                        {
-                        }
-
-                        return true;
-                    }
-
                     return ((OpenTK.Input.Joystick.GetState(device).GetButton(GetButton(this.ID)) == OpenTK.Input.ButtonState.Pressed) ^ this.Negative);
                 case InputType.PovUp:
                     return OpenTK.Input.Joystick.GetState(device).GetHat(GetHat(this.ID)).IsUp ^ this.Negative;
