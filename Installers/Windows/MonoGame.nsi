@@ -39,7 +39,7 @@ RequestExecutionLevel admin
 
 !insertmacro MUI_PAGE_WELCOME
 
-;!insertmacro MUI_PAGE_LICENSE "License.txt"
+!insertmacro MUI_PAGE_LICENSE "..\..\License.txt"
 
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
