@@ -54,13 +54,12 @@ namespace Microsoft.Xna.Framework.Input
 
 		static void AutoConfig()
 		{
-#if DEBUG
-
             int num = 0;
 
             while(OpenTK.Input.Joystick.GetCapabilities(num).IsConnected)
                 num++;
 
+#if DEBUG
             Console.WriteLine("Number of joysticks: " + num);
 #endif			
 			// Limit to the first 4 sticks to avoid crashes
