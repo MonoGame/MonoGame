@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="MonoGame.Tests.ContentPipeline.PolymorphicTypes">
+  <Asset Type="PolymorphicTypes">
     <Hello Type="string">World</Hello>
     <Elf Type="int">23</Elf>
     <TypedArray>
       <Item>
         <Value>true</Value>
       </Item>
-      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicB">
+      <Item Type="PolymorphicB">
         <Value>true</Value>
       </Item>
-      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicC">
+      <Item Type="PolymorphicC">
         <Value>true</Value>
       </Item>
     </TypedArray>
-    <UntypedArray Type="MonoGame.Tests.ContentPipeline.PolymorphicA[]">
+    <UntypedArray Type="PolymorphicA[]">
       <Item>
         <Value>true</Value>
       </Item>
-      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicB">
+      <Item Type="PolymorphicB">
         <Value>true</Value>
       </Item>
-      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicC">
+      <Item Type="PolymorphicC">
         <Value>true</Value>
       </Item>
     </UntypedArray>

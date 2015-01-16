@@ -51,7 +51,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public string Importer { get; set; }
 
+        /// <summary>
+        /// The date/time stamp of the DLL containing the importer.
+        /// </summary>
+        public DateTime ImporterTime { get; set; }
+
         public string Processor { get; set; }
+
+        /// <summary>
+        /// The date/time stamp of the DLL containing the processor.
+        /// </summary>
+        public DateTime ProcessorTime { get; set; }
 
         [XmlIgnore]
         public OpaqueDataDictionary Parameters { get; set; }
@@ -143,7 +153,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 serializer.Serialize(textWriter, this);
         }
 
-        public bool NeedsRebuild(PipelineBuildEvent cachedEvent)
+        public bool NeedsRebuild(PipelineManager manager, PipelineBuildEvent cachedEvent)
         {
             // If we have no previously cached build event then we cannot
             // be sure that the state hasn't changed... force a rebuild.
@@ -180,13 +190,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 cachedEvent.DestFile != DestFile)
                 return true;
 
+            // Did the importer assembly change?
+            if (manager.GetImporterAssemblyTimestamp(cachedEvent.Importer) > cachedEvent.ImporterTime)
+                return true;
+
             // Did the importer change?
-            // TODO: I need to test the assembly versions here!
             if (cachedEvent.Importer != Importer)
                 return true;
 
+            // Did the processor assembly change?
+            if (manager.GetProcessorAssemblyTimestamp(cachedEvent.Processor) > cachedEvent.ProcessorTime)
+                return true;
+
             // Did the processor change?
-            // TODO: I need to test the assembly versions here!
             if (cachedEvent.Processor != Processor)
                 return true;
 

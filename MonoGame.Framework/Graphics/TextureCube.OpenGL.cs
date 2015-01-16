@@ -28,11 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Threading.BlockOnUIThread(() =>
             {
-#if IOS
-			GL.GenTextures(1, ref this.glTexture);
-#else
-            GL.GenTextures(1, out this.glTexture);
-#endif
+			GL.GenTextures(1, out this.glTexture);
             GraphicsExtensions.CheckGLError();
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();

@@ -30,6 +30,7 @@ namespace MonoGame.Tools.Pipeline
 			}
 			this.Hide ();
 			this.treeview1.ButtonReleaseEvent += new global::Gtk.ButtonReleaseEventHandler (this.OnTreeview1ButtonReleaseEvent);
+			this.treeview1.CursorChanged += new global::System.EventHandler (this.OnTreeview1CursorChanged);
 		}
 	}
 }

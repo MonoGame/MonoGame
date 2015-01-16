@@ -14,10 +14,10 @@ using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
 #if IOS
-using MonoTouch.AudioToolbox;
-using MonoTouch.AudioUnit;
-using MonoTouch.AVFoundation;
-using MonoTouch.Foundation;
+using AudioToolbox;
+using AudioUnit;
+using AVFoundation;
+using Foundation;
 #endif
 #endif
 
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Audio
                         channelsPerFrame = (int)player.NumberOfChannels;
                         bitsPerChannel = player.SoundSetting.LinearPcmBitDepth.GetValueOrDefault(16);
 
-                        Rate = player.Settings.SampleRate;
+						Rate = (float)player.SoundSetting.SampleRate;
                         _duration = TimeSpan.FromSeconds(player.Duration);
                     }
                 }

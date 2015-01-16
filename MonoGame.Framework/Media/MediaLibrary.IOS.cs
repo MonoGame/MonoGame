@@ -4,8 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using MonoTouch.Foundation;
-using MonoTouch.MediaPlayer;
+using Foundation;
+using MediaPlayer;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Media
             for (int i = 0; i < mediaQuery.Collections.Length; i++)
             {
                 MPMediaItemCollection itemCollection = mediaQuery.Collections[i];
-                List<Song> albumSongs = new List<Song>(itemCollection.Count);
+				List<Song> albumSongs = new List<Song>((int)itemCollection.Count);
 
                 var nsAlbumArtist = itemCollection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumArtistProperty);
                 var nsAlbumName = itemCollection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumTitleProperty);

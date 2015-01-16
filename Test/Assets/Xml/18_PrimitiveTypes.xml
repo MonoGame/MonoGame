@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="MonoGame.Tests.ContentPipeline.PrimitiveTypes">
+  <Asset Type="PrimitiveTypes">
     <Char>A</Char>
+    <Char2>°</Char2>
+    <Char3>Δ</Char3>
     <Byte>127</Byte>
     <SByte>-127</SByte>
     <Short>-1000</Short>
@@ -10,9 +12,9 @@
     <UInt>100000</UInt>
     <Long>-10000000</Long>
     <ULong>10000000</ULong>
-    <Float>1234567.0</Float>
-    <Double>1234567890.0</Double>
-    <NullChar Null="true"></NullChar>
-    <NotNullChar>&#32;</NotNullChar>
+    <Float>1234567</Float>
+    <Double>1234567890</Double>
+    <NullChar Null="true" />
+    <NotNullChar>B</NotNullChar>
   </Asset>
 </XnaContent>

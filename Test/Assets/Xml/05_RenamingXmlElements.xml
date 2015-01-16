@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="MonoGame.Tests.ContentPipeline.RenamingXmlElements">
+  <Asset Type="RenamingXmlElements">
     <ShawnSaysHello>world</ShawnSaysHello>
     <ElvesAreCool>23</ElvesAreCool>
   </Asset>

@@ -10,5 +10,6 @@ namespace MonoGame.Tools.Pipeline
         string Name { get; }
         string Location { get; }
         string Icon { get; set; }
+        bool Exists { get; set; }
     }
 }

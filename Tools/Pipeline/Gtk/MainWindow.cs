@@ -49,11 +49,6 @@ namespace MonoGame.Tools.Pipeline
 			AllFilesFilter.Name = "All Files (*.*)";
 			AllFilesFilter.AddPattern ("*.*");
 
-			if (!String.IsNullOrEmpty(OpenProjectPath)) {
-				_controller.OpenProject(OpenProjectPath);
-				OpenProjectPath = null;
-			}
-
 			Widget[] widgets = menubar1.Children;
 			foreach (Widget w in widgets) {
 				if(((MenuItem)w).Name == "FileAction")
@@ -77,6 +72,8 @@ namespace MonoGame.Tools.Pipeline
 				menubar1.Hide ();
 				vbox2.Remove (menubar1);
 			}
+
+			propertiesview1.Initalize (this);
 		}
 			
 		void BuildMenu() {
@@ -103,12 +100,32 @@ namespace MonoGame.Tools.Pipeline
 #endif
 		}
 
-		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
+		public void OnShowEvent()
 		{
-			Application.Quit ();
+			if (string.IsNullOrEmpty(OpenProjectPath))
+			{
+				var startupProject = History.Default.StartupProject;
+				if (!string.IsNullOrEmpty(startupProject) && System.IO.File.Exists(startupProject))                
+					OpenProjectPath = startupProject;                
+			}
+
+			History.Default.StartupProject = null;
+
+			if (!String.IsNullOrEmpty(OpenProjectPath)) {
+				_controller.OpenProject(OpenProjectPath);
+				OpenProjectPath = null;
+			}
 		}
 
-		#region IView implements
+		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
+		{
+			if (_controller.Exit ()) 
+				Application.Quit ();
+			else
+				a.RetVal = true;
+		}
+
+#region IView implements
 
 		public void Attach (IController controller)
 		{
@@ -233,7 +250,7 @@ namespace MonoGame.Tools.Pipeline
 
 		public void AddTreeItem (IProjectItem item)
 		{
-			projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath);
+			projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
 		}
 
 		public void RemoveTreeItem (ContentItem contentItem)
@@ -243,7 +260,7 @@ namespace MonoGame.Tools.Pipeline
 
 		public void UpdateTreeItem (IProjectItem item)
 		{
-			//throw new NotImplementedException();
+
 		}
 
 		public void EndTreeUpdate ()
@@ -297,11 +314,12 @@ namespace MonoGame.Tools.Pipeline
 
 		public void OnTemplateDefined(ContentItemTemplate item)
 		{
+
 		}
 
-		private string ReplaceCharacters(string fileName)
+		public void ItemExistanceChanged(IProjectItem item)
 		{
-			return fileName.Replace (" ", "\\ ").Replace ("(", "\\(").Replace (")", "\\)");
+			projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
 		}
 
 		public Process CreateProcess(string exe, string commands)
@@ -318,6 +336,7 @@ namespace MonoGame.Tools.Pipeline
 
 			return _buildProcess;
 		}
+#endregion
 
 		protected void OnNewActionActivated (object sender, EventArgs e)
 		{
@@ -381,10 +400,10 @@ namespace MonoGame.Tools.Pipeline
 				if (paths.Length == 1) {
 					if (icons [0] == projectview1.ICON_FOLDER)
 						location = paths [0];
-					else if (icons [0] == projectview1.ICON_OTHER)
-						location = System.IO.Path.GetDirectoryName (paths [0]);
-					else
+					else if (icons[0] == projectview1.ICON_BASE)
 						location = _controller.GetFullPath ("");
+					else
+						location = System.IO.Path.GetDirectoryName (paths [0]);
 				}
 				else
 					location = _controller.GetFullPath ("");
@@ -402,10 +421,10 @@ namespace MonoGame.Tools.Pipeline
 			if (paths.Length == 1) {
 				if (icons [0] == projectview1.ICON_FOLDER)
 					_controller.Include (paths [0]);
-				else if (icons [0] == projectview1.ICON_OTHER)
-					_controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
-				else
+				else if (icons[0] == projectview1.ICON_BASE)
 					_controller.Include (_controller.GetFullPath (""));
+				else
+					_controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
 			}
 			else
 				_controller.Include (_controller.GetFullPath (""));
@@ -472,8 +491,8 @@ namespace MonoGame.Tools.Pipeline
 			RebuildAction.Sensitive = treerebuild.Sensitive;
 
 			CleanAction.Sensitive = projectOpenAndNotBuilding;
-			CancelBuildAction.Sensitive = false;
-			CancelBuildAction.Visible = false;
+			CancelBuildAction.Sensitive = !notBuilding;
+			CancelBuildAction.Visible = !notBuilding;
 
 			UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
 			UpdateRecentProjectList();
@@ -511,6 +530,8 @@ namespace MonoGame.Tools.Pipeline
 				recentMenu.Submenu = m;
 				m.ShowAll ();
 			}
+
+            recentMenu.Sensitive = nop > 0;
 			menubar1.ShowAll ();
 		}
 
@@ -522,12 +543,13 @@ namespace MonoGame.Tools.Pipeline
 
 		protected void OnFileActionActivated (object sender, EventArgs e)
 		{
-			var notBuilding = !_controller.ProjectBuilding;
-			var projectOpen = _controller.ProjectOpen;
-			var projectOpenAndNotBuilding = projectOpen && notBuilding;
-			SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
+			UpdateMenus ();
 		}
-		#endregion
+
+		protected void OnBuildActionActivated (object sender, EventArgs e)
+		{
+			UpdateMenus ();
+		}
 	}
 }
 
