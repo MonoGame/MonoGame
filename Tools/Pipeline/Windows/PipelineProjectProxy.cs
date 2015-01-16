@@ -132,6 +132,12 @@ namespace MonoGame.Tools.Pipeline
             set { _project.Icon = value; }
         }
 
+        public bool Exists
+        {
+            get { return _project.Exists; }
+            set { _project.Exists = value; }
+        }
+
         #endregion
 
         public PipelineProjectProxy(PipelineProject project)

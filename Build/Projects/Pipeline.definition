@@ -215,6 +215,7 @@
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="App.ico" />
     <EmbeddedResource Include="Icons\blueprint.png" />
+    <EmbeddedResource Include="Icons\missing.png" />
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\settings.png" />
