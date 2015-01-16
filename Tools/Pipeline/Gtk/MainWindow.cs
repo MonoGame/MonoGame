@@ -530,6 +530,8 @@ namespace MonoGame.Tools.Pipeline
 				recentMenu.Submenu = m;
 				m.ShowAll ();
 			}
+
+            recentMenu.Sensitive = nop > 0;
 			menubar1.ShowAll ();
 		}
 
