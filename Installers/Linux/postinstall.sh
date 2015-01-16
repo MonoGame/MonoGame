@@ -25,6 +25,13 @@ echo "Copying files..."
 
 cp "$DIR/." "$IDIR/" -R
 
+#fix permissions
+usr="$SUDO_USER"
+if [ -z "$usr" -a "$usr"==" " ]; then
+	usr="$USERNAME"
+fi
+sudo chown -R "$usr" "$IDIR/"
+
 echo "Creating launcher items..."
 
 #monogame pipeline terminal command
