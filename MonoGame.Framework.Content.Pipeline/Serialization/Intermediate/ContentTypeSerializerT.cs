@@ -43,8 +43,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, object value)
         {
-            var cast = value == null ? default(T) : (T)value;
-            ScanChildren(serializer, callback, cast);
+            if (value == null)
+                return;
+            ScanChildren(serializer, callback, (T)value);
         }
 
         protected internal abstract void Serialize(IntermediateWriter output, T value, ContentSerializerAttribute format);

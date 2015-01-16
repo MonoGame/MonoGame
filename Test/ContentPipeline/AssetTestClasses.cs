@@ -298,6 +298,7 @@ namespace MonoGame.Tests.ContentPipeline
         public object E;
         public object F;
         public object G;
+        public List<string> H;
     }
 
     namespace Nested
