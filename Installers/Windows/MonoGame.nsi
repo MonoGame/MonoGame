@@ -44,21 +44,6 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 
-;Page custom XamarinPageEnter XamarinPageLeave
-
-;  Function XamarinPageEnter
-;      ReserveFile "xamarin.ini"
-;      ReserveFile "mono.bmp"
-;      ReserveFile "xamarin.bmp"
-;      !insertmacro INSTALLOPTIONS_EXTRACT "xamarin.ini"
-;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 1" "Text" "mono.bmp"
-;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 2" "Text" "xamarin.bmp"
-;      !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
-;  FunctionEnd
-  
-;  Function XamarinPageLeave
-;  FunctionEnd
-
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
@@ -86,11 +71,6 @@ RequestExecutionLevel admin
 !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
-
-Function CustomPageFunction ;Function name defined with Page command
-  !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
-FunctionEnd
-
 
 ; The stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
