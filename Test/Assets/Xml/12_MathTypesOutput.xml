@@ -11,10 +11,6 @@
     <Color>FF6495ED</Color>
     <Vector2Array>0 0 1 1</Vector2Array>
     <Vector2List>1 7 1 9 1 10</Vector2List>
-    <Vector2ListSpaced>
-      0 4
-      0 6
-      0 7
-    </Vector2ListSpaced>
+    <Vector2ListSpaced>0 4 0 6 0 7</Vector2ListSpaced>
   </Asset>
 </XnaContent>

@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     abstract class ElementSerializer<T> : ContentTypeSerializer<T>
     {
-        private static readonly char [] _seperators = { ' ', '\t' };
+        private static readonly char [] _seperators = { ' ', '\t', '\n' };
 
         private const string _writeSeperator = " ";
 
