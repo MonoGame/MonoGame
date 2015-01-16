@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework
 #elif WINDOWS_PHONE
             return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
 #elif WINRT
-            return new MetroGamePlatform(game);
+            return new ModernGamePlatform(game);
 #elif WEB
             return new WebGamePlatform(game);
 #endif
