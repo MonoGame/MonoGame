@@ -271,13 +271,7 @@ namespace MonoGame.Tools.Pipeline
         void SetExists(string path, bool exist)
         {
             if (_project != null) {
-                var projectDir = _project.Location;
-
-                #if WINDOWS
-                projectDir += "\\";
-                #else
-                projectDir += "/";
-                #endif
+                var projectDir = _project.Location + Path.DirectorySeparatorChar;
 
                 IProjectItem item = GetItem (PathHelper.GetRelativePath (projectDir, path));
                 if (item != null) {
@@ -680,13 +674,7 @@ namespace MonoGame.Tools.Pipeline
             if (Path.IsPathRooted(filePath))
                 return filePath;
 
-            #if WINDOWS
-            return _project.Location + "\\" + filePath;
-            #endif
-
-            #if LINUX || MONOMAC
-            return _project.Location + "/" + filePath;
-            #endif
+            return _project.Location + Path.DirectorySeparatorChar + filePath;
         }
     }
 }
