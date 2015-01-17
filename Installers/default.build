@@ -56,7 +56,7 @@
       <copy tofile="./distribution.xml" file="./MacOS/distribution.xml" />
       <copy tofile="./MacOS/Resources/LICENSE.html" file="./../LICENSE.txt" />
       <xmlpoke file="./distribution.xml" xpath="/installer-gui-script/title" value="MonoGame ${buildNumber}" />
-      <exec program="productbuild" workingdir="${project::get-base-directory()}" commandline=" --distribution ./distribution.xml --resources ./MacOS/Resources --package-path ./ MonoGame.Installer.pkg" />
+      <exec program="productbuild" workingdir="${project::get-base-directory()}" commandline=" --distribution ./distribution.xml --resources ./MacOS/Resources --package-path ./ MonoGame.pkg" />
       <delete dir="./root"/>
       <delete file="./distribution.xml"/>
       <delete file="./MacOS/Resources/LICENSE.html"/>
