@@ -13,8 +13,7 @@ using MonoMac.OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
-using BufferTarget = OpenTK.Graphics.ES20.All;
-using BufferUsageHint = OpenTK.Graphics.ES20.All;
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 #if WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;

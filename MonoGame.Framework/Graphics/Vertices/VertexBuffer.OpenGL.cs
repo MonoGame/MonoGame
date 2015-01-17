@@ -16,8 +16,7 @@ using OpenTK.Graphics.OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
-using BufferTarget = OpenTK.Graphics.ES20.All;
-using BufferUsageHint = OpenTK.Graphics.ES20.All;
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

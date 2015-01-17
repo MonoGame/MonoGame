@@ -144,11 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int anisotropy = 0;
             if (SupportsTextureFilterAnisotropic)
             {
-#if GLES && !ANGLE && !ANDROID
-                GL.GetInteger(All.MaxTextureMaxAnisotropyExt, ref anisotropy);
-#else
                 GL.GetInteger((GetPName)All.MaxTextureMaxAnisotropyExt, out anisotropy);
-#endif
                 GraphicsExtensions.CheckGLError();
             }
             MaxTextureAnisotropy = anisotropy;

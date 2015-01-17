@@ -10,10 +10,7 @@ using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using EnableCap = OpenTK.Graphics.ES20.All;
-using GLStencilFunction = OpenTK.Graphics.ES20.All;
-using StencilOp = OpenTK.Graphics.ES20.All;
-using DepthFunction = OpenTK.Graphics.ES20.All;
+using GLStencilFunction = OpenTK.Graphics.ES20.StencilFunction;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -85,10 +82,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (this.TwoSidedStencilMode)
                 {
 #if GLES
-                    var cullFaceModeFront = (All)CullFaceMode.Front;
-                    var cullFaceModeBack = (All)CullFaceMode.Back;
-                    var stencilFaceFront = (All)CullFaceMode.Front;
-                    var stencilFaceBack = (All)CullFaceMode.Back;
+                    var cullFaceModeFront = CullFaceMode.Front;
+                    var cullFaceModeBack = CullFaceMode.Back;
+                    var stencilFaceFront = CullFaceMode.Front;
+                    var stencilFaceBack = CullFaceMode.Back;
 #elif MONOMAC
                     var cullFaceModeFront = (Version20)CullFaceMode.Front;
                     var cullFaceModeBack = (Version20)CullFaceMode.Back;
@@ -135,24 +132,24 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (function)
             {
-            case CompareFunction.Always:
-                return GLStencilFunction.Always;
-            case CompareFunction.Equal:
-                return GLStencilFunction.Equal;
-            case CompareFunction.Greater:
-                return GLStencilFunction.Greater;
-            case CompareFunction.GreaterEqual:
-                return GLStencilFunction.Gequal;
-            case CompareFunction.Less:
-                return GLStencilFunction.Less;
-            case CompareFunction.LessEqual:
-                return GLStencilFunction.Lequal;
-            case CompareFunction.Never:
-                return GLStencilFunction.Never;
-            case CompareFunction.NotEqual:
-                return GLStencilFunction.Notequal;
-            default:
-                return GLStencilFunction.Always;
+                case CompareFunction.Always: 
+                    return GLStencilFunction.Always;
+                case CompareFunction.Equal:
+                    return GLStencilFunction.Equal;
+                case CompareFunction.Greater:
+                    return GLStencilFunction.Greater;
+                case CompareFunction.GreaterEqual:
+                    return GLStencilFunction.Gequal;
+                case CompareFunction.Less:
+                    return GLStencilFunction.Less;
+                case CompareFunction.LessEqual:
+                    return GLStencilFunction.Lequal;
+                case CompareFunction.Never:
+                    return GLStencilFunction.Never;
+                case CompareFunction.NotEqual:
+                    return GLStencilFunction.Notequal;
+                default:
+                    return GLStencilFunction.Always;
             }
         }
 
