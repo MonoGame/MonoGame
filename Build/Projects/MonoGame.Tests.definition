@@ -533,7 +533,7 @@
     <Content Include="Assets\Xml\20_SystemTypes.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="Assets\Xml\21_QualifiedTypes.xml">
+	<Content Include="Assets\Xml\21_CustomFormatting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

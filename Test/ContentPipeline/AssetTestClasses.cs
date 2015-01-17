@@ -185,6 +185,7 @@ public class MathTypes
     public Matrix Matrix;
     public Color Color;
     public Vector2[] Vector2Array = new Vector2[0];
+    public List<Vector2> Vector2List = new List<Vector2>();
 }
 #endregion
 
@@ -325,34 +326,11 @@ namespace MonoGame.Tests.ContentPipeline
     }
     #endregion
 
-    #region The Basics Namespaced
-    public class QualifiedTypes
+    #region CustomFormatting
+    public class CustomFormatting
     {
-        public int PublicField;
-        protected int ProtectedField;
-        private int PrivateField;
-        internal int InternalField;
-
-        public string GetSetProperty
-        {
-            get;
-            set;
-        }
-
-        public string GetOnlyProperty
-        {
-            get { return "Hello World"; }
-        }
-
-        public string SetOnlyProperty { set; private get; }
-
-        public NestedQualifiedType Nested = new NestedQualifiedType();
-    }
-
-    public class NestedQualifiedType
-    {
-        public string Name;
-        public bool IsEnglish;
+        public byte A;
+        public List<Vector2> Vector2ListSpaced = new List<Vector2>();
     }
     #endregion
 }
