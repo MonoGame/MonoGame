@@ -163,14 +163,14 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Reference comparison of the underlying Texture objects for each given SpriteBatchitem.
+        /// Comparison of the underlying Texture objects for each given SpriteBatchitem.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
-        /// <returns>0 if they are not reference equal, and 1 if so.</returns>
+        /// <returns>0 if they are equal, -1 or 1 if not.</returns>
 	    static int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
 		{
-            return ReferenceEquals( a.Texture, b.Texture ) ? 0 : 1;
+            return a.Texture.ComparisonCode.CompareTo(b.Texture.ComparisonCode);
 		}
 
         /// <summary>
