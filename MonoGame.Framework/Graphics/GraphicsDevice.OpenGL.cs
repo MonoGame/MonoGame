@@ -299,7 +299,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
+#if GLES
                 GL.ClearDepth (depth);
+#else
+                GL.ClearDepth((double)depth);
+#endif
                 GraphicsExtensions.CheckGLError();
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
