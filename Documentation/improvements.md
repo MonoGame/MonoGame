@@ -1,28 +1,5 @@
 The new API features which are available in the current development release and does not exist in XNA.
 
-##Circle
-
-[Circle](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Circle) - A Circle which can be used for circle-based bounds and collisions. Circle contains methods to get the Diameter and Circumference in addition to a way of getting points on the circles edge with a specified radii. A Circle has methods to check intersection with other Circles and [Rectangles](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Rectangle)
-
-```
-
-	Circle circle = new Circle(new Vector2(200.0f, 300.0f), 100.0f);
-	float diameter = circle.Diameter;
-	float circumference = circle.Circumference;
-	
-	Rectangle rectangleAroundCircle = circle.ToRectangle();
-
-	// All of these will come out as true
-	bool containsFloat = circle.Contains(200.0f, 300.0f);
-	bool containsPoint = circle.Contains(new Point(200, 300));
-	bool containsVector2 = circle.Contains(new Vector2(200.0f, 300.0f));
-	bool containsCircle = circle.Contains(new Circle(new Vector2(200.0f, 300.0f), 25.0f));
-	
-	bool intersectsCircle = circle.Intersects(new Circle(new Vector2(350.0f, 300.0f), 100.0f));
-	bool intersectsRectangle = circle.Intersects(new Rectangle(250, 350, 150, 100));
-```
-
-
 
 ##Graphics and window routines
 
@@ -30,7 +7,7 @@ The new API features which are available in the current development release and 
 
 [GameWindow.IsBorderless](http://www.monogame.net/documentation/?page=P_Microsoft_Xna_Framework_GameWindow_IsBorderless) - boolean that makes border of your window invisible. You cannot move or resize your game window after this boolean setted to true. Works only on desktop platforms.
 
-##Math
+##Math and geometry routines
 
 [MathHelper.Clamp(int,int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_MathHelper_Clamp_1) - this overload clamps integers instead floats which could be useful in some cases. You dont need to convert like this MathHelper.Clamp((float)integer,(float)min,(float)max) anymore.
 
@@ -56,6 +33,23 @@ var vector2 = point.ToVector2();
 ```
 Vector2 vector2 = new Vector2(10.01f,10.99f);
 var point = vector2.ToPoint(); // point will be 10,10.
+```
+
+[Circle](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Circle) - A Circle which can be used for circle-based bounds and collisions. Circle contains methods of getting points on the circles edge with a specified radii in addition to ones for checking intersection with other Circles and [Rectangles](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Rectangle)
+
+```
+
+	Circle circle = new Circle(new Vector2(200.0f, 300.0f), 100.0f);
+	Rectangle rectangleAroundCircle = circle.ToRectangle();
+
+	bool containsFloat = circle.Contains(200.0f, 300.0f);
+	bool containsPoint = circle.Contains(new Point(200, 300));
+	bool containsVector2 = circle.Contains(new Vector2(200.0f, 300.0f));
+	bool containsCircle = circle.Contains(new Circle(new Vector2(200.0f, 300.0f), 25.0f));
+	
+	bool intersectsCircle = circle.Intersects(new Circle(new Vector2(350.0f, 300.0f), 100.0f));
+	bool intersectsRectangle = circle.Intersects(new Rectangle(250, 350, 150, 100));
+
 ```
 
 ##Input
