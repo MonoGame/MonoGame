@@ -19,7 +19,7 @@ namespace MonoGame.Framework
         [CLSCompliant(false)]
         public IFrameworkView CreateView()
         {
-            return new MetroFrameworkView<T>(_gameConstructorCustomizationDelegate);
+            return new ModernFrameworkView<T>(_gameConstructorCustomizationDelegate);
         }
     }
 }

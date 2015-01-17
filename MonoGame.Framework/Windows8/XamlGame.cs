@@ -35,10 +35,10 @@ namespace MonoGame.Framework
                 throw new NullReferenceException("The swap chain panel cannot be null!");
 
             // Save any launch parameters to be parsed by the platform.
-            MetroGamePlatform.LaunchParameters = launchParameters;
+            ModernGamePlatform.LaunchParameters = launchParameters;
 
             // Setup the window class.
-            MetroGameWindow.Instance.Initialize(window, swapChainBackgroundPanel, MetroGamePlatform.TouchQueue);
+            ModernGameWindow.Instance.Initialize(window, swapChainBackgroundPanel, ModernGamePlatform.TouchQueue);
 
             // Construct the game.
             var game = new T();
@@ -71,7 +71,7 @@ namespace MonoGame.Framework
 #endif
         
         /// <summary>
-        /// Preserves the previous execution state in MetroGamePlatform and returns the constructed game object initialized with the given window.
+        /// Preserves the previous execution state in ModernGamePlatform and returns the constructed game object initialized with the given window.
         /// </summary>
         /// <param name="args">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
@@ -79,14 +79,14 @@ namespace MonoGame.Framework
         /// <returns></returns>
         static public T Create(LaunchActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapChainBackgroundPanel)
         {
-            MetroGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
+            ModernGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
 
             return Create(args.Arguments, window, swapChainBackgroundPanel);
         }
 
         static public T Create(ProtocolActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapChainBackgroundPanel)
         {
-            MetroGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
+            ModernGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
 
             return Create(args.Uri.AbsoluteUri, window, swapChainBackgroundPanel);
         }

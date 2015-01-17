@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Content
 		public static string Normalize(string fileName, string[] extensions)
 		{
 #if WINRT
-            if (MetroHelper.AppDataFileExists(fileName))
+            if (ModernHelper.AppDataFileExists(fileName))
                 return fileName;
 #else
             if (File.Exists(fileName))
@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework.Content
                 string fileNamePlusExt = fileName + ext;
 
 #if WINRT
-                if (MetroHelper.AppDataFileExists(fileNamePlusExt))
+                if (ModernHelper.AppDataFileExists(fileNamePlusExt))
                     return fileNamePlusExt;
 #else
 			    if (File.Exists(fileNamePlusExt))

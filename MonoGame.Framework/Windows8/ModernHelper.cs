@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.Storage;
+using Windows.ApplicationModel;
 
 namespace Microsoft.Xna.Framework
 {
-    static internal class MetroHelper
+    static internal class ModernHelper
     {
         static public bool AppDataFileExists(string fileName)
         {
@@ -16,7 +17,7 @@ namespace Microsoft.Xna.Framework
 
                 try
                 {
-                    var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(fileName);
+                    var file = await Package.Current.InstalledLocation.GetFileAsync(fileName);
                     return file == null ? false : true;
                 }
                 catch (FileNotFoundException)
