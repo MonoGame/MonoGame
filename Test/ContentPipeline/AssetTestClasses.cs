@@ -329,6 +329,7 @@ namespace MonoGame.Tests.ContentPipeline
     #region CustomFormatting
     public class CustomFormatting
     {
+        public byte A;
         public List<Vector2> Vector2ListSpaced = new List<Vector2>();
     }
     #endregion

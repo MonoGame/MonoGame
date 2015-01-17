@@ -451,6 +451,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             DeserializeCompileAndLoad<CustomFormatting>("21_CustomFormatting.xml", customFormatting =>
             {
+                Assert.AreEqual(1, customFormatting.A);
                 Assert.AreEqual(3, customFormatting.Vector2ListSpaced.Count);
                 Assert.AreEqual(new Vector2(0, 4), customFormatting.Vector2ListSpaced[0]);
                 Assert.AreEqual(new Vector2(0, 6), customFormatting.Vector2ListSpaced[1]);
