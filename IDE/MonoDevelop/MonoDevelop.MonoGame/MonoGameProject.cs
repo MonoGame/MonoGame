@@ -37,7 +37,7 @@ namespace MonoDevelop.MonoGame
 
 		public override bool SupportsFormat (FileFormat format)
 		{
-			return format.Id == "MSBuild10";
+			return format.Id == "MSBuild12";
 		}
 
 		public override TargetFrameworkMoniker GetDefaultTargetFrameworkForFormat (FileFormat format)

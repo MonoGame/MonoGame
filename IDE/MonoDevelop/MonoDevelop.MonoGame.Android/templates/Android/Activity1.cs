@@ -36,11 +36,9 @@ namespace ${Namespace}
 		{
 			base.OnCreate (bundle);
 
-			// Create our OpenGL view, and display it
-			Game1.Activity = this;
-			var g = new Game1();
-			SetContentView (g.Window);
-			g.Run();
+			var g = new Game1 ();
+			SetContentView (g.Services.GetService<View>());
+			g.Run ();
 		}
 		
 	}

@@ -51,7 +51,17 @@
 		<Import file="MonoDevelop.MonoGame.iOS.dll" />
 		<Import file="MonoDevelop.MonoGame.Mac.dll" />
 		<!-- Nuget Packages -->
+		<!---
 		<Import file="packages/MonoGame.Binaries.3.2.0.nupkg" />
+		-->
+		<Import file="packages/MonoGame.Framework.Android.3.3.0.nupkg" />
+		<Import file="packages/MonoGame.Framework.iOS.3.3.0.nupkg" />
+		<Import file="packages/MonoGame.Framework.Linux.3.3.0.nupkg" />
+		<Import file="packages/MonoGame.Framework.MacOS.3.3.0.nupkg" />
+		<Import file="packages/MonoGame.Framework.MonoMac.3.3.0.nupkg" />
+		<Import file="packages/MonoGame.Framework.Ouya.3.3.0.nupkg" />
+		<Import file="packages/MonoGame.Framework.WindowsDX.3.3.0.nupkg" />
+		<Import file="packages/MonoGame.Framework.WindowsGL.3.3.0.nupkg" />
 		<Import file="packages/Ouya.Console.Api.1.0.13.1.nupkg" />
 		<!-- Exclude non .net files from a scan -->
 		<ScanExclude path="nvtt.dll"/>
@@ -87,7 +97,9 @@
 		<ProjectTemplate id="MonoGameSharedProject" file="templates/MonoGameSharedProject.xpt.xml" />
 		<Condition id="IsWindows">
 			<!-- DirectX Based Templates -->
-			<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
+			<ProjectTemplate id="MonoGameDXProject" file="templates/MonoGameWindowsProject.xpt.xml" />
+			<!--- Linux Templates -->
+			<ProjectTemplate id="MonoGameProject" file="templates/MonoGameProject.xpt.xml" />
 		</Condition>
 		<Condition id="IsLinux">
 			<!--- Linux Templates -->
@@ -179,16 +191,5 @@
 			<ProjectTemplate id="MonoGameForMonoMacProject" file="templates/MonoGameMacProject.xpt.xml" />
 		</Extension>
 	</Module>
-
-	<!--
-	<Module>
-		<Runtime>
-			<Import assembly="MonoDevelop.MonoGame.Content.dll"/>
-		</Runtime>
-		<Dependencies>
-		</Dependencies>
-		
-	</Module>
-	-->
 </Addin>
 

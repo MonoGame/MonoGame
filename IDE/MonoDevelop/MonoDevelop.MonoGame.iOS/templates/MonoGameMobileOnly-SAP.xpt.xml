@@ -33,7 +33,7 @@
 				<Reference type="Project" refto="${ProjectName}"/>
 			</References>
 			<Packages>
-				<Package id="MonoGame.Binaries" version="3.2.0" targetFramework="Xamarin.iOS" />
+				<Package id="MonoGame.Framework.iOS" version="3.3.0" targetFramework="Xamarin.iOS" />
 			</Packages>
 			<Files>
 				<File name="Main.cs" AddStandardHeader="True" src="Shared/Program.cs" />
@@ -64,7 +64,7 @@
 				<Reference type="Project" refto="${ProjectName}"/>
 			</References>
 			<Packages>
-				<Package id="MonoGame.Binaries" version="3.2.0" targetFramework="MonoAndroid" />
+				<Package id="MonoGame.Framework.Android" version="3.3.0" targetFramework="MonoAndroid" />
 			</Packages>
 			<Files>
 				<File name="Activity1.cs" src="Shared/Activity1.cs" />

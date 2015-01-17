@@ -28,7 +28,17 @@
 
   <target name="buildaddin" description="Build Xamarin Studio Addin" depends="checkos">
      <mkdir dir="MonoDevelop.MonoGame/packages/"/>
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AABc07_IED6pnHqDvRwx9OAMa/MonoGame.Framework.Android.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.Android.3.3.0.nupkg" />
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AADEdMYLTwjxAkuq4mH3uCLea/MonoGame.Framework.iOS.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.iOS.3.3.0.nupkg" />
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AAC7kkRvrj7SWlO4UQkPU6Gta/MonoGame.Framework.Linux.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.Linux.3.3.0.nupkg" />
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AAAtFUCied2XT_j4ooZeU-Tpa//MonoGame.Framework.MacOS.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.MacOS.3.3.0.nupkg" />
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AACpNSCMkHy_mZ7I0-fynSfma/MonoGame.Framework.MonoMac.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.MonoMac.3.3.0.nupkg" />
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AADpOxSFMudqfKDlcihy1Jpoa/MonoGame.Framework.Ouya.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.Ouya.3.3.0.nupkg" />
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AAATOvYnHNZtPk67ntgFSTCwa/MonoGame.Framework.WindowsDX.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.WindowsDX.3.3.0.nupkg" />
+     <get src="https://www.dropbox.com/sh/e2tnfxrmgk6rdno/AACGuKviRNBNzbTuXpKRQY1Ma/MonoGame.Framework.WindowsGL.3.3.0.nupkg?dl=1" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.WindowsGL.3.3.0.nupkg" />
+     <!---
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Binaries/3.2.0" dest="MonoDevelop.MonoGame/packages/MonoGame.Binaries.3.2.0.nupkg"/>
+     -->
      <get src="https://www.nuget.org/api/v2/package/Ouya.Console.Api/1.0.13.1" dest="MonoDevelop.MonoGame/packages/Ouya.Console.Api.1.0.13.1.nupkg"/>
      <if test="${os == 'MacOS'}">
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Clean -c:Release  MonoDevelop.MonoGame.Addin.sln" />

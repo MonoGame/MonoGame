@@ -74,5 +74,8 @@ Test/*.csproj
 *.pkg
 *.mpack
 
+#Nuget Packages
+**/*.nupkg
+
 #Zip files
 *.zip

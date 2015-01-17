@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <Template>
 	<TemplateConfiguration>
-		<_Name>MonoGame Windows Application</_Name>
+		<_Name>MonoGame Application (DirectX)</_Name>
 		<_Category>C#/MonoGame</_Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
-		<_Description>Creates a new C# MonoGame Windows Application.</_Description>	   
+		<_Description>Creates a new C# MonoGame Windows Application. This application will use the DirecTX backend.</_Description>	   
 	</TemplateConfiguration>
 	
 	<Actions>
@@ -25,7 +25,7 @@
 				<Reference type="Gac" refto="System.Core" />
 			</References>
 			<Packages>
-				<Package id="MonoGame.Binaries" version="3.2.0" targetFramework="net40" />
+				<Package id="MonoGame.Framework.WindowsDX" version="3.3.0" targetFramework="net40" />
 			</Packages>
 			<Files>
 				<File name="Game1.cs" src="templates/Common/Game1.cs" />
