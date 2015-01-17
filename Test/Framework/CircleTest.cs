@@ -172,6 +172,36 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void IntersectionTest()
+        {
+            var circle = new Circle(new Vector2(200.0f, 300.0f), 100.0f);
+
+            var circ1 = new Circle(new Vector2(350.0f, 300.0f), 100.0f);
+            var circ2 = new Circle(new Vector2(400.0f, 300.0f), 100.0f);
+
+            var rect1 = new Rectangle(250, 300, 100, 100);
+            var rect2 = new Rectangle(400, 300, 100, 100);
+
+            bool result;
+
+            circle.Intersects(ref circ1, out result);
+            Assert.AreEqual(true, result);
+            circle.Intersects(ref circ2, out result);
+            Assert.AreEqual(false, result);
+
+            circle.Intersects(ref rect1, out result);
+            Assert.AreEqual(true, result);
+            circle.Intersects(ref rect2, out result);
+            Assert.AreEqual(false, result);
+
+            Assert.AreEqual(true, circle.Intersects(circ1));
+            Assert.AreEqual(false, circle.Intersects(circ2));
+
+            Assert.AreEqual(true, circle.Intersects(rect1));
+            Assert.AreEqual(false, circle.Intersects(rect2));  
+        }
+
+        [Test]
         public void Inflate()
         {
             var circle = new Circle(new Vector2(200.0f, 300.0f), 100.0f);

@@ -364,6 +364,32 @@ namespace Microsoft.Xna.Framework
 			return (distanceOfCorners <= (Radius * Radius));
 		}
 
+        /// <summary>
+        /// Gets whether or not a specified <see cref="Rectangle"/> intersects with this <see cref="Circle"/>.
+        /// </summary>
+        /// <param name="value">Other <see cref="Rectangle"/>.</param>
+        /// <param name="result"><c>true</c> if other <see cref="Rectangle"/> intersects with this <see cref="Circle"/>; <c>false</c> otherwise. As an output parameter.</param>
+        public void Intersects(ref Rectangle value, out bool result)
+        {
+            Vector2 distance = new Vector2(Math.Abs(Center.X - value.X), Math.Abs(Center.Y - value.Y));
+
+            if (distance.X > (value.Width / 2.0f + Radius))
+                result = false;
+            if (distance.Y > (value.Height / 2.0f + Radius))
+                result = false;
+
+            if (distance.X <= (value.Width / 2.0f))
+                result = true;
+            if (distance.Y <= (value.Height / 2.0f))
+                result = true;
+
+
+            float distanceOfCorners = ((distance.X - value.Width / 2.0f) * (distance.X - value.Width / 2.0f) +
+                                       (distance.Y - value.Height / 2.0f) * (distance.Y - value.Height / 2.0f));
+
+            result = (distanceOfCorners <= (Radius * Radius));
+        }
+
 		/*
 		/// <summary>
 		/// Creates a new <see cref="Circle"/> that contains overlapping region of two other circles.
