@@ -1,5 +1,29 @@
 The new API features which are available in the current development release and does not exist in XNA.
 
+##Circle
+
+[Circle](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Circle) - A Circle which can be used for circle-based bounds and collisions. Circle contains methods to get the Diameter and Circumference in addition to a way of getting points on the circles edge with a specified radii. A Circle has methods to check intersection with other Circles and [Rectangles](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Rectangle)
+
+```
+
+	Circle circle = new Circle(new Vector2(200.0f, 300.0f), 100.0f);
+	float diameter = circle.Diameter;
+	float circumference = circle.Circumference;
+	
+	Rectangle rectangleAroundCircle = circle.ToRectangle();
+
+	// All of these will come out as true
+	bool containsFloat = circle.Contains(200.0f, 300.0f);
+	bool containsPoint = circle.Contains(new Point(200, 300));
+	bool containsVector2 = circle.Contains(new Vector2(200.0f, 300.0f));
+	bool containsCircle = circle.Contains(new Circle(new Vector2(200.0f, 300.0f), 25.0f));
+	
+	bool intersectsCircle = circle.Intersects(new Circle(new Vector2(350.0f, 300.0f), 100.0f));
+	bool intersectsRectangle = circle.Intersects(new Rectangle(250, 350, 150, 100));
+```
+
+
+
 ##Graphics and window routines
 
 [GameWindow.AllowAltF4](http://www.monogame.net/documentation/?page=P_Microsoft_Xna_Framework_GameWindow_AllowAltF4) - boolean that allows or disallow using Alt+F4 combo for game window closing. You can change it anytime in your code. Note : this isnt working on WinRT projects because Alt+F4 is intended to work always on this platform.
