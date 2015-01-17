@@ -78,7 +78,7 @@ namespace MonoDevelop.MonoGame
 		{
 			var process = new Process ();
 			if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-				process.StartInfo.FileName = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFilesX86), @"MonoGame\Tools", "Pipeline.exe");;
+				process.StartInfo.FileName = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\MonoGame\v3.0\Tools", "Pipeline.exe");
 				process.StartInfo.Arguments = string.Format ("\"{0}\"", filename);
 			} else {
 				if (Directory.Exists ("/Applications/Pipeline.app")) {
