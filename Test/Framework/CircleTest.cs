@@ -212,7 +212,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ToStringTest()
         {
-            Assert.AreEqual("{Center:{{X:200 Y:300}} Radius:100}", new Circle(new Vector2(200.0f, 300.0f), 100.0f).ToString());
+            Assert.AreEqual("{Center:{X:200 Y:300} Radius:100}", new Circle(new Vector2(200.0f, 300.0f), 100.0f).ToString());
         }
 
         [Test]
