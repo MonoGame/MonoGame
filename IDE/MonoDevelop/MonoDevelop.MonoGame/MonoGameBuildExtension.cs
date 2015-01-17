@@ -73,7 +73,7 @@ namespace MonoDevelop.MonoGame
 			if (!File.Exists (location)) {
 				switch (Environment.OSVersion.Platform) {
 					case PlatformID.Win32NT:
-					location = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFilesX86), @"MonoGame\Tools", "MGCB.exe");
+						location = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\MonoGame\v3.0\Tools", "MGCB.exe");
 						break;
 					case PlatformID.Unix:
 						if (Directory.Exists ("/Applications") &&
