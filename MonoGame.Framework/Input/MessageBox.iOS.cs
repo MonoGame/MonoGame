@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using MonoTouch.UIKit;
+using UIKit;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Input
                 alert.Dismissed += (sender, e) =>
                 {
                     if (!tcs.Task.IsCompleted)
-                        tcs.SetResult(e.ButtonIndex);
+					    tcs.SetResult((int)e.ButtonIndex);
                 };
                 alert.Show();
             });
