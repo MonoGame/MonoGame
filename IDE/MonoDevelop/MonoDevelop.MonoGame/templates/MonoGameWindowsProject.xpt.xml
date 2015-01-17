@@ -28,11 +28,11 @@
 				<Package id="MonoGame.Framework.WindowsDX" version="3.3.0" targetFramework="net40" />
 			</Packages>
 			<Files>
-				<File name="Game1.cs" src="templates/Common/Game1.cs" />
-				<File name="Program.cs" src="templates/Common/Program.cs" />
-				<RawFile name="Icon.png" src="templates/Common/Icon-md.png" />
+				<File name="Game1.cs" src="Common/Game1.cs" />
+				<File name="Program.cs" src="Common/Program.cs" />
+				<RawFile name="Icon.png" src="Common/Icon-md.png" />
 				<Directory name="Properties">
-					<File name="AssemblyInfo.cs" src="templates/Common/AssemblyInfo.cs" />
+					<File name="AssemblyInfo.cs" src="Common/AssemblyInfo.cs" />
 				</Directory>
 				<Directory name="Content">
 					<File name="Content.mgcb" src="Common/Content.mgcb"/>

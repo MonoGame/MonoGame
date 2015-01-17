@@ -13,6 +13,7 @@
 		<!--- Generic Templates -->
 		<Import file="templates/MonoGameProject.xpt.xml" />
 		<Import file="templates/MonoGameSharedProject.xpt.xml" />
+		<Import file="templates/MonoGamePCLProject.xpt.xml" />
 		<!-- Windows Templates -->
 		<Import file="templates/MonoGameWindowsProject.xpt.xml" />
 		<Import file="templates/Common/AssemblyInfo.cs" />
@@ -34,6 +35,7 @@
 		<Import file="templates/Android/Styles.xml" />
 		<!-- Mac Templates -->
 		<Import file="templates/MonoGameMacProject.xpt.xml" />
+		<Import file="templates/MonoGameOSXProject.xpt.xml" />
 		<Import file="templates/Mac/MacInfo.plist" />
 		<Import file="templates/Mac/Program.cs" />
 		<!-- iOS Templates -->
@@ -95,6 +97,7 @@
 	
 	<Extension path="/MonoDevelop/Ide/ProjectTemplates">
 		<ProjectTemplate id="MonoGameSharedProject" file="templates/MonoGameSharedProject.xpt.xml" />
+		<ProjectTemplate id="MonoGamePCLProject" file="templates/MonoGamePCLProject.xpt.xml" />
 		<Condition id="IsWindows">
 			<!-- DirectX Based Templates -->
 			<ProjectTemplate id="MonoGameDXProject" file="templates/MonoGameWindowsProject.xpt.xml" />
@@ -189,6 +192,9 @@
 		</Dependencies>
 		<Extension path="/MonoDevelop/Ide/ProjectTemplates">
 			<ProjectTemplate id="MonoGameForMonoMacProject" file="templates/MonoGameMacProject.xpt.xml" />
+			<!---
+			<ProjectTemplate id="MonoGameForXamMacProject" file="templates/MonoGameOSXProject.xpt.xml" />
+			-->
 		</Extension>
 	</Module>
 </Addin>
