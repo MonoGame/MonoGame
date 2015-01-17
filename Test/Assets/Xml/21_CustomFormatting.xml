@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <!-- A fully qualified type -->
+  <Asset Type="MonoGame.Tests.ContentPipeline.CustomFormatting">
+    <Vector2ListSpaced>
+      0 4
+      0 6
+      0 7
+    </Vector2ListSpaced>
+  </Asset>
+</XnaContent>
