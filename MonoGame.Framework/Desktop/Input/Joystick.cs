@@ -112,5 +112,4 @@ namespace Microsoft.Xna.Framework.Input
             return list;
         }
     }
-
 }

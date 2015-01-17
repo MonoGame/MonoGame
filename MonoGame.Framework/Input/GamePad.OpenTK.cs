@@ -320,7 +320,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-            return false;
+            PrepSettings();
+            return OpenTK.Input.GamePad.SetVibration(index, leftMotor, rightMotor);
         }
     }
 }
