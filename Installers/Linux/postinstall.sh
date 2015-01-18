@@ -16,11 +16,12 @@ case "$choice" in
 		read IDIR
 esac
 
-if [ ! -d "$IDIR" ]
+if [ -d "$IDIR" ]
 then
-	sudo mkdir "$IDIR"
+	rm -rf "$IDIR"
 fi
 
+mkdir "$IDIR"
 echo "Copying files..."
 
 cp "$DIR/." "$IDIR/" -R
