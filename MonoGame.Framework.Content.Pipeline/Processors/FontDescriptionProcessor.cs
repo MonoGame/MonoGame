@@ -56,11 +56,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #endif
 
 #if LINUX
-			directories.Add("/usr/share/fonts/truetype");
-			string[] subdirectories = Directory.GetDirectories ("/usr/share/fonts/truetype");
+            if(Directory.Exists("/usr/share/fonts"))
+            {
+                directories.Add("/usr/share/fonts");
+                string[] subdirectories = Directory.GetDirectories ("/usr/share/fonts");
 
-			for(int i = 0;i < subdirectories.Length;i++)
-				directories.Add(subdirectories[i]);
+                for(int i = 0;i < subdirectories.Length;i++)
+                {
+                    directories.Add(subdirectories[i]);
+                    string[] ssdirs = Directory.GetDirectories (subdirectories[i]);
+                    if(ssdirs.Length > 0)
+                        directories.AddRange(ssdirs);
+                }
+            }
 #endif
 
 			foreach( var dir in directories) {

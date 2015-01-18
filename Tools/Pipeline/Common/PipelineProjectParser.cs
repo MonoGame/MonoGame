@@ -140,13 +140,7 @@ namespace MonoGame.Tools.Pipeline
         public bool AddContent(string sourceFile, bool skipDuplicates)
         {
             // Make sure the source file is relative to the project.
-            var projectDir = ProjectDirectory;
-
-#if WINDOWS
-            projectDir += "\\";
-#else
-            projectDir += "/";
-#endif
+            var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
 
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
@@ -190,13 +184,7 @@ namespace MonoGame.Tools.Pipeline
         public void OnCopy(string sourceFile)
         {
             // Make sure the source file is relative to the project.
-            var projectDir = ProjectDirectory;
-
-#if WINDOWS
-            projectDir += "\\";
-#else
-            projectDir += "/";
-#endif
+            var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
 
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 

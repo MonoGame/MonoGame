@@ -127,12 +127,18 @@ namespace Microsoft.Xna.Framework.Media
 
         private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
         {
-            foreach (var file in await storageFolder.GetFilesAsync())
-                if (file.ContentType.StartsWith("audio") && !file.ContentType.EndsWith("url"))
-                    musicFiles.Add(file);
-
-            foreach (var folder in await storageFolder.GetFoldersAsync())
-                await this.GetAllFiles(folder, musicFiles);
+            foreach (var item in await storageFolder.GetItemsAsync())
+                if (item is StorageFile)
+                {
+                    var file = item as StorageFile;
+                    if (file.ContentType.StartsWith("audio") && !file.ContentType.EndsWith("url"))
+                        musicFiles.Add(file);
+                }
+                else
+                {
+                    var folder = item as StorageFolder;
+                    await this.GetAllFiles(folder, musicFiles);
+                }
         }
 
         private AlbumCollection PlatformGetAlbums()

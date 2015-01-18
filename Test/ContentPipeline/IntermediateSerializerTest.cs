@@ -230,7 +230,8 @@ namespace MonoGame.Tests.ContentPipeline
                 Plane = new Plane(1, 2, 3, 4),
                 Matrix = new Matrix(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16),
                 Color = new Color{ A = 0xFF, R = 0x64, G = 0x95, B = 0xED },
-                Vector2Array = new []{ new Vector2(0, 0), new Vector2(1, 1) }
+                Vector2Array = new []{ new Vector2(0, 0), new Vector2(1, 1) },
+                Vector2List = new List<Vector2>(new[] { new Vector2(1, 7), new Vector2(1, 9), new Vector2(1, 10) })
             });
         }
 

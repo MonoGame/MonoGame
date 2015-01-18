@@ -172,6 +172,9 @@ namespace MonoGame.Tools.Pipeline
 			var result = (filechooser.Run() == (int)ResponseType.Accept) ? true : false;
 			filePath = filechooser.Filename;
 
+            if (filechooser.Filter == MonoGameContentProjectFileFilter)
+                filePath += ".mgcb";
+
 			filechooser.Destroy ();
 			return result;
 		}
@@ -530,6 +533,8 @@ namespace MonoGame.Tools.Pipeline
 				recentMenu.Submenu = m;
 				m.ShowAll ();
 			}
+
+            recentMenu.Sensitive = nop > 0;
 			menubar1.ShowAll ();
 		}
 

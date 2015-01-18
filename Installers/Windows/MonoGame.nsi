@@ -1,7 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
 !include "header.nsh"
-!define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
 ;Include Modern UI
@@ -14,11 +13,11 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
-Name '${APPNAME} ${INSTALLERVERSION}'
-OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
+Name '${APPNAME} SDK ${INSTALLERVERSION}'
+OutFile 'MonoGameSetup.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 !define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
-VIProductVersion "${VERSION}.${REVISION}"
+VIProductVersion "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} SDK"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
@@ -40,25 +39,10 @@ RequestExecutionLevel admin
 
 !insertmacro MUI_PAGE_WELCOME
 
-;!insertmacro MUI_PAGE_LICENSE "License.txt"
+!insertmacro MUI_PAGE_LICENSE "..\..\License.txt"
 
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
-
-;Page custom XamarinPageEnter XamarinPageLeave
-
-;  Function XamarinPageEnter
-;      ReserveFile "xamarin.ini"
-;      ReserveFile "mono.bmp"
-;      ReserveFile "xamarin.bmp"
-;      !insertmacro INSTALLOPTIONS_EXTRACT "xamarin.ini"
-;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 1" "Text" "mono.bmp"
-;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 2" "Text" "xamarin.bmp"
-;      !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
-;  FunctionEnd
-  
-;  Function XamarinPageLeave
-;  FunctionEnd
 
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -87,11 +71,6 @@ RequestExecutionLevel admin
 !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
-
-Function CustomPageFunction ;Function name defined with Page command
-  !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
-FunctionEnd
-
 
 ; The stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
@@ -226,7 +205,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   End32Bitvs64BitCheck:
   ; Add remote programs
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayName' '${APPNAME} SDK'
-  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayVersion' '${VERSION}'
+  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayVersion' '${INSTALLERVERSION}'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayIcon' '$INSTDIR\monogame.ico'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'InstallLocation' '$INSTDIR\'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'Publisher' 'The MonoGame Team'

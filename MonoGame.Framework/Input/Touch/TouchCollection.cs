@@ -162,7 +162,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
         /// <summary>
-        /// Copies the <see cref="TouchLocation "/>collection to specified array starting from the given index.
+        /// Copies the <see cref="TouchLocation"/>collection to specified array starting from the given index.
         /// </summary>
         /// <param name="array">The array to copy <see cref="TouchLocation"/> items.</param>
         /// <param name="arrayIndex">The starting index of the copy operation.</param>
