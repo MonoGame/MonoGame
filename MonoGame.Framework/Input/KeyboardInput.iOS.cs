@@ -102,7 +102,6 @@ namespace Microsoft.Xna.Framework.Input
                 get { return (KeyboardInputView)base.View; }
             }
 
-            [Obsolete]
             public override void ViewDidUnload()
             {
                 base.ViewDidUnload();
@@ -141,7 +140,6 @@ namespace Microsoft.Xna.Framework.Input
             }
 
             #region Autorotation for iOS 5 or older
-            [Obsolete]
             public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
             {
                 var requestedOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);
