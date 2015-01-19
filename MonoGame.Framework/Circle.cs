@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework
 		/// <returns><c>true</c> if the provided coordinates lie inside this <see cref="Circle"/>; <c>false</c> otherwise.</returns>
 		public bool Contains(float x, float y)
 		{
-			return ((new Vector2(x, y) - Center).Length() <= Radius);
+            return ((new Vector2(x, y) - Center).LengthSquared() <= Radius * Radius);
 		}
 		
 		/// <summary>
@@ -214,7 +214,7 @@ namespace Microsoft.Xna.Framework
 		/// <returns><c>true</c> if the provided <see cref="Point"/> lies inside this <see cref="Circle"/>; <c>false</c> otherwise.</returns>
 		public bool Contains(Point value)
 		{
-			return ((value.ToVector2() - Center).Length() <= Radius);
+            return ((value.ToVector2() - Center).LengthSquared() <= Radius * Radius);
 		}
 
 		/// <summary>
@@ -224,7 +224,7 @@ namespace Microsoft.Xna.Framework
 		/// <param name="result"><c>true</c> if the provided <see cref="Point"/> lies inside this <see cref="Circle"/>; <c>false</c> otherwise. As an output parameter.</param>
 		public void Contains(ref Point value, out bool result)
 		{
-			result = ((value.ToVector2() - Center).Length() <= Radius);
+            result = ((value.ToVector2() - Center).LengthSquared() <= Radius * Radius);
 		}
 
 		/// <summary>
@@ -234,7 +234,7 @@ namespace Microsoft.Xna.Framework
 		/// <returns><c>true</c> if the provided <see cref="Vector2"/> lies inside this <see cref="Circle"/>; <c>false</c> otherwise.</returns>
 		public bool Contains(Vector2 value)
 		{
-			return ((value - Center).Length() <= Radius);
+            return ((value - Center).LengthSquared() <= Radius * Radius);
 		}
 
 		/// <summary>
@@ -244,7 +244,7 @@ namespace Microsoft.Xna.Framework
 		/// <param name="result"><c>true</c> if the provided <see cref="Vector2"/> lies inside this <see cref="Circle"/>; <c>false</c> otherwise. As an output parameter.</param>
 		public void Contains(ref Vector2 value, out bool result)
 		{
-			result = ((value - Center).Length() <= Radius);
+            result = ((value - Center).LengthSquared() <= Radius * Radius);
 		}
 
 		/// <summary>
