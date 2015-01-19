@@ -85,8 +85,6 @@ using OpenTK.Platform.iPhoneOS;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-using All = OpenTK.Graphics.ES20.All;
-
 namespace Microsoft.Xna.Framework {
 
     [Register("iOSGameView")]

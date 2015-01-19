@@ -53,31 +53,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
 
-#if GLES
-        const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
-		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
-		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
-		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
-		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#endif
-#if !GLES
-		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
-		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentExt;
-		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
-		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
-		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
-		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#endif
-
         internal FramebufferHelper framebufferHelper;
 
         internal int glFramebuffer = 0;
