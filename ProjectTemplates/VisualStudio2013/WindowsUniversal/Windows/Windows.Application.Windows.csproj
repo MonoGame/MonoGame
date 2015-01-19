@@ -8,7 +8,7 @@
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>$ext_safeprojectname$</RootNamespace>
-    <AssemblyName>$ext_projectname$.Windows</AssemblyName>
+    <AssemblyName>$ext_safeprojectname$.Windows</AssemblyName>
     <DefaultLanguage>$currentuiculturename$</DefaultLanguage>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
@@ -16,7 +16,7 @@
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     $if$($includeKeyFile$==true)
-    <PackageCertificateKeyFile>$ext_projectname$.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>$ext_safeprojectname$.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     $endif$
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
     <MonoGameContentBuilderExe></MonoGameContentBuilderExe>
@@ -117,7 +117,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
 	$if$($includeKeyFile$==true)
-    <None Include="$ext_projectname$.Windows_TemporaryKey.pfx" />
+    <None Include="$ext_safeprojectname$.Windows_TemporaryKey.pfx" />
     $endif$
   </ItemGroup>
   <ItemGroup>
@@ -127,7 +127,7 @@
     <Content Include="Assets\StoreLogo.scale-100.png" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="..\$ext_safeprojectname$.Shared\Content\Content.mgcb">
+    <MonoGameContentReference Include="..\$ext_projectname$.Shared\Content\Content.mgcb">
       <Link>Content\Content.mgcb</Link>
     </MonoGameContentReference>
   </ItemGroup>  

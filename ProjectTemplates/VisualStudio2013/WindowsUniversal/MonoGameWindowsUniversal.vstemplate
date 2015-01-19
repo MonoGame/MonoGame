@@ -19,14 +19,14 @@
 	</TemplateData>
  	<TemplateContent>
  		<ProjectCollection>
-			<SolutionFolder Name="$safeprojectname$">
-				<ProjectTemplateLink ProjectName="$safeprojectname$.Shared" CopyParameters="true">
+			<SolutionFolder Name="$projectname$">
+				<ProjectTemplateLink ProjectName="$projectname$.Shared" CopyParameters="true">
 					Shared\Shared.vstemplate
 				</ProjectTemplateLink>
-				<ProjectTemplateLink ProjectName="$safeprojectname$.Windows" CopyParameters="true">
+				<ProjectTemplateLink ProjectName="$projectname$.Windows" CopyParameters="true">
 					Windows\Windows.vstemplate
 				</ProjectTemplateLink>
-				<ProjectTemplateLink ProjectName="$safeprojectname$.WindowsPhone" CopyParameters="true">
+				<ProjectTemplateLink ProjectName="$projectname$.WindowsPhone" CopyParameters="true">
 					WindowsPhone\WindowsPhone.vstemplate
 				</ProjectTemplateLink>
 			</SolutionFolder>

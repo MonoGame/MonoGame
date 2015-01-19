@@ -8,7 +8,7 @@
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>$ext_safeprojectname$</RootNamespace>
-    <AssemblyName>$ext_projectname$.WindowsPhone</AssemblyName>
+    <AssemblyName>$ext_safeprojectname$.WindowsPhone</AssemblyName>
     <DefaultLanguage>$currentuiculturename$</DefaultLanguage>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
@@ -101,7 +101,7 @@
     <Content Include="Assets\WideLogo.scale-240.png" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="..\$ext_safeprojectname$.Shared\Content\Content.mgcb">
+    <MonoGameContentReference Include="..\$ext_projectname$.Shared\Content\Content.mgcb">
       <Link>Content\Content.mgcb</Link>
     </MonoGameContentReference>
   </ItemGroup>  
