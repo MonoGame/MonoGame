@@ -38,290 +38,136 @@ purpose and non-infringement.
 */
 #endregion License
 using System;
+using OpenTK;
 
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
-        static Settings settings;
-        static Settings Settings
+        static bool prepDone = false;
+
+        static void PrepSettings()
         {
-        	get
+            #if DEBUG
+            if (!prepDone)
             {
-                return PrepSettings();
+                try {
+                    int count = 0;
+                    for (int i = 0; i < 4; i++) 
+                    {
+                        if (OpenTK.Input.GamePad.GetState (i).IsConnected) 
+                        {
+                            count++;
+                        }
+                    }
+                    Console.WriteLine("Number of joysticks: " + count);
+                } catch (Exception ex) {
+                    Console.WriteLine("Unable to determine number of joysticks.");
+                    Console.WriteLine(ex.Message);
+                }
             }
-        }
+            #endif
 
-		static void AutoConfig()
-		{
-            int num = 0;
-
-            while(OpenTK.Input.Joystick.GetCapabilities(num).IsConnected)
-                num++;
-
-#if DEBUG
-            Console.WriteLine("Number of joysticks: " + num);
-#endif			
-			// Limit to the first 4 sticks to avoid crashes
-            int numSticks = Math.Min (4, num);
-			for (int x = 0; x < numSticks; x++)
-			{
-				PadConfig pc = new PadConfig("", x);
-
-				pc.Button_A.ID = 0;
-				pc.Button_A.Type = InputType.Button;
-
-				pc.Button_B.ID = 1;
-				pc.Button_B.Type = InputType.Button;
-
-				pc.Button_X.ID = 2;
-				pc.Button_X.Type = InputType.Button;
-
-				pc.Button_Y.ID = 3;
-				pc.Button_Y.Type = InputType.Button;
-
-				pc.Button_LB.ID = 4;
-				pc.Button_LB.Type = InputType.Button;
-
-				pc.Button_RB.ID = 5;
-				pc.Button_RB.Type = InputType.Button;
-
-				pc.Button_Back.ID = 6;
-				pc.Button_Back.Type = InputType.Button;
-
-				pc.Button_Start.ID = 7;
-				pc.Button_Start.Type = InputType.Button;
-
-				pc.LeftStick.Press.ID = 8;
-				pc.LeftStick.Press.Type = InputType.Button;
-
-				pc.RightStick.Press.ID = 9;
-				pc.RightStick.Press.Type = InputType.Button;
-
-				pc.LeftStick.X.Negative.ID = 0;
-				pc.LeftStick.X.Negative.Type = InputType.Axis;
-				pc.LeftStick.X.Negative.Negative = true;
-
-				pc.LeftStick.X.Positive.ID = 0;
-				pc.LeftStick.X.Positive.Type = InputType.Axis;
-				pc.LeftStick.X.Positive.Negative = false;
-
-				pc.LeftStick.Y.Negative.ID = 1;
-				pc.LeftStick.Y.Negative.Type = InputType.Axis;
-				pc.LeftStick.Y.Negative.Negative = true;
-
-				pc.LeftStick.Y.Positive.ID = 1;
-				pc.LeftStick.Y.Positive.Type = InputType.Axis;
-				pc.LeftStick.Y.Positive.Negative = false;
-
-				pc.RightStick.Y.Negative.ID = 3;
-				pc.RightStick.Y.Negative.Type = InputType.Axis;
-				pc.RightStick.Y.Negative.Negative = true;
-
-				pc.RightStick.Y.Positive.ID = 3;
-				pc.RightStick.Y.Positive.Type = InputType.Axis;
-				pc.RightStick.Y.Positive.Negative = false;
-
-				pc.RightStick.X.Negative.ID = 4;
-				pc.RightStick.X.Negative.Type = InputType.Axis;
-				pc.RightStick.X.Negative.Negative = true;
-
-				pc.RightStick.X.Positive.ID = 4;
-				pc.RightStick.X.Positive.Type = InputType.Axis;
-				pc.RightStick.X.Positive.Negative = false;
-
-				pc.Dpad.Up.ID = 0;
-				pc.Dpad.Up.Type = InputType.PovUp;
-
-				pc.Dpad.Down.ID = 0;
-				pc.Dpad.Down.Type = InputType.PovDown;
-
-				pc.Dpad.Left.ID = 0;
-				pc.Dpad.Left.Type = InputType.PovLeft;
-
-				pc.Dpad.Right.ID = 0;
-				pc.Dpad.Right.Type = InputType.PovRight;
-
-				pc.LeftTrigger.ID = 2;
-				pc.LeftTrigger.Type = InputType.Axis;
-				pc.LeftTrigger.Negative = false;
-
-				pc.RightTrigger.ID = 2;
-				pc.RightTrigger.Type = InputType.Axis;
-				pc.RightTrigger.Negative = true;
-
-				// Suggestion: Xbox Guide button <=> BigButton
-				//pc.BigButton.ID = 8;
-				//pc.BigButton.Type = InputType.Button;
-
-#if DEBUG
-                int numbuttons = OpenTK.Input.Joystick.GetCapabilities(x).ButtonCount;
-				Console.WriteLine("Number of buttons for joystick: " + x + " - " + numbuttons);
-
-                int numaxes = OpenTK.Input.Joystick.GetCapabilities(x).AxisCount;
-				Console.WriteLine("Number of axes for joystick: " + x + " - " + numaxes);
-
-                int numhats = OpenTK.Input.Joystick.GetCapabilities(x).HatCount;
-				Console.WriteLine("Number of PovHats for joystick: " + x + " - " + numhats);
-#endif
-
-                settings[x] = pc;
-			}
-		}
-
-        static Settings PrepSettings()
-        {
-            if (settings == null)
-            {
-                settings = new Settings();
-                AutoConfig();		
-            }
-
-            return settings;
-        }
-
-        static Buttons ReadButtons(int device, PadConfig c, float deadZoneSize)
-        {
-            short DeadZone = (short)(deadZoneSize * short.MaxValue);
-            Buttons b = (Buttons)0;
-
-            if (c.Button_A.ReadBool(device, DeadZone))
-                b |= Buttons.A;
-            if (c.Button_B.ReadBool(device, DeadZone))
-                b |= Buttons.B;
-            if (c.Button_X.ReadBool(device, DeadZone))
-                b |= Buttons.X;
-            if (c.Button_Y.ReadBool(device, DeadZone))
-                b |= Buttons.Y;
-
-            if (c.Button_LB.ReadBool(device, DeadZone))
-                b |= Buttons.LeftShoulder;
-            if (c.Button_RB.ReadBool(device, DeadZone))
-                b |= Buttons.RightShoulder;
-
-            if (c.Button_Back.ReadBool(device, DeadZone))
-                b |= Buttons.Back;
-            if (c.Button_Start.ReadBool(device, DeadZone))
-                b |= Buttons.Start;
-
-            if (c.LeftStick.Press.ReadBool(device, DeadZone))
-                b |= Buttons.LeftStick;
-            if (c.RightStick.Press.ReadBool(device, DeadZone))
-                b |= Buttons.RightStick;
-
-            if (c.Dpad.Up.ReadBool(device, DeadZone))
-                b |= Buttons.DPadUp;
-            if (c.Dpad.Down.ReadBool(device, DeadZone))
-                b |= Buttons.DPadDown;
-            if (c.Dpad.Left.ReadBool(device, DeadZone))
-                b |= Buttons.DPadLeft;
-            if (c.Dpad.Right.ReadBool(device, DeadZone))
-                b |= Buttons.DPadRight;
-
-            return b;
-        }
-		
-		static Buttons StickToButtons( Vector2 stick, Buttons left, Buttons right, Buttons up , Buttons down, float DeadZoneSize )
-		{
-			Buttons b = (Buttons)0;
-
-			if ( stick.X > DeadZoneSize )
-				b |= right;
-			if ( stick.X < -DeadZoneSize )
-				b |= left;
-			if ( stick.Y > DeadZoneSize )
-				b |= up;
-			if ( stick.Y < -DeadZoneSize )
-				b |= down;
-			
-			return b;
-		}
-		
-		static Buttons TriggerToButton( float trigger, Buttons button, float DeadZoneSize )
-		{
-			Buttons b = (Buttons)0;
-            
-			if ( trigger > DeadZoneSize )
-				b |= button;
-
-			return b;
-		}
-		
-        static GamePadState ReadState(int index, GamePadDeadZone deadZone)
-        {
-            const float DeadZoneSize = 0.27f;
-            var device = index;
-            var c = Settings[index];
-            if (c == null && OpenTK.Input.Joystick.GetCapabilities(index).IsConnected)
-                return GamePadState.Default;
-
-            var leftStick = c.LeftStick.ReadAxisPair(device);
-            var rightStick = c.RightStick.ReadAxisPair(device);
-            GamePadThumbSticks sticks = new GamePadThumbSticks(new Vector2(leftStick.X, leftStick.Y), new Vector2(rightStick.X, rightStick.Y), deadZone);
-            GamePadTriggers triggers = new GamePadTriggers(c.LeftTrigger.ReadFloat(device), c.RightTrigger.ReadFloat(device));
-
-            Buttons buttonState = ReadButtons(device, c, DeadZoneSize);
-			buttonState |= StickToButtons(sticks.Left, Buttons.LeftThumbstickLeft, Buttons.LeftThumbstickRight, Buttons.LeftThumbstickUp, Buttons.LeftThumbstickDown, DeadZoneSize);
-			buttonState |= StickToButtons(sticks.Right, Buttons.RightThumbstickLeft, Buttons.RightThumbstickRight, Buttons.RightThumbstickUp, Buttons.RightThumbstickDown, DeadZoneSize);
-			buttonState |= TriggerToButton(triggers.Left, Buttons.LeftTrigger, DeadZoneSize);
-			buttonState |= TriggerToButton(triggers.Right, Buttons.RightTrigger, DeadZoneSize);
-
-            GamePadButtons buttons = new GamePadButtons(buttonState);
-            GamePadDPad dpad = new GamePadDPad(buttons.buttons);
-
-            GamePadState g = new GamePadState(sticks, triggers, buttons, dpad);
-
-            return g;
+            prepDone = true;
         }
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            var c = Settings[index];
+            PrepSettings ();
 
-            if (c == null && OpenTK.Input.Joystick.GetCapabilities(index).IsConnected)
-                return new GamePadCapabilities();
+            var capabilitiesTK = OpenTK.Input.GamePad.GetCapabilities (index);
+            if (capabilitiesTK.GamePadType == OpenTK.Input.GamePadType.Unknown) 
+            {
+                return new GamePadCapabilities ();
+            }
 
             return new GamePadCapabilities()
             {
-                IsConnected = OpenTK.Input.Joystick.GetCapabilities(index).IsConnected,
-                HasAButton = c.Button_A.Type != InputType.None,
-                HasBButton = c.Button_B.Type != InputType.None,
-                HasXButton = c.Button_X.Type != InputType.None,
-                HasYButton = c.Button_Y.Type != InputType.None,
-                HasBackButton = c.Button_Back.Type != InputType.None,
-                HasStartButton = c.Button_Start.Type != InputType.None,
-                HasDPadDownButton = c.Dpad.Down.Type != InputType.None,
-                HasDPadLeftButton = c.Dpad.Left.Type != InputType.None,
-                HasDPadRightButton = c.Dpad.Right.Type != InputType.None,
-                HasDPadUpButton = c.Dpad.Up.Type != InputType.None,
-                HasLeftShoulderButton = c.Button_LB.Type != InputType.None,
-                HasRightShoulderButton = c.Button_RB.Type != InputType.None,
-                HasLeftStickButton = c.LeftStick.Press.Type != InputType.None,
-                HasRightStickButton = c.RightStick.Press.Type != InputType.None,
-                HasLeftTrigger = c.LeftTrigger.Type != InputType.None,
-                HasRightTrigger = c.RightTrigger.Type != InputType.None,
-                HasLeftXThumbStick = c.LeftStick.X.Type != InputType.None,
-                HasLeftYThumbStick = c.LeftStick.Y.Type != InputType.None,
-                HasRightXThumbStick = c.RightStick.X.Type != InputType.None,
-                HasRightYThumbStick = c.RightStick.Y.Type != InputType.None,
-
-                HasLeftVibrationMotor = false,
-                HasRightVibrationMotor = false,
-                HasVoiceSupport = false,
-                HasBigButton = false
+                IsConnected = true, // otherwise, GamePadType would have been Unknown
+                HasAButton = capabilitiesTK.HasAButton,
+                HasBButton = capabilitiesTK.HasBButton,
+                HasXButton = capabilitiesTK.HasXButton,
+                HasYButton = capabilitiesTK.HasYButton,
+                HasBackButton = capabilitiesTK.HasBackButton,
+                HasStartButton = capabilitiesTK.HasStartButton,
+                HasDPadDownButton = capabilitiesTK.HasDPadDownButton,
+                HasDPadLeftButton = capabilitiesTK.HasDPadLeftButton,
+                HasDPadRightButton = capabilitiesTK.HasDPadRightButton,
+                HasDPadUpButton = capabilitiesTK.HasDPadUpButton,
+                HasLeftShoulderButton = capabilitiesTK.HasLeftShoulderButton,
+                HasRightShoulderButton = capabilitiesTK.HasRightShoulderButton,
+                HasLeftStickButton = capabilitiesTK.HasLeftStickButton,
+                HasRightStickButton = capabilitiesTK.HasRightStickButton,
+                HasLeftTrigger = capabilitiesTK.HasLeftTrigger,
+                HasRightTrigger = capabilitiesTK.HasRightTrigger,
+                HasLeftXThumbStick = capabilitiesTK.HasLeftXThumbStick,
+                HasLeftYThumbStick = capabilitiesTK.HasLeftYThumbStick,
+                HasRightXThumbStick = capabilitiesTK.HasRightXThumbStick,
+                HasRightYThumbStick = capabilitiesTK.HasRightYThumbStick,
+                HasLeftVibrationMotor = capabilitiesTK.HasLeftVibrationMotor,
+                HasRightVibrationMotor = capabilitiesTK.HasRightVibrationMotor,
+                HasVoiceSupport = capabilitiesTK.HasVoiceSupport,
+                HasBigButton = capabilitiesTK.HasBigButton
             };
         }
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             PrepSettings();
-            return ReadState(index, deadZoneMode);
+
+            var stateTK = OpenTK.Input.GamePad.GetState (index);
+
+            if (!stateTK.IsConnected) 
+            {
+                return GamePadState.Default;
+            }
+
+            var sticks = 
+                new GamePadThumbSticks (
+                    new Vector2(stateTK.ThumbSticks.Left.X, stateTK.ThumbSticks.Left.Y),
+                    new Vector2(stateTK.ThumbSticks.Right.X, stateTK.ThumbSticks.Right.Y),
+                    deadZoneMode
+                );
+
+            var triggers =
+                new GamePadTriggers (
+                    stateTK.Triggers.Left,
+                    stateTK.Triggers.Right
+                );
+
+            Buttons buttonStates = 
+                (stateTK.Buttons.A == OpenTK.Input.ButtonState.Pressed ? Buttons.A : 0) |
+                (stateTK.Buttons.B == OpenTK.Input.ButtonState.Pressed ? Buttons.B : 0) |
+                (stateTK.Buttons.Back == OpenTK.Input.ButtonState.Pressed ? Buttons.Back : 0) |
+                (stateTK.Buttons.BigButton == OpenTK.Input.ButtonState.Pressed ? Buttons.BigButton : 0) |
+                (stateTK.Buttons.LeftShoulder == OpenTK.Input.ButtonState.Pressed ? Buttons.LeftShoulder : 0) |
+                (stateTK.Buttons.LeftStick == OpenTK.Input.ButtonState.Pressed ? Buttons.LeftStick : 0) |
+                (stateTK.Buttons.RightShoulder == OpenTK.Input.ButtonState.Pressed ? Buttons.RightShoulder : 0) |
+                (stateTK.Buttons.RightStick == OpenTK.Input.ButtonState.Pressed ? Buttons.RightStick : 0) |
+                (stateTK.Buttons.Start == OpenTK.Input.ButtonState.Pressed ? Buttons.Start : 0) |
+                (stateTK.Buttons.X == OpenTK.Input.ButtonState.Pressed ? Buttons.X : 0) |
+                (stateTK.Buttons.Y == OpenTK.Input.ButtonState.Pressed ? Buttons.Y : 0) |
+                0;
+            var buttons = new GamePadButtons(buttonStates);
+
+            var dpad = 
+                new GamePadDPad(
+                    stateTK.DPad.IsUp ? ButtonState.Pressed : ButtonState.Released,
+                    stateTK.DPad.IsDown ? ButtonState.Pressed : ButtonState.Released,
+                    stateTK.DPad.IsLeft ? ButtonState.Pressed : ButtonState.Released,
+                    stateTK.DPad.IsRight ? ButtonState.Pressed : ButtonState.Released
+                );
+
+            var result = new GamePadState(sticks, triggers, buttons, dpad);
+            result.PacketNumber = stateTK.PacketNumber;
+            return result;
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-            PrepSettings();
-            return OpenTK.Input.GamePad.SetVibration(index, leftMotor, rightMotor);
+            PrepSettings ();
+
+            return OpenTK.Input.GamePad.SetVibration (index, leftMotor, rightMotor);
         }
     }
 }
