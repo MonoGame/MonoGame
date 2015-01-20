@@ -18,7 +18,6 @@ namespace MonoGame.Tools.Pipeline
     {
         private FileSystemWatcher watcher;
 
-        private readonly IView _view;
         private PipelineProject _project;
 
         private Task _buildTask;
@@ -59,7 +58,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public IView View { get; set; }
+        public IView View { get; private set; }
 
         public event Action OnProjectLoading;
 
@@ -74,8 +73,8 @@ namespace MonoGame.Tools.Pipeline
             _actionStack = new ActionStack();
             Selection = new Selection();
 
-            _view = view;
-            _view.Attach(this);
+            View = view;
+            View.Attach(this);
             _project = project;
             ProjectOpen = false;
 
@@ -100,11 +99,11 @@ namespace MonoGame.Tools.Pipeline
         {
             Debug.Assert(ProjectOpen, "OnItemModified called with no project open?");
             ProjectDirty = true;
-            _view.UpdateProperties(contentItem);
+            View.UpdateProperties(contentItem);
 
-            _view.BeginTreeUpdate();
-            _view.UpdateTreeItem(contentItem);
-            _view.EndTreeUpdate();
+            View.BeginTreeUpdate();
+            View.UpdateTreeItem(contentItem);
+            View.EndTreeUpdate();
         }
 
         public void NewProject()
@@ -118,7 +117,7 @@ namespace MonoGame.Tools.Pipeline
             // So we need the user to choose that location even though the project has not
             // yet actually been saved to disk.
             var projectFilePath = Environment.CurrentDirectory;
-            if (!_view.AskSaveName(ref projectFilePath, "New Project"))
+            if (!View.AskSaveName(ref projectFilePath, "New Project"))
                 return;
 
             CloseProject();
@@ -150,7 +149,7 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             string projectFilePath;
-            if (!_view.AskImportProject(out projectFilePath))
+            if (!View.AskImportProject(out projectFilePath))
                 return;
 
             CloseProject();
@@ -175,7 +174,7 @@ namespace MonoGame.Tools.Pipeline
 #if SHIPPING
             catch (Exception e)
             {
-                _view.ShowError("Open Project", "Failed to open project!");
+                View.ShowError("Open Project", "Failed to open project!");
                 return;
             }
 #endif
@@ -194,7 +193,7 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             string projectFilePath;
-            if (!_view.AskOpenProject(out projectFilePath))
+            if (!View.AskOpenProject(out projectFilePath))
                 return;
             
             OpenProject(projectFilePath);
@@ -247,7 +246,7 @@ namespace MonoGame.Tools.Pipeline
 #if SHIPPING
             catch (Exception e)
             {
-                _view.ShowError("Open Project", "Failed to open project!");
+                View.ShowError("Open Project", "Failed to open project!");
                 return;
             }
 #endif
@@ -277,7 +276,7 @@ namespace MonoGame.Tools.Pipeline
                 if (item != null) {
                     if (item.Exists == !exist) {
                         item.Exists = exist;
-                        _view.ItemExistanceChanged (item);
+                        View.ItemExistanceChanged (item);
                     }
                 }
             }
@@ -302,7 +301,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectDirty = false;
             _project = null;
             _actionStack.Clear();
-            _view.OutputClear();
+            View.OutputClear();
 
             History.Default.StartupProject = null;
             History.Default.Save();
@@ -317,7 +316,7 @@ namespace MonoGame.Tools.Pipeline
             if (saveAs || string.IsNullOrEmpty(_project.OriginalPath))
             {
                 string newFilePath = _project.OriginalPath;
-                if (!_view.AskSaveName(ref newFilePath, null))
+                if (!View.AskSaveName(ref newFilePath, null))
                     return false;
 
                 _project.OriginalPath = newFilePath;
@@ -387,7 +386,7 @@ namespace MonoGame.Tools.Pipeline
             if (OnBuildStarted != null)
                 OnBuildStarted();
 
-            _view.OutputClear();
+            View.OutputClear();
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
@@ -405,7 +404,7 @@ namespace MonoGame.Tools.Pipeline
             if (OnBuildStarted != null)
                 OnBuildStarted();
 
-            _view.OutputClear();
+            View.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
             if (LaunchDebugger)
@@ -433,13 +432,13 @@ namespace MonoGame.Tools.Pipeline
             try
             {
                 // Prepare the process.
-                _buildProcess = _view.CreateProcess(FindMGCB(), commands);
+                _buildProcess = View.CreateProcess(FindMGCB(), commands);
                 _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath);
                 _buildProcess.StartInfo.CreateNoWindow = true;
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
-                _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
+                _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.
                 _buildProcess.Start();
@@ -450,12 +449,12 @@ namespace MonoGame.Tools.Pipeline
             {
                 // If we got a message assume it has everything the user needs to know.
                 if (!string.IsNullOrEmpty(ex.Message))
-                    _view.OutputAppend("Build failed:  " + ex.Message);
+                    View.OutputAppend("Build failed:  " + ex.Message);
                 else
                 {
                     // Else we need to get verbose.
-                    _view.OutputAppend("Build failed:" + Environment.NewLine);
-                    _view.OutputAppend(ex.ToString());
+                    View.OutputAppend("Build failed:" + Environment.NewLine);
+                    View.OutputAppend(ex.ToString());
                 }
             }
 
@@ -476,7 +475,7 @@ namespace MonoGame.Tools.Pipeline
                     return;
 
                 _buildProcess.Kill();
-                _view.OutputAppend("Build terminated!" + Environment.NewLine);
+                View.OutputAppend("Build terminated!" + Environment.NewLine);
             }
         }
 
@@ -494,7 +493,7 @@ namespace MonoGame.Tools.Pipeline
                 return true;
 
             // Ask the user if they want to save or cancel.
-            var result = _view.AskSaveOrCancel();
+            var result = View.AskSaveOrCancel();
 
             // Did we cancel the exit?
             if (result == AskResult.Cancel)
@@ -509,19 +508,19 @@ namespace MonoGame.Tools.Pipeline
 
         private void UpdateTree()
         {
-            _view.BeginTreeUpdate();
+            View.BeginTreeUpdate();
 
             if (_project == null || string.IsNullOrEmpty(_project.OriginalPath))
-                _view.SetTreeRoot(null);
+                View.SetTreeRoot(null);
             else
             {
-                _view.SetTreeRoot(_project);
+                View.SetTreeRoot(_project);
 
                 foreach (var item in _project.ContentItems)
-                    _view.AddTreeItem(item);
+                    View.AddTreeItem(item);
             }            
 
-            _view.EndTreeUpdate();
+            View.EndTreeUpdate();
         }
 
         public bool Exit()
@@ -529,7 +528,7 @@ namespace MonoGame.Tools.Pipeline
             // Can't exit if we're building!
             if (ProjectBuilding)
             {
-                _view.ShowMessage("You cannot exit while the project is building!");
+                View.ShowMessage("You cannot exit while the project is building!");
                 return false;
             }
 
@@ -545,7 +544,7 @@ namespace MonoGame.Tools.Pipeline
                 initialDirectory = Path.Combine(_project.Location, initialDirectory);
 
             List<string> files;
-            if (!_view.ChooseContentFile(initialDirectory, out files))
+            if (!View.ChooseContentFile(initialDirectory, out files))
                 return;
 
             var action = new IncludeAction(this, files);
@@ -621,7 +620,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 i.Observer = this;
                 i.ResolveTypes();
-                _view.UpdateProperties(i);
+                View.UpdateProperties(i);
             }
 
             LoadTemplates(_project.Location);
@@ -654,7 +653,7 @@ namespace MonoGame.Tools.Pipeline
                 var fpath = Path.GetDirectoryName(f);
                 item.TemplateFile = Path.GetFullPath(Path.Combine(fpath, item.TemplateFile));
 
-                _view.OnTemplateDefined(item);
+                View.OnTemplateDefined(item);
 
                 _templateItems.Add(item);
             }

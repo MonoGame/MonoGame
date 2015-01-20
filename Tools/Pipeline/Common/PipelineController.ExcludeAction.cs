@@ -30,7 +30,7 @@ namespace MonoGame.Tools.Pipeline
 
             public void Do()
             {
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 foreach (var obj in _state)
                 {
@@ -40,19 +40,19 @@ namespace MonoGame.Tools.Pipeline
                         if (item.OriginalPath == obj.SourceFile)
                         {
                             _con._project.ContentItems.Remove(item);
-                            _con._view.RemoveTreeItem(item);
+                            _con.View.RemoveTreeItem(item);
                             break;
                         }
                     }
                 }
 
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
 
             public void Undo()
             {
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 foreach (var obj in _state)
                 {
@@ -64,10 +64,10 @@ namespace MonoGame.Tools.Pipeline
                     item.ResolveTypes();
 
                     _con._project.ContentItems.Add(item);
-                    _con._view.AddTreeItem(item);                        
+                    _con.View.AddTreeItem(item);
                 }
 
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
         }
