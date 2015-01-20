@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>MonoGame.Framework.MacOS</id>
-        <version>3.3.0</version>
+        <version>0.0.0.0</version>
         <title>MonoGame.Framework.MacOS</title>
-        <authors>Simon-darkside-Jackson,Michael Cummings</authors>
+        <authors>MonoGameTeam</authors>
         <owners>MonoGameTeam</owners>
-        <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+        <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt#L2</licenseUrl>
         <projectUrl>http://monogame.net/</projectUrl>
         <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -15,7 +15,7 @@
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
         <releaseNotes>Updated dev release - 10th December 2014 
 		Added support for Windows Phone 8.1 and Universal projects</releaseNotes>
-        <copyright>Copyright  2013</copyright>
+        <copyright>Copyright  2015</copyright>
         <language>en-US</language>
     </metadata>
     <files>

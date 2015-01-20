@@ -23,7 +23,8 @@ The currentlt available packages are:
 
 _Contents
 This package contains only MonoGame DLL references for a solution.
-For project templates either use the Monogame Project templates from the MSI installer on windows or the MonoDevelop/Xamarin Studio Addin on Mac
+For project templates either use the Monogame Project templates from the MonoGameSetup installer on windows or the MonoDevelop/Xamarin Studio Addin on Mac.
+Both installers can be sourced from http://www.monogame.net/downloads/
 
 **Note this package no longer contains the .Net and .GamerServices namespaces, please see the adjoining MonoGame.Net NuGet packages if you require them**
 
@@ -40,7 +41,7 @@ Such references include:
 When applied, this NuGet will install all relevant dll's for MonoGame.
 
 **Updating to use the new MonoGame Content Builder tool
-To use the new content builder tool you will need the latest development MSI installer which can be located at http://www.monogame.net/downloads/ in the Development Builds section
+To use the new content builder tool you will need the latest development MonoGameSetup installer which can be located at http://www.monogame.net/downloads/ in the Development Builds section
 This will install all the project templates for Visual Studio including the new Content Builder tool.
 To upgrade your project you will need to edit your .CSPROJ file for your solution (either from windows explorer or using the VS power tools to edit the project file) and add the following entries:
 	*  <MonoGamePlatform>WindowsGL</MonoGamePlatform>  <- Placed just before the 1st line with   </PropertyGroup> (in the initial project definition section)
@@ -52,9 +53,7 @@ Finally, set the "Build Action" of the MGCB file to "MonoGameContentReference" (
 (Don't forget to exclude your existing .XNB / content files once you have upgraded)
 
 _Release Notes
-3.3.0 release
-Updated to latest development build (January 2015)
-More details can be found at http://monogame.net
+For release details, please see the http://monogame.net site
 
 _Known Issues
 None
