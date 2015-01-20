@@ -124,9 +124,11 @@ namespace Microsoft.Xna.Framework.Input
             // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
             left = leftPosition;
             right = rightPosition;
+            System.Console.Out.WriteLine("Pre = " + right.X + " ; " + right.Y);
             ApplyDeadZone(deadZoneMode);
             Left = left;
             Right = right;
+            //System.Console.Out.WriteLine("Post = " + Right.X + " ; " + Right.Y);
         }
 
         private void ApplyDeadZone(GamePadDeadZone dz)
@@ -175,30 +177,47 @@ namespace Microsoft.Xna.Framework.Input
             }
 
             // excluding deadZone from the final output range
-             if (dz != GamePadDeadZone.None)
-             {
-                 if (left.X < -leftThumbDeadZone)
+            if (dz == GamePadDeadZone.IndependentAxes)
+            {
+                if (left.X < -leftThumbDeadZone)
                      left.X = left.X + leftThumbDeadZone;
-                 else if (left.X > leftThumbDeadZone)
-                     left.X = left.X - leftThumbDeadZone;
-                 if (left.Y < -leftThumbDeadZone)
-                     left.Y = left.Y + leftThumbDeadZone;
-                 else if (left.Y > leftThumbDeadZone)
-                     left.Y = left.Y - leftThumbDeadZone;
+                else if (left.X > leftThumbDeadZone)
+                    left.X = left.X - leftThumbDeadZone;
+                if (left.Y < -leftThumbDeadZone)
+                    left.Y = left.Y + leftThumbDeadZone;
+                else if (left.Y > leftThumbDeadZone)
+                    left.Y = left.Y - leftThumbDeadZone;
 
-                 if (right.X < -rightThumbDeadZone)
-                     right.X = right.X + rightThumbDeadZone;
-                 else if (right.X > rightThumbDeadZone)
-                     right.X = right.X - rightThumbDeadZone;
-                 if (right.Y < -rightThumbDeadZone)
-                     right.Y = right.Y + rightThumbDeadZone;
-                 else if (right.Y > rightThumbDeadZone)
-                     right.Y = right.Y - rightThumbDeadZone;
+                if (right.X < -rightThumbDeadZone)
+                    right.X = right.X + rightThumbDeadZone;
+                else if (right.X > rightThumbDeadZone)
+                    right.X = right.X - rightThumbDeadZone;
+                if (right.Y < -rightThumbDeadZone)
+                    right.Y = right.Y + rightThumbDeadZone;
+                else if (right.Y > rightThumbDeadZone)
+                    right.Y = right.Y - rightThumbDeadZone;
 
-                 left.X = left.X / (1.0f - leftThumbDeadZone);
-                 left.Y = left.Y / (1.0f - leftThumbDeadZone);
-                 right.X = right.X / (1.0f - rightThumbDeadZone);
-                 right.Y = right.Y / (1.0f - rightThumbDeadZone);
+                left.X = left.X / (1.0f - leftThumbDeadZone);
+                left.Y = left.Y / (1.0f - leftThumbDeadZone);
+                right.X = right.X / (1.0f - rightThumbDeadZone);
+                right.Y = right.Y / (1.0f - rightThumbDeadZone);
+            }
+            else if (dz == GamePadDeadZone.Circular)
+            {
+                if (left.LengthSquared() >= leftThumbDeadZone * leftThumbDeadZone)
+                {
+                    Vector2 norm = left;
+                    norm.Normalize();
+                    left = left - norm * leftThumbDeadZone; // excluding deadzone
+                    left = left / leftThumbDeadZone; // re-range output
+                }
+                if (right.LengthSquared() >= rightThumbDeadZone * rightThumbDeadZone)
+                {
+                    Vector2 norm = right;
+                    norm.Normalize();
+                    right = right - norm * rightThumbDeadZone;
+                    right = right / rightThumbDeadZone;
+                }
             }
         }
 
