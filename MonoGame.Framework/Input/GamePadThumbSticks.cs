@@ -124,11 +124,9 @@ namespace Microsoft.Xna.Framework.Input
             // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
             left = leftPosition;
             right = rightPosition;
-            System.Console.Out.WriteLine("Pre = " + right.X + " ; " + right.Y);
             ApplyDeadZone(deadZoneMode);
             Left = left;
             Right = right;
-            //System.Console.Out.WriteLine("Post = " + Right.X + " ; " + Right.Y);
         }
 
         private void ApplyDeadZone(GamePadDeadZone dz)
