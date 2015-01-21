@@ -55,22 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			directories.Add(fontDirectory);
 #endif
 
-#if LINUX
-            if(Directory.Exists("/usr/share/fonts"))
-            {
-                directories.Add("/usr/share/fonts");
-                string[] subdirectories = Directory.GetDirectories ("/usr/share/fonts");
-
-                for(int i = 0;i < subdirectories.Length;i++)
-                {
-                    directories.Add(subdirectories[i]);
-                    string[] ssdirs = Directory.GetDirectories (subdirectories[i]);
-                    if(ssdirs.Length > 0)
-                        directories.AddRange(ssdirs);
-                }
-            }
-#endif
-
+#if !LINUX
 			foreach( var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
 					fontName += ".ttf";
@@ -87,9 +72,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					directory = dir;
 					break;
 				}
-			}
+            }
+#else
+            System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            proc.StartInfo.FileName = "/bin/bash";
+            proc.StartInfo.Arguments = "-c \"fc-list : file family\"";
+            proc.StartInfo.UseShellExecute = false; 
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.Start();
 
-			fontName = Path.Combine (directory, fontName);
+            while (!proc.StandardOutput.EndOfStream)
+            {
+                string line = proc.StandardOutput.ReadLine();
+                string[] split = line.Replace(": ", ":").Split(':');
+
+                if (split.Length > 1)
+                {
+                    if (split[1] == input.FontName || Path.GetFileNameWithoutExtension(split[0]) == input.FontName)
+                    {
+                        directory = Path.GetDirectoryName(split[0]);
+                        fontName = Path.GetFileName(split[0]);
+                    }
+                }
+            }
+#endif
+            fontName = Path.Combine (directory, fontName);
+
 #if WINDOWS
 			}
 #endif
