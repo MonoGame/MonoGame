@@ -49,6 +49,7 @@ namespace MonoGame.Tools.Pipeline
 			treeview1.Model = listStore;
 			treeview1.Selection.Mode = SelectionMode.Multiple;
 
+            treeview1.ButtonPressEvent += OnTreeview1ButtonPressEvent;
 			treeview1.KeyReleaseEvent += HandleKeyReleaseEvent;
 		}
 
