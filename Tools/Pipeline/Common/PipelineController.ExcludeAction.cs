@@ -59,6 +59,7 @@ namespace MonoGame.Tools.Pipeline
                     var item = new ContentItem()
                         {
                             Observer = _con,
+                            Exists = File.Exists(System.IO.Path.GetDirectoryName(_con._project.OriginalPath) + Path.DirectorySeparatorChar + obj.SourceFile)
                         };
                     obj.Apply(item);
                     item.ResolveTypes();
