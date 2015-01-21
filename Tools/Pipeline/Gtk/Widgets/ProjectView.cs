@@ -152,6 +152,7 @@ namespace MonoGame.Tools.Pipeline
 					newpath += "/" + split[i];
 
 				AddItem (itr, newpath, exists);
+				treeview1.ExpandRow(treeview1.Model.GetPath(itr), false);
 			}
 		}
 
