@@ -2,10 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-using MonoMac.OpenGL;
-using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
-#elif WINDOWS || LINUX
+#if WINDOWS || LINUX || MONOMAC
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
 #elif GLES
@@ -89,11 +86,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     var cullFaceModeBack = (All)CullFaceMode.Back;
                     var stencilFaceFront = (All)CullFaceMode.Front;
                     var stencilFaceBack = (All)CullFaceMode.Back;
-#elif MONOMAC
-                    var cullFaceModeFront = (Version20)CullFaceMode.Front;
-                    var cullFaceModeBack = (Version20)CullFaceMode.Back;
-                    var stencilFaceFront = StencilFace.Front;
-                    var stencilFaceBack = StencilFace.Back;
 #else
                     var cullFaceModeFront = StencilFace.Front;
                     var cullFaceModeBack = StencilFace.Back;

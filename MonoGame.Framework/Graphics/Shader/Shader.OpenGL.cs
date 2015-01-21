@@ -5,9 +5,7 @@
 using System;
 using System.IO;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#if WINDOWS || LINUX || MONOMAC
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using System.Text;

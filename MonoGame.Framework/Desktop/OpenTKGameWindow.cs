@@ -342,11 +342,11 @@ namespace Microsoft.Xna.Framework
 
             GraphicsContext.ShareContexts = true;
 
-            window = new NativeWindow();
-            window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
-            window.Resize += OnResize;
-            window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+			window = new NativeWindow ();
+			window.Closing += new EventHandler<CancelEventArgs> (OpenTkGameWindow_Closing);
+			window.Resize += OnResize;
+			window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs> (Keyboard_KeyDown);
+			window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs> (Keyboard_KeyUp);
 #if LINUX
             window.WindowBorder = WindowBorder.Resizable;
 #endif
@@ -354,13 +354,16 @@ namespace Microsoft.Xna.Framework
             window.MouseEnter += OnMouseEnter;
             window.MouseLeave += OnMouseLeave;
 #endif
+			window.KeyPress += OnKeyPress;
 
-            window.KeyPress += OnKeyPress;
-
+#if MONOMAC
+			#warning DISABLED DURING MONOMAC OPENTK CONVERSION
+#else
             // Set the window icon.
             var assembly = Assembly.GetEntryAssembly();
             if(assembly != null)
                 window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+#endif
             Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             updateClientBounds = false;
@@ -374,7 +377,7 @@ namespace Microsoft.Xna.Framework
 
             // mouse
             // TODO review this when opentk 1.1 is released
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || ANGLE || MONOMAC
             Mouse.setWindows(this);
 #else
             Mouse.UpdateMouseInfo(window.Mouse);

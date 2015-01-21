@@ -6,9 +6,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif GLES
+#if GLES
 using OpenTK.Graphics.ES20;
 #elif OPENGL
 using OpenTK.Graphics.OpenGL;
@@ -241,7 +239,7 @@ namespace Microsoft.Xna.Framework
 
             ((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
 
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || MONOMAC
             ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
 
             //Set the swap interval based on if vsync is desired or not.
@@ -252,12 +250,12 @@ namespace Microsoft.Xna.Framework
             else
                 swapInterval = 0;
             _graphicsDevice.Context.SwapInterval = swapInterval;
-#elif MONOMAC
-            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
-
-            // TODO: Implement multisampling (aka anti-alising) for all platforms!
-
-			_game.applyChanges(this);
+//#elif MONOMAC
+//            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
+//
+//            // TODO: Implement multisampling (aka anti-alising) for all platforms!
+//
+//			_game.applyChanges(this);
 #else
 
 #if ANDROID

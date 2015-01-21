@@ -2,9 +2,7 @@
 using System.Diagnostics;
 
 #if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#if WINDOWS || LINUX || MONOMAC
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
@@ -446,7 +444,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || ANGLE || MONOMAC
         /// <summary>
         /// Convert a <see cref="SurfaceFormat"/> to an OpenTK.Graphics.ColorFormat.
         /// This is used for setting up the backbuffer format of the OpenGL context.

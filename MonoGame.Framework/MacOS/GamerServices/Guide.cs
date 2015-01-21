@@ -201,12 +201,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if (isVisible)
 				return;
 			isVisible = true;
+
+			// --- New game window, new behavior? May no longer be needed. ---
+			#warning DISABLED DURING MONOMAC OPENTK CONVERSION
 			// We clear the key cache state here to prevent any extraneous keys from
 			// corrupting the key states from the time we call the method
 			// to the time it is actually shown.  This seems to be caused because
 			// we are interrupting the normal flow the game update logic.
-			Window.ClearKeyCacheState();
-			
+//			Window.ClearKeyCacheState();
+			// ---------------------------------------------------------------
+
 			MonoGameGamerServicesHelper.ShowSigninSheet();
 			
 			if (GamerServicesComponent.LocalNetworkGamer == null) {

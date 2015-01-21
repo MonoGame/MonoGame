@@ -22,11 +22,11 @@ namespace Microsoft.Xna.Framework
     {
         static TitleContainer() 
         {
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || MONOMAC
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-#elif IOS || MONOMAC
+#elif IOS
 			Location = NSBundle.MainBundle.ResourcePath;
 #elif PSM
 			Location = "/Application";
@@ -106,8 +106,8 @@ namespace Microsoft.Xna.Framework
             }
             return File.OpenRead(absolutePath);
 #else
-            var absolutePath = Path.Combine(Location, safeName);
-            return File.OpenRead(absolutePath);
+			var absolutePath = Path.Combine(Location, safeName);
+			return File.OpenRead(absolutePath);
 #endif
         }
 

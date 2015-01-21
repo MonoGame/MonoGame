@@ -5,9 +5,7 @@
 using System;
 using System.Collections.Generic;
 #if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif GLES
+#if GLES
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;

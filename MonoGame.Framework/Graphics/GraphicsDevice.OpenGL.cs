@@ -7,12 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
-#endif
-
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || MONOMAC
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
@@ -44,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || ANGLE || MONOMAC
         internal IGraphicsContext Context { get; private set; }
 #endif
 
@@ -116,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || ANGLE || MONOMAC
             GraphicsMode mode = GraphicsMode.Default;
             var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
 
@@ -134,7 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (Context == null || Context.IsDisposed)
             {
-                var color = PresentationParameters.BackBufferFormat.GetColorFormat();
+				var color = PresentationParameters.BackBufferFormat.GetColorFormat();
                 var depth =
                     PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
                     PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
@@ -265,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper = new FramebufferHelper(this);
             }
-            #if !(GLES || MONOMAC)
+            #if !GLES
             else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
             {
                 this.framebufferHelper = new FramebufferHelperEXT(this);
@@ -353,7 +348,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsDevice.AddDisposeAction(() =>
                                             {
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || ANGLE || MONOMAC
                 Context.Dispose();
                 Context = null;
 
@@ -391,7 +386,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformPresent()
         {
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || ANGLE || MONOMAC
             Context.SwapBuffers();
 #endif
             GraphicsExtensions.CheckGLError();

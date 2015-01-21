@@ -28,9 +28,7 @@ namespace Microsoft.Xna.Framework
         {
 #if IOS
             return new iOSGamePlatform(game);
-#elif MONOMAC
-            return new MacGamePlatform(game);
-#elif (WINDOWS && OPENGL) || LINUX || ANGLE
+#elif (WINDOWS && OPENGL) || LINUX || ANGLE || MONOMAC
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
@@ -104,6 +102,10 @@ namespace Microsoft.Xna.Framework
                 }
             }
         }
+
+#if MONOMAC
+		public bool IsPlayingVideo { get; set; }
+#endif
 
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         private ApplicationViewState _viewState;
