@@ -358,10 +358,30 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            Application.Idle += OnIdle;
-            Application.Run(_form);
-            Application.Idle -= OnIdle;
+            // https://bugzilla.novell.com/show_bug.cgi?id=487896
+            // Since there's existing bug from implementation with mono WinForms since 09'
+            // Application.Idle is not working as intended
+            // So we're just going to emulate Application.Run just like Microsoft implementation
+            _form.Show();
 
+            var nativeMsg = new NativeMessage();
+            while (_form != null && _form.IsDisposed == false)
+            {
+                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
+                {
+                    Application.DoEvents();
+
+                    if (nativeMsg.msg == WM_QUIT)
+                        break;
+
+                    continue;
+                }
+
+                OnIdle(this, null);
+
+                // Application.Run does this after processing idle handler
+                WaitMessage();
+            }
 
             // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
@@ -422,6 +442,10 @@ namespace MonoGame.Framework
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         private static extern bool PeekMessage(out NativeMessage msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
+
+        [System.Security.SuppressUnmanagedCodeSecurity]
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        private static extern void WaitMessage();
 
         #region Public Methods
 
