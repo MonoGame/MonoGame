@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #else
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = "/bin/bash";
-            proc.StartInfo.Arguments = "-c \"fc-list : file family\"";
+            proc.StartInfo.Arguments = "-c \"fc-list : file family style\"";
             proc.StartInfo.UseShellExecute = false; 
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
@@ -86,12 +86,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 string line = proc.StandardOutput.ReadLine();
                 string[] split = line.Replace(": ", ":").Split(':');
 
-                if (split.Length > 1)
+                if (split.Length > 2)
                 {
                     if (split[1] == input.FontName || Path.GetFileNameWithoutExtension(split[0]) == input.FontName)
                     {
-                        directory = Path.GetDirectoryName(split[0]);
-                        fontName = Path.GetFileName(split[0]);
+                        if(split[2].ToLower().Contains(input.Style.ToString().ToLower()))
+                        {
+                            directory = Path.GetDirectoryName(split[0]);
+                            fontName = Path.GetFileName(split[0]);
+                        }
                     }
                 }
             }
