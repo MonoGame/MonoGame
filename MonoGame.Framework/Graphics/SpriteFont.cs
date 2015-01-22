@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (c == '\n')
                 {
                     fullLineCount++;
-                    finalLineHeight = LineSpacing;
+                    finalLineHeight = 0;
 
                     offset.X = 0;
                     offset.Y = LineSpacing * fullLineCount;
