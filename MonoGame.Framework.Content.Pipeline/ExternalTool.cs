@@ -151,6 +151,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private static void EnsureExecutable(string path)
         {
 #if LINUX || MONOMAC
+            if(path == "/bin/bash")
+                return;
+
             try
             {
                 var p = Process.Start("chmod", "u+x '" + path + "'");
