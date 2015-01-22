@@ -38,10 +38,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			var fontName = input.FontName;
 
+#if WINDOWS || LINUX
 #if WINDOWS
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
-		        var fontDirectory = Path.Combine(windowsfolder,"Fonts");
+		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
 			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+#elif LINUX
+            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
+#endif
 			if (string.IsNullOrWhiteSpace(fontName)) {
 				fontName = input.FontName;
 #endif
@@ -55,7 +59,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			directories.Add(fontDirectory);
 #endif
 
-#if !LINUX
 			foreach( var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
 					fontName += ".ttf";
@@ -73,38 +76,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					break;
 				}
             }
-#else
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = "/bin/bash";
-            proc.StartInfo.Arguments = "-c \"fc-list : file family style\"";
-            proc.StartInfo.UseShellExecute = false; 
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.Start();
 
-            while (!proc.StandardOutput.EndOfStream)
-            {
-                string line = proc.StandardOutput.ReadLine();
-                string[] split = line.Replace(": ", ":").Split(':');
-
-                if (split.Length > 2)
-                {
-                    if (split[1] == input.FontName || Path.GetFileNameWithoutExtension(split[0]) == input.FontName)
-                    {
-                        List<string> styles = new List<string>();
-                        styles.AddRange(split[2].Split('=')[1].Split(','));
-
-                        if(styles.Contains(input.Style.ToString()))
-                        {
-                            directory = Path.GetDirectoryName(split[0]);
-                            fontName = Path.GetFileName(split[0]);
-                        }
-                    }
-                }
-            }
-#endif
             fontName = Path.Combine (directory, fontName);
 
-#if WINDOWS
+#if WINDOWS || LINUX
 			}
 #endif
 
@@ -242,6 +217,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 			return String.Empty;
 		}
+#endif
+
+#if LINUX
+        string FindFontFileFromFontName(string fontname, string style)
+        {
+            string s, e;
+            ExternalTool.Run("/bin/bash", string.Format ("-c \"fc-match -f '%{{file}}:%{{family}}\\n' '{0}:style={1}'\"", fontname, style), out s, out e);
+            s = s.Trim();
+
+            var split = s.Split (':');
+            //check font family, fontconfig might return a fallback
+            if (split [1].Contains (",")) { //this file defines multiple family names
+                var families = split [1].Split (',');
+                foreach (var f in families) {
+                    if (f.ToLowerInvariant () == fontname.ToLowerInvariant ())
+                        return split [0];
+                }
+                //didn't find it
+                return String.Empty;
+            } else {
+                if (split [1].ToLowerInvariant () != fontname.ToLowerInvariant ())
+                    return String.Empty;
+            }
+            return split [0];
+        }
 #endif
     }
 }
