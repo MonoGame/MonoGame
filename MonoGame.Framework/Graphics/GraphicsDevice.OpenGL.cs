@@ -24,19 +24,9 @@ using OpenTK.Graphics;
 
 #if GLES
 using OpenTK.Graphics.ES20;
-using BeginMode = OpenTK.Graphics.ES20.All;
-using EnableCap = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using BufferTarget = OpenTK.Graphics.ES20.All;
-using BufferUsageHint = OpenTK.Graphics.ES20.All;
-using DrawElementsType = OpenTK.Graphics.ES20.All;
-using GetPName = OpenTK.Graphics.ES20.All;
-using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
-using FramebufferTarget = OpenTK.Graphics.ES20.All;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
-using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-using GLPrimitiveType = OpenTK.Graphics.ES20.All;
+using GLPrimitiveType = OpenTK.Graphics.ES20.BeginMode;
 #endif
 
 
@@ -62,31 +52,6 @@ namespace Microsoft.Xna.Framework.Graphics
         static readonly float[] _posFixup = new float[4];
 
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
-
-#if GLES
-        const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
-		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
-		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
-		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
-		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#endif
-#if !GLES
-		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
-		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentExt;
-		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
-		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
-		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
-		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#endif
 
         internal FramebufferHelper framebufferHelper;
 
@@ -190,16 +155,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             MaxTextureSlots = 16;
 
-#if  IOS
-            GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(All.MaxTextureSize, ref _maxTextureSize);
-            GraphicsExtensions.CheckGLError();
-#else
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -217,7 +172,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
-#endif
             _extensions = GetGLExtensions();
         }
 
@@ -225,11 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Setup extensions.
             List<string> extensions = new List<string>();
-#if GLES
-            var extstring = GL.GetString(RenderbufferStorage.Extensions);            			
-#else
             var extstring = GL.GetString(StringName.Extensions);
-#endif
             GraphicsExtensions.CheckGLError();
             if (!string.IsNullOrEmpty(extstring))
             {
@@ -326,18 +276,15 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 #if GLES
                 GL.ClearDepth (depth);
-                GraphicsExtensions.CheckGLError();
 #else
-                GL.ClearDepth ((double)depth);
+                GL.ClearDepth((double)depth);
 #endif
+                GraphicsExtensions.CheckGLError();
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if GLES && !ANGLE && !ANDROID
-			GL.Clear((uint)bufferMask);
-#else
+
 			GL.Clear(bufferMask);
-#endif
             GraphicsExtensions.CheckGLError();
            		
             // Restore the previous render state.
@@ -678,7 +625,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 renderTarget = renderTargetBinding.RenderTarget as RenderTarget2D;
                 if (renderTarget.LevelCount > 1)
                 {
-                    GL.BindTexture(renderTarget.glTarget, renderTarget.glTexture);
+                    GL.BindTexture((TextureTarget)renderTarget.glTarget, renderTarget.glTexture);
                     GraphicsExtensions.CheckGLError();
                     this.framebufferHelper.GenerateMipmap((int)renderTarget.glTarget);
                 }

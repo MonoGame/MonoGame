@@ -10,9 +10,6 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using EnableCap = OpenTK.Graphics.ES20.All;
-using FrontFaceDirection = OpenTK.Graphics.ES20.All;
-using CullFaceMode = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

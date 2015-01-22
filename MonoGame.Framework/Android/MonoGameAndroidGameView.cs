@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework
                     continue;
                 }
                 Android.Util.Log.Debug("MonoGame", "Created format {0}", GraphicsContext.GraphicsMode);
-                All status = GL.CheckFramebufferStatus(All.Framebuffer);
+                var status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
 
                 MakeCurrent();
