@@ -90,7 +90,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     if (split[1] == input.FontName || Path.GetFileNameWithoutExtension(split[0]) == input.FontName)
                     {
-                        if(split[2].ToLower().Contains(input.Style.ToString().ToLower()))
+                        List<string> styles = new List<string>();
+                        styles.AddRange(split[2].Split('=')[1].Split(','));
+
+                        if(styles.Contains(input.Style.ToString()))
                         {
                             directory = Path.GetDirectoryName(split[0]);
                             fontName = Path.GetFileName(split[0]);
