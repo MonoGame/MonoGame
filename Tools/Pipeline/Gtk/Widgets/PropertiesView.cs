@@ -44,7 +44,11 @@ namespace MonoGame.Tools.Pipeline
 				this.currentObjects = cobjects;
 			else
 				this.currentObjects = null;
-			Refresh ();
+
+            if (this.name == "????" && this.location == "????")
+                propertygridtable1.Clear();
+            else
+			    Refresh ();
 		}
 
 		private object CompareVariables(object a, object b)

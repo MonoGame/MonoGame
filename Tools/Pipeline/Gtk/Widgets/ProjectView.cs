@@ -147,13 +147,13 @@ namespace MonoGame.Tools.Pipeline
 			if (!GetIter (iter, split [0], out itr))
 				itr = listStore.AppendValues (iter, icon, split [0]);
 
+            treeview1.ExpandRow(treeview1.Model.GetPath(iter), false);
 			if (split.Length > 1) {
 				string newpath = split [1];
 				for(int i = 2;i < split.Length;i++)
 					newpath += "/" + split[i];
 
 				AddItem (itr, newpath, exists);
-				treeview1.ExpandRow(treeview1.Model.GetPath(itr), false);
 			}
 		}
 
@@ -373,6 +373,7 @@ namespace MonoGame.Tools.Pipeline
 		protected void OnTreeview1CursorChanged (object o, EventArgs args)
 		{
 			ReloadPropertyGrid ();
+            window.UpdateMenus();
 		}
 
 		private string CombineVariables(string vara, string varb)
