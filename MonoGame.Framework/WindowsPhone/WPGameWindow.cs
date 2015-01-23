@@ -56,6 +56,7 @@ namespace MonoGame.Framework.WindowsPhone
         private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private Rectangle _clientBounds;
+        private Rectangle _actualBounds;
         private Game _game;
 
         #region Internal Properties
@@ -118,6 +119,8 @@ namespace MonoGame.Framework.WindowsPhone
                 frame.Unobscured += (sender, e) => { if (Game.Instance != null) Platform.IsActive = true; };
             };
 
+            Page.SizeChanged += Page_SizeChanged; 
+
             PhoneApplicationService.Current.Activated += (sender, e) => { if (Game.Instance != null) Platform.IsActive = true; };
             PhoneApplicationService.Current.Launching += (sender, e) => { if (Game.Instance != null) Platform.IsActive = true; };
             PhoneApplicationService.Current.Deactivated += (sender, e) => { if (Game.Instance != null) Platform.IsActive = false; };
@@ -135,44 +138,56 @@ namespace MonoGame.Framework.WindowsPhone
         {
             SetClientBounds(clientWidth, clientHeight);
             _game.graphicsDeviceManager.ApplyChanges();
+
+            this.UpdateBounds();
         }
 
-        /*
-        private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            _actualBounds = new Rectangle(0,
+                0,
+                (int)(e.NewSize.Width * Application.Current.Host.Content.ScaleFactor / 100 + 0.5f),
+                (int)(e.NewSize.Height * Application.Current.Host.Content.ScaleFactor / 100 + 0.5f));
+
+            this.UpdateBounds();
+        }
+
+        private void UpdateBounds()
         {
             var manager = _game.graphicsDeviceManager;
 
-            // If we haven't calculated the back buffer scale then do it now.
-            if (_backBufferScale == Vector2.Zero)
+            if (manager.GraphicsDevice == null)
+                return;
+
+            // Determine correct content size based on orientation difference
+            int height;
+            int width;
+            if (_game.Window.CurrentOrientation == manager.GraphicsDevice.PresentationParameters.DisplayOrientation)
             {
-                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth/(float)_clientBounds.Width, 
-                                                manager.PreferredBackBufferHeight/(float)_clientBounds.Height);
+                height = _actualBounds.Height;
+                width = _actualBounds.Width;
+            }
+            else
+            {
+                height = _actualBounds.Width;
+                width = _actualBounds.Height;
             }
 
-            // Set the new client bounds.
-            SetClientBounds(args.Size.Width, args.Size.Height);
+            SetClientBounds(width, height);
 
-            // Set the default new back buffer size and viewport, but this
-            // can be overloaded by the two events below.
-            
-            var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
-            var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
-            manager.PreferredBackBufferWidth = newWidth;
-            manager.PreferredBackBufferHeight = newHeight;
+            manager.PreferredBackBufferWidth = width;
+            manager.PreferredBackBufferHeight = height;
 
-            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
+            manager.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
 
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
             OnClientSizeChanged();
 
-            // If we have a valid client bounds then 
-            // update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                manager.ApplyChanges();
+            // We don't call ApplyChanges because we don't want the TouchPanel resolution to change
+            //manager.ApplyChanges();
         }
-        */
 
         private static DisplayOrientation ToOrientation(PageOrientation orientations)
         {
