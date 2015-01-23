@@ -253,16 +253,16 @@ namespace MonoGame.Tools.Pipeline
 
 		public void AddTreeItem (IProjectItem item)
 		{
-			projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
+            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
 		}
 
 		public void RemoveTreeItem (ContentItem contentItem)
 		{
-			projectview1.RemoveItem (projectview1.GetBaseIter (), contentItem.OriginalPath);
+            projectview1.RemoveItem (projectview1.GetBaseIter (), contentItem.OriginalPath);
 		}
 
 		public void UpdateTreeItem (IProjectItem item)
-		{
+        {
 
 		}
 
@@ -273,7 +273,7 @@ namespace MonoGame.Tools.Pipeline
 
 		public void UpdateProperties (IProjectItem item)
 		{
-
+            UpdateMenus ();
 		}
 
 		public void OutputAppend (string text)
@@ -283,13 +283,15 @@ namespace MonoGame.Tools.Pipeline
 
 			Gtk.Application.Invoke (delegate { 
 				textview2.Buffer.Text += text + "\r\n";
+                UpdateMenus();
 			});
 		}
 
 		public void OutputClear ()
 		{
 			Gtk.Application.Invoke (delegate { 
-				textview2.Buffer.Text = "";
+                textview2.Buffer.Text = "";
+                UpdateMenus();
 			});
 		}
 
@@ -363,12 +365,14 @@ namespace MonoGame.Tools.Pipeline
 
 		protected void OnSaveActionActivated (object sender, EventArgs e)
 		{
-			_controller.SaveProject(false);
+            _controller.SaveProject(false);
+            UpdateMenus();
 		}
 
 		protected void OnSaveAsActionActivated (object sender, EventArgs e)
 		{
-			_controller.SaveProject(true);
+            _controller.SaveProject(true);
+            UpdateMenus();
 		}
 
 		protected void OnExitActionActivated (object sender, EventArgs e)
@@ -411,7 +415,8 @@ namespace MonoGame.Tools.Pipeline
 				else
 					location = _controller.GetFullPath ("");
 
-				_controller.NewItem(dialog.name, location, dialog.templateFile);
+                _controller.NewItem(dialog.name, location, dialog.templateFile);
+                UpdateMenus();
 			}
 		}
 
@@ -430,12 +435,14 @@ namespace MonoGame.Tools.Pipeline
 					_controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
 			}
 			else
-				_controller.Include (_controller.GetFullPath (""));
+                _controller.Include (_controller.GetFullPath (""));
+            UpdateMenus();
 		}
 
 		public void OnDeleteActionActivated (object sender, EventArgs e)
 		{
-			projectview1.Remove ();
+            projectview1.Remove ();
+            UpdateMenus();
 		}
 
 		protected void OnBuildAction1Activated (object sender, EventArgs e)
@@ -468,9 +475,14 @@ namespace MonoGame.Tools.Pipeline
 
 		public void UpdateMenus()
 		{
+            List<TreeIter> iters;
+            List<Gdk.Pixbuf> icons;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+
 			var notBuilding = !_controller.ProjectBuilding;
 			var projectOpen = _controller.ProjectOpen;
-			var projectOpenAndNotBuilding = projectOpen && notBuilding;
+            var projectOpenAndNotBuilding = projectOpen && notBuilding;
+            var somethingSelected = paths.Length > 0;
 
 			// Update the state of all menu items.
 
@@ -486,9 +498,10 @@ namespace MonoGame.Tools.Pipeline
 
 			NewItemAction.Sensitive = projectOpen;
 			AddItemAction.Sensitive = projectOpen;
-			DeleteAction.Sensitive = projectOpen;
+			DeleteAction.Sensitive = projectOpen && somethingSelected;
 
-			BuildAction.Sensitive = projectOpenAndNotBuilding;
+            BuildAction.Sensitive = projectOpen;
+            BuildAction1.Sensitive = projectOpenAndNotBuilding;
 
 			treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
 			RebuildAction.Sensitive = treerebuild.Sensitive;
@@ -546,12 +559,12 @@ namespace MonoGame.Tools.Pipeline
 
 		protected void OnFileActionActivated (object sender, EventArgs e)
 		{
-			UpdateMenus ();
+
 		}
 
 		protected void OnBuildActionActivated (object sender, EventArgs e)
 		{
-			UpdateMenus ();
+
 		}
 	}
 }
