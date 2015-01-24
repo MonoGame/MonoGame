@@ -37,7 +37,7 @@ namespace MonoGame.Tests.Visual
                 vertexBuffer.GetData(readData, 0, 4);
                 Assert.AreEqual(savedData, readData);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -58,7 +58,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(vertexZero, readData[2]);
                 Assert.AreEqual(vertexZero, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -79,7 +79,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[0], readData[2]);
                 Assert.AreEqual(savedData[1], readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
         
         //[TestCase(true)]
@@ -100,7 +100,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2], readData[0]);
                 Assert.AreEqual(savedData[3], readData[1]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -119,7 +119,7 @@ namespace MonoGame.Tests.Visual
                 vertexBuffer.GetData(readData, 0, 4);
                 Assert.AreEqual(savedData, readData);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -161,7 +161,7 @@ namespace MonoGame.Tests.Visual
                         readDataBytes.Skip(startIndex).Take(elementCount).ToArray());
                 }
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -200,7 +200,7 @@ namespace MonoGame.Tests.Visual
                         readDataBytes.Take(elementCount).ToArray());
                 }
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -233,7 +233,7 @@ namespace MonoGame.Tests.Visual
                         readData.Take(elementCount).ToArray());
                 }
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -255,7 +255,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].Position, readData[2]);
                 Assert.AreEqual(savedData[3].Position, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -284,7 +284,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].Position, readData[2]);
                 Assert.AreEqual(savedData[3].Position, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -307,7 +307,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                 Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -337,7 +337,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                 Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
     }
 }
