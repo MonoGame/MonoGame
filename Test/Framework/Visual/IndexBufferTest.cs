@@ -25,7 +25,7 @@ namespace MonoGame.Tests.Visual
                 indexBuffer.GetData(readData, 0, 4);
                 Assert.AreEqual(savedData, readData);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(0, readData[2]);
                 Assert.AreEqual(0, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(1, readData[2]);
                 Assert.AreEqual(2, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(3, readData[0]);
                 Assert.AreEqual(4, readData[1]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
     }
