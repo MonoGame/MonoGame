@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-
+using Microsoft.Xna.Framework.Utilities;
 using SharpDX;
 using SharpDX.Direct3D;
 
@@ -143,13 +143,15 @@ namespace Microsoft.Xna.Framework.Graphics
         private void UpdateDevice(Device device, DeviceContext context)
         {
             // TODO: Lost device logic!
-            SharpDX.Utilities.Dispose(ref _d3dDevice);
+
+            SharpDxDisposeHelper.SafeDispose(ref _d3dDevice);
             _d3dDevice = device;
 
-            SharpDX.Utilities.Dispose(ref _d3dContext);
+            // looks like this line solves lost device issues at least on windows phone 8.1
+            SharpDxDisposeHelper.SafeDispose(ref _d3dContext);
             _d3dContext = context;
 
-            SharpDX.Utilities.Dispose(ref _depthStencilView);
+            SharpDxDisposeHelper.SafeDispose(ref _depthStencilView);
 
             using (var dxgiDevice2 = device.QueryInterface<SharpDX.DXGI.Device2>())
             {
@@ -814,10 +816,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDispose()
         {
             ClearLayouts();
-            SharpDX.Utilities.Dispose(ref _renderTargetView);
-            SharpDX.Utilities.Dispose(ref _depthStencilView);
-            SharpDX.Utilities.Dispose(ref _d3dDevice);
-            SharpDX.Utilities.Dispose(ref _d3dContext);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _renderTargetView);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _depthStencilView);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _d3dDevice);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _d3dContext);
 
 #if WINDOWS_STOREAPP
 

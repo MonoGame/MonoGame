@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Threading;
+using Microsoft.Xna.Framework.Utilities;
 using SharpDX;
 using SharpDX.Direct3D11;
 
@@ -108,7 +109,7 @@ namespace MonoGame.Framework.WindowsPhone
             {
                 _surfaceUpdateHandler.Disconnect();
                 _host = null;
-                SharpDX.Utilities.Dispose(ref _synchronizedTexture);
+                SharpDxDisposeHelper.SafeDispose(ref _synchronizedTexture);
                 _drawingSurfaceUpdateHandler.DisposeResources();
             }
 

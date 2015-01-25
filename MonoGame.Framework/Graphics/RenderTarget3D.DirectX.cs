@@ -51,8 +51,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
-                SharpDX.Utilities.Dispose(ref _renderTargetView);
-                SharpDX.Utilities.Dispose(ref _depthStencilView);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _renderTargetView);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _depthStencilView);
             }
 
             base.Dispose(disposing);
