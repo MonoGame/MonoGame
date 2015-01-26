@@ -55,9 +55,14 @@ namespace Microsoft.Xna.Framework.Graphics
         float _dpi; 
 #endif
 #if WINDOWS
-
+        
         SwapChain _swapChain;
 
+	#if DIRECTX
+        // Additional swap chains for this same graphics device, but targeting different window handles
+        // which are created on demand if Present() is passed an 'override' window handle.
+        private readonly Dictionary<IntPtr, SwapChainRenderTarget> _overrideWindows = new Dictionary<IntPtr, SwapChainRenderTarget>();
+	#endif
 #endif
 
         // The active render targets.
@@ -818,6 +823,12 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _depthStencilView);
             SharpDX.Utilities.Dispose(ref _d3dDevice);
             SharpDX.Utilities.Dispose(ref _d3dContext);
+
+#if WINDOWS && DIRECTX
+            foreach (var pair in _overrideWindows)            
+                pair.Value.Dispose();
+            _overrideWindows.Clear();
+#endif
 
 #if WINDOWS_STOREAPP
 
