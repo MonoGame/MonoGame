@@ -307,12 +307,22 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformPresent();
         }
 
-        /*
+#if WINDOWS && DIRECTX
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
-            throw new NotImplementedException();
-        }
+            // TODO: How to handle sourceRectangle and destinationRectangle?
+            SwapChainRenderTarget scrt;
+            if (!_overrideWindows.TryGetValue(overrideWindowHandle, out scrt))
+            {
+                scrt = new SwapChainRenderTarget(this, overrideWindowHandle, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+                _overrideWindows.Add(overrideWindowHandle, scrt);
+            }
 
+            scrt.Present();                  
+        }
+#endif
+
+        /*
         public void Reset()
         {
             // Manually resetting the device is not currently supported.
