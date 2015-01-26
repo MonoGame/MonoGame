@@ -255,8 +255,12 @@ namespace Microsoft.Xna.Framework.Content
 			try
             {
                 string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
+
+                // For Win8 metro applications you do not have access to Environment.CurrentDirectory nor does Path.DirectorySeparatorChar exist.
+#if !WINRT
                 if (Path.IsPathRooted(assetPath))
                     assetPath = FileHelpers.GetRelativePath(Environment.CurrentDirectory + Path.DirectorySeparatorChar, assetPath);
+#endif
                 
                 stream = TitleContainer.OpenStream(assetPath);
 #if ANDROID
