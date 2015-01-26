@@ -18,5 +18,6 @@
     <G Type="MonoGame.Tests.SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace">
       <Value>true</Value>
     </G>
+    <H Null="true" />
   </Asset>
 </XnaContent>

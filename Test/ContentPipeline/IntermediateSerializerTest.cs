@@ -270,7 +270,8 @@ namespace MonoGame.Tests.ContentPipeline
                 D = new Nested.ContentPipeline.ClassInsideNestedAmbiguousNamespace { Value = true },
                 E = new Nested.ClassInsideNestedNamespace { Value = true },
                 F = new Nested.ContentPipeline2.ClassInsideNestedUnambiguousNamespace { Value = true },
-                G = new SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace { Value = true }
+                G = new SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace { Value = true },
+                H = null
             });
         }
 

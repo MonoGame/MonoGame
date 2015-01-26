@@ -320,6 +320,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(true, ((Nested.ContentPipeline2.ClassInsideNestedUnambiguousNamespace) namespaceClass.F).Value);
                 Assert.IsAssignableFrom<SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace>(namespaceClass.G);
                 Assert.AreEqual(true, ((SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace) namespaceClass.G).Value);
+                Assert.IsNull(namespaceClass.H);
             });
         }
 
