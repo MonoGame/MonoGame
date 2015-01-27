@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 
-namespace Lz4
+namespace Microsoft.Xna.Framework.Content.Pipeline.LZ4
 {
 	public class Lz4DecoderStream : Stream
 	{

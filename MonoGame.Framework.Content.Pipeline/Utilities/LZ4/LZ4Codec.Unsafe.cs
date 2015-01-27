@@ -27,7 +27,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 
-namespace LZ4n
+namespace Microsoft.Xna.Framework.Content.Pipeline.LZ4
 {
 	/// <summary>Unsafe LZ4 codec.</summary>
 	public static partial class LZ4Codec
