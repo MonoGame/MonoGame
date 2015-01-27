@@ -4,7 +4,7 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Content.Pipeline.LZ4;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities.LZ4;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using System.Collections.Generic;

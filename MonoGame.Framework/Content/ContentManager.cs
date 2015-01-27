@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Microsoft.Xna.Framework.Content.Pipeline.LZ4;
+using Microsoft.Xna.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 
 #if !WINRT

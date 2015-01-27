@@ -1,13 +1,17 @@
-﻿#define CHECK_ARGS
+﻿// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#define CHECK_ARGS
 #define CHECK_EOF
 //#define LOCAL_SHADOW
 
 using System;
 using System.IO;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.LZ4
+namespace Microsoft.Xna.Framework.Utilities
 {
-	public class Lz4DecoderStream : Stream
+	internal class Lz4DecoderStream : Stream
 	{
 		public Lz4DecoderStream()
 		{
