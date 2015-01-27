@@ -866,7 +866,7 @@ namespace Microsoft.Xna.Framework
 			var lines = frame.GetLines ();
 
 			// Special case, no text
-			if (text.Length == 0) {
+			if (text.Length == 0 || lines.Length < 2) {
 				PointF origin = new PointF (Bounds.GetMinX (), Bounds.GetMinY () - font.Leading);
 				// Note: using fabs() for typically negative descender from fonts
 				return new RectangleF (origin.X, origin.Y - Math.Abs (font.Descender), 3, font.Ascender + Math.Abs (font.Descender));
