@@ -253,9 +253,17 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
-                stream = TitleContainer.OpenStream(assetPath);
+                var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
 
+                // This is primarily for editor support. 
+                // Setting the RootDirectory to an absolute path is useful in editor
+                // situations, but TitleContainer can ONLY be passed relative paths.                
+#if LINUX || MONOMAC || WINDOWS
+                if (Path.IsPathRooted(assetPath))                
+                    stream = File.OpenRead(assetPath);                
+                else
+#endif                
+                stream = TitleContainer.OpenStream(assetPath);
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
                 // in load times on Android due to slow Android asset streams.
