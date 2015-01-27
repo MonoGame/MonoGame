@@ -58,18 +58,18 @@ namespace Microsoft.Xna.Framework.Content
 			
 			SurfaceFormat surfaceFormat;
 			if (reader.version < 5) {
-				SurfaceFormat_Legacy legacyFormat = (SurfaceFormat_Legacy)reader.ReadInt32 ();
+				SurfaceFormatLegacy legacyFormat = (SurfaceFormatLegacy)reader.ReadInt32 ();
 				switch(legacyFormat) {
-				case SurfaceFormat_Legacy.Dxt1:
+				case SurfaceFormatLegacy.Dxt1:
 					surfaceFormat = SurfaceFormat.Dxt1;
 					break;
-				case SurfaceFormat_Legacy.Dxt3:
+				case SurfaceFormatLegacy.Dxt3:
 					surfaceFormat = SurfaceFormat.Dxt3;
 					break;
-				case SurfaceFormat_Legacy.Dxt5:
+				case SurfaceFormatLegacy.Dxt5:
 					surfaceFormat = SurfaceFormat.Dxt5;
 					break;
-				case SurfaceFormat_Legacy.Color:
+				case SurfaceFormatLegacy.Color:
 					surfaceFormat = SurfaceFormat.Color;
 					break;
 				default:
