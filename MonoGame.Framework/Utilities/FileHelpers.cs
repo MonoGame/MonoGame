@@ -59,23 +59,5 @@ namespace Microsoft.Xna.Framework.Utilities
             // correct platform specific separator.
             return NormalizeFilePathSeparators(localPath);
         }
-
-        /// <summary>
-        /// Returns a path relative to the base path.
-        /// </summary>
-        /// <param name="basePath">The path to make relative to.  Must end with directory seperator.</param>
-        /// <param name="path">The path to be made relative to the basePath.</param>
-        /// <returns>The relative path or the original string if it is not absolute or cannot be made relative.</returns>
-        public static string GetRelativePath(string basePath, string path)
-        {
-            Uri uri;
-            if (!Uri.TryCreate(path, UriKind.Absolute, out uri))
-                return path;
-
-            uri = new Uri(basePath).MakeRelativeUri(uri);
-            var str = Uri.UnescapeDataString(uri.ToString());
-
-            return NormalizeFilePathSeparators(str);
-        }
     }
 }

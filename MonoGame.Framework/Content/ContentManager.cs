@@ -46,7 +46,6 @@ using System.Text;
 using Lz4;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Utilities;
 using Path = System.IO.Path;
 using System.Diagnostics;
 
@@ -254,14 +253,16 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
+                var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
 
-                // For Win8 metro applications you do not have access to Environment.CurrentDirectory nor does Path.DirectorySeparatorChar exist.
-#if !WINRT
-                if (Path.IsPathRooted(assetPath))
-                    assetPath = FileHelpers.GetRelativePath(Environment.CurrentDirectory + Path.DirectorySeparatorChar, assetPath);
-#endif
-                
+                // This is primarily for editor support. 
+                // Setting the RootDirectory to an absolute path is useful in editor
+                // situations, but TitleContainer can ONLY be passed relative paths.                
+#if LINUX || MONOMAC || WINDOWS
+                if (Path.IsPathRooted(assetPath))                
+                    stream = File.OpenRead(assetPath);                
+                else
+#endif                
                 stream = TitleContainer.OpenStream(assetPath);
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
