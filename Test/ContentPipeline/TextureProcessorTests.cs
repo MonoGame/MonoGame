@@ -12,7 +12,7 @@ namespace MonoGame.Tests.ContentPipeline
     class TextureProcessorTests
     {
         [Test]
-        public void VaidateDefaults()
+        public void ValidateDefaults()
         {
             var processor = new TextureProcessor();
             Assert.AreEqual(new Color(255, 0, 255, 255), processor.ColorKeyColor);
