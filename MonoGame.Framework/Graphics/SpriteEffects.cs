@@ -7,7 +7,7 @@ using System;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Defines sprite visual options for rotation.
+    /// Defines sprite visual options for mirroring.
     /// </summary>
     [Flags]
     public enum SpriteEffects
@@ -17,12 +17,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		None = 0,
         /// <summary>
-        /// Rotate 180 degrees around the Y axis before rendering.
+        /// Render the sprite reversed along the X axis.
         /// </summary>
         FlipHorizontally = 1,
         /// <summary>
-        /// Rotate 180 degrees around the X axis before rendering.
+        /// Render the sprite reversed along the Y axis.
         /// </summary>
-        FlipVertically = 2        
+        FlipVertically = 2
     }
 }
