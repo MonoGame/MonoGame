@@ -140,6 +140,12 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+		public override void DidReceiveMemoryWarning()
+		{
+			base.DidReceiveMemoryWarning();
+			GC.Collect();
+		}
+
         #endregion
     }
 }
