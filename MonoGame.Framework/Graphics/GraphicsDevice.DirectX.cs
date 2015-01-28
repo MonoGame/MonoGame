@@ -993,17 +993,21 @@ namespace Microsoft.Xna.Framework.Graphics
             SamplerStates.Dirty();
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
-            _indexBufferDirty = true;
-            _vertexBufferDirty = true;
+            _indexBufferDirty = true;            
             _pixelShaderDirty = true;
             _vertexShaderDirty = true;
             _rasterizerStateDirty = true;
-            _scissorRectangleDirty = true;            
+            _scissorRectangleDirty = true;   
+        
+            for (var i = 0; i < _vertexBufferSlotDirty.Length; i++)            
+                _vertexBufferSlotDirty[i] = true;
+            
+            _vertexBuffersDirty = true;
         }
 #endif
 
         private static PrimitiveTopology ToPrimitiveTopology(PrimitiveType primitiveType)
-        {
+        {            
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
@@ -1067,12 +1071,26 @@ namespace Microsoft.Xna.Framework.Graphics
                 _indexBufferDirty = false;
             }
 
-            if (_vertexBufferDirty)
+            if (_vertexBuffersDirty)
             {
-                if (_vertexBuffer != null)
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer.Binding);
-                else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0);
+                // TODO: Preferable to use InputAssembler.SetVertexBuffers taking an array of bindings.
+                // TODO: We should be setting the InstanceFrequency for each slot. We can probably do this fix once we get a unit test for validating the API works.
+                for (int slot = 0; slot < _numVertexBufferSlots; ++slot)
+                {
+                    if (_vertexBufferSlotDirty[slot])
+                    {
+                        if (_vertexBufferSlots[slot].VertexBuffer != null)
+                        {
+                            _d3dContext.InputAssembler.SetVertexBuffers(slot, _vertexBufferSlots[slot].VertexBuffer.Binding);
+                        }
+                        else
+                        {
+                            _d3dContext.InputAssembler.SetVertexBuffers(slot);
+                        }
+
+                        _vertexBufferSlotDirty[slot] = false;
+                    }
+                }
             }
 
             if (_vertexShader == null)
@@ -1083,10 +1101,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexShaderDirty)
                 _d3dContext.VertexShader.Set(_vertexShader.VertexShader);
 
-            if (_vertexShaderDirty || _vertexBufferDirty)
+            if (_vertexShaderDirty || _vertexBuffersDirty)
             {
-                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
-                _vertexShaderDirty = _vertexBufferDirty = false;
+                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader);
+                _vertexShaderDirty = _vertexBuffersDirty = false;
             }
 
             if (_pixelShaderDirty)
@@ -1102,15 +1120,34 @@ namespace Microsoft.Xna.Framework.Graphics
             SamplerStates.PlatformSetSamplers(this);
         }
 
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader)
         {
+            Debug.Assert(_vertexBufferSlots[0].VertexBuffer != null, "The vertex buffer is null!");
+
             SharpDX.Direct3D11.InputLayout layout;
 
             // Lookup the layout using the shader and declaration as the key.
-            var key = (ulong)decl.HashKey << 32 | (uint)shader.HashKey;           
+            // TODO: We should really be combining all the non-null vertex buffer binding slots's hashs into one hash.
+            var key = (ulong)_vertexBufferSlots[0].VertexBuffer.VertexDeclaration.HashKey << 32 | (uint)shader.HashKey;
             if (!_inputLayouts.TryGetValue(key, out layout))
             {
-                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, decl.GetInputLayout());
+                var inputElements = new List<SharpDX.Direct3D11.InputElement>();
+                for (int vertexDeclIndex = 0; vertexDeclIndex < _numVertexBufferSlots; ++vertexDeclIndex)
+                {
+                    if (_vertexBufferSlots[vertexDeclIndex].VertexBuffer != null)
+                    {
+                        int firstElementOffset = inputElements.Count;
+                        inputElements.AddRange(_vertexBufferSlots[vertexDeclIndex].VertexBuffer.VertexDeclaration.GetInputLayout());
+                        // set correct vertex buffer slot in the InputElements for that vertex buffer.
+                        for (int inputElement = firstElementOffset; inputElement < inputElements.Count; ++inputElement)
+                        {
+                            SharpDX.Direct3D11.InputElement element = inputElements[inputElement];
+                            element.Slot = vertexDeclIndex;
+                            inputElements[inputElement] = element;
+                        }
+                    }
+                }
+                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, inputElements.ToArray());
                 _inputLayouts.Add(key, layout);
             }
 

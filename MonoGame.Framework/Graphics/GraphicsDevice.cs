@@ -25,9 +25,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
-  
-        private VertexBuffer _vertexBuffer;
-        private bool _vertexBufferDirty;
+        
+        private int _numVertexBufferSlots;
+        private VertexBufferBinding[] _vertexBufferSlots;
+        private bool[] _vertexBufferSlotDirty;
+        private bool _vertexBuffersDirty;
 
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
@@ -204,9 +206,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Force set the buffers and shaders on next ApplyState() call
             _indexBufferDirty = true;
-            _vertexBufferDirty = true;
             _vertexShaderDirty = true;
             _pixelShaderDirty = true;
+            _vertexBuffersDirty = true;
+
+            // Determine number of vertex buffer slots.
+#if DIRECTX
+            _numVertexBufferSlots = 16;
+            if (_d3dDevice.FeatureLevel >= SharpDX.Direct3D.FeatureLevel.Level_11_0)
+                _numVertexBufferSlots = SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount;
+#elif OPENGL
+            _numVertexBufferSlots = MaxVertexAttributes;
+#else            
+            _numVertexBufferSlots = 1;
+#endif
+            // Allocate vertex buffer binding and 'dirty' arrays.
+            _vertexBufferSlots = new VertexBufferBinding[_numVertexBufferSlots];
+            _vertexBufferSlotDirty = new bool[_numVertexBufferSlots];
+            for (var i = 0; i < _numVertexBufferSlots; i++)
+                _vertexBufferSlotDirty[i] = true;            
 
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
@@ -552,11 +570,62 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
-            if (_vertexBuffer == vertexBuffer)
-                return;
+            if (!ReferenceEquals(_vertexBufferSlots[0].VertexBuffer, vertexBuffer))
+            {
+                _vertexBufferSlots[0] = new VertexBufferBinding(vertexBuffer);
+                _vertexBufferSlotDirty[0] = true;
+                _vertexBuffersDirty = true;
+            }
 
-            _vertexBuffer = vertexBuffer;
-            _vertexBufferDirty = true;
+            for (var i = 1; i < _numVertexBufferSlots; i++)
+            {
+                if (_vertexBufferSlots[i].VertexBuffer != null)
+                {
+                    _vertexBufferSlots[i] = VertexBufferBinding.None;
+                    _vertexBufferSlotDirty[i] = true;
+                    _vertexBuffersDirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set vertex buffers.
+        /// </summary>
+        /// <param name="vertexBuffers">Array of vertex buffers to use.</param>
+        public void SetVertexBuffers(params VertexBufferBinding[] vertexBuffers)
+        {
+            if ((vertexBuffers != null) && (vertexBuffers.Length > _numVertexBufferSlots))
+            {
+                throw new ArgumentOutOfRangeException("vertexBuffers", String.Format("Max Vertex Buffers supported is {0}", _numVertexBufferSlots));
+            }
+
+            // Set vertex buffers if they are different
+            int slot = 0;
+            if (vertexBuffers != null)
+            {
+                for (; slot < vertexBuffers.Length; ++slot)
+                {
+                    if (!ReferenceEquals(_vertexBufferSlots[slot].VertexBuffer, vertexBuffers[slot].VertexBuffer)
+                        || (_vertexBufferSlots[slot].VertexOffset != vertexBuffers[slot].VertexOffset)
+                        || (_vertexBufferSlots[slot].InstanceFrequency != vertexBuffers[slot].InstanceFrequency))
+                    {
+                        _vertexBufferSlots[slot] = vertexBuffers[slot];
+                        _vertexBufferSlotDirty[slot] = true;
+                        _vertexBuffersDirty = true;
+                    }
+                }
+            }
+
+            // unset any unused vertex buffers
+            for (; slot < _numVertexBufferSlots; ++slot)
+            {
+                if (_vertexBufferSlots[slot].VertexBuffer != null)
+                {
+                    _vertexBufferSlots[slot] = new VertexBufferBinding(null);
+                    _vertexBufferSlotDirty[slot] = true;
+                    _vertexBuffersDirty = true;
+                }
+            }
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
@@ -620,7 +689,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            Debug.Assert(_vertexBufferSlots[0].VertexBuffer != null, "The vertex buffer is null!");
             Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
             // NOTE: minVertexIndex and numVertices are only hints of the
@@ -648,7 +717,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            Debug.Assert(_vertexBufferSlots[0].VertexBuffer != null, "The vertex buffer is null!");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 

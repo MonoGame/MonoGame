@@ -802,13 +802,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 _indexBufferDirty = false;
             }
 
-            if (_vertexBufferDirty)
+            if (_vertexBuffersDirty)
             {
-                if (_vertexBuffer != null)
+                for (int slot = 0; slot < _numVertexBufferSlots; ++slot)
                 {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
-                    GraphicsExtensions.CheckGLError();
+                    if (_vertexBufferSlotDirty[slot])
+                    {
+                        if (_vertexBufferSlots[slot].VertexBuffer != null)
+                        {
+                            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferSlots[slot].VertexBuffer.vbo);
+                            GraphicsExtensions.CheckGLError();
+                            GL.EnableVertexAttribArray(slot);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                        _vertexBufferSlotDirty[slot] = false;
+                    }
                 }
+
+                _vertexBuffersDirty = false;
             }
 
             if (_vertexShader == null)
@@ -840,9 +851,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);
-			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
+			var vertexOffset = (IntPtr)(_vertexBufferSlots[0].VertexBuffer.VertexDeclaration.VertexStride * baseVertex);
 
-			_vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
+            _vertexBufferSlots[0].VertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -855,12 +866,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformApplyState(true);
 
-            // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            // Unbind current VBOs.            
+            ClearBuffers();
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -881,9 +888,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
+            var vb = _vertexBufferSlots[0].VertexBuffer;
+            Debug.Assert(vb != null, "The vertex buffer is null!");
+
             PlatformApplyState(true);
 
-            _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
+            vb.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -896,11 +906,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformApplyState(true);
 
             // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            ClearBuffers();
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -929,11 +935,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformApplyState(true);
 
             // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            ClearBuffers();
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -960,6 +962,20 @@ namespace Microsoft.Xna.Framework.Graphics
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
            return GraphicsProfile.HiDef;
+        }
+
+        private void ClearBuffers()
+        {
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            GraphicsExtensions.CheckGLError();
+            _indexBufferDirty = true;
+            _vertexBuffersDirty = true;
+            for (int slot = 0; slot < _numVertexBufferSlots; ++slot)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+                GraphicsExtensions.CheckGLError();
+                _vertexBufferSlotDirty[slot] = true;
+            }
         }
     }
 }
