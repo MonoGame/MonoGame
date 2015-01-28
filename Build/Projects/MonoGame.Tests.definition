@@ -141,6 +141,9 @@
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\FontTextureProcessorTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
