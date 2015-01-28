@@ -15,9 +15,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
-        private BlendState _blendState = BlendState.Opaque;
-        private DepthStencilState _depthStencilState = DepthStencilState.Default;
-		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
+        private BlendState _blendState;
+        private DepthStencilState _depthStencilState;
+        private RasterizerState _rasterizerState;
 
         private bool _blendStateDirty;
         private bool _depthStencilStateDirty;
@@ -36,6 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _currentRenderTargetCount;
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+        internal GraphicsDeviceContext Context { get; private set; }
 
         public TextureCollection Textures { get; private set; }
 
@@ -131,7 +132,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities(this);
             GraphicsProfile = gdi.GraphicsProfile;
-            Initialize();
+
+            using (new GraphicsDeviceContextScope(Context)) 
+                Initialize();
         }
 
         internal GraphicsDevice ()
@@ -140,7 +143,9 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities(this);
-            Initialize();
+
+            using (new GraphicsDeviceContextScope(Context)) 
+                Initialize();
         }
 
         /// <summary>
@@ -161,7 +166,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities(this);
             GraphicsProfile = graphicsProfile;
-            Initialize();
+            
+            using (new GraphicsDeviceContextScope(Context))
+                Initialize();
         }
 
         private void Setup() 
@@ -173,9 +180,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            Textures = new TextureCollection (MaxTextureSlots);
-			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
+            // Setup graphics device context first and set to the current graphics device context so we can setup further states correctly
+            Context = new GraphicsDeviceContext(this);
 
+            using (new GraphicsDeviceContextScope(Context))
+            {
+                Textures = new TextureCollection(MaxTextureSlots);
+                SamplerStates = new SamplerStateCollection(MaxTextureSlots);
+            }
         }
 
         ~GraphicsDevice()
@@ -293,7 +305,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (disposing)
                 {
                     // Dispose of all remaining graphics resources before disposing of the graphics device
-                    GraphicsResource.DisposeAll();
+                    using (new GraphicsDeviceContextScope(Context))
+                    {
+                        GraphicsResource.DisposeAll();
+                    }
+
+                    // Dispose GraphicsDeviceContext associated with graphics device
+                    Context.Reset();
+                    Context = null;
 
                     PlatformDispose();
                 }

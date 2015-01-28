@@ -134,7 +134,7 @@ namespace MonoGame.Framework
         
         public override void Exit()
         {
-            Application.Exit();
+            _window.Dispose();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
