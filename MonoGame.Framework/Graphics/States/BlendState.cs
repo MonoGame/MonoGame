@@ -187,44 +187,30 @@ namespace Microsoft.Xna.Framework.Graphics
             _multiSampleMask = Int32.MaxValue;
             _independentBlendEnable = false;
         }
+
+	    private BlendState(string name, Blend sourceBlend, Blend destinationBlend)
+            : this()
+	    {
+	        Name = name;
+	        ColorSourceBlend = sourceBlend;
+	        AlphaSourceBlend = sourceBlend;
+	        ColorDestinationBlend = destinationBlend;
+	        AlphaDestinationBlend = destinationBlend;
+	    }
 		
 		static BlendState() 
         {
-            _additive = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState
-            {
-                Name = "BlendState.Additive",
-                ColorSourceBlend = Blend.SourceAlpha,
-                AlphaSourceBlend = Blend.SourceAlpha,
-                ColorDestinationBlend = Blend.One,
-                AlphaDestinationBlend = Blend.One
-            });
+            _additive = new Utilities.ObjectFactoryWithReset<BlendState>(() => 
+                new BlendState("BlendState.Additive", Blend.SourceAlpha, Blend.One));
 			
-			_alphaBlend = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
-            {
-                Name = "BlendState.AlphaBlend",
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			});
+			_alphaBlend = new Utilities.ObjectFactoryWithReset<BlendState>(() =>
+                new BlendState("BlendState.AlphaBlend", Blend.One, Blend.InverseSourceAlpha));
 			
-			_nonPremultiplied = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState() 
-            {
-                Name = "BlendState.NonPremultiplied",
-				ColorSourceBlend = Blend.SourceAlpha,
-				AlphaSourceBlend = Blend.SourceAlpha,
-				ColorDestinationBlend = Blend.InverseSourceAlpha,
-				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			});
+			_nonPremultiplied = new Utilities.ObjectFactoryWithReset<BlendState>(() =>
+                new BlendState("BlendState.NonPremultiplied", Blend.SourceAlpha, Blend.InverseSourceAlpha));
 			
-			_opaque = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
-            {
-                Name = "BlendState.Opaque",
-				ColorSourceBlend = Blend.One,
-				AlphaSourceBlend = Blend.One,			    
-				ColorDestinationBlend = Blend.Zero,
-				AlphaDestinationBlend = Blend.Zero
-			});
+			_opaque = new Utilities.ObjectFactoryWithReset<BlendState>(() =>
+                new BlendState("BlendState.Opaque", Blend.One, Blend.Zero));
 		}
 
         internal static void ResetStates()
