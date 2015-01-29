@@ -176,6 +176,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
+            BlendStateAdditive = BlendState.Additive.Clone();
+            BlendStateAlphaBlend = BlendState.AlphaBlend.Clone();
+            BlendStateNonPremultiplied = BlendState.NonPremultiplied.Clone();
+            BlendStateOpaque = BlendState.Opaque.Clone();
+
             BlendState = BlendState.Opaque;
         }
 
@@ -247,14 +252,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_blendState == value)
                     return;
 
-                // Blend state is now bound to a device... no one should
-                // be changing the state of the blend state object now!
-                value.BindToGraphicsDevice(this);
+                value.MarkBound();
 
 				_blendState = value;
                 _blendStateDirty = true;
             }
 		}
+
+        internal BlendState BlendStateAdditive;
+        internal BlendState BlendStateAlphaBlend;
+        internal BlendState BlendStateNonPremultiplied;
+        internal BlendState BlendStateOpaque;
 
         public DepthStencilState DepthStencilState
         {
@@ -276,7 +284,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_blendStateDirty)
             {
-                _blendState.PlatformApplyState(this);
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newBlendState = _blendState;
+                if (ReferenceEquals(_blendState, BlendState.Additive))
+                    newBlendState = BlendStateAdditive;
+                else if (ReferenceEquals(_blendState, BlendState.AlphaBlend))
+                    newBlendState = BlendStateAlphaBlend;
+                else if (ReferenceEquals(_blendState, BlendState.NonPremultiplied))
+                    newBlendState = BlendStateNonPremultiplied;
+                else if (ReferenceEquals(_blendState, BlendState.Opaque))
+                    newBlendState = BlendStateOpaque;
+
+                // Blend state is now bound to a device... no one should
+                // be changing the state of the blend state object now!
+                newBlendState.BindToGraphicsDevice(this);
+
+                newBlendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
 

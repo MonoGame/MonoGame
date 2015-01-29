@@ -29,6 +29,20 @@ namespace Microsoft.Xna.Framework.Graphics
             ColorWriteChannels = ColorWriteChannels.All;
         }
 
+	    internal TargetBlendState Clone(BlendState parent)
+	    {
+	        return new TargetBlendState(parent)
+	        {
+	            AlphaBlendFunction = AlphaBlendFunction,
+                AlphaDestinationBlend = AlphaDestinationBlend,
+                AlphaSourceBlend = AlphaSourceBlend,
+                ColorBlendFunction = ColorBlendFunction,
+                ColorDestinationBlend = ColorDestinationBlend,
+                ColorSourceBlend = ColorSourceBlend,
+                ColorWriteChannels = ColorWriteChannels
+	        };
+	    }
+
 	    public BlendFunction AlphaBlendFunction
 	    {
 	        get { return _alphaBlendFunction; }
