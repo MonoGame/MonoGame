@@ -239,9 +239,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return _blendState; }
 			set 
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_blendState == value)
                     return;
+
+                // Blend state is now bound to a device... no one should
+                // be changing the state of the blend state object now!
+                value.GraphicsDevice = this;
 
 				_blendState = value;
                 _blendStateDirty = true;

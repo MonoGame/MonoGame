@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -17,10 +16,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    private bool _independentBlendEnable;
 
-        [Conditional("DEBUG")]
-        private void AssertIfBound()
+        private void ThrowIfBound()
         {
-            Debug.Assert(GraphicsDevice == null, "You cannot modify the blend state after it has been bound to the graphics device!");
+            if (GraphicsDevice != null)
+                throw new InvalidOperationException("You cannot modify the blend state after it has been bound to the graphics device!");
         }
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _targetBlendState[0].AlphaBlendFunction; } 
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[0].AlphaBlendFunction = value;
             }
 	    }
@@ -48,7 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[0].AlphaDestinationBlend; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[0].AlphaDestinationBlend = value;
             }
         }
@@ -58,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[0].AlphaSourceBlend; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[0].AlphaSourceBlend = value;
             }
         }
@@ -68,7 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[0].ColorBlendFunction; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[0].ColorBlendFunction = value;
             }
         }
@@ -78,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[0].ColorDestinationBlend; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[0].ColorDestinationBlend = value;
             }
         }
@@ -88,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[0].ColorSourceBlend; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[0].ColorSourceBlend = value;
             }
         }
@@ -98,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[0].ColorWriteChannels; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[0].ColorWriteChannels = value;
             }
         }
@@ -108,7 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[1].ColorWriteChannels; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[1].ColorWriteChannels = value;
             }
         }
@@ -118,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[2].ColorWriteChannels; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[2].ColorWriteChannels = value;
             }
         }
@@ -128,7 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _targetBlendState[3].ColorWriteChannels; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _targetBlendState[3].ColorWriteChannels = value;
             }
         }
@@ -138,7 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _blendFactor; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _blendFactor = value;
             }
 	    }
@@ -148,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _multiSampleMask; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _multiSampleMask = value;
             }
         }
@@ -161,7 +160,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _independentBlendEnable; }
             set
             {
-                AssertIfBound();
+                ThrowIfBound();
                 _independentBlendEnable = value;
             }
         }

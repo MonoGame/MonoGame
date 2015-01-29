@@ -109,6 +109,7 @@
     <Compile Include="Framework\Vector2Test.cs" />
     <Compile Include="Framework\Vector3Test.cs" />
     <Compile Include="Framework\Vector4Test.cs" />
+    <Compile Include="Framework\Visual\BlendStateTest.cs" />
     <Compile Include="Framework\Visual\IndexBufferTest.cs" />
     <Compile Include="Framework\Visual\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
