@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    private bool _independentBlendEnable;
 
-        private void ThrowIfBound()
+        internal void ThrowIfBound()
         {
             if (GraphicsDevice != null)
                 throw new InvalidOperationException("You cannot modify the blend state after it has been bound to the graphics device!");
@@ -178,10 +178,10 @@ namespace Microsoft.Xna.Framework.Graphics
         public BlendState() 
         {
             _targetBlendState = new TargetBlendState[4];
-            _targetBlendState[0] = new TargetBlendState();
-            _targetBlendState[1] = new TargetBlendState();
-            _targetBlendState[2] = new TargetBlendState();
-            _targetBlendState[3] = new TargetBlendState();
+            _targetBlendState[0] = new TargetBlendState(this);
+            _targetBlendState[1] = new TargetBlendState(this);
+            _targetBlendState[2] = new TargetBlendState(this);
+            _targetBlendState[3] = new TargetBlendState(this);
 
 			_blendFactor = Color.White;
             _multiSampleMask = Int32.MaxValue;

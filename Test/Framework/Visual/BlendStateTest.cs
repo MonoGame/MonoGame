@@ -28,14 +28,23 @@ namespace MonoGame.Tests.Visual
             {
                 var blendState = new BlendState();
                 Assert.DoesNotThrow(() => blendState.AlphaBlendFunction = BlendFunction.ReverseSubtract);
+#if !XNA
+                Assert.DoesNotThrow(() => blendState[0].AlphaBlendFunction = BlendFunction.ReverseSubtract);
+#endif
 
                 // Can't mutate after binding.
                 Game.GraphicsDevice.BlendState = blendState;
                 Assert.Throws<InvalidOperationException>(() => blendState.AlphaBlendFunction = BlendFunction.ReverseSubtract);
+#if !XNA
+                Assert.Throws<InvalidOperationException>(() => blendState[0].AlphaBlendFunction = BlendFunction.ReverseSubtract);
+#endif
 
                 // Even after changing to different BlendState, you still can't mutate a previously-bound object.
                 Game.GraphicsDevice.BlendState = BlendState.Opaque;
                 Assert.Throws<InvalidOperationException>(() => blendState.AlphaBlendFunction = BlendFunction.ReverseSubtract);
+#if !XNA
+                Assert.Throws<InvalidOperationException>(() => blendState[0].AlphaBlendFunction = BlendFunction.ReverseSubtract);
+#endif
             };
             Game.Run();
         }
