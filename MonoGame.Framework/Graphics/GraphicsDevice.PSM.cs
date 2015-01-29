@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return renderTarget;
         }
-		
+
         internal void PlatformBeginApplyState()
         {
             // TODO: This was on both the OpenGL and PSM path previously - is it necessary?

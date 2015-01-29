@@ -757,7 +757,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Uniform4(posFixupLoc, 1, _posFixup);
             GraphicsExtensions.CheckGLError();
         }
-		
+
         internal void PlatformBeginApplyState()
         {
             Threading.EnsureUIThread();
