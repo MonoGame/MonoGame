@@ -94,20 +94,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return renderTarget;
         }
-
-        internal void PlatformApplyState(bool applyShaders)
+		
+        internal void PlatformBeginApplyState()
         {
             // TODO: This was on both the OpenGL and PSM path previously - is it necessary?
             Threading.EnsureUIThread();
+        }
 
+        internal void PlatformApplyState(bool applyShaders)
+        {
             if ( _scissorRectangleDirty )
 	            _scissorRectangleDirty = false;
 
-            if (_blendStateDirty)
-            {
-                _blendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
 	        if ( _depthStencilStateDirty )
             {
                 _depthStencilState.PlatformApplyState(this);

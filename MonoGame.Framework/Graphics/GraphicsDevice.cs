@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
-        private BlendState _blendState = BlendState.Opaque;
+        private BlendState _blendState;
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
 
@@ -176,6 +176,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
+            BlendState = BlendState.Opaque;
         }
 
         ~GraphicsDevice()
@@ -267,6 +268,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 _depthStencilState = value;
                 _depthStencilStateDirty = true;
             }
+        }
+
+        internal void ApplyState(bool applyShaders)
+        {
+            PlatformBeginApplyState();
+
+            if (_blendStateDirty)
+            {
+                _blendState.PlatformApplyState(this);
+                _blendStateDirty = false;
+            }
+
+            PlatformApplyState(applyShaders);
         }
 
         public void Clear(Color color)

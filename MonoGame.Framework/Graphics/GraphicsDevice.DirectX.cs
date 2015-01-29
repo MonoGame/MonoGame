@@ -1020,10 +1020,14 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
+        internal void PlatformBeginApplyState()
+        {
+            Debug.Assert(_d3dContext != null, "The d3d context is null!");
+        }
+
         internal void PlatformApplyState(bool applyShaders)
         {
             // NOTE: This code assumes _d3dContext has been locked by the caller.
-            Debug.Assert(_d3dContext != null, "The d3d context is null!");
 
             if ( _scissorRectangleDirty )
 	        {
@@ -1034,12 +1038,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _scissorRectangle.Bottom);
 	            _scissorRectangleDirty = false;
 	        }
-
-            if (_blendStateDirty)
-            {
-                _blendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
+            
 	        if ( _depthStencilStateDirty )
             {
 	            _depthStencilState.PlatformApplyState(this);
@@ -1214,7 +1213,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
 
@@ -1229,7 +1228,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.Draw(vertexCount, startVertex);
@@ -1240,7 +1239,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.Draw(vertexCount, vertexStart);
@@ -1255,7 +1254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);
@@ -1270,7 +1269,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);
