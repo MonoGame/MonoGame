@@ -10,15 +10,23 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
         private readonly TargetBlendState[] _targetBlendState;
 
+	    private bool _bound;
+
 	    private Color _blendFactor;
 
 	    private int _multiSampleMask;
 
 	    private bool _independentBlendEnable;
 
+	    internal void BindToGraphicsDevice(GraphicsDevice device)
+	    {
+	        GraphicsDevice = device;
+	        _bound = true;
+	    }
+
         internal void ThrowIfBound()
         {
-            if (GraphicsDevice != null)
+            if (_bound)
                 throw new InvalidOperationException("You cannot modify the blend state after it has been bound to the graphics device!");
         }
 
@@ -196,6 +204,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        AlphaSourceBlend = sourceBlend;
 	        ColorDestinationBlend = destinationBlend;
 	        AlphaDestinationBlend = destinationBlend;
+	        _bound = true;
 	    }
 		
 		static BlendState() 

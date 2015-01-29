@@ -48,5 +48,16 @@ namespace MonoGame.Tests.Visual
             };
             Game.Run();
         }
+
+        [Test]
+        public void ShouldNotBeAbleToMutateDefaultStateObjects()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                Assert.Throws<InvalidOperationException>(
+                    () => BlendState.Additive.AlphaBlendFunction = BlendFunction.ReverseSubtract);
+            };
+            Game.Run();
+        }
     }
 }

@@ -248,7 +248,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Blend state is now bound to a device... no one should
                 // be changing the state of the blend state object now!
-                value.GraphicsDevice = this;
+                value.BindToGraphicsDevice(this);
 
 				_blendState = value;
                 _blendStateDirty = true;
