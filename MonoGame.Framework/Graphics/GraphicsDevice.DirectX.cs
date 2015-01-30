@@ -632,6 +632,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 //Find the maximum supported level coming down from 32, 16, 8, 4, 2, 1, 0
                 var maxLevel = 32;
+                var quality = (int) SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
                 while (maxLevel > 0)
                 {
                     if (_d3dDevice.CheckMultisampleQualityLevels(Format.R32G32B32A32_Typeless, maxLevel) > 0)
@@ -643,10 +644,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (PresentationParameters.MultiSampleCount > maxLevel)
                 {
                     targetLevel = maxLevel;
+                    quality = maxLevel - 1;
                 }
 
                 multisampleDesc.Count = targetLevel;
-                multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
+                multisampleDesc.Quality = quality;
             }
 
             // Use BGRA for the swap chain.
