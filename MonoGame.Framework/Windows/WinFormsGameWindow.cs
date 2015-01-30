@@ -380,7 +380,7 @@ namespace MonoGame.Framework
                 OnIdle(this, null);
 
                 // Application.Run does this after processing idle handler
-                WaitMessage();
+                //WaitMessage();
             }
 
             // We need to remove the WM_QUIT message in the message 
