@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
             BindVertexBuffer(true);
-            PlatformApplyState(true);
+            ApplyState(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
         }
 
