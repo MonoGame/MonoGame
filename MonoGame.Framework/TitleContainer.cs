@@ -116,7 +116,15 @@ namespace Microsoft.Xna.Framework
         // this same logic is duplicated all over the code base.
         internal static string GetFilename(string name)
         {
-            return FileHelpers.NormalizeFilePathSeparators(new Uri("file:///" + name).LocalPath.Substring(1));
+            var path = new Uri("file:///" + name).LocalPath.Replace("///", "")
+                                                 .Replace("//", "")
+                                                 .Replace(@"\\\", "")
+                                                 .Replace(@"\\", "");
+
+            if (path.StartsWith("/"))
+                path = path.Remove(0, 1);
+
+            return FileHelpers.NormalizeFilePathSeparators(path);
         }
     }
 }
