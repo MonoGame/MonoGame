@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _isDisposed;
 
         private BlendState _blendState;
+        private BlendState _actualBlendState;
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
 		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
 
@@ -176,10 +177,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
-            BlendStateAdditive = BlendState.Additive.Clone();
-            BlendStateAlphaBlend = BlendState.AlphaBlend.Clone();
-            BlendStateNonPremultiplied = BlendState.NonPremultiplied.Clone();
-            BlendStateOpaque = BlendState.Opaque.Clone();
+            _blendStateAdditive = BlendState.Additive.Clone();
+            _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
+            _blendStateNonPremultiplied = BlendState.NonPremultiplied.Clone();
+            _blendStateOpaque = BlendState.Opaque.Clone();
 
             BlendState = BlendState.Opaque;
         }
@@ -252,17 +253,34 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_blendState == value)
                     return;
 
-                value.MarkBound();
-
 				_blendState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newBlendState = _blendState;
+                if (ReferenceEquals(_blendState, BlendState.Additive))
+                    newBlendState = _blendStateAdditive;
+                else if (ReferenceEquals(_blendState, BlendState.AlphaBlend))
+                    newBlendState = _blendStateAlphaBlend;
+                else if (ReferenceEquals(_blendState, BlendState.NonPremultiplied))
+                    newBlendState = _blendStateNonPremultiplied;
+                else if (ReferenceEquals(_blendState, BlendState.Opaque))
+                    newBlendState = _blendStateOpaque;
+
+                // Blend state is now bound to a device... no one should
+                // be changing the state of the blend state object now!
+                newBlendState.BindToGraphicsDevice(this);
+
+                _actualBlendState = newBlendState;
+
                 _blendStateDirty = true;
             }
 		}
 
-        internal BlendState BlendStateAdditive;
-        internal BlendState BlendStateAlphaBlend;
-        internal BlendState BlendStateNonPremultiplied;
-        internal BlendState BlendStateOpaque;
+        private BlendState _blendStateAdditive;
+        private BlendState _blendStateAlphaBlend;
+        private BlendState _blendStateNonPremultiplied;
+        private BlendState _blendStateOpaque;
 
         public DepthStencilState DepthStencilState
         {
@@ -284,23 +302,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_blendStateDirty)
             {
-                // Static state properties never actually get bound;
-                // instead we use our GraphicsDevice-specific version of them.
-                var newBlendState = _blendState;
-                if (ReferenceEquals(_blendState, BlendState.Additive))
-                    newBlendState = BlendStateAdditive;
-                else if (ReferenceEquals(_blendState, BlendState.AlphaBlend))
-                    newBlendState = BlendStateAlphaBlend;
-                else if (ReferenceEquals(_blendState, BlendState.NonPremultiplied))
-                    newBlendState = BlendStateNonPremultiplied;
-                else if (ReferenceEquals(_blendState, BlendState.Opaque))
-                    newBlendState = BlendStateOpaque;
-
-                // Blend state is now bound to a device... no one should
-                // be changing the state of the blend state object now!
-                newBlendState.BindToGraphicsDevice(this);
-
-                newBlendState.PlatformApplyState(this);
+                _actualBlendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
 

@@ -11,18 +11,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly TargetBlendState[] _targetBlendState;
 
         private readonly bool _defaultStateObject;
-        private bool _bound;
 
 	    private Color _blendFactor;
 
 	    private int _multiSampleMask;
 
 	    private bool _independentBlendEnable;
-
-        internal void MarkBound()
-        {
-            _bound = true;
-        }
 
         internal void BindToGraphicsDevice(GraphicsDevice device)
         {
@@ -37,7 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_defaultStateObject)
                 throw new InvalidOperationException("You cannot modify a default blend state object.");
-            if (_bound)
+            if (GraphicsDevice != null)
                 throw new InvalidOperationException("You cannot modify the blend state after it has been bound to the graphics device!");
         }
 
