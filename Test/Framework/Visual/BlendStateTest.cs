@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
@@ -27,24 +28,17 @@ namespace MonoGame.Tests.Visual
             Game.DrawWith += (sender, e) =>
             {
                 var blendState = new BlendState();
-                Assert.DoesNotThrow(() => blendState.AlphaBlendFunction = BlendFunction.ReverseSubtract);
-#if !XNA
-                Assert.DoesNotThrow(() => blendState[0].AlphaBlendFunction = BlendFunction.ReverseSubtract);
-#endif
+
+                // Can mutate before binding.
+                DoAsserts(blendState, Assert.DoesNotThrow);
 
                 // Can't mutate after binding.
                 Game.GraphicsDevice.BlendState = blendState;
-                Assert.Throws<InvalidOperationException>(() => blendState.AlphaBlendFunction = BlendFunction.ReverseSubtract);
-#if !XNA
-                Assert.Throws<InvalidOperationException>(() => blendState[0].AlphaBlendFunction = BlendFunction.ReverseSubtract);
-#endif
+                DoAsserts(blendState, d => Assert.Throws<InvalidOperationException>(d));
 
                 // Even after changing to different BlendState, you still can't mutate a previously-bound object.
                 Game.GraphicsDevice.BlendState = BlendState.Opaque;
-                Assert.Throws<InvalidOperationException>(() => blendState.AlphaBlendFunction = BlendFunction.ReverseSubtract);
-#if !XNA
-                Assert.Throws<InvalidOperationException>(() => blendState[0].AlphaBlendFunction = BlendFunction.ReverseSubtract);
-#endif
+                DoAsserts(blendState, d => Assert.Throws<InvalidOperationException>(d));
             };
             Game.Run();
         }
@@ -54,10 +48,44 @@ namespace MonoGame.Tests.Visual
         {
             Game.DrawWith += (sender, e) =>
             {
-                Assert.Throws<InvalidOperationException>(
-                    () => BlendState.Additive.AlphaBlendFunction = BlendFunction.ReverseSubtract);
+                DoAsserts(BlendState.Additive, d => Assert.Throws<InvalidOperationException>(d));
+                DoAsserts(BlendState.AlphaBlend, d => Assert.Throws<InvalidOperationException>(d));
+                DoAsserts(BlendState.NonPremultiplied, d => Assert.Throws<InvalidOperationException>(d));
+                DoAsserts(BlendState.Opaque, d => Assert.Throws<InvalidOperationException>(d));
             };
             Game.Run();
+        }
+
+        private static void DoAsserts(BlendState blendState, Action<TestDelegate> assertMethod)
+        {
+            assertMethod(() => blendState.AlphaBlendFunction = BlendFunction.Add);
+            assertMethod(() => blendState.AlphaDestinationBlend = Blend.BlendFactor);
+            assertMethod(() => blendState.AlphaSourceBlend = Blend.BlendFactor);
+            assertMethod(() => blendState.BlendFactor = Color.White);
+            assertMethod(() => blendState.ColorBlendFunction = BlendFunction.Add);
+            assertMethod(() => blendState.ColorDestinationBlend = Blend.BlendFactor);
+            assertMethod(() => blendState.ColorSourceBlend = Blend.BlendFactor);
+            assertMethod(() => blendState.ColorWriteChannels = ColorWriteChannels.All);
+            assertMethod(() => blendState.ColorWriteChannels1 = ColorWriteChannels.All);
+            assertMethod(() => blendState.ColorWriteChannels2 = ColorWriteChannels.All);
+            assertMethod(() => blendState.ColorWriteChannels3 = ColorWriteChannels.All);
+#if !XNA
+            assertMethod(() => blendState.IndependentBlendEnable = true);
+#endif
+            assertMethod(() => blendState.MultiSampleMask = 0);
+
+#if !XNA
+            for (var i = 0; i < 4; i++)
+            {
+                assertMethod(() => blendState[0].AlphaBlendFunction = BlendFunction.Add);
+                assertMethod(() => blendState[0].AlphaDestinationBlend = Blend.BlendFactor);
+                assertMethod(() => blendState[0].AlphaSourceBlend = Blend.BlendFactor);
+                assertMethod(() => blendState[0].ColorBlendFunction = BlendFunction.Add);
+                assertMethod(() => blendState[0].ColorDestinationBlend = Blend.BlendFactor);
+                assertMethod(() => blendState[0].ColorSourceBlend = Blend.BlendFactor);
+                assertMethod(() => blendState[0].ColorWriteChannels = ColorWriteChannels.All);
+            }
+#endif
         }
     }
 }
