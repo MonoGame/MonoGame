@@ -206,7 +206,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         if (attributes.Length != 0)
                         {
                             var processorAttribute = attributes[0] as ContentProcessorAttribute;
-                            _processors.Add(new ProcessorInfo {attribute = processorAttribute, type = t});
+                            _processors.Add(new ProcessorInfo
+                            {
+                                attribute = processorAttribute,
+                                type = t,
+                                assemblyTimestamp = assemblyTimestamp
+                            });
                         }
                     }
                     else if (t.GetInterface(@"ContentTypeWriter") != null)
@@ -530,6 +535,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
                 // Write the content to disk.
                 WriteXnb(processedObject, pipelineEvent);
+
+                // Store the timestamp of the DLLs containing the importer and processor.
+                pipelineEvent.ImporterTime = GetImporterAssemblyTimestamp(pipelineEvent.Importer);
+                pipelineEvent.ProcessorTime = GetProcessorAssemblyTimestamp(pipelineEvent.Processor);
 
                 // Store the new event into the intermediate folder.
                 pipelineEvent.Save(eventFilepath);

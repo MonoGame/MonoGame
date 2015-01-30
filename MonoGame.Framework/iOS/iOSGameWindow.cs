@@ -68,7 +68,7 @@ non-infringement.
 
 using System;
 
-using MonoTouch.UIKit;
+using UIKit;
 
 namespace Microsoft.Xna.Framework {
 	class iOSGameWindow : GameWindow {

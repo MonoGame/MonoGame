@@ -13,8 +13,7 @@ using MonoMac.OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
-using BufferTarget = OpenTK.Graphics.ES20.All;
-using BufferUsageHint = OpenTK.Graphics.ES20.All;
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 #if WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
@@ -45,11 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var sizeInBytes = IndexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
-#if IOS
-                GL.GenBuffers(1, ref ibo);
-#else
                 GL.GenBuffers(1, out ibo);
-#endif
                 GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
                 GraphicsExtensions.CheckGLError();

@@ -25,12 +25,13 @@ namespace MonoGame.Tools.Pipeline
         private ImageList _treeIcons;
 
         private bool _treeUpdating;
-        private bool _treeSort;        
+        private bool _treeSort;
 
         private const int ContentItemIcon = 0;
-        private const int FolderOpenIcon = 1;
-        private const int FolderClosedIcon = 2;
-        private const int ProjectIcon = 3;        
+        private const int ContentMissingIcon = 1;
+        private const int FolderOpenIcon = 2;
+        private const int FolderClosedIcon = 3;
+        private const int ProjectIcon = 4;        
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -58,6 +59,7 @@ namespace MonoGame.Tools.Pipeline
             _treeIcons = new ImageList();
             var asm = Assembly.GetExecutingAssembly();
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.missing.png")));
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
             _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
@@ -78,7 +80,6 @@ namespace MonoGame.Tools.Pipeline
         public void Attach(IController controller)
         {
             _controller = controller;
-            _controller.View = this;
 
             var updateMenus = new Action(UpdateMenus);
             var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
@@ -397,8 +398,8 @@ namespace MonoGame.Tools.Pipeline
 
             var node = parent.Add(string.Empty, item.Name, -1);
             node.Tag = item;
-            node.ImageIndex = ContentItemIcon;
-            node.SelectedImageIndex = ContentItemIcon;
+            node.ImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
+            node.SelectedImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
 
             _treeView.SelectedNode = node;
 
@@ -866,6 +867,39 @@ namespace MonoGame.Tools.Pipeline
             IntPtr ptr_func = Marshal.GetFunctionPointerForDelegate(WordWrapCallbackEvent);
 
             SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
+        }
+
+        public void ItemExistanceChanged(IProjectItem item)
+        {
+            var path = item.Location;
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes[0];
+            var parent = root.Nodes;
+
+            foreach (var folder in folders)
+            {
+                var found = parent.Find(folder, false);
+                if (found.Length == 0)
+                    return;
+
+                parent = found[0].Nodes;
+            }
+
+            for (int i = 0; i < parent.Count; i++)
+            {
+                if (parent[i].Text == item.Name)
+                {
+                    if (parent[i].ImageIndex == ContentItemIcon || parent[i].ImageIndex == ContentMissingIcon)
+                    {
+                        this.Invoke(new MethodInvoker(delegate()
+                        {
+                            parent[i].ImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
+                            parent[i].SelectedImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
+                        }));
+                    }
+                }
+            }
         }
     }
 }

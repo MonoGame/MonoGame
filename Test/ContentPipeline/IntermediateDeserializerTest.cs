@@ -114,6 +114,10 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.NotNull(theBasics.Nested);
                 Assert.AreEqual("Shawn", theBasics.Nested.Name);
                 Assert.AreEqual(true, theBasics.Nested.IsEnglish);
+                Assert.NotNull(theBasics.Nested2);
+                Assert.AreEqual("Shawn", theBasics.Nested2.Name);
+                Assert.AreEqual(true, theBasics.Nested2.IsEnglish);
+                Assert.AreNotSame(theBasics.Nested, theBasics.Nested2);
             });
         }
 
@@ -252,7 +256,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.AreEqual(new Point(1, 2), mathTypes.Point);
                 Assert.AreEqual(new Rectangle(1, 2, 3, 4), mathTypes.Rectangle);
-                Assert.AreEqual(new Vector3(1, 2, 3), mathTypes.Vector3);
+                Assert.AreEqual(new Vector3(1, 2, 3.1f), mathTypes.Vector3);
                 Assert.AreEqual(new Vector4(1, 2, 3, 4), mathTypes.Vector4);
                 Assert.AreEqual(new Quaternion(1, 2, 3, 4), mathTypes.Quaternion);
                 Assert.AreEqual(new Plane(1, 2, 3, 4), mathTypes.Plane);
@@ -262,27 +266,10 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(2, mathTypes.Vector2Array.Length);
                 Assert.AreEqual(Vector2.Zero, mathTypes.Vector2Array[0]);
                 Assert.AreEqual(Vector2.One, mathTypes.Vector2Array[1]);
-            });
-        }
-
-        [Test]
-        public void PrimitiveTypes()
-        {
-            DeserializeCompileAndLoad<PrimitiveTypes>("18_PrimitiveTypes.xml", primitiveTypes =>
-            {
-                Assert.AreEqual('A', primitiveTypes.Char);
-                Assert.AreEqual(127, primitiveTypes.Byte);
-                Assert.AreEqual(-127, primitiveTypes.SByte);
-                Assert.AreEqual(-1000, primitiveTypes.Short);
-                Assert.AreEqual(1000, primitiveTypes.UShort);
-                Assert.AreEqual(-100000, primitiveTypes.Int);
-                Assert.AreEqual(100000, primitiveTypes.UInt);
-                Assert.AreEqual(-10000000, primitiveTypes.Long);
-                Assert.AreEqual(10000000, primitiveTypes.ULong);
-                Assert.AreEqual(1234567.0f, primitiveTypes.Float);
-                Assert.AreEqual(1234567890.0, primitiveTypes.Double);
-                Assert.AreEqual(null, primitiveTypes.NullChar);
-                Assert.AreEqual(' ', primitiveTypes.NotNullChar);
+                Assert.AreEqual(3, mathTypes.Vector2List.Count);
+                Assert.AreEqual(new Vector2(1, 7), mathTypes.Vector2List[0]);
+                Assert.AreEqual(new Vector2(1, 9), mathTypes.Vector2List[1]);
+                Assert.AreEqual(new Vector2(1, 10), mathTypes.Vector2List[2]);
             });
         }
 
@@ -325,6 +312,15 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(Vector2.Zero, namespaceClass.B);
                 Assert.IsAssignableFrom<SpriteSortMode>(namespaceClass.C);
                 Assert.AreEqual(SpriteSortMode.Immediate, namespaceClass.C);
+                Assert.IsAssignableFrom<Nested.ContentPipeline.ClassInsideNestedAmbiguousNamespace>(namespaceClass.D);
+                Assert.AreEqual(true, ((Nested.ContentPipeline.ClassInsideNestedAmbiguousNamespace) namespaceClass.D).Value);
+                Assert.IsAssignableFrom<Nested.ClassInsideNestedNamespace>(namespaceClass.E);
+                Assert.AreEqual(true, ((Nested.ClassInsideNestedNamespace) namespaceClass.E).Value);
+                Assert.IsAssignableFrom<Nested.ContentPipeline2.ClassInsideNestedUnambiguousNamespace>(namespaceClass.F);
+                Assert.AreEqual(true, ((Nested.ContentPipeline2.ClassInsideNestedUnambiguousNamespace) namespaceClass.F).Value);
+                Assert.IsAssignableFrom<SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace>(namespaceClass.G);
+                Assert.AreEqual(true, ((SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace) namespaceClass.G).Value);
+                Assert.IsNull(namespaceClass.H);
             });
         }
 
@@ -366,8 +362,34 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.NotNull(externalReferences.Texture);
                 Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.NotNull(externalReferences.Texture2);
+                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.AreNotSame(externalReferences.Texture, externalReferences.Texture2);
                 Assert.NotNull(externalReferences.Shader);
                 Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.fx"));
+            });
+        }
+
+        [Test]
+        public void PrimitiveTypes()
+        {
+            DeserializeCompileAndLoad<PrimitiveTypes>("18_PrimitiveTypes.xml", primitiveTypes =>
+            {
+                Assert.AreEqual('A', primitiveTypes.Char);
+                Assert.AreEqual('°', primitiveTypes.Char2);
+                Assert.AreEqual('Δ', primitiveTypes.Char3);
+                Assert.AreEqual(127, primitiveTypes.Byte);
+                Assert.AreEqual(-127, primitiveTypes.SByte);
+                Assert.AreEqual(-1000, primitiveTypes.Short);
+                Assert.AreEqual(1000, primitiveTypes.UShort);
+                Assert.AreEqual(-100000, primitiveTypes.Int);
+                Assert.AreEqual(100000, primitiveTypes.UInt);
+                Assert.AreEqual(-10000000, primitiveTypes.Long);
+                Assert.AreEqual(10000000, primitiveTypes.ULong);
+                Assert.AreEqual(1234567.0f, primitiveTypes.Float);
+                Assert.AreEqual(1234567890.0, primitiveTypes.Double);
+                Assert.AreEqual(null, primitiveTypes.NullChar);
+                Assert.AreEqual('B', primitiveTypes.NotNullChar);
             });
         }
 
@@ -422,6 +444,19 @@ namespace MonoGame.Tests.ContentPipeline
             DeserializeCompileAndLoad<SystemTypes>("20_SystemTypes.xml", sysTypes =>
             {
                 Assert.AreEqual(TimeSpan.FromSeconds(42.5f), sysTypes.TimeSpan);
+            });
+        }
+
+        [Test]
+        public void CustomFormatting()
+        {
+            DeserializeCompileAndLoad<CustomFormatting>("21_CustomFormatting.xml", customFormatting =>
+            {
+                Assert.AreEqual(1, customFormatting.A);
+                Assert.AreEqual(3, customFormatting.Vector2ListSpaced.Count);
+                Assert.AreEqual(new Vector2(0, 4), customFormatting.Vector2ListSpaced[0]);
+                Assert.AreEqual(new Vector2(0, 6), customFormatting.Vector2ListSpaced[1]);
+                Assert.AreEqual(new Vector2(0, 7), customFormatting.Vector2ListSpaced[2]);
             });
         }
     }

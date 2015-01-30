@@ -87,6 +87,7 @@
     <Compile Include="ContentPipeline\AssetTestClasses.cs" />
     <Compile Include="ContentPipeline\FontDescriptionTests.cs" />
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs" />
+    <Compile Include="ContentPipeline\IntermediateSerializerTest.cs" />
     <Compile Include="ContentPipeline\ModelProcessorTests.cs" />
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs" />
     <Compile Include="ContentPipeline\TestProcessorContext.cs" />
@@ -98,6 +99,9 @@
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
+    <Compile Include="Framework\CurveKeyCollectionTest.cs" />
+    <Compile Include="Framework\CurveKeyTest.cs" />
+    <Compile Include="Framework\CurveTest.cs" />
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
@@ -460,6 +464,9 @@
     <Content Include="Assets\Xml\04_ExcludingPublicMembers.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Xml\04_ExcludingPublicMembersOutput.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Xml\05_RenamingXmlElements.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -563,6 +570,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Xml\20_SystemTypes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\21_CustomFormatting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

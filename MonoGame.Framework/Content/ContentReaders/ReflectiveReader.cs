@@ -149,12 +149,6 @@ namespace Microsoft.Xna.Framework.Content
             Func<object, object> construct = parent => null;
             if (property != null && !property.CanWrite)
                 construct = parent => property.GetValue(parent, null);
-            else if (ReflectionHelpers.IsConcreteClass(elementType))
-            {
-                var constructor = elementType.GetDefaultConstructor();
-                if (constructor != null)
-                    construct = parent => constructor.Invoke(null);
-            }
 
             return (input, parent) =>
             {

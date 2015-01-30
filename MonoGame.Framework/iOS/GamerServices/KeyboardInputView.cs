@@ -64,13 +64,16 @@ change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
+
+
 #endregion License
 
 using System;
 using System.Drawing;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
+using CoreGraphics;
 
 namespace Microsoft.Xna.Framework {
 	class KeyboardInputView : UIScrollView {
@@ -216,33 +219,31 @@ namespace Microsoft.Xna.Framework {
 			_toolbar.SizeToFit ();
 
 			var titleSize = SizeThatFitsWidth (_title, Bounds.Width - TitleMargin.Horizontal);
-			_title.Frame = new RectangleF (
+			_title.Frame = new CGRect (
 				TitleMargin.Left, _toolbar.Bounds.Bottom + TitleMargin.Top,
 				titleSize.Width, titleSize.Height);
 
 			var descriptionSize = SizeThatFitsWidth (
 				_description, Bounds.Width - DescriptionMargin.Horizontal);
-			_description.Frame = new RectangleF (
+			_description.Frame = new CGRect (
 				DescriptionMargin.Left,
 				_title.Frame.Bottom + TitleMargin.Bottom + DescriptionMargin.Top,
 				descriptionSize.Width, descriptionSize.Height);
 
 			var textFieldSize = _textField.SizeThatFits (
-				new SizeF(Bounds.Width - TextFieldMargin.Horizontal, Bounds.Height));
-			_textFieldContainer.Frame = new RectangleF (
+				new CGSize(Bounds.Width - TextFieldMargin.Horizontal, Bounds.Height));
+			_textFieldContainer.Frame = new CGRect (
 				TextFieldMargin.Left,
 				_description.Frame.Bottom + DescriptionMargin.Bottom + TextFieldMargin.Top,
 				Bounds.Width - TextFieldMargin.Horizontal, textFieldSize.Height);
 
-			ContentSize = new SizeF(Bounds.Width, _textFieldContainer.Frame.Bottom + TextFieldMargin.Bottom);
+			ContentSize = new CGSize(Bounds.Width, _textFieldContainer.Frame.Bottom + TextFieldMargin.Bottom);
 		}
 
-		private static SizeF SizeThatFitsWidth(UILabel label, float width)
+		private static CGSize SizeThatFitsWidth(UILabel label, nfloat width)
 		{
 			var font = label.Font;
-			return label.StringSize (
-				label.Text, font, new SizeF(width, font.LineHeight * label.Lines),
-				label.LineBreakMode);
+            return label.SizeThatFits(new CGSize(width, font.LineHeight * label.Lines));
 		}
 
 		private void DoneButton_Tapped (object sender, EventArgs e)

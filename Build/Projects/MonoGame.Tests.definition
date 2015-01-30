@@ -84,23 +84,26 @@
         <Platforms>iOS</Platforms>
     </Compile>
 
+    <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\ColorTest.cs" />
+	<Compile Include="Framework\CurveKeyCollectionTest.cs" />
+	<Compile Include="Framework\CurveKeyTest.cs" />
+	<Compile Include="Framework\CurveTest.cs" />
+    <Compile Include="Framework\GamePadStateTest.cs" />
+    <Compile Include="Framework\GameTest.cs" />	
+    <Compile Include="Framework\GameTest+Methods.cs" />
+    <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Framework\GestureRecognizerTest.cs" />
+    <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Framework\MockWindow.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
-    <Compile Include="Framework\TouchCollectionTest.cs" />
-    <Compile Include="Framework\TouchPanelTest.cs" />
-    <Compile Include="Framework\TouchLocationTest.cs" />
-    <Compile Include="Framework\Bounding.cs" />
-    <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
 	<Compile Include="Framework\RectangleTest.cs" />
-    <Compile Include="Framework\GameTest+Methods.cs" />
-    <Compile Include="Framework\GameTest+Properties.cs" />
-    <Compile Include="Framework\GameTest.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
-    <Compile Include="Framework\GamePadStateTest.cs" />
+    <Compile Include="Framework\TouchCollectionTest.cs" />
+    <Compile Include="Framework\TouchLocationTest.cs" />
+    <Compile Include="Framework\TouchPanelTest.cs" />
     <Compile Include="Framework\UtilitiesTest.cs" />
 	<Compile Include="Framework\Vector2Test.cs" />
 	
@@ -138,7 +141,13 @@
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\FontTextureProcessorTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\IntermediateSerializerTest.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
@@ -476,6 +485,9 @@
     <Content Include="Assets\Xml\04_ExcludingPublicMembers.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Assets\Xml\04_ExcludingPublicMembersOutput.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Xml\05_RenamingXmlElements.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -523,7 +535,10 @@
     </Content>
     <Content Include="Assets\Xml\20_SystemTypes.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>    
+    </Content>
+	<Content Include="Assets\Xml\21_CustomFormatting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\Default.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

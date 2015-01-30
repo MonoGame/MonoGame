@@ -22,10 +22,10 @@
 
   <Applications>
     <Application Id="App"
-        Executable="$ext_safeprojectname$.exe"
-        EntryPoint="$ext_safeprojectname$.App">
+        Executable="$targetnametoken$.exe"
+        EntryPoint="$safeprojectname$.App">
         <m2:VisualElements
-            DisplayName="$ext_safeprojectname$"
+            DisplayName="$safeprojectname$"
             Square150x150Logo="Assets\Logo.png"
             Square30x30Logo="Assets\SmallLogo.png"
             Description="$ext_safeprojectname$"

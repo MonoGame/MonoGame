@@ -88,7 +88,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var startBytes = startIndex * vertexStride;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, elementCount * TsizeInBytes);
 
                 lock (GraphicsDevice._d3dContext)
                 {
@@ -101,7 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-                        for (int i = 0; i < data.Length; i++)
+                        for (int i = 0; i < elementCount; i++)
                             SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * vertexStride + offsetInBytes, TsizeInBytes);
                     }
 
@@ -173,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         var box = d3dContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read,
                             SharpDX.Direct3D11.MapFlags.None);
 
-                        for (int i = 0; i < data.Length; i++)
+                        for (int i = 0; i < elementCount; i++)
                             SharpDX.Utilities.CopyMemory(
                                 box.DataPointer + i*vertexStride + offsetInBytes,
                                 dataPtr + i*elementSizeInBytes, elementSizeInBytes);

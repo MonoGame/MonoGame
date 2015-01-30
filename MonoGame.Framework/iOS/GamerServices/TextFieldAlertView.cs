@@ -1,8 +1,9 @@
 using System;
 using System.Drawing;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
+using CoreGraphics;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
@@ -92,9 +93,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		private void AdjustControlSize()
 		{
-			float tfExtH = _tf.Frame.Size.Height + 16.0f;
+			nfloat tfExtH = _tf.Frame.Size.Height + 16.0f;
 			
-			RectangleF frame = new RectangleF(this.Frame.X, 
+			CGRect frame = new CGRect(this.Frame.X, 
 			                                  this.Frame.Y - tfExtH/2,
 			                                  this.Frame.Size.Width,
 			                                  this.Frame.Size.Height + tfExtH);
@@ -104,7 +105,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				if(view is UIControl)
 				{
-					view.Frame = new RectangleF(view.Frame.X, 
+					view.Frame = new CGRect(view.Frame.X, 
 					                            view.Frame.Y + tfExtH,
 					                            view.Frame.Size.Width, 
 					                            view.Frame.Size.Height);

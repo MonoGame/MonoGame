@@ -3,81 +3,106 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
-	// TODO [TypeConverter(ExpandableObjectConverter)]
+    /// <summary>
+    /// Contains a collection of <see cref="CurveKey"/> points in 2D space and provides methods for evaluating features of the curve they define.
+    /// </summary>
+    // TODO : [TypeConverter(typeof(ExpandableObjectConverter))]
     [DataContract]
     public class Curve
     {
         #region Private Fields
 
-        private CurveKeyCollection keys;
-        private CurveLoopType postLoop;
-        private CurveLoopType preLoop;
+        private CurveKeyCollection _keys;
+        private CurveLoopType _postLoop;
+        private CurveLoopType _preLoop;
 
-        #endregion Private Fields
-
+        #endregion
 
         #region Public Properties
 
+        /// <summary>
+        /// Returns <c>true</c> if this curve is constant (has zero or one points); <c>false</c> otherwise.
+        /// </summary>
         [DataMember]
         public bool IsConstant
         {
-            get { return this.keys.Count <= 1; }
+            get { return this._keys.Count <= 1; }
         }
 
+        /// <summary>
+        /// Gets the collection of curve keys.
+        /// </summary>
         [DataMember]
         public CurveKeyCollection Keys
         {
-            get { return this.keys; }
+            get { return this._keys; }
         }
 
+        /// <summary>
+        /// Gets or sets how to handle weighting values that are greater than the last control point in the curve.
+        /// </summary>
         [DataMember]
         public CurveLoopType PostLoop
         {
-            get { return this.postLoop; }
-            set { this.postLoop = value; }
+            get { return this._postLoop; }
+            set { this._postLoop = value; }
         }
 
+        /// <summary>
+        /// Gets or sets how to handle weighting values that are less than the first control point in the curve.
+        /// </summary>
         [DataMember]
         public CurveLoopType PreLoop
         {
-            get { return this.preLoop; }
-            set { this.preLoop = value; }
+            get { return this._preLoop; }
+            set { this._preLoop = value; }
         }
 
-        #endregion Public Properties
-
+        #endregion
 
         #region Public Constructors
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Curve"/> class.
+        /// </summary>
         public Curve()
         {
-            this.keys = new CurveKeyCollection();
+            this._keys = new CurveKeyCollection();
         }
 
-        #endregion Public Constructors
-
+        #endregion
 
         #region Public Methods
 
+        /// <summary>
+        /// Creates a copy of this curve.
+        /// </summary>
+        /// <returns>A copy of this curve.</returns>
         public Curve Clone()
         {
             Curve curve = new Curve();
 
-            curve.keys = this.keys.Clone();
-            curve.preLoop = this.preLoop;
-            curve.postLoop = this.postLoop;
+            curve._keys = this._keys.Clone();
+            curve._preLoop = this._preLoop;
+            curve._postLoop = this._postLoop;
 
             return curve;
         }
 
+        /// <summary>
+        /// Evaluate the value at a position of this <see cref="Curve"/>.
+        /// </summary>
+        /// <param name="position">The position on this <see cref="Curve"/>.</param>
+        /// <returns>Value at the position on this <see cref="Curve"/>.</returns>
         public float Evaluate(float position)
         {
-            CurveKey first = keys[0];
-            CurveKey last = keys[keys.Count - 1];
+            CurveKey first = _keys[0];
+            CurveKey last = _keys[_keys.Count - 1];
 
             if (position < first.Position)
             {
@@ -156,27 +181,49 @@ namespace Microsoft.Xna.Framework
             return GetCurvePosition(position);
         }
 
-		public void ComputeTangents (CurveTangent tangentType )
+        /// <summary>
+        /// Computes tangents for all keys in the collection.
+        /// </summary>
+        /// <param name="tangentType">The tangent type for both in and out.</param>
+		public void ComputeTangents (CurveTangent tangentType)
 		{
 		    ComputeTangents(tangentType, tangentType);
 		}
 		
+        /// <summary>
+        /// Computes tangents for all keys in the collection.
+        /// </summary>
+        /// <param name="tangentInType">The tangent in-type. <see cref="CurveKey.TangentIn"/> for more details.</param>
+        /// <param name="tangentOutType">The tangent out-type. <see cref="CurveKey.TangentOut"/> for more details.</param>
 		public void ComputeTangents(CurveTangent tangentInType, CurveTangent tangentOutType)
 		{
-            for (var i = 0; i < Keys.Count; i++)
+            for (var i = 0; i < Keys.Count; ++i)
+            {
                 ComputeTangent(i, tangentInType, tangentOutType);
+            }
 		}
 
+        /// <summary>
+        /// Computes tangent for the specific key in the collection.
+        /// </summary>
+        /// <param name="keyIndex">The index of a key in the collection.</param>
+        /// <param name="tangentType">The tangent type for both in and out.</param>
         public void ComputeTangent(int keyIndex, CurveTangent tangentType)
         {
             ComputeTangent(keyIndex, tangentType, tangentType);
         }
 
+        /// <summary>
+        /// Computes tangent for the specific key in the collection.
+        /// </summary>
+        /// <param name="keyIndex">The index of key in the collection.</param>
+        /// <param name="tangentInType">The tangent in-type. <see cref="CurveKey.TangentIn"/> for more details.</param>
+        /// <param name="tangentOutType">The tangent out-type. <see cref="CurveKey.TangentOut"/> for more details.</param>
         public void ComputeTangent(int keyIndex, CurveTangent tangentInType, CurveTangent tangentOutType)
         {
             // See http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.curvetangent.aspx
 
-            var key = keys[keyIndex];
+            var key = _keys[keyIndex];
 
             float p0, p, p1;
             p0 = p = p1 = key.Position;
@@ -186,14 +233,14 @@ namespace Microsoft.Xna.Framework
 
             if ( keyIndex > 0 )
             {
-                p0 = keys[keyIndex - 1].Position;
-                v0 = keys[keyIndex - 1].Value;
+                p0 = _keys[keyIndex - 1].Position;
+                v0 = _keys[keyIndex - 1].Value;
             }
 
-            if (keyIndex < keys.Count-1)
+            if (keyIndex < _keys.Count-1)
             {
-                p1 = keys[keyIndex + 1].Position;
-                v1 = keys[keyIndex + 1].Value;
+                p1 = _keys[keyIndex + 1].Position;
+                v1 = _keys[keyIndex + 1].Value;
             }
 
             switch (tangentInType)
@@ -231,14 +278,13 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-	    #endregion Public Methods
-
+	    #endregion
 
         #region Private Methods
 
         private int GetNumberOfCycle(float position)
         {
-            float cycle = (position - keys[0].Position) / (keys[keys.Count - 1].Position - keys[0].Position);
+            float cycle = (position - _keys[0].Position) / (_keys[_keys.Count - 1].Position - _keys[0].Position);
             if (cycle < 0f)
                 cycle--;
             return (int)cycle;
@@ -247,9 +293,9 @@ namespace Microsoft.Xna.Framework
         private float GetCurvePosition(float position)
         {
             //only for position in curve
-            CurveKey prev = this.keys[0];
+            CurveKey prev = this._keys[0];
             CurveKey next;
-            for (int i = 1; i < this.keys.Count; i++)
+            for (int i = 1; i < this._keys.Count; ++i)
             {
                 next = this.Keys[i];
                 if (next.Position >= position)

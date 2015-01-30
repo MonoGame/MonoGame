@@ -38,10 +38,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			var fontName = input.FontName;
 
+#if WINDOWS || LINUX
 #if WINDOWS
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
-		        var fontDirectory = Path.Combine(windowsfolder,"Fonts");
+		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
 			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+#elif LINUX
+            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
+#endif
 			if (string.IsNullOrWhiteSpace(fontName)) {
 				fontName = input.FontName;
 #endif
@@ -53,14 +57,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			directories.Add("/Library/Fonts");
 #if WINDOWS
 			directories.Add(fontDirectory);
-#endif
-
-#if LINUX
-			directories.Add("/usr/share/fonts/truetype");
-			string[] subdirectories = Directory.GetDirectories ("/usr/share/fonts/truetype");
-
-			for(int i = 0;i < subdirectories.Length;i++)
-				directories.Add(subdirectories[i]);
 #endif
 
 			foreach( var dir in directories) {
@@ -79,10 +75,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					directory = dir;
 					break;
 				}
-			}
+            }
 
-			fontName = Path.Combine (directory, fontName);
-#if WINDOWS
+            fontName = Path.Combine (directory, fontName);
+
+#if WINDOWS || LINUX
 			}
 #endif
 
@@ -220,6 +217,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 			return String.Empty;
 		}
+#endif
+
+#if LINUX
+        string FindFontFileFromFontName(string fontname, string style)
+        {
+            string s, e;
+            ExternalTool.Run("/bin/bash", string.Format ("-c \"fc-match -f '%{{file}}:%{{family}}\\n' '{0}:style={1}'\"", fontname, style), out s, out e);
+            s = s.Trim();
+
+            var split = s.Split (':');
+            //check font family, fontconfig might return a fallback
+            if (split [1].Contains (",")) { //this file defines multiple family names
+                var families = split [1].Split (',');
+                foreach (var f in families) {
+                    if (f.ToLowerInvariant () == fontname.ToLowerInvariant ())
+                        return split [0];
+                }
+                //didn't find it
+                return String.Empty;
+            } else {
+                if (split [1].ToLowerInvariant () != fontname.ToLowerInvariant ())
+                    return String.Empty;
+            }
+            return split [0];
+        }
 #endif
     }
 }

@@ -115,6 +115,23 @@ namespace MonoGame.Tests {
 
             return dest;
         }
+
+        public static byte[] ConvertFrom<T>(T[] source) where T : struct
+        {
+            var sizeOfSource = Marshal.SizeOf(typeof(T));
+            var count = source.Length;
+            var dest = new byte[sizeOfSource * count];
+
+            var pinned = GCHandle.Alloc(dest, GCHandleType.Pinned);
+            var pointer = pinned.AddrOfPinnedObject();
+
+            for (var i = 0; i < count; i++, pointer += sizeOfSource)
+                Marshal.StructureToPtr(source[i], pointer, true);
+
+            pinned.Free();
+
+            return dest;
+        }
     }
 
 	static class MathUtility 

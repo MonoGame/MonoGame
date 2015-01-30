@@ -45,7 +45,7 @@
     </Project>
   </TemplateContent>
   <WizardExtension>
-    <Assembly>Microsoft.VisualStudio.SmartDevice.ProjectSystem.Base, Version=11.0.0.0, Culture=Neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <Assembly>Microsoft.VisualStudio.SmartDevice.ProjectSystem.Base, Version=12.0.0.0, Culture=Neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
     <FullClassName>Microsoft.VisualStudio.SmartDevice.ProjectSystem.Wizards.ProjectTemplateWizard</FullClassName>
   </WizardExtension>
 </VSTemplate>

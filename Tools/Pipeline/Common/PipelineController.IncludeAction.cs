@@ -24,7 +24,7 @@ namespace MonoGame.Tools.Pipeline
             public void Do()
             {
                 var parser = new PipelineProjectParser(_con, _con._project);
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 _con.Selection.Clear(_con);
 
@@ -40,17 +40,17 @@ namespace MonoGame.Tools.Pipeline
 
                     _files[i] = item.OriginalPath;
 
-                    _con._view.AddTreeItem(item);                    
-                    _con.Selection.Add(item, _con);                    
+                    _con.View.AddTreeItem(item);
+                    _con.Selection.Add(item, _con);
                 }
 
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
 
             public void Undo()
             {
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 foreach (var f in _files)
                 {
@@ -66,7 +66,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
 
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
         }

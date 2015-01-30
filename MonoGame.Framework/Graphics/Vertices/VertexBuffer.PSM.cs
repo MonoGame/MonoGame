@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_vertexArray == null)
                 _vertexArray = new T[VertexCount];
-            Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
+            Array.Copy(data, offsetInBytes / VertexDeclaration.VertexStride, _vertexArray, startIndex, elementCount);
         }
 
         protected override void Dispose(bool disposing)
