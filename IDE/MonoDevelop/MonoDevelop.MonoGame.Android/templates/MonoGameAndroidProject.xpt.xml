@@ -31,7 +31,7 @@
 				<Reference type="Gac" refto="OpenTK" />
 			</References>
 			<Packages>
-				<Package id="MonoGame.Framework.Android" version="3.3.0" targetFramework="MonoAndroid" />
+				<Package id="MonoGame.Framework.Android" version="3.2.99-Beta" targetFramework="MonoAndroid" />
 			</Packages>
 			<Files>
 				<File name="Activity1.cs" src="Android/Activity1.cs" />

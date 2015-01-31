@@ -20,7 +20,7 @@
 		<Project name = "${ProjectName}" directory = "." type = "PortableDotNet">
 			<Options Target = "Library" TargetFrameworkVersion = ".NETPortable,Version=v4.0,Profile=Profile158"/>
 			<Packages>
-				<Package id="MonoGame.Framework.PCL" version="3.3.0"/>
+				<Package id="MonoGame.Framework.PCL" version="3.2.99-Beta"/>
 			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />

@@ -33,21 +33,23 @@
     <Reference Include="System" />
     <Reference Include="MonoDevelop.Ide">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.MonoMac">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\MonoDevelop.MonoMac\MonoDevelop.MonoMac.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.MacDev">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\MonoDevelop.MacDev\MonoDevelop.MacDev.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Components">
-      <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\MacOS\lib\monodevelop\AddIns\Xamarin.Ide\Xamarin.Components.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

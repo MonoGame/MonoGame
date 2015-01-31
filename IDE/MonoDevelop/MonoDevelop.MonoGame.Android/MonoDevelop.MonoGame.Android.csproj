@@ -33,21 +33,27 @@
     <Reference Include="System" />
     <Reference Include="MonoDevelop.Ide">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.MonoDroid">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\MonoDevelop.MonoDroid\MonoDevelop.MonoDroid.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Components.Ide">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\Xamarin.Ide\Xamarin.Components.Ide.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Xamarin.Ide">
       <HintPath>..\..\..\..\..\..\..\..\..\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\Xamarin.Ide\Xamarin.Ide.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

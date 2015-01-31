@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<?xml version="1.0"?>
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Mac Application (MonoMac)</_Name>
@@ -31,7 +30,7 @@
 				<Reference type="Gac" refto="MonoMac" SpecificVersion="false" />
 			</References>
 			<Packages>
-				<Package id="MonoGame.Framework.MonoMac" version="3.3.0" targetFramework="net40" />
+				<Package id="MonoGame.Framework.MacOS" version="3.2.99-Beta" targetFramework="net40" />
 			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />

@@ -24,10 +24,10 @@
 				<Reference type="Gac" refto="System.Core" />
 				<Reference type="Gac" refto="System.Xml.Linq" />
 				<Reference type="Gac" refto="System.Drawing" />
-				<Reference type="Gac" refto="Xamarin.Mac" SpecificVersion="false" />
+				<Reference type="Gac" refto="XamMac" SpecificVersion="false" />
 			</References>
 			<Packages>
-				<Package id="MonoGame.Framework.MacOS" version="3.3.0" targetFramework="Xamarin.Mac" />
+				<Package id="MonoGame.Framework.MacOS" version="3.2.99-Beta" targetFramework="net40" />
 			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />

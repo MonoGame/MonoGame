@@ -26,7 +26,7 @@
 				<Reference type="Gac" refto="Xamarin.iOS" />
 			</References>
 			<Packages>
-				<Package id="MonoGame.Framework.iOS" version="3.3.0" targetFramework="Xamarin.iOS" />
+				<Package id="MonoGame.Framework.iOS" version="3.2.99-Beta" targetFramework="XamariniOS" />
 			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
