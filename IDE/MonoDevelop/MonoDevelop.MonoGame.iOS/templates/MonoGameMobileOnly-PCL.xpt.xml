@@ -20,7 +20,7 @@
 		<Project name = "${ProjectName}" directory = "." type = "PortableDotNet">
 			<Options Target = "Library" TargetFrameworkVersion = ".NETPortable,Version=v4.0,Profile=Profile158"/>
 			<Packages>
-				<Package id="MonoGame.Framework.PCL" version="3.2.99"/>
+				<Package id="MonoGame.Framework.PCL" version="3.2.99-Beta"/>
 			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
@@ -37,7 +37,7 @@
 				<Reference type="Project" refto="${ProjectName}"/>
 			</References>
 			<Packages>
-				<Package id="MonoGame.Framework.iOS" version="3.2.99" targetFramework="Xamarin.iOS" />
+				<Package id="MonoGame.Framework.iOS" version="3.2.99-Beta" targetFramework="XamariniOS" />
 			</Packages>
 			<Files>
 				<File name="Main.cs" AddStandardHeader="True" src="Shared/Program.cs" />
