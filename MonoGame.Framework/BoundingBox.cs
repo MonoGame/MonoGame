@@ -472,6 +472,7 @@ namespace Microsoft.Xna.Framework
                 negativeVertex.Z = Max.Z;
             }
 
+            // Inline Vector3.Dot(plane.Normal, negativeVertex) + plane.D;
             var distance = plane.Normal.X * negativeVertex.X + plane.Normal.Y * negativeVertex.Y + plane.Normal.Z * negativeVertex.Z + plane.D;
             if (distance > 0)
             {
@@ -479,6 +480,7 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
+            // Inline Vector3.Dot(plane.Normal, positiveVertex) + plane.D;
             distance = plane.Normal.X * positiveVertex.X + plane.Normal.Y * positiveVertex.Y + plane.Normal.Z * positiveVertex.Z + plane.D;
             if (distance < 0)
             {
