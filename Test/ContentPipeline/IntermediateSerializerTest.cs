@@ -191,7 +191,14 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 StringArray = new[] { "Hello", "World" },
                 StringList = new List<string> { "This", "is", "a", "test" },
-                IntArray = new[] { 1, 2, 3, 23, 42 }
+                IntArray = new[] { 1, 2, 3, 23, 42 },
+                ColorArray = new[]
+                {
+                    new Color(0x88, 0x65, 0x42, 0xFF),
+                    new Color(0x91, 0x6B, 0x46, 0xFF),
+                    new Color(0x91, 0x7B, 0x46, 0xFF),
+                    new Color(0x88, 0x65, 0x43, 0xFF)
+                }
             });
         }
 

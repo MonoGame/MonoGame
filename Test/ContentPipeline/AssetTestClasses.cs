@@ -134,6 +134,14 @@ public class Collections
     public string[] StringArray;
     public List<string> StringList;
     public int[] IntArray;
+    public Color[] ColorArray;
+
+    // Indexer - should be ignored by intermediate serializer.
+    public Color this[int i]
+    {
+        get { return ColorArray[i]; }
+        set { ColorArray[i] = value; }
+    }
 }
 #endregion
 

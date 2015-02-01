@@ -65,6 +65,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     if (prop.GetSetMethod() == null &&
                         prop.PropertyType.Namespace == "System")
                         return false;
+
+                    // Don't serialize or deserialize indexers.
+                    if (prop.GetIndexParameters().Any())
+                        return false;
                 }
                 else if (field != null)
                 {
