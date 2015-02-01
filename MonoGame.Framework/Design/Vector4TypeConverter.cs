@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Design
 
             if (destinationType == typeof(string))
             {
-                var terms = new string[3];
+                var terms = new string[4];
                 terms[0] = vec.X.ToString(culture);
                 terms[1] = vec.Y.ToString(culture);
                 terms[2] = vec.Z.ToString(culture);
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Design
                 vec.X = float.Parse(words[0]);
                 vec.Y = float.Parse(words[1]);
                 vec.Z = float.Parse(words[2]);
-                vec.Z = float.Parse(words[3]);
+                vec.W = float.Parse(words[3]);
 
                 return vec;
             }
