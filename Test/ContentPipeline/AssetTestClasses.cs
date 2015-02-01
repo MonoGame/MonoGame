@@ -134,6 +134,7 @@ public class Collections
     public string[] StringArray;
     public List<string> StringList;
     public int[] IntArray;
+    public Color[] ColorArray;
 }
 #endregion
 

@@ -222,6 +222,13 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(3, collections.IntArray[2]);
                 Assert.AreEqual(23, collections.IntArray[3]);
                 Assert.AreEqual(42, collections.IntArray[4]);
+
+                Assert.NotNull(collections.ColorArray);
+                Assert.AreEqual(4, collections.ColorArray.Length);
+                Assert.AreEqual(new Color(0x88, 0x65, 0x42, 0xFF), collections.ColorArray[0]);
+                Assert.AreEqual(new Color(0x91, 0x6B, 0x46, 0xFF), collections.ColorArray[1]);
+                Assert.AreEqual(new Color(0x91, 0x7B, 0x46, 0xFF), collections.ColorArray[2]);
+                Assert.AreEqual(new Color(0x88, 0x65, 0x43, 0xFF), collections.ColorArray[3]);
             });            
         }
 
