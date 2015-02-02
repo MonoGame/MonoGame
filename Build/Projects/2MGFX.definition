@@ -142,6 +142,21 @@
     <Compile Include="..\..\MonoGame.Framework\Vector4.cs">
       <Link>MonoGame.Framework\Vector4.cs</Link>
     </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Design\Vector2TypeConverter.cs">
+      <Link>MonoGame.Framework\Design\Vector2TypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Design\Vector3TypeConverter.cs">
+      <Link>MonoGame.Framework\Design\Vector3TypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Design\Vector4TypeConverter.cs">
+      <Link>MonoGame.Framework\Design\Vector4TypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Design\VectorConversion.cs">
+      <Link>MonoGame.Framework\Design\VectorConversion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs">
+      <Link>MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs</Link>
+    </Compile>    
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
     </Compile>
