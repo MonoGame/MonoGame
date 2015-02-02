@@ -59,7 +59,7 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    class WinFormsGameWindow : GameWindow
+    class WinFormsGameWindow : GameWindow, IDisposable
     {
         internal WinFormsGameForm _form;
 
@@ -196,6 +196,11 @@ namespace MonoGame.Framework
             _form.KeyPress += OnKeyPress;
 
             _allWindows.Add(this);
+        }
+
+        ~WinFormsGameWindow()
+        {
+            Dispose(false);
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -377,7 +382,8 @@ namespace MonoGame.Framework
                     continue;
                 }
 
-                OnIdle(this, null);
+                UpdateWindows();
+                Game.Tick();
             }
 
             // We need to remove the WM_QUIT message in the message 
@@ -397,18 +403,6 @@ namespace MonoGame.Framework
                 Thread.Sleep(100);
             } 
             while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
-        }
-
-        private void OnIdle(object sender, EventArgs eventArgs)
-        {
-            // While there are no pending messages 
-            // to be processed tick the game.
-            NativeMessage msg;
-            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
-            {
-                UpdateWindows();
-                Game.Tick();
-            }
         }
 
         internal void UpdateWindows()
@@ -444,11 +438,20 @@ namespace MonoGame.Framework
 
         public void Dispose()
         {
-            if (_form != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _allWindows.Remove(this);
-                _form.Dispose();
-                _form = null;
+                if (_form != null)
+                {
+                    _allWindows.Remove(this);
+                    _form.Dispose();
+                    _form = null;
+                }
             }
         }
 
