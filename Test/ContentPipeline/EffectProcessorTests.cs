@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using System.IO;
@@ -40,6 +39,14 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
+        public void TestDefines()
+        {
+            Assert.DoesNotThrow(() => BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows));
+            Assert.Throws<InvalidContentException>(() =>
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "INVALID_SYNTAX;ANOTHER_MACRO"));
+        }
+
+        [Test]
         [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx")]
         [TestCase("Assets/Effects/Stock/BasicEffect.fx")]
         [TestCase("Assets/Effects/Stock/DualTextureEffect.fx")]
@@ -51,7 +58,7 @@ namespace MonoGame.Tests.ContentPipeline
             BuildEffect(effectFile, TargetPlatform.Windows);
         }
 
-        private void BuildEffect(string effectFile, TargetPlatform targetPlatform)
+        private void BuildEffect(string effectFile, TargetPlatform targetPlatform, string defines = null)
         {
             var importerContext = new ImporterContext();
             var importer = new EffectImporter();
@@ -60,7 +67,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.NotNull(input);
 
             var processorContext = new TestProcessorContext(targetPlatform, Path.ChangeExtension(effectFile, ".xnb"));
-            var processor = new EffectProcessor();
+            var processor = new EffectProcessor { Defines = defines };
             var output = processor.Process(input, processorContext);
 
             Assert.NotNull(output);
