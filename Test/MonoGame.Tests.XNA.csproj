@@ -102,6 +102,7 @@
     <Compile Include="Framework\CurveKeyCollectionTest.cs" />
     <Compile Include="Framework\CurveKeyTest.cs" />
     <Compile Include="Framework\CurveTest.cs" />
+    <Compile Include="Framework\EnumConformingTest.cs" />
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
