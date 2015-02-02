@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Design
                 terms[2] = vec.Z.ToString(culture);
                 terms[3] = vec.W.ToString(culture);
 
-                return string.Join(culture.NumberFormat.NumberGroupSeparator, terms);
+                return string.Join("; ", terms);
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Design
             if (sourceType == typeof(string))
             {
                 var str = (string)value;
-                var words = str.Split(culture.NumberFormat.NumberGroupSeparator.ToCharArray());
+                var words = str.Split(';');
 
                 vec.X = float.Parse(words[0]);
                 vec.Y = float.Parse(words[1]);
