@@ -105,8 +105,10 @@
     <Compile Include="Framework\TouchLocationTest.cs" />
     <Compile Include="Framework\TouchPanelTest.cs" />
     <Compile Include="Framework\UtilitiesTest.cs" />
-	<Compile Include="Framework\Vector2Test.cs" />
-	
+    <Compile Include="Framework\Vector2Test.cs" />
+    <Compile Include="Framework\Vector3Test.cs" />
+    <Compile Include="Framework\Vector4Test.cs" />
+    
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
