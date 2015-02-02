@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Linq;
 
 using SharpDX;
 using SharpDX.Direct3D;
@@ -1110,7 +1111,27 @@ namespace Microsoft.Xna.Framework.Graphics
             var key = (ulong)decl.HashKey << 32 | (uint)shader.HashKey;           
             if (!_inputLayouts.TryGetValue(key, out layout))
             {
-                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, decl.GetInputLayout());
+                var inputElements = decl.GetInputLayout();
+                try
+                {
+                    layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, inputElements);
+                }
+                catch (SharpDXException ex)
+                {
+                    // If InputLayout ctor fails with InvalidArg, then it's most likely because the vertex declaration doesn't
+                    // match the vertex shader. So we throw a more helpful exception.
+                    if (ex.Descriptor == Result.InvalidArg)
+                    {
+                        var elements = string.Join(", ", inputElements.Select(x => x.SemanticName + x.SemanticIndex));
+                        throw new InvalidOperationException("An error occurred while preparing to draw. "
+                            + "This is probably because the current vertex declaration does not include all the elements "
+                            + "required by the current vertex shader. The current vertex declaration includes these elements: " 
+                            + elements + ".");
+                    }
+
+                    // Otherwise, just throw the original exception.
+                    throw;
+                }
                 _inputLayouts.Add(key, layout);
             }
 
