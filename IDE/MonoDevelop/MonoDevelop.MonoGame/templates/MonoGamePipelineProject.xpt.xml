@@ -16,7 +16,7 @@
 		<Project name = "${ProjectName}" directory = "." type = "DotNet">
 			<Options Target = "Library"/>
 			<Packages>
-				<Package id="MonoGame.Framework.Pipeline.Portable" version="3.2.99-Beta" />
+				<Package id="MonoGame.Framework.Content.Pipeline.Portable" version="3.2.99-Beta" />
 			</Packages>
 			<Files>
 				<File name="Importer1.cs" AddStandardHeader="True" src="Common/Importer1.cs" />
