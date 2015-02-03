@@ -115,7 +115,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _linearWrap.Reset();
             _pointClamp.Reset();
             _pointWrap.Reset();
+            PlatformResetStates();
         }
+
+        static partial void PlatformResetStates();
     }
 }
 
