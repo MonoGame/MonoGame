@@ -150,6 +150,73 @@ namespace MonoGame.Tests.Visual
             };
             Game.Run();
         }
+		
+#if !XNA
+        [TestCase(SurfaceFormat.Color, false)]
+        [TestCase(SurfaceFormat.Color, true)]
+        [TestCase(SurfaceFormat.ColorSRgb, false)]
+        [TestCase(SurfaceFormat.ColorSRgb, true)]
+        public void DrawWithSRgbFormats(SurfaceFormat textureFormat, bool sRgbSourceTexture)
+        {
+            SpriteBatch spriteBatch = null;
+            Texture2D texture = null;
+
+            Game.LoadContentWith += (sender, e) =>
+            {
+                spriteBatch = new SpriteBatch(Game.GraphicsDevice);
+
+                var width = Game.GraphicsDevice.Viewport.Width;
+                var height = Game.GraphicsDevice.Viewport.Height;
+
+                // Create gradient texture. This will highlight the difference
+                // between sRGB and non-sRGB textures.
+
+                texture = new Texture2D(
+                    Game.GraphicsDevice, width, height,
+                    false, textureFormat);
+
+                var heightOver3 = height / 3;
+
+                var textureData = new Color[width * height];
+                for (var y = 0; y < height; y++)
+                    for (var x = 0; x < width; x++)
+                    {
+                        var colorValue = x / (float) width;
+
+                        // Approximation of sRGB - it's not actually as simple as this,
+                        // but it will suffice for these tests.
+                        if (sRgbSourceTexture)
+                            colorValue = (float) Math.Pow(colorValue, 1 / 2.2);
+
+                        var color = (y < heightOver3) ? new Color(colorValue, 0, 0)
+                            : (y < heightOver3 * 2) ? new Color(0, colorValue, 0)
+                            : new Color(0, 0, colorValue);
+                        textureData[(y * width) + x] = color;
+                    }
+                texture.SetData(textureData);
+            };
+
+            Game.DrawWith += (sender, e) =>
+            {
+                Game.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+
+                spriteBatch.Begin();
+                spriteBatch.Draw(texture, Vector2.Zero, Color.White);
+                spriteBatch.End();
+            };
+
+            Game.UnloadContentWith += (sender, e) =>
+            {
+                spriteBatch.Dispose();
+                spriteBatch = null;
+
+                texture.Dispose();
+                texture = null;
+            };
+
+            RunSingleFrameTest();
+        }
+#endif
 
 #if !XNA
         [TestCase(1, 1)]

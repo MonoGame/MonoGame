@@ -533,6 +533,18 @@
     <Content Include="Assets\ReferenceImages\SpriteFont\Scaled.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\Texture2D\TextureArrayAsRenderTargetAndShaderResource.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
