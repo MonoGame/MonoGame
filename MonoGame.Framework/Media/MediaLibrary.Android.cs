@@ -107,6 +107,8 @@ namespace Microsoft.Xna.Framework.Media
 
                     } while (musicCursor.MoveToNext()); 
                 }
+
+                musicCursor.Close();
             }
 
             albumCollection = new AlbumCollection(albumList);
