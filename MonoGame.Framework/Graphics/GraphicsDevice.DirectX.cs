@@ -591,7 +591,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
         }
 
-        internal void CreateSizeDependentResources()
+        internal void CreateSizeDependentResources(bool useFullscreenParameter = false)
         {
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null,
                                                 (SharpDX.Direct3D11.RenderTargetView)null);
@@ -666,6 +666,12 @@ namespace Microsoft.Xna.Framework.Graphics
                                             format,
                                             SwapChainFlags.None);
 
+                // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
+                if (useFullscreenParameter)
+                {
+                    _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+                }
+
                 // Update Vsync setting.
                 using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
                 {
@@ -687,7 +693,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     ModeDescription =
                     {
                         Format = format,
+#if WINRT
                         Scaling = DisplayModeScaling.Stretched,
+#else
+                        Scaling = DisplayModeScaling.Unspecified,
+#endif
                         Width = PresentationParameters.BackBufferWidth,
                         Height = PresentationParameters.BackBufferHeight,                        
                     },
@@ -697,7 +707,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
-                    IsWindowed = true,
+                    IsWindowed = useFullscreenParameter ? PresentationParameters.IsFullScreen : true
                 };
 
                 // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device

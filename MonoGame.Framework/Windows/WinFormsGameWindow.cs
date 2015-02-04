@@ -205,6 +205,20 @@ namespace MonoGame.Framework
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
+#if (WINDOWS && DIRECTX)
+            if (Game.GraphicsDevice != null)
+            {
+                if (Game.graphicsDeviceManager.HardwareModeSwitch)
+                {
+                    if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
+                   {
+                       Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
+                       Game.GraphicsDevice.CreateSizeDependentResources(true);
+                        Game.GraphicsDevice.ApplyRenderTargets(null);
+                   }
+                }
+          }
+#endif
             _platform.IsActive = true;
         }
 
@@ -343,9 +357,11 @@ namespace MonoGame.Framework
 
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
+
+#if !(WINDOWS && DIRECTX)
                 manager.PreferredBackBufferWidth = newWidth;
                 manager.PreferredBackBufferHeight = newHeight;
-
+#endif
                 if (manager.GraphicsDevice == null)
                     return;
             }
