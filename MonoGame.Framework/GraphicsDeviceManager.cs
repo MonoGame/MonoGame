@@ -455,14 +455,18 @@ namespace Microsoft.Xna.Framework
 #endif
 
         /// <summary>
-        /// Gets or sets the boolean which defines how window would be switched from windowed to fullscreen state.
-        /// "Hard" mode(true) is slow to switch but more effecient for performance, while "soft" mode(false) is vice versa.
-        /// The default value is <c>true</c>.
+        /// Gets or sets the boolean which defines how window switches from windowed to fullscreen state.
+        /// "Hard" mode(true) is slow to switch, but more effecient for performance, while "soft" mode(false) is vice versa.
+        /// The default value is <c>true</c>. Can only be changed in game's constructor.
         /// </summary>
         public bool HardwareModeSwitch
         {
             get { return _hardwareModeSwitch;}
-            set { if (_graphicsDevice == null) _hardwareModeSwitch = value; }
+            set
+            {
+                if (_graphicsDevice == null) _hardwareModeSwitch = value;
+                else throw new InvalidOperationException("This property can only be changed in constructor.");
+            }
         }
 
         public bool PreferMultiSampling
