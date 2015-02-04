@@ -34,6 +34,11 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
+        private bool _hardwareModeSwitch = true;
+
+#if WINDOWS && DIRECTX
+        private bool _firstLaunch = true;
+#endif
         bool disposed;
 
 #if !WINRT
@@ -220,13 +225,14 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.ApplyRenderTargets(null);
 
 #elif WINDOWS && DIRECTX
+           
 
             _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -286,6 +292,22 @@ namespace Microsoft.Xna.Framework
             //
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+
+#if WINDOWS && DIRECTX
+
+            if (!_firstLaunch)
+            {
+                if (IsFullScreen)
+                {
+                    _game.Platform.EnterFullScreen();
+                }
+                else
+                {
+                    _game.Platform.ExitFullScreen();
+                }
+            }
+            _firstLaunch = false;
+#endif
         }
 
         private void Initialize()
@@ -368,6 +390,10 @@ namespace Microsoft.Xna.Framework
         public void ToggleFullScreen()
         {
             IsFullScreen = !IsFullScreen;
+#if WINDOWS && DIRECTX
+
+            ApplyChanges();
+#endif
         }
 
 #if WINDOWS_STOREAPP
@@ -393,15 +419,20 @@ namespace Microsoft.Xna.Framework
                 return true;
 #else
                 if (_graphicsDevice != null)
+                {
                     return _graphicsDevice.PresentationParameters.IsFullScreen;
-                else
-                    return _wantFullScreen;
+                }
+
+                return _wantFullScreen;
 #endif
             }
             set
             {
 #if WINRT
                 // Just ignore this as it is not relevant on Windows 8
+#elif WINDOWS && DIRECTX
+
+                _wantFullScreen = value;
 #else
                 _wantFullScreen = value;
                 if (_graphicsDevice != null)
@@ -413,6 +444,12 @@ namespace Microsoft.Xna.Framework
                 }
 #endif
             }
+        }
+
+        public bool HardwareModeSwitch
+        {
+            get { return _hardwareModeSwitch;}
+            set { if (_graphicsDevice == null) _hardwareModeSwitch = value; }
         }
 
 #if ANDROID

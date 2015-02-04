@@ -118,8 +118,19 @@ namespace MonoGame.Framework
         public override void BeforeInitialize()
         {
             _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
-
             base.BeforeInitialize();
+
+#if (WINDOWS && DIRECTX)
+
+            if (Game.graphicsDeviceManager.IsFullScreen)
+            {
+                EnterFullScreen();
+            }
+            else
+            {
+                ExitFullScreen();
+            }
+#endif
         }
 
         public override void RunLoop()
@@ -149,12 +160,59 @@ namespace MonoGame.Framework
             return true;
         }
 
+
         public override void EnterFullScreen()
         {
+#if (WINDOWS && DIRECTX)
+
+            if (_alreadyInFullScreenMode)
+            {
+                return;
+            }
+
+            if (Game.graphicsDeviceManager.HardwareModeSwitch)
+            {
+                 Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
+                 Game.GraphicsDevice.CreateSizeDependentResources(true);
+                 Game.GraphicsDevice.ApplyRenderTargets(null);
+                _window._form.WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                _window.IsBorderless = true;
+                _window._form.WindowState = FormWindowState.Maximized;
+            }
+
+            _alreadyInWindowedMode = false;
+            _alreadyInFullScreenMode = true;
+#endif
         }
 
         public override void ExitFullScreen()
         {
+#if (WINDOWS && DIRECTX)
+            if (_alreadyInWindowedMode)
+            {
+                return;
+            }
+
+            if (Game.graphicsDeviceManager.HardwareModeSwitch)
+            {
+                Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
+                Game.GraphicsDevice.CreateSizeDependentResources(true);
+                Game.GraphicsDevice.ApplyRenderTargets(null);
+                _window._form.WindowState = FormWindowState.Normal;
+            }
+            else
+            {
+                _window._form.WindowState = FormWindowState.Normal;
+                _window.IsBorderless = false;
+            }
+            ResetWindowBounds();
+
+            _alreadyInWindowedMode = true;
+            _alreadyInFullScreenMode = false;
+#endif
         }
 
         public void ResetWindowBounds()
