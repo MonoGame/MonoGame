@@ -31,6 +31,7 @@ namespace MonoGame.Tools.Pipeline
 
         MenuItem treerebuild;
         MenuItem recentMenu;
+        bool expand = false;
 
         public MainWindow () :
             base (WindowType.Toplevel)
@@ -252,7 +253,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddTreeItem (IProjectItem item)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
+            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, expand);
         }
 
         public void RemoveTreeItem (ContentItem contentItem)
@@ -392,6 +393,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
+            expand = true;
             var dialog = new NewTemplateDialog(_controller.Templates.GetEnumerator ());
             dialog.TransientFor = this;
 
@@ -417,10 +419,12 @@ namespace MonoGame.Tools.Pipeline
                 _controller.NewItem(dialog.name, location, dialog.templateFile);
                 UpdateMenus();
             }
+            expand = false;
         }
 
         public void OnAddItemActionActivated (object sender, EventArgs e)
         {
+            expand = true;
             List<TreeIter> iters;
             List<Gdk.Pixbuf> icons;
             string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
@@ -436,6 +440,7 @@ namespace MonoGame.Tools.Pipeline
             else
                 _controller.Include (_controller.GetFullPath (""));
             UpdateMenus();
+            expand = false;
         }
 
         public void OnDeleteActionActivated (object sender, EventArgs e)
