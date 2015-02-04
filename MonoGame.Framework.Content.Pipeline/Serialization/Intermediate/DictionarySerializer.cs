@@ -44,6 +44,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             };
         }
 
+        public override bool ObjectIsEmpty(Dictionary<TKey, TValue> value)
+        {
+            return value.Count == 0;
+        }
+
+        protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, Dictionary<TKey, TValue> value)
+        {
+            foreach (var kvp in value)
+            {
+                callback(_keySerializer, kvp.Key);
+                callback(_valueSerializer, kvp.Value);
+            }
+        }
+
         protected internal override Dictionary<TKey, TValue> Deserialize(IntermediateReader input, ContentSerializerAttribute format, Dictionary<TKey, TValue> existingInstance)
         {
             var result = existingInstance ?? new Dictionary<TKey, TValue>();
@@ -64,7 +78,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(IntermediateWriter output, Dictionary<TKey, TValue> value, ContentSerializerAttribute format)
         {
-            throw new NotImplementedException();
+            foreach (var kvp in value)
+            {
+                output.Xml.WriteStartElement(format.CollectionItemName);
+
+                output.WriteObject(kvp.Key, _keyFormat, _keySerializer);
+                output.WriteObject(kvp.Value, _valueFormat, _valueSerializer);
+
+                output.Xml.WriteEndElement();
+            }
         }
     }
 }

@@ -2,6 +2,9 @@
 [Tt]humbs.db
 *.DS_Store
 
+#Linux installer file
+*.run
+
 #Visual Studio files
 *.pidb
 *.userprefs
@@ -59,6 +62,7 @@ MonoGame.Framework/*.csproj
 Tools/2MGFX/*.csproj
 Tools/MGCB/*.csproj
 Tools/Pipeline/*.csproj
+ThirdParty/Lidgren.Network/*.csproj
 Test/*.csproj
 !Test/MonoGame.Test.XNA.csproj
 /*.sln

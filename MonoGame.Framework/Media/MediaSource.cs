@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 #if IOS
-using MonoTouch.UIKit;
+using UIKit;
 #endif
 
 namespace Microsoft.Xna.Framework.Media

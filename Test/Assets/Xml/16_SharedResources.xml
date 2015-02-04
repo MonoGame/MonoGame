@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="MonoGame.Tests.ContentPipeline.SharedResources">
+  <Asset Type="SharedResources">
     <Head>#Resource1</Head>
   </Asset>
   <Resources>
-    <Resource ID="#Resource1" Type="MonoGame.Tests.ContentPipeline.Linked">
+    <Resource ID="#Resource1" Type="Linked">
       <Value>1</Value>
       <Next>#Resource2</Next>
     </Resource>
-    <Resource ID="#Resource2" Type="MonoGame.Tests.ContentPipeline.Linked">
+    <Resource ID="#Resource2" Type="Linked">
       <Value>2</Value>
       <Next>#Resource3</Next>
     </Resource>
-    <Resource ID="#Resource3" Type="MonoGame.Tests.ContentPipeline.Linked">
+    <Resource ID="#Resource3" Type="Linked">
       <Value>3</Value>
       <Next>#Resource1</Next>
     </Resource>

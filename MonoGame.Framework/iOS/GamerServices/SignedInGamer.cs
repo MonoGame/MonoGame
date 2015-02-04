@@ -3,16 +3,34 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using MonoTouch.Foundation;
-using MonoTouch.GameKit;
-using MonoTouch.UIKit;
+using Foundation;
+using GameKit;
+using UIKit;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+    // iOS Unified API needs explicit conversion of DateTime/NSDate
+    // see http://developer.xamarin.com/guides/cross-platform/macios/unified/
+    public static class DateTimeNSDateConversions
+    {
+        public static DateTime NSDateToDateTime(this NSDate date)
+        {
+            DateTime reference = TimeZone.CurrentTimeZone.ToLocalTime( 
+                new DateTime(2001, 1, 1, 0, 0, 0) );
+            return reference.AddSeconds(date.SecondsSinceReferenceDate);
+        }
+
+        public static NSDate DateTimeToNSDate(this DateTime date)
+        {
+            DateTime reference = TimeZone.CurrentTimeZone.ToLocalTime(
+                new DateTime(2001, 1, 1, 0, 0, 0) );
+            return NSDate.FromTimeIntervalSinceReferenceDate(
+                (date - reference).TotalSeconds);
+        }
+    }
+
     public class SignedInGamer : Gamer
     {
-        private double osVersion;
-
         private GKLocalPlayer lp;
 		
         private AchievementCollection gamerAchievements;
@@ -39,7 +57,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             try
             {
-                if (osVersion > 4.1d)
+                if (UIDevice.CurrentDevice.CheckSystemVersion(4, 1))
                 {
                     UIApplication.SharedApplication.BeginInvokeOnMainThread(delegate
                     {
@@ -47,7 +65,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                     
                         if (lp != null)
                         {
-                            if (osVersion < 6.0d)
+                            if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                             {
                                 #pragma warning disable 618
                                 // Game Center authentication for iOS 5 and older
@@ -92,15 +110,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public SignedInGamer()
         {
-            var osVersionString = UIDevice.CurrentDevice.SystemVersion;
-            if (osVersionString.Contains(".") && osVersionString.IndexOf(".") != osVersionString.LastIndexOf("."))
-            {
-                var parts = osVersionString.Split(char.Parse("."));
-                osVersionString = parts[0] + "." + parts[1];
-            }
-
-            osVersion = double.Parse(osVersionString, System.Globalization.CultureInfo.InvariantCulture);
-
             // Register to receive the GKPlayerAuthenticationDidChangeNotificationName so we are notified when authentication changes
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("GKPlayerAuthenticationDidChangeNotificationName"), (notification) =>
             {   
@@ -238,7 +247,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                                 if (ac.Key == a.Identifier)
                                 {
                                     ac.IsEarned = a.Completed;
-                                    ac.EarnedDateTime = a.LastReportedDate;
+                                    ac.EarnedDateTime = a.LastReportedDate.NSDateToDateTime();
                                 }
                             }															
                         }
@@ -294,7 +303,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                     GKAchievement achievement = new GKAchievement(achievementId);
                     achievement.PercentComplete = percentageComplete;
 
-                    if (osVersion < 6.0d)
+                    if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                     {
                         #pragma warning disable 618
                         // Report achievement for iOS 5 and older
@@ -339,7 +348,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                     GKScore score = new GKScore(aCategory);
                     score.Value = aScore;
 
-                    if (osVersion < 6.0d)
+                    if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0))
                     {
                         #pragma warning disable 618
                         // Report score for iOS 5 and older

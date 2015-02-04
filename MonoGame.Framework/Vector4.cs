@@ -9,6 +9,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
+#if WINDOWS
+    [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector4TypeConverter))]
+#endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector4 : IEquatable<Vector4>

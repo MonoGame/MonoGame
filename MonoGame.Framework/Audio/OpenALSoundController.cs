@@ -18,6 +18,10 @@ using Android.Content;
 using Android.Media;
 #endif
 
+#if IOS
+using AudioToolbox;
+#endif
+
 namespace Microsoft.Xna.Framework.Audio
 {
 	internal sealed class OpenALSoundController : IDisposable
@@ -172,6 +176,21 @@ namespace Microsoft.Xna.Framework.Audio
                     AlcUpdateBuffers, updateBuffers,
                     0
                 };
+#elif IOS
+                AudioSession.Initialize();
+
+                AudioSession.Interrupted += (sender, e) => {
+                    AudioSession.SetActive(false);
+                    Alc.MakeContextCurrent(ContextHandle.Zero);
+                    Alc.SuspendContext(_context);
+                };
+                AudioSession.Resumed += (sender, e) => {
+                    AudioSession.SetActive(true);
+                    Alc.MakeContextCurrent(_context);
+                    Alc.ProcessContext(_context);
+                };
+
+                int[] attribute = new int[0];
 #else
                 int[] attribute = new int[0];
 #endif

@@ -44,8 +44,8 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
 #if IOS
-using MonoTouch.Foundation;
-using MonoTouch.OpenGLES;
+using Foundation;
+using OpenGLES;
 #if ES11
 using OpenTK.Graphics.ES11;
 #else

@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework
             : base(context)
         {
             _gameWindow = androidGameWindow;
-            _game = game;
+			_game = game;
             _touchManager = new AndroidTouchEventManager(androidGameWindow);
         }
 
@@ -200,8 +200,8 @@ namespace Microsoft.Xna.Framework
         protected override void CreateFrameBuffer()
         {
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.CreateFrameBuffer");
-            GLContextVersion = GLContextVersion.Gles2_0;
 
+            ContextRenderingApi = GLVersion.ES2;
             int depth = 0;
             int stencil = 0;
             switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework
                     continue;
                 }
                 Android.Util.Log.Debug("MonoGame", "Created format {0}", GraphicsContext.GraphicsMode);
-                All status = GL.CheckFramebufferStatus(All.Framebuffer);
+                var status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
 
                 MakeCurrent();

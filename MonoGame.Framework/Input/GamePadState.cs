@@ -142,7 +142,6 @@ namespace Microsoft.Xna.Framework.Input
         private Buttons GetVirtualButtons () {
             var result = Buttons.buttons;
             var sticks = ThumbSticks;
-            sticks.ApplyDeadZone(GamePadDeadZone.IndependentAxes, 7849 / 32767f);
             
             if (sticks.Left.X < 0)
                 result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickLeft;

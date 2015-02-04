@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -151,6 +152,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <typeparam name="TargetType">Target vector format for the converted channel data.</typeparam>
         /// <returns>The converted channel data.</returns>
         public override IEnumerable<TargetType> ReadConvertedContent<TargetType>()
+        {
+            if (typeof(TargetType).IsAssignableFrom(typeof(T)))
+                return items.Cast<TargetType>();
+
+            return Convert<TargetType>(items);
+        }
+
+        private static IEnumerable<TargetType> Convert<TargetType>(IEnumerable<T> items)
         {
             // The following formats are supported:
             // - Single

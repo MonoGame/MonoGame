@@ -70,8 +70,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 namespace Microsoft.Xna.Framework {
 	class KeyboardInputViewController : UIViewController {
@@ -135,8 +135,8 @@ namespace Microsoft.Xna.Framework {
 			    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
             {
                 var tmpkeyboardSize = keyboardSize;
-                keyboardSize.Width = Math.Max(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
-                keyboardSize.Height = Math.Min(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
+				keyboardSize.Width = (nfloat)Math.Max(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
+				keyboardSize.Height = (nfloat)Math.Min(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
 			}
 
 			var view = (KeyboardInputView)View;

@@ -70,8 +70,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
         /// <returns>Resulting game asset.</returns>
         public override TextureContent Import (string filename, ContentImporterContext context)
-		{
-			var output = new Texture2DContent ();
+        {
+            var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
 #if WINDOWS || MACOS
 

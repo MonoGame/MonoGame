@@ -134,7 +134,9 @@ namespace MonoGame.Framework
         
         public override void Exit()
         {
-            Application.Exit();
+            _window.Dispose();
+            _window = null;
+            Window = null;
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -189,9 +191,8 @@ namespace MonoGame.Framework
                     _window.Dispose();
                     _window = null;
                     Window = null;
-
-                    Microsoft.Xna.Framework.Media.MediaManagerState.CheckShutdown();
                 }
+                Microsoft.Xna.Framework.Media.MediaManagerState.CheckShutdown();
             }
 
             base.Dispose(disposing);

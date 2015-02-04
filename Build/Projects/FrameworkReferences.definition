@@ -3,8 +3,8 @@
 
   <Platform Type="iOS">
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
-    <Reference Include="OpenTK" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="OpenTK-1.0" />
   </Platform>
 
   <Platform Type="Linux">
@@ -32,14 +32,14 @@
   <Platform Type="Android">
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK" />
+    <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
   </Platform>
 
   <Platform Type="Ouya">
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK" />
+    <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
     <Binary
       Name="Ouya.Console.Api"

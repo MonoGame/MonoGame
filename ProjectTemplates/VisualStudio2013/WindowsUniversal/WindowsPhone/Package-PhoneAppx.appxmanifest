@@ -8,7 +8,7 @@
   <mp:PhoneIdentity PhoneProductId="$guid9$" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>$ext_projectname$</DisplayName>
+    <DisplayName>$ext_safeprojectname$</DisplayName>
     <PublisherDisplayName>$XmlEscapedPublisher$</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -25,12 +25,12 @@
   <Applications>
     <Application Id="App"
         Executable="$targetnametoken$.exe"
-        EntryPoint="$ext_safeprojectname$.App">
+        EntryPoint="$safeprojectname$.App">
         <m3:VisualElements
-            DisplayName="$ext_safeprojectname$"
+            DisplayName="$safeprojectname$"
             Square150x150Logo="Assets\Logo.png"
             Square44x44Logo="Assets\SmallLogo.png"
-            Description="$ext_safeprojectname$"
+            Description="$safeprojectname$"
             ForegroundText="light"
             BackgroundColor="transparent">
             <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png"/>

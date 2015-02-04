@@ -51,7 +51,7 @@ namespace Lidgren.Network
 			// randomize ping sent time (0.25 - 1.0 x ping interval)
 			m_sentPingTime = now;
 			m_sentPingTime -= (m_peerConfiguration.PingInterval * 0.25f); // delay ping for a little while
-			m_sentPingTime -= (NetRandom.Instance.NextSingle() * (m_peerConfiguration.PingInterval * 0.75f));
+			m_sentPingTime -= (MWCRandom.Instance.NextSingle() * (m_peerConfiguration.PingInterval * 0.75f));
 			m_timeoutDeadline = now + (m_peerConfiguration.m_connectionTimeout * 2.0f); // initially allow a little more time
 
 			// make it better, quick :-)
@@ -71,9 +71,10 @@ namespace Lidgren.Network
 
 			int len = om.Encode(m_peer.m_sendBuffer, 0, 0);
 			bool connectionReset;
-			m_peer.SendPacket(len, m_remoteEndpoint, 1, out connectionReset);
+			m_peer.SendPacket(len, m_remoteEndPoint, 1, out connectionReset);
 
 			m_statistics.PacketSent(len, 1);
+			m_peer.Recycle(om);
 		}
 
 		internal void SendPong(int pingNumber)
@@ -88,9 +89,10 @@ namespace Lidgren.Network
 			int len = om.Encode(m_peer.m_sendBuffer, 0, 0);
 			bool connectionReset;
 
-			m_peer.SendPacket(len, m_remoteEndpoint, 1, out connectionReset);
+			m_peer.SendPacket(len, m_remoteEndPoint, 1, out connectionReset);
 
 			m_statistics.PacketSent(len, 1);
+			m_peer.Recycle(om);
 		}
 
 		internal void ReceivedPong(float now, int pongNumber, float remoteSendTime)
@@ -138,7 +140,7 @@ namespace Lidgren.Network
 			{
 				NetIncomingMessage update = m_peer.CreateIncomingMessage(NetIncomingMessageType.ConnectionLatencyUpdated, 4);
 				update.m_senderConnection = this;
-				update.m_senderEndpoint = this.m_remoteEndpoint;
+				update.m_senderEndPoint = this.m_remoteEndPoint;
 				update.Write(rtt);
 				m_peer.ReleaseMessage(update);
 			}

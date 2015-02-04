@@ -4,74 +4,206 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Assimp;
-using Assimp.Configs;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework;
-using System.IO;
 using System.Diagnostics;
-using Quaternion = Microsoft.Xna.Framework.Quaternion;
-using System.Text;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Assimp;
+using Assimp.Unmanaged;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    [ContentImporter(".fbx", ".x", DisplayName = "Open Asset Import Library - MonoGame", DefaultProcessor = "ModelProcessor")]
+    [ContentImporter(".dae", ".fbx", ".x", DisplayName = "Open Asset Import Library - MonoGame", DefaultProcessor = "ModelProcessor")]
     public class OpenAssetImporter : ContentImporter<NodeContent>
     {
+        // Assimp has a few limitations (not all FBX files are supported):
+        // FBX files reference objects using IDs. Therefore, it is possible to resolve
+        // bones even if multiple bones/nodes have the same name. But Assimp references
+        // bones only by name!
+        // --> Limitation #1: A model cannot have more than one skeleton!
+        // --> Limitation #2: Bone names need to be unique!
+        //
+        // Bones are represented by regular nodes, but there is no flag indicating whether
+        // a node is a bone. A mesh in Assimp references deformation bones (= bones that
+        // affect vertices) by name. That means, we can identify the nodes that represent
+        // deformation bones. But there is no way to identify helper bones (= bones that 
+        // belong to the skeleton, but do not affect vertices). As described in 
+        // http://assimp.sourceforge.net/lib_html/data.html and 
+        // http://gamedev.stackexchange.com/questions/26382/i-cant-figure-out-how-to-animate-my-loaded-model-with-assimp/26442#26442
+        // we can only guess which nodes belong to a skeleton:
+        // --> Limitation #3: The skeleton needs to be a direct child of the root node or
+        //                    the mesh node!
+        //
+        // Node.Transform is irrelevant for bones. This transform is just the pose of the
+        // bone at the time of the export. This could be one of the animation frames. It
+        // is not necessarily the bind pose (rest pose)! For example, XNA's Dude.fbx does
+        // NOT store the skeleton in bind pose.
+        // The correct transform is stored in Mesh.Bones[i].OffsetMatrix. However, this
+        // information is only available for deformation bones, not for helper bones.
+        // --> Limitation #4: The skeleton either must not contain helper bones, or it must
+        //                    be guaranteed that the skeleton is exported in bind pose!
+        //
+        // An FBX file does not directly store all animation values. In some FBX scene it
+        // is insufficient to simply read the animation data from the file. Instead, the
+        // animation properties of all relevant objects in the scene need to be evaluated.
+        // For example, some animations are the result of the current skeleton pose + the
+        // current animation. The current skeleton pose is not imported/processed by XNA.
+        // Assimp does not include an "animation evaluater" that automatically bakes these
+        // animations.
+        // --> Limitation #5: All bones included in an animation need to be key framed.
+        //                    (There is no automatic evaluation.)
+        //
+        // In FBX it is possible to define animations curves for some transform components
+        // (e.g. translation X and Y) and leave other components (e.g. translation Z) undefined.
+        // Assimp does not pick the right defaults for undefined components.
+        // --> Limitation #6: When scale, rotation, or translation is animated, all components
+        //                    X, Y, Z need to be key framed.
+
+        #region Nested Types
+        /// <summary>Defines the frame for local scale/rotation/translation of FBX nodes.</summary>
+        /// <remarks>
+        /// <para>
+        /// The transformation pivot defines the frame for local scale/rotation/translation. The
+        /// local transform of a node is:
+        /// </para>
+        /// <para>
+        /// Local Transform = Translation * RotationOffset * RotationPivot * PreRotation
+        ///                   * Rotation * PostRotation * RotationPivotInverse * ScalingOffset
+        ///                   * ScalingPivot * Scaling * ScalingPivotInverse
+        /// </para>
+        /// <para>
+        /// where the matrix multiplication order is right-to-left.
+        /// </para>
+        /// <para>
+        /// 3ds max uses three additional transformations:
+        /// </para>
+        /// <para>
+        /// Local Transform = Translation * Rotation * Scaling
+        ///                   * GeometricTranslation * GeometricRotation * GeometricScaling
+        /// </para>
+        /// <para>
+        /// Transformation pivots are stored per FBX node. When Assimp hits an FBX node with
+        /// a transformation pivot it generates additional nodes named
+        /// </para>
+        /// <para>
+        ///   <i>OriginalName</i>_$AssimpFbx$_<i>TransformName</i>
+        /// </para>
+        /// <para>
+        /// where <i>TransformName</i> is one of: 
+        /// </para>
+        /// <para>
+        ///   Translation, RotationOffset, RotationPivot, PreRotation, Rotation, PostRotation,
+        ///   RotationPivotInverse, ScalingOffset, ScalingPivot, Scaling, ScalingPivotInverse,
+        ///   GeometricTranslation, GeometricRotation, GeometricScaling
+        /// </para>
+        /// </remarks>
+        /// <seealso href="http://download.autodesk.com/us/fbx/20112/FBX_SDK_HELP/index.html?url=WS1a9193826455f5ff1f92379812724681e696651.htm,topicNumber=d0e7429"/>
+        /// <seealso href="http://area.autodesk.com/forum/autodesk-fbx/fbx-sdk/the-makeup-of-the-local-matrix-of-an-kfbxnode/"/>
+        private class FbxPivot
+        {
+            public static readonly FbxPivot Default = new FbxPivot();
+
+            public Matrix? Translation;
+            public Matrix? RotationOffset;
+            public Matrix? RotationPivot;
+            public Matrix? PreRotation;
+            public Matrix? Rotation;
+            public Matrix? PostRotation;
+            public Matrix? RotationPivotInverse;
+            public Matrix? ScalingOffset;
+            public Matrix? ScalingPivot;
+            public Matrix? Scaling;
+            public Matrix? ScalingPivotInverse;
+            public Matrix? GeometricTranslation;
+            public Matrix? GeometricRotation;
+            public Matrix? GeometricScaling;
+        }
+        #endregion
+
+        private static readonly List<VectorKey> EmptyVectorKeys = new List<VectorKey>();
+        private static readonly List<QuaternionKey> EmptyQuaternionKeys = new List<QuaternionKey>();
+
+        // XNA Content importer
+        private ContentImporterContext _context;
+        private ContentIdentity _identity;
+
+        // Assimp scene
         private Scene _scene;
+        private Dictionary<string, Matrix> _deformationBones;   // The names and offset matrices of all deformation bones.
+        private Node _rootBone;                                 // The node that represents the root bone.
+        private List<Node> _bones = new List<Node>();           // All nodes attached to the root bone.
+        private Dictionary<string, FbxPivot> _pivots;              // The transformation pivots.
+
+        // XNA content
         private NodeContent _rootNode;
         private List<MaterialContent> _materials;
-
-        private Matrix4x4 _globalInverseXform = Matrix4x4.Identity;
-        private Node _skeletonRoot;
-        private List<string> _boneNames = new List<string>();
-        private List<string> _skeletonNodes = new List<string>();
-        private Dictionary<string, Matrix4x4> _objectToBone = new Dictionary<string, Matrix4x4>();
-        private Dictionary<string, Matrix4x4> _offsetMatrix = new Dictionary<string, Matrix4x4>();
 
         public string ImporterName { get; set; }
 
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
-            var identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
+#if LINUX
+			var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+
+			try
+			{
+				AssimpLibrary.Instance.LoadLibrary(
+					Path.Combine(targetDir, "libassimp.so"), 
+					Path.Combine(targetDir, "libassimp.so"));
+			}
+			catch { }
+#endif
+
+            _identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
 
             using (var importer = new AssimpContext())
             {
+                // FBXPreservePivotsConfig(false) can be set to remove transformation
+                // pivots. However, Assimp does not automatically correct animations!
+                // --> Leave default settings, handle transformation pivots explicitly.
+                //importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(false));
+
+                // Note about Assimp post-processing:
+                // Keep post-processing to a minimum. The ModelImporter should import
+                // the model as is. We don't want to lose any information, i.e. empty
+                // nodes shoud not be thrown away, meshes/materials should not be merged,
+                // etc. Custom model processors may depend on this information!
                 _scene = importer.ImportFile(filename,
-                    //PostProcessSteps.FindInstances | // No effect + slow?
+                    PostProcessSteps.FindDegenerates |
                     PostProcessSteps.FindInvalidData |
-                    PostProcessSteps.FlipUVs |
-                    PostProcessSteps.FlipWindingOrder |
-                    //PostProcessSteps.MakeLeftHanded | // Appears to just mess things up
+                    PostProcessSteps.FlipUVs |              // Required for Direct3D
+                    PostProcessSteps.FlipWindingOrder |     // Required for Direct3D
                     PostProcessSteps.JoinIdenticalVertices |
                     PostProcessSteps.ImproveCacheLocality |
                     PostProcessSteps.OptimizeMeshes |
-                    //PostProcessSteps.OptimizeGraph | // Will eliminate helper nodes
-                    PostProcessSteps.RemoveRedundantMaterials |
                     PostProcessSteps.Triangulate
+
+                    // Unused: 
+                    //PostProcessSteps.CalculateTangentSpace
+                    //PostProcessSteps.Debone |
+                    //PostProcessSteps.FindInstances |      // No effect + slow?
+                    //PostProcessSteps.FixInFacingNormals |
+                    //PostProcessSteps.GenerateNormals |
+                    //PostProcessSteps.GenerateSmoothNormals |
+                    //PostProcessSteps.GenerateUVCoords |
+                    //PostProcessSteps.LimitBoneWeights |
+                    //PostProcessSteps.MakeLeftHanded |     // Not necessary, XNA is right-handed.
+                    //PostProcessSteps.OptimizeGraph |      // Will eliminate helper nodes
+                    //PostProcessSteps.PreTransformVertices |
+                    //PostProcessSteps.RemoveComponent |
+                    //PostProcessSteps.RemoveRedundantMaterials |
+                    //PostProcessSteps.SortByPrimitiveType |
+                    //PostProcessSteps.SplitByBoneCount |
+                    //PostProcessSteps.SplitLargeMeshes |
+                    //PostProcessSteps.TransformUVCoords |
+                    //PostProcessSteps.ValidateDataStructure |
                     );
 
-                _globalInverseXform = _scene.RootNode.Transform;
-                _globalInverseXform.Inverse();
-
-                _rootNode = new NodeContent
-                {
-                    Name = _scene.RootNode.Name,
-                    Identity = identity,
-                    Transform = ToXna(_scene.RootNode.Transform)
-                };
-
-                _materials = ImportMaterials(identity, _scene);
-
-                FindMeshes(_scene.RootNode, _scene.RootNode.Transform);
-
-                if (_scene.HasAnimations)
-                {
-                    var skeleton = CreateSkeleton();
-                    CreateAnimation(skeleton);
-                }
+                FindSkeleton();     // Find _rootBone, _bones, _deformationBones.
+                ImportMaterials();  // Create _materials.
+                ImportNodes();      // Create _pivots and _rootNode (incl. children).
+                ImportSkeleton();   // Create skeleton (incl. animations) and add to _rootNode.
 
                 // If we have a simple hierarchy with no bones and just the one
                 // mesh, we can flatten it out so the mesh is the root node.
@@ -79,7 +211,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     var absXform = _rootNode.Children[0].AbsoluteTransform;
                     _rootNode = _rootNode.Children[0];
-                    _rootNode.Identity = identity;
+                    _rootNode.Identity = _identity;
                     _rootNode.Transform = absXform;
                 }
 
@@ -89,77 +221,99 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return _rootNode;
         }
 
-        private static List<MaterialContent> ImportMaterials(ContentIdentity identity, Scene scene)
+        /// <summary>
+        /// Converts all Assimp <see cref="Material"/>s to XNA <see cref="MaterialContent"/>s.
+        /// </summary>
+        private void ImportMaterials()
         {
-            var materials = new List<MaterialContent>();
-
-            foreach (var sceneMaterial in scene.Materials)
+            _materials = new List<MaterialContent>();
+            foreach (var aiMaterial in _scene.Materials)
             {
                 var material = new BasicMaterialContent
                 {
-                    Name = sceneMaterial.Name,
-                    Identity = identity,
+                    Name = aiMaterial.Name,
+                    Identity = _identity,
                 };
 
-                if (sceneMaterial.HasTextureDiffuse)
+                if (aiMaterial.HasTextureDiffuse)
                 {
-                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureDiffuse.FilePath, identity);
-                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureDiffuse.UVIndex));
+                    var texture = new ExternalReference<TextureContent>(aiMaterial.TextureDiffuse.FilePath, _identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", aiMaterial.TextureDiffuse.UVIndex));
                     material.Texture = texture;
                 }
 
-                if (sceneMaterial.HasTextureOpacity)
+                if (aiMaterial.HasTextureOpacity)
                 {
-                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureOpacity.FilePath, identity);
-                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureOpacity.UVIndex));
+                    var texture = new ExternalReference<TextureContent>(aiMaterial.TextureOpacity.FilePath, _identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", aiMaterial.TextureOpacity.UVIndex));
                     material.Textures.Add("Transparency", texture);
                 }
 
-                if (sceneMaterial.HasTextureSpecular)
+                if (aiMaterial.HasTextureSpecular)
                 {
-                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureSpecular.FilePath, identity);
-                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureSpecular.UVIndex));
+                    var texture = new ExternalReference<TextureContent>(aiMaterial.TextureSpecular.FilePath, _identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", aiMaterial.TextureSpecular.UVIndex));
                     material.Textures.Add("Specular", texture);
                 }
 
-                if (sceneMaterial.HasTextureHeight)
+                if (aiMaterial.HasTextureHeight)
                 {
-                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureHeight.FilePath, identity);
-                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureHeight.UVIndex));
+                    var texture = new ExternalReference<TextureContent>(aiMaterial.TextureHeight.FilePath, _identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", aiMaterial.TextureHeight.UVIndex));
                     material.Textures.Add("Bump", texture);
                 }
 
-                if (sceneMaterial.HasColorDiffuse)
-                    material.DiffuseColor = ToXna(sceneMaterial.ColorDiffuse);
+                if (aiMaterial.HasColorDiffuse)
+                    material.DiffuseColor = ToXna(aiMaterial.ColorDiffuse);
 
-                if (sceneMaterial.HasColorEmissive)
-                    material.EmissiveColor = ToXna(sceneMaterial.ColorEmissive);
+                if (aiMaterial.HasColorEmissive)
+                    material.EmissiveColor = ToXna(aiMaterial.ColorEmissive);
 
-                if (sceneMaterial.HasOpacity)
-                    material.Alpha = sceneMaterial.Opacity;
+                if (aiMaterial.HasOpacity)
+                    material.Alpha = aiMaterial.Opacity;
 
-                if (sceneMaterial.HasColorSpecular)
-                    material.SpecularColor = ToXna(sceneMaterial.ColorSpecular);
+                if (aiMaterial.HasColorSpecular)
+                    material.SpecularColor = ToXna(aiMaterial.ColorSpecular);
 
-                if (sceneMaterial.HasShininessStrength)
-                    material.SpecularPower = sceneMaterial.ShininessStrength;
+                if (aiMaterial.HasShininessStrength)
+                    material.SpecularPower = aiMaterial.ShininessStrength;
 
-                materials.Add(material);
+                _materials.Add(material);
             }
-
-            return materials;
         }
 
-        private void FindMeshes(Node aiNode, Matrix4x4 parentXform)
+        /// <summary>
+        /// Converts all Assimp nodes to XNA nodes. (Nodes representing bones are excluded!)
+        /// </summary>
+        private void ImportNodes()
         {
-            var transform = parentXform * aiNode.Transform;
+            _pivots = new Dictionary<string, FbxPivot>();
+            _rootNode = ImportNodes(_scene.RootNode, null,  null);
+        }
 
+        /// <summary>
+        /// Converts the specified node and all descendant nodes.
+        /// </summary>
+        /// <param name="aiNode">The node.</param>
+        /// <param name="aiParent">The parent node. Can be <see langword="null"/>.</param>
+        /// <param name="parent">The <paramref name="aiParent"/> node converted to XNA.</param>
+        /// <returns>The XNA <see cref="NodeContent"/>.</returns>
+        /// <remarks>
+        /// It may be necessary to skip certain "preserve pivot" nodes in the hierarchy. The
+        /// converted node needs to be relative to <paramref name="aiParent"/>, not <c>node.Parent</c>.
+        /// </remarks>
+        private NodeContent ImportNodes(Node aiNode, Node aiParent, NodeContent parent)
+        {
+            Debug.Assert(aiNode != null);
+
+            NodeContent node = null;
             if (aiNode.HasMeshes)
             {
                 var mesh = new MeshContent
                 {
                     Name = aiNode.Name,
-                    Transform = ToXna(transform)
+                    Identity = _identity,
+                    Transform = ToXna(GetRelativeTransform(aiNode, aiParent))
                 };
 
                 foreach (var meshIndex in aiNode.MeshIndices)
@@ -168,53 +322,95 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     if (!aiMesh.HasVertices)
                         continue;
 
-                    // Extract bind pose.
-                    foreach (var bone in aiMesh.Bones)
-                    {
-                        if (!_boneNames.Contains(bone.Name))
-                            _boneNames.Add(bone.Name);
-
-                        _offsetMatrix[bone.Name] = bone.OffsetMatrix;
-                    }
-
                     var geom = CreateGeometry(mesh, aiMesh);
                     mesh.Geometry.Add(geom);
                 }
 
-                _rootNode.Children.Add(mesh);
+                node = mesh;
+            }
+            else if (aiNode.Name.Contains("_$AssimpFbx$"))
+            {
+                // This is a transformation pivot.
+                //   <OriginalName>_$AssimpFbx$_<TransformName>
+                // where <TransformName> is one of
+                //   Translation, RotationOffset, RotationPivot, PreRotation, Rotation,
+                //   PostRotation, RotationPivotInverse, ScalingOffset, ScalingPivot,
+                //   Scaling, ScalingPivotInverse
+                string originalName = GetNodeName(aiNode.Name);
+                FbxPivot pivot;
+                if (!_pivots.TryGetValue(originalName, out pivot))
+                {
+                    pivot = new FbxPivot();
+                    _pivots.Add(originalName, pivot);
+                }
+
+                Matrix transform = ToXna(aiNode.Transform);
+                if (aiNode.Name.EndsWith("_Translation"))
+                    pivot.Translation = transform;
+                else if (aiNode.Name.EndsWith("_RotationOffset"))
+                    pivot.RotationOffset = transform;
+                else if (aiNode.Name.EndsWith("_RotationPivot"))
+                    pivot.RotationPivot = transform;
+                else if (aiNode.Name.EndsWith("_PreRotation"))
+                    pivot.PreRotation = transform;
+                else if (aiNode.Name.EndsWith("_Rotation"))
+                    pivot.Rotation = transform;
+                else if (aiNode.Name.EndsWith("_PostRotation"))
+                    pivot.PostRotation = transform;
+                else if (aiNode.Name.EndsWith("_RotationPivotInverse"))
+                    pivot.RotationPivotInverse = transform;
+                else if (aiNode.Name.EndsWith("_ScalingOffset"))
+                    pivot.ScalingOffset = transform;
+                else if (aiNode.Name.EndsWith("_ScalingPivot"))
+                    pivot.ScalingPivot = transform;
+                else if (aiNode.Name.EndsWith("_Scaling"))
+                    pivot.Scaling = transform;
+                else if (aiNode.Name.EndsWith("_ScalingPivotInverse"))
+                    pivot.ScalingPivotInverse = transform;
+                else if (aiNode.Name.EndsWith("_GeometricTranslation"))
+                    pivot.GeometricTranslation = transform;
+                else if (aiNode.Name.EndsWith("_GeometricRotation"))
+                    pivot.GeometricRotation = transform;
+                else if (aiNode.Name.EndsWith("_GeometricScaling"))
+                    pivot.GeometricScaling = transform;
+                else
+                    throw new InvalidContentException(string.Format("Unknown $AssimpFbx$ node: \"{0}\"", aiNode.Name), _identity);
+            }
+            else if (!_bones.Contains(aiNode)) // Ignore bones.
+            {
+                node = new NodeContent
+                {
+                    Name = aiNode.Name,
+                    Identity = _identity,
+                    Transform = ToXna(GetRelativeTransform(aiNode, aiParent))
+                };
             }
 
-            // Children
+            if (node != null)
+            {
+                if (parent != null)
+                    parent.Children.Add(node);
+
+                // For the children, this is the new parent.
+                aiParent = aiNode;
+                parent = node;
+            }
+
+            Debug.Assert(parent != null);
+
             foreach (var child in aiNode.Children)
-                FindMeshes(child, transform);
-        }
+                ImportNodes(child, aiParent, parent);
 
-        private void AddAllSkeletonBones(Node aiNode)
-        {
-            //The skeleton bones list is generated from the bones found in the mesh only
-            //This means its missing any helper bones that are animated but not actually attached to vertices
-            //Now we've found the root of the skeleton we can all all bones
-
-            if (!_boneNames.Contains(aiNode.Name))
-            {
-                _boneNames.Add(aiNode.Name);
-                _objectToBone[aiNode.Name] = Matrix4x4.Identity;
-            }
-
-            if (!_skeletonNodes.Contains(aiNode.Name))
-            {
-                _skeletonNodes.Add(aiNode.Name);
-            }
-
-            foreach (var child in aiNode.Children)
-            {
-                AddAllSkeletonBones(child);
-            }
+            return node;
         }
 
         private GeometryContent CreateGeometry(MeshContent mesh, Mesh aiMesh)
         {
-            var geom = new GeometryContent { Material = _materials[aiMesh.MaterialIndex] };
+            var geom = new GeometryContent
+            {
+              Identity = _identity,
+              Material = _materials[aiMesh.MaterialIndex]
+            };
 
             // Vertices
             var baseVertex = mesh.Positions.Count;
@@ -249,188 +445,504 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // Individual channels go here
             if (aiMesh.HasNormals)
-                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), ToXna(aiMesh.Normals));
+                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), aiMesh.Normals.Select(ToXna));
 
             for (var i = 0; i < aiMesh.TextureCoordinateChannelCount; i++)
-                geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i),
-                                           ToXnaTexCoord(aiMesh.TextureCoordinateChannels[i]));
+                geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i), aiMesh.TextureCoordinateChannels[i].Select(ToXnaTexCoord));
 
             for (var i = 0; i < aiMesh.VertexColorChannelCount; i++)
-            {
-                geom.Vertices.Channels.Add(VertexChannelNames.Color(i),
-                       ToXnaColors(aiMesh.VertexColorChannels[i]));
-            }
+                geom.Vertices.Channels.Add(VertexChannelNames.Color(i), aiMesh.VertexColorChannels[i].Select(ToXnaColor));
 
             return geom;
         }
 
-        private BoneContent CreateSkeleton()
+        /// <summary>
+        /// Identifies the nodes that represent bones and stores the bone offset matrices.
+        /// </summary>
+        private void FindSkeleton()
         {
-            _skeletonRoot = FindSkeletonRoot(_boneNames, _scene.RootNode);
-            if (_skeletonRoot == null)
-                return null;
+            // See http://assimp.sourceforge.net/lib_html/data.html, section "Bones"
+            // and notes above.
 
-            return WalkHierarchy(_skeletonRoot, _rootNode, Matrix4x4.Identity) as BoneContent;
+            // First, identify all deformation bones.
+            _deformationBones = FindDeformationBones(_scene);
+            if (_deformationBones.Count == 0)
+                return;
+
+            // Walk the tree upwards to find the root bones.
+            var rootBones = new HashSet<Node>();
+            foreach (var boneName in _deformationBones.Keys)
+                rootBones.Add(FindRootBone(_scene, boneName));
+
+            if (rootBones.Count > 1)
+                throw new InvalidContentException("Multiple skeletons found. Please ensure that the model does not contain more that one skeleton.", _identity);
+
+            _rootBone = rootBones.First();
+
+            // Add all nodes below root bone to skeleton.
+            GetSubtree(_rootBone, _bones);
         }
 
-        private Node FindSkeletonRoot(IEnumerable<string> boneNames, Node sceneRoot)
+        /// <summary>
+        /// Finds the deformation bones (= bones attached to meshes).
+        /// </summary>
+        /// <param name="scene">The scene.</param>
+        /// <returns>A dictionary of all deformation bones and their offset matrices.</returns>
+        private static Dictionary<string, Matrix> FindDeformationBones(Scene scene)
         {
-            Node rootNode = null;
-            var minDepth = int.MaxValue;
+            Debug.Assert(scene != null);
 
-            foreach (var boneName in boneNames)
-            {
-                var node = sceneRoot.FindNode(boneName);
+            var offsetMatrices = new Dictionary<string, Matrix>();
+            if (scene.HasMeshes)
+                foreach (var mesh in scene.Meshes)
+                    if (mesh.HasBones)
+                        foreach (var bone in mesh.Bones)
+                            if (!offsetMatrices.ContainsKey(bone.Name))
+                                offsetMatrices[bone.Name] = ToXna(bone.OffsetMatrix);
 
-                // Walk up the tree to find the depth of this node
-                var depth = 0;
-                var walk = node;
-                while (walk != sceneRoot)
-                {
-                    walk = walk.Parent;
-                    depth++;
-                }
-
-                if (depth < minDepth)
-                {
-                    rootNode = node;
-                    minDepth = depth;
-                }
-
-                if (!_skeletonNodes.Contains(boneName))
-                    _skeletonNodes.Add(boneName);
-            }
-
-            // We're at the base of the skeleton, now walk
-            // all the way up to the scene root to get the
-            // full stack.
-            Node skeletonRoot = rootNode;
-            while (rootNode.Parent != sceneRoot)
-            {
-                // The FBX path likes to put these extra preserve
-                // pivot nodes in here.
-                if (!rootNode.Name.Contains("$AssimpFbx$"))
-                    skeletonRoot = rootNode;
-
-                if (!_skeletonNodes.Contains(skeletonRoot.Name))
-                    _skeletonNodes.Add(skeletonRoot.Name);
-
-                rootNode = rootNode.Parent;
-            }
-
-            AddAllSkeletonBones(skeletonRoot);
-            return skeletonRoot;
+            return offsetMatrices;
         }
 
-        private NodeContent WalkHierarchy(Node aiNode, NodeContent xnaParent, Matrix4x4 parentXform)
+        /// <summary>
+        /// Finds the root bone of a specific bone in the skeleton.
+        /// </summary>
+        /// <param name="scene">The scene.</param>
+        /// <param name="boneName">The name of a bone in the skeleton.</param>
+        /// <returns>The root bone.</returns>
+        private static Node FindRootBone(Scene scene, string boneName)
         {
-            var transform = Matrix4x4.Identity;
-            Node walk = aiNode;
-            while (walk != null && walk.Name != xnaParent.Name)
+            Debug.Assert(scene != null);
+            Debug.Assert(!string.IsNullOrEmpty(boneName));
+
+            // Start with the specified bone.
+            Node node = scene.RootNode.FindNode(boneName);
+            Debug.Assert(node != null, "Node referenced by mesh not found in model.");
+
+            // Walk all the way up to the scene root or the mesh node.
+            Node rootBone = node;
+            while (node != scene.RootNode && !node.HasMeshes)
             {
-                transform *= walk.Transform;
-                walk = walk.Parent;
+                // Only when FBXPreservePivotsConfig(true):
+                // The FBX path likes to put these extra preserve pivot nodes in here.
+                if (!node.Name.Contains("$AssimpFbx$"))
+                    rootBone = node;
+
+                node = node.Parent;
             }
+
+            return rootBone;
+        }
+
+        /// <summary>
+        /// Imports the skeleton including all skeletal animations.
+        /// </summary>
+        private void ImportSkeleton()
+        {
+            if (_rootBone == null)
+                return;
+
+            // Convert nodes to bones and attach to root node.
+            var rootBoneContent = (BoneContent)ImportBones(_rootBone, _rootBone.Parent, null);
+            _rootNode.Children.Add(rootBoneContent);
+
+            if (!_scene.HasAnimations)
+                return;
+
+            // Convert animations and add to root bone.
+            foreach (var animation in _scene.Animations)
+            {
+                var animationContent = ImportAnimation(animation);
+                rootBoneContent.Animations.Add(animationContent.Name, animationContent);
+            }
+        }
+
+        /// <summary>
+        /// Converts the specified node and all descendant nodes to XNA bones.
+        /// </summary>
+        /// <param name="aiNode">The node.</param>
+        /// <param name="aiParent">The parent node.</param>
+        /// <param name="parent">The <paramref name="aiParent"/> node converted to XNA.</param>
+        /// <returns>The XNA <see cref="NodeContent"/>.</returns>
+        private NodeContent ImportBones(Node aiNode, Node aiParent, NodeContent parent)
+        {
+            Debug.Assert(aiNode != null);
+            Debug.Assert(aiParent != null);
 
             NodeContent node = null;
-
             if (!aiNode.Name.Contains("_$AssimpFbx$")) // Ignore pivot nodes
             {
                 const string mangling = "_$AssimpFbxNull$"; // Null leaf nodes are helpers
 
-                if (_skeletonNodes.Contains(aiNode.Name))
-                    node = new BoneContent { Name = aiNode.Name };
-                else if (aiNode.Name.Contains(mangling))
-                    node = new NodeContent { Name = aiNode.Name.Replace(mangling, string.Empty) };
-
-                // Only emit XNA nodes for concrete nodes
-                if (node != null)
+                if (aiNode.Name.Contains(mangling))
                 {
-                    node.Transform = ToXna(transform);
-                    xnaParent.Children.Add(node);
+                    // Null leaf node
+                    node = new NodeContent
+                    {
+                        Name = aiNode.Name.Replace(mangling, string.Empty),
+                        Identity = _identity,
+                        Transform = ToXna(GetRelativeTransform(aiNode, aiParent))
+                    };
+                }
+                else if (_bones.Contains(aiNode))
+                {
+                    // Bone
+                    node = new BoneContent
+                    {
+                      Name = aiNode.Name,
+                      Identity = _identity
+                    };
 
-                    _objectToBone[aiNode.Name] = transform;
+                    // node.Transform is irrelevant for bones. This transform is just the
+                    // pose of the node at the time of the export. This could, for example,
+                    // be one of the animation frames. It is not necessarily the bind pose
+                    // (rest pose)!
+                    // In XNA BoneContent.Transform needs to be set to the relative bind pose
+                    // matrix. The relative bind pose matrix can be derived from the OffsetMatrix
+                    // which is stored in aiMesh.Bones.
+                    //
+                    // offsetMatrix ... Offset matrix. Transforms the mesh from local space to bone space in bind pose.
+                    // bindPoseRel  ... Relative bind pose matrix. Defines the transform of a bone relative to its parent bone.
+                    // bindPoseAbs  ... Absolute bind pose matrix. Defines the transform of a bone relative to world space.
+                    //
+                    // The offset matrix is the inverse of the absolute bind pose matrix.
+                    //   offsetMatrix = inverse(bindPoseAbs)
+                    //
+                    // bindPoseAbs = bindPoseRel * parentBindPoseAbs
+                    // => bindPoseRel = bindPoseAbs * inverse(parentBindPoseAbs)
+                    //                = inverse(offsetMatrix) * parentOffsetMatrix
 
-                    // For the children, this is the new parent.
-                    xnaParent = node;
+                    Matrix offsetMatrix;
+                    Matrix parentOffsetMatrix;
+                    bool isOffsetMatrixValid = _deformationBones.TryGetValue(aiNode.Name, out offsetMatrix);
+                    bool isParentOffsetMatrixValid = _deformationBones.TryGetValue(aiParent.Name, out parentOffsetMatrix);
+                    if (isOffsetMatrixValid && isParentOffsetMatrixValid)
+                    {
+                        node.Transform = Matrix.Invert(offsetMatrix) * parentOffsetMatrix;
+                    }
+                    else if (isOffsetMatrixValid && (aiNode == _rootBone || aiParent == _rootBone))
+                    {
+                        // The current bone is the first or second bone in the chain.
+                        // The parent offset matrix is missing. :(
+                        // Let's assume that parent's transform is Identity.
+                        node.Transform = Matrix.Invert(offsetMatrix);
+                    }
+                    else
+                    {
+                        // Offset matrices are not provided by Assimp. :(
+                        // Let's hope that the skeleton was exported in bind pose.
+                        // (Otherwise we are just importing garbage.)
+                        node.Transform = ToXna(GetRelativeTransform(aiNode, aiParent));
+                    }
                 }
             }
 
-            // Children
+            if (node != null)
+            {
+                if (parent != null)
+                    parent.Children.Add(node);
+
+                // For the children, this is the new parent.
+                aiParent = aiNode;
+                parent = node;
+            }
+
             foreach (var child in aiNode.Children)
-                WalkHierarchy(child, xnaParent, transform);
+                ImportBones(child, aiParent, parent);
 
             return node;
         }
 
-        private static string FixupAnimationName(string name)
+        /// <summary>
+        /// Converts the specified animation to XNA.
+        /// </summary>
+        /// <param name="aiAnimation">The animation.</param>
+        /// <returns>The animation converted to XNA.</returns>
+        private AnimationContent ImportAnimation(Animation aiAnimation)
+        {
+            var animation = new AnimationContent
+            {
+                Name = GetAnimationName(aiAnimation.Name),
+                Identity = _identity,
+                Duration = TimeSpan.FromSeconds(aiAnimation.DurationInTicks / aiAnimation.TicksPerSecond)
+            };
+
+            // In Assimp animation channels may be split into separate channels.
+            //   "nodeXyz" --> "nodeXyz_$AssimpFbx$_Translation",
+            //                 "nodeXyz_$AssimpFbx$_Rotation",
+            //                 "nodeXyz_$AssimpFbx$_Scaling"
+            // Group animation channels by name (strip the "_$AssimpFbx$" part).
+            var channelGroups = aiAnimation.NodeAnimationChannels
+                                           .GroupBy(channel => GetNodeName(channel.NodeName));
+
+            foreach (var channelGroup in channelGroups)
+            {
+                var boneName = channelGroup.Key;
+                var channel = new AnimationChannel();
+
+                // Get transformation pivot for current bone.
+                FbxPivot pivot;
+                if (!_pivots.TryGetValue(boneName, out pivot))
+                    pivot = FbxPivot.Default;
+
+                var scaleKeys = EmptyVectorKeys;
+                var rotationKeys = EmptyQuaternionKeys;
+                var translationKeys = EmptyVectorKeys;
+
+                foreach (var aiChannel in channelGroup)
+                {
+                    if (aiChannel.NodeName.EndsWith("_$AssimpFbx$_Scaling"))
+                    {
+                        scaleKeys = aiChannel.ScalingKeys;
+
+                        Debug.Assert(pivot.Scaling.HasValue);
+                        Debug.Assert(!aiChannel.HasRotationKeys || (aiChannel.RotationKeyCount == 1 && (aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(1, 0, 0, 0) || aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(0, 0, 0, 0))));
+                        Debug.Assert(!aiChannel.HasPositionKeys || (aiChannel.PositionKeyCount == 1 && aiChannel.PositionKeys[0].Value == new Vector3D(0, 0, 0)));
+                    }
+                    else if (aiChannel.NodeName.EndsWith("_$AssimpFbx$_Rotation"))
+                    {
+                        rotationKeys = aiChannel.RotationKeys;
+
+                        Debug.Assert(pivot.Rotation.HasValue);
+                        Debug.Assert(!aiChannel.HasScalingKeys || (aiChannel.ScalingKeyCount == 1 && aiChannel.ScalingKeys[0].Value == new Vector3D(1, 1, 1)));
+                        Debug.Assert(!aiChannel.HasPositionKeys || (aiChannel.PositionKeyCount == 1 && aiChannel.PositionKeys[0].Value == new Vector3D(0, 0, 0)));
+                    }
+                    else if (aiChannel.NodeName.EndsWith("_$AssimpFbx$_Translation"))
+                    {
+                        translationKeys = aiChannel.PositionKeys;
+
+                        Debug.Assert(pivot.Translation.HasValue);
+                        Debug.Assert(!aiChannel.HasScalingKeys || (aiChannel.ScalingKeyCount == 1 && aiChannel.ScalingKeys[0].Value == new Vector3D(1, 1, 1)));
+                        Debug.Assert(!aiChannel.HasRotationKeys || (aiChannel.RotationKeyCount == 1 && (aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(1, 0, 0, 0) || aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(0, 0, 0, 0))));
+                    }
+                    else
+                    {
+                        scaleKeys = aiChannel.ScalingKeys;
+                        rotationKeys = aiChannel.RotationKeys;
+                        translationKeys = aiChannel.PositionKeys;
+                    }
+                }
+
+                // Get all unique keyframe times. (Assuming that no two key frames
+                // have the same time, which is usually a safe assumption.)
+                var times = scaleKeys.Select(k => k.Time)
+                                     .Union(rotationKeys.Select(k => k.Time))
+                                     .Union(translationKeys.Select(k => k.Time))
+                                     .OrderBy(t => t)
+                                     .ToList();
+
+                Debug.Assert(times.Count == times.Distinct().Count(), "Sequences combined with Union() should not have duplicates.");
+
+                int prevScaleIndex = -1;
+                int prevRotationIndex = -1;
+                int prevTranslationIndex = -1;
+                double prevScaleTime = 0.0;
+                double prevRotationTime = 0.0;
+                double prevTranslationTime = 0.0;
+                Vector3? prevScale = null;
+                Quaternion? prevRotation = null;
+                Vector3? prevTranslation = null;
+
+                foreach (var time in times)
+                {
+                    // Get scaling.
+                    Vector3? scale;
+                    int scaleIndex = scaleKeys.FindIndex(k => k.Time == time);
+                    if (scaleIndex != -1)
+                    {
+                        // Scaling key found.
+                        scale = ToXna(scaleKeys[scaleIndex].Value);
+                        prevScaleIndex = scaleIndex;
+                        prevScaleTime = time;
+                        prevScale = scale;
+                    }
+                    else
+                    {
+                        // No scaling key found.
+                        if (prevScaleIndex != -1 && prevScaleIndex + 1 < scaleKeys.Count)
+                        {
+                            // Lerp between previous and next scaling key.
+                            var nextScaleKey = scaleKeys[prevScaleIndex + 1];
+                            var nextScaleTime = nextScaleKey.Time;
+                            var nextScale = ToXna(nextScaleKey.Value);
+                            var amount = (float)((time - prevScaleTime) / (nextScaleTime - prevScaleTime));
+                            scale = Vector3.Lerp(prevScale.Value, nextScale, amount);
+                        }
+                        else
+                        {
+                            // Hold previous scaling value.
+                            scale = prevScale;
+                        }
+                    }
+
+                    // Get rotation.
+                    Quaternion? rotation;
+                    int rotationIndex = rotationKeys.FindIndex(k => k.Time == time);
+                    if (rotationIndex != -1)
+                    {
+                        // Rotation key found.
+                        rotation = ToXna(rotationKeys[rotationIndex].Value);
+                        prevRotationIndex = rotationIndex;
+                        prevRotationTime = time;
+                        prevRotation = rotation;
+                    }
+                    else
+                    {
+                        // No rotation key found.
+                        if (prevRotationIndex != -1 && prevRotationIndex + 1 < rotationKeys.Count)
+                        {
+                            // Lerp between previous and next rotation key.
+                            var nextRotationKey = rotationKeys[prevRotationIndex + 1];
+                            var nextRotationTime = nextRotationKey.Time;
+                            var nextRotation = ToXna(nextRotationKey.Value);
+                            var amount = (float)((time - prevRotationTime) / (nextRotationTime - prevRotationTime));
+                            rotation = Quaternion.Slerp(prevRotation.Value, nextRotation, amount);
+                        }
+                        else
+                        {
+                            // Hold previous rotation value.
+                            rotation = prevRotation;
+                        }
+                    }
+
+                    // Get translation.
+                    Vector3? translation;
+                    int translationIndex = translationKeys.FindIndex(k => k.Time == time);
+                    if (translationIndex != -1)
+                    {
+                        // Translation key found.
+                        translation = ToXna(translationKeys[translationIndex].Value);
+                        prevTranslationIndex = translationIndex;
+                        prevTranslationTime = time;
+                        prevTranslation = translation;
+                    }
+                    else
+                    {
+                        // No translation key found.
+                        if (prevTranslationIndex != -1 && prevTranslationIndex + 1 < translationKeys.Count)
+                        {
+                            // Lerp between previous and next translation key.
+                            var nextTranslationKey = translationKeys[prevTranslationIndex + 1];
+                            var nextTranslationTime = nextTranslationKey.Time;
+                            var nextTranslation = ToXna(nextTranslationKey.Value);
+                            var amount = (float)((time - prevTranslationTime) / (nextTranslationTime - prevTranslationTime));
+                            translation = Vector3.Lerp(prevTranslation.Value, nextTranslation, amount);
+                        }
+                        else
+                        {
+                            // Hold previous translation value.
+                            translation = prevTranslation;
+                        }
+                    }
+
+                    // Apply transformation pivot.
+                    var transform = Matrix.Identity;
+
+                    if (pivot.GeometricScaling.HasValue)
+                        transform *= pivot.GeometricScaling.Value;
+                    if (pivot.GeometricRotation.HasValue)
+                        transform *= pivot.GeometricRotation.Value;
+                    if (pivot.GeometricTranslation.HasValue)
+                        transform *= pivot.GeometricTranslation.Value;
+                    if (pivot.ScalingPivotInverse.HasValue)
+                        transform *= pivot.ScalingPivotInverse.Value;
+                    if (scale.HasValue)
+                        transform *= Matrix.CreateScale(scale.Value);
+                    else if (pivot.Scaling.HasValue)
+                        transform *= pivot.Scaling.Value;
+                    if (pivot.ScalingPivot.HasValue)
+                        transform *= pivot.ScalingPivot.Value;
+                    if (pivot.ScalingOffset.HasValue)
+                        transform *= pivot.ScalingOffset.Value;
+                    if (pivot.RotationPivotInverse.HasValue)
+                        transform *= pivot.RotationPivotInverse.Value;
+                    if (pivot.PostRotation.HasValue)
+                        transform *= pivot.PostRotation.Value;
+                    if (rotation.HasValue)
+                        transform *= Matrix.CreateFromQuaternion(rotation.Value);
+                    else if (pivot.Rotation.HasValue)
+                        transform *= pivot.Rotation.Value;
+                    if (pivot.PreRotation.HasValue)
+                        transform *= pivot.PreRotation.Value;
+                    if (pivot.RotationPivot.HasValue)
+                        transform *= pivot.RotationPivot.Value;
+                    if (pivot.RotationOffset.HasValue)
+                        transform *= pivot.RotationOffset.Value;
+                    if (translation.HasValue)
+                        transform *= Matrix.CreateTranslation(translation.Value);
+                    else if (pivot.Translation.HasValue)
+                        transform *= pivot.Translation.Value;
+
+                    channel.Add(new AnimationKeyframe(TimeSpan.FromSeconds(time / aiAnimation.TicksPerSecond), transform));
+                }
+
+                animation.Channels[channelGroup.Key] = channel;
+            }
+
+            return animation;
+        }
+
+        /// <summary>
+        /// Copies the current node and all descendant nodes into a list.
+        /// </summary>
+        /// <param name="node">The current node.</param>
+        /// <param name="list">The list.</param>
+        private static void GetSubtree(Node node, List<Node> list)
+        {
+            Debug.Assert(node != null);
+            Debug.Assert(list != null);
+
+            list.Add(node);
+            foreach (var child in node.Children)
+                GetSubtree(child, list);
+        }
+
+        /// <summary>
+        /// Gets the transform of node relative to a specific ancestor node.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <param name="ancestor">The ancestor node. Can be <see langword="null"/>.</param>
+        /// <returns>
+        /// The relative transform. If <paramref name="ancestor"/> is <see langword="null"/> the
+        /// absolute transform of <paramref name="node"/> is returned.
+        /// </returns>
+        private static Matrix4x4 GetRelativeTransform(Node node, Node ancestor)
+        {
+            Debug.Assert(node != null);
+
+            // Get transform of node relative to ancestor.
+            Matrix4x4 transform = node.Transform;
+            Node parent = node.Parent;
+            while (parent != null && parent != ancestor)
+            {
+                transform *= parent.Transform;
+                parent = parent.Parent;
+            }
+
+            if (parent == null && ancestor != null)
+                throw new ArgumentException(string.Format("Node \"{0}\" is not an ancestor of \"{1}\".", ancestor.Name, node.Name));
+
+            return transform;
+        }
+
+        /// <summary>
+        /// Gets the animation name without the "AnimStack::" part.
+        /// </summary>
+        /// <param name="name">The mangled animation name.</param>
+        /// <returns>The original animation name.</returns>
+        private static string GetAnimationName(string name)
         {
             return name.Replace("AnimStack::", string.Empty);
         }
 
-        private void CreateAnimation(NodeContent skeleton)
+        /// <summary>
+        /// Gets the node name without the "_$AssimpFbx$" part.
+        /// </summary>
+        /// <param name="name">The mangled node name.</param>
+        /// <returns>The original node name.</returns>
+        private static string GetNodeName(string name)
         {
-            if (skeleton != null)
-            {
-                foreach (var animation in _scene.Animations)
-                    skeleton.Animations.Add(FixupAnimationName(animation.Name), CreateAnimation(animation));
-            }
-        }
-
-        private AnimationContent CreateAnimation(Assimp.Animation aiAnimation)
-        {
-            var animation = new AnimationContent
-            {
-                Name = FixupAnimationName(aiAnimation.Name),
-                Duration = TimeSpan.FromSeconds(aiAnimation.DurationInTicks / aiAnimation.TicksPerSecond)
-            };
-
-            foreach (var aiChannel in aiAnimation.NodeAnimationChannels)
-            {
-                if (aiChannel.NodeName.Contains("_$AssimpFbx$"))
-                    continue;
-
-                var channel = new AnimationChannel();
-
-                // We can have different numbers of keyframes for each, so find the max index.
-                var keyCount = Math.Max(aiChannel.PositionKeyCount, Math.Max(aiChannel.RotationKeyCount, aiChannel.ScalingKeyCount));
-
-                // Get all unique keyframe times
-                var times = aiChannel.PositionKeys.Select(k => k.Time)
-                    .Union(aiChannel.RotationKeys.Select(k => k.Time))
-                    .Union(aiChannel.ScalingKeys.Select(k => k.Time))
-                    .Distinct().ToList();
-
-                var translation = new Vector3D(0, 0, 0);
-                var rotation = new Assimp.Quaternion(1, 0, 0, 0);
-                var scale = new Vector3D(1, 1, 1);
-                foreach (var aiKeyTime in times)
-                {
-                    var time = TimeSpan.FromSeconds(aiKeyTime / aiAnimation.TicksPerSecond);
-
-                    var translateIndex = aiChannel.PositionKeys.FindIndex(k => k.Time == aiKeyTime);
-                    if (translateIndex != -1)
-                        translation = aiChannel.PositionKeys[translateIndex].Value;
-
-                    var rotationIndex = aiChannel.RotationKeys.FindIndex(k => k.Time == aiKeyTime);
-                    if (rotationIndex != -1)
-                        rotation = aiChannel.RotationKeys[rotationIndex].Value;
-
-                    var scaleIndex = aiChannel.ScalingKeys.FindIndex(k => k.Time == aiKeyTime);
-                    if (scaleIndex != -1)
-                        scale = aiChannel.ScalingKeys[scaleIndex].Value;
-
-                    var nodeTransform = Matrix4x4.FromScaling(scale) *
-                                        new Matrix4x4(rotation.GetMatrix()) *
-                                        Matrix4x4.FromTranslation(translation);
-
-                    channel.Add(new AnimationKeyframe(time, ToXna(nodeTransform)));
-                }
-
-                animation.Channels.Add(aiChannel.NodeName, channel);
-            }
-
-            return animation;
+            int index = name.IndexOf("_$AssimpFbx$", StringComparison.Ordinal);
+            return (index >= 0) ? name.Remove(index) : name;
         }
 
         #region Conversion Helpers
@@ -464,27 +976,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         [DebuggerStepThrough]
-        public static IEnumerable<Vector2> ToXna(IEnumerable<Vector2D> vectors)
-        {
-            foreach (var vector in vectors)
-                yield return ToXna(vector);
-        }
-
-        [DebuggerStepThrough]
-        public static IEnumerable<Vector3> ToXna(IEnumerable<Vector3D> vectors)
-        {
-            foreach (var vector in vectors)
-                yield return ToXna(vector);
-        }
-
-        [DebuggerStepThrough]
-        public static IEnumerable<Vector2> ToXnaTexCoord(IEnumerable<Vector3D> vectors)
-        {
-            foreach (var vector in vectors)
-                yield return new Vector2(vector.X, vector.Y);
-        }
-
-        [DebuggerStepThrough]
         public static Vector2 ToXna(Vector2D vector)
         {
             return new Vector2(vector.X, vector.Y);
@@ -503,17 +994,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         [DebuggerStepThrough]
-        public static Vector3 ToXna(Assimp.Color4D color)
+        public static Vector3 ToXna(Color4D color)
         {
             return new Vector3(color.R, color.G, color.B);
         }
 
-        public static IEnumerable<Color> ToXnaColors(IEnumerable<Color4D> colors)
+        [DebuggerStepThrough]
+        public static Vector2 ToXnaTexCoord(Vector3D vector)
         {
-            foreach (var color in colors)
-                yield return new Color(color.R, color.G, color.B, color.A);
+            return new Vector2(vector.X, vector.Y);
         }
 
+        [DebuggerStepThrough]
+        public static Color ToXnaColor(Color4D color)
+        {
+            return new Color(color.R, color.G, color.B, color.A);
+        }
         #endregion
     }
 }

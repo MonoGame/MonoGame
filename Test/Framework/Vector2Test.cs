@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using NUnit.Framework;
+using System.ComponentModel;
+using System.Globalization;
 
 namespace MonoGame.Tests.Framework
 {
@@ -364,6 +366,26 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void TypeConverter()
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(Vector2));
+            CultureInfo invariantCulture = CultureInfo.InvariantCulture;
+
+            Assert.AreEqual(new Vector2(32, 64), converter.ConvertFromString(null, invariantCulture, "32, 64"));
+            Assert.AreEqual(new Vector2(0.5f, 2.75f), converter.ConvertFromString(null, invariantCulture, "0.5, 2.75"));
+            Assert.AreEqual(new Vector2(1024.5f, 2048.75f), converter.ConvertFromString(null, invariantCulture, "1024.5, 2048.75"));
+            Assert.AreEqual("32, 64", converter.ConvertToString(null, invariantCulture, new Vector2(32, 64)));
+            Assert.AreEqual("0.5, 2.75", converter.ConvertToString(null, invariantCulture, new Vector2(0.5f, 2.75f)));
+            Assert.AreEqual("1024.5, 2048.75", converter.ConvertToString(null, invariantCulture, new Vector2(1024.5f, 2048.75f)));
+
+            CultureInfo otherCulture = new CultureInfo("el-GR");
+
+            Assert.AreEqual(new Vector2(1024.5f, 2048.75f), converter.ConvertFromString(null, otherCulture, "1024,5; 2048,75"));
+            Assert.AreEqual("1024,5; 2048,75", converter.ConvertToString(null, otherCulture, new Vector2(1024.5f, 2048.75f)));
+        }
+
+#if !XNA
+        [Test]
         public void ToPoint()
         {
             Assert.AreEqual(new Point(0, 0), new Vector2(0.1f, 0.1f).ToPoint());
@@ -374,5 +396,6 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Point(1, 1), new Vector2(1.0f, 1.0f).ToPoint());
             Assert.AreEqual(new Point(19, 27), new Vector2(19.033f, 27.1f).ToPoint());
         }
+#endif     
     }
 }

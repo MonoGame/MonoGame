@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
     /// <summary>
@@ -12,6 +10,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     [ContentTypeWriter]
     class ExternalReferenceWriter<T> : BuiltInContentWriter<ExternalReference<T>>
     {
+        private ContentTypeWriter _targetWriter;
+
+        /// <inheritdoc/>
+        protected override void Initialize(ContentCompiler compiler)
+        {
+            base.Initialize(compiler);
+            _targetWriter = compiler.GetTypeWriter(typeof(T));
+        }
+
         /// <summary>
         /// Writes the value to the output.
         /// </summary>
@@ -20,6 +27,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         protected internal override void Write(ContentWriter output, ExternalReference<T> value)
         {
             output.WriteExternalReference(value);
+        }
+
+        /// <inheritdoc/>
+        public override string GetRuntimeReader(TargetPlatform targetPlatform)
+        {
+            var type = typeof(ContentReader);
+            var readerType = type.Namespace + ".ExternalReferenceReader, " + type.Assembly.FullName;
+            return readerType;
+        }
+
+        /// <inheritdoc/>
+        public override string GetRuntimeType(TargetPlatform targetPlatform)
+        {
+            return _targetWriter.GetRuntimeType(targetPlatform);
         }
     }
 }

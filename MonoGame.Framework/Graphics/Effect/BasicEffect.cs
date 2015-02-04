@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.dx11.mgfxo"
 #elif PSM 
-            "MonoGame.Framework.PSMobile.PSSuite.Graphics.Resources.BasicEffect.cgx" //FIXME: This shader is totally incomplete
+            "Microsoft.Xna.Framework.PSSuite.Graphics.Resources.BasicEffect.cgx" //FIXME: This shader is totally incomplete
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.ogl.mgfxo"
 #endif

@@ -64,16 +64,19 @@ change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
+
+
 #endregion License
 
 using System;
 using System.Drawing;
 
-using MonoTouch.CoreAnimation;
-using MonoTouch.Foundation;
-using MonoTouch.ObjCRuntime;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
+using CoreAnimation;
+using Foundation;
+using ObjCRuntime;
+using OpenGLES;
+using UIKit;
+using CoreGraphics;
 
 using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
@@ -81,8 +84,6 @@ using OpenTK.Platform.iPhoneOS;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-
-using All = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework {
 
@@ -94,7 +95,7 @@ namespace Microsoft.Xna.Framework {
 		private int _framebuffer;
 
 		#region Construction/Destruction
-		public iOSGameView (iOSGamePlatform platform, RectangleF frame)
+		public iOSGameView (iOSGamePlatform platform, CGRect frame)
 			: base(frame)
 		{
 			if (platform == null)
@@ -221,10 +222,10 @@ namespace Microsoft.Xna.Framework {
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
 			
 			// Create our Depth buffer. Color buffer must be the last one bound
-			GL.GenRenderbuffers(1, ref _depthbuffer);
-			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
-            GL.RenderbufferStorage (All.Renderbuffer, All.DepthComponent16, viewportWidth, viewportHeight);
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
+			GL.GenRenderbuffers(1, out _depthbuffer);
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthbuffer);
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16, viewportWidth, viewportHeight);
+			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
 
 			_glapi.GenRenderbuffers(1, ref _colorbuffer);
 			_glapi.BindRenderbuffer(All.Renderbuffer, _colorbuffer);
@@ -239,8 +240,8 @@ namespace Microsoft.Xna.Framework {
 			
 			_glapi.FramebufferRenderbuffer (All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
 			
-			var status = GL.CheckFramebufferStatus (All.Framebuffer);
-			if (status != All.FramebufferComplete)
+			var status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+			if (status != FramebufferErrorCode.FramebufferComplete)
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
 
@@ -285,7 +286,7 @@ namespace Microsoft.Xna.Framework {
 			}
 
             if (Threading.BackgroundContext == null)
-                Threading.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(ctx.EAGLContext.API, ctx.EAGLContext.ShareGroup);
+                Threading.BackgroundContext = new OpenGLES.EAGLContext(ctx.EAGLContext.API, ctx.EAGLContext.ShareGroup);
 		}
 
 		private void DestroyFramebuffer ()

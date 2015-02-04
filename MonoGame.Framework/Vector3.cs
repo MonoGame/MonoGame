@@ -9,6 +9,9 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+#if WINDOWS
+    [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector3TypeConverter))]
+#endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector3 : IEquatable<Vector3>

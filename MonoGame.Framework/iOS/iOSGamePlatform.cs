@@ -70,11 +70,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using MonoTouch.Foundation;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
-using MonoTouch.CoreAnimation;
-using MonoTouch.ObjCRuntime;
+using Foundation;
+using OpenGLES;
+using UIKit;
+using CoreAnimation;
+using ObjCRuntime;
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -117,7 +117,6 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService (typeof(UIViewController), _viewController);
             Window = new iOSGameWindow (_viewController);
 
-            _mainWindow.RootViewController = _viewController;
             _mainWindow.Add (_viewController.View);
 
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
@@ -201,6 +200,11 @@ namespace Microsoft.Xna.Framework
         {
             // Show the window
             _mainWindow.MakeKeyAndVisible();
+
+            // In iOS 8+ we need to set the root view controller *after* Window MakeKey
+            // This ensures that the viewController's supported interface orientations
+            // will be respected at launch
+            _mainWindow.RootViewController = _viewController;
 
             BeginObservingUIApplication();
 
