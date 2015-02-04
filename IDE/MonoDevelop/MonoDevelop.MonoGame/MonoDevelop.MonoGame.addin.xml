@@ -73,7 +73,7 @@
 		<Import file="packages/MonoGame.Framework.WindowsDX.3.2.99.nupkg" />
 		<Import file="packages/MonoGame.Framework.WindowsGL.3.2.99.nupkg" />
 		<Import file="packages/Ouya.Console.Api.1.0.13.1.nupkg" />
-		<Import file="packages/MonoGame.Framework.Pipeline.Portable.3.2.99.nupkg" />
+		<Import file="packages/MonoGame.Framework.Content.Pipeline.Portable.3.2.99.nupkg" />
 		<!-- Exclude non .net files from a scan -->
 		<ScanExclude path="nvtt.dll"/>
 		<!--  Exclude -->
