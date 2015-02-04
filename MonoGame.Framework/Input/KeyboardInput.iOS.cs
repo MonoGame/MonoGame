@@ -51,7 +51,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void PlatformSetResult(string result)
         {
-            gameViewController.DismissViewController(true, null);
+            UIApplication.SharedApplication.InvokeOnMainThread(delegate
+            {
+                gameViewController.DismissViewController(true, null);
+            });
 
             if (!tcs.Task.IsCompleted)
                 tcs.SetResult(result);

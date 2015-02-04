@@ -31,7 +31,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void PlatformSetResult(int result)
         {
-            alert.DismissWithClickedButtonIndex(result, true);
+            UIApplication.SharedApplication.InvokeOnMainThread(delegate
+            {
+                alert.DismissWithClickedButtonIndex(result, true);
+            });
         }
     }
 }
