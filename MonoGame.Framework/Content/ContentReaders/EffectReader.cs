@@ -1,9 +1,14 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Linq;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -31,11 +36,14 @@ namespace Microsoft.Xna.Framework.Content
 
         protected internal override Effect Read(ContentReader input, Effect existingInstance)
         {
-            int count = input.ReadInt32();
-            
-            var effect = new Effect(input.GraphicsDevice,input.ReadBytes(count));
+            int dataSize = input.ReadInt32();
+            byte[] data = MemoryPool.Current.GetPooledBuffer(dataSize);
+            input.Read(data, 0, dataSize);
+            var effect = new Effect(input.GraphicsDevice, data, 0, dataSize); 
+            MemoryPool.Current.PoolBuffer(data);
+
             effect.Name = input.AssetName;
-            
+       
             return effect;
         }
     }
