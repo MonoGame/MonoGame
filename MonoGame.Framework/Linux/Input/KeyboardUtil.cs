@@ -255,7 +255,7 @@ namespace Microsoft.Xna.Framework.Input
 					return Keys.Enter;
 	                    
 				case OpenTK.Input.Key.KeypadMinus:
-					return Keys.OemMinus;
+                    return Keys.Subtract;
 	                    
 				case OpenTK.Input.Key.KeypadMultiply:
 					return Keys.Multiply;
