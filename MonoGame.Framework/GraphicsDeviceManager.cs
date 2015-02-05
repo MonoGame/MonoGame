@@ -35,6 +35,11 @@ namespace Microsoft.Xna.Framework
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
         bool disposed;
+        private bool _hardwareModeSwitch = true;
+
+#if WINDOWS && DIRECTX
+        private bool _firstLaunch = true;
+#endif
 
 #if !WINRT
         private bool _wantFullScreen = false;
@@ -226,7 +231,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -286,6 +291,22 @@ namespace Microsoft.Xna.Framework
             //
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+
+#if WINDOWS && DIRECTX
+
+            if (!_firstLaunch)
+            {
+                if (IsFullScreen)
+                {
+                    _game.Platform.EnterFullScreen();
+                }
+                else
+                {
+                   _game.Platform.ExitFullScreen();
+                }
+            }
+            _firstLaunch = false;
+#endif
         }
 
         private void Initialize()
@@ -368,6 +389,10 @@ namespace Microsoft.Xna.Framework
         public void ToggleFullScreen()
         {
             IsFullScreen = !IsFullScreen;
+
+#if WINDOWS && DIRECTX
+            ApplyChanges();
+#endif
         }
 
 #if WINDOWS_STOREAPP
@@ -394,14 +419,15 @@ namespace Microsoft.Xna.Framework
 #else
                 if (_graphicsDevice != null)
                     return _graphicsDevice.PresentationParameters.IsFullScreen;
-                else
-                    return _wantFullScreen;
+                return _wantFullScreen;
 #endif
             }
             set
             {
 #if WINRT
                 // Just ignore this as it is not relevant on Windows 8
+#elif WINDOWS && DIRECTX
+                _wantFullScreen = value;
 #else
                 _wantFullScreen = value;
                 if (_graphicsDevice != null)
@@ -427,6 +453,21 @@ namespace Microsoft.Xna.Framework
                 Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
         }
 #endif
+
+        /// <summary>
+        /// Gets or sets the boolean which defines how window switches from windowed to fullscreen state.
+        /// "Hard" mode(true) is slow to switch, but more effecient for performance, while "soft" mode(false) is vice versa.
+        /// The default value is <c>true</c>. Can only be changed before graphics device is created (in game's constructor).
+        /// </summary>
+        public bool HardwareModeSwitch
+        {
+            get { return _hardwareModeSwitch;}
+            set
+            {
+                if (_graphicsDevice == null) _hardwareModeSwitch = value;
+                else throw new InvalidOperationException("This property can only be changed before graphics device is created(in game constructor).");
+            }
+        }
 
         public bool PreferMultiSampling
         {
