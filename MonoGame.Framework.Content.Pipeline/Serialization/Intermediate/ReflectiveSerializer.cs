@@ -60,10 +60,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     if (prop.GetGetMethod() == null)
                         return false;
 
-                    // If there is no public setter and the property is a system
-                    // type then we have no way for it to be deserialized.
-                    if (prop.GetSetMethod() == null &&
-                        prop.PropertyType.Namespace == "System")
+                    // If there is no public setter, and we don't have a type serializer 
+                    // that can deserialize into an existing object, then we have no way 
+                    // for it to be deserialized.
+                    if (prop.GetSetMethod() == null && !serializer.GetTypeSerializer(prop.PropertyType).CanDeserializeIntoExistingObject)
                         return false;
 
                     // Don't serialize or deserialize indexers.

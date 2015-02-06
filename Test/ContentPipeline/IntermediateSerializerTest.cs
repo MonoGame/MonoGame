@@ -145,11 +145,15 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void RenamingXmlElements()
         {
-            SerializeAndAssert("05_RenamingXmlElements.xml", new RenamingXmlElements
+            var value = new RenamingXmlElements
             {
                 hello = "world",
-                elf = 23
-            });
+                elf = 23,
+                speed = 80.2f,
+                isOrganic = true
+            };
+            value.SetDimensions(new Vector2(32, 32));
+            SerializeAndAssert("05_RenamingXmlElements.xml", value);
         }
 
         [Test]

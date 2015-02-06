@@ -97,6 +97,25 @@ public class RenamingXmlElements
 
     [ContentSerializer(ElementName = "ElvesAreCool")]
     public int elf;
+
+    [ContentSerializer(ElementName = "Speed")]
+    public float speed;
+
+    [ContentSerializer(ElementName = "Organic")]
+    public bool isOrganic;
+
+    [ContentSerializer(ElementName = "Dimensions")]
+    private Vector2 dimensions;
+
+    public Vector2 Dimensions
+    {
+        get { return dimensions; }
+    }
+
+    internal void SetDimensions(Vector2 value)
+    {
+        dimensions = value;
+    }
 }
 #endregion
 

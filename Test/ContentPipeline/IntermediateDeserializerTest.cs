@@ -161,6 +161,9 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.AreEqual("world", renaming.hello);
                 Assert.AreEqual(23, renaming.elf);
+                Assert.AreEqual(80.2f, renaming.speed);
+                Assert.AreEqual(true, renaming.isOrganic);
+                Assert.AreEqual(new Vector2(32, 32), renaming.Dimensions);
             });
         }
 
