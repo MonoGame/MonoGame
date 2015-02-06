@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 
 #region The Basics
 public class TheBasics
@@ -306,6 +307,67 @@ class ExtendedFontDescription : FontDescription
 class SystemTypes
 {
     public TimeSpan TimeSpan;
+}
+#endregion
+
+#region GetterOnlyProperties
+class GetterOnlyProperties
+{
+    private readonly List<int> _intList;
+    private readonly Dictionary<int, string> _intStringDictionary;
+    private readonly AnotherClass _customClass;
+    private readonly AnotherStruct _customStruct;
+
+    public int IntValue
+    {
+        get { return 0; }
+    }
+
+    public Vector2 Dimensions
+    {
+        get { return new Vector2(16, 16); }
+    }
+
+    public List<int> IntList
+    {
+        get { return _intList; }
+    }
+
+    public Dictionary<int, string> IntStringDictionaryWithPrivateSetter { get; private set; }
+
+    public Dictionary<int, string> IntStringDictionary
+    {
+        get { return _intStringDictionary; }
+    }
+
+    public class AnotherClass
+    {
+        public int A;
+    }
+
+    public AnotherClass CustomClass
+    {
+        get { return _customClass; }
+    }
+
+    public struct AnotherStruct
+    {
+        public int A;
+    }
+
+    public AnotherStruct CustomStruct
+    {
+        get { return _customStruct; }
+    }
+
+    public GetterOnlyProperties()
+    {
+        _intList = new List<int>();
+        IntStringDictionaryWithPrivateSetter = new Dictionary<int, string>();
+        _intStringDictionary = new Dictionary<int, string>();
+        _customClass = new AnotherClass();
+        _customStruct = new AnotherStruct();
+    }
 }
 #endregion
 

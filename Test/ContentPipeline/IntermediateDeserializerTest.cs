@@ -469,5 +469,22 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Vector2(0, 7), customFormatting.Vector2ListSpaced[2]);
             });
         }
+
+        [Test]
+        public void GetterOnlyProperties()
+        {
+            DeserializeCompileAndLoad<GetterOnlyProperties>("22_GetterOnlyProperties.xml", getterOnlyProps =>
+            {
+                Assert.AreEqual(3, getterOnlyProps.IntList.Count);
+                Assert.AreEqual(1, getterOnlyProps.IntList[0]);
+                Assert.AreEqual(2, getterOnlyProps.IntList[1]);
+                Assert.AreEqual(3, getterOnlyProps.IntList[2]);
+                Assert.AreEqual(0, getterOnlyProps.IntStringDictionaryWithPrivateSetter.Count);
+                Assert.AreEqual(2, getterOnlyProps.IntStringDictionary.Count);
+                Assert.AreEqual("Foo", getterOnlyProps.IntStringDictionary[1]);
+                Assert.AreEqual("Bar", getterOnlyProps.IntStringDictionary[5]);
+                Assert.AreEqual(42, getterOnlyProps.CustomClass.A);
+            });
+        }
     }
 }

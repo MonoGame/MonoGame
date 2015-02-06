@@ -400,5 +400,24 @@ namespace MonoGame.Tests.ContentPipeline
                 TimeSpan = TimeSpan.FromSeconds(42.5f)
             });
         }
+
+        // Test 21 (CustomFormatting) specifically tests IntermediateDeserializer,
+        // and isn't relevant for IntermediateSerializer.
+
+        [Test]
+        public void GetterOnlyProperties()
+        {
+            var value = new GetterOnlyProperties();
+            value.IntList.Add(1);
+            value.IntList.Add(2);
+            value.IntList.Add(3);
+            value.IntStringDictionary.Add(1, "Foo");
+            value.IntStringDictionary.Add(5, "Bar");
+            value.IntStringDictionaryWithPrivateSetter.Add(2, "Baz");
+            value.IntStringDictionaryWithPrivateSetter.Add(6, "Shawn");
+            value.CustomClass.A = 42;
+
+            SerializeAndAssert("22_GetterOnlyProperties.xml", value);
+        }
     }
 }

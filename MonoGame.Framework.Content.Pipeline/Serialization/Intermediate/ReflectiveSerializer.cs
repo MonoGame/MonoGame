@@ -60,10 +60,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     if (prop.GetGetMethod() == null)
                         return false;
 
-                    // If there is no public setter, and we don't have a type serializer 
+                    // If there is a setter, but it's private, then don't include this element
+                    // (although technically we could, as long as we have a serializer with
+                    // CanDeserializeIntoExistingObject=true for this property type)
+                    var setter = prop.GetSetMethod(true);
+                    if (setter != null && !setter.IsPublic)
+                        return false;
+
+                    // If there is no setter, and we don't have a type serializer 
                     // that can deserialize into an existing object, then we have no way 
                     // for it to be deserialized.
-                    if (prop.GetSetMethod() == null && !serializer.GetTypeSerializer(prop.PropertyType).CanDeserializeIntoExistingObject)
+                    if (setter == null && !serializer.GetTypeSerializer(prop.PropertyType).CanDeserializeIntoExistingObject)
                         return false;
 
                     // Don't serialize or deserialize indexers.
@@ -125,6 +132,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 if (GetElementInfo(serializer, field, out info))
                     _elements.Add(info);                
             }
+        }
+
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return TargetType.IsClass; }
         }
 
         protected internal override object Deserialize(IntermediateReader input, ContentSerializerAttribute format, object existingInstance)
