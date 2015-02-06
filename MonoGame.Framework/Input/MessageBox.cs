@@ -9,6 +9,19 @@ namespace Microsoft.Xna.Framework.Input
     {
         public static bool IsVisible { get; private set; }
 
+        /// <summary>
+        /// Displays the message box interface asynchronously.
+        /// </summary>
+        /// <param name="title">Title of the message box.</param>
+        /// <param name="description">Description of the message box.</param>
+        /// <param name="buttons">Captions of the message box buttons. Up to three supported.</param>
+        /// <returns>Index of button selected by the player. Null if back was used.</returns>
+        /// <exception cref="System.Exception">Thrown when the message box is already visible</exception>
+        /// <example>
+        /// <code>
+        /// var color = await MessageBox.Show("Color", "What's your favorite color?", new[] { "Red", "Green", "Blue" });
+        /// </code>
+        /// </example>
         public static async Task<int?> Show(string title, string description, IEnumerable<string> buttons)
         {
             if (IsVisible)
@@ -27,6 +40,18 @@ namespace Microsoft.Xna.Framework.Input
             return result;
         }
 
+        /// <summary>
+        /// Returns the parameter as the result of <see cref="Show"/>
+        /// </summary>
+        /// <param name="result">Result to return</param>
+        /// <exception cref="System.Exception">Thrown when the message box is not visible</exception>
+        /// <example>
+        /// <code>
+        /// var colorTask = MessageBox.Show("Color", "What's your favorite color?", new[] { "Red", "Green", "Blue" });
+        /// MessageBox.SetResult(0);
+        /// var color = await colorTask;
+        /// </code>
+        /// </example>
         public static void SetResult(int result)
         {
             if (!IsVisible)
