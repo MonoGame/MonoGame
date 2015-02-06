@@ -175,9 +175,13 @@ namespace Microsoft.Xna.Framework.Graphics
             WriteableBitmap bitmap = null;
             Threading.BlockOnUIThread(() =>
             {
+                try
+                {
                     BitmapImage bitmapImage = new BitmapImage();
                     bitmapImage.SetSource(stream);
                     bitmap = new WriteableBitmap(bitmapImage);
+                }
+                catch { }
             });
 
             // Convert from ARGB to ABGR 
