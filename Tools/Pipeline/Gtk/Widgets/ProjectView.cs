@@ -134,7 +134,7 @@ namespace MonoGame.Tools.Pipeline
             listStore.Clear ();
         }
 
-        public void AddItem(TreeIter iter, string path, bool exists)
+        public void AddItem(TreeIter iter, string path, bool exists, bool expand)
         {
             Gdk.Pixbuf icon = ICON_OTHER[Convert.ToInt32(!exists)];
 
@@ -146,13 +146,14 @@ namespace MonoGame.Tools.Pipeline
             if (!GetIter (iter, split [0], out itr))
                 itr = listStore.AppendValues (iter, icon, split [0]);
 
-            treeview1.ExpandRow(treeview1.Model.GetPath(iter), false);
+            if(expand)
+                treeview1.ExpandRow(treeview1.Model.GetPath(iter), false);
             if (split.Length > 1) {
                 string newpath = split [1];
                 for(int i = 2;i < split.Length;i++)
                     newpath += "/" + split[i];
 
-                AddItem (itr, newpath, exists);
+                AddItem (itr, newpath, exists, expand);
             }
         }
 
