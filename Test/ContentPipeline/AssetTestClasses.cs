@@ -232,6 +232,8 @@ public class PolymorphicTypes
     public object Elf;
     public PolymorphicA[] TypedArray;
     public Array UntypedArray;
+    public ICollection<int> IntCollection;
+    public object UntypedDictionary;
 }
 #endregion
 

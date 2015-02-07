@@ -266,6 +266,14 @@ namespace MonoGame.Tests.ContentPipeline
                     new PolymorphicA { Value = true },
                     new PolymorphicB { Value = true },
                     new PolymorphicC { Value = true }
+                },
+
+                IntCollection = new List<int> { 1, 4, 6 },
+
+                UntypedDictionary = new Dictionary<int, PolymorphicA>
+                {
+                    { 1, new PolymorphicA { Value = true } },
+                    { 5, new PolymorphicA { Value = false } }
                 }
             });
         }

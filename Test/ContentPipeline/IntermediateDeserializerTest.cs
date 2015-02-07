@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Xml;
 using Microsoft.Xna.Framework;
@@ -308,6 +309,19 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(true, ((PolymorphicB)polymorphicTypes.UntypedArray.GetValue(1)).Value);
                 Assert.IsAssignableFrom<PolymorphicC>(polymorphicTypes.UntypedArray.GetValue(2));
                 Assert.AreEqual(true, ((PolymorphicC)polymorphicTypes.UntypedArray.GetValue(2)).Value);
+
+                Assert.NotNull(polymorphicTypes.IntCollection);
+                Assert.IsInstanceOf<List<int>>(polymorphicTypes.IntCollection);
+                Assert.AreEqual(3, polymorphicTypes.IntCollection.Count);
+                Assert.AreEqual(1, polymorphicTypes.IntCollection.ElementAt(0));
+                Assert.AreEqual(4, polymorphicTypes.IntCollection.ElementAt(1));
+                Assert.AreEqual(6, polymorphicTypes.IntCollection.ElementAt(2));
+
+                Assert.NotNull(polymorphicTypes.UntypedDictionary);
+                Assert.IsInstanceOf<Dictionary<int, PolymorphicA>>(polymorphicTypes.UntypedDictionary);
+                Assert.AreEqual(2, ((Dictionary<int, PolymorphicA>) polymorphicTypes.UntypedDictionary).Count);
+                Assert.AreEqual(true, ((Dictionary<int, PolymorphicA>) polymorphicTypes.UntypedDictionary)[1].Value);
+                Assert.AreEqual(false, ((Dictionary<int, PolymorphicA>) polymorphicTypes.UntypedDictionary)[5].Value);
             });
         }
 

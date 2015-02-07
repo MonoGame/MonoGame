@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 AliasedNamespace namespaceAlias;
                 if (_namespaceLookupReverse.TryGetValue(type.Namespace, out namespaceAlias))
                 {
-                    typeName = namespaceAlias.Alias + ":" + namespaceAlias.TypePrefix + type.Name;
+                    typeName = namespaceAlias.Alias + ":" + namespaceAlias.TypePrefix + _serializer.GetTypeName(type);
                     return true;
                 }
             }
