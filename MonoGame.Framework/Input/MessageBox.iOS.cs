@@ -6,11 +6,12 @@ namespace Microsoft.Xna.Framework.Input
 {
     public partial class MessageBox
     {
+        private static TaskCompletionSource<int?> tcs;
         private static UIAlertView alert;
 
         private static Task<int?> PlatformShow(string title, string description, List<string> buttons)
         {
-            var tcs = new TaskCompletionSource<int?>();
+            tcs = new TaskCompletionSource<int?>();
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
                 alert = new UIAlertView();
@@ -31,9 +32,10 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void PlatformCancel(int? result)
         {
+            tcs.SetResult(result);
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert.DismissWithClickedButtonIndex(result, true);
+                alert.DismissWithClickedButtonIndex(0, true);
             });
         }
     }
