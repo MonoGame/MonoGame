@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Input
             return tcs.Task;
         }
 
-        private static void PlatformSetResult(int result)
+        private static void PlatformCancel(int? result)
         {
             // TODO: MessageDialog doesn't hide on Windows Phone 8.1
             tcs.SetResult(result);

@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Input
             return tcs.Task;
         }
 
-        private static void PlatformSetResult(string result)
+        private static void PlatformCancel(string result)
         {
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {

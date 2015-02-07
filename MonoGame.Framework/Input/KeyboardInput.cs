@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Returns the parameter as the result of <see cref="Show"/>
+        /// Hides the keyboard input interface and returns the parameter as the result of <see cref="Show"/>
         /// </summary>
         /// <param name="result">Result to return</param>
         /// <exception cref="System.Exception">Thrown when the keyboard input is not visible</exception>
@@ -47,12 +47,12 @@ namespace Microsoft.Xna.Framework.Input
         /// var name = await nameTask;
         /// </code>
         /// </example>
-        public static void SetResult(string result)
+        public static void Cancel(string result)
         {
             if (!IsVisible)
                 throw new Exception("The function cannot be completed at this time: the MessageBox UI is not active.");
 
-            PlatformSetResult(result);
+            PlatformCancel(result);
         }
     }
 }

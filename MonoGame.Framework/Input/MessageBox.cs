@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Returns the parameter as the result of <see cref="Show"/>
+        /// Hides the message box interface and returns the parameter as the result of <see cref="Show"/>
         /// </summary>
         /// <param name="result">Result to return</param>
         /// <exception cref="System.Exception">Thrown when the message box is not visible</exception>
@@ -52,12 +52,12 @@ namespace Microsoft.Xna.Framework.Input
         /// var color = await colorTask;
         /// </code>
         /// </example>
-        public static void SetResult(int result)
+        public static void Cancel(int? result)
         {
             if (!IsVisible)
                 throw new Exception("The function cannot be completed at this time: the MessageBox UI is not active.");
 
-            PlatformSetResult(result);
+            PlatformCancel(result);
         }
     }
 }

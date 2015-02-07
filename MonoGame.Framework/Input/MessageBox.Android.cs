@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Input
             return tcs.Task;
         }
 
-        private static void PlatformSetResult(int result)
+        private static void PlatformCancel(int? result)
         {
             alert.Dismiss();
             tcs.SetResult(result);
