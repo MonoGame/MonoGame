@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <example>
         /// <code>
         /// var colorTask = MessageBox.Show("Color", "What's your favorite color?", new[] { "Red", "Green", "Blue" });
-        /// MessageBox.SetResult(0);
+        /// MessageBox.Cancel(0);
         /// var color = await colorTask;
         /// </code>
         /// </example>

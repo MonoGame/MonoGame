@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <example>
         /// <code>
         /// var nameTask = KeyboardInput.Show("Name", "What's your name?", "Player");
-        /// KeyboardInput.SetResult("John Doe");
+        /// KeyboardInput.Cancel("John Doe");
         /// var name = await nameTask;
         /// </code>
         /// </example>
