@@ -7,10 +7,6 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// Defines types of surface formats.
     /// </summary>
-    /// <remarks>
-    /// Good explanation of compressed formats for mobile devices (aimed at Android, but describes PVRTC)
-    /// http://developer.motorola.com/docstools/library/understanding-texture-compression/
-    /// </remarks>
     public enum SurfaceFormat
     {
         /// <summary>
