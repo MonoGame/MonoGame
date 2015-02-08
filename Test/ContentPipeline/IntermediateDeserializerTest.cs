@@ -500,5 +500,19 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(42, getterOnlyProps.CustomClass.A);
             });
         }
+
+        [Test]
+        public void GetterOnlyPolymorphicArrayProperties()
+        {
+            var filePath = Paths.Xml("23_GetterOnlyPolymorphicArrayProperties.xml");
+            using (var reader = XmlReader.Create(filePath))
+            {
+                // This should throw an InvalidContentException as the
+                // xml tries to deserialize into an IList property
+                // but the property value is actually an Array.
+                Assert.Throws<InvalidOperationException>(() =>
+                    IntermediateSerializer.Deserialize<GetterOnlyPolymorphicArrayProperties>(reader, filePath));
+            }
+        }
     }
 }

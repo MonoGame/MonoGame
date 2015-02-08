@@ -34,6 +34,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override T[] Deserialize(IntermediateReader input, ContentSerializerAttribute format, T[] existingInstance)
         {
+            if (existingInstance != null)
+                throw new InvalidOperationException("You cannot deserialize an array into a getter-only property.");
             var result = _listSerializer.Deserialize(input, format, null);
             return result.ToArray();
         }

@@ -427,5 +427,12 @@ namespace MonoGame.Tests.ContentPipeline
 
             SerializeAndAssert("22_GetterOnlyProperties.xml", value);
         }
+
+        [Test]
+        public void GetterOnlyPolymorphicArrayProperties()
+        {
+            var value = new GetterOnlyPolymorphicArrayProperties();
+            SerializeAndAssert("23_GetterOnlyPolymorphicArrayProperties.xml", value);
+        }
     }
 }

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -352,7 +353,17 @@ class GetterOnlyProperties
         get { return _customClass; }
     }
 
+    public object UntypedCustomClass
+    {
+        get { return _customClass; }
+    }
+
     public AnotherClass[] CustomClassArray
+    {
+        get { return _customClassArray; }
+    }
+
+    public object UntypedCustomClassArray
     {
         get { return _customClassArray; }
     }
@@ -375,6 +386,28 @@ class GetterOnlyProperties
         _customClass = new AnotherClass();
         _customClassArray = new [] { new AnotherClass { A = 42 } };
         _customStruct = new AnotherStruct();
+    }
+}
+#endregion
+
+#region GetterOnlyPolymorphicArrayProperties
+class GetterOnlyPolymorphicArrayProperties
+{
+    private readonly AnotherClass[] _customClassArray;
+
+    public class AnotherClass
+    {
+        public int A;
+    }
+
+    public IList CustomClassArrayAsIList
+    {
+        get { return _customClassArray; }
+    }
+
+    public GetterOnlyPolymorphicArrayProperties()
+    {
+        _customClassArray = new[] { new AnotherClass { A = 42 } };
     }
 }
 #endregion

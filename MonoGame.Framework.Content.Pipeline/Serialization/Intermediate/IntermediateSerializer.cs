@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -158,6 +159,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             else if (type.IsEnum)
             {
                 serializer = new EnumSerializer(type);
+            }
+            else if (typeof(IList).IsAssignableFrom(type))
+            {
+                // Special handling for non-generic IList types. By the time we get here,
+                // generic collection types will already have been handled by one of the known serializers.
+                serializer = new NonGenericIListSerializer(type);
             }
             else
             {
