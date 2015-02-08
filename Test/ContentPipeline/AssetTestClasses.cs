@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 
 #region The Basics
 public class TheBasics
@@ -318,6 +317,7 @@ class GetterOnlyProperties
     private readonly List<int> _intList;
     private readonly Dictionary<int, string> _intStringDictionary;
     private readonly AnotherClass _customClass;
+    private readonly AnotherClass[] _customClassArray;
     private readonly AnotherStruct _customStruct;
 
     public int IntValue
@@ -352,6 +352,11 @@ class GetterOnlyProperties
         get { return _customClass; }
     }
 
+    public AnotherClass[] CustomClassArray
+    {
+        get { return _customClassArray; }
+    }
+
     public struct AnotherStruct
     {
         public int A;
@@ -368,6 +373,7 @@ class GetterOnlyProperties
         IntStringDictionaryWithPrivateSetter = new Dictionary<int, string>();
         _intStringDictionary = new Dictionary<int, string>();
         _customClass = new AnotherClass();
+        _customClassArray = new [] { new AnotherClass { A = 42 } };
         _customStruct = new AnotherStruct();
     }
 }
