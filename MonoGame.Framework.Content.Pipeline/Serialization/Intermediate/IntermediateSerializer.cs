@@ -319,6 +319,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 return result;
             }
 
+            if (type.IsArray)
+                return GetTypeName(type.GetElementType()) + "[]";
+
+            if (type.IsNested)
+                return type.DeclaringType.Name + "+" + type.Name;
+
             return type.Name;
         }
 
