@@ -99,7 +99,19 @@ namespace Microsoft.Xna.Framework
             // There's no check to see if min > max.
             return value;
         }
-        
+
+        /// <summary>
+        /// Restricts a value to be within a 0.0f to 1.0f range.
+        /// </summary>
+        /// <param name="value">The value to clamp.</param>
+        /// <returns>The clamped value.</returns>
+        public static float ClampScalar(float value)
+        {
+            value = (value > 1.0f) ? 1.0f : value;
+            value = (value < 0.0f) ? 0.0f : value;
+            return value;
+        }
+
         /// <summary>
         /// Restricts a value to be within a specified range.
         /// </summary>

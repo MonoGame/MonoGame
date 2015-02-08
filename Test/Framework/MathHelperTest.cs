@@ -29,6 +29,18 @@ namespace MonoGame.Tests.Framework
             Assert.True(MathHelper.Clamp(0, -1, -1) == -1, "Failed boundary test, clamp [-1,-1] on 0 should be -1");
         }
 
+#if !XNA
+        [Test]
+        public void ClampScalarTest()
+        {
+            Assert.AreEqual(0, MathHelper.ClampScalar(-0.1f));
+            Assert.AreEqual(0, MathHelper.ClampScalar(0.0f));
+            Assert.AreEqual(0.5f, MathHelper.ClampScalar(0.5f));
+            Assert.AreEqual(1, MathHelper.ClampScalar(1.0f));
+            Assert.AreEqual(1, MathHelper.ClampScalar(1.1f));
+        }
+#endif
+
         [Test]
         public void DistanceTest()
         {
