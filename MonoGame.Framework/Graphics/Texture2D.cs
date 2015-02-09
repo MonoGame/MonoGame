@@ -53,9 +53,6 @@ namespace Microsoft.Xna.Framework.Graphics
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
-            this._comparisonCode = _nextComparisonCode;
-            _nextComparisonCode++;
-
             // Texture will be assigned by the swap chain.
 		    if (type == SurfaceType.SwapChainRenderTarget)
 		        return;
@@ -149,18 +146,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
             }
         }
-
-        /// <summary>
-        /// Returns a code unique to this <see cref="Texture2D"/> instance, used for sorting
-        /// textures with <see cref="SpriteSortMode.Texture"/>.
-        /// </summary>
-        internal int ComparisonCode
-        {
-            get { return _comparisonCode; }
-        }
-
-        private int _comparisonCode;
-        private static int _nextComparisonCode;
 	}
 }
 

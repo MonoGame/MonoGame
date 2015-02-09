@@ -4,13 +4,17 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public abstract partial class Texture : GraphicsResource
+	public abstract partial class Texture : GraphicsResource, IComparable<Texture>
 	{
 		internal SurfaceFormat _format;
 		internal int _levelCount;
+
+        private readonly int _comparisonCode = Interlocked.Increment(ref _lastComparisonCode);
+        private static int _lastComparisonCode;
 
 		public SurfaceFormat Format
 		{
@@ -66,6 +70,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformGraphicsDeviceResetting();
         }
-	}
+
+        public int CompareTo(Texture other)
+        {
+            if (other == null)
+                return 1;
+
+            return _comparisonCode.CompareTo(other._comparisonCode);
+        }
+    }
 }
 
