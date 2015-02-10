@@ -719,7 +719,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiFactory = dxgiAdapter.GetParent<SharpDX.DXGI.Factory1>())
                 {
                     _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
-
+                    dxgiFactory.MakeWindowAssociation(PresentationParameters.DeviceWindowHandle, WindowAssociationFlags.IgnoreAll);
                     // If VSync is disabled, Ensure that DXGI does not queue more than one frame at a time. This 
                     // both reduces latency and ensures that the application will only render 
                     // after each VSync, minimizing power consumption.
