@@ -18,7 +18,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private BlendState _blendState;
         private BlendState _actualBlendState;
         private DepthStencilState _depthStencilState = DepthStencilState.Default;
-		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
+
+        private RasterizerState _rasterizerState;
+        private RasterizerState _actualRasterizerState;
+
+        private RasterizerState _rasterizerStateCullClockwise;
+        private RasterizerState _rasterizerStateCullCounterClockwise;
+        private RasterizerState _rasterizerStateCullNone;
 
         private bool _blendStateDirty;
         private bool _depthStencilStateDirty;
@@ -183,6 +189,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _blendStateOpaque = BlendState.Opaque.Clone();
 
             BlendState = BlendState.Opaque;
+
+            _rasterizerStateCullClockwise = RasterizerState.CullClockwise.Clone();
+            _rasterizerStateCullCounterClockwise = RasterizerState.CullCounterClockwise.Clone();
+            _rasterizerStateCullNone = RasterizerState.CullNone.Clone();
+
+            RasterizerState = RasterizerState.CullCounterClockwise;
         }
 
         ~GraphicsDevice()
@@ -232,11 +244,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_rasterizerState == value)
                     return;
 
                 _rasterizerState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newRasterizerState = _rasterizerState;
+                if (ReferenceEquals(_rasterizerState, RasterizerState.CullClockwise))
+                    newRasterizerState = _rasterizerStateCullClockwise;
+                else if (ReferenceEquals(_rasterizerState, RasterizerState.CullCounterClockwise))
+                    newRasterizerState = _rasterizerStateCullCounterClockwise;
+                else if (ReferenceEquals(_rasterizerState, RasterizerState.CullNone))
+                    newRasterizerState = _rasterizerStateCullNone;
+
+                newRasterizerState.BindToGraphicsDevice(this);
+
+                _actualRasterizerState = newRasterizerState;
+
                 _rasterizerStateDirty = true;
             }
         }
@@ -304,6 +334,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _actualBlendState.PlatformApplyState(this);
                 _blendStateDirty = false;
+            }
+
+            if (_rasterizerStateDirty)
+            {
+                _actualRasterizerState.PlatformApplyState(this);
+                _rasterizerStateDirty = false;
             }
 
             PlatformApplyState(applyShaders);

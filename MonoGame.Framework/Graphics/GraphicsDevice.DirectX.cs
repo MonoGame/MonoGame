@@ -1054,11 +1054,6 @@ namespace Microsoft.Xna.Framework.Graphics
 	            _depthStencilState.PlatformApplyState(this);
                 _depthStencilStateDirty = false;
             }
-	        if ( _rasterizerStateDirty )
-            {
-	            _rasterizerState.PlatformApplyState(this);
-	            _rasterizerStateDirty = false;
-            }
 
             // If we're not applying shaders then early out now.
             if (!applyShaders)

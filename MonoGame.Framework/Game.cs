@@ -121,7 +121,6 @@ namespace Microsoft.Xna.Framework
                     {
                         Effect.FlushCache();
                         DepthStencilState.ResetStates();
-                        RasterizerState.ResetStates();
                         SamplerState.ResetStates();
 
                         (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
