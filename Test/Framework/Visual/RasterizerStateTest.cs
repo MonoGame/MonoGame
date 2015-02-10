@@ -63,7 +63,7 @@ namespace MonoGame.Tests.Visual
             assertMethod(() => rasterizerState.FillMode = FillMode.WireFrame);
             assertMethod(() => rasterizerState.MultiSampleAntiAlias = true);
             assertMethod(() => rasterizerState.ScissorTestEnable = true);
-            assertMethod(() => rasterizerState.SlopeScaleDepthBias = 0.1f);
+            assertMethod(() => rasterizerState.SlopeScaleDepthBias = 0.2f);
         }
 
         [TestCase(CullMode.CullClockwiseFace)]
@@ -115,7 +115,7 @@ namespace MonoGame.Tests.Visual
                 };
 
                 var viewport = Game.GraphicsDevice.Viewport;
-                Game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, 
+                Game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0,
                     viewport.Width / 2, viewport.Height / 2);
             };
 

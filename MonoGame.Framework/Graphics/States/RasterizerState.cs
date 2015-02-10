@@ -22,8 +22,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _cullMode; }
             set
             {
-                _cullMode = value;
                 ThrowIfBound();
+                _cullMode = value;
             }
 	    }
 
@@ -32,8 +32,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _depthBias; }
 	        set
 	        {
-	            _depthBias = value;
                 ThrowIfBound();
+                _depthBias = value;
 	        }
 	    }
 
@@ -42,8 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _fillMode; }
 	        set
 	        {
-	            _fillMode = value;
                 ThrowIfBound();
+                _fillMode = value;
 	        }
 	    }
 
@@ -52,8 +52,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _multiSampleAntiAlias; }
 	        set
 	        {
-	            _multiSampleAntiAlias = value;
                 ThrowIfBound();
+                _multiSampleAntiAlias = value;
 	        }
 	    }
 
@@ -62,8 +62,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _scissorTestEnable; }
 	        set
 	        {
-	            _scissorTestEnable = value;
                 ThrowIfBound();
+                _scissorTestEnable = value;
 	        }
 	    }
 
@@ -72,8 +72,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	        get { return _slopeScaleDepthBias; }
 	        set
 	        {
-	            _slopeScaleDepthBias = value;
                 ThrowIfBound();
+                _slopeScaleDepthBias = value;
 	        }
 	    }
 
