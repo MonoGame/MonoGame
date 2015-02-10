@@ -227,9 +227,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
                     "Try updating your graphics drivers.");
             }
+
+            // Force reseting states
+            this.BlendState.PlatformApplyState(this, true);
+            this.DepthStencilState.PlatformApplyState(this, true);
+            this.RasterizerState.PlatformApplyState(this, true);            
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
+
+        private Vector4 _currentClearColor = Vector4.Zero;
+        private float _currentClearDepth = 1.0f;
+        private int _currentClearStencil = 0;
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
@@ -261,25 +270,37 @@ namespace Microsoft.Xna.Framework.Graphics
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
             {
-                GL.ClearColor(color.X, color.Y, color.Z, color.W);
-                GraphicsExtensions.CheckGLError();
+                if (color != _currentClearColor)
+                {
+                    GL.ClearColor(color.X, color.Y, color.Z, color.W);
+                    GraphicsExtensions.CheckGLError();
+                    _currentClearColor = color;
+                }
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
 			if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
-				GL.ClearStencil(stencil);
-                GraphicsExtensions.CheckGLError();
+                if (stencil != _currentClearStencil)
+                {
+				    GL.ClearStencil(stencil);
+                    GraphicsExtensions.CheckGLError();
+                    _currentClearStencil = stencil;
+                }
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
 			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
-#if GLES
-                GL.ClearDepth (depth);
-#else
-                GL.ClearDepth((double)depth);
-#endif
-                GraphicsExtensions.CheckGLError();
+                if (depth != _currentClearDepth)
+                {
+ #if GLES
+                    GL.ClearDepth (depth);
+ #else
+                    GL.ClearDepth((double)depth);
+ #endif
+                    GraphicsExtensions.CheckGLError();
+                    _currentClearDepth = depth;
+                }
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
