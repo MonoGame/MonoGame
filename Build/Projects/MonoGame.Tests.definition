@@ -122,6 +122,7 @@
     <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
     <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
     
+    <Compile Include="Framework\Visual\BlendStateTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Visual\Texture2DTest.cs" />
     <Compile Include="Framework\Visual\Texture3DTest.cs" />
@@ -224,6 +225,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
+    <Content Include="Assets\ReferenceImages\BlendState\VisualTests.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

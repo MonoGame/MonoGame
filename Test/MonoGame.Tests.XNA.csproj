@@ -110,6 +110,7 @@
     <Compile Include="Framework\Vector2Test.cs" />
     <Compile Include="Framework\Vector3Test.cs" />
     <Compile Include="Framework\Vector4Test.cs" />
+    <Compile Include="Framework\Visual\BlendStateTest.cs" />
     <Compile Include="Framework\Visual\IndexBufferTest.cs" />
     <Compile Include="Framework\Visual\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
@@ -196,6 +197,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Effects\Include.fxh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\BlendState\VisualTests.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-1.png">

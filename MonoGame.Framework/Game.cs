@@ -120,7 +120,6 @@ namespace Microsoft.Xna.Framework
                     if (_graphicsDeviceManager != null)
                     {
                         Effect.FlushCache();
-                        BlendState.ResetStates();
                         DepthStencilState.ResetStates();
                         RasterizerState.ResetStates();
                         SamplerState.ResetStates();

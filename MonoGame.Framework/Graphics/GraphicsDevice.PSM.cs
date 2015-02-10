@@ -95,19 +95,17 @@ namespace Microsoft.Xna.Framework.Graphics
             return renderTarget;
         }
 
-        internal void PlatformApplyState(bool applyShaders)
+        internal void PlatformBeginApplyState()
         {
             // TODO: This was on both the OpenGL and PSM path previously - is it necessary?
             Threading.EnsureUIThread();
+        }
 
+        internal void PlatformApplyState(bool applyShaders)
+        {
             if ( _scissorRectangleDirty )
 	            _scissorRectangleDirty = false;
 
-            if (_blendStateDirty)
-            {
-                _blendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
 	        if ( _depthStencilStateDirty )
             {
                 _depthStencilState.PlatformApplyState(this);
@@ -138,7 +136,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
             BindVertexBuffer(true);
-            PlatformApplyState(true);
+            ApplyState(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
         }
 
