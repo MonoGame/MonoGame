@@ -60,6 +60,15 @@ namespace Microsoft.Xna.Framework.Graphics
         internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 
+        // Keeps track of last applied state to avoid redundant OpenGL calls
+        internal bool _lastBlendEnable = false;
+        internal BlendState _lastBlendState = new BlendState();
+        internal DepthStencilState _lastDepthStencilState = new DepthStencilState();
+        internal RasterizerState _lastRasterizerState = new RasterizerState();
+        private Vector4 _lastClearColor = Vector4.Zero;
+        private float _lastClearDepth = 1.0f;
+        private int _lastClearStencil = 0;
+
         internal void SetVertexAttributeArray(bool[] attrs)
         {
             for(int x = 0; x < attrs.Length; x++)
@@ -236,10 +245,6 @@ namespace Microsoft.Xna.Framework.Graphics
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
 
-        private Vector4 _currentClearColor = Vector4.Zero;
-        private float _currentClearDepth = 1.0f;
-        private int _currentClearStencil = 0;
-
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
             // TODO: We need to figure out how to detect if we have a
@@ -270,28 +275,28 @@ namespace Microsoft.Xna.Framework.Graphics
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
             {
-                if (color != _currentClearColor)
+                if (color != _lastClearColor)
                 {
                     GL.ClearColor(color.X, color.Y, color.Z, color.W);
                     GraphicsExtensions.CheckGLError();
-                    _currentClearColor = color;
+                    _lastClearColor = color;
                 }
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
 			if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
-                if (stencil != _currentClearStencil)
+                if (stencil != _lastClearStencil)
                 {
 				    GL.ClearStencil(stencil);
                     GraphicsExtensions.CheckGLError();
-                    _currentClearStencil = stencil;
+                    _lastClearStencil = stencil;
                 }
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
 			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
-                if (depth != _currentClearDepth)
+                if (depth != _lastClearDepth)
                 {
  #if GLES
                     GL.ClearDepth (depth);
@@ -299,7 +304,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.ClearDepth((double)depth);
  #endif
                     GraphicsExtensions.CheckGLError();
-                    _currentClearDepth = depth;
+                    _lastClearDepth = depth;
                 }
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}

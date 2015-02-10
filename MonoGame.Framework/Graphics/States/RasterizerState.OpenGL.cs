@@ -16,8 +16,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RasterizerState
     {
-        private static RasterizerState _currentRasterizerState = new RasterizerState();
-
         internal void PlatformApplyState(GraphicsDevice device, bool force = false)
         {
             // When rendering offscreen the faces change order.
@@ -69,19 +67,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException();
 #endif
 
-            if (force || this.ScissorTestEnable != _currentRasterizerState.ScissorTestEnable)
+            if (force || this.ScissorTestEnable != device._lastRasterizerState.ScissorTestEnable)
 			{
 			    if (ScissorTestEnable)
 				    GL.Enable(EnableCap.ScissorTest);
 			    else
 				    GL.Disable(EnableCap.ScissorTest);
                 GraphicsExtensions.CheckGLError();
-                _currentRasterizerState.ScissorTestEnable = this.ScissorTestEnable;
+                device._lastRasterizerState.ScissorTestEnable = this.ScissorTestEnable;
             }
 
             if (force || 
-                this.DepthBias != _currentRasterizerState.DepthBias ||
-                this.SlopeScaleDepthBias != _currentRasterizerState.SlopeScaleDepthBias)
+                this.DepthBias != device._lastRasterizerState.DepthBias ||
+                this.SlopeScaleDepthBias != device._lastRasterizerState.SlopeScaleDepthBias)
             {
                 if (this.DepthBias != 0 || this.SlopeScaleDepthBias != 0)
                 {   
@@ -91,8 +89,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 else
                     GL.Disable(EnableCap.PolygonOffsetFill);
                 GraphicsExtensions.CheckGLError();
-                _currentRasterizerState.DepthBias = this.DepthBias;
-                _currentRasterizerState.SlopeScaleDepthBias = this.SlopeScaleDepthBias;
+                device._lastRasterizerState.DepthBias = this.DepthBias;
+                device._lastRasterizerState.SlopeScaleDepthBias = this.SlopeScaleDepthBias;
             }
 
             // TODO: Implement MultiSampleAntiAlias
