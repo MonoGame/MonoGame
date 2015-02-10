@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public void WriteTypeName(Type type)
         {
-            Xml.WriteString(Serializer.GetTypeName(type));
+            Xml.WriteString(Serializer.GetFullTypeName(type));
         }
     }        
 }

@@ -59,5 +59,14 @@ namespace Microsoft.Xna.Framework.Content
             return type.GetFields(attrs);
 #endif
         }
+
+        public static bool IsClass(this Type type)
+        {
+#if WINRT
+            return type.GetTypeInfo().IsClass;
+#else
+            return type.IsClass;
+#endif
+        }
     }
 }

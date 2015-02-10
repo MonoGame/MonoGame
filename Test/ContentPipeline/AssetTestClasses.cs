@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -97,6 +98,25 @@ public class RenamingXmlElements
 
     [ContentSerializer(ElementName = "ElvesAreCool")]
     public int elf;
+
+    [ContentSerializer(ElementName = "Speed")]
+    public float speed;
+
+    [ContentSerializer(ElementName = "Organic")]
+    public bool isOrganic;
+
+    [ContentSerializer(ElementName = "Dimensions")]
+    private Vector2 dimensions;
+
+    public Vector2 Dimensions
+    {
+        get { return dimensions; }
+    }
+
+    internal void SetDimensions(Vector2 value)
+    {
+        dimensions = value;
+    }
 }
 #endregion
 
@@ -212,6 +232,8 @@ public class PolymorphicTypes
     public object Elf;
     public PolymorphicA[] TypedArray;
     public Array UntypedArray;
+    public ICollection<int> IntCollection;
+    public object UntypedDictionary;
 }
 #endregion
 
@@ -287,6 +309,106 @@ class ExtendedFontDescription : FontDescription
 class SystemTypes
 {
     public TimeSpan TimeSpan;
+}
+#endregion
+
+#region GetterOnlyProperties
+class GetterOnlyProperties
+{
+    private readonly List<int> _intList;
+    private readonly Dictionary<int, string> _intStringDictionary;
+    private readonly AnotherClass _customClass;
+    private readonly AnotherClass[] _customClassArray;
+    private readonly AnotherStruct _customStruct;
+
+    public int IntValue
+    {
+        get { return 0; }
+    }
+
+    public Vector2 Dimensions
+    {
+        get { return new Vector2(16, 16); }
+    }
+
+    public List<int> IntList
+    {
+        get { return _intList; }
+    }
+
+    public Dictionary<int, string> IntStringDictionaryWithPrivateSetter { get; private set; }
+
+    public Dictionary<int, string> IntStringDictionary
+    {
+        get { return _intStringDictionary; }
+    }
+
+    public class AnotherClass
+    {
+        public int A;
+    }
+
+    public AnotherClass CustomClass
+    {
+        get { return _customClass; }
+    }
+
+    public object UntypedCustomClass
+    {
+        get { return _customClass; }
+    }
+
+    public AnotherClass[] CustomClassArray
+    {
+        get { return _customClassArray; }
+    }
+
+    public object UntypedCustomClassArray
+    {
+        get { return _customClassArray; }
+    }
+
+    public struct AnotherStruct
+    {
+        public int A;
+    }
+
+    public AnotherStruct CustomStruct
+    {
+        get { return _customStruct; }
+    }
+
+    public GetterOnlyProperties()
+    {
+        _intList = new List<int>();
+        IntStringDictionaryWithPrivateSetter = new Dictionary<int, string>();
+        _intStringDictionary = new Dictionary<int, string>();
+        _customClass = new AnotherClass();
+        _customClassArray = new [] { new AnotherClass { A = 42 } };
+        _customStruct = new AnotherStruct();
+    }
+}
+#endregion
+
+#region GetterOnlyPolymorphicArrayProperties
+class GetterOnlyPolymorphicArrayProperties
+{
+    private readonly AnotherClass[] _customClassArray;
+
+    public class AnotherClass
+    {
+        public int A;
+    }
+
+    public IList CustomClassArrayAsIList
+    {
+        get { return _customClassArray; }
+    }
+
+    public GetterOnlyPolymorphicArrayProperties()
+    {
+        _customClassArray = new[] { new AnotherClass { A = 42 } };
+    }
 }
 #endregion
 
