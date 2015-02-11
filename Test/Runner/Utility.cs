@@ -7,11 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.ContentPipeline;
 
 namespace MonoGame.Tests {
 
@@ -225,19 +220,4 @@ namespace MonoGame.Tests {
 			Directory.SetCurrentDirectory(directory);
 		}
 	}
-
-    internal static class EffectUtility
-    {
-        public static Effect CompileEffect(GraphicsDevice graphicsDevice, params string[] pathParts)
-        {
-            var effectProcessor = new EffectProcessor();
-            var context = new TestProcessorContext(TargetPlatform.Windows, "notused.xnb");
-            var compiledEffect = effectProcessor.Process(new EffectContent
-            {
-                Identity = new ContentIdentity(Paths.Effect(pathParts))
-            }, context);
-
-            return new Effect(graphicsDevice, compiledEffect.GetEffectCode());
-        }
-    }
 }
