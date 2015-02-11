@@ -17,7 +17,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private BlendState _blendState;
         private BlendState _actualBlendState;
-        private DepthStencilState _depthStencilState = DepthStencilState.Default;
+
+        private DepthStencilState _depthStencilState;
+        private DepthStencilState _actualDepthStencilState;
+
+        private DepthStencilState _depthStencilStateDefault;
+        private DepthStencilState _depthStencilStateDepthRead;
+        private DepthStencilState _depthStencilStateNone;
 
         private RasterizerState _rasterizerState;
         private RasterizerState _actualRasterizerState;
@@ -190,6 +196,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             BlendState = BlendState.Opaque;
 
+            _depthStencilStateDefault = DepthStencilState.Default.Clone();
+            _depthStencilStateDepthRead = DepthStencilState.DepthRead.Clone();
+            _depthStencilStateNone = DepthStencilState.None.Clone();
+
+            DepthStencilState = DepthStencilState.Default;
+
             _rasterizerStateCullClockwise = RasterizerState.CullClockwise.Clone();
             _rasterizerStateCullCounterClockwise = RasterizerState.CullCounterClockwise.Clone();
             _rasterizerStateCullNone = RasterizerState.CullNone.Clone();
@@ -317,11 +329,29 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _depthStencilState; }
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_depthStencilState == value)
                     return;
 
                 _depthStencilState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newDepthStencilState = _depthStencilState;
+                if (ReferenceEquals(_depthStencilState, DepthStencilState.Default))
+                    newDepthStencilState = _depthStencilStateDefault;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.DepthRead))
+                    newDepthStencilState = _depthStencilStateDepthRead;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.None))
+                    newDepthStencilState = _depthStencilStateNone;
+
+                newDepthStencilState.BindToGraphicsDevice(this);
+
+                _actualDepthStencilState = newDepthStencilState;
+
                 _depthStencilStateDirty = true;
             }
         }
@@ -334,6 +364,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _actualBlendState.PlatformApplyState(this);
                 _blendStateDirty = false;
+            }
+
+            if (_depthStencilStateDirty)
+            {
+                _actualDepthStencilState.PlatformApplyState(this);
+                _depthStencilStateDirty = false;
             }
 
             if (_rasterizerStateDirty)

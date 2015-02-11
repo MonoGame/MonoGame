@@ -97,6 +97,7 @@
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
+    <Compile Include="Framework\Components\Two3DCubesComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
     <Compile Include="Framework\CurveKeyCollectionTest.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Framework\Vector3Test.cs" />
     <Compile Include="Framework\Vector4Test.cs" />
     <Compile Include="Framework\Visual\BlendStateTest.cs" />
+    <Compile Include="Framework\Visual\DepthStencilStateTest.cs" />
     <Compile Include="Framework\Visual\IndexBufferTest.cs" />
     <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
     <Compile Include="Framework\Visual\VertexBufferTest.cs" />
@@ -201,6 +203,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\BlendState\VisualTests.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_True_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-1.png">
