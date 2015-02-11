@@ -129,6 +129,12 @@ namespace Microsoft.Xna.Framework
             get { return DisplayOrientation.LandscapeLeft; }
         }
 
+        public override Point Position
+        {
+            get { return new Point(window.Location.X,window.Location.Y); }
+            set { window.Location = new System.Drawing.Point(value.X,value.Y); }
+        }
+
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
             // Do nothing.  Desktop platforms don't do orientation.

@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework {
         /// </summary>
         public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } } 
 
-#if WINDOWS && DIRECTX
+#if (WINDOWS && DIRECTX) || (WINDOWS && OPENGL)
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
