@@ -129,9 +129,9 @@ namespace Microsoft.Xna.Framework
             get { return DisplayOrientation.LandscapeLeft; }
         }
 #if (WINDOWS && OPENGL) || LINUX
-        public override Point Position
+        public override Microsoft.Xna.Framework.Point Position
         {
-            get { return new Point(window.Location.X,window.Location.Y); }
+            get { return new Microsoft.Xna.Framework.Point(window.Location.X,window.Location.Y); }
             set { window.Location = new System.Drawing.Point(value.X,value.Y); }
         }
 #endif
