@@ -7,6 +7,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tests.ContentPipeline;
 
 namespace MonoGame.Tests {
 
@@ -134,16 +139,16 @@ namespace MonoGame.Tests {
         }
     }
 
-	static class MathUtility 
+	static class MathUtility
     {
 		public static void MinMax (int a, int b, out int min, out int max)
 		{
-			if (a > b) 
+			if (a > b)
             {
 				min = b;
 				max = a;
-			} 
-            else 
+			}
+            else
             {
 				min = a;
 				max = b;
@@ -151,7 +156,7 @@ namespace MonoGame.Tests {
 		}
 	}
 
-	static class Paths 
+	static class Paths
     {
 		private const string AssetFolder = "Assets";
 		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
@@ -221,4 +226,18 @@ namespace MonoGame.Tests {
 		}
 	}
 
+    internal static class EffectUtility
+    {
+        public static Effect CompileEffect(GraphicsDevice graphicsDevice, params string[] pathParts)
+        {
+            var effectProcessor = new EffectProcessor();
+            var context = new TestProcessorContext(TargetPlatform.Windows, "notused.xnb");
+            var compiledEffect = effectProcessor.Process(new EffectContent
+            {
+                Identity = new ContentIdentity(Paths.Effect(pathParts))
+            }, context);
+
+            return new Effect(graphicsDevice, compiledEffect.GetEffectCode());
+        }
+    }
 }

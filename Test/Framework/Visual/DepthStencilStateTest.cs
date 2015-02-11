@@ -80,14 +80,73 @@ namespace MonoGame.Tests.Visual
         [TestCase(true)]
         public void VisualTestDepthBufferEnable(bool depthBufferEnable)
         {
-            Game.Components.Add(new Two3DCubesComponent(Game));
+            var cube = new Simple3DCubeComponent(Game);
 
-            Game.PreDrawWith += (sender, e) =>
+            Game.InitializeWith += (sender, e) =>
+            {
+                cube.Initialize();
+            };
+
+            Game.DrawWith += (sender, e) =>
             {
                 Game.GraphicsDevice.DepthStencilState = new DepthStencilState
                 {
                     DepthBufferEnable = depthBufferEnable
                 };
+
+                Game.GraphicsDevice.Clear(Color.CornflowerBlue);
+
+                cube.CubeColor = Color.Red;
+                cube.Draw(e.FrameInfo.GameTime);
+
+                cube.CubePosition = new Vector3(0.4f, 0, 0);
+                cube.CubeColor = Color.Green;
+                cube.Draw(e.FrameInfo.GameTime);
+            };
+
+            RunSingleFrameTest();
+        }
+
+        [Test]
+        public void VisualTestStencilBuffer()
+        {
+            var cube = new Simple3DCubeComponent(Game);
+
+            Game.InitializeWith += (sender, e) =>
+            {
+                cube.Initialize();
+            };
+
+            Game.DrawWith += (sender, e) =>
+            {
+                Game.GraphicsDevice.Clear(
+                    ClearOptions.DepthBuffer | ClearOptions.Stencil | ClearOptions.Target,
+                    Color.CornflowerBlue, 1, 0);
+
+                Game.GraphicsDevice.DepthStencilState = new DepthStencilState
+                {
+                    ReferenceStencil = 1,
+                    StencilEnable = true,
+                    StencilFunction = CompareFunction.Always,
+                    StencilPass = StencilOperation.Replace,
+                    DepthBufferEnable = false
+                };
+
+                cube.CubeColor = Color.Red;
+                cube.Draw(e.FrameInfo.GameTime);
+
+                Game.GraphicsDevice.DepthStencilState = new DepthStencilState
+                {
+                    ReferenceStencil = 0,
+                    StencilEnable = true,
+                    StencilFunction = CompareFunction.Equal,
+                    StencilPass = StencilOperation.Keep,
+                    DepthBufferEnable = false
+                };
+
+                cube.CubePosition = new Vector3(0.4f, 0, 0);
+                cube.CubeColor = Color.Green;
+                cube.Draw(e.FrameInfo.GameTime);
             };
 
             RunSingleFrameTest();

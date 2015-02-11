@@ -8,12 +8,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Components {
-	class Two3DCubesComponent : VisualTestDrawableGameComponent {
+	class Simple3DCubeComponent : VisualTestDrawableGameComponent {
 		BasicEffect basicEffect;
 
 		Matrix worldMatrix, viewMatrix, projectionMatrix;
 
-        public Two3DCubesComponent(Game game)
+        public Vector3 CubePosition { get; set; }
+	    public Color CubeColor { get; set; }
+
+        public Simple3DCubeComponent(Game game)
             : base(game)
 		{
 		}
@@ -52,17 +55,11 @@ namespace MonoGame.Tests.Components {
 
 		public override void Draw (GameTime gameTime)
 		{
-			GraphicsDevice.Clear (Color.CornflowerBlue);
-
 			GraphicsDevice.SetVertexBuffer (vertices);
 			GraphicsDevice.Indices = indices;
 
-			//RasterizerState rasterizerState1 = new RasterizerState ();
-			//rasterizerState1.CullMode = CullMode.None;
-			//graphics.GraphicsDevice.RasterizerState = rasterizerState1;
-
-			basicEffect.World = worldMatrix;
-            basicEffect.DiffuseColor = Color.Red.ToVector3();
+			basicEffect.World = worldMatrix * Matrix.CreateTranslation(CubePosition);
+            basicEffect.DiffuseColor = CubeColor.ToVector3();
 
 			foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes) {
                 pass.Apply();
@@ -70,19 +67,6 @@ namespace MonoGame.Tests.Components {
 				GraphicsDevice.DrawIndexedPrimitives (PrimitiveType.TriangleList, 0, 0,
 					number_of_vertices, 0, number_of_indices / 3);
 			}
-
-            var secondWorldMatrix = worldMatrix;
-            secondWorldMatrix *= Matrix.CreateTranslation(0.4f, 0, 0);
-            basicEffect.World = secondWorldMatrix;
-            basicEffect.DiffuseColor = Color.Green.ToVector3();
-
-            foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
-                    number_of_vertices, 0, number_of_indices / 3);
-            }
 
 			base.Draw (gameTime);
 		}
