@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>0 if they are equal, -1 or 1 if not.</returns>
 	    static int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
 		{
-            return a.Texture.CompareTo(b.Texture);
+            return a.Texture.SortingKey.CompareTo(b.Texture.SortingKey);
 		}
 
         /// <summary>

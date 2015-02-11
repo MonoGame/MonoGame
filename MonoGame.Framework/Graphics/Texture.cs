@@ -8,13 +8,26 @@ using System.Threading;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public abstract partial class Texture : GraphicsResource, IComparable<Texture>
+	public abstract partial class Texture : GraphicsResource
 	{
 		internal SurfaceFormat _format;
 		internal int _levelCount;
 
-        private readonly int _comparisonCode = Interlocked.Increment(ref _lastComparisonCode);
-        private static int _lastComparisonCode;
+        private readonly int _sortingKey = Interlocked.Increment(ref _lastSortingKey);
+        private static int _lastSortingKey;
+
+        /// <summary>
+        /// Gets a unique identifier of this texture for sorting purposes.
+        /// </summary>
+        /// <remarks>
+        /// <para>For example, this value is used by <see cref="SpriteBatch"/> when drawing with <see cref="SpriteSortMode.Texture"/>.</para>
+        /// <para>The value is an implementation detail and may change between application launches or MonoGame versions.
+        /// It is only guaranteed to stay consistent during application lifetime.</para>
+        /// </remarks>
+        internal int SortingKey
+        {
+            get { return _sortingKey; }
+        }
 
 		public SurfaceFormat Format
 		{
@@ -69,14 +82,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal protected override void GraphicsDeviceResetting()
         {
             PlatformGraphicsDeviceResetting();
-        }
-
-        public int CompareTo(Texture other)
-        {
-            if (other == null)
-                return 1;
-
-            return _comparisonCode.CompareTo(other._comparisonCode);
         }
     }
 }
