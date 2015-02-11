@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public BlendFunction AlphaBlendFunction
 	    {
-	        get { return _targetBlendState[0].AlphaBlendFunction; } 
+	        get { return _targetBlendState[0].AlphaBlendFunction; }
             set
             {
                 ThrowIfBound();
@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static readonly BlendState NonPremultiplied;
         public static readonly BlendState Opaque;
 
-        public BlendState() 
+        public BlendState()
         {
             _targetBlendState = new TargetBlendState[4];
             _targetBlendState[0] = new TargetBlendState(this);
@@ -209,6 +209,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private BlendState(BlendState cloneSource)
         {
+            Name = cloneSource.Name;
+
             _targetBlendState = new TargetBlendState[4];
             _targetBlendState[0] = cloneSource[0].Clone(this);
             _targetBlendState[1] = cloneSource[1].Clone(this);
@@ -219,8 +221,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _multiSampleMask = cloneSource._multiSampleMask;
             _independentBlendEnable = cloneSource._independentBlendEnable;
         }
-		
-		static BlendState() 
+
+        static BlendState()
         {
             Additive = new BlendState("BlendState.Additive", Blend.SourceAlpha, Blend.One);
             AlphaBlend = new BlendState("BlendState.AlphaBlend", Blend.One, Blend.InverseSourceAlpha);
