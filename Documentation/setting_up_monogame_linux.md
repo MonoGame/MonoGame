@@ -1,17 +1,21 @@
 This section will help you setup MonoGame on Linux.
 
-The following packages are needed for the MonoGame to work on Linux:
+### Running MonoGame Applications
+
+The following packages are needed for the MonoGame Applications to run on Linux:
 * libsdl-mixer1.2
 * libopenal-dev
+* mono-runtime
 
 For Ubuntu/Debian based Linux systems, you can run:
 ```
-sudo apt-get install libopenal-dev libsdl-mixer1.2
+sudo apt-get install libopenal-dev libsdl-mixer1.2 mono-runtime
 ```
 
-For developing MonoGame applications from linux, Monodevelop 5 is needed. Please download and install it from: [http://www.monodevelop.com/download/](http://www.monodevelop.com/download/)
+### Developing MonoGame Applications
 
-To install the MonoGame on linux do the following:
+To setup MonoGame application development on linux do the following:
+* download and install Monodevelop 5 from: [http://www.monodevelop.com/download/](http://www.monodevelop.com/download/)
 * Go to [MonoGame Downloads page](http://www.monogame.net/downloads/)
 * Click on the newest MonoGame release
 * Download MonoGame for Linux
