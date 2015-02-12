@@ -1,17 +1,11 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// SkinnedEffect.cs
-//
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
 
-#region Using Statements
 using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#endregion
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -194,7 +188,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets the per-pixel lighting prefer flag.
+        /// Enables per-pixel lighting for this effect.
         /// </summary>
         public bool PreferPerPixelLighting
         {
@@ -245,7 +239,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets the fog enable flag.
+        /// Enables fog for this effect.
         /// </summary>
         public bool FogEnabled
         {
@@ -368,17 +362,17 @@ namespace Microsoft.Xna.Framework.Graphics
             return bones;
         }
 
-
         /// <summary>
-        /// This effect requires lighting, so we explicitly implement
-        /// IEffectLights.LightingEnabled, and do not allow turning it off.
+        /// Enables light for this effect.
         /// </summary>
+        /// <remarks>
+        /// This effect requires lighting, turning it off is not allowed. 
+        /// </remarks>
         bool IEffectLights.LightingEnabled
         {
             get { return true; }
             set { if (!value) throw new NotSupportedException("SkinnedEffect does not support setting LightingEnabled to false."); }
         }
-
 
         #endregion
 
@@ -386,8 +380,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Creates a new SkinnedEffect with default parameter settings.
+        /// Creates a new instance of <see cref="SkinnedEffect"/> class with default parameter settings.
         /// </summary>
+        /// <param name="device">A graphics device.</param>
         public SkinnedEffect(GraphicsDevice device)
             : base(device, Bytecode)
         {
@@ -410,8 +405,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Creates a new SkinnedEffect by cloning parameter settings from an existing instance.
+        /// Creates a new instance of <see cref="SkinnedEffect"/> class by cloning parameter settings from an existing instance.
         /// </summary>
+        /// <param name="cloneSource">A copy of an <see cref="SkinnedEffect"/>.</param>
         protected SkinnedEffect(SkinnedEffect cloneSource)
             : base(cloneSource)
         {
@@ -438,7 +434,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Creates a clone of the current SkinnedEffect instance.
+        /// Creates a clone of the current <see cref="SkinnedEffect"/> instance.
         /// </summary>
         public override Effect Clone()
         {
@@ -447,7 +443,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Sets up the standard key/fill/back lighting rig.
+        /// Initializes the default light system for this effect and enables it.
         /// </summary>
         public void EnableDefaultLighting()
         {

@@ -1,17 +1,9 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// BasicEffect.cs
-//
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-#endregion
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -192,7 +184,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Enables light for this effect.
+        /// </summary>
         public bool LightingEnabled
         {
             get { return lightingEnabled; }
@@ -209,7 +203,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets the per-pixel lighting prefer flag.
+        /// Enables per-pixel lighting for this effect.
         /// </summary>
         public bool PreferPerPixelLighting
         {
@@ -226,7 +220,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the ambient color for light.
+        /// </summary>
         public Vector3 AmbientLightColor
         {
             get { return ambientLightColor; }
@@ -238,20 +234,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the first directional light.
+        /// </summary>
         public DirectionalLight DirectionalLight0 { get { return light0; } }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the second directional light.
+        /// </summary>
         public DirectionalLight DirectionalLight1 { get { return light1; } }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the third directional light.
+        /// </summary>
         public DirectionalLight DirectionalLight2 { get { return light2; } }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Enables fog for this effect.
+        /// </summary>
         public bool FogEnabled
         {
             get { return fogEnabled; }
@@ -267,7 +270,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the fog start distance.
+        /// </summary>
         public float FogStart
         {
             get { return fogStart; }
@@ -280,7 +285,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the fog end distance.
+        /// </summary>
         public float FogEnd
         {
             get { return fogEnd; }
@@ -293,7 +300,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the fog color in <see cref="Vector3"/> format.
+        /// </summary>
         public Vector3 FogColor
         {
             get { return fogColorParam.GetValueVector3(); }
@@ -302,7 +311,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets whether texturing is enabled.
+        /// Enables texturing for this effect.
         /// </summary>
         public bool TextureEnabled
         {
@@ -330,7 +339,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets whether vertex color is enabled.
+        /// Enables vertex color for this effect.
         /// </summary>
         public bool VertexColorEnabled
         {
@@ -352,8 +361,9 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Methods
 
         /// <summary>
-        /// Creates a new BasicEffect with default parameter settings.
+        /// Creates a new instance of <see cref="BasicEffect"/> class with default parameter settings.
         /// </summary>
+        /// <param name="device">A graphics device.</param>
         public BasicEffect(GraphicsDevice device)
             : base(device, Bytecode)
         {
@@ -365,8 +375,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Creates a new BasicEffect by cloning parameter settings from an existing instance.
+        /// Creates a new instance of <see cref="BasicEffect"/> class by cloning parameter settings from an existing instance.
         /// </summary>
+        /// <param name="cloneSource">A copy of an <see cref="AlphaTestEffect"/>.</param>
         protected BasicEffect(BasicEffect cloneSource)
             : base(cloneSource)
         {
@@ -394,7 +405,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Creates a clone of the current BasicEffect instance.
+        /// Creates a clone of the current <see cref="BasicEffect"/> instance.
         /// </summary>
         public override Effect Clone()
         {
@@ -402,7 +413,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes the default light system for this effect and enables it.
+        /// </summary>
         public void EnableDefaultLighting()
         {
             LightingEnabled = true;

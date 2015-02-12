@@ -1,16 +1,9 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// DualTextureEffect.cs
-//
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-#endregion
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -141,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets the fog enable flag.
+        /// Enables fog for this effect.
         /// </summary>
         public bool FogEnabled
         {
@@ -219,7 +212,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets whether vertex color is enabled.
+        /// Enables vertex color for this effect.
         /// </summary>
         public bool VertexColorEnabled
         {
@@ -242,8 +235,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Creates a new DualTextureEffect with default parameter settings.
+        /// Creates a new instance of <see cref="DualTextureEffect"/> class with default parameter settings.
         /// </summary>
+        /// <param name="device">A graphics device.</param>
         public DualTextureEffect(GraphicsDevice device)
             : base(device, Bytecode)
         {
@@ -252,8 +246,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Creates a new DualTextureEffect by cloning parameter settings from an existing instance.
+        /// Creates a new instance of <see cref="DualTextureEffect"/> class by cloning parameter settings from an existing instance.
         /// </summary>
+        /// <param name="cloneSource">A copy of an <see cref="DualTextureEffect"/>.</param>
         protected DualTextureEffect(DualTextureEffect cloneSource)
             : base(cloneSource)
         {
@@ -276,7 +271,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Creates a clone of the current DualTextureEffect instance.
+        /// Creates a clone of the current <see cref="DualTextureEffect"/> instance.
         /// </summary>
         public override Effect Clone()
         {
