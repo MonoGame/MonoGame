@@ -85,6 +85,8 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _samplers.Length; i++)
             {
                 _samplers[i] = SamplerState.LinearWrap;
+
+                _samplerStateLinearWrap.BindToGraphicsDevice(_graphicsDevice);
                 _actualSamplers[i] = _samplerStateLinearWrap;
             }
 
