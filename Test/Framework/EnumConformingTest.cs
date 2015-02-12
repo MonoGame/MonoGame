@@ -3,6 +3,9 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework
 {
+    /// <summary>
+    /// Tests for enum compatibility with XNA.
+    /// </summary>
     class EnumConformingTest
     {
         [Test]
@@ -60,6 +63,71 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(5, (int)(StencilOperation.IncrementSaturation));
             Assert.AreEqual(6, (int)(StencilOperation.DecrementSaturation));
             Assert.AreEqual(7, (int)(StencilOperation.Invert));
+
+        [Test]
+        public void SurfaceFormateEnum()
+        {
+            // note : here is only XNA formats, extensions is not included
+
+            Assert.AreEqual(0, (int)SurfaceFormat.Color);
+            Assert.AreEqual(1, (int)SurfaceFormat.Bgr565);
+            Assert.AreEqual(2, (int)SurfaceFormat.Bgra5551);
+            Assert.AreEqual(3, (int)SurfaceFormat.Bgra4444);
+            Assert.AreEqual(4, (int)SurfaceFormat.Dxt1);
+            Assert.AreEqual(5, (int)SurfaceFormat.Dxt3);
+            Assert.AreEqual(6, (int)SurfaceFormat.Dxt5);
+            Assert.AreEqual(7, (int)SurfaceFormat.NormalizedByte2);
+            Assert.AreEqual(8, (int)SurfaceFormat.NormalizedByte4);
+            Assert.AreEqual(9, (int)SurfaceFormat.Rgba1010102);
+            Assert.AreEqual(10, (int)SurfaceFormat.Rg32);
+            Assert.AreEqual(11, (int)SurfaceFormat.Rgba64);
+            Assert.AreEqual(12, (int)SurfaceFormat.Alpha8);
+            Assert.AreEqual(13, (int)SurfaceFormat.Single);
+            Assert.AreEqual(14, (int)SurfaceFormat.Vector2);
+            Assert.AreEqual(15, (int)SurfaceFormat.Vector4);
+            Assert.AreEqual(16, (int)SurfaceFormat.HalfSingle);
+            Assert.AreEqual(17, (int)SurfaceFormat.HalfVector2);
+            Assert.AreEqual(18, (int)SurfaceFormat.HalfVector4);
+            Assert.AreEqual(19, (int)SurfaceFormat.HdrBlendable);
+        }
+
+        [Test]
+        public void TextureAddressModeEnum()
+        {
+            Assert.AreEqual(0, (int)TextureAddressMode.Wrap);
+            Assert.AreEqual(1, (int)TextureAddressMode.Clamp);
+            Assert.AreEqual(2, (int)TextureAddressMode.Mirror);
+        }
+
+        [Test]
+        public void TextureFilterEnum()
+        {
+            Assert.AreEqual(0, (int)TextureFilter.Linear);
+            Assert.AreEqual(1, (int)TextureFilter.Point);
+            Assert.AreEqual(2, (int)TextureFilter.Anisotropic);
+            Assert.AreEqual(3, (int)TextureFilter.LinearMipPoint);
+            Assert.AreEqual(4, (int)TextureFilter.PointMipLinear);
+            Assert.AreEqual(5, (int)TextureFilter.MinLinearMagPointMipLinear);
+            Assert.AreEqual(6, (int)TextureFilter.MinLinearMagPointMipPoint);
+            Assert.AreEqual(7, (int)TextureFilter.MinPointMagLinearMipLinear);
+            Assert.AreEqual(8, (int)TextureFilter.MinPointMagLinearMipPoint);
+        }
+
+        [Test]
+        public void VertexElementFormatEnum()
+        {
+            Assert.AreEqual(0, (int)VertexElementFormat.Single);
+            Assert.AreEqual(1, (int)VertexElementFormat.Vector2);
+            Assert.AreEqual(2, (int)VertexElementFormat.Vector3);
+            Assert.AreEqual(3, (int)VertexElementFormat.Vector4);
+            Assert.AreEqual(4, (int)VertexElementFormat.Color);
+            Assert.AreEqual(5, (int)VertexElementFormat.Byte4);
+            Assert.AreEqual(6, (int)VertexElementFormat.Short2);
+            Assert.AreEqual(7, (int)VertexElementFormat.Short4);
+            Assert.AreEqual(8, (int)VertexElementFormat.NormalizedShort2);
+            Assert.AreEqual(9, (int)VertexElementFormat.NormalizedShort4);
+            Assert.AreEqual(10, (int)VertexElementFormat.HalfVector2);
+            Assert.AreEqual(11, (int)VertexElementFormat.HalfVector4);
         }
 
         [Test]
