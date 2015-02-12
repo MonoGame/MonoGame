@@ -74,11 +74,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         case SurfaceFormat.RgbaPvrtc4Bpp:
                             imageSize = (Math.Max(this.width, 8) * Math.Max(this.height, 8) * 4 + 7) / 8;
                             break;
-                        case SurfaceFormat.RgbEtc1:
                         case SurfaceFormat.Dxt1:
                         case SurfaceFormat.Dxt1a:
                         case SurfaceFormat.Dxt3:
                         case SurfaceFormat.Dxt5:
+                        case SurfaceFormat.RgbEtc1:
+                        case SurfaceFormat.RgbaATCExplicitAlpha:
+                        case SurfaceFormat.RgbaATCInterpolatedAlpha:
                             imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * GraphicsExtensions.GetSize(format);
                             break;
                         default:

@@ -98,8 +98,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-			    var compressed = TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed;
-                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, compressed, compressed);
+                var format = GraphicsUtil.GetTextureFormatForPlatform(TextureFormat, context.TargetPlatform);
+                var requiresPOT = GraphicsUtil.RequiresPowerOfTwo(format, context.TargetPlatform, context.TargetProfile);
+                var requiresSquare = GraphicsUtil.RequiresSquare(format, context.TargetPlatform);
+
+                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, requiresPOT, requiresSquare);
 
 				//systemBitmap.Save ("fontglyphs.png");
 
@@ -127,9 +130,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
 			    systemBitmap.Dispose();
 
-                if (compressed)
+                if (GraphicsUtil.IsCompressedTextureFormat(format))
                 {
-                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
+                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, true, true);
                 }
 			}
 			catch(Exception ex) {

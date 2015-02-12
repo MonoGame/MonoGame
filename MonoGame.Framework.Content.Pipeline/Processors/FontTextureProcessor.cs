@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 		public override SpriteFontContent Process (Texture2DContent input, ContentProcessorContext context)
 		{
-			var output = new SpriteFontContent ();
+			var output = new SpriteFontContent();
 
 			// extract the glyphs from the texture and map them to a list of characters.
 			// we need to call GtCharacterForIndex for each glyph in the Texture to 
@@ -90,16 +90,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             var glyphs = ExtractGlyphs(systemBitmap);
 			// Optimize.
-			foreach (Glyph glyph in glyphs) {
+			foreach (Glyph glyph in glyphs)
+            {
 				GlyphCropper.Crop(glyph);
                 output.VerticalLineSpacing = Math.Max(output.VerticalLineSpacing, glyph.Subrect.Height);
 			}
 
             systemBitmap.Dispose();
-		    var compressed = TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed;
-            systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), compressed, compressed);
+            var format = GraphicsUtil.GetTextureFormatForPlatform(TextureFormat, context.TargetPlatform);
+            var requiresPOT = GraphicsUtil.RequiresPowerOfTwo(format, context.TargetPlatform, context.TargetProfile);
+            var requiresSquare = GraphicsUtil.RequiresSquare(format, context.TargetPlatform);
+            systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), requiresPOT, requiresSquare);
 			
-			foreach (Glyph glyph in glyphs) {
+			foreach (Glyph glyph in glyphs)
+            {
 				output.CharacterMap.Add (glyph.Character);
 				output.Glyphs.Add (new Rectangle (glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
                 output.Cropping.Add(new Rectangle((int)glyph.XOffset, (int)glyph.YOffset, glyph.Subrect.Width, glyph.Subrect.Height));
@@ -134,8 +138,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 bmp.SetPixelData(data);
             }
 
-            if (compressed)
-                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, PremultiplyAlpha, true);
+            if (GraphicsUtil.IsCompressedTextureFormat(format))
+                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, PremultiplyAlpha, true);
 
 			return output;
 		}

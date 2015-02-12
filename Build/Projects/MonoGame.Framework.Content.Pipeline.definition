@@ -79,6 +79,9 @@
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\AtcBitmapContent.cs" />
+    <Compile Include="Graphics\AtcExplicitBitmapContent.cs" />
+    <Compile Include="Graphics\AtcInterpolatedBitmapContent.cs" />
     <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
     <Compile Include="Graphics\Font\BitmapUtils.cs" />
@@ -95,6 +98,7 @@
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\EffectMaterialContent.cs" />
     <Compile Include="Graphics\EnvironmentMapMaterialContent.cs" />
+    <Compile Include="Graphics\Etc1BitmapContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
@@ -469,6 +473,11 @@
       <Link>ffprobe.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Windows\x64\PVRTexLibWrapper.dll">
+      <Platforms>Windows</Platforms>
+      <Link>PVRTexLibWrapper.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Linux Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\assimp\libassimp.so">
@@ -519,6 +528,16 @@
     <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe">
       <Platforms>Linux</Platforms>
       <Link>ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x86\PVRTexLibWrapper.dll">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibWrapper.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibWrapper.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibWrapper.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
@@ -606,6 +625,16 @@
     <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimageplus.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libfreeimageplus.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\MacOS\x86\PVRTexLibWrapper.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>PVRTexLibWrapper.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibWrapper.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>PVRTexLibWrapper.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </Files>

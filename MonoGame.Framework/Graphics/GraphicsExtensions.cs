@@ -523,8 +523,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
-#if IOS || ANDROID
+#if IOS
 				glInternalFormat = PixelInternalFormat.Rgba;
+#elif ANDROID
+				glInternalFormat = (PixelInternalFormat)All.Rgba4;
 #else
 				glInternalFormat = PixelInternalFormat.Rgba4;
 #endif
@@ -648,6 +650,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 glInternalFormat = (PixelInternalFormat)0x83F3;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
+            case SurfaceFormat.RgbaATCExplicitAlpha:
+				glInternalFormat = (PixelInternalFormat)All.AtcRgbaExplicitAlphaAmd;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+            case SurfaceFormat.RgbaATCInterpolatedAlpha:
+				glInternalFormat = (PixelInternalFormat)All.AtcRgbaInterpolatedAlphaAmd;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break
 #endif
                     
 
@@ -710,6 +720,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.RgbPvrtc4Bpp:
                 case SurfaceFormat.RgbaPvrtc4Bpp:
+                case SurfaceFormat.RgbaATCExplicitAlpha:
+                case SurfaceFormat.RgbaATCInterpolatedAlpha:
                     // One texel in DXT3, DXT5 and PVRTC 4bpp is a minimum 4x4 block, which is 16 bytes
                     return 16;
                 case SurfaceFormat.Alpha8:

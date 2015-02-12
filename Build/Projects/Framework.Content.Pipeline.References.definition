@@ -14,6 +14,9 @@
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNet\x86\PVRTexLibNET.dll" />
   </Platform>
 
 
@@ -34,6 +37,9 @@
     <Binary
       Name="FreeImageNET"
       Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNet\x86\PVRTexLibNET.dll" />
   </Platform>
 
 
@@ -56,9 +62,12 @@
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
-  <Binary
+    <Binary
       Name="FreeImageNET"
-       Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
+      Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNet\x64\PVRTexLibNET.dll" />
   </Platform>
 	
 </ExternalProject>
