@@ -15,7 +15,7 @@ sudo apt-get install libopenal-dev libsdl-mixer1.2 mono-runtime
 ### Developing MonoGame Applications
 
 To setup MonoGame application development on linux do the following:
-* download and install Monodevelop 5 from: [http://www.monodevelop.com/download/](http://www.monodevelop.com/download/)
+* Download and install Monodevelop 5 from: [http://www.monodevelop.com/download/](http://www.monodevelop.com/download/)
 * Go to [MonoGame Downloads page](http://www.monogame.net/downloads/)
 * Click on the newest MonoGame release
 * Download MonoGame for Linux
