@@ -134,16 +134,16 @@ namespace MonoGame.Tests {
         }
     }
 
-	static class MathUtility 
+	static class MathUtility
     {
 		public static void MinMax (int a, int b, out int min, out int max)
 		{
-			if (a > b) 
+			if (a > b)
             {
 				min = b;
 				max = a;
-			} 
-            else 
+			}
+            else
             {
 				min = a;
 				max = b;
@@ -151,7 +151,7 @@ namespace MonoGame.Tests {
 		}
 	}
 
-	static class Paths 
+	static class Paths
     {
 		private const string AssetFolder = "Assets";
 		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
@@ -220,5 +220,4 @@ namespace MonoGame.Tests {
 			Directory.SetCurrentDirectory(directory);
 		}
 	}
-
 }

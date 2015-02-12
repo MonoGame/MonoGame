@@ -17,22 +17,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private BlendState _blendState;
         private BlendState _actualBlendState;
-        private DepthStencilState _depthStencilState = DepthStencilState.Default;
+        private bool _blendStateDirty;
+
+        private BlendState _blendStateAdditive;
+        private BlendState _blendStateAlphaBlend;
+        private BlendState _blendStateNonPremultiplied;
+        private BlendState _blendStateOpaque;
+
+        private DepthStencilState _depthStencilState;
+        private DepthStencilState _actualDepthStencilState;
+        private bool _depthStencilStateDirty;
+
+        private DepthStencilState _depthStencilStateDefault;
+        private DepthStencilState _depthStencilStateDepthRead;
+        private DepthStencilState _depthStencilStateNone;
 
         private RasterizerState _rasterizerState;
         private RasterizerState _actualRasterizerState;
+        private bool _rasterizerStateDirty;
 
         private RasterizerState _rasterizerStateCullClockwise;
         private RasterizerState _rasterizerStateCullCounterClockwise;
         private RasterizerState _rasterizerStateCullNone;
 
-        private bool _blendStateDirty;
-        private bool _depthStencilStateDirty;
-        private bool _rasterizerStateDirty;
-
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
-  
+
         private VertexBuffer _vertexBuffer;
         private bool _vertexBufferDirty;
 
@@ -63,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private Shader _vertexShader;
         private bool _vertexShaderDirty;
-        private bool VertexShaderDirty 
+        private bool VertexShaderDirty
         {
             get { return _vertexShaderDirty; }
         }
@@ -73,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
-        private bool PixelShaderDirty 
+        private bool PixelShaderDirty
         {
             get { return _pixelShaderDirty; }
         }
@@ -107,8 +117,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _isDisposed;
             }
         }
-		
-		public bool IsContentLost { 
+
+		public bool IsContentLost {
 			get {
 				// We will just return IsDisposed for now
 				// as that is the only case I can see for now
@@ -171,7 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Initialize();
         }
 
-        private void Setup() 
+        private void Setup()
         {
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
@@ -189,6 +199,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _blendStateOpaque = BlendState.Opaque.Clone();
 
             BlendState = BlendState.Opaque;
+
+            _depthStencilStateDefault = DepthStencilState.Default.Clone();
+            _depthStencilStateDepthRead = DepthStencilState.DepthRead.Clone();
+            _depthStencilStateNone = DepthStencilState.None.Clone();
+
+            DepthStencilState = DepthStencilState.Default;
 
             _rasterizerStateCullClockwise = RasterizerState.CullClockwise.Clone();
             _rasterizerStateCullCounterClockwise = RasterizerState.CullCounterClockwise.Clone();
@@ -271,10 +287,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public BlendState BlendState 
+        public BlendState BlendState
         {
 			get { return _blendState; }
-			set 
+			set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
@@ -307,21 +323,34 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 		}
 
-        private BlendState _blendStateAdditive;
-        private BlendState _blendStateAlphaBlend;
-        private BlendState _blendStateNonPremultiplied;
-        private BlendState _blendStateOpaque;
-
         public DepthStencilState DepthStencilState
         {
             get { return _depthStencilState; }
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_depthStencilState == value)
                     return;
 
                 _depthStencilState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newDepthStencilState = _depthStencilState;
+                if (ReferenceEquals(_depthStencilState, DepthStencilState.Default))
+                    newDepthStencilState = _depthStencilStateDefault;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.DepthRead))
+                    newDepthStencilState = _depthStencilStateDepthRead;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.None))
+                    newDepthStencilState = _depthStencilStateNone;
+
+                newDepthStencilState.BindToGraphicsDevice(this);
+
+                _actualDepthStencilState = newDepthStencilState;
+
                 _depthStencilStateDirty = true;
             }
         }
@@ -334,6 +363,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _actualBlendState.PlatformApplyState(this);
                 _blendStateDirty = false;
+            }
+
+            if (_depthStencilStateDirty)
+            {
+                _actualDepthStencilState.PlatformApplyState(this);
+                _depthStencilStateDirty = false;
             }
 
             if (_rasterizerStateDirty)
@@ -410,7 +445,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Update the back buffer.
             CreateSizeDependentResources();
-            ApplyRenderTargets(null);        
+            ApplyRenderTargets(null);
         }
 #endif
 
@@ -480,15 +515,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public GraphicsProfile GraphicsProfile
-        { 
-            get 
+        {
+            get
             {
                 return _graphicsProfile;
             }
             internal set
             {
                 //Check if Profile is supported.
-                //TODO: [DirectX] Recreate the Device using the new 
+                //TODO: [DirectX] Recreate the Device using the new
                 //      feature level each time the Profile changes.
                 if(value > GetHighestSupportedGraphicsProfile(this))
                     throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
@@ -529,7 +564,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			else
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
 		}
-		
+
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
         {
             if (renderTarget == null)
@@ -538,7 +573,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
         }
 
-		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
+		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
 		{
             // Avoid having to check for null and zero length.
             var renderTargetCount = 0;
@@ -646,7 +681,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_indexBuffer == indexBuffer)
                 return;
-            
+
             _indexBuffer = indexBuffer;
             _indexBufferDirty = true;
         }
@@ -721,7 +756,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
-        {            
+        {
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);

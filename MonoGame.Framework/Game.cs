@@ -120,7 +120,6 @@ namespace Microsoft.Xna.Framework
                     if (_graphicsDeviceManager != null)
                     {
                         Effect.FlushCache();
-                        DepthStencilState.ResetStates();
                         SamplerState.ResetStates();
 
                         (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();

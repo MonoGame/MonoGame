@@ -775,12 +775,6 @@ namespace Microsoft.Xna.Framework.Graphics
 	            _scissorRectangleDirty = false;
 	        }
 
-	        if ( _depthStencilStateDirty )
-            {
-	            _depthStencilState.PlatformApplyState(this);
-                _depthStencilStateDirty = false;
-            }
-
             // If we're not applying shaders then early out now.
             if (!applyShaders)
                 return;
