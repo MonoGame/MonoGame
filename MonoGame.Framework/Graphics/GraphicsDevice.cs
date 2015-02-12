@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformSetup();
 
             Textures = new TextureCollection (MaxTextureSlots);
-			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
+			SamplerStates = new SamplerStateCollection(this, MaxTextureSlots);
 
             _blendStateAdditive = BlendState.Additive.Clone();
             _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
