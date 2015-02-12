@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using NUnit.Core;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework
@@ -67,7 +68,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void SurfaceFormateEnum()
         {
-            // note : here is only XNA formats, extensions is not included
+            // note : here is only XNA formats, extensions are not included
 
             Assert.AreEqual(0, (int)SurfaceFormat.Color);
             Assert.AreEqual(1, (int)SurfaceFormat.Bgr565);
@@ -133,19 +134,19 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void VertexElementUsageEnum()
         {
-                Assert.AreEqual(0, (int)(VertexElementUsage.Position));
-                Assert.AreEqual(1, (int)(VertexElementUsage.Color));
-                Assert.AreEqual(2, (int)(VertexElementUsage.TextureCoordinate));
-                Assert.AreEqual(3, (int)(VertexElementUsage.Normal));
-                Assert.AreEqual(4, (int)(VertexElementUsage.Binormal));
-                Assert.AreEqual(5, (int)(VertexElementUsage.Tangent));
-                Assert.AreEqual(6, (int)(VertexElementUsage.BlendIndices));
-                Assert.AreEqual(7, (int)(VertexElementUsage.BlendWeight));
-                Assert.AreEqual(8, (int)(VertexElementUsage.Depth));
-                Assert.AreEqual(9, (int)(VertexElementUsage.Fog));
-                Assert.AreEqual(10, (int)(VertexElementUsage.PointSize));
-                Assert.AreEqual(11, (int)(VertexElementUsage.Sample));
-                Assert.AreEqual(12, (int)(VertexElementUsage.TessellateFactor));
+            Assert.AreEqual(0, (int)(VertexElementUsage.Position));
+            Assert.AreEqual(1, (int)(VertexElementUsage.Color));
+            Assert.AreEqual(2, (int)(VertexElementUsage.TextureCoordinate));
+            Assert.AreEqual(3, (int)(VertexElementUsage.Normal));
+            Assert.AreEqual(4, (int)(VertexElementUsage.Binormal));
+            Assert.AreEqual(5, (int)(VertexElementUsage.Tangent));
+            Assert.AreEqual(6, (int)(VertexElementUsage.BlendIndices));
+            Assert.AreEqual(7, (int)(VertexElementUsage.BlendWeight));
+            Assert.AreEqual(8, (int)(VertexElementUsage.Depth));
+            Assert.AreEqual(9, (int)(VertexElementUsage.Fog));
+            Assert.AreEqual(10, (int)(VertexElementUsage.PointSize));
+            Assert.AreEqual(11, (int)(VertexElementUsage.Sample));
+            Assert.AreEqual(12, (int)(VertexElementUsage.TessellateFactor));
         }
     }
 }
