@@ -1,17 +1,11 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// AlphaTestEffect.cs
-//
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
 
-#region Using Statements
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-#endregion
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -148,7 +142,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets the fog enable flag.
+        /// Enables fog for this effect.
         /// </summary>
         public bool FogEnabled
         {
@@ -216,7 +210,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         /// <summary>
-        /// Gets or sets whether vertex color is enabled.
+        /// Enables vertex color for this effect.
         /// </summary>
         public bool VertexColorEnabled
         {
@@ -268,8 +262,9 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Methods
 
         /// <summary>
-        /// Creates a new AlphaTestEffect with default parameter settings.
+        ///  Creates a new instance of <see cref="AlphaTestEffect"/> class with default parameter settings.
         /// </summary>
+        /// <param name="device">A graphics device.</param>
         public AlphaTestEffect(GraphicsDevice device)
             : base(device, Bytecode)
         {
@@ -277,8 +272,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Creates a new AlphaTestEffect by cloning parameter settings from an existing instance.
+        /// Creates a new instance of <see cref="AlphaTestEffect"/> class by cloning parameter settings from an existing instance.
         /// </summary>
+        /// <param name="cloneSource">A copy of an <see cref="AlphaTestEffect"/>.</param>
         protected AlphaTestEffect(AlphaTestEffect cloneSource)
             : base(cloneSource)
         {
@@ -304,7 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Creates a clone of the current AlphaTestEffect instance.
+        /// Creates a clone of the current <see cref="AlphaTestEffect"/> instance.
         /// </summary>
         public override Effect Clone()
         {
@@ -314,7 +310,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Looks up shortcut references to our effect parameters.
         /// </summary>
-        void CacheEffectParameters()
+        private void CacheEffectParameters()
         {
             textureParam        = Parameters["Texture"];
             diffuseColorParam   = Parameters["DiffuseColor"];
@@ -407,11 +403,12 @@ namespace Microsoft.Xna.Framework.Graphics
                         break;
 
                     case CompareFunction.Always:
-                    default:
                         // Shader will evaluate: clip((a < x) ? z : w)
                         alphaTest.Z = 1;
                         alphaTest.W = 1;
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
                 
                 alphaTestParam.SetValue(alphaTest);

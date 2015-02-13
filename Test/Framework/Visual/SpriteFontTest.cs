@@ -194,7 +194,7 @@ namespace MonoGame.Tests.Visual {
 
 			RunSingleFrameTest ();
 		}
-
+        
 		[Test]
 		public void Origins_scaled ()
 		{
