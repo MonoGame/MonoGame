@@ -62,5 +62,40 @@ namespace MonoGame.Tests.Framework
 
             Assert.AreEqual(testBox.Contains(testSphere), ContainmentType.Disjoint);
         }
+
+        [Test]
+        public void BoundingFrustumToBoundingFrustumTests()
+        {
+            var view = Matrix.CreateLookAt(new Vector3(0, 0, 5), Vector3.Zero, Vector3.Up);
+            var projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, 1, 1, 100);
+            var testFrustum = new BoundingFrustum(view * projection);
+
+            // Same frustum.
+            Assert.That(testFrustum.Contains(testFrustum), Is.EqualTo(ContainmentType.Contains));
+            Assert.That(testFrustum.Intersects(testFrustum), Is.True);
+
+            var otherFrustum = new BoundingFrustum(Matrix.Identity);
+
+            // Smaller frustum contained entirely inside.
+            var view2 = Matrix.CreateLookAt(new Vector3(0, 0, 4), Vector3.Zero, Vector3.Up);
+            var projection2 = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, 1, 1, 50);
+            otherFrustum.Matrix = view2 * projection2;
+
+            Assert.That(testFrustum.Contains(otherFrustum), Is.EqualTo(ContainmentType.Contains));
+            Assert.That(testFrustum.Intersects(otherFrustum), Is.True);
+
+            // Same size frustum, pointing in the same direction and offset by a small amount.
+            otherFrustum.Matrix = view2 * projection;
+
+            Assert.That(testFrustum.Contains(otherFrustum), Is.EqualTo(ContainmentType.Intersects));
+            Assert.That(testFrustum.Intersects(otherFrustum), Is.True);
+
+            // Same size frustum, pointing in the opposite direction and not overlapping.
+            var view3 = Matrix.CreateLookAt(new Vector3(0, 0, 6), new Vector3(0, 0, 7), Vector3.Up);
+            otherFrustum.Matrix = view3 * projection;
+
+            Assert.That(testFrustum.Contains(otherFrustum), Is.EqualTo(ContainmentType.Disjoint));
+            Assert.That(testFrustum.Intersects(otherFrustum), Is.False);
+        }
     }
 }

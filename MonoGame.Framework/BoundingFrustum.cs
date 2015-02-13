@@ -128,15 +128,33 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
-        /*
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             if (this == frustum)                // We check to see if the two frustums are equal
                 return ContainmentType.Contains;// If they are, there's no need to go any further.
 
-            throw new NotImplementedException();
+            var anyInside = false;
+            var anyOutside = false;
+
+            for (var i = 0; i < CornerCount; ++i)
+            {
+                ContainmentType cornerResult;
+                Contains(ref frustum.corners[i], out cornerResult);
+
+                if (cornerResult == ContainmentType.Disjoint)
+                    anyOutside = true;
+                else
+                    anyInside = true;
+            }
+
+            if (!anyOutside)
+                return ContainmentType.Contains;
+
+            if (!anyInside)
+                return ContainmentType.Disjoint;
+
+            return ContainmentType.Intersects;
         }
-        */
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
@@ -231,12 +249,10 @@ namespace Microsoft.Xna.Framework
 			result = containment != ContainmentType.Disjoint;
 		}
 
-        /*
         public bool Intersects(BoundingFrustum frustum)
         {
-            throw new NotImplementedException();
+            return Contains(frustum) != ContainmentType.Disjoint;
         }
-        */
 
         public bool Intersects(BoundingSphere sphere)
         {
