@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Defines how render target data is used once a new render target is set.
+    /// Defines when render target data is preserved.
     /// </summary>
     public enum RenderTargetUsage
     {
