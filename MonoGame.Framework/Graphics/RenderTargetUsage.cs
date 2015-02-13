@@ -10,15 +10,15 @@ namespace Microsoft.Xna.Framework.Graphics
     public enum RenderTargetUsage
     {
         /// <summary>
-        /// Always clears the render target data.
+        /// The render target content will not be preserved.
         /// </summary>
         DiscardContents,
         /// <summary>
-        /// Clears or keeps render target data depending of platform. 
+        /// The render target content will be preserved.
         /// </summary>
         PreserveContents,
         /// <summary>
-        /// Always keeps the render target data.
+        /// The render target content might be preserved if the platform can do so without a penalty in performance or memory usage.
         /// </summary>
         PlatformContents
     }
