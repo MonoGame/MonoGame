@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 
@@ -90,6 +91,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
+
+        /// <summary>
+        /// The cache of effects from unique byte streams.
+        /// </summary>
+        internal Dictionary<int, Effect> EffectCache;
 
 		// TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
@@ -211,6 +217,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerStateCullNone = RasterizerState.CullNone.Clone();
 
             RasterizerState = RasterizerState.CullCounterClockwise;
+
+            EffectCache = new Dictionary<int, Effect>();
         }
 
         ~GraphicsDevice()
@@ -412,6 +420,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     // Dispose of all remaining graphics resources before disposing of the graphics device
                     GraphicsResource.DisposeAll();
+
+                    // Clear the effect cache.
+                    EffectCache.Clear();
 
                     PlatformDispose();
                 }
