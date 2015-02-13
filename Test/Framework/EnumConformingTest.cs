@@ -9,7 +9,7 @@ namespace MonoGame.Tests.Framework
     class EnumConformingTest
     {
         [Test]
-        void PresentIntervalEnum()
+        public void PresentIntervalEnum()
         {
             Assert.AreEqual(0, (int)(PresentInterval.Default));
             Assert.AreEqual(1, (int)(PresentInterval.One));
