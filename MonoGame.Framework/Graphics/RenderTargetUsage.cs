@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         DiscardContents,
         /// <summary>
-        /// The render target content will be preserved.
+        /// The render target content will be preserved even if it is slow or requires extra memory.
         /// </summary>
         PreserveContents,
         /// <summary>
