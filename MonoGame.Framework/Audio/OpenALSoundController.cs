@@ -462,12 +462,15 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
             }
-            foreach (var soundBuffer in purgeMe)
+            lock (purgeMe)
             {
-                AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, 0);
-                RecycleSource(soundBuffer);
+                foreach (var soundBuffer in purgeMe)
+                {
+                    AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, 0);
+                    RecycleSource(soundBuffer);
+                }
+                purgeMe.Clear();
             }
-            purgeMe.Clear();
         }
 
 #if ANDROID
