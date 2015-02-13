@@ -24,7 +24,7 @@
             <topic id="Setting Up MonoGame Linux" name="Linux" filename="setting_up_monogame_linux.md"/>
         </topic>
         <topic id="MonoGame FAQ" name="MonoGame FAQ" filename="monogame_faq.md"/>
-        <topic id="Help & Support" name="Help & Support" filename="help_and_support.md"/>
+        <topic id="Help and Support" name="Help and Support" filename="help_and_support.md"/>
     </topic>
     <topic id="Getting_Started" name="Getting Started" filename="getting_started.md"/>
     <topic id="Tutorials" name="Tutorials" filename="tutorials.md"/>
