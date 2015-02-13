@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Defines how adapter's refresh rate and <see cref="GraphicsDevice.Present"/> connected with each other. 
+    /// Defines how <see cref="GraphicsDevice.Present"/> updates the game window.
     /// </summary>
     public enum PresentInterval
     {
