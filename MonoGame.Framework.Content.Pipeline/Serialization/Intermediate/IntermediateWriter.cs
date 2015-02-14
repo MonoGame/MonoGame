@@ -148,6 +148,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         private string GetSharedResourceID(object value)
         {
+            if (value == null)
+                return null;
+
             string id;
             if (!_sharedResources.TryGetValue(value, out id))
                 _sharedResources.Add(value, id = "#Resource" + (_sharedResources.Count + 1));
