@@ -253,6 +253,8 @@ public class SharedResources
 {
     [ContentSerializer(SharedResource = true)]
     public Linked Head;
+
+    public Linked2[] LinkedArray;
 }
 
 public class Linked
@@ -262,6 +264,13 @@ public class Linked
     [ContentSerializer(SharedResource = true)]
     public Linked Next;
 }
+
+public class Linked2
+{
+    [ContentSerializer(SharedResource = true)]
+    public Linked2[] Next;
+}
+
 #endregion
 
 #region CircularReferences

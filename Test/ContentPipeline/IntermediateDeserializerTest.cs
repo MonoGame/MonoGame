@@ -376,6 +376,14 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.NotNull(sharedResources.Head.Next.Next);
                 Assert.AreEqual(3, sharedResources.Head.Next.Next.Value);
                 Assert.AreSame(sharedResources.Head, sharedResources.Head.Next.Next.Next);
+
+                Assert.NotNull(sharedResources.LinkedArray);
+                Assert.AreEqual(2, sharedResources.LinkedArray.Length);
+                Assert.IsNotNull(sharedResources.LinkedArray[0].Next);
+                Assert.AreEqual(2, sharedResources.LinkedArray[0].Next.Length);
+                Assert.IsNotNull(sharedResources.LinkedArray[1].Next);
+                Assert.AreEqual(1, sharedResources.LinkedArray[1].Next.Length);
+                Assert.AreSame(sharedResources.LinkedArray[0].Next, sharedResources.LinkedArray[1].Next[0].Next);
             });
         }
 
