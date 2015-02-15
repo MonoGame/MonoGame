@@ -6,12 +6,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Utilities.ZLib;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace MonoGame.Utilities.Png
 {
@@ -28,7 +29,8 @@ namespace MonoGame.Utilities.Png
         private IList<PngChunk> dataChunks;
         private ColorType colorType;
         private Palette palette;
-        private Bitmap bitmap;
+        private Texture2D texture;
+        private Color[] data;
         
         public PngReader()
         {
@@ -36,7 +38,7 @@ namespace MonoGame.Utilities.Png
             dataChunks = new List<PngChunk>();
         }
 
-        public Bitmap Read(Stream inputStream)
+        public Texture2D Read(Stream inputStream, GraphicsDevice graphicsDevice)
         {
             byte[] signature = new byte[8];
             inputStream.Read(signature, 0, 8);
@@ -62,7 +64,10 @@ namespace MonoGame.Utilities.Png
 
             UnpackDataChunks();
 
-            return bitmap;
+            texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
+            texture.SetData<Color>(data);
+
+            return texture;
         }
 
         private void ProcessChunk(byte[] chunkBytes)
@@ -164,8 +169,9 @@ namespace MonoGame.Utilities.Png
 
         private void DecodePixelData(byte[][] pixelData)
         {
-            bitmap = new Bitmap(width, height);
-
+            //bitmap = new Bitmap(width, height);
+            data = new Color[width * height];
+            
             byte[] previousScanline = new byte[bytesPerScanline];
 
             for (int y = 0; y < height; y++)
@@ -228,7 +234,8 @@ namespace MonoGame.Utilities.Png
 
                         byte intensity = defilteredScanline[offset];
 
-                        bitmap.SetPixel(x, y, Color.FromArgb(intensity, intensity, intensity));
+                        //bitmap.SetPixel(x, y, Color.FromArgb(intensity, intensity, intensity));
+                        data[(y * width) + x] = new Color(intensity, intensity, intensity);
                     }
 
                     break;
@@ -242,7 +249,7 @@ namespace MonoGame.Utilities.Png
                         byte intensity = defilteredScanline[offset];
                         byte alpha = defilteredScanline[offset + bytesPerSample];
 
-                        bitmap.SetPixel(x, y, Color.FromArgb(alpha, intensity, intensity, intensity));
+                        data[(y * width) + x] = new Color(intensity, intensity, intensity, alpha);
                     }
 
                     break;
@@ -253,7 +260,7 @@ namespace MonoGame.Utilities.Png
                     {
                         var pixelColor = palette[defilteredScanline[x + 1]];
 
-                        bitmap.SetPixel(x, y, Color.FromArgb(pixelColor.Item4, pixelColor.Item1, pixelColor.Item2, pixelColor.Item3));
+                        data[(y * width) + x] = new Color(pixelColor.Item1, pixelColor.Item2, pixelColor.Item3, pixelColor.Item4);
                     }
 
                     break;
@@ -268,7 +275,7 @@ namespace MonoGame.Utilities.Png
                         int green = defilteredScanline[offset + bytesPerSample];
                         int blue = defilteredScanline[offset + 2 * bytesPerSample];
 
-                        bitmap.SetPixel(x, y, Color.FromArgb(red, green, blue));
+                        data[(y * width) + x] = new Color(red, green, blue);
                     }
 
                     break;
@@ -284,7 +291,7 @@ namespace MonoGame.Utilities.Png
                         int blue = defilteredScanline[offset + 2 * bytesPerSample];
                         int alpha = defilteredScanline[offset + 3 * bytesPerSample];
 
-                        bitmap.SetPixel(x, y, Color.FromArgb(alpha, red, green, blue));
+                        data[(y * width) + x] = new Color(red, green, blue, alpha);
                     }
 
                     break;
