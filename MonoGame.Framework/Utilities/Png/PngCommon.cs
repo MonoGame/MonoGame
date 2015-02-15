@@ -11,16 +11,16 @@ using Microsoft.Xna.Framework;
 
 namespace MonoGame.Utilities.Png
 {
-    public class Palette
+    internal class Palette
     {
         private IList<Color> colors;
 
-        public Palette()
+        internal Palette()
         {
             colors = new List<Color>();
         }
 
-        public Color this[int index]
+        internal Color this[int index]
         {
             get
             {
@@ -28,19 +28,19 @@ namespace MonoGame.Utilities.Png
             }
         }
 
-        public void AddColor(Color color)
+        internal void AddColor(Color color)
         {
             colors.Add(color);
         }
 
-        public void AddAlphaToColorAtIndex(int colorIndex, byte alpha)
+        internal void AddAlphaToColorAtIndex(int colorIndex, byte alpha)
         {
             var oldColor = colors[colorIndex];
 
             colors[colorIndex] = new Color(oldColor.R, oldColor.G, oldColor.B, alpha);
         }
 
-        public void AddAlphaToColors(IList<byte> alphas)
+        internal void AddAlphaToColors(IList<byte> alphas)
         {
             for (int i = 0; i < alphas.Count; i++)
             {
@@ -51,9 +51,9 @@ namespace MonoGame.Utilities.Png
 
     #region Chunks
 
-    public class PngChunk
+    internal class PngChunk
     {
-        public PngChunk()
+        internal PngChunk()
         {
             this.Data = new byte[0];
         }
@@ -61,13 +61,13 @@ namespace MonoGame.Utilities.Png
         /// <summary>
         /// Length of Data field
         /// </summary>
-        public uint Length
+        internal uint Length
         {
             get;
             set;
         }
 
-        public string Type
+        internal string Type
         {
             get;
             set;
@@ -97,7 +97,7 @@ namespace MonoGame.Utilities.Png
             set;
         }
 
-        public byte[] Data
+        internal byte[] Data
         {
             get;
             set;
@@ -106,13 +106,13 @@ namespace MonoGame.Utilities.Png
         /// <summary>
         /// CRC of both Type and Data fields, but not Length field
         /// </summary>
-        public uint Crc
+        internal uint Crc
         {
             get;
             set;
         }
 
-        public virtual void Decode(byte[] chunkBytes)
+        internal virtual void Decode(byte[] chunkBytes)
         {
             var chunkBytesList = chunkBytes.ToList();
 
@@ -127,7 +127,7 @@ namespace MonoGame.Utilities.Png
             }
         }
 
-        public virtual byte[] Encode()
+        internal virtual byte[] Encode()
         {
             var result = new List<byte>();
 
@@ -167,7 +167,7 @@ namespace MonoGame.Utilities.Png
             return chunkTypeBytes.Concat(this.Data).ToArray();
         }
 
-        public static string GetChunkTypeString(byte[] chunkTypeBytes)
+        internal static string GetChunkTypeString(byte[] chunkTypeBytes)
         {
             return Encoding.UTF8.GetString(chunkTypeBytes, 0, chunkTypeBytes.Length);
         }
@@ -178,63 +178,63 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public class HeaderChunk : PngChunk
+    internal class HeaderChunk : PngChunk
     {
         private static byte[] pngSignature = new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 };
         
-        public HeaderChunk()
+        internal HeaderChunk()
         {
             base.Type = "IHDR";
         }
 
-        public uint Width
+        internal uint Width
         {
             get;
             set;
         }
 
-        public uint Height
+        internal uint Height
         {
             get;
             set;
         }
 
-        public byte BitDepth
+        internal byte BitDepth
         {
             get;
             set;
         }
 
-        public ColorType ColorType
+        internal ColorType ColorType
         {
             get;
             set;
         }
 
-        public byte CompressionMethod
+        internal byte CompressionMethod
         {
             get;
             set;
         }
 
-        public byte FilterMethod
+        internal byte FilterMethod
         {
             get;
             set;
         }
 
-        public byte InterlaceMethod
+        internal byte InterlaceMethod
         {
             get;
             set;
         }
 
-        public static byte[] PngSignature
+        internal static byte[] PngSignature
         {
             get { return pngSignature; }
         }
 
-        public override void Decode(byte[] chunkBytes)
+        internal override void Decode(byte[] chunkBytes)
         {
             base.Decode(chunkBytes);
             var chunkData = base.Data;
@@ -253,7 +253,7 @@ namespace MonoGame.Utilities.Png
             }
         }
 
-        public override byte[] Encode()
+        internal override byte[] Encode()
         {
             var chunkData = new List<byte>();
 
@@ -271,21 +271,21 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public class PaletteChunk : PngChunk
+    internal class PaletteChunk : PngChunk
     {
-        public PaletteChunk()
+        internal PaletteChunk()
         {
             base.Type = "PLTE";
             this.Palette = new Palette();
         }
 
-        public Palette Palette
+        internal Palette Palette
         {
             get;
             set;
         }
 
-        public override void Decode(byte[] chunkBytes)
+        internal override void Decode(byte[] chunkBytes)
         {
             base.Decode(chunkBytes);
             var chunkData = base.Data;
@@ -306,21 +306,21 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public class TransparencyChunk : PngChunk
+    internal class TransparencyChunk : PngChunk
     {
-        public TransparencyChunk()
+        internal TransparencyChunk()
         {
             base.Type = "tRNS";
             this.PaletteTransparencies = new List<byte>();
         }
 
-        public IList<byte> PaletteTransparencies
+        internal IList<byte> PaletteTransparencies
         {
             get;
             set;
         }
 
-        public override void Decode(byte[] chunkBytes)
+        internal override void Decode(byte[] chunkBytes)
         {
             base.Decode(chunkBytes);
             var chunkData = base.Data;
@@ -328,7 +328,7 @@ namespace MonoGame.Utilities.Png
             this.PaletteTransparencies = chunkData.ToArray();
         }
 
-        public override byte[] Encode()
+        internal override byte[] Encode()
         {
             var chunkData = new List<byte>();
 
@@ -339,17 +339,17 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public class DataChunk : PngChunk
+    internal class DataChunk : PngChunk
     {
-        public DataChunk()
+        internal DataChunk()
         {
             base.Type = "IDAT";
         }
     }
 
-    public class EndChunk : PngChunk
+    internal class EndChunk : PngChunk
     {
-        public EndChunk()
+        internal EndChunk()
         {
             base.Type = "IEND";
         }
@@ -359,7 +359,7 @@ namespace MonoGame.Utilities.Png
     
     #region Enumerations
 
-    public enum ColorType
+    internal enum ColorType
     {
         Grayscale = 0,
         Rgb = 2,
@@ -368,7 +368,7 @@ namespace MonoGame.Utilities.Png
         RgbWithAlpha = 6
     }
 
-    public enum FilterType
+    internal enum FilterType
     {
         None = 0,
         Sub = 1,
@@ -381,14 +381,14 @@ namespace MonoGame.Utilities.Png
 
     #region Filters
 
-    public static class NoneFilter
+    internal static class NoneFilter
     {
-        public static byte[] Decode(byte[] scanline)
+        internal static byte[] Decode(byte[] scanline)
         {
             return scanline;
         }
 
-        public static byte[] Encode(byte[] scanline)
+        internal static byte[] Encode(byte[] scanline)
         {
             var encodedScanline = new byte[scanline.Length + 1];
 
@@ -399,9 +399,9 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public static class SubFilter
+    internal static class SubFilter
     {
-        public static byte[] Decode(byte[] scanline, int bytesPerPixel)
+        internal static byte[] Decode(byte[] scanline, int bytesPerPixel)
         {
             byte[] result = new byte[scanline.Length];
 
@@ -415,7 +415,7 @@ namespace MonoGame.Utilities.Png
             return result;
         }
 
-        public static byte[] Encode(byte[] scanline, int bytesPerPixel)
+        internal static byte[] Encode(byte[] scanline, int bytesPerPixel)
         {
             var encodedScanline = new byte[scanline.Length + 1];
 
@@ -432,9 +432,9 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public static class UpFilter
+    internal static class UpFilter
     {
-        public static byte[] Decode(byte[] scanline, byte[] previousScanline)
+        internal static byte[] Decode(byte[] scanline, byte[] previousScanline)
         {
             byte[] result = new byte[scanline.Length];
 
@@ -448,7 +448,7 @@ namespace MonoGame.Utilities.Png
             return result;
         }
 
-        public static byte[] Encode(byte[] scanline, byte[] previousScanline)
+        internal static byte[] Encode(byte[] scanline, byte[] previousScanline)
         {
             var encodedScanline = new byte[scanline.Length + 1];
 
@@ -465,9 +465,9 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public static class AverageFilter
+    internal static class AverageFilter
     {
-        public static byte[] Decode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
+        internal static byte[] Decode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
         {
             byte[] result = new byte[scanline.Length];
 
@@ -482,7 +482,7 @@ namespace MonoGame.Utilities.Png
             return result;
         }
 
-        public static byte[] Encode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
+        internal static byte[] Encode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
         {
             var encodedScanline = new byte[scanline.Length + 1];
 
@@ -505,9 +505,9 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public static class PaethFilter
+    internal static class PaethFilter
     {
-        public static byte[] Decode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
+        internal static byte[] Decode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
         {
             byte[] result = new byte[scanline.Length];
 
@@ -523,7 +523,7 @@ namespace MonoGame.Utilities.Png
             return result;
         }
 
-        public static byte[] Encode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
+        internal static byte[] Encode(byte[] scanline, byte[] previousScanline, int bytesPerPixel)
         {
             var encodedScanline = new byte[scanline.Length + 1];
 
@@ -568,7 +568,7 @@ namespace MonoGame.Utilities.Png
 
     #endregion
 
-    public static class PngCrc
+    internal static class PngCrc
     {
         // table of CRCs of all 8-bit messages
         private static uint[] crcTable = null;
@@ -607,7 +607,7 @@ namespace MonoGame.Utilities.Png
             }
         }
 
-        public static uint Calculate(byte[] bytes)
+        internal static uint Calculate(byte[] bytes)
         {
             uint c = 0xffffffff;
 
@@ -627,9 +627,9 @@ namespace MonoGame.Utilities.Png
         }
     }
 
-    public static class Extensions
+    internal static class Extensions
     {
-        public static bool EqualsByElement(this byte[] byteArray1, byte[] byteArray2)
+        internal static bool EqualsByElement(this byte[] byteArray1, byte[] byteArray2)
         {
             if (byteArray1.Length != byteArray2.Length)
             {
@@ -647,7 +647,7 @@ namespace MonoGame.Utilities.Png
             return true;
         }
 
-        public static uint ToUInt(this byte[] bytes)
+        internal static uint ToUInt(this byte[] bytes)
         {
             byte[] input;
 
@@ -663,7 +663,7 @@ namespace MonoGame.Utilities.Png
             return BitConverter.ToUInt32(input, 0);
         }
 
-        public static byte[] ToByteArray(this uint integer)
+        internal static byte[] ToByteArray(this uint integer)
         {
             byte[] output = BitConverter.GetBytes(integer);
 
