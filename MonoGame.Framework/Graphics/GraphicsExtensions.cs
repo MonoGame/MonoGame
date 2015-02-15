@@ -691,7 +691,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case SurfaceFormat.Dxt1SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt1;
-                glInternalFormat = PixelInternalFormat)0x8C4C;
+                glInternalFormat = (PixelInternalFormat)0x8C4C;
                 glFormat = (PixelFormat)All.CompressedTextureFormats;
                 break;
             case SurfaceFormat.Dxt1a:
@@ -706,7 +706,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case SurfaceFormat.Dxt3SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt3;
-                glInternalFormat = PixelInternalFormat)0x8C4E;
+                glInternalFormat = (PixelInternalFormat)0x8C4E;
                 glFormat = (PixelFormat)All.CompressedTextureFormats;
                 break;
 			case SurfaceFormat.Dxt5:
@@ -716,7 +716,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case SurfaceFormat.Dxt5SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt5;
-                glInternalFormat = PixelInternalFormat)0x8C4F;
+                glInternalFormat = (PixelInternalFormat)0x8C4F;
                 glFormat = (PixelFormat)All.CompressedTextureFormats;
                 break;
 #endif
