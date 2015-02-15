@@ -445,5 +445,15 @@ namespace MonoGame.Tests.ContentPipeline
             var value = new GetterOnlyPolymorphicArrayProperties();
             SerializeAndAssert("23_GetterOnlyPolymorphicArrayProperties.xml", value);
         }
+
+        [Test]
+        public void GenericTypes()
+        {
+            SerializeAndAssert("24_GenericTypes.xml", new GenericTypes
+            {
+                A = new GenericClass<int> { Value = 3 },
+                B = new GenericClass<float> { Value = 4.2f }
+            });
+        }
     }
 }
