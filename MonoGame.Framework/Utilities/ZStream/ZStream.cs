@@ -51,31 +51,31 @@ namespace MonoGame.Utilities.ZLib
     {
         public static void CompressStream(Stream decompressedStream, Stream compressedStream)
         {
-            var outputZStream = new ZOutputStream(compressedStream, zlibConst.Z_DEFAULT_COMPRESSION);
-
-            try
+            using (var outputZStream = new ZOutputStream(compressedStream, zlibConst.Z_DEFAULT_COMPRESSION))
             {
-                CopyStream(decompressedStream, outputZStream);
-            }
-            finally
-            {
-                outputZStream.Close();
-                decompressedStream.Close();
+                try
+                {
+                    CopyStream(decompressedStream, outputZStream);
+                }
+                finally
+                {
+                    decompressedStream.Close();
+                }
             }
         }
         
         public static void DecompressStream(Stream compressedStream, Stream decompressedStream)
         {
-            var outputZStream = new ZOutputStream(decompressedStream);
-
-            try
+            using (var outputZStream = new ZOutputStream(decompressedStream))
             {
-                CopyStream(compressedStream, outputZStream);
-            }
-            finally
-            {
-                outputZStream.Close();
-                compressedStream.Close();
+                try
+                {
+                    CopyStream(compressedStream, outputZStream);
+                }
+                finally
+                {
+                    compressedStream.Close();
+                }
             }
         }
 
@@ -4803,9 +4803,11 @@ namespace MonoGame.Utilities.ZLib
             return ((long)SupportClass.ReadInput(BaseStream, tmp, 0, tmp.Length));
         }
 
-        public override void Close()
+        protected override void Dispose(bool disposing)
         {
-            in_Renamed.Close();
+            in_Renamed.Dispose();
+            
+            base.Dispose(disposing);
         }
     }
 
@@ -4992,7 +4994,8 @@ namespace MonoGame.Utilities.ZLib
             z.free();
             z = null;
         }
-        public override void Close()
+
+        protected override void Dispose(bool disposing)
         {
             try
             {
@@ -5010,8 +5013,10 @@ namespace MonoGame.Utilities.ZLib
                 out_Renamed.Close();
                 out_Renamed = null;
             }
+            
+            base.Dispose(disposing);
         }
-
+        
         public override void Flush()
         {
             out_Renamed.Flush();
