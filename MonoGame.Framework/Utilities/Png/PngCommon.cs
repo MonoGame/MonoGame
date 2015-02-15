@@ -7,19 +7,20 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace MonoGame.Utilities.Png
 {
     public class Palette
     {
-        private IList<Tuple<byte, byte, byte, byte>> colors;
+        private IList<Color> colors;
 
         public Palette()
         {
-            colors = new List<Tuple<byte, byte, byte, byte>>();
+            colors = new List<Color>();
         }
 
-        public Tuple<byte, byte, byte, byte> this[int index]
+        public Color this[int index]
         {
             get
             {
@@ -27,21 +28,16 @@ namespace MonoGame.Utilities.Png
             }
         }
 
-        public void AddColor(byte red, byte green, byte blue)
+        public void AddColor(Color color)
         {
-            colors.Add(new Tuple<byte, byte, byte, byte>(red, green, blue, 255));
-        }
-
-        public void AddColor(byte red, byte green, byte blue, byte alpha)
-        {
-            colors.Add(new Tuple<byte, byte, byte, byte>(red, green, blue, alpha));
+            colors.Add(color);
         }
 
         public void AddAlphaToColorAtIndex(int colorIndex, byte alpha)
         {
             var oldColor = colors[colorIndex];
 
-            colors[colorIndex] = new Tuple<byte, byte, byte, byte>(oldColor.Item1, oldColor.Item2, oldColor.Item3, alpha);
+            colors[colorIndex] = new Color(oldColor.R, oldColor.G, oldColor.B, alpha);
         }
 
         public void AddAlphaToColors(IList<byte> alphas)
@@ -293,7 +289,7 @@ namespace MonoGame.Utilities.Png
                 byte green = chunkData.Skip((3 * i) + 1).Take(1).First();
                 byte blue = chunkData.Skip((3 * i) + 2).Take(1).First();
 
-                this.Palette.AddColor(red, green, blue);
+                this.Palette.AddColor(new Color(red, green, blue));
             }
         }
     }

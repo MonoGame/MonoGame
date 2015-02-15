@@ -234,7 +234,6 @@ namespace MonoGame.Utilities.Png
 
                         byte intensity = defilteredScanline[offset];
 
-                        //bitmap.SetPixel(x, y, Color.FromArgb(intensity, intensity, intensity));
                         data[(y * width) + x] = new Color(intensity, intensity, intensity);
                     }
 
@@ -260,7 +259,7 @@ namespace MonoGame.Utilities.Png
                     {
                         var pixelColor = palette[defilteredScanline[x + 1]];
 
-                        data[(y * width) + x] = new Color(pixelColor.Item1, pixelColor.Item2, pixelColor.Item3, pixelColor.Item4);
+                        data[(y * width) + x] = pixelColor;
                     }
 
                     break;
