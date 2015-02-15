@@ -9,7 +9,6 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using MonoGame.Utilities.ZLib;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -131,7 +130,14 @@ namespace MonoGame.Utilities.Png
             var compressedStream = new MemoryStream(dataByteList.ToArray());
             var decompressedStream = new MemoryStream();
 
-            ZStreamUtilities.DecompressStream(compressedStream, decompressedStream);
+            try
+            {
+                ZStreamUtilities.DecompressStream(compressedStream, decompressedStream);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception("An error occurred during DEFLATE decompression.", exception);
+            }
 
             var decompressedBytes = decompressedStream.ToArray();
             var pixelData = DeserializePixelData(decompressedBytes);
@@ -148,7 +154,7 @@ namespace MonoGame.Utilities.Png
 
             if (pixelData.Length % bytesPerScanline != 0)
             {
-                throw new Exception("Malformed pixel data - not multiple of ((bytesPerPixel * width) + 1)");
+                throw new Exception("Malformed pixel data - total length of pixel data not multiple of ((bytesPerPixel * width) + 1)");
             }
 
             var result = new byte[scanlineCount][];
@@ -168,7 +174,6 @@ namespace MonoGame.Utilities.Png
 
         private void DecodePixelData(byte[][] pixelData)
         {
-            //bitmap = new Bitmap(width, height);
             data = new Color[width * height];
             
             byte[] previousScanline = new byte[bytesPerScanline];

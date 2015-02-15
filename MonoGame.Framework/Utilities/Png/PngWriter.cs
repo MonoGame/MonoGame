@@ -22,6 +22,7 @@ namespace MonoGame.Utilities.Png
 
         public PngWriter()
         {
+            // TODO: currently ignoring alpha values while writing PNG images
             colorType = ColorType.Rgb;
         }
 
@@ -52,7 +53,15 @@ namespace MonoGame.Utilities.Png
             var encodedPixelData = EncodePixelData(texture2D);
 
             var compressedPixelData = new MemoryStream();
-            ZStreamUtilities.CompressStream(new MemoryStream(encodedPixelData), compressedPixelData);
+
+            try
+            {
+                ZStreamUtilities.CompressStream(new MemoryStream(encodedPixelData), compressedPixelData);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception("An error occurred during DEFLATE compression.", exception);
+            }
             
             var dataChunk = new DataChunk();
             dataChunk.Data = compressedPixelData.ToArray();
@@ -60,7 +69,6 @@ namespace MonoGame.Utilities.Png
             outputStream.Write(dataChunkBytes, 0, dataChunkBytes.Length);
 
             // write end chunk
-
             var endChunk = new EndChunk();
             var endChunkBytes = endChunk.Encode();
             outputStream.Write(endChunkBytes, 0, endChunkBytes.Length);
@@ -98,6 +106,14 @@ namespace MonoGame.Utilities.Png
             return result.ToArray();
         }
 
+        /// <summary>
+        /// Applies all PNG filters to the given scanline and returns the filtered scanline that is deemed
+        /// to be most compressible, using lowest total variation as proxy for compressibility.
+        /// </summary>
+        /// <param name="rawScanline"></param>
+        /// <param name="previousScanline"></param>
+        /// <param name="bytesPerPixel"></param>
+        /// <returns></returns>
         private byte[] GetOptimalFilteredScanline(byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
         {
             var candidates = new List<Tuple<byte[], int>>();
@@ -129,6 +145,12 @@ namespace MonoGame.Utilities.Png
             return candidates[lowestTotalVariationIndex].Item1;
         }
 
+        /// <summary>
+        /// Calculates the total variation of given byte array.  Total variation is the sum of the absolute values of
+        /// neighbour differences.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         private int CalculateTotalVariation(byte[] input)
         {
             int totalVariation = 0;

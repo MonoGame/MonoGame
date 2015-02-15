@@ -246,6 +246,11 @@ namespace MonoGame.Utilities.Png
             this.CompressionMethod = chunkData.Skip(10).First();
             this.FilterMethod = chunkData.Skip(11).First();
             this.InterlaceMethod = chunkData.Skip(12).First();
+
+            if (this.BitDepth < 8)
+            {
+                throw new Exception(String.Format("Bit depth less than 8 bits per sample is unsupported.  Image bit depth is {0} bits per sample.", this.BitDepth));
+            }
         }
 
         public override byte[] Encode()
