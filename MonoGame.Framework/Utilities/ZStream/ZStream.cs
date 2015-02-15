@@ -59,7 +59,7 @@ namespace MonoGame.Utilities.ZLib
                 }
                 finally
                 {
-                    decompressedStream.Close();
+                    decompressedStream.Dispose();
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace MonoGame.Utilities.ZLib
                 }
                 finally
                 {
-                    compressedStream.Close();
+                    compressedStream.Dispose();
                 }
             }
         }
