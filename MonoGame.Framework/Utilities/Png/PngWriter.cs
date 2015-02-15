@@ -4,12 +4,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Utilities.ZLib;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace MonoGame.Utilities.Png
 {
@@ -17,14 +18,18 @@ namespace MonoGame.Utilities.Png
     {
         private const int bitsPerSample = 8;
         private ColorType colorType;
+        private Color[] textureData;
 
         public PngWriter()
         {
             colorType = ColorType.Rgb;
         }
 
-        public Stream Write(Bitmap bitmap)
+        public Stream Write(Texture2D texture2D)
         {
+            textureData = new Color[texture2D.Width * texture2D.Height];
+            texture2D.GetData<Color>(textureData);
+            
             var outputStream = new MemoryStream();
 
             // write PNG signature
@@ -32,8 +37,8 @@ namespace MonoGame.Utilities.Png
 
             // write header chunk
             var headerChunk = new HeaderChunk();
-            headerChunk.Width = (uint)bitmap.Width;
-            headerChunk.Height = (uint)bitmap.Height;
+            headerChunk.Width = (uint)texture2D.Width;
+            headerChunk.Height = (uint)texture2D.Height;
             headerChunk.BitDepth = 8;
             headerChunk.ColorType = colorType;
             headerChunk.CompressionMethod = 0;
@@ -44,7 +49,7 @@ namespace MonoGame.Utilities.Png
             outputStream.Write(headerChunkBytes, 0, headerChunkBytes.Length);
 
             // write data chunks
-            var encodedPixelData = EncodePixelData(bitmap);
+            var encodedPixelData = EncodePixelData(texture2D);
 
             var compressedPixelData = new MemoryStream();
             ZStreamUtilities.CompressStream(new MemoryStream(encodedPixelData), compressedPixelData);
@@ -63,18 +68,18 @@ namespace MonoGame.Utilities.Png
             return outputStream;
         }
 
-        private byte[] EncodePixelData(Bitmap bitmap)
+        private byte[] EncodePixelData(Texture2D texture2D)
         {
             List<byte[]> filteredScanlines = new List<byte[]>();
 
-            int width = bitmap.Width;
-            int height = bitmap.Height;
+            int width = texture2D.Width;
+            int height = texture2D.Height;
             int bytesPerPixel = CalculateBytesPerPixel();
             byte[] previousScanline = new byte[width * bytesPerPixel];
 
             for (int y = 0; y < height; y++)
             {
-                var rawScanline = GetRawScanline(bitmap, y);
+                var rawScanline = GetRawScanline(texture2D, y);
 
                 var filteredScanline = GetOptimalFilteredScanline(rawScanline, previousScanline, bytesPerPixel);
 
@@ -136,15 +141,15 @@ namespace MonoGame.Utilities.Png
             return totalVariation;
         }
 
-        private byte[] GetRawScanline(Bitmap bitmap, int y)
+        private byte[] GetRawScanline(Texture2D texture2D, int y)
         {
-            int width = bitmap.Width;
+            int width = texture2D.Width;
 
             var rawScanline = new byte[3 * width];
             
             for (int x = 0; x < width; x++)
             {
-                var color = bitmap.GetPixel(x, y);
+                var color = textureData[(y * width) + x];
 
                 rawScanline[3 * x] = color.R;
                 rawScanline[(3 * x) + 1] = color.G;
