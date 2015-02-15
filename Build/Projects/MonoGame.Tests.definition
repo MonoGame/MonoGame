@@ -331,7 +331,7 @@
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestFillMode_Solid_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestFillMode_Wireframe_.png">
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestFillMode_WireFrame_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_False_.png">
