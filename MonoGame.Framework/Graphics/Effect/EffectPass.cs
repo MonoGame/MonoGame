@@ -121,8 +121,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     var param = _effect.Parameters[sampler.parameter];
                     var texture = param.Data as Texture;
 										
-					// If there is no texture explicitly assigned then skip it
-					// and leave whatever set directly on the device.
+                    // If there is no texture *explicitly* assigned then skip it
+                    // and leave whatever set directly on the device.
+                    // Each time an effect parameter value is set, param.StateKey
+                    // will be incremented. So if our stored _stateKey - which is the cached
+                    // value from the previous time Apply() was called - is less than the 
+                    // current value of param.StateKey, we know that this texture parameter 
+                    // has been explicitly set to a value since the previous time Apply()
+                    // was called.
                     if (param.StateKey >= _stateKey)
 						device.Textures[sampler.textureSlot] = texture;
 
@@ -140,6 +146,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+            // Store current value of NextStateKey, so we can detect whether any texture
+            // parameter values are set between now and the next call to Apply().
             _stateKey = EffectParameter.NextStateKey;
 
 #endif
