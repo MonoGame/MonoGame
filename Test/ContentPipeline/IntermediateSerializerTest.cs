@@ -337,9 +337,20 @@ namespace MonoGame.Tests.ContentPipeline
             resource2.Next = resource3;
             resource3.Next = resource1;
 
+            var resourceArray1 = new Linked2();
+            var resourceArray2 = new Linked2();
+            var resourceArray3 = new Linked2();
+            resourceArray1.Next = new[] { resourceArray2, resourceArray3 };
+            resourceArray2.Next = new[] { resourceArray1 };
+
             SerializeAndAssert("16_SharedResources.xml", new SharedResources
             {
-                Head = resource1
+                Head = resource1,
+                LinkedArray = new[]
+                {
+                    resourceArray1,
+                    resourceArray2
+                }
             });
         }
 
