@@ -10,5 +10,6 @@
       <!-- An XML comment in the middle of a list -->
       0 7
     </Vector2ListSpaced>
+    <EmptyString />
   </Asset>
 </XnaContent>
