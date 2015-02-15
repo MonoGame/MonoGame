@@ -169,7 +169,7 @@ namespace MonoGame.Utilities.Png
 
         public static string GetChunkTypeString(byte[] chunkTypeBytes)
         {
-            return Encoding.UTF8.GetString(chunkTypeBytes);
+            return Encoding.UTF8.GetString(chunkTypeBytes, 0, chunkTypeBytes.Length);
         }
 
         private static byte[] GetChunkTypeBytes(string chunkTypeString)

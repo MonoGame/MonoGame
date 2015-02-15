@@ -5010,7 +5010,7 @@ namespace MonoGame.Utilities.ZLib
             finally
             {
                 end();
-                out_Renamed.Close();
+                out_Renamed.Dispose();
                 out_Renamed = null;
             }
             
