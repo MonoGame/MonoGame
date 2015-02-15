@@ -18,6 +18,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly DepthStencilState _depthStencilState;
         private readonly RasterizerState _rasterizerState;
 
+        private ulong _stateKey;
+
 		public string Name { get; private set; }
 
         public EffectAnnotationCollection Annotations { get; private set; }
@@ -90,6 +92,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL || DIRECTX
 
+            // If our state key becomes larger than the 
+            // next state key then the keys have rolled 
+            // over and we need to reset.
+            if (_stateKey > EffectParameter.NextStateKey)
+                _stateKey = 0;
+
             if (_vertexShader != null)
             {
                 device.VertexShader = _vertexShader;
@@ -113,9 +121,15 @@ namespace Microsoft.Xna.Framework.Graphics
                     var param = _effect.Parameters[sampler.parameter];
                     var texture = param.Data as Texture;
 										
-					// If there is no texture assigned then skip it
-					// and leave whatever set directly on the device.
-					if (texture != null)
+                    // If there is no texture *explicitly* assigned then skip it
+                    // and leave whatever set directly on the device.
+                    // Each time an effect parameter value is set, param.StateKey
+                    // will be incremented. So if our stored _stateKey - which is the cached
+                    // value from the previous time Apply() was called - is less than the 
+                    // current value of param.StateKey, we know that this texture parameter 
+                    // has been explicitly set to a value since the previous time Apply()
+                    // was called.
+                    if (param.StateKey >= _stateKey)
 						device.Textures[sampler.textureSlot] = texture;
 
                     // If there is a sampler state set it.
@@ -131,6 +145,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
                 }
             }
+
+            // Store current value of NextStateKey, so we can detect whether any texture
+            // parameter values are set between now and the next call to Apply().
+            _stateKey = EffectParameter.NextStateKey;
 
 #endif
 
