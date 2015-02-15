@@ -522,5 +522,17 @@ namespace MonoGame.Tests.ContentPipeline
                     IntermediateSerializer.Deserialize<GetterOnlyPolymorphicArrayProperties>(reader, filePath));
             }
         }
+
+        [Test]
+        public void GenericTypes()
+        {
+            DeserializeCompileAndLoad<GenericTypes>("24_GenericTypes.xml", genericTypes =>
+            {
+                Assert.IsNotNull(genericTypes.A);
+                Assert.AreEqual(3, genericTypes.A.Value);
+                Assert.IsNotNull(genericTypes.B);
+                Assert.AreEqual(4.2f, genericTypes.B.Value);
+            });
+        }
     }
 }

@@ -421,6 +421,19 @@ class GetterOnlyPolymorphicArrayProperties
 }
 #endregion
 
+#region GenericTypes
+class GenericTypes
+{
+    public GenericClass<int> A;
+    public GenericClass<float> B;
+}
+
+class GenericClass<T>
+{
+    public T Value;
+}
+#endregion
+
 namespace MonoGame.Tests.ContentPipeline
 {
     #region Namespaces
