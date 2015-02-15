@@ -548,7 +548,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case SurfaceFormat.ColorSRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Color;
-                glInternalFormat = PixelInternalFormat.Srgb;
+                glInternalFormat = (PixelInternalFormat) 0x8C40; // PixelInternalFormat.Srgb;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedByte;
                 break;
