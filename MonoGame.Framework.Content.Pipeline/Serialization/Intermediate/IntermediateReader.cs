@@ -114,6 +114,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             var result = typeSerializer.Deserialize(this, format, existingInstance);
 
+            if (isEmpty)
+                Xml.Skip();
+
             if (!isEmpty)
                 Xml.ReadEndElement();
 

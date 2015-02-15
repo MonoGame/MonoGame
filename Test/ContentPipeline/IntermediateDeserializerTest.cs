@@ -489,6 +489,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Vector2(0, 4), customFormatting.Vector2ListSpaced[0]);
                 Assert.AreEqual(new Vector2(0, 6), customFormatting.Vector2ListSpaced[1]);
                 Assert.AreEqual(new Vector2(0, 7), customFormatting.Vector2ListSpaced[2]);
+                Assert.AreEqual(string.Empty, customFormatting.EmptyString);
             });
         }
 

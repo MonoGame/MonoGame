@@ -484,6 +484,7 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public byte A;
         public List<Vector2> Vector2ListSpaced = new List<Vector2>();
+        public string EmptyString;
     }
     #endregion
 }
