@@ -180,6 +180,8 @@ namespace MonoGame.Utilities.Png
 
     public class HeaderChunk : PngChunk
     {
+        private static byte[] pngSignature = new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 };
+        
         public HeaderChunk()
         {
             base.Type = "IHDR";
@@ -225,6 +227,11 @@ namespace MonoGame.Utilities.Png
         {
             get;
             set;
+        }
+
+        public static byte[] PngSignature
+        {
+            get { return pngSignature; }
         }
 
         public override void Decode(byte[] chunkBytes)

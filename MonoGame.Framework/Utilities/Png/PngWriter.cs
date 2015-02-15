@@ -15,7 +15,6 @@ namespace MonoGame.Utilities.Png
 {
     public class PngWriter
     {
-        private byte[] pngSignature = new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 };
         private const int bitsPerSample = 8;
         private ColorType colorType;
 
@@ -29,7 +28,7 @@ namespace MonoGame.Utilities.Png
             var outputStream = new MemoryStream();
 
             // write PNG signature
-            outputStream.Write(pngSignature, 0, pngSignature.Length);
+            outputStream.Write(HeaderChunk.PngSignature, 0, HeaderChunk.PngSignature.Length);
 
             // write header chunk
             var headerChunk = new HeaderChunk();

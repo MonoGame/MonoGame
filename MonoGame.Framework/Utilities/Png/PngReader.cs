@@ -18,7 +18,6 @@ namespace MonoGame.Utilities.Png
 {
     public class PngReader
     {
-        private byte[] pngSignature = new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 };
         private int width;
         private int height;
         private int bitsPerSample;
@@ -43,7 +42,7 @@ namespace MonoGame.Utilities.Png
             byte[] signature = new byte[8];
             inputStream.Read(signature, 0, 8);
 
-            if (signature.EqualsByElement(pngSignature) == false)
+            if (signature.EqualsByElement(HeaderChunk.PngSignature) == false)
             {
                 throw new Exception("File does not have PNG signature.");
             }
