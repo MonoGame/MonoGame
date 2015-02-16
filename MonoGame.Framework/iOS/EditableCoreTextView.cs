@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 
-using MonoTouch.CoreGraphics;
-using MonoTouch.CoreText;
-using MonoTouch.CoreAnimation;
-using MonoTouch.Foundation;
-using MonoTouch.ObjCRuntime;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using CoreText;
+using CoreAnimation;
+using Foundation;
+using ObjCRuntime;
+using OpenGLES;
+using UIKit;
 
 using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
@@ -23,27 +23,29 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
 using All = OpenTK.Graphics.ES20.All;
+using Microsoft.Xna.Framework.Input;
 
 
 namespace Microsoft.Xna.Framework
 {
-
 	[Adopts ("UITextInput")]
 	[Adopts ("UIKeyInput")]
 	[Adopts ("UITextInputTraits")]
 	[Register ("EditableCoreTextView")]
+
 	public class EditableCoreTextView : UIView
 	{
 		StringBuilder text = new StringBuilder ();
-		UITextInputStringTokenizer tokenizer;
+		IUITextInputTokenizer tokenizer;
 		SimpleCoreTextView textView;
 		NSDictionary markedTextStyle;
 		IUITextInputDelegate inputDelegate;
+		public UITextField textfield;
 
 		public delegate void ViewWillEditDelegate (EditableCoreTextView editableCoreTextView);
 		public event ViewWillEditDelegate ViewWillEdit;
 
-		public EditableCoreTextView (RectangleF frame)
+		public EditableCoreTextView (CGRect frame)
 			: base (frame)
 		{
 			// Add tap gesture recognizer to let the user enter editing mode
@@ -56,7 +58,7 @@ namespace Microsoft.Xna.Framework
 			AddGestureRecognizer (tap);
 
 			// Create our tokenizer and text storage
-			tokenizer = new UITextInputStringTokenizer (this);
+			tokenizer = new UITextInputStringTokenizer ();
 
 			// Create and set up our SimpleCoreTextView that will do the drawing
 			textView = new SimpleCoreTextView (Bounds.Inset (5, 5));
@@ -66,6 +68,18 @@ namespace Microsoft.Xna.Framework
 			AddSubview (textView);
 			textView.Text = string.Empty;
 			textView.UserInteractionEnabled = false;
+
+			textfield = new UITextField
+			{
+				Placeholder = "Enter your username",
+				BorderStyle = UITextBorderStyle.RoundedRect,
+				Frame = new RectangleF(10, 32, 0, 0)
+			};
+
+			textfield.KeyboardAppearance = UIKeyboardAppearance.Dark;
+			textfield.KeyboardType = UIKeyboardType.NumberPad;
+
+			AddSubview(textfield);
 		}
 
 		protected override void Dispose (bool disposing)
@@ -77,17 +91,16 @@ namespace Microsoft.Xna.Framework
 			base.Dispose (disposing);
 		}
 
-
-
 		public delegate void KeyboardTextEntryEventHandler(object sender, KeyboardEntryEventArgs e);
 		public event KeyboardTextEntryEventHandler KeyboardTextEntry;
 		// Invoke the KeyboardTextEntry event
 		public virtual void OnKeyboardTextEntry(KeyboardEntryEventArgs e) 
 		{
 			if (KeyboardTextEntry != null) 
+			{
 				KeyboardTextEntry (this, e);
+			}
 		}
-
 
 		public delegate void KeyboardTextChangeEventHandler(object sender, KeyboardEntryEventArgs e);
 		public event KeyboardTextChangeEventHandler KeyboardTextChange;
@@ -95,47 +108,91 @@ namespace Microsoft.Xna.Framework
 		public virtual void OnKeyboardTextChange(KeyboardEntryEventArgs e) 
 		{
 			if (KeyboardTextChange != null) 
+			{
 				KeyboardTextChange (this, e);
+			}
 		}
 
+		public delegate void SelectionChangedEventHandler(object sender, SelectionChangedEventArgs e);
+		public event SelectionChangedEventHandler SelectionChanged;
+		// Invoke the KeyboardTextEntry event
+		public virtual void OnSelectionChanged(SelectionChangedEventArgs e) 
+		{
+			if (SelectionChanged != null) 
+			{
+				SelectionChanged (this, e);
+			}
+		}
 
+		public delegate void TabKeyPressedEventHandler(object sender, EventArgs e);
+		public event TabKeyPressedEventHandler TabKeyPressed;
+		// Invoke the KeyboardTextEntry event
+		public virtual void OnTabKeyPressed(EventArgs e) 
+		{
+			if (TabKeyPressed != null) 
+			{
+				TabKeyPressed (this, e);
+			}
+		}
 
 		public void Restart()
 		{
 			if (!IsFirstResponder) {
 				// Inform controller that we're about to enter editing mode
 				if (ViewWillEdit != null)
+				{
 					ViewWillEdit (this);
+				}
+
+				textfield.BecomeFirstResponder();
+
 				// Flag that underlying SimpleCoreTextView is now in edit mode
 				// Become first responder state (which shows software keyboard, if applicable)
-				BecomeFirstResponder ();
+				BecomeFirstResponder();
+
 			} 
 
-			textView.IsEditing = true;
-			textView.Text = string.Empty;
 			textView.MarkedTextRange = new NSRange (NSRange.NotFound, 0);
 			textView.SelectedTextRange = new NSRange (0, 0);
+			this.text.Clear();
+			textView.IsEditing = true;
+			textView.Text = string.Empty;
 		}
 
+		public void SetText(string text)
+		{
+			if (text != textView.Text)
+			{		
+				this.text.Clear();
+				this.text.Append(text);
+				textView.Text = text;
+			}
+		}
 
+		public void SetSelection(NSRange range)
+		{
+			textView.SelectedTextRange = range;
+		}
+			
 		#region Custom user interaction
 
-		// UIResponder protocol override - our view can become first responder to 
+		// UIResponder protocol override - our view can become first responder to
 		// receive user text input
 		public override bool CanBecomeFirstResponder {
-			get {
+			get 
+			{
 				return true;
 			}
 		}
 
-		// UIResponder protocol override - called when our view is being asked to resign 
-		// first responder state (in this sample by using the "Done" button)  
+		// UIResponder protocol override - called when our view is being asked to resign
+		// first responder state (in this sample by using the "Done" button)
 		public override bool ResignFirstResponder ()
 		{
 			textView.IsEditing = false;
 			return base.ResignFirstResponder ();
 		}
-
+						
 		// Our tap gesture recognizer selector that enters editing mode, or if already
 		// in editing mode, updates the text insertion point
 		[Export ("Tap:")]
@@ -187,7 +244,7 @@ namespace Microsoft.Xna.Framework
 		string TextInRange (UITextRange range)
 		{
 			IndexedRange r = (IndexedRange) range;
-			return text.ToString ().Substring (r.Range.Location, r.Range.Length);
+			return text.ToString ().Substring ((int)r.Range.Location, (int)r.Range.Length);
 		}
 
 		// UITextInput required method - called by text system to replace the given
@@ -200,7 +257,7 @@ namespace Microsoft.Xna.Framework
 			// Determine if replaced range intersects current selection range
 			// and update selection range if so.
 			if (r.Range.Location + r.Range.Length <= selectedNSRange.Location) {
-				// This is the easy case. 
+				// This is the easy case.
 				selectedNSRange.Location -= (r.Range.Length - text.Length);
 			} else {
 				// Need to also deal with overlapping ranges.  Not addressed
@@ -208,25 +265,35 @@ namespace Microsoft.Xna.Framework
 			}
 
 			// Now replace characters in text storage
-			this.text.Remove (r.Range.Location, r.Range.Length);
-			this.text.Insert (r.Range.Location, text);
+			this.text.Remove ((int)r.Range.Location, (int)r.Range.Length);
+			this.text.Insert ((int)r.Range.Location, text);
 
 			// Update underlying SimpleCoreTextView
-			textView.Text = this.text.ToString ();
+			textView.Text = this.text.ToString();
 			textView.SelectedTextRange = selectedNSRange;
 
 
-			if (text == " " || text == "\n") {
+			if (text == " " || text == "\n") 
+			{
 				OnKeyboardTextChange (new KeyboardEntryEventArgs (text));
 			} else if (text.Trim () != "") {
 
-				OnKeyboardTextChange (new KeyboardEntryEventArgs (text, r.Range.Location, r.Range.Length, r.Range.Location+r.Range.Length));
+				OnKeyboardTextChange (new KeyboardEntryEventArgs (text, (int)r.Range.Location, (int)r.Range.Length, (int)(r.Range.Location + r.Range.Length)));
 			}
-
-
 
 		}
 		#endregion
+
+		public UIKeyboardType _keyboardType = UIKeyboardType.EmailAddress;
+
+		[Export ("keyboardAppearance")]
+		UIKeyboardAppearance keyboardAppearance {
+			get 
+			{
+				return UIKeyboardAppearance.Dark;
+			}
+		}
+
 		#region UITextInput - Working with Marked and Selected Text
 
 		// UITextInput selectedTextRange property accessor overrides
@@ -238,6 +305,8 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				textView.SelectedTextRange = value.Range;
+			
+				OnSelectionChanged(new SelectionChangedEventArgs(value.Range));
 			}
 		}
 
@@ -250,8 +319,8 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
-		// UITextInput required method - Insert the provided text and marks it to indicate 
-		// that it is part of an active input session. 
+		// UITextInput required method - Insert the provided text and marks it to indicate
+		// that it is part of an active input session.
 		[Export ("setMarkedText:selectedRange:")]
 		void SetMarkedText (string markedText, NSRange selectedRange)
 		{
@@ -263,24 +332,23 @@ namespace Microsoft.Xna.Framework
 
 			if (markedTextRange.Location != NSRange.NotFound) {
 				// Replace characters in text storage and update markedText range length
-				text.Remove (markedTextRange.Location, markedTextRange.Length);
-				text.Insert (markedTextRange.Location, markedText);
+				text.Remove ((int)markedTextRange.Location, (int)markedTextRange.Length);
+				text.Insert ((int)markedTextRange.Location, markedText);
 				markedTextRange.Length = markedText.Length;
 			} else if (selectedNSRange.Length > 0) {
 				// There currently isn't a marked text range, but there is a selected range,
 				// so replace text storage at selected range and update markedTextRange.
-				text.Remove (selectedNSRange.Location, selectedNSRange.Length);
-				text.Insert (selectedNSRange.Location, markedText);
+				text.Remove ((int)selectedNSRange.Location, (int)selectedNSRange.Length);
+				text.Insert ((int)selectedNSRange.Location, markedText);
 				markedTextRange.Location = selectedNSRange.Location;
 				markedTextRange.Length = markedText.Length;
 			} else {
 				// There currently isn't marked or selected text ranges, so just insert
 				// given text into storage and update markedTextRange.
-				text.Insert (selectedNSRange.Location, markedText);
+				text.Insert ((int)selectedNSRange.Location, markedText);
 				markedTextRange.Location = selectedNSRange.Location;
 				markedTextRange.Length = markedText.Length;
 			}
-
 
 			// Updated selected text range and underlying SimpleCoreTextView
 			selectedNSRange = new NSRange (selectedRange.Location + markedTextRange.Location, selectedRange.Length);
@@ -291,7 +359,7 @@ namespace Microsoft.Xna.Framework
 
 		// UITextInput required method - Unmark the currently marked text.
 		[Export ("unmarkText")]
-		void UnmarkText () 
+		void UnmarkText ()
 		{
 			NSRange markedTextRange = textView.MarkedTextRange;
 
@@ -300,7 +368,7 @@ namespace Microsoft.Xna.Framework
 
 			// unmark the underlying SimpleCoreTextView.markedTextRange
 			markedTextRange.Location = NSRange.NotFound;
-			textView.MarkedTextRange = markedTextRange;    
+			textView.MarkedTextRange = markedTextRange;
 
 		}
 		#endregion
@@ -309,7 +377,7 @@ namespace Microsoft.Xna.Framework
 		// UITextInput beginningOfDocument property accessor override
 		[Export ("beginningOfDocument")]
 		IndexedPosition BeginningOfDocument {
-			get { 
+			get {
 				// For this sample, the document always starts at index 0 and is the full
 				// length of the text storage
 				return IndexedPosition.GetPosition (0);
@@ -319,10 +387,10 @@ namespace Microsoft.Xna.Framework
 		// UITextInput endOfDocument property accessor override
 		[Export ("endOfDocument")]
 		IndexedPosition EndOfDocument {
-			get { 
+			get {
 				// For this sample, the document always starts at index 0 and is the full
 				// length of the text storage
-				return IndexedPosition.GetPosition (text.Length); 
+				return IndexedPosition.GetPosition (text.Length);
 			}
 		}
 
@@ -338,7 +406,7 @@ namespace Microsoft.Xna.Framework
 			return IndexedRange.GetRange (range);
 		}
 
-		// UITextInput protocol required method - Returns the text position at a given offset 
+		// UITextInput protocol required method - Returns the text position at a given offset
 		// from another text position using our implementation of UITextPosition
 		[Export ("positionFromPosition:offset:")]
 		IndexedPosition GetPosition (UITextPosition position, int offset)
@@ -353,7 +421,7 @@ namespace Microsoft.Xna.Framework
 			return IndexedPosition.GetPosition (end);
 		}
 
-		// UITextInput protocol required method - Returns the text position at a given offset 
+		// UITextInput protocol required method - Returns the text position at a given offset
 		// in a specified direction from another text position using our implementation of
 		// UITextPosition.
 		[Export ("positionFromPosition:inDirection:offset:")]
@@ -389,8 +457,8 @@ namespace Microsoft.Xna.Framework
 		#endregion
 		#region UITextInput - Evaluating Text Positions
 
-		// UITextInput protocol required method - Return how one text position compares to another 
-		// text position.  
+		// UITextInput protocol required method - Return how one text position compares to another
+		// text position.
 		[Export ("comparePosition:toPosition:")]
 		NSComparisonResult ComparePosition (UITextPosition position, UITextPosition other)
 		{
@@ -407,7 +475,7 @@ namespace Microsoft.Xna.Framework
 			}
 		}
 
-		// UITextInput protocol required method - Return the number of visible characters 
+		// UITextInput protocol required method - Return the number of visible characters
 		// between one text position and another text position.
 		[Export ("offsetFromPosition:toPosition:")]
 		int GetOffset (IndexedPosition @from, IndexedPosition toPosition)
@@ -419,29 +487,29 @@ namespace Microsoft.Xna.Framework
 
 		// UITextInput tokenizer property accessor override
 		//
-		// An input tokenizer is an object that provides information about the granularity 
-		// of text units by implementing the UITextInputTokenizer protocol.  Standard units 
-		// of granularity include characters, words, lines, and paragraphs. In most cases, 
-		// you may lazily create and assign an instance of a subclass of 
-		// UITextInputStringTokenizer for this purpose, as this sample does. If you require 
-		// different behavior than this system-provided tokenizer, you can create a custom 
+		// An input tokenizer is an object that provides information about the granularity
+		// of text units by implementing the UITextInputTokenizer protocol.  Standard units
+		// of granularity include characters, words, lines, and paragraphs. In most cases,
+		// you may lazily create and assign an instance of a subclass of
+		// UITextInputStringTokenizer for this purpose, as this sample does. If you require
+		// different behavior than this system-provided tokenizer, you can create a custom
 		// tokenizer that adopts the UITextInputTokenizer protocol.
 		[Export ("tokenizer")]
-		UITextInputTokenizer Tokenizer {
-			get { 
-				return tokenizer; 
+		IUITextInputTokenizer Tokenizer {
+			get {
+				return tokenizer;
 			}
 		}
 		#endregion
 		#region UITextInput - Text Layout, writing direction and position related methods
-		// UITextInput protocol method - Return the text position that is at the farthest 
+		// UITextInput protocol method - Return the text position that is at the farthest
 		// extent in a given layout direction within a range of text.
 		[Export ("positionWithinRange:farthestInDirection:")]
 		IndexedPosition GetPosition (UITextRange range, UITextLayoutDirection direction)
 		{
 			// Note that this sample assumes LTR text direction
 			IndexedRange r = (IndexedRange) range;
-			int pos = r.Range.Location;
+			int pos = (int)r.Range.Location;
 
 			// For this sample, we just return the extent of the given range if the
 			// given direction is "forward" in a LTR context (UITextLayoutDirectionRight
@@ -449,11 +517,11 @@ namespace Microsoft.Xna.Framework
 			switch (direction) {
 			case UITextLayoutDirection.Up:
 			case UITextLayoutDirection.Left:
-				pos = r.Range.Location;
+				pos = (int)r.Range.Location;
 				break;
 			case UITextLayoutDirection.Right:
 			case UITextLayoutDirection.Down:
-				pos = r.Range.Location + r.Range.Length;
+				pos = (int)(r.Range.Location + r.Range.Length);
 				break;
 			}
 
@@ -462,7 +530,7 @@ namespace Microsoft.Xna.Framework
 			return IndexedPosition.GetPosition (pos);
 		}
 
-		// UITextInput protocol required method - Return a text range from a given text position 
+		// UITextInput protocol required method - Return a text range from a given text position
 		// to its farthest extent in a certain direction of layout.
 		[Export ("characterRangeByExtendingPosition:inDirection:")]
 		IndexedRange GetCharacterRange (UITextPosition position, UITextLayoutDirection direction)
@@ -487,7 +555,7 @@ namespace Microsoft.Xna.Framework
 			return IndexedRange.GetRange (result);
 		}
 
-		// UITextInput protocol required method - Return the base writing direction for 
+		// UITextInput protocol required method - Return the base writing direction for
 		// a position in the text going in a specified text direction.
 		[Export ("baseWritingDirectionForPosition:inDirection:")]
 		UITextWritingDirection GetBaseWritingDirection (UITextPosition position, UITextStorageDirection direction)
@@ -495,7 +563,7 @@ namespace Microsoft.Xna.Framework
 			return UITextWritingDirection.LeftToRight;
 		}
 
-		// UITextInput protocol required method - Set the base writing direction for a 
+		// UITextInput protocol required method - Set the base writing direction for a
 		// given range of text in a document.
 		[Export ("setBaseWritingDirection:forRange:")]
 		void SetBaseWritingDirection (UITextWritingDirection writingDirection, UITextRange range)
@@ -504,10 +572,10 @@ namespace Microsoft.Xna.Framework
 		}
 		#endregion
 		#region UITextInput - Geometry methods
-		// UITextInput protocol required method - Return the first rectangle that encloses 
+		// UITextInput protocol required method - Return the first rectangle that encloses
 		// a range of text in a document.
 		[Export ("firstRectForRange:")]
-		RectangleF FirstRect (UITextRange range)
+		CGRect FirstRect (UITextRange range)
 		{
 			// FIXME: the Objective-C code doesn't get a null range
 			// This is the reason why we don't get the autocorrection suggestions
@@ -515,7 +583,7 @@ namespace Microsoft.Xna.Framework
 			// Possibly due to http://bugzilla.xamarin.com/show_bug.cgi?id=265
 			IndexedRange r = (IndexedRange) (range ?? IndexedRange.GetRange (new NSRange (0, 1)));
 			// Use underlying SimpleCoreTextView to get rect for range
-			RectangleF rect = textView.FirstRect (r.Range);
+			CGRect rect = textView.FirstRect (r.Range);
 			// Convert rect to our view coordinates
 			return ConvertRectFromView (rect, textView);
 		}
@@ -523,7 +591,7 @@ namespace Microsoft.Xna.Framework
 		// UITextInput protocol required method - Return a rectangle used to draw the caret
 		// at a given insertion point.
 		[Export ("caretRectForPosition:")]
-		RectangleF CaretRect (UITextPosition position)
+		CGRect CaretRect (UITextPosition position)
 		{
 			// FIXME: the Objective-C code doesn't get a null position
 			// This is the reason why we don't get the autocorrection suggestions
@@ -531,7 +599,7 @@ namespace Microsoft.Xna.Framework
 			// Possibly due to http://bugzilla.xamarin.com/show_bug.cgi?id=265
 			IndexedPosition pos = (IndexedPosition) (position ?? IndexedPosition.GetPosition (0));
 			// Get caret rect from underlying SimpleCoreTextView
-			RectangleF rect = textView.CaretRect (pos.Index);
+			CGRect rect = textView.CaretRect (pos.Index);
 			// Convert rect to our view coordinates
 			return ConvertRectFromView (rect, textView);
 		}
@@ -542,48 +610,48 @@ namespace Microsoft.Xna.Framework
 		// is a wide variety of approaches for this (gestures, drag rects, etc) and
 		// any approach chosen will depend greatly on the design of the application.
 
-		// UITextInput protocol required method - Return the position in a document that 
-		// is closest to a specified point. 
+		// UITextInput protocol required method - Return the position in a document that
+		// is closest to a specified point.
 		[Export ("closestPositionToPoint:")]
-		UITextPosition ClosestPosition (PointF point)
+		UITextPosition ClosestPosition (CGPoint point)
 		{
-			// Not implemented in this sample.  Could utilize underlying 
+			// Not implemented in this sample.  Could utilize underlying
 			// SimpleCoreTextView:closestIndexToPoint:point
 			return null;
 		}
 
-		// UITextInput protocol required method - Return the position in a document that 
+		// UITextInput protocol required method - Return the position in a document that
 		// is closest to a specified point in a given range.
 		[Export ("closestPositionToPoint:withinRange:")]
-		UITextPosition ClosestPosition (PointF point, UITextRange range)
+		UITextPosition ClosestPosition (CGPoint point, UITextRange range)
 		{
-			// Not implemented in this sample.  Could utilize underlying 
+			// Not implemented in this sample.  Could utilize underlying
 			// SimpleCoreTextView:closestIndexToPoint:point
 			return null;
 		}
 
-		// UITextInput protocol required method - Return the character or range of 
+		// UITextInput protocol required method - Return the character or range of
 		// characters that is at a given point in a document.
 		[Export ("characterRangeAtPoint:")]
-		UITextRange CharacterRange (PointF point)
+		UITextRange CharacterRange (CGPoint point)
 		{
-			// Not implemented in this sample.  Could utilize underlying 
+			// Not implemented in this sample.  Could utilize underlying
 			// SimpleCoreTextView:closestIndexToPoint:point
 			return null;
 		}
 		#endregion
 		#region UITextInput - Returning Text Styling Information
-		// UITextInput protocol method - Return a dictionary with properties that specify 
+		// UITextInput protocol method - Return a dictionary with properties that specify
 		// how text is to be style at a certain location in a document.
 		[Export ("textStylingAtPosition:inDirection:")]
 		NSDictionary TextStyling (UITextPosition position, UITextStorageDirection direction)
 		{
 			// This sample assumes all text is single-styled, so this is easy.
-			return NSDictionary.FromObjectAndKey (textView.Font, CTStringAttributeKey.Font);
+			return new NSDictionary (CTStringAttributeKey.Font, textView.Font);
 		}
 		#endregion
 		#region UIKeyInput methods
-		// UIKeyInput required method - A Boolean value that indicates whether the text-entry 
+		// UIKeyInput required method - A Boolean value that indicates whether the text-entry
 		// objects have any text.
 		[Export ("hasText")]
 		bool HasText {
@@ -595,10 +663,15 @@ namespace Microsoft.Xna.Framework
 		[Export ("insertText:")]
 		void InsertText (string text)
 		{
-			if (text == " " || text == "\n") {
+			if (text == " " || text == "\n") 
+			{
 				OnKeyboardTextEntry (new KeyboardEntryEventArgs (text));
 			} else if (text.Trim () != "") {
 				OnKeyboardTextEntry (new KeyboardEntryEventArgs (text));
+			}
+			else
+			{
+				OnTabKeyPressed(EventArgs.Empty);
 			}
 
 			NSRange selectedNSRange = textView.SelectedTextRange;
@@ -609,20 +682,20 @@ namespace Microsoft.Xna.Framework
 			// these ranges and acts accordingly.
 			if (markedTextRange.Location != NSRange.NotFound) {
 				// There is marked text -- replace marked text with user-entered text
-				this.text.Remove (markedTextRange.Location, markedTextRange.Length);
-				this.text.Insert (markedTextRange.Location, text);
+				this.text.Remove ((int)markedTextRange.Location, (int)markedTextRange.Length);
+				this.text.Insert ((int)markedTextRange.Location, text);
 				selectedNSRange.Location = markedTextRange.Location + text.Length;
 				selectedNSRange.Length = 0;
 				markedTextRange = new NSRange (NSRange.NotFound, 0);
 			} else if (selectedNSRange.Length > 0) {
 				// Replace selected text with user-entered text
-				this.text.Remove (selectedNSRange.Location, selectedNSRange.Length);
-				this.text.Insert (selectedNSRange.Location, text);
+				this.text.Remove ((int)selectedNSRange.Location, (int)selectedNSRange.Length);
+				this.text.Insert ((int)selectedNSRange.Location, text);
 				selectedNSRange.Length = 0;
 				selectedNSRange.Location += text.Length;
 			} else {
 				// Insert user-entered text at current insertion point
-				this.text.Insert (selectedNSRange.Location, text);
+				this.text.Insert ((int)selectedNSRange.Location, text);
 				selectedNSRange.Location += text.Length;
 			}
 
@@ -638,9 +711,7 @@ namespace Microsoft.Xna.Framework
 		[Export ("deleteBackward")]
 		void DeleteBackward ()
 		{
-
 			OnKeyboardTextEntry(new KeyboardEntryEventArgs (Keypresses.backspaceDeleteKey));
-
 
 			NSRange selectedNSRange = textView.SelectedTextRange;
 			NSRange markedTextRange = textView.MarkedTextRange;
@@ -650,19 +721,19 @@ namespace Microsoft.Xna.Framework
 			// these ranges and acts accordingly.
 			if (markedTextRange.Location != NSRange.NotFound) {
 				// There is marked text, so delete it
-				text.Remove (markedTextRange.Location, markedTextRange.Length);
+				text.Remove ((int)markedTextRange.Location, (int)markedTextRange.Length);
 				selectedNSRange.Location = markedTextRange.Location;
 				selectedNSRange.Length = 0;
 				markedTextRange = new NSRange (NSRange.NotFound, 0);
 			} else if (selectedNSRange.Length > 0) {
 				// Delete the selected text
-				text.Remove (selectedNSRange.Location, selectedNSRange.Length);
+				text.Remove ((int)selectedNSRange.Location, (int)selectedNSRange.Length);
 				selectedNSRange.Length = 0;
 			} else if (selectedNSRange.Location > 0) {
 				// Delete one char of text at the current insertion point
 				selectedNSRange.Location--;
 				selectedNSRange.Length = 1;
-				text.Remove (selectedNSRange.Location, selectedNSRange.Length);
+				text.Remove ((int)selectedNSRange.Location, (int)selectedNSRange.Length);
 				selectedNSRange.Length = 0;
 			}
 
@@ -675,16 +746,13 @@ namespace Microsoft.Xna.Framework
 	#endregion
 	#endregion
 
-
-
-
-
 	//*********************************************************************
 
 
 	public class SimpleCoreTextView : UIView
 	{
-		string text;
+		string text = "";
+		string selectionText = "";
 		UIFont font;
 		bool is_editing;
 		NSRange markedTextRange;
@@ -700,7 +768,7 @@ namespace Microsoft.Xna.Framework
 		public static UIColor SelectionColor = new UIColor (0.25f, 0.5f, 1.0f, 0.5f);
 		public static UIColor CaretColor = new UIColor (0.25f, 0.5f, 1.0f, 1.0f);
 
-		public SimpleCoreTextView (RectangleF frame)
+		public SimpleCoreTextView (CGRect frame)
 			: base (frame)
 		{
 			Layer.GeometryFlipped = true;  // For ease of interaction with the CoreText coordinate system.
@@ -708,7 +776,7 @@ namespace Microsoft.Xna.Framework
 			Text = string.Empty;
 			Font = UIFont.SystemFontOfSize (18);
 			BackgroundColor = UIColor.Clear;
-			caretView = new SimpleCaretView (RectangleF.Empty);
+			caretView = new SimpleCaretView (CGRect.Empty);
 		}
 
 		protected override void Dispose (bool disposing)
@@ -758,7 +826,7 @@ namespace Microsoft.Xna.Framework
 
 		public string Text {
 			get {
-				return "";
+				return text;
 			}
 			set {
 				text = value;
@@ -782,7 +850,7 @@ namespace Microsoft.Xna.Framework
 			// Find the overlap intersection range between first and second
 			if (second.Location < first.Location + first.Length) {
 				result.Location = second.Location;
-				int end = Math.Min (first.Location + first.Length, second.Location + second.Length);
+				int end = Math.Min ((int)(first.Location + first.Length), (int)(second.Location + second.Length));
 				result.Length = end - result.Location;
 			}
 
@@ -792,7 +860,6 @@ namespace Microsoft.Xna.Framework
 		// Helper method for drawing the current selection range (as a simple filled rect)
 		void DrawRangeAsSelection (NSRange selectionRange)
 		{
-
 			// If not in editing mode, we do not draw selection rects
 			if (!IsEditing)
 				return;
@@ -815,44 +882,46 @@ namespace Microsoft.Xna.Framework
 				NSRange intersection = RangeIntersection (range, selectionRange);
 				if (intersection.Location != NSRange.NotFound && intersection.Length > 0) {
 					// The text range for this line intersects our selection range
-					float xStart = line.GetOffsetForStringIndex (intersection.Location);
-					float xEnd = line.GetOffsetForStringIndex (intersection.Location + intersection.Length);
-					PointF [] origin = new PointF [lines.Length];
+					nfloat xStart = line.GetOffsetForStringIndex (intersection.Location);
+					nfloat xEnd = line.GetOffsetForStringIndex (intersection.Location + intersection.Length);
+					var origin = new CGPoint [lines.Length];
 					// Get coordinate and bounds information for the intersection text range
-					frame.GetLineOrigins (new NSRange (i, 0), origin);
-					float ascent, descent, leading;
+					frame.GetLineOrigins (new NSRange (i, 0), origin );
+					nfloat ascent, descent, leading;
 					line.GetTypographicBounds (out ascent, out descent, out leading);
 					// Create a rect for the intersection and draw it with selection color
-					RectangleF selectionRect = new RectangleF (xStart, origin [0].Y - descent, xEnd - xStart, ascent + descent);
+					CGRect selectionRect = new CGRect (xStart, origin [0].Y - descent, xEnd - xStart, ascent + descent);
 					UIGraphics.RectFill (selectionRect);
 				}
 			}
 		}
 
 		// Standard UIView drawRect override that uses Core Text to draw our text contents
-		public override void Draw (RectangleF rect)
+		public override void Draw (CGRect rect)
 		{
 			// First draw selection / marked text, then draw text
-			DrawRangeAsSelection (SelectedTextRange);
-			DrawRangeAsSelection (MarkedTextRange);
-			frame.Draw (UIGraphics.GetCurrentContext ());
+			//DrawRangeAsSelection (SelectedTextRange);
+			//DrawRangeAsSelection (MarkedTextRange);
+			//frame.Draw (UIGraphics.GetCurrentContext ());
+
+			//caretView.RemoveFromSuperview ();
 		}
 
 		// Public method to find the text range index for a given CGPoint
-		public int ClosestIndex (PointF point)
+		public int ClosestIndex (CGPoint point)
 		{
 			// Use Core Text to find the text index for a given CGPoint by
 			// iterating over the y-origin points for each line, finding the closest
 			// line, and finding the closest index within that line.
 			var lines = frame.GetLines ();
-			PointF[] origins = new PointF [lines.Length];
+			var origins = new CGPoint [lines.Length];
 			frame.GetLineOrigins (new NSRange (0, lines.Length), origins);
 
 			for (int i = 0; i < lines.Length; i++) {
 				if (point.Y > origins [i].Y) {
 					// This line origin is closest to the y-coordinate of our point,
 					// now look for the closest string index in this line.
-					return lines [i].GetStringIndexForPosition (point);
+					return (int)lines [i].GetStringIndexForPosition (point);
 				}
 			}
 
@@ -861,80 +930,80 @@ namespace Microsoft.Xna.Framework
 
 		// Public method to determine the CGRect for the insertion point or selection, used
 		// when creating or updating our SimpleCaretView instance
-		public RectangleF CaretRect (int index)
+		public CGRect CaretRect (int index)
 		{
 			var lines = frame.GetLines ();
 
 			// Special case, no text
-			if (text.Length == 0 || lines.Length < 2) {
-				PointF origin = new PointF (Bounds.GetMinX (), Bounds.GetMinY () - font.Leading);
+			if (text.Length == 0) {
+				CGPoint origin = new CGPoint (Bounds.GetMinX (), Bounds.GetMinY () - font.Leading);
 				// Note: using fabs() for typically negative descender from fonts
-				return new RectangleF (origin.X, origin.Y - Math.Abs (font.Descender), 3, font.Ascender + Math.Abs (font.Descender));
+				return new CGRect (origin.X, origin.Y - (nfloat)Math.Abs (font.Descender), 3, font.Ascender + (nfloat)Math.Abs (font.Descender));
 			}
 
 			// Special case, insertion point at final position in text after newline
 			if (index == text.Length && text.EndsWith ("\n")) {
 				CTLine line = lines [lines.Length - 1];
 				NSRange range = line.StringRange;
-				float xPos = line.GetOffsetForStringIndex (range.Location);
-				PointF[] origins = new PointF [lines.Length];
-				float ascent, descent, leading;
+				nfloat xPos = line.GetOffsetForStringIndex (range.Location);
+				var origins = new CGPoint [lines.Length];
+				nfloat ascent, descent, leading;
 				line.GetTypographicBounds (out ascent, out descent, out leading);
 				frame.GetLineOrigins (new NSRange (lines.Length - 1, 0), origins);
 				// Place point after last line, including any font leading spacing if applicable
 				origins[0].Y -= font.Leading;
-				return new RectangleF (xPos, origins [0].Y - descent, 3, ascent + descent);        
+				return new CGRect (xPos, origins [0].Y - descent, 3, ascent + descent);
 			}
 
 			// Regular case, caret somewhere within our text content range
 			for (int i = 0; i < lines.Length; i++) {
 				CTLine line = lines [i];
 				NSRange range = line.StringRange;
-				int localIndex = index - range.Location;
+				int localIndex = index - (int)range.Location;
 				if (localIndex >= 0 && localIndex <= range.Length) {
 					// index is in the range for this line
-					float xPos = line.GetOffsetForStringIndex (index);
-					PointF[] origins = new PointF [lines.Length];
-					float ascent, descent, leading;
+					nfloat xPos = line.GetOffsetForStringIndex (index);
+					var origins = new CGPoint [lines.Length];
+					nfloat ascent, descent, leading;
 					line.GetTypographicBounds (out ascent, out descent, out leading);
 					frame.GetLineOrigins (new NSRange (i, 0), origins);
 					// Make a small "caret" rect at the index position
-					return new RectangleF (xPos, origins [0].Y - descent, 3, ascent + descent);
+					return new CGRect (xPos, origins [0].Y - descent, 3, ascent + descent);
 				}
 			}
 
-			return RectangleF.Empty;
+			return CGRect.Empty;
 		}
 
 		// Public method to create a rect for a given range in the text contents
-		// Called by our EditableTextRange to implement the required 
+		// Called by our EditableTextRange to implement the required
 		// UITextInput:firstRectForRange method
-		public RectangleF FirstRect (NSRange range)
-		{    
-			int index = range.Location;
+		public CGRect FirstRect (NSRange range)
+		{
+			int index = (int)range.Location;
 
 			// Iterate over our CTLines, looking for the line that encompasses the given range
 			var lines = frame.GetLines ();
 			for (int i = 0; i < lines.Length; i++) {
 				CTLine line = lines [i];
 				NSRange lineRange = line.StringRange;
-				int localIndex = index - lineRange.Location;
+				int localIndex = index - (int)lineRange.Location;
 				if (localIndex >= 0 && localIndex < lineRange.Length) {
 					// For this sample, we use just the first line that intersects range
-					int finalIndex = Math.Min (lineRange.Location + lineRange.Length, range.Location + range.Length);
+					int finalIndex = (int)Math.Min (lineRange.Location + lineRange.Length, range.Location + range.Length);
 					// Create a rect for the given range within this line
-					float xStart = line.GetOffsetForStringIndex (index);
-					float xEnd = line.GetOffsetForStringIndex (finalIndex);
-					PointF[] origins = new PointF [lines.Length];
+					nfloat xStart = line.GetOffsetForStringIndex (index);
+					nfloat xEnd = line.GetOffsetForStringIndex (finalIndex);
+					var origins = new CGPoint [lines.Length];
 					frame.GetLineOrigins (new NSRange (i, 0), origins);
-					float ascent, descent, leading;
+					nfloat ascent, descent, leading;
 					line.GetTypographicBounds (out ascent, out descent, out leading);
 
-					return new RectangleF (xStart, origins [0].Y - descent, xEnd - xStart, ascent + descent);
+					return new CGRect (xStart, origins [0].Y - descent, xEnd - xStart, ascent + descent);
 				}
 			}
 
-			return RectangleF.Empty;
+			return CGRect.Empty;
 		}
 
 		// Helper method to update caretView when insertion point/selection changes
@@ -949,7 +1018,7 @@ namespace Microsoft.Xna.Framework
 			// If there is no selection range (always true for this sample), find the
 			// insert point rect and create a caretView to draw the caret at this position
 			if (SelectedTextRange.Length == 0) {
-				caretView.Frame = CaretRect (SelectedTextRange.Location);
+				caretView.Frame = CaretRect ((int)SelectedTextRange.Location);
 				if (caretView.Superview == null) {
 					AddSubview (caretView);
 					SetNeedsDisplay ();
@@ -960,20 +1029,21 @@ namespace Microsoft.Xna.Framework
 				// If there is an actual selection, don't draw the insertion caret too
 				caretView.RemoveFromSuperview ();
 				SetNeedsDisplay ();
-			}    
+			}
 
 			if (MarkedTextRange.Location != NSRange.NotFound) {
 				SetNeedsDisplay ();
 			}
 		}
 
-		// markedTextRange property accessor overrides 
+		// markedTextRange property accessor overrides
 		public NSRange MarkedTextRange {
 			get {
 				return markedTextRange;
 			}
 			set {
 				markedTextRange = value;
+
 				// Call selectionChanged to update view if necessary
 				SelectionChanged ();
 			}
@@ -986,6 +1056,7 @@ namespace Microsoft.Xna.Framework
 			}
 			set {
 				selectedTextRange = value;
+					
 				// Call selectionChanged to update view if necessary
 				SelectionChanged ();
 			}
@@ -994,7 +1065,7 @@ namespace Microsoft.Xna.Framework
 		// editing property accessor overrides
 		public bool IsEditing {
 			get {
-				return is_editing; 
+				return is_editing;
 			}
 			set {
 				is_editing = value;
@@ -1009,7 +1080,7 @@ namespace Microsoft.Xna.Framework
 		const double InitialBlinkDelay = 0.7;
 		const double BlinkRate = 0.5;
 
-		public SimpleCaretView (RectangleF frame)
+		public SimpleCaretView (CGRect frame)
 			: base (frame)
 		{
 			BackgroundColor = SimpleCoreTextView.CaretColor;
@@ -1033,7 +1104,7 @@ namespace Microsoft.Xna.Framework
 			Hidden = false;
 
 			if (Superview != null) {
-				blink_timer = NSTimer.CreateRepeatingScheduledTimer (BlinkRate, () => Blink ());
+				blink_timer = NSTimer.CreateRepeatingScheduledTimer (BlinkRate, (timer) => Blink ());
 				DelayBlink ();
 			} else {
 				blink_timer.Invalidate ();
@@ -1062,23 +1133,24 @@ namespace Microsoft.Xna.Framework
 	// representing ranges within the text managed by the class. The starting and ending indexes 
 	// of the range are represented by UITextPosition objects. The text system uses both UITextRange 
 	// and UITextPosition objects for communicating text-layout information.
-	class IndexedRange : UITextRange 
+	public class IndexedRange : UITextRange 
 	{
 		public NSRange Range { get; private set; }
 
 		private IndexedRange ()
 		{
+
 		}
 
-		public override UITextPosition start {
+		public override UITextPosition Start {
 			get {
-				return IndexedPosition.GetPosition (Range.Location);
+				return IndexedPosition.GetPosition ((int)Range.Location);
 			}
 		}
 
-		public override UITextPosition end {
+		public override UITextPosition End {
 			get {
-				return IndexedPosition.GetPosition (Range.Location + Range.Length);
+				return IndexedPosition.GetPosition ((int)Range.Location + (int)Range.Length);
 			}
 		}
 
@@ -1120,7 +1192,6 @@ namespace Microsoft.Xna.Framework
 			}
 			#endregion
 		}
-
 	}
 
 
@@ -1136,7 +1207,7 @@ namespace Microsoft.Xna.Framework
 	// system uses both these objects and UITextRange objects for communicating text-layout information.
 	//
 	// We could use more sophisticated objects, but for demonstration purposes it suffices to wrap integers.
-	class IndexedPosition : UITextPosition
+	public class IndexedPosition : UITextPosition
 	{
 		public int Index { get; private set; }
 
@@ -1161,10 +1232,7 @@ namespace Microsoft.Xna.Framework
 		}
 	}
 
-
 	//*********************************************************************
-
-
 
 }
 

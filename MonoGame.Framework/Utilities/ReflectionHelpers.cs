@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Utilities
 		}
 
         /// <summary>
-        /// Returns true if the given type represents a class that is not abstract
+        /// Returns true if the given type represents a non-object type that is not abstract.
         /// </summary>
 		public static bool IsConcreteClass(Type t)
 		{
@@ -43,6 +43,9 @@ namespace Microsoft.Xna.Framework.Utilities
 			{
 				throw new NullReferenceException("Must supply the t (type) parameter");
 			}
+
+            if (t == typeof(object))
+                return false;
 #if WINRT
 			var ti = t.GetTypeInfo();
 			if (ti.IsClass && !ti.IsAbstract)
@@ -82,20 +85,15 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
         }
 
-		public static Attribute GetCustomAttribute(MemberInfo member, Type memberType)
+		public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
 		{
 			if (member == null)
-			{
 				throw new NullReferenceException("Must supply the member parameter");
-			}
-			if (memberType == null)
-			{
-				throw new NullReferenceException("Must supply the memberType parameter");
-			}
+
 #if WINRT
-			return member.GetCustomAttribute(memberType);
+			return member.GetCustomAttribute(typeof(T)) as T;
 #else
-			return Attribute.GetCustomAttribute(member, memberType);
+            return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
 		}
 

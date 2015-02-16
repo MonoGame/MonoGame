@@ -59,7 +59,8 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    public class WinFormsGameWindow : GameWindow
+
+    public class WinFormsGameWindow : GameWindow, IDisposable
     {
         // Amendment: Added events for integrating our key processing logic with monogame.
         public event EventHandler<KeysEventArgs> TSKeyUp;
@@ -204,8 +205,27 @@ namespace MonoGame.Framework
             _allWindows.Add(this);
         }
 
+        ~WinFormsGameWindow()
+        {
+            Dispose(false);
+        }
+
         private void OnActivated(object sender, EventArgs eventArgs)
         {
+#if (WINDOWS && DIRECTX)
+            if (Game.GraphicsDevice != null)
+            {
+                if (Game.graphicsDeviceManager.HardwareModeSwitch)
+                {
+                    if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
+                   {
+                       Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
+                       Game.GraphicsDevice.CreateSizeDependentResources(true);
+                        Game.GraphicsDevice.ApplyRenderTargets(null);
+                   }
+                }
+          }
+#endif
             _platform.IsActive = true;
         }
 
@@ -374,9 +394,11 @@ namespace MonoGame.Framework
 
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
+
+#if !(WINDOWS && DIRECTX)
                 manager.PreferredBackBufferWidth = newWidth;
                 manager.PreferredBackBufferHeight = newHeight;
-
+#endif
                 if (manager.GraphicsDevice == null)
                     return;
             }
@@ -394,10 +416,28 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            Application.Idle += OnIdle;
-            Application.Run(_form);
-            Application.Idle -= OnIdle;
+            // https://bugzilla.novell.com/show_bug.cgi?id=487896
+            // Since there's existing bug from implementation with mono WinForms since 09'
+            // Application.Idle is not working as intended
+            // So we're just going to emulate Application.Run just like Microsoft implementation
+            _form.Show();
 
+            var nativeMsg = new NativeMessage();
+            while (_form != null && _form.IsDisposed == false)
+            {
+                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
+                {
+                    Application.DoEvents();
+
+                    if (nativeMsg.msg == WM_QUIT)
+                        break;
+
+                    continue;
+                }
+
+                UpdateWindows();
+                Game.Tick();
+            }
 
             // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
@@ -416,18 +456,6 @@ namespace MonoGame.Framework
                 Thread.Sleep(100);
             } 
             while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
-        }
-
-        private void OnIdle(object sender, EventArgs eventArgs)
-        {
-            // While there are no pending messages 
-            // to be processed tick the game.
-            NativeMessage msg;
-            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
-            {
-                UpdateWindows();
-                Game.Tick();
-            }
         }
 
         internal void UpdateWindows()
@@ -463,11 +491,20 @@ namespace MonoGame.Framework
 
         public void Dispose()
         {
-            if (_form != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _allWindows.Remove(this);
-                _form.Dispose();
-                _form = null;
+                if (_form != null)
+                {
+                    _allWindows.Remove(this);
+                    _form.Dispose();
+                    _form = null;
+                }
             }
         }
 

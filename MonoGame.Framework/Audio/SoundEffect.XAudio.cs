@@ -125,31 +125,54 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
-            PlatformInitialize(buffer, 0, buffer.Length, sampleRate, channels, 0, buffer.Length);
+            CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
+                            DataStream.Create(buffer, true, false),
+                            0, 
+                            buffer.Length);
         }
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-            _format = new WaveFormat(sampleRate, (int)channels);
+            CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
+                            DataStream.Create(buffer, true, false, offset),
+                            loopStart, 
+                            loopLength);
+        }
 
-            _dataStream = DataStream.Create<byte>(buffer, true, false);
+        private void PlatformLoadAudioStream(Stream s)
+        {
+            var soundStream = new SoundStream(s);
+            var dataStream = soundStream.ToDataStream();
+            CreateBuffers(  soundStream.Format,
+                            dataStream,
+                            0,
+                            (int)dataStream.Length);
+        }
 
-            // Use the loopStart and loopLength also as the range
-            // when playing this SoundEffect a single time / unlooped.
-            _buffer = new AudioBuffer()
+        private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)
+        {
+            _format = format;
+            _dataStream = dataStream;
+
+            // Convert the loop points from bytes to samples.
+            var bytesPerSample = 2 * _format.Channels;
+            loopStart /= bytesPerSample;
+            loopLength /= bytesPerSample;
+
+            _buffer = new AudioBuffer
             {
                 Stream = _dataStream,
-                AudioBytes = count,
+                AudioBytes = (int)_dataStream.Length,
                 Flags = BufferFlags.EndOfStream,
                 PlayBegin = loopStart,
                 PlayLength = loopLength,
                 Context = new IntPtr(42),
             };
 
-            _loopedBuffer = new AudioBuffer()
+            _loopedBuffer = new AudioBuffer
             {
                 Stream = _dataStream,
-                AudioBytes = count,
+                AudioBytes = (int)_dataStream.Length,
                 Flags = BufferFlags.EndOfStream,
                 LoopBegin = loopStart,
                 LoopLength = loopLength,
@@ -165,35 +188,6 @@ namespace Microsoft.Xna.Framework.Audio
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             inst._voice = voice;
-        }
-
-        private void PlatformLoadAudioStream(Stream s)
-        {
-            SoundStream soundStream = new SoundStream(s);
-
-            _format = soundStream.Format;
-            _dataStream = soundStream.ToDataStream();
-
-            _buffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = (int)_dataStream.Length,
-                Flags = BufferFlags.EndOfStream,
-                PlayBegin = 0,
-                PlayLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
-                Context = new IntPtr(42),
-            };
-
-            _loopedBuffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = (int)_dataStream.Length,
-                Flags = BufferFlags.EndOfStream,
-                LoopBegin = 0,
-                LoopLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
-                LoopCount = AudioBuffer.LoopInfinite,
-                Context = new IntPtr(42),
-            }; 
         }
 
         #endregion

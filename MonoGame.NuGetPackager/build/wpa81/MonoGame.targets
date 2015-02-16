@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+	<Reference Include="MonoGame.Framework">
+		<HintPath>$(MSBuildThisFileDirectory)$(Platform)\MonoGame.Framework.dll</HintPath>
+	</Reference>
+	<Reference Include="SharpDX">
+      <HintPath>$(MSBuildThisFileDirectory)\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1">
+      <HintPath>$(MSBuildThisFileDirectory)\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>$(MSBuildThisFileDirectory)\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>$(MSBuildThisFileDirectory)\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.MediaFoundation">
+      <HintPath>$(MSBuildThisFileDirectory)\SharpDX.MediaFoundation.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2">
+      <HintPath>$(MSBuildThisFileDirectory)\SharpDX.XAudio2.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

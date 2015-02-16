@@ -1,44 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
-  
-  <Asset Type="MonoGame.Tests.ContentPipeline.ExtendedFontDescription">
-      
+<XnaContent>
+  <Asset Type="ExtendedFontDescription">
     <FontName>Foo</FontName>
     <Size>30</Size>
     <Spacing>0.75</Spacing>
     <UseKerning>true</UseKerning>
     <Style>Bold</Style>
-
-    <DefaultCharacter>*</DefaultCharacter> 
-
+    <DefaultCharacter>*</DefaultCharacter>
     <CharacterRegions>
-      
-      <!-- Standard letters and numbers -->
       <CharacterRegion>
-        <Start>&#32;</Start>
-        <End>&#126;</End>
+        <Start> </Start>
+        <End>~</End>
       </CharacterRegion>
-
-      <!-- Δ Delta symbol -->
       <CharacterRegion>
-        <Start>&#916;</Start>
-        <End>&#916;</End>
+        <Start>°</Start>
+        <End>°</End>
       </CharacterRegion>
-
-      <!-- ° Degree symbol -->
       <CharacterRegion>
-        <Start>&#176;</Start>
-        <End>&#176;</End>
+        <Start>Δ</Start>
+        <End>Δ</End>
       </CharacterRegion>
-      
     </CharacterRegions>
-
-    <ExtendedListProperty>      
+    <ExtendedListProperty>
       <Item>item0</Item>
       <Item>item1</Item>
-      <Item>item2</Item>          
+      <Item>item2</Item>
     </ExtendedListProperty>
-
   </Asset>
-  
 </XnaContent>

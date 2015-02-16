@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 <project name="Installer Build Script" default="build" basedir=".">
-	<description>Default Installer Automated Build script</description>
-	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
-  
+  <description>Default Installer Automated Build script</description>
+  <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
+
+  <!-- The build version number we can get from the environment variable -->
+  <property name="buildNumber" value="0.0.0.0"/>
+  <if test="${environment::variable-exists('BUILD_NUMBER')}">
+    <property name="buildNumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
+  </if>
+
   <target name="download" description="Downloads iOS binaries">
     <if test="${environment::variable-exists('MACBUILDJOB')}">
       <property name="macbuildjob" value="${environment::get-variable('MACBUILDJOB')}"/>
@@ -21,8 +27,7 @@
         <echo append="false" file="Windows/header.nsh">
 !define FrameworkPath "${project::get-base-directory()}"
 !define VERSION "3.0"
-!define INSTALLERVERSION "3.2"
-!define REVISION "0.0"
+!define INSTALLERVERSION "${buildNumber}"
         </echo>
         <call target="download"/>
         <exec program="makensis" workingdir="Windows" basedir="C:\Program Files (x86)\NSIS">

@@ -22,8 +22,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         [DebuggerDisplay("ImporterInfo: {type.Name}")]
         private struct ImporterInfo
         {
-            public ContentImporterAttribute attribue;
+            public ContentImporterAttribute attribute;
             public Type type;
+            public DateTime assemblyTimestamp;
         };
 
         private List<ImporterInfo> _importers;
@@ -31,13 +32,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         [DebuggerDisplay("ProcessorInfo: {type.Name}")]
         private struct ProcessorInfo
         {
-            public ContentProcessorAttribute attribue;
+            public ContentProcessorAttribute attribute;
             public Type type;
+            public DateTime assemblyTimestamp;
         };
 
         private List<ProcessorInfo> _processors;
 
         private List<Type> _writers;
+
+        // Keep track of all built assets. (Required to resolve automatic names "AssetName_n".)
+        //   Key = absolute, normalized path of source file
+        //   Value = list of build events
+        // (Note: When using external references, an asset may be built multiple times
+        // with different parameters.)
+        private readonly Dictionary<string, List<PipelineBuildEvent>> _pipelineBuildEvents;
 
         public string ProjectDirectory { get; private set; }
         public string OutputDirectory { get; private set; }
@@ -78,6 +87,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
         {
+            _pipelineBuildEvents = new Dictionary<string, List<PipelineBuildEvent>>();
             RethrowExceptions = true;
 
             Assemblies = new List<string>();
@@ -91,9 +101,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 	    RegisterCustomConverters ();
         }
 
-	public void AssignTypeConverter<IType, IConverterType> ()
+	public void AssignTypeConverter<TType, TTypeConverter> ()
 	{
-		TypeDescriptor.AddAttributes (typeof (IType), new TypeConverterAttribute (typeof (IConverterType)));
+		TypeDescriptor.AddAttributes (typeof (TType), new TypeConverterAttribute (typeof (TTypeConverter)));
 	}
 
 	private void RegisterCustomConverters ()
@@ -131,6 +141,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             foreach (var assemblyPath in Assemblies)
             {
                 Type[] exportedTypes;
+                DateTime assemblyTimestamp;
                 try
                 {
                     Assembly a;
@@ -140,6 +151,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         a = Assembly.LoadFrom(assemblyPath);
 
                     exportedTypes = a.GetTypes();
+                    assemblyTimestamp = File.GetLastWriteTime(a.Location);
                 }
                 catch (BadImageFormatException e)
                 {
@@ -167,7 +179,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         if (attributes.Length != 0)
                         {
                             var importerAttribute = attributes[0] as ContentImporterAttribute;
-                            _importers.Add(new ImporterInfo { attribue = importerAttribute, type = t });
+                            _importers.Add(new ImporterInfo
+                            {
+                                attribute = importerAttribute,
+                                type = t,
+                                assemblyTimestamp = assemblyTimestamp
+                            });
                         }
                         else
                         {
@@ -175,7 +192,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             var importerAttribute = new ContentImporterAttribute(".*");
                             importerAttribute.DefaultProcessor = "";
                             importerAttribute.DisplayName = t.Name;
-                            _importers.Add(new ImporterInfo { attribue = importerAttribute, type = t });
+                            _importers.Add(new ImporterInfo
+                            {
+                                attribute = importerAttribute,
+                                type = t,
+                                assemblyTimestamp = assemblyTimestamp
+                            });
                         }
                     }
                     else if (t.GetInterface(@"IContentProcessor") != null)
@@ -184,7 +206,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         if (attributes.Length != 0)
                         {
                             var processorAttribute = attributes[0] as ContentProcessorAttribute;
-                            _processors.Add(new ProcessorInfo {attribue = processorAttribute, type = t});
+                            _processors.Add(new ProcessorInfo
+                            {
+                                attribute = processorAttribute,
+                                type = t,
+                                assemblyTimestamp = assemblyTimestamp
+                            });
                         }
                     }
                     else if (t.GetInterface(@"ContentTypeWriter") != null)
@@ -249,11 +276,26 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Search for the importer.
             foreach (var info in _importers)
             {
-                if (info.attribue.FileExtensions.Any(e => e.Equals(ext, StringComparison.InvariantCultureIgnoreCase)))
+                if (info.attribute.FileExtensions.Any(e => e.Equals(ext, StringComparison.InvariantCultureIgnoreCase)))
                     return info.type.Name;
             }
 
             return null;
+        }
+
+        public DateTime GetImporterAssemblyTimestamp(string name)
+        {
+            if (_importers == null)
+                ResolveAssemblies();
+
+            // Search for the importer.
+            foreach (var info in _importers)
+            {
+                if (info.type.Name.Equals(name))
+                    return info.assemblyTimestamp;
+            }
+
+            return DateTime.MaxValue;
         }
 
         public string FindDefaultProcessor(string importer)
@@ -265,7 +307,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             foreach (var info in _importers)
             {
                 if (info.type.Name == importer)
-                    return info.attribue.DefaultProcessor;
+                    return info.attribute.DefaultProcessor;
             }
 
             return null;
@@ -333,6 +375,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             return processor;
+        }
+
+        public DateTime GetProcessorAssemblyTimestamp(string name)
+        {
+            if (_processors == null)
+                ResolveAssemblies();
+
+            // Search for the processor.
+            foreach (var info in _processors)
+            {
+                if (info.type.Name.Equals(name))
+                    return info.assemblyTimestamp;
+            }
+
+            return DateTime.MaxValue;
         }
 
         public OpaqueDataDictionary ValidateProcessorParameters(string name, OpaqueDataDictionary processorParameters)
@@ -411,7 +468,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Record what we're building and how.
             var contentEvent = new PipelineBuildEvent
             {
-                SourceFile = PathHelper.Normalize(sourceFilepath),
+                SourceFile = sourceFilepath,
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,
@@ -427,14 +484,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return contentEvent;
         }
 
-        public void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
+        private void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
         {
             if (!File.Exists(pipelineEvent.SourceFile))
                 throw new PipelineException("The source file '{0}' does not exist!", pipelineEvent.SourceFile);
 
-            Logger.PushFile(pipelineEvent.SourceFile);            
+            Logger.PushFile(pipelineEvent.SourceFile);
 
-            var rebuild = pipelineEvent.NeedsRebuild(cachedEvent);
+            // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
+            TrackPipelineBuildEvent(pipelineEvent);
+
+            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
             if (!rebuild)
             {
                 // While this asset doesn't need to be rebuilt the dependent assets might.
@@ -476,6 +536,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // Write the content to disk.
                 WriteXnb(processedObject, pipelineEvent);
 
+                // Store the timestamp of the DLLs containing the importer and processor.
+                pipelineEvent.ImporterTime = GetImporterAssemblyTimestamp(pipelineEvent.Importer);
+                pipelineEvent.ProcessorTime = GetProcessorAssemblyTimestamp(pipelineEvent.Processor);
+
                 // Store the new event into the intermediate folder.
                 pipelineEvent.Save(eventFilepath);
             }
@@ -500,9 +564,6 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var importer = CreateImporter(pipelineEvent.Importer);
             if (importer == null)
                 throw new PipelineException("Failed to create importer '{0}'", pipelineEvent.Importer);
-            var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
-            if (processor == null)
-                throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
 
             // Try importing the content.
             object importedObject;
@@ -527,6 +588,15 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 var importContext = new PipelineImporterContext(this);
                 importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
             }
+
+            // The pipelineEvent.Processor can be null or empty. In this case the
+            // asset should be imported but not processed.
+            if (string.IsNullOrEmpty(pipelineEvent.Processor))
+                return importedObject;
+
+            var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
+            if (processor == null)
+                throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
 
             // Make sure the input type is valid.
             if (!processor.InputType.IsAssignableFrom(importedObject.GetType()))
@@ -579,6 +649,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             if (cachedEvent != null)
             {
+                // Recursively clean additional (nested) assets.
                 foreach (var asset in cachedEvent.BuildAsset)
                 {
                     string assetEventFilepath;
@@ -587,15 +658,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     if (assetCachedEvent == null)
                     {
                         Logger.LogMessage("Cleaning {0}", asset);
+
+                        // Remove asset (.xnb file) from output folder.
                         FileHelper.DeleteIfExists(asset);
+
+                        // Remove event file (.mgcontent file) from intermediate folder.
                         FileHelper.DeleteIfExists(assetEventFilepath);
                         continue;
                     }
 
-                    // Give the asset a chance to rebuild.                    
                     CleanContent(string.Empty, asset);
                 }
 
+                // Remove related output files (non-XNB files) that were copied to the output folder.
                 foreach (var asset in cachedEvent.BuildOutput)
                 {
                     Logger.LogMessage("Cleaning {0}", asset);
@@ -604,8 +679,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             Logger.LogMessage("Cleaning {0}", outputFilepath);
+
+            // Remove asset (.xnb file) from output folder.
             FileHelper.DeleteIfExists(outputFilepath);
+
+            // Remove event file (.mgcontent file) from intermediate folder.
             FileHelper.DeleteIfExists(eventFilepath);
+
+            _pipelineBuildEvents.Remove(sourceFilepath);
         }
 
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
@@ -625,6 +706,131 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.
             pipelineEvent.DestTime = File.GetLastWriteTime(pipelineEvent.DestFile);
+        }
+
+        /// <summary>
+        /// Stores the pipeline build event (in memory) if no matching event is found.
+        /// </summary>
+        /// <param name="pipelineEvent">The pipeline build event.</param>
+        private void TrackPipelineBuildEvent(PipelineBuildEvent pipelineEvent)
+        {
+            List<PipelineBuildEvent> pipelineBuildEvents;
+            if (!_pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents))
+            {
+                pipelineBuildEvents = new List<PipelineBuildEvent>();
+                _pipelineBuildEvents.Add(pipelineEvent.SourceFile, pipelineBuildEvents);
+            }
+
+            if (FindMatchingEvent(pipelineBuildEvents, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters) == null)
+                pipelineBuildEvents.Add(pipelineEvent);
+        }
+
+        /// <summary>
+        /// Gets an automatic asset name, such as "AssetName_0".
+        /// </summary>
+        /// <param name="sourceFileName">The source file name.</param>
+        /// <param name="importerName">The name of the content importer. Can be <see langword="null"/>.</param>
+        /// <param name="processorName">The name of the content processor. Can be <see langword="null"/>.</param>
+        /// <param name="processorParameters">The processor parameters. Can be <see langword="null"/>.</param>
+        /// <returns>The asset name.</returns>
+        public string GetAssetName(string sourceFileName, string importerName, string processorName, OpaqueDataDictionary processorParameters)
+        {
+            Debug.Assert(Path.IsPathRooted(sourceFileName), "Absolute path expected.");
+
+            // Get source file name, which is used for lookup in _pipelineBuildEvents.
+            sourceFileName = PathHelper.Normalize(sourceFileName);
+            string relativeSourceFileName = PathHelper.GetRelativePath(ProjectDirectory, sourceFileName);
+
+            List<PipelineBuildEvent> pipelineBuildEvents;
+            if (_pipelineBuildEvents.TryGetValue(sourceFileName, out pipelineBuildEvents))
+            {
+                // This source file has already been build.
+                // --> Compare pipeline build events.
+                ResolveImporterAndProcessor(sourceFileName, ref importerName, ref processorName);
+
+                var matchingEvent = FindMatchingEvent(pipelineBuildEvents, importerName, processorName, processorParameters);
+                if (matchingEvent != null)
+                {
+                    // Matching pipeline build event found.
+                    string existingName = matchingEvent.DestFile;
+                    existingName = PathHelper.GetRelativePath(OutputDirectory, existingName);
+                    existingName = existingName.Substring(0, existingName.Length - 4);   // Remove ".xnb".
+                    return existingName;
+                }
+
+                Logger.LogMessage(string.Format("Warning: Asset {0} built multiple times with different settings.", relativeSourceFileName));
+            }
+
+            // No pipeline build event with matching settings found.
+            // Get default asset name (= output file name relative to output folder without ".xnb").
+            string directoryName = Path.GetDirectoryName(relativeSourceFileName);
+            string fileName = Path.GetFileNameWithoutExtension(relativeSourceFileName);
+            string assetName = Path.Combine(directoryName, fileName);
+            assetName = PathHelper.Normalize(assetName);
+            return AppendAssetNameSuffix(assetName);
+        }
+
+        /// <summary>
+        /// Determines whether the specified list contains a matching pipeline build event.
+        /// </summary>
+        /// <param name="pipelineBuildEvents">The list of pipeline build events.</param>
+        /// <param name="importerName">The name of the content importer. Can be <see langword="null"/>.</param>
+        /// <param name="processorName">The name of the content processor. Can be <see langword="null"/>.</param>
+        /// <param name="processorParameters">The processor parameters. Can be <see langword="null"/>.</param>
+        /// <returns>
+        /// The matching pipeline build event, or <see langword="null"/>.
+        /// </returns>
+        private static PipelineBuildEvent FindMatchingEvent(List<PipelineBuildEvent> pipelineBuildEvents, string importerName, string processorName, OpaqueDataDictionary processorParameters)
+        {
+            foreach (var existingBuildEvent in pipelineBuildEvents)
+            {
+                if (existingBuildEvent.Importer == importerName
+                    && existingBuildEvent.Processor == processorName
+                    && PipelineBuildEvent.AreParametersEqual(existingBuildEvent.Parameters, processorParameters))
+                {
+                    return existingBuildEvent;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the asset name including a suffix, such as "_0". (The number is incremented
+        /// automatically.
+        /// </summary>
+        /// <param name="baseAssetName">
+        /// The asset name without suffix (relative to output folder).
+        /// </param>
+        /// <returns>The asset name with suffix.</returns>
+        private string AppendAssetNameSuffix(string baseAssetName)
+        {
+            int index = 0;
+            string assetName = baseAssetName + "_0";
+            while (IsAssetNameUsed(assetName))
+            {
+                index++;
+                assetName = baseAssetName + '_' + index;
+            }
+
+            return assetName;
+        }
+
+        /// <summary>
+        /// Determines whether the specified asset name is already used.
+        /// </summary>
+        /// <param name="assetName">The asset name (relative to output folder).</param>
+        /// <returns>
+        /// <see langword="true"/> if the asset name is already used; otherwise,
+        /// <see langword="false"/> if the name is available.
+        /// </returns>
+        private bool IsAssetNameUsed(string assetName)
+        {
+            string destFile = Path.Combine(OutputDirectory, assetName + ".xnb");
+
+            return _pipelineBuildEvents.SelectMany(pair => pair.Value)
+                                       .Select(pipelineEvent => pipelineEvent.DestFile)
+                                       .Any(existingDestFile => destFile.Equals(existingDestFile, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

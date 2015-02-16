@@ -296,7 +296,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the blue component of <see cref="Color"/>.
+        /// Gets or sets the blue component.
         /// </summary>
         [DataMember]
         public byte B
@@ -315,7 +315,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the green component of <see cref="Color"/>.
+        /// Gets or sets the green component.
         /// </summary>
         [DataMember]
         public byte G
@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the red component of <see cref="Color"/>.
+        /// Gets or sets the red component.
         /// </summary>
         [DataMember]
         public byte R
@@ -353,7 +353,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the alpha component of <see cref="Color"/>.
+        /// Gets or sets the alpha component.
         /// </summary>
         [DataMember]
         public byte A
@@ -1650,7 +1650,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Wheat color (R:245,G:222,B:179,A:255).
         /// </summary>
-	public static Color Wheat
+		public static Color Wheat
         {
             get;
             private set;
@@ -1660,10 +1660,10 @@ namespace Microsoft.Xna.Framework
         /// White color (R:255,G:255,B:255,A:255).
         /// </summary>
         public static Color White
-    {
+    	{
         get;
         private set;
-    }
+    	}
        
         /// <summary>
         /// WhiteSmoke color (R:245,G:245,B:245,A:255).
@@ -1710,47 +1710,47 @@ namespace Microsoft.Xna.Framework
                 (int)MathHelper.Lerp(value1.A, value2.A, amount) );
         }
 		
-	/// <summary>
+		/// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color Multiply(Color value, float scale)
-	{
-	    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-	}
+		public static Color Multiply(Color value, float scale)
+		{
+		    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+		}
 	
-	/// <summary>
+		/// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color operator *(Color value, float scale)
+		public static Color operator *(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
-    /// <summary>
-    /// Gets a three-component <see cref="Vector3"/> representation for this object.
-    /// </summary>
-    /// <returns>A three-component <see cref="Vector3"/> representation for this object.</returns>
+        /// <summary>
+        /// Returns the color in a 0-to-1 normalized <see cref="Vector3"/> format.
+        /// </summary>
+        /// <returns>A <see cref="Vector3"/> representation for this object.</returns>
         public Vector3 ToVector3()
         {
             return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
         }
 
         /// <summary>
-        /// Gets a four-component <see cref="Vector4"/> representation for this object.
+        /// Returns the color in a 0-to-1 normalized <see cref="Vector4"/> format.
         /// </summary>
-        /// <returns>A four-component <see cref="Vector4"/> representation for this object.</returns>
+        /// <returns>A <see cref="Vector4"/> representation for this object.</returns>
         public Vector4 ToVector4()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
 	
-	/// <summary>
+		/// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
         [CLSCompliant(false)]
@@ -1780,22 +1780,22 @@ namespace Microsoft.Xna.Framework
         /// {R:[red] G:[green] B:[blue] A:[alpha]}
         /// </summary>
         /// <returns><see cref="String"/> representation of this <see cref="Color"/>.</returns>
-	public override string ToString ()
-	{
-        StringBuilder sb = new StringBuilder(25);
-        sb.Append("{R:");
-        sb.Append(R);
-        sb.Append(" G:");
-        sb.Append(G);
-        sb.Append(" B:");
-        sb.Append(B);
-        sb.Append(" A:");
-        sb.Append(A);
-        sb.Append("}");
-        return sb.ToString();
-	}
+		public override string ToString ()
+		{
+	        StringBuilder sb = new StringBuilder(25);
+	        sb.Append("{R:");
+	        sb.Append(R);
+	        sb.Append(" G:");
+	        sb.Append(G);
+	        sb.Append(" B:");
+	        sb.Append(B);
+	        sb.Append(" A:");
+	        sb.Append(A);
+	        sb.Append("}");
+	        return sb.ToString();
+		}
 	
-	/// <summary>
+		/// <summary>
         /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="vector">A <see cref="Vector4"/> representing color.</param>
@@ -1805,7 +1805,7 @@ namespace Microsoft.Xna.Framework
             return new Color(vector.X * vector.W, vector.Y * vector.W, vector.Z * vector.W, vector.W);
         }
 	
-	/// <summary>
+		/// <summary>
         /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="r">Red component value.</param>
@@ -1818,9 +1818,14 @@ namespace Microsoft.Xna.Framework
             return new Color((byte)(r * a / 255),(byte)(g * a / 255), (byte)(b * a / 255), a);
         }
 
+		public static Color FromArgb(int r, int g, int b)
+		{
+			return FromNonPremultiplied(r, g, b, 255);
+		}
+
         #region IEquatable<Color> Members
 	
-	/// <summary>
+		/// <summary>
         /// Compares whether current instance is equal to specified <see cref="Color"/>.
         /// </summary>
         /// <param name="other">The <see cref="Color"/> to compare.</param>

@@ -5,6 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
+
+
 #if WINRT
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -12,8 +16,6 @@ using Windows.ApplicationModel.Activation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input.Touch;
-
 
 namespace Microsoft.Xna.Framework
 {
@@ -120,7 +122,6 @@ namespace Microsoft.Xna.Framework
                     if (_graphicsDeviceManager != null)
                     {
                         Effect.FlushCache();
-                        BlendState.ResetStates();
                         DepthStencilState.ResetStates();
                         RasterizerState.ResetStates();
                         SamplerState.ResetStates();
@@ -324,7 +325,7 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
-#if IOS || WINDOWS_STOREAPP
+#if IOS || WINDOWS_STOREAPP && !WINDOWS_PHONE81
         [Obsolete("This platform's policy does not allow programmatically closing.", true)]
 #endif
         public void Exit()
@@ -632,11 +633,14 @@ namespace Microsoft.Xna.Framework
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+
+#if !(WINDOWS && DIRECTX)
+
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 Platform.EnterFullScreen();
             else
                 Platform.ExitFullScreen();
-
+#endif
             var viewport = new Viewport(0, 0,
 			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
 			                            GraphicsDevice.PresentationParameters.BackBufferHeight);
@@ -648,6 +652,7 @@ namespace Microsoft.Xna.Framework
         internal void DoUpdate(GameTime gameTime)
         {
             AssertNotDisposed();
+
             if (Platform.BeforeUpdate(gameTime))
             {
                 // Once per frame, we need to check currently 

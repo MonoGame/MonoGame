@@ -3,7 +3,7 @@
 
   <Platform Type="iOS">
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
+    <Reference Include="Xamarin.iOS" />
     <Reference Include="Lidgren.Network" />
   </Platform>
 

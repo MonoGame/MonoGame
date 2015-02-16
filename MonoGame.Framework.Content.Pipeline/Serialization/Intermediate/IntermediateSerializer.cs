@@ -46,6 +46,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             { "string", typeof(string) }
         };
 
+        private static readonly Dictionary<Type, string> _typeAliasesReverse;
+
+        static IntermediateSerializer()
+        {
+            _typeAliasesReverse = _typeAliases.ToDictionary(x => x.Value, x => x.Key);
+        }
+
+        private IntermediateSerializer()
+        {
+            _scannedObjects = new List<object>();
+            _namespaceAliasHelper = new NamespaceAliasHelper(this);
+        }
+
         /// <summary>
         /// Maps "ShortName:" -> "My.Namespace.LongName." for type lookups.
         /// </summary>
@@ -55,6 +68,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         private Dictionary<Type, Type> _genericSerializerTypes;
 
+        private readonly NamespaceAliasHelper _namespaceAliasHelper;
+
+        private readonly List<object> _scannedObjects;
 
         public static T Deserialize<T>(XmlReader input, string referenceRelocationPath)
         {
@@ -169,15 +185,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var serializer = new IntermediateSerializer();
             var writer = new IntermediateWriter(serializer, output, referenceRelocationPath);
             output.WriteStartElement("XnaContent");
-            
-            // TODO: Write namespaces?
+
+            serializer._namespaceAliasHelper.WriteNamespaces(output, value);
 
             // Write the asset.
             var format = new ContentSerializerAttribute { ElementName = "Asset" };
-            writer.WriteObject(value, format);
+            writer.WriteObjectInternal(value, format, serializer.GetTypeSerializer(typeof(T)), typeof(object));
 
-            // TODO: Write the shared resources and external 
-            // references here!
+            // Process the shared resources and external references.
+            writer.WriteSharedResources();
+            writer.WriteExternalReferences();
 
             // Close the XnaContent element.
             output.WriteEndElement();
@@ -235,5 +252,37 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             return foundType;
         }
-    }        
+
+        /// <summary>
+        /// Gets the (potentially) aliased name for any type.
+        /// </summary>
+        internal string GetTypeName(Type type)
+        {
+            string typeName;
+
+            // Shortcut for friendly C# names
+            if (_typeAliasesReverse.TryGetValue(type, out typeName))
+                return typeName;
+
+            // Look for aliased namespace.
+            if (_namespaceAliasHelper.TryGetAliasedTypeName(type, out typeName))
+                return typeName;
+
+            // Fallback to full type name.
+            return type.FullName;
+        }
+
+        internal bool AlreadyScanned(object value)
+        {
+            if (_scannedObjects.Contains(value))
+                return true;
+            _scannedObjects.Add(value);
+            return false;
+        }
+
+        internal bool HasTypeAlias(Type type)
+        {
+            return _typeAliasesReverse.ContainsKey(type);
+        }
+    }
 }

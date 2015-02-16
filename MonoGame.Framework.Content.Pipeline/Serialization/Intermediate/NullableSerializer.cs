@@ -25,7 +25,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(IntermediateWriter output, T? value, ContentSerializerAttribute format)
         {
-            throw new NotImplementedException();
+            var results = new List<string>();
+            _serializer.Serialize(value.Value, results);
+            output.Xml.WriteRaw(results.First());
         }
     }
 }

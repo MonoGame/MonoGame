@@ -10,12 +10,7 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif GLES
-using System.Text;
 using OpenTK.Graphics.ES20;
-using ShaderType = OpenTK.Graphics.ES20.All;
-using ShaderParameter = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -64,39 +59,16 @@ namespace Microsoft.Xna.Framework.Graphics
             //
             _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
             GraphicsExtensions.CheckGLError();
-#if GLES
-			GL.ShaderSource(_shaderHandle, 1, new string[] { _glslCode }, (int[])null);
-#else
             GL.ShaderSource(_shaderHandle, _glslCode);
-#endif
             GraphicsExtensions.CheckGLError();
             GL.CompileShader(_shaderHandle);
             GraphicsExtensions.CheckGLError();
-
             var compiled = 0;
-#if GLES && !ANGLE && !ANDROID
-			GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, ref compiled);
-#else
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
-#endif
             GraphicsExtensions.CheckGLError();
             if (compiled == (int)All.False)
             {
-#if GLES && !ANGLE && !ANDROID
-                string log = "";
-                int length = 0;
-				GL.GetShader(_shaderHandle, ShaderParameter.InfoLogLength, ref length);
-                GraphicsExtensions.CheckGLError();
-                if (length > 0)
-                {
-                    var logBuilder = new StringBuilder(length);
-					GL.GetShaderInfoLog(_shaderHandle, length, ref length, logBuilder);
-                    GraphicsExtensions.CheckGLError();
-                    log = logBuilder.ToString();
-                }
-#else
                 var log = GL.GetShaderInfoLog(_shaderHandle);
-#endif
                 Console.WriteLine(log);
 
                 if (GL.IsShader(_shaderHandle))
@@ -163,7 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                GraphicsDevice.AddDisposeAction(() =>
+                Threading.BlockOnUIThread(() =>
                 {
                     if (_shaderHandle != -1)
                     {

@@ -75,6 +75,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
+            options.Defines = Defines;
             options.OutputFile = context.OutputFilename;
 
             // Parse the MGFX file expanding includes, macros, and returning the techniques.
