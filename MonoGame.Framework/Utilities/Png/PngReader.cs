@@ -38,13 +38,12 @@ namespace MonoGame.Utilities.Png
 
         public Texture2D Read(Stream inputStream, GraphicsDevice graphicsDevice)
         {
-            byte[] signature = new byte[8];
-            inputStream.Read(signature, 0, 8);
-
-            if (signature.EqualsByElement(HeaderChunk.PngSignature) == false)
+            if (IsPngImage(inputStream) == false)
             {
                 throw new Exception("File does not have PNG signature.");
             }
+
+            inputStream.Position = 8;
 
             while (inputStream.Position != inputStream.Length)
             {
@@ -66,6 +65,20 @@ namespace MonoGame.Utilities.Png
             texture.SetData<Color>(data);
 
             return texture;
+        }
+
+        public static bool IsPngImage(Stream stream)
+        {
+            stream.Position = 0;
+            
+            byte[] signature = new byte[8];
+            stream.Read(signature, 0, 8);
+
+            bool result = signature.SequenceEqual(HeaderChunk.PngSignature);
+
+            stream.Position = 0;
+
+            return result;
         }
 
         private void ProcessChunk(byte[] chunkBytes)
