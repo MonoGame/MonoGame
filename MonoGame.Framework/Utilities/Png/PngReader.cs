@@ -9,7 +9,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
-using MonoGame.Utilities.ZLib;
+using MonoGame.Utilities.Deflate;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
@@ -132,7 +132,10 @@ namespace MonoGame.Utilities.Png
 
             try
             {
-                ZStreamUtilities.DecompressStream(compressedStream, decompressedStream);
+                using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress))
+                {
+                    deflateStream.CopyTo(decompressedStream);
+                }
             }
             catch (Exception exception)
             {

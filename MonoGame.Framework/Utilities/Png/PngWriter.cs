@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MonoGame.Utilities.ZLib;
+using MonoGame.Utilities.Deflate;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
@@ -51,12 +51,14 @@ namespace MonoGame.Utilities.Png
 
             // write data chunks
             var encodedPixelData = EncodePixelData(texture2D);
-
             var compressedPixelData = new MemoryStream();
 
             try
             {
-                ZStreamUtilities.CompressStream(new MemoryStream(encodedPixelData), compressedPixelData);
+                using (var deflateStream = new DeflateStream(new MemoryStream(encodedPixelData), CompressionMode.Compress))
+                {
+                    deflateStream.CopyTo(compressedPixelData);
+                }
             }
             catch (Exception exception)
             {
