@@ -489,6 +489,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Vector2(0, 4), customFormatting.Vector2ListSpaced[0]);
                 Assert.AreEqual(new Vector2(0, 6), customFormatting.Vector2ListSpaced[1]);
                 Assert.AreEqual(new Vector2(0, 7), customFormatting.Vector2ListSpaced[2]);
+                Assert.AreEqual(string.Empty, customFormatting.EmptyString);
             });
         }
 
@@ -521,6 +522,18 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.Throws<InvalidOperationException>(() =>
                     IntermediateSerializer.Deserialize<GetterOnlyPolymorphicArrayProperties>(reader, filePath));
             }
+        }
+
+        [Test]
+        public void GenericTypes()
+        {
+            DeserializeCompileAndLoad<GenericTypes>("24_GenericTypes.xml", genericTypes =>
+            {
+                Assert.IsNotNull(genericTypes.A);
+                Assert.AreEqual(3, genericTypes.A.Value);
+                Assert.IsNotNull(genericTypes.B);
+                Assert.AreEqual(4.2f, genericTypes.B.Value);
+            });
         }
     }
 }

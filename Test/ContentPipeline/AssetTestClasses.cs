@@ -421,6 +421,19 @@ class GetterOnlyPolymorphicArrayProperties
 }
 #endregion
 
+#region GenericTypes
+class GenericTypes
+{
+    public GenericClass<int> A;
+    public GenericClass<float> B;
+}
+
+class GenericClass<T>
+{
+    public T Value;
+}
+#endregion
+
 namespace MonoGame.Tests.ContentPipeline
 {
     #region Namespaces
@@ -471,6 +484,7 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public byte A;
         public List<Vector2> Vector2ListSpaced = new List<Vector2>();
+        public string EmptyString;
     }
     #endregion
 }

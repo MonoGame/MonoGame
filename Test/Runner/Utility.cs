@@ -72,6 +72,29 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class Vector2Comparer : IEqualityComparer<Vector2>
+    {
+        static public Vector2Comparer Epsilon = new Vector2Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector2Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector2 x, Vector2 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon;
+        }
+
+        public int GetHashCode(Vector2 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class PlaneComparer : IEqualityComparer<Plane>
     {
         static public PlaneComparer Epsilon = new PlaneComparer(0.000001f);
