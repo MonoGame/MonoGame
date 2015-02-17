@@ -9,9 +9,9 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
-using MonoGame.Utilities.ZLib;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using MonoGame.Utilities;
 
 namespace MonoGame.Utilities.Png
 {
@@ -145,7 +145,10 @@ namespace MonoGame.Utilities.Png
 
             try
             {
-                ZStreamUtilities.DecompressStream(compressedStream, decompressedStream);
+                using (var deflateStream = new ZlibStream(compressedStream, CompressionMode.Decompress))
+                {
+                    deflateStream.CopyTo(decompressedStream);
+                }
             }
             catch (Exception exception)
             {
