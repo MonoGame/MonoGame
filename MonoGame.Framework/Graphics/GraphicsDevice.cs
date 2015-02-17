@@ -837,7 +837,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Must set a vertex shader before calling DrawPrimitives.");
+
+            if (_vertexBuffer == null)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawPrimitives.");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 

@@ -14,6 +14,42 @@ namespace MonoGame.Tests.Visual
     internal class GraphicsDeviceTest : VisualTestFixtureBase
     {
         [Test]
+        public void DrawPrimitivesParameterValidation()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = new VertexBuffer(
+                    Game.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration,
+                    3, BufferUsage.None);
+
+                // No vertex shader or pixel shader.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
+
+                new BasicEffect(Game.GraphicsDevice).CurrentTechnique.Passes[0].Apply();
+
+                // No vertexBuffer.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
+
+                Game.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+                // Success - "normal" usage.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
+
+                // vertexStart too small / large.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, -1, 1));
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 3, 1));
+
+                // primitiveCount too small / large.
+                Assert.Throws<ArgumentOutOfRangeException>(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 0));
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 2));
+
+                // vertexStart + primitiveCount too large.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 1, 1));
+            };
+            Game.Run();
+        }
+
+        [Test]
         public void DrawUserPrimitivesParameterValidation()
         {
             Game.DrawWith += (sender, e) =>
@@ -26,10 +62,13 @@ namespace MonoGame.Tests.Visual
                 };
                 var vertexDataEmpty = new VertexPositionColorTexture[0];
 
+                // No vertex shader or pixel shader.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 1));
+
                 new BasicEffect(Game.GraphicsDevice).CurrentTechnique.Passes[0].Apply();
 
-
-                // Failure cases.
+                // Success - "normal" usage.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 1));
 
                 // Null vertexData.
                 DoDrawUserPrimitivesAsserts(null, 0, 1, d => Assert.Throws<ArgumentNullException>(d));
@@ -50,12 +89,6 @@ namespace MonoGame.Tests.Visual
 
                 // Null vertexDeclaration.
                 Assert.Throws<ArgumentNullException>(() => Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 1, null));
-
-
-                // Success cases.
-
-                // "Normal" usage.
-                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 1));
             };
             Game.Run();
         }
@@ -82,8 +115,13 @@ namespace MonoGame.Tests.Visual
                 var indexDataNonEmpty = new short[] { 0, 1, 2 };
                 var indexDataEmpty = new short[0];
 
+                // No vertex shader or pixel shader.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty, 0, 1));
+
                 new BasicEffect(Game.GraphicsDevice).CurrentTechnique.Passes[0].Apply();
 
+                // Success - "normal" usage.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty, 0, 1));
 
                 // Failure cases.
 
@@ -124,12 +162,6 @@ namespace MonoGame.Tests.Visual
 
                 // Null vertexDeclaration.
                 Assert.Throws<ArgumentNullException>(() => Game.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty, 0, 1, null));
-
-
-                // Success cases.
-
-                // "Normal" usage.
-                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty, 0, 1));
 
                 // Smaller vertex stride in VertexDeclaration than in actual vertices.
 
