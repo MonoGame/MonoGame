@@ -9,9 +9,9 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
-using MonoGame.Utilities.Deflate;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using MonoGame.Utilities;
 
 namespace MonoGame.Utilities.Png
 {
