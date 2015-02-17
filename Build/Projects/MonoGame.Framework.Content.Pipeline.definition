@@ -365,6 +365,7 @@
     <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
     <Compile Include="Serialization\Intermediate\NamedValueDictionarySerializer.cs" />    
     <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
+    <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
 	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />

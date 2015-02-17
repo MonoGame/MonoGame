@@ -719,7 +719,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiFactory = dxgiAdapter.GetParent<SharpDX.DXGI.Factory1>())
                 {
                     _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
-
+                    dxgiFactory.MakeWindowAssociation(PresentationParameters.DeviceWindowHandle, WindowAssociationFlags.IgnoreAll);
                     // If VSync is disabled, Ensure that DXGI does not queue more than one frame at a time. This 
                     // both reduces latency and ensures that the application will only render 
                     // after each VSync, minimizing power consumption.
@@ -1030,10 +1030,14 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
+        internal void PlatformBeginApplyState()
+        {
+            Debug.Assert(_d3dContext != null, "The d3d context is null!");
+        }
+
         internal void PlatformApplyState(bool applyShaders)
         {
             // NOTE: This code assumes _d3dContext has been locked by the caller.
-            Debug.Assert(_d3dContext != null, "The d3d context is null!");
 
             if ( _scissorRectangleDirty )
 	        {
@@ -1044,23 +1048,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _scissorRectangle.Bottom);
 	            _scissorRectangleDirty = false;
 	        }
-
-            if (_blendStateDirty)
-            {
-                _blendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
-	        if ( _depthStencilStateDirty )
-            {
-	            _depthStencilState.PlatformApplyState(this);
-                _depthStencilStateDirty = false;
-            }
-	        if ( _rasterizerStateDirty )
-            {
-	            _rasterizerState.PlatformApplyState(this);
-	            _rasterizerStateDirty = false;
-            }
-
+            
             // If we're not applying shaders then early out now.
             if (!applyShaders)
                 return;
@@ -1224,7 +1212,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
 
@@ -1239,7 +1227,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.Draw(vertexCount, startVertex);
@@ -1250,7 +1238,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.Draw(vertexCount, vertexStart);
@@ -1265,7 +1253,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);
@@ -1280,7 +1268,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             lock (_d3dContext)
             {
-                PlatformApplyState(true);
+                ApplyState(true);
 
                 _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
                 _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);

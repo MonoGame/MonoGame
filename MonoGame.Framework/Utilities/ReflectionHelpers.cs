@@ -98,7 +98,9 @@ namespace Microsoft.Xna.Framework.Utilities
 		}
 
         /// <summary>
-        /// Returns true if the get and set methods of the given property exist and are public
+        /// Returns true if the get method of the given property exist and are public.
+        /// Note that we allow a getter-only property to be serialized (and deserialized),
+        /// *if* CanDeserializeIntoExistingObject is true for the property type.
         /// </summary>
         public static bool PropertyIsPublic(PropertyInfo property)
         {
@@ -109,10 +111,6 @@ namespace Microsoft.Xna.Framework.Utilities
 
             var getMethod = GetPropertyGetMethod(property);
             if (getMethod == null || !getMethod.IsPublic)
-                return false;
-
-            var setMethod = GetPropertySetMethod(property);
-            if (setMethod == null || !setMethod.IsPublic)
                 return false;
 
             return true;

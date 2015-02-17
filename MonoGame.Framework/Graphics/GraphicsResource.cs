@@ -39,21 +39,13 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public abstract class GraphicsResource : IDisposable
     {
         bool disposed;
-        
-        // Resources may be added to and removed from the list from many threads.
-        static object resourcesLock = new object();
-
-        // Use WeakReference for the global resources list as we do not know when a resource
-        // may be disposed and collected. We do not want to prevent a resource from being
-        // collected by holding a strong reference to it in this list.
-        static List<WeakReference> resources = new List<WeakReference>();
 
         // The GraphicsDevice property should only be accessed in Dispose(bool) if the disposing
         // parameter is true. If disposing is false, the GraphicsDevice may or may not be
@@ -64,11 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal GraphicsResource()
         {
-            lock (resourcesLock)
-            {
-                _selfReference = new WeakReference(this);
-                resources.Add(_selfReference);
-            }
+            
         }
 
         ~GraphicsResource()
@@ -86,39 +74,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal protected virtual void GraphicsDeviceResetting()
         {
 
-        }
-
-        internal static void DoGraphicsDeviceResetting()
-        {
-            lock (resourcesLock)
-            {
-                foreach (var resource in resources)
-                {
-                    var target = resource.Target;
-                    if (target != null)
-                        (target as GraphicsResource).GraphicsDeviceResetting();
-                }
-
-                // Remove references to resources that have been garbage collected.
-                resources.RemoveAll(wr => !wr.IsAlive);
-            }
-        }
-
-        /// <summary>
-        /// Dispose all graphics resources remaining in the global resources list.
-        /// </summary>
-        internal static void DisposeAll()
-        {
-            lock (resourcesLock)
-            {
-                foreach (var resource in resources.ToArray())
-                {
-                    var target = resource.Target;
-                    if (target != null)
-                        (target as IDisposable).Dispose();
-                }
-                resources.Clear();
-            }
         }
 
         public void Dispose()
@@ -152,10 +107,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     Disposing(this, EventArgs.Empty);
 
                 // Remove from the global list of graphics resources
-                lock (resourcesLock)
-                {
-                    resources.Remove(_selfReference);
-                }
+                if (graphicsDevice != null)
+                    graphicsDevice.RemoveResourceReference(_selfReference);
 
                 _selfReference = null;
                 graphicsDevice = null;
@@ -174,7 +127,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal set
             {
+                Debug.Assert(value != null);
+
+                if (graphicsDevice == value)
+                    return;
+
+                // VertexDeclaration objects can be bound to multiple GraphicsDevice objects
+                // during their lifetime. But only one GraphicsDevice should retain ownership.
+                if (graphicsDevice != null)
+                {
+                    graphicsDevice.RemoveResourceReference(_selfReference);
+                    _selfReference = null;
+                }
+
                 graphicsDevice = value;
+
+                _selfReference = new WeakReference(this);
+                graphicsDevice.AddResourceReference(_selfReference);
             }
 		}
 		

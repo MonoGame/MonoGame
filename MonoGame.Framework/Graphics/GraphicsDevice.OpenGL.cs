@@ -270,7 +270,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // some drivers won't clear with stencil test disabled
             DepthStencilState = this.clearDepthStencilState;
 		    BlendState = BlendState.Opaque;
-            PlatformApplyState(false);
+            ApplyState(false);
 
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
@@ -784,10 +784,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
         }
 
-        internal void PlatformApplyState(bool applyShaders)
+        internal void PlatformBeginApplyState()
         {
             Threading.EnsureUIThread();
+        }
 
+        internal void PlatformApplyState(bool applyShaders)
+        {
             if ( _scissorRectangleDirty )
 	        {
                 var scissorRect = _scissorRectangle;
@@ -797,22 +800,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
 	            _scissorRectangleDirty = false;
 	        }
-
-            if (_blendStateDirty)
-            {
-                _blendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
-	        if ( _depthStencilStateDirty )
-            {
-	            _depthStencilState.PlatformApplyState(this);
-                _depthStencilStateDirty = false;
-            }
-	        if ( _rasterizerStateDirty )
-            {
-	            _rasterizerState.PlatformApplyState(this);
-	            _rasterizerStateDirty = false;
-            }
 
             // If we're not applying shaders then early out now.
             if (!applyShaders)
@@ -857,7 +844,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
 
@@ -879,7 +866,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -907,7 +894,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
 
@@ -919,7 +906,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -952,7 +939,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);

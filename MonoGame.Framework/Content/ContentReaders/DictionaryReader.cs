@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Content
 			valueReader = manager.GetTypeReader(valueType);
         }
 
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return true; }
+        }
+
         protected internal override Dictionary<TKey, TValue> Read(ContentReader input, Dictionary<TKey, TValue> existingInstance)
         {
             int count = input.ReadInt32();

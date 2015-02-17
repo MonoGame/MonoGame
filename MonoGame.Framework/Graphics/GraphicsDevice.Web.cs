@@ -56,6 +56,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return null;
         }
+		
+        internal void PlatformBeginApplyState()
+        {
+        }
 
         internal void PlatformApplyState(bool applyShaders)
         {
