@@ -126,6 +126,7 @@
     <Compile Include="Framework\Visual\BlendStateTest.cs" />
     <Compile Include="Framework\Visual\DepthStencilStateTest.cs" />
     <Compile Include="Framework\Visual\EffectTest.cs" />
+    <Compile Include="Framework\Visual\GraphicsDeviceTest.cs" />
     <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
     <Compile Include="Framework\Visual\SamplerStateTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
