@@ -416,7 +416,7 @@ namespace MonoGame.Utilities
                 if (!_disposed)
                 {
                     if (disposing && (this._baseStream != null))
-                        this._baseStream.Close();
+                        this._baseStream.Dispose();
                     _disposed = true;
                 }
             }
@@ -1686,22 +1686,6 @@ namespace MonoGame.Utilities
                 _z.EndInflate();
             }
             _z = null;
-        }
-
-
-        public override void Close()
-        {
-            if (_stream == null) return;
-            try
-            {
-                finish();
-            }
-            finally
-            {
-                end();
-                if (!_leaveOpen) _stream.Close();
-                _stream = null;
-            }
         }
 
         public override void Flush()
@@ -5525,7 +5509,7 @@ namespace MonoGame.Utilities
                 {
                     if (disposing && (this._baseStream != null))
                     {
-                        this._baseStream.Close();
+                        this._baseStream.Dispose();
                         this._Crc32 = _baseStream.Crc32;
                     }
                     _disposed = true;
@@ -8482,17 +8466,7 @@ namespace MonoGame.Utilities
 
         void IDisposable.Dispose()
         {
-            Close();
-        }
-
-        /// <summary>
-        /// Closes the stream.
-        /// </summary>
-        public override void Close()
-        {
-            base.Close();
-            if (!_leaveOpen)
-                _innerStream.Close();
+            base.Dispose();
         }
     }
 }
