@@ -793,8 +793,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
-            Debug.Assert(_indexBuffer != null, "The index buffer is null!");
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawIndexedPrimitives.");
+
+            if (_vertexBuffer == null)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawIndexedPrimitives.");
+
+            if (_indexBuffer == null)
+                throw new InvalidOperationException("Index buffer must be set before calling DrawIndexedPrimitives.");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
             // NOTE: minVertexIndex and numVertices are only hints of the
             // range of vertex data which will be indexed.
@@ -838,7 +847,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
             if (_vertexShader == null)
-                throw new InvalidOperationException("Must set a vertex shader before calling DrawPrimitives.");
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawPrimitives.");
 
             if (_vertexBuffer == null)
                 throw new InvalidOperationException("Vertex buffer must be set before calling DrawPrimitives.");
