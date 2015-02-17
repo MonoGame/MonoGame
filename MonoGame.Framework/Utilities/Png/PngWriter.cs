@@ -55,7 +55,7 @@ namespace MonoGame.Utilities.Png
 
             try
             {
-                using (var deflateStream = new DeflateStream(new MemoryStream(encodedPixelData), CompressionMode.Compress))
+                using (var deflateStream = new ZlibStream(new MemoryStream(encodedPixelData), CompressionMode.Compress))
                 {
                     deflateStream.CopyTo(compressedPixelData);
                 }
