@@ -68,7 +68,7 @@ namespace MonoGame.Utilities
     /// </remarks>
     /// <seealso cref="DeflateStream" />
     /// <seealso cref="GZipStream" />
-    public class ZlibStream : System.IO.Stream
+    public class ZlibStream : Stream
     {
         internal ZlibBaseStream _baseStream;
         bool _disposed;
@@ -724,60 +724,60 @@ namespace MonoGame.Utilities
     /// <summary>
     /// A bunch of constants used in the Zlib interface.
     /// </summary>
-    public static class ZlibConstants
+    internal static class ZlibConstants
     {
         /// <summary>
         /// The maximum number of window bits for the Deflate algorithm.
         /// </summary>
-        public const int WindowBitsMax = 15; // 32K LZ77 window
+        internal const int WindowBitsMax = 15; // 32K LZ77 window
 
         /// <summary>
         /// The default number of window bits for the Deflate algorithm.
         /// </summary>
-        public const int WindowBitsDefault = WindowBitsMax;
+        internal const int WindowBitsDefault = WindowBitsMax;
 
         /// <summary>
         /// indicates everything is A-OK
         /// </summary>
-        public const int Z_OK = 0;
+        internal const int Z_OK = 0;
 
         /// <summary>
         /// Indicates that the last operation reached the end of the stream.
         /// </summary>
-        public const int Z_STREAM_END = 1;
+        internal const int Z_STREAM_END = 1;
 
         /// <summary>
         /// The operation ended in need of a dictionary. 
         /// </summary>
-        public const int Z_NEED_DICT = 2;
+        internal const int Z_NEED_DICT = 2;
 
         /// <summary>
         /// There was an error with the stream - not enough data, not open and readable, etc.
         /// </summary>
-        public const int Z_STREAM_ERROR = -2;
+        internal const int Z_STREAM_ERROR = -2;
 
         /// <summary>
         /// There was an error with the data - not enough data, bad data, etc.
         /// </summary>
-        public const int Z_DATA_ERROR = -3;
+        internal const int Z_DATA_ERROR = -3;
 
         /// <summary>
         /// There was an error with the working buffer.
         /// </summary>
-        public const int Z_BUF_ERROR = -5;
+        internal const int Z_BUF_ERROR = -5;
 
         /// <summary>
         /// The size of the working buffer used in the ZlibCodec class. Defaults to 8192 bytes.
         /// </summary>
 #if NETCF        
-        public const int WorkingBufferSizeDefault = 8192;
+        internal const int WorkingBufferSizeDefault = 8192;
 #else
-        public const int WorkingBufferSizeDefault = 16384;
+        internal const int WorkingBufferSizeDefault = 16384;
 #endif
         /// <summary>
         /// The minimum size of the working buffer used in the ZlibCodec class.  Currently it is 128 bytes.
         /// </summary>
-        public const int WorkingBufferSizeMin = 1024;
+        internal const int WorkingBufferSizeMin = 1024;
     }
 
     /// <summary>
@@ -791,17 +791,17 @@ namespace MonoGame.Utilities
     /// href="http://www.ietf.org/rfc/rfc1951.txt">RFC 1951 - DEFLATE</see>.
     /// </remarks>
 
-    sealed public class ZlibCodec
+    sealed internal class ZlibCodec
     {
         /// <summary>
         /// The buffer from which data is taken.
         /// </summary>
-        public byte[] InputBuffer;
+        internal byte[] InputBuffer;
 
         /// <summary>
         /// An index into the InputBuffer array, indicating where to start reading. 
         /// </summary>
-        public int NextIn;
+        internal int NextIn;
 
         /// <summary>
         /// The number of bytes available in the InputBuffer, starting at NextIn. 
@@ -810,22 +810,22 @@ namespace MonoGame.Utilities
         /// Generally you should set this to InputBuffer.Length before the first Inflate() or Deflate() call. 
         /// The class will update this number as calls to Inflate/Deflate are made.
         /// </remarks>
-        public int AvailableBytesIn;
+        internal int AvailableBytesIn;
 
         /// <summary>
         /// Total number of bytes read so far, through all calls to Inflate()/Deflate().
         /// </summary>
-        public long TotalBytesIn;
+        internal long TotalBytesIn;
 
         /// <summary>
         /// Buffer to store output data.
         /// </summary>
-        public byte[] OutputBuffer;
+        internal byte[] OutputBuffer;
 
         /// <summary>
         /// An index into the OutputBuffer array, indicating where to start writing. 
         /// </summary>
-        public int NextOut;
+        internal int NextOut;
 
         /// <summary>
         /// The number of bytes available in the OutputBuffer, starting at NextOut. 
@@ -834,17 +834,17 @@ namespace MonoGame.Utilities
         /// Generally you should set this to OutputBuffer.Length before the first Inflate() or Deflate() call. 
         /// The class will update this number as calls to Inflate/Deflate are made.
         /// </remarks>
-        public int AvailableBytesOut;
+        internal int AvailableBytesOut;
 
         /// <summary>
         /// Total number of bytes written to the output so far, through all calls to Inflate()/Deflate().
         /// </summary>
-        public long TotalBytesOut;
+        internal long TotalBytesOut;
 
         /// <summary>
         /// used for diagnostics, when something goes wrong!
         /// </summary>
-        public System.String Message;
+        internal System.String Message;
 
         internal DeflateManager dstate;
         internal InflateManager istate;
@@ -854,7 +854,7 @@ namespace MonoGame.Utilities
         /// <summary>
         /// The compression level to use in this codec.  Useful only in compression mode.
         /// </summary>
-        public CompressionLevel CompressLevel = CompressionLevel.Default;
+        internal CompressionLevel CompressLevel = CompressionLevel.Default;
 
         /// <summary>
         /// The number of Window Bits to use.  
@@ -865,7 +865,7 @@ namespace MonoGame.Utilities
         /// setting alone if you don't know what it is.  The maximum value is 15 bits, which implies
         /// a 32k window.  
         /// </remarks>
-        public int WindowBits = ZlibConstants.WindowBitsDefault;
+        internal int WindowBits = ZlibConstants.WindowBitsDefault;
 
         /// <summary>
         /// The compression strategy to use.
@@ -880,13 +880,13 @@ namespace MonoGame.Utilities
         /// different strategy options and evaluates them on different file types. If you do that,
         /// let me know your results.
         /// </remarks>
-        public CompressionStrategy Strategy = CompressionStrategy.Default;
+        internal CompressionStrategy Strategy = CompressionStrategy.Default;
 
 
         /// <summary>
         /// The Adler32 checksum on the data transferred through the codec so far. You probably don't need to look at this.
         /// </summary>
-        public int Adler32 { get { return (int)_Adler32; } }
+        internal int Adler32 { get { return (int)_Adler32; } }
 
 
         /// <summary>
@@ -897,7 +897,7 @@ namespace MonoGame.Utilities
         /// InitializeInflate() or InitializeDeflate() before using the ZlibCodec to compress 
         /// or decompress. 
         /// </remarks>
-        public ZlibCodec() { }
+        internal ZlibCodec() { }
 
         /// <summary>
         /// Create a ZlibCodec that either compresses or decompresses.
@@ -905,7 +905,7 @@ namespace MonoGame.Utilities
         /// <param name="mode">
         /// Indicates whether the codec should compress (deflate) or decompress (inflate).
         /// </param>
-        public ZlibCodec(CompressionMode mode)
+        internal ZlibCodec(CompressionMode mode)
         {
             if (mode == CompressionMode.Compress)
             {
@@ -928,7 +928,7 @@ namespace MonoGame.Utilities
         /// It is implicitly called when you call the constructor.
         /// </remarks>
         /// <returns>Z_OK if everything goes well.</returns>
-        public int InitializeInflate()
+        internal int InitializeInflate()
         {
             return InitializeInflate(this.WindowBits);
         }
@@ -951,7 +951,7 @@ namespace MonoGame.Utilities
         /// pair when reading the stream of data to be inflated.</param>
         ///
         /// <returns>Z_OK if everything goes well.</returns>
-        public int InitializeInflate(bool expectRfc1950Header)
+        internal int InitializeInflate(bool expectRfc1950Header)
         {
             return InitializeInflate(this.WindowBits, expectRfc1950Header);
         }
@@ -962,7 +962,7 @@ namespace MonoGame.Utilities
         /// <param name="windowBits">The number of window bits to use. If you need to ask what that is, 
         /// then you shouldn't be calling this initializer.</param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int InitializeInflate(int windowBits)
+        internal int InitializeInflate(int windowBits)
         {
             this.WindowBits = windowBits;
             return InitializeInflate(windowBits, true);
@@ -987,7 +987,7 @@ namespace MonoGame.Utilities
         /// <param name="windowBits">The number of window bits to use. If you need to ask what that is, 
         /// then you shouldn't be calling this initializer.</param>
         /// <returns>Z_OK if everything goes well.</returns>
-        public int InitializeInflate(int windowBits, bool expectRfc1950Header)
+        internal int InitializeInflate(int windowBits, bool expectRfc1950Header)
         {
             this.WindowBits = windowBits;
             if (dstate != null) throw new ZlibException("You may not call InitializeInflate() after calling InitializeDeflate().");
@@ -1058,7 +1058,7 @@ namespace MonoGame.Utilities
         /// </example>
         /// <param name="flush">The flush to use when inflating.</param>
         /// <returns>Z_OK if everything goes well.</returns>
-        public int Inflate(FlushType flush)
+        internal int Inflate(FlushType flush)
         {
             if (istate == null)
                 throw new ZlibException("No Inflate State!");
@@ -1075,7 +1075,7 @@ namespace MonoGame.Utilities
         /// InitializeInflate() overloads.
         /// </remarks>
         /// <returns>Z_OK if everything goes well.</returns>
-        public int EndInflate()
+        internal int EndInflate()
         {
             if (istate == null)
                 throw new ZlibException("No Inflate State!");
@@ -1088,7 +1088,7 @@ namespace MonoGame.Utilities
         /// I don't know what this does!
         /// </summary>
         /// <returns>Z_OK if everything goes well.</returns>
-        public int SyncInflate()
+        internal int SyncInflate()
         {
             if (istate == null)
                 throw new ZlibException("No Inflate State!");
@@ -1135,7 +1135,7 @@ namespace MonoGame.Utilities
         /// </code>
         /// </example>
         /// <returns>Z_OK if all goes well. You generally don't need to check the return code.</returns>
-        public int InitializeDeflate()
+        internal int InitializeDeflate()
         {
             return _InternalInitializeDeflate(true);
         }
@@ -1149,7 +1149,7 @@ namespace MonoGame.Utilities
         /// </remarks>
         /// <param name="level">The compression level for the codec.</param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int InitializeDeflate(CompressionLevel level)
+        internal int InitializeDeflate(CompressionLevel level)
         {
             this.CompressLevel = level;
             return _InternalInitializeDeflate(true);
@@ -1170,7 +1170,7 @@ namespace MonoGame.Utilities
         /// <param name="level">The compression level for the codec.</param>
         /// <param name="wantRfc1950Header">whether to emit an initial RFC1950 byte pair in the compressed stream.</param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int InitializeDeflate(CompressionLevel level, bool wantRfc1950Header)
+        internal int InitializeDeflate(CompressionLevel level, bool wantRfc1950Header)
         {
             this.CompressLevel = level;
             return _InternalInitializeDeflate(wantRfc1950Header);
@@ -1187,7 +1187,7 @@ namespace MonoGame.Utilities
         /// <param name="level">The compression level for the codec.</param>
         /// <param name="bits">the number of window bits to use.  If you don't know what this means, don't use this method.</param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int InitializeDeflate(CompressionLevel level, int bits)
+        internal int InitializeDeflate(CompressionLevel level, int bits)
         {
             this.CompressLevel = level;
             this.WindowBits = bits;
@@ -1204,7 +1204,7 @@ namespace MonoGame.Utilities
         /// <param name="wantRfc1950Header">whether to emit an initial RFC1950 byte pair in the compressed stream.</param>
         /// <param name="bits">the number of window bits to use.  If you don't know what this means, don't use this method.</param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int InitializeDeflate(CompressionLevel level, int bits, bool wantRfc1950Header)
+        internal int InitializeDeflate(CompressionLevel level, int bits, bool wantRfc1950Header)
         {
             this.CompressLevel = level;
             this.WindowBits = bits;
@@ -1288,7 +1288,7 @@ namespace MonoGame.Utilities
         /// flush everything. 
         /// </param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int Deflate(FlushType flush)
+        internal int Deflate(FlushType flush)
         {
             if (dstate == null)
                 throw new ZlibException("No Deflate State!");
@@ -1302,7 +1302,7 @@ namespace MonoGame.Utilities
         /// Call this after making a series of one or more calls to Deflate(). All buffers are flushed.
         /// </remarks>
         /// <returns>Z_OK if all goes well.</returns>
-        public int EndDeflate()
+        internal int EndDeflate()
         {
             if (dstate == null)
                 throw new ZlibException("No Deflate State!");
@@ -1321,7 +1321,7 @@ namespace MonoGame.Utilities
         /// block and before the next Deflate(None) of the second block.
         /// </remarks>
         /// <returns>Z_OK if all goes well.</returns>
-        public void ResetDeflate()
+        internal void ResetDeflate()
         {
             if (dstate == null)
                 throw new ZlibException("No Deflate State!");
@@ -1335,7 +1335,7 @@ namespace MonoGame.Utilities
         /// <param name="level">the level of compression to use.</param>
         /// <param name="strategy">the strategy to use for compression.</param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int SetDeflateParams(CompressionLevel level, CompressionStrategy strategy)
+        internal int SetDeflateParams(CompressionLevel level, CompressionStrategy strategy)
         {
             if (dstate == null)
                 throw new ZlibException("No Deflate State!");
@@ -1348,7 +1348,7 @@ namespace MonoGame.Utilities
         /// </summary>
         /// <param name="dictionary">The dictionary bytes to use.</param>
         /// <returns>Z_OK if all goes well.</returns>
-        public int SetDictionary(byte[] dictionary)
+        internal int SetDictionary(byte[] dictionary)
         {
             if (istate != null)
                 return istate.SetDictionary(dictionary);
@@ -1450,7 +1450,7 @@ namespace MonoGame.Utilities
 
         internal int Crc32 { get { if (crc == null) return 0; return crc.Crc32Result; } }
 
-        public ZlibBaseStream(System.IO.Stream stream,
+        internal ZlibBaseStream(System.IO.Stream stream,
                               CompressionMode compressionMode,
                               CompressionLevel level,
                               ZlibStreamFlavor flavor,
@@ -1513,9 +1513,7 @@ namespace MonoGame.Utilities
                 return _workingBuffer;
             }
         }
-
-
-
+        
         public override void Write(System.Byte[] buffer, int offset, int count)
         {
             // workitem 7159
@@ -1723,7 +1721,7 @@ namespace MonoGame.Utilities
 
 
 #if NOT
-        public int Read()
+        internal int Read()
         {
             if (Read(_buf1, 0, 1) == 0)
                 return 0;
@@ -1954,7 +1952,7 @@ namespace MonoGame.Utilities
         }
 
 
-        public static void CompressString(String s, Stream compressor)
+        internal static void CompressString(String s, Stream compressor)
         {
             byte[] uncompressed = System.Text.Encoding.UTF8.GetBytes(s);
             using (compressor)
@@ -1963,7 +1961,7 @@ namespace MonoGame.Utilities
             }
         }
 
-        public static void CompressBuffer(byte[] b, Stream compressor)
+        internal static void CompressBuffer(byte[] b, Stream compressor)
         {
             // workitem 8460
             using (compressor)
@@ -1972,7 +1970,7 @@ namespace MonoGame.Utilities
             }
         }
 
-        public static String UncompressString(byte[] compressed, Stream decompressor)
+        internal static String UncompressString(byte[] compressed, Stream decompressor)
         {
             // workitem 8460
             byte[] working = new byte[1024];
@@ -1995,7 +1993,7 @@ namespace MonoGame.Utilities
             }
         }
 
-        public static byte[] UncompressBuffer(byte[] compressed, Stream decompressor)
+        internal static byte[] UncompressBuffer(byte[] compressed, Stream decompressor)
         {
             // workitem 8460
             byte[] working = new byte[1024];
@@ -2140,7 +2138,7 @@ namespace MonoGame.Utilities
     /// work better on different sorts of data.  The strategy parameter can affect the compression
     /// ratio and the speed of compression but not the correctness of the compresssion.
     /// </summary>
-    public enum CompressionStrategy
+    internal enum CompressionStrategy
     {
         /// <summary>
         /// The default strategy is probably the best for normal data.
@@ -2183,13 +2181,13 @@ namespace MonoGame.Utilities
     /// <summary>
     /// A general purpose exception class for exceptions in the Zlib library.
     /// </summary>
-    public class ZlibException : System.Exception
+    internal class ZlibException : System.Exception
     {
         /// <summary>
         /// The ZlibException class captures exception information generated
         /// by the Zlib library.
         /// </summary>
-        public ZlibException()
+        internal ZlibException()
             : base()
         {
         }
@@ -2198,7 +2196,7 @@ namespace MonoGame.Utilities
         /// This ctor collects a message attached to the exception.
         /// </summary>
         /// <param name="s">the message for the exception.</param>
-        public ZlibException(System.String s)
+        internal ZlibException(System.String s)
             : base(s)
         {
         }
@@ -2213,7 +2211,7 @@ namespace MonoGame.Utilities
         /// <param name="number">Number to operate on</param>
         /// <param name="bits">Ammount of bits to shift</param>
         /// <returns>The resulting number from the shift operation</returns>
-        public static int URShift(int number, int bits)
+        internal static int URShift(int number, int bits)
         {
             return (int)((uint)number >> bits);
         }
@@ -2225,7 +2223,7 @@ namespace MonoGame.Utilities
         /// <param name="number">Number to operate on</param>
         /// <param name="bits">Ammount of bits to shift</param>
         /// <returns>The resulting number from the shift operation</returns>
-        public static long URShift(long number, int bits)
+        internal static long URShift(long number, int bits)
         {
             return (long) ((UInt64)number >> bits);
         }
@@ -2246,7 +2244,7 @@ namespace MonoGame.Utilities
         ///   count depending on the data available in the source TextReader. Returns -1
         ///   if the end of the stream is reached.
         /// </returns>
-        public static System.Int32 ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
+        internal static System.Int32 ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
         {
             // Returns 0 bytes if not enough space in target
             if (target.Length == 0) return 0;
@@ -2385,7 +2383,7 @@ namespace MonoGame.Utilities
     /// </remarks>
     ///
     /// <exclude/>
-    public sealed class Adler
+    internal sealed class Adler
     {
         // largest prime smaller than 65536
         private static readonly uint BASE = 65521;
@@ -2411,7 +2409,7 @@ namespace MonoGame.Utilities
         ///    adler = Adler.Adler32(adler, buffer, index, length);
         ///  </code>
         /// </example>
-        public static uint Adler32(uint adler, byte[] buf, int index, int len)
+        internal static uint Adler32(uint adler, byte[] buf, int index, int len)
         {
             if (buf == null)
                 return 1;
@@ -4575,9 +4573,9 @@ namespace MonoGame.Utilities
 
         internal InflateBlocks blocks; // current inflate_blocks state
 
-        public InflateManager() { }
+        internal InflateManager() { }
 
-        public InflateManager(bool expectRfc1950HeaderBytes)
+        internal InflateManager(bool expectRfc1950HeaderBytes)
         {
             _handleRfc1950HeaderBytes = expectRfc1950HeaderBytes;
         }
@@ -4966,7 +4964,7 @@ namespace MonoGame.Utilities
     ///
     /// <seealso cref="DeflateStream" />
     /// <seealso cref="ZlibStream" />
-    public class GZipStream : System.IO.Stream
+    internal class GZipStream : Stream
     {
         // GZip format
         // source: http://tools.ietf.org/html/rfc1952
@@ -5026,7 +5024,7 @@ namespace MonoGame.Utilities
         ///   (<c>Nothing</c> in VB).
         /// </para>
         /// </remarks>
-        public String Comment
+        internal String Comment
         {
             get
             {
@@ -5062,7 +5060,7 @@ namespace MonoGame.Utilities
         ///   in VB).
         /// </para>
         /// </remarks>
-        public String FileName
+        internal String FileName
         {
             get { return _FileName; }
             set
@@ -5094,7 +5092,7 @@ namespace MonoGame.Utilities
         ///   <c>Write()</c>.  When decompressing, you can retrieve this value any time
         ///   after the first call to <c>Read()</c>.
         /// </remarks>
-        public DateTime? LastModified;
+        internal DateTime? LastModified;
 
         /// <summary>
         /// The CRC on the GZIP stream.
@@ -5102,7 +5100,7 @@ namespace MonoGame.Utilities
         /// <remarks>
         /// This is used for internal error checking. You probably don't need to look at this property.
         /// </remarks>
-        public int Crc32 { get { return _Crc32; } }
+        internal int Crc32 { get { return _Crc32; } }
 
         private int _headerByteCount;
         internal ZlibBaseStream _baseStream;
@@ -5227,7 +5225,7 @@ namespace MonoGame.Utilities
         ///
         /// <param name="stream">The stream which will be read or written.</param>
         /// <param name="mode">Indicates whether the GZipStream will compress or decompress.</param>
-        public GZipStream(Stream stream, CompressionMode mode)
+        internal GZipStream(Stream stream, CompressionMode mode)
             : this(stream, mode, CompressionLevel.Default, false)
         {
         }
@@ -5292,7 +5290,7 @@ namespace MonoGame.Utilities
         /// <param name="stream">The stream to be read or written while deflating or inflating.</param>
         /// <param name="mode">Indicates whether the <c>GZipStream</c> will compress or decompress.</param>
         /// <param name="level">A tuning knob to trade speed for effectiveness.</param>
-        public GZipStream(Stream stream, CompressionMode mode, CompressionLevel level)
+        internal GZipStream(Stream stream, CompressionMode mode, CompressionLevel level)
             : this(stream, mode, level, false)
         {
         }
@@ -5345,7 +5343,7 @@ namespace MonoGame.Utilities
         ///   true if the application would like the base stream to remain open after
         ///   inflation/deflation.
         /// </param>
-        public GZipStream(Stream stream, CompressionMode mode, bool leaveOpen)
+        internal GZipStream(Stream stream, CompressionMode mode, bool leaveOpen)
             : this(stream, mode, CompressionLevel.Default, leaveOpen)
         {
         }
@@ -5419,7 +5417,7 @@ namespace MonoGame.Utilities
         /// <param name="mode">Indicates whether the GZipStream will compress or decompress.</param>
         /// <param name="leaveOpen">true if the application would like the stream to remain open after inflation/deflation.</param>
         /// <param name="level">A tuning knob to trade speed for effectiveness.</param>
-        public GZipStream(Stream stream, CompressionMode mode, CompressionLevel level, bool leaveOpen)
+        internal GZipStream(Stream stream, CompressionMode mode, CompressionLevel level, bool leaveOpen)
         {
             _baseStream = new ZlibBaseStream(stream, mode, level, ZlibStreamFlavor.GZIP, leaveOpen);
         }
@@ -5429,7 +5427,7 @@ namespace MonoGame.Utilities
         /// <summary>
         /// This property sets the flush behavior on the stream.
         /// </summary>
-        virtual public FlushType FlushMode
+        virtual internal FlushType FlushMode
         {
             get { return (this._baseStream._flushMode); }
             set
@@ -5456,7 +5454,7 @@ namespace MonoGame.Utilities
         ///   stream. If you try to set it afterwards, it will throw.
         /// </para>
         /// </remarks>
-        public int BufferSize
+        internal int BufferSize
         {
             get
             {
@@ -5475,7 +5473,7 @@ namespace MonoGame.Utilities
 
 
         /// <summary> Returns the total number of bytes input so far.</summary>
-        virtual public long TotalIn
+        virtual internal long TotalIn
         {
             get
             {
@@ -5484,7 +5482,7 @@ namespace MonoGame.Utilities
         }
 
         /// <summary> Returns the total number of bytes output so far.</summary>
-        virtual public long TotalOut
+        virtual internal long TotalOut
         {
             get
             {
@@ -5508,7 +5506,7 @@ namespace MonoGame.Utilities
         ///   <para>
         ///     This method may be invoked in two distinct scenarios.  If disposing
         ///     == true, the method has been called directly or indirectly by a
-        ///     user's code, for example via the public Dispose() method. In this
+        ///     user's code, for example via the internal Dispose() method. In this
         ///     case, both managed and unmanaged resources can be referenced and
         ///     disposed.  If disposing == false, the method has been called by the
         ///     runtime from inside the object finalizer and this method should not
@@ -5828,7 +5826,7 @@ namespace MonoGame.Utilities
         /// </param>
         ///
         /// <returns>The string in compressed form</returns>
-        public static byte[] CompressString(String s)
+        internal static byte[] CompressString(String s)
         {
             using (var ms = new MemoryStream())
             {
@@ -5856,7 +5854,7 @@ namespace MonoGame.Utilities
         /// </param>
         ///
         /// <returns>The data in compressed form</returns>
-        public static byte[] CompressBuffer(byte[] b)
+        internal static byte[] CompressBuffer(byte[] b)
         {
             using (var ms = new MemoryStream())
             {
@@ -5881,7 +5879,7 @@ namespace MonoGame.Utilities
         /// </param>
         ///
         /// <returns>The uncompressed string</returns>
-        public static String UncompressString(byte[] compressed)
+        internal static String UncompressString(byte[] compressed)
         {
             using (var input = new MemoryStream(compressed))
             {
@@ -5903,7 +5901,7 @@ namespace MonoGame.Utilities
         /// </param>
         ///
         /// <returns>The data in uncompressed form</returns>
-        public static byte[] UncompressBuffer(byte[] compressed)
+        internal static byte[] UncompressBuffer(byte[] compressed)
         {
             using (var input = new System.IO.MemoryStream(compressed))
             {
@@ -5969,7 +5967,7 @@ namespace MonoGame.Utilities
                 this.Flavor = flavor;
             }
 
-            public static Config Lookup(CompressionLevel level)
+            internal static Config Lookup(CompressionLevel level)
             {
                 return Table[(int)level];
             }
@@ -7733,12 +7731,12 @@ namespace MonoGame.Utilities
     ///   archive files.
     /// </remarks>
 
-    public class CRC32
+    internal class CRC32
     {
         /// <summary>
         ///   Indicates the total number of bytes applied to the CRC.
         /// </summary>
-        public Int64 TotalBytesRead
+        internal Int64 TotalBytesRead
         {
             get
             {
@@ -7749,7 +7747,7 @@ namespace MonoGame.Utilities
         /// <summary>
         /// Indicates the current CRC for all blocks slurped in.
         /// </summary>
-        public Int32 Crc32Result
+        internal Int32 Crc32Result
         {
             get
             {
@@ -7762,7 +7760,7 @@ namespace MonoGame.Utilities
         /// </summary>
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <returns>the CRC32 calculation</returns>
-        public Int32 GetCrc32(System.IO.Stream input)
+        internal Int32 GetCrc32(System.IO.Stream input)
         {
             return GetCrc32AndCopy(input, null);
         }
@@ -7774,7 +7772,7 @@ namespace MonoGame.Utilities
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <param name="output">The stream into which to deflate the input</param>
         /// <returns>the CRC32 calculation</returns>
-        public Int32 GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
+        internal Int32 GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
         {
             if (input == null)
                 throw new Exception("The input stream must not be null.");
@@ -7808,7 +7806,7 @@ namespace MonoGame.Utilities
         /// <param name="W">The word to start with.</param>
         /// <param name="B">The byte to combine it with.</param>
         /// <returns>The CRC-ized result.</returns>
-        public Int32 ComputeCrc32(Int32 W, byte B)
+        internal Int32 ComputeCrc32(Int32 W, byte B)
         {
             return _InternalComputeCrc32((UInt32)W, B);
         }
@@ -7826,7 +7824,7 @@ namespace MonoGame.Utilities
         /// <param name="block">block of bytes to slurp</param>
         /// <param name="offset">starting point in the block</param>
         /// <param name="count">how many bytes within the block to slurp</param>
-        public void SlurpBlock(byte[] block, int offset, int count)
+        internal void SlurpBlock(byte[] block, int offset, int count)
         {
             if (block == null)
                 throw new Exception("The data buffer must not be null.");
@@ -7855,7 +7853,7 @@ namespace MonoGame.Utilities
         ///   Process one byte in the CRC.
         /// </summary>
         /// <param name = "b">the byte to include into the CRC .  </param>
-        public void UpdateCRC(byte b)
+        internal void UpdateCRC(byte b)
         {
             if (this.reverseBits)
             {
@@ -7883,7 +7881,7 @@ namespace MonoGame.Utilities
         /// </remarks>
         /// <param name = "b">the byte to include into the CRC.  </param>
         /// <param name = "n">the number of times that byte should be repeated. </param>
-        public void UpdateCRC(byte b, int n)
+        internal void UpdateCRC(byte b, int n)
         {
             while (n-- > 0)
             {
@@ -8018,7 +8016,7 @@ namespace MonoGame.Utilities
         /// </remarks>
         /// <param name="crc">the crc value to be combined with this one</param>
         /// <param name="length">the length of data the CRC value was calculated on</param>
-        public void Combine(int crc, int length)
+        internal void Combine(int crc, int length)
         {
             uint[] even = new uint[32];     // even-power-of-two zeros operator
             uint[] odd = new uint[32];      // odd-power-of-two zeros operator
@@ -8082,7 +8080,7 @@ namespace MonoGame.Utilities
         ///   Create an instance of the CRC32 class using the default settings: no
         ///   bit reversal, and a polynomial of 0xEDB88320.
         /// </summary>
-        public CRC32()
+        internal CRC32()
             : this(false)
         {
         }
@@ -8103,7 +8101,7 @@ namespace MonoGame.Utilities
         ///     those, you should pass false.
         ///   </para>
         /// </remarks>
-        public CRC32(bool reverseBits) :
+        internal CRC32(bool reverseBits) :
             this(unchecked((int)0xEDB88320), reverseBits)
         {
         }
@@ -8134,7 +8132,7 @@ namespace MonoGame.Utilities
         ///     <c>reverseBits</c> parameter.
         ///   </para>
         /// </remarks>
-        public CRC32(int polynomial, bool reverseBits)
+        internal CRC32(int polynomial, bool reverseBits)
         {
             this.reverseBits = reverseBits;
             this.dwPolynomial = (uint)polynomial;
@@ -8150,7 +8148,7 @@ namespace MonoGame.Utilities
         ///     multiple, distinct CRCs on multiple, distinct data blocks.
         ///   </para>
         /// </remarks>
-        public void Reset()
+        internal void Reset()
         {
             _register = 0xFFFFFFFFU;
         }
@@ -8184,7 +8182,7 @@ namespace MonoGame.Utilities
     /// DotNetZip library.
     /// </para>
     /// </remarks>
-    public class CrcCalculatorStream : System.IO.Stream, System.IDisposable
+    internal class CrcCalculatorStream : System.IO.Stream, System.IDisposable
     {
         private static readonly Int64 UnsetLengthLimit = -99;
 
@@ -8204,7 +8202,7 @@ namespace MonoGame.Utilities
         ///   </para>
         /// </remarks>
         /// <param name="stream">The underlying stream</param>
-        public CrcCalculatorStream(System.IO.Stream stream)
+        internal CrcCalculatorStream(System.IO.Stream stream)
             : this(true, CrcCalculatorStream.UnsetLengthLimit, stream, null)
         {
         }
@@ -8222,7 +8220,7 @@ namespace MonoGame.Utilities
         /// <param name="stream">The underlying stream</param>
         /// <param name="leaveOpen">true to leave the underlying stream
         /// open upon close of the <c>CrcCalculatorStream</c>; false otherwise.</param>
-        public CrcCalculatorStream(System.IO.Stream stream, bool leaveOpen)
+        internal CrcCalculatorStream(System.IO.Stream stream, bool leaveOpen)
             : this(leaveOpen, CrcCalculatorStream.UnsetLengthLimit, stream, null)
         {
         }
@@ -8243,7 +8241,7 @@ namespace MonoGame.Utilities
         /// </remarks>
         /// <param name="stream">The underlying stream</param>
         /// <param name="length">The length of the stream to slurp</param>
-        public CrcCalculatorStream(System.IO.Stream stream, Int64 length)
+        internal CrcCalculatorStream(System.IO.Stream stream, Int64 length)
             : this(true, length, stream, null)
         {
             if (length < 0)
@@ -8265,7 +8263,7 @@ namespace MonoGame.Utilities
         /// <param name="length">The length of the stream to slurp</param>
         /// <param name="leaveOpen">true to leave the underlying stream
         /// open upon close of the <c>CrcCalculatorStream</c>; false otherwise.</param>
-        public CrcCalculatorStream(System.IO.Stream stream, Int64 length, bool leaveOpen)
+        internal CrcCalculatorStream(System.IO.Stream stream, Int64 length, bool leaveOpen)
             : this(leaveOpen, length, stream, null)
         {
             if (length < 0)
@@ -8288,7 +8286,7 @@ namespace MonoGame.Utilities
         /// <param name="leaveOpen">true to leave the underlying stream
         /// open upon close of the <c>CrcCalculatorStream</c>; false otherwise.</param>
         /// <param name="crc32">the CRC32 instance to use to calculate the CRC32</param>
-        public CrcCalculatorStream(System.IO.Stream stream, Int64 length, bool leaveOpen,
+        internal CrcCalculatorStream(System.IO.Stream stream, Int64 length, bool leaveOpen,
                                    CRC32 crc32)
             : this(leaveOpen, length, stream, crc32)
         {
@@ -8321,7 +8319,7 @@ namespace MonoGame.Utilities
         ///   This is either the total number of bytes read, or the total number of
         ///   bytes written, depending on the direction of this stream.
         /// </remarks>
-        public Int64 TotalBytesSlurped
+        internal Int64 TotalBytesSlurped
         {
             get { return _Crc32.TotalBytesRead; }
         }
@@ -8336,7 +8334,7 @@ namespace MonoGame.Utilities
         ///     get an accurate CRC for the entire stream.
         ///   </para>
         /// </remarks>
-        public Int32 Crc
+        internal Int32 Crc
         {
             get { return _Crc32.Crc32Result; }
         }
@@ -8350,7 +8348,7 @@ namespace MonoGame.Utilities
         ///     Set this at any point before calling <see cref="Close()"/>.
         ///   </para>
         /// </remarks>
-        public bool LeaveOpen
+        internal bool LeaveOpen
         {
             get { return _leaveOpen; }
             set { _leaveOpen = value; }
