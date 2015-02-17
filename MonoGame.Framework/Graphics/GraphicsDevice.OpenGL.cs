@@ -60,6 +60,15 @@ namespace Microsoft.Xna.Framework.Graphics
         internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 
+        // Keeps track of last applied state to avoid redundant OpenGL calls
+        internal bool _lastBlendEnable = false;
+        internal BlendState _lastBlendState = new BlendState();
+        internal DepthStencilState _lastDepthStencilState = new DepthStencilState();
+        internal RasterizerState _lastRasterizerState = new RasterizerState();
+        private Vector4 _lastClearColor = Vector4.Zero;
+        private float _lastClearDepth = 1.0f;
+        private int _lastClearStencil = 0;
+
         internal void SetVertexAttributeArray(bool[] attrs)
         {
             for(int x = 0; x < attrs.Length; x++)
@@ -227,6 +236,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
                     "Try updating your graphics drivers.");
             }
+
+            // Force reseting states
+            this.BlendState.PlatformApplyState(this, true);
+            this.DepthStencilState.PlatformApplyState(this, true);
+            this.RasterizerState.PlatformApplyState(this, true);            
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -261,25 +275,37 @@ namespace Microsoft.Xna.Framework.Graphics
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
             {
-                GL.ClearColor(color.X, color.Y, color.Z, color.W);
-                GraphicsExtensions.CheckGLError();
+                if (color != _lastClearColor)
+                {
+                    GL.ClearColor(color.X, color.Y, color.Z, color.W);
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearColor = color;
+                }
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
 			if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
-				GL.ClearStencil(stencil);
-                GraphicsExtensions.CheckGLError();
+                if (stencil != _lastClearStencil)
+                {
+				    GL.ClearStencil(stencil);
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearStencil = stencil;
+                }
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
 			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
-#if GLES
-                GL.ClearDepth (depth);
-#else
-                GL.ClearDepth((double)depth);
-#endif
-                GraphicsExtensions.CheckGLError();
+                if (depth != _lastClearDepth)
+                {
+ #if GLES
+                    GL.ClearDepth (depth);
+ #else
+                    GL.ClearDepth((double)depth);
+ #endif
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearDepth = depth;
+                }
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
