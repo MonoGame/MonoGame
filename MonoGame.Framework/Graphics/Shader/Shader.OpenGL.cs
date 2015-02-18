@@ -135,18 +135,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                Threading.BlockOnUIThread(() =>
+                if (_shaderHandle != -1)
                 {
-                    if (_shaderHandle != -1)
+                    if (GL.IsShader(_shaderHandle))
                     {
-                        if (GL.IsShader(_shaderHandle))
-                        {
-                            GL.DeleteShader(_shaderHandle);
-                            GraphicsExtensions.CheckGLError();
-                        }
-                        _shaderHandle = -1;
+                        GL.DeleteShader(_shaderHandle);
+                        GraphicsExtensions.CheckGLError();
                     }
-                });
+                    _shaderHandle = -1;
+                }
             }
 
             base.Dispose(disposing);
