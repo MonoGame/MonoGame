@@ -24,6 +24,7 @@ namespace Microsoft.Xna.Framework
 
         public bool AutoPauseAndResumeMediaPlayer = true;
         public bool RenderOnUIThread = true; 
+        public bool PreventRotation { get; set; }
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app

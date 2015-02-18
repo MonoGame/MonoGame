@@ -27,6 +27,9 @@ namespace Microsoft.Xna.Framework
             if (ScreenReceiver.ScreenLocked)
                 return;
 
+            if (Game.Activity.PreventRotation)
+                return;
+
             var disporientation = AndroidCompatibility.GetAbsoluteOrientation(orientation);
 
             // Only auto-rotate if target orientation is supported and not current
