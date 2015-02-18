@@ -267,6 +267,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.AreEqual(new Point(1, 2), mathTypes.Point);
                 Assert.AreEqual(new Rectangle(1, 2, 3, 4), mathTypes.Rectangle);
+                Assert.AreEqual(new Vector2(1, 2), mathTypes.Vector2);
                 Assert.AreEqual(new Vector3(1, 2, 3.1f), mathTypes.Vector3);
                 Assert.AreEqual(new Vector4(1, 2, 3, 4), mathTypes.Vector4);
                 Assert.AreEqual(new Quaternion(1, 2, 3, 4), mathTypes.Quaternion);
@@ -281,6 +282,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Vector2(1, 7), mathTypes.Vector2List[0]);
                 Assert.AreEqual(new Vector2(1, 9), mathTypes.Vector2List[1]);
                 Assert.AreEqual(new Vector2(1, 10), mathTypes.Vector2List[2]);
+                Assert.AreEqual(0, mathTypes.Vector2ListEmpty.Count);
             });
         }
 
