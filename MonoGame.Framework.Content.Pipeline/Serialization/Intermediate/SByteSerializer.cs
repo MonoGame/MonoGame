@@ -17,11 +17,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override sbyte Deserialize(string[] inputs, ref int index)
         {
-            if (inputs.Length > 0)
-            {
-                return XmlConvert.ToSByte(inputs[index++]);
-            }
-            return new sbyte();
+            if (inputs.Length == 0)
+                return new sbyte();
+
+            return XmlConvert.ToSByte(inputs[index++]);
         }
 
         protected internal override void Serialize(sbyte value, List<string> results)

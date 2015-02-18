@@ -17,14 +17,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Plane Deserialize(string[] inputs, ref int index)
         {
-            if (inputs.Length > 0)
-            {
-                return new Plane(XmlConvert.ToSingle(inputs[index++]),
-                                    XmlConvert.ToSingle(inputs[index++]),
-                                    XmlConvert.ToSingle(inputs[index++]),
-                                    XmlConvert.ToSingle(inputs[index++]));
-            }
-            return new Plane();
+            if (inputs.Length == 0)
+                return new Plane();
+
+            return new Plane(XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]));
         }
 
         protected internal override void Serialize(Plane value, List<string> results)

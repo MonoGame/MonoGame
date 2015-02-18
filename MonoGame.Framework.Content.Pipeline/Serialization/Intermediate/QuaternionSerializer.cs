@@ -17,14 +17,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Quaternion Deserialize(string[] inputs, ref int index)
         {
-            if (inputs.Length > 0)
-            {
-                return new Quaternion(XmlConvert.ToSingle(inputs[index++]),
-                                        XmlConvert.ToSingle(inputs[index++]),
-                                        XmlConvert.ToSingle(inputs[index++]),
-                                        XmlConvert.ToSingle(inputs[index++]));
-            }
-            return Quaternion.Identity;
+            if (inputs.Length == 0)
+                return Quaternion.Identity;
+
+            return new Quaternion(XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]));
         }
 
         protected internal override void Serialize(Quaternion value, List<string> results)

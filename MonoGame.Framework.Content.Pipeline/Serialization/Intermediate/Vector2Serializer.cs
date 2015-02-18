@@ -17,12 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Vector2 Deserialize(string[] inputs, ref int index)
         {
-            if (inputs.Length > 0)
-            {
-                return new Vector2(XmlConvert.ToSingle(inputs[index++]),
-                                    XmlConvert.ToSingle(inputs[index++]));
-            }
-            return Vector2.Zero;
+            if (inputs.Length == 0)
+                return Vector2.Zero;
+
+            return new Vector2(XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]));
 
         }
 

@@ -17,11 +17,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override ulong Deserialize(string[] inputs, ref int index)
         {
-            if (inputs.Length > 0)
-            {
-                return XmlConvert.ToUInt64(inputs[index++]);
-            }
-            return new ulong();
+            if (inputs.Length == 0)
+                return new ulong();
+
+            return XmlConvert.ToUInt64(inputs[index++]);
         }
 
         protected internal override void Serialize(ulong value, List<string> results)
