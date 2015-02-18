@@ -206,6 +206,7 @@ public class MathTypes
 {
     public Point Point;
     public Rectangle Rectangle;
+    public Vector2 Vector2;
     public Vector3 Vector3;
     public Vector4 Vector4;
     public Quaternion Quaternion;
@@ -214,6 +215,7 @@ public class MathTypes
     public Color Color;
     public Vector2[] Vector2Array = new Vector2[0];
     public List<Vector2> Vector2List = new List<Vector2>();
+    public List<Vector2> Vector2ListEmpty = new List<Vector2>();
 }
 #endregion
 

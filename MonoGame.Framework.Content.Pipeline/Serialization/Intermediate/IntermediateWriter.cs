@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 }
             }
 
-            if (value != null)
+            if (value != null && !typeSerializer.ObjectIsEmpty(value))
                 typeSerializer.Serialize(this, value, format);
 
             if (!format.FlattenContent)
