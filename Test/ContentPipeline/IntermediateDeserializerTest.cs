@@ -545,6 +545,27 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.AreEqual(Vector2.Zero, deserialiseDefaults.EmptyVector2);
                 Assert.AreEqual(Vector2.Zero, deserialiseDefaults.Empty2Vector2);
+                Assert.AreEqual(Point.Zero, deserialiseDefaults.EmptyPoint);
+                Assert.AreEqual(Rectangle.Empty, deserialiseDefaults.EmptyRectangle);
+                Assert.AreEqual(Vector3.Zero, deserialiseDefaults.EmptyVector3);
+                Assert.AreEqual(Vector4.Zero, deserialiseDefaults.EmptyVector4);
+                Assert.AreEqual(Quaternion.Identity, deserialiseDefaults.EmptyQuaternion);
+                Assert.AreEqual(new Plane(), deserialiseDefaults.EmptyPlane);
+                Assert.AreEqual(Matrix.Identity, deserialiseDefaults.EmptyMatrix);
+                Assert.AreEqual(String.Empty, deserialiseDefaults.EmptyString);
+                Assert.AreEqual(new bool(), deserialiseDefaults.EmptyBool);
+                Assert.AreEqual(new int(), deserialiseDefaults.EmptyInt);
+                Assert.AreEqual(new float(), deserialiseDefaults.EmptyFloat);
+                Assert.AreEqual(new byte(), deserialiseDefaults.EmptyByte);
+                Assert.AreEqual(new char(), deserialiseDefaults.EmptyChar);
+                Assert.AreEqual(new Color(), deserialiseDefaults.EmptyColor);
+                Assert.AreEqual(new double(), deserialiseDefaults.EmptyDouble);
+                Assert.AreEqual(new long(), deserialiseDefaults.EmptyLong);
+                Assert.AreEqual(new sbyte(), deserialiseDefaults.EmptySbyte);
+                Assert.AreEqual(new short(), deserialiseDefaults.EmptyShort);
+                Assert.AreEqual(new TimeSpan(), deserialiseDefaults.EmptyTimeSpan);
+                Assert.AreEqual(new uint(), deserialiseDefaults.EmptyUint);
+                Assert.AreEqual(new ushort(), deserialiseDefaults.EmptyUshort);
 
             });
         }
