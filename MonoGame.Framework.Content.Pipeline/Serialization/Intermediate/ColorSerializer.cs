@@ -19,11 +19,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         protected internal override Color Deserialize(string[] inputs, ref int index)
         {
             // NOTE: The value is serialized in ARGB format.
-            var value = uint.Parse(inputs[index++], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            return new Color(   (int)(value >> 16 & 0xFF),
-                                (int)(value >> 8 & 0xFF),
-                                (int)(value >> 0 & 0xFF),
-                                (int)(value >> 24 & 0xFF));
+            if (inputs.Length > 0)
+            {
+                var value = uint.Parse(inputs[index++], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                return new Color((int)(value >> 16 & 0xFF),
+                                    (int)(value >> 8 & 0xFF),
+                                    (int)(value >> 0 & 0xFF),
+                                    (int)(value >> 24 & 0xFF));
+            }
+            return new Color();
         }
 
         protected internal override void Serialize(Color value, List<string> results)

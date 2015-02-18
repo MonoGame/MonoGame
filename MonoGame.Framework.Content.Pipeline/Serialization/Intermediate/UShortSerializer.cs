@@ -17,7 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override ushort Deserialize(string[] inputs, ref int index)
         {
-            return XmlConvert.ToUInt16(inputs[index++]);
+            if (inputs.Length > 0)
+            {
+                return XmlConvert.ToUInt16(inputs[index++]);
+            }
+            return new ushort();
         }
 
         protected internal override void Serialize(ushort value, List<string> results)

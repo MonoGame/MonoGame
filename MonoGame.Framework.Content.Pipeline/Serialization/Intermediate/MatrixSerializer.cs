@@ -17,22 +17,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Matrix Deserialize(string[] inputs, ref int index)
         {
-            return new Matrix(XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]));
+            if (inputs.Length > 0)
+            {
+                return new Matrix(XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]));
+            }
+            return Matrix.Identity;
         }
 
         protected internal override void Serialize(Matrix value, List<string> results)

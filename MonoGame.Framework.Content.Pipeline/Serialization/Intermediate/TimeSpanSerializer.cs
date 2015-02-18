@@ -18,7 +18,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override TimeSpan Deserialize(string[] inputs, ref int index)
         {
-            return XmlConvert.ToTimeSpan(inputs[index++]);
+            if (inputs.Length > 0)
+            {
+                return XmlConvert.ToTimeSpan(inputs[index++]);
+            }
+            return new TimeSpan();
         }
 
         protected internal override void Serialize(TimeSpan value, List<string> results)

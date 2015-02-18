@@ -17,8 +17,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Point Deserialize(string[] inputs, ref int index)
         {
-            return new Point(   XmlConvert.ToInt32(inputs[index++]),
-                                XmlConvert.ToInt32(inputs[index++]));
+            if (inputs.Length > 0)
+            {
+                return new Point(XmlConvert.ToInt32(inputs[index++]),
+                                    XmlConvert.ToInt32(inputs[index++]));
+            }
+            return Point.Zero;
         }
 
         protected internal override void Serialize(Point value, List<string> results)

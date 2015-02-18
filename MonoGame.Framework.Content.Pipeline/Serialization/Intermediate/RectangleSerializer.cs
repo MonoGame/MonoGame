@@ -17,10 +17,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Rectangle Deserialize(string[] inputs, ref int index)
         {
-            return new Rectangle(   XmlConvert.ToInt32(inputs[index++]),
-                                    XmlConvert.ToInt32(inputs[index++]),
-                                    XmlConvert.ToInt32(inputs[index++]),
-                                    XmlConvert.ToInt32(inputs[index++]));
+            if (inputs.Length > 0)
+            {
+                return new Rectangle(XmlConvert.ToInt32(inputs[index++]),
+                                         XmlConvert.ToInt32(inputs[index++]),
+                                         XmlConvert.ToInt32(inputs[index++]),
+                                         XmlConvert.ToInt32(inputs[index++]));
+            }
+            return Rectangle.Empty;
         }
 
         protected internal override void Serialize(Rectangle value, List<string> results)

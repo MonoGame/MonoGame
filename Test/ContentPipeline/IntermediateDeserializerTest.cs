@@ -94,7 +94,7 @@ namespace MonoGame.Tests.ContentPipeline
                                 false, Directory.GetCurrentDirectory(), "referenceRelocationPath" });
 #else
             var compiler = new ContentCompiler();
-            compiler.Compile(xnbStream, result, TargetPlatform.Windows, GraphicsProfile.Reach, 
+            compiler.Compile(xnbStream, result, TargetPlatform.Windows, GraphicsProfile.Reach,
                                 false, "rootDirectory", "referenceRelocationPath");
 #endif
 
@@ -148,7 +148,7 @@ namespace MonoGame.Tests.ContentPipeline
             using (var reader = XmlReader.Create(filePath))
             {
                 // This should throw an InvalidContentException as the
-                // xml tries to set the <elf> element which has a 
+                // xml tries to set the <elf> element which has a
                 // [ContentSerializerIgnore] attribute.
                 Assert.Throws<InvalidContentException>(() =>
                     IntermediateSerializer.Deserialize<object>(reader, filePath));
@@ -195,7 +195,7 @@ namespace MonoGame.Tests.ContentPipeline
             using (var reader = XmlReader.Create(filePath))
             {
                 // This should throw an InvalidContentException as the
-                // xml tries to set the <elf> element which has a 
+                // xml tries to set the <elf> element which has a
                 // [ContentSerializerIgnore] attribute.
                 Assert.Throws<InvalidContentException>(() =>
                     IntermediateSerializer.Deserialize<object>(reader, filePath));
@@ -233,7 +233,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Color(0x91, 0x6B, 0x46, 0xFF), collections.ColorArray[1]);
                 Assert.AreEqual(new Color(0x91, 0x7B, 0x46, 0xFF), collections.ColorArray[2]);
                 Assert.AreEqual(new Color(0x88, 0x65, 0x43, 0xFF), collections.ColorArray[3]);
-            });            
+            });
         }
 
         [Test]
@@ -438,7 +438,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(true, fontDesc.UseKerning);
                 Assert.AreEqual(FontDescriptionStyle.Bold, fontDesc.Style);
                 Assert.AreEqual('*', fontDesc.DefaultCharacter);
-                        
+
                 var expectedCharacters = new List<char>();
                 for (var c = HttpUtility.HtmlDecode("&#32;")[0]; c <= HttpUtility.HtmlDecode("&#126;")[0]; c++)
                     expectedCharacters.Add(c);
@@ -535,6 +535,17 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(3, genericTypes.A.Value);
                 Assert.IsNotNull(genericTypes.B);
                 Assert.AreEqual(4.2f, genericTypes.B.Value);
+            });
+        }
+
+        [Test]
+        public void DeserialiseDefaults()
+        {
+            DeserializeCompileAndLoad<DeserialiseDefaults>("25_DeserialiseDefaults.xml", deserialiseDefaults =>
+            {
+                Assert.AreEqual(Vector2.Zero, deserialiseDefaults.EmptyVector2);
+                Assert.AreEqual(Vector2.Zero, deserialiseDefaults.Empty2Vector2);
+
             });
         }
     }

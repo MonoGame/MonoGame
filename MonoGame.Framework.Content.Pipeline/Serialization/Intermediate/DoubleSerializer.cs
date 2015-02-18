@@ -17,7 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override double Deserialize(string[] inputs, ref int index)
         {
-            return XmlConvert.ToDouble(inputs[index++]);
+            if (inputs.Length > 0)
+            {
+                return XmlConvert.ToDouble(inputs[index++]);
+            }
+            return new double();
         }
 
         protected internal override void Serialize(double value, List<string> results)

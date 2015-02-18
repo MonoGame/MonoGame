@@ -17,10 +17,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Vector4 Deserialize(string[] inputs, ref int index)
         {
-            return new Vector4( XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]));
+            if (inputs.Length > 0)
+            {
+                return new Vector4(XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]));
+            }
+            return Vector4.Zero;
         }
 
         protected internal override void Serialize(Vector4 value, List<string> results)

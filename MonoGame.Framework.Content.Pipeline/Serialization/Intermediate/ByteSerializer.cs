@@ -17,7 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override byte Deserialize(string[] inputs, ref int index)
         {
-            return XmlConvert.ToByte(inputs[index++]);
+            if (inputs.Length > 0)
+            {
+                return XmlConvert.ToByte(inputs[index++]);
+            }
+            return new byte();
         }
 
         protected internal override void Serialize(byte value, List<string> results)

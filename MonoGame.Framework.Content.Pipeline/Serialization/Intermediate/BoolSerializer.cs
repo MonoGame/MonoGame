@@ -17,7 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override bool Deserialize(string[] inputs, ref int index)
         {
-            return XmlConvert.ToBoolean(inputs[index++]);
+            if (inputs.Length > 0)
+            {
+                return XmlConvert.ToBoolean(inputs[index++]);
+            }
+            return new bool();
         }
 
         protected internal override void Serialize(bool value, List<string> results)

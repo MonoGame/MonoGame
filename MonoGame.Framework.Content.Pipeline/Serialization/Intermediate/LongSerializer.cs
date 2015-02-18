@@ -17,7 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override long Deserialize(string[] inputs, ref int index)
         {
-            return XmlConvert.ToInt64(inputs[index++]);
+            if (inputs.Length > 0)
+            {
+                return XmlConvert.ToInt64(inputs[index++]);
+            }
+            return new long();
         }
 
         protected internal override void Serialize(long value, List<string> results)
