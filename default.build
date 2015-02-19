@@ -187,7 +187,6 @@
 
   <target name="run_tests" description="Run all the tests" depends="build_code">
     <property name="teamcity.dotnet.nant.nunit2.platform" value="x86" />
-    <property name="teamcity.dotnet.nant.nunit2.runProcessPerAssembly" value="true" />
     <nunit2 if="${os == 'Win32NT'}">
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
