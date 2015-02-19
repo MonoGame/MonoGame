@@ -62,6 +62,7 @@
       <exec program="Protobuild" commandline="-generate WindowsGL" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild " commandline="Test/MonoGame.Tests.XNA.csproj /t:Build /p:Configuration=Release" />
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Windows" />
@@ -188,6 +189,7 @@
     <nunit2 if="${os == 'Win32NT'}">
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
+      <test assemblyname="Test\bin\XNA\Release\MonoGame.Tests.XNA.exe" />
     </nunit2>
   </target>
 
