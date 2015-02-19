@@ -7,7 +7,6 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -80,8 +79,8 @@ namespace Microsoft.Xna.Framework.Content
 			
 			for (int level = 0; level < levelCount; level++)
 			{
-				int levelDataSizeInBytes = reader.ReadInt32 ();
-                byte[] levelData = MemoryPool.Current.GetPooledBuffer(levelDataSizeInBytes);
+				var levelDataSizeInBytes = reader.ReadInt32();
+                var levelData = reader.ContentManager.GetScratchBuffer(levelDataSizeInBytes);
                 reader.Read(levelData, 0, levelDataSizeInBytes);
                 int levelWidth = width >> level;
                 int levelHeight = height >> level;
@@ -167,8 +166,7 @@ namespace Microsoft.Xna.Framework.Content
 						break;
 				}
 				
-				texture.SetData(level, null, levelData, 0, levelData.Length);	
-                MemoryPool.Current.PoolBuffer(levelData);
+                texture.SetData(level, null, levelData, 0, levelDataSizeInBytes);
 			}
 			
 			return texture;

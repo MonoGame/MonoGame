@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -15,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content
 
             bool sixteenBits = input.ReadBoolean();
             int dataSize = input.ReadInt32();
-            byte[] data = MemoryPool.Current.GetPooledBuffer(dataSize);
+            byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
 
             if (indexBuffer == null)
@@ -26,7 +25,6 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             indexBuffer.SetData(data, 0, dataSize);
-            MemoryPool.Current.PoolBuffer(data);
             return indexBuffer;
         }
     }

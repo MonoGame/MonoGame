@@ -2,13 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework.Graphics;
-using System.IO;
 using System.Linq;
-using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -37,10 +32,9 @@ namespace Microsoft.Xna.Framework.Content
         protected internal override Effect Read(ContentReader input, Effect existingInstance)
         {
             int dataSize = input.ReadInt32();
-            byte[] data = MemoryPool.Current.GetPooledBuffer(dataSize);
+            byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
-            var effect = new Effect(input.GraphicsDevice, data, 0, dataSize); 
-            MemoryPool.Current.PoolBuffer(data);
+            var effect = new Effect(input.GraphicsDevice, data, 0, dataSize);
 
             effect.Name = input.AssetName;
        

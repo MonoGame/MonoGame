@@ -4,7 +4,6 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -12,22 +11,15 @@ namespace Microsoft.Xna.Framework.Content
     {
         protected internal override VertexBuffer Read(ContentReader input, VertexBuffer existingInstance)
         {
-            VertexBuffer vertexBuffer = existingInstance;
-
             var declaration = input.ReadRawObject<VertexDeclaration>();
             var vertexCount = (int)input.ReadUInt32();
             int dataSize = vertexCount * declaration.VertexStride;
-            byte[] data = MemoryPool.Current.GetPooledBuffer(dataSize);
+            byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
 
-            if(vertexBuffer == null)
-            { 
-                vertexBuffer = new VertexBuffer(input.GraphicsDevice, declaration, vertexCount, BufferUsage.None);
-            }
-
-            vertexBuffer.SetData(data, 0, dataSize);
-            MemoryPool.Current.PoolBuffer(data);
-            return vertexBuffer;
+            var buffer = new VertexBuffer(input.GraphicsDevice, declaration, vertexCount, BufferUsage.None);
+            buffer.SetData(data, 0, dataSize);
+            return buffer;
         }
     }
 }
