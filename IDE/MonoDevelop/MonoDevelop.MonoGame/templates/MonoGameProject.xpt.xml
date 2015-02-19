@@ -37,6 +37,12 @@
 				<Directory name="Content">
 					<File name="Content.mgcb" src="Common/Content.mgcb"/>
 				</Directory>
+				<ContentFile>
+					<File name="OpenTK.dll.config" src="Common/OpenTK.dll.config" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
+				<ContentFile>
+					<File name="Tao.Sdl.dll.config" src="Common/Tao.Sdl.dll.config" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
 			</Files>
 		</Project>
 	</Combine>

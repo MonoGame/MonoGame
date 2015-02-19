@@ -64,6 +64,7 @@
     <Compile Include="MonoGameContentEditorViewContent.cs" />
     <Compile Include="MonoGameBuildExtension.cs" />
     <Compile Include="MonoGameConditions.cs" />
+    <Compile Include="ContentItemTemplate.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -118,7 +119,7 @@
     <Content Include="templates\Common\Content.mgcb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-<!---
+    <!---
     <Content Include="packages\MonoGame.Framework.Android.3.3.0.nupkg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -163,6 +164,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\MonoGameContentProcessor.xpt.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\OpenTK.dll.config">
+      <Link>templates\Common\OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
+      <Link>templates\Common\Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

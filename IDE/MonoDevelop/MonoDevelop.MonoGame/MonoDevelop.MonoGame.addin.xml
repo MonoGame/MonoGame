@@ -28,6 +28,8 @@
 		<Import file="templates/Common/Icon-hd.png" />
 		<Import file="templates/Common/Program.cs" />
 		<Import file="templates/Common/Content.mgcb" />
+		<Import file="templates/Common/OpenTK.dll.config" />
+		<Import file="templates/Common/Tao.Sdl.dll.config" />
 		<!-- Android Templates -->
 		<Import file="templates/MonoGameAndroidProject.xpt.xml" />
 		<Import file="templates/MonoGameOUYAProject.xpt.xml" />
@@ -59,21 +61,16 @@
 		<Import file="MonoDevelop.MonoGame.iOS.dll" />
 		<Import file="MonoDevelop.MonoGame.Mac.dll" />
 		<!-- Nuget Packages -->
-		<!---
-		<Import file="packages/MonoGame.Binaries.3.2.0.nupkg" />
-		-->
-		<Import file="packages/MonoGame.Framework.Android.3.2.99.nupkg" />
-		<Import file="packages/MonoGame.Framework.iOS.3.2.99.nupkg" />
-		<Import file="packages/MonoGame.Framework.Linux.3.2.99.nupkg" />
-		<Import file="packages/MonoGame.Framework.MacOS.3.2.99.nupkg" />
-		<!--
-		<Import file="packages/MonoGame.Framework.MonoMac.3.2.99.nupkg" />
-		-->
-		<Import file="packages/MonoGame.Framework.Ouya.3.2.99.nupkg" />
-		<Import file="packages/MonoGame.Framework.WindowsDX.3.2.99.nupkg" />
-		<Import file="packages/MonoGame.Framework.WindowsGL.3.2.99.nupkg" />
+		<Import file="packages/MonoGame.Framework.Android.3.2.99-Beta.nupkg" />
+		<Import file="packages/MonoGame.Framework.iOS.3.2.99-Beta.nupkg" />
+		<Import file="packages/MonoGame.Framework.Linux.3.2.99-Beta.nupkg" />
+		<Import file="packages/MonoGame.Framework.MacOS.3.2.99-Beta.nupkg" />
+		<Import file="packages/MonoGame.Framework.Ouya.3.2.99-Beta.nupkg" />
+		<Import file="packages/MonoGame.Framework.WindowsDX.3.2.99-Beta.nupkg" />
+		<Import file="packages/MonoGame.Framework.WindowsGL.3.2.99-Beta.nupkg" />
 		<Import file="packages/Ouya.Console.Api.1.0.13.1.nupkg" />
-		<Import file="packages/MonoGame.Framework.Content.Pipeline.Portable.3.2.99.nupkg" />
+		<Import file="packages/MonoGame.Framework.Content.Pipeline.Portable.3.2.99-Beta.nupkg" />
+		<Import file="packages/MonoGame.Framework.Portable.3.2.99-Beta.nupkg" />
 		<!-- Exclude non .net files from a scan -->
 		<ScanExclude path="nvtt.dll"/>
 		<!--  Exclude -->
@@ -98,6 +95,10 @@
 		<DotNetProjectSubtype id="MonoGame" guid="{9b831fef-f496-498f-9fe8-180da5cb4258}" type="MonoDevelop.MonoGame.MonoGameProject">
 			<!-- Add MonoGame Specific Imports  -->
 		</DotNetProjectSubtype>
+	</Extension>
+
+	<Extension path="/MonoDevelop/Ide/FileTemplateTypes">
+		<FileTemplateType name="ContentFile" class="MonoDevelop.MonoGame.ContentItemTemplate"/>
 	</Extension>
 
 	<Extension path="/MonoDevelop/ProjectModel/ProjectBindings">
