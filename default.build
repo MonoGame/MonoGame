@@ -189,7 +189,7 @@
     <nunit2 if="${os == 'Win32NT'}">
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
-      <test assemblyname="Test\bin\XNA\Release\MonoGame.Tests.XNA.exe" />
+      <test assemblyname="Test\bin\XNA\Release\MonoGameTests.XNA.exe" />
     </nunit2>
   </target>
 
