@@ -17,7 +17,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Plane Deserialize(string[] inputs, ref int index)
         {
-            return new Plane(   XmlConvert.ToSingle(inputs[index++]),
+            if (inputs.Length == 0)
+                return new Plane();
+
+            return new Plane(XmlConvert.ToSingle(inputs[index++]),
                                 XmlConvert.ToSingle(inputs[index++]),
                                 XmlConvert.ToSingle(inputs[index++]),
                                 XmlConvert.ToSingle(inputs[index++]));

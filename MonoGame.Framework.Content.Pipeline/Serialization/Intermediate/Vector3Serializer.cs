@@ -17,9 +17,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override Vector3 Deserialize(string[] inputs, ref int index)
         {
-            return new Vector3( XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]));
+            if (inputs.Length == 0)
+                return Vector3.Zero;
+
+            return new Vector3(XmlConvert.ToSingle(inputs[index++]),
+                                 XmlConvert.ToSingle(inputs[index++]),
+                                 XmlConvert.ToSingle(inputs[index++]));
         }
 
         protected internal override void Serialize(Vector3 value, List<string> results)

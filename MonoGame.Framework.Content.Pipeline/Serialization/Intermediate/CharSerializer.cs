@@ -17,6 +17,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override char Deserialize(string[] inputs, ref int index)
         {
+            if (inputs.Length == 0)
+                return new char();
+
             var str = inputs[index++];
             if (str.Length == 1)
                 return XmlConvert.ToChar(str);

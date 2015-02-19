@@ -196,7 +196,7 @@ public class PrimitiveTypes
     public ulong ULong;
     public float Float;
     public double Double;
-    public char? NullChar;                        
+    public char? NullChar;
     public char? NotNullChar;
 }
 #endregion
@@ -487,6 +487,35 @@ namespace MonoGame.Tests.ContentPipeline
         public byte A;
         public List<Vector2> Vector2ListSpaced = new List<Vector2>();
         public string EmptyString;
+    }
+    #endregion
+
+    #region DeserialiseStructDefaults
+    public class DeserialiseDefaults
+    {
+        public Vector2 EmptyVector2;
+        public Vector2 Empty2Vector2;
+        public Point EmptyPoint;
+        public Rectangle EmptyRectangle;
+        public Vector3 EmptyVector3;
+        public Vector4 EmptyVector4;
+        public Quaternion EmptyQuaternion;
+        public Plane EmptyPlane;
+        public Matrix EmptyMatrix;
+        public string EmptyString;
+        public bool EmptyBool;
+        public int EmptyInt;
+        public float EmptyFloat;
+        public byte EmptyByte;
+        public char EmptyChar;
+        public Color EmptyColor;
+        public double EmptyDouble;
+        public long EmptyLong;
+        public sbyte EmptySbyte;
+        public short EmptyShort;
+        public TimeSpan EmptyTimeSpan;
+        public uint EmptyUint;
+        public ushort EmptyUshort;
     }
     #endregion
 }

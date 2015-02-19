@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         private static string[] ReadElements(IntermediateReader input)
         {
-            if (input.Xml.IsEmptyElement)
+            if (input.Xml.IsEmptyElement || !input.Xml.HasValue)
                 return new string[0];
 
             string str = string.Empty;
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         protected internal void Deserialize(IntermediateReader input, List<T> results)
         {
             var elements = ReadElements(input);
-                            
+
             for (var index = 0; index < elements.Length;)
             {
                 if (elements.Length - index < _elementCount)
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             var elements = ReadElements(input);
 
-            if (elements.Length < _elementCount)
+            if (elements.Length > 0 && elements.Length < _elementCount)
                 ThrowElementCountException();
 
             var index = 0;

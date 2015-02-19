@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <!-- A fully qualified type -->
+  <Asset Type="MonoGame.Tests.ContentPipeline.DeserialiseDefaults">
+    <EmptyVector2 />
+    <Empty2Vector2></Empty2Vector2>
+    <EmptyPoint></EmptyPoint>
+    <EmptyRectangle></EmptyRectangle>
+    <EmptyVector3></EmptyVector3>
+    <EmptyVector4></EmptyVector4>
+    <EmptyQuaternion></EmptyQuaternion>
+    <EmptyPlane></EmptyPlane>
+    <EmptyMatrix></EmptyMatrix>
+    <EmptyString></EmptyString>
+    <EmptyBool></EmptyBool>
+    <EmptyInt></EmptyInt>
+    <EmptyFloat></EmptyFloat>
+    <EmptyByte></EmptyByte>
+    <EmptyChar></EmptyChar>
+    <EmptyColor></EmptyColor>
+    <EmptyDouble></EmptyDouble>
+    <EmptyLong></EmptyLong>
+    <EmptySbyte></EmptySbyte>
+    <EmptyShort></EmptyShort>
+    <EmptyTimeSpan></EmptyTimeSpan>
+    <EmptyUint></EmptyUint>
+    <EmptyUshort></EmptyUshort>
+  </Asset>
+</XnaContent>

@@ -17,7 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override float Deserialize(string[] inputs, ref int index)
         {
+            if (inputs.Length == 0)
+                return new float();
+
             return XmlConvert.ToSingle(inputs[index++]);
+
         }
 
         protected internal override void Serialize(float value, List<string> results)
