@@ -10,13 +10,12 @@ namespace Microsoft.Xna.Framework.Graphics
 	public enum IndexElementSize
 	{
         /// <summary>
-        /// 16-bit short value been used.
+        /// 16-bit short/ushort value been used.
         /// </summary>
 		SixteenBits,
         /// <summary>
-        /// 32-bit integer value been used.
+        /// 32-bit int/uint value been used.
         /// </summary>
 		ThirtyTwoBits
 	}
 }
-
