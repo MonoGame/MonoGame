@@ -32,6 +32,35 @@ namespace MonoGame.Tests.Visual
         }
 
         [Test]
+        public void EffectPassShouldSetTextureOnSubsequentCalls()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+                Game.GraphicsDevice.Textures[0] = null;
+
+                var effect = new BasicEffect(Game.GraphicsDevice);
+                effect.TextureEnabled = true;
+                effect.Texture = texture;
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
+
+                var effectPass = effect.CurrentTechnique.Passes[0];
+                effectPass.Apply();
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+
+                Game.GraphicsDevice.Textures[0] = null;
+
+                effectPass = effect.CurrentTechnique.Passes[0];
+                effectPass.Apply();
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            };
+            Game.Run();
+        }
+
+        [Test]
         public void EffectPassShouldSetTextureEvenIfNull()
         {
             Game.DrawWith += (sender, e) =>
