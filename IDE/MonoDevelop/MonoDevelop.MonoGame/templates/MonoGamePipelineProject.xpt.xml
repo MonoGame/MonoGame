@@ -16,7 +16,8 @@
 		<Project name = "${ProjectName}" directory = "." type = "DotNet">
 			<Options Target = "Library"/>
 			<Packages>
-				<Package id="MonoGame.Framework.Content.Pipeline.Portable" version="3.2.99-Beta" targetFramework="portable-net45+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10"/>
+				<Package id="MonoGame.Framework.Portable" version="3.2.99.1-Beta" targetFramework="portable-net45+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10"/>
+				<Package id="MonoGame.Framework.Content.Pipeline.Portable" version="3.2.99.1-Beta" targetFramework="portable-net45+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10"/>
 			</Packages>
 			<Files>
 				<File name="Importer1.cs" AddStandardHeader="True" src="Common/Importer1.cs" />
