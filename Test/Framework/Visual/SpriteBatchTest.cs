@@ -5,7 +5,7 @@ using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual {
@@ -291,21 +291,22 @@ namespace MonoGame.Tests.Visual {
         }
 
         [Test]
-        public void DrawWithTextureAlreadySet()
+        public void DrawWithCustomEffectAndTwoTextures()
         {
             Game.DrawWith += (sender, e) =>
             {
+                var customSpriteEffect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "CustomSpriteBatchEffect.fx");
                 var texture2 = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
 
-                Game.GraphicsDevice.Textures[0] = texture2;
-                Game.GraphicsDevice.Textures[1] = _texture;
+                customSpriteEffect.Parameters["SourceTexture"].SetValue(texture2);
+                customSpriteEffect.Parameters["OtherTexture"].SetValue(texture2);
 
-                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, null, null, null, customSpriteEffect);
                 _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
                 _spriteBatch.End();
 
                 Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
-                Assert.That(Game.GraphicsDevice.Textures[1], Is.SameAs(_texture));
+                Assert.That(Game.GraphicsDevice.Textures[1], Is.SameAs(texture2));
             };
             Game.Run();
         }

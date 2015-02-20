@@ -81,5 +81,26 @@ namespace MonoGame.Tests.Visual
             };
             Game.Run();
         }
+
+        [Test]
+        public void EffectPassShouldOverrideTextureIfNotExplicitlySet()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+                Game.GraphicsDevice.Textures[0] = texture;
+
+                var effect = new BasicEffect(Game.GraphicsDevice);
+                effect.TextureEnabled = true;
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+
+                var effectPass = effect.CurrentTechnique.Passes[0];
+                effectPass.Apply();
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
+            };
+            Game.Run();
+        }
     }
 }
