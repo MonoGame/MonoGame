@@ -292,7 +292,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 var passes = effect.CurrentTechnique.Passes;
                 foreach (var pass in passes)
                 {
+                    // Whatever happens in pass.Apply, make sure the texture being drawn
+                    // ends up in Textures[0].
+                    var texture = _device.Textures[0];
+
                     pass.Apply();
+
+                    _device.Textures[0] = texture;
 
                     _device.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,
