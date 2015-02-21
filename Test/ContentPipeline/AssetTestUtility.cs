@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
@@ -15,9 +16,11 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var effectProcessor = new EffectProcessor();
             var context = new TestProcessorContext(TargetPlatform.Windows, "notused.xnb");
+            var effectPath = Paths.Effect(pathParts);
             var compiledEffect = effectProcessor.Process(new EffectContent
             {
-                Identity = new ContentIdentity(Paths.Effect(pathParts))
+                EffectCode = File.ReadAllText(effectPath),
+                Identity = new ContentIdentity(effectPath)
             }, context);
 
             return new Effect(graphicsDevice, compiledEffect.GetEffectCode());
