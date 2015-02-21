@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         Solid,
         /// <summary>
-        /// Draw lines connecting the vertices that define a primitive face.
+        /// Draw lines for each primitive.
         /// </summary>
         WireFrame
     }
