@@ -1011,6 +1011,11 @@
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
+    <Compile Include="Utilities\ZlibStream\ZlibStream.cs" />
+    <Compile Include="Utilities\Png\PngCommon.cs" />
+    <Compile Include="Utilities\Png\PngReader.cs" />
+    <Compile Include="Utilities\Png\PngWriter.cs" />
+
 
     <!-- Android/OUYA Platform -->
     <Compile Include="Android\AndroidCompatibility.cs">
