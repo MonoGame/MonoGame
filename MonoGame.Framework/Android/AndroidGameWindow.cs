@@ -182,8 +182,11 @@ namespace Microsoft.Xna.Framework
         
         internal void ChangeClientBounds(Rectangle bounds)
         {
-            _clientBounds = bounds;
-            OnClientSizeChanged();
+            if (bounds != _clientBounds)
+            {
+                _clientBounds = bounds;
+                OnClientSizeChanged();
+            }
         }
 
         public override bool AllowUserResizing 

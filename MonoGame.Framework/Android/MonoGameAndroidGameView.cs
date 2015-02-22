@@ -91,6 +91,18 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
+            var manager = _game.graphicsDeviceManager;
+            
+            manager.PreferredBackBufferWidth = width;
+            manager.PreferredBackBufferHeight = height;
+
+            if (manager.GraphicsDevice != null)
+                manager.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
+
+            _gameWindow.ChangeClientBounds(new Rectangle(0, 0, width, height));
+
+            manager.ApplyChanges();
+
             SurfaceChanged(holder, format, width, height);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
 
