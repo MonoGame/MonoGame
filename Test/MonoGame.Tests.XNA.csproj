@@ -119,6 +119,7 @@
     <Compile Include="Framework\Visual\IndexBufferTest.cs" />
     <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
     <Compile Include="Framework\Visual\SamplerStateTest.cs" />
+    <Compile Include="Framework\Visual\TextureCubeTest.cs" />
     <Compile Include="Framework\Visual\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Visual\Texture2DTest.cs" />
