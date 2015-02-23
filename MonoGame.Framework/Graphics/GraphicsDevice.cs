@@ -942,7 +942,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
-            //TODO: Overview the calculation
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
