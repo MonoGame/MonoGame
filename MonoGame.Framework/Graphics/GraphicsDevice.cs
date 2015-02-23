@@ -942,7 +942,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
-            //TODO: Overview the calculation
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
@@ -952,7 +951,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case PrimitiveType.TriangleList:
                     return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
-                    return 3 + (primitiveCount - 1); // ???
+                    return primitiveCount + 2;
             }
 
             throw new NotSupportedException();
