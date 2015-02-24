@@ -16,17 +16,10 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformLoad(Action<int> progressCallback)
         {
-            MPMediaQuery mediaQuery = new MPMediaQuery();
-            var value = NSObject.FromObject(MPMediaType.Music);
-            var type = MPMediaItem.MediaTypeProperty;
-            var predicate = MPMediaPropertyPredicate.PredicateWithValue(value, type);
-            mediaQuery.AddFilterPredicate(predicate);
-            mediaQuery.GroupingType = MPMediaGrouping.Album;
+            var songList = new List<Song>();
+            var albumList = new List<Album>();
 
-            List<Song> songList = new List<Song>();
-            List<Album> albumList = new List<Album>();
-
-            foreach (var collection in mediaQuery.Collections)
+            foreach (var collection in MPMediaQuery.AlbumsQuery.Collections)
             {
                 var nsAlbumArtist = collection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumArtistProperty);
                 var nsAlbumName = collection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumTitleProperty);
