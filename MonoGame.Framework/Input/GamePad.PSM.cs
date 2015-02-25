@@ -98,7 +98,7 @@ using Microsoft.Xna.Framework.Graphics;
                     throw;
             }
 
-            var state = new GamePadState(new GamePadThumbSticks(leftStick, rightStick), new GamePadTriggers(), new GamePadButtons((Buttons)buttons), new GamePadDPad((Buttons)buttons));
+            var state = new GamePadState(new GamePadThumbSticks(leftStick, rightStick, deadZoneMode), new GamePadTriggers(), new GamePadButtons((Buttons)buttons), new GamePadDPad((Buttons)buttons));
 
             return state;
         }

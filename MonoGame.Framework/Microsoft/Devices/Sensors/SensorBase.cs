@@ -11,7 +11,7 @@ namespace Microsoft.Devices.Sensors
 	{
 #if IOS
         [CLSCompliant(false)]
-        protected static readonly MonoTouch.CoreMotion.CMMotionManager motionManager = new MonoTouch.CoreMotion.CMMotionManager();
+        protected static readonly CoreMotion.CMMotionManager motionManager = new CoreMotion.CMMotionManager();
 #endif
         bool disposed;
 		private TimeSpan timeBetweenUpdates;

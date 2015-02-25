@@ -292,7 +292,6 @@ namespace MGCB
                     for (var j = 0; j < commands.Length; j++)
                     {
                         var line = commands[j];
-                        line = line.Trim();
                         if (string.IsNullOrEmpty(line))
                             continue;
                         if (line.StartsWith("#"))

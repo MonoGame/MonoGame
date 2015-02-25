@@ -10,6 +10,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
+    <Reference Include="MGCB" />
 
     <Reference Include="PipelineReferences" />
   </References>
@@ -21,8 +22,8 @@
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;XWT</Platform>
-      <Platform Name="Linux">TRACE;LINUX;XWT</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -36,6 +37,7 @@
     <None Include="App.config" />
 
     <Compile Include="Common\ActionStack.cs" />
+    <Compile Include="Common\AssemblyAttributes.cs" />
     <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />
     <Compile Include="Common\ContentItem.Processor.cs" />
@@ -102,6 +104,13 @@
     <Compile Include="Windows\SortedEnumTypeConverter.cs">
       <Platforms>Windows</Platforms>
     </Compile>
+	<Compile Include="Windows\AboutDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AboutDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -111,6 +120,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="Windows\AboutDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
@@ -134,26 +147,110 @@
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </EmbeddedResource>
 
-    <!-- The Xwt specific stuff -->
-    <Compile Include="Xwt\PipelineProjectProxy.cs">
+    <!-- The Gtk specific stuff -->
+    <Compile Include="Gtk\MainWindow.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\XwtView.cs">
+    <Compile Include="Gtk\Widgets\ProjectView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\OutputTextView.cs">
+    <Compile Include="Gtk\Widgets\PropertyGridTable.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\PropertyGrid.cs">
+    <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\AboutDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\ColorPickerDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\generated.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.MainWindow.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.NewTemplateDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ProjectView.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertiesView.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.YesNoCancelDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.CollectionEditorDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ColorPickerDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertyGridTable.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AboutDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="IgeMacIntegration.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <EmbeddedResource Include="gtk-gui\gui.stetic">
+      <Platforms>MacOS,Linux</Platforms>
+    </EmbeddedResource>
 
     <!-- The resources for icons and buttons -->
+    <EmbeddedResource Include="App.ico" />
     <EmbeddedResource Include="Icons\blueprint.png" />
+    <EmbeddedResource Include="Icons\missing.png" />
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\settings.png" />
 
+    <!-- Copy config files to output directory -->
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
+      <Platforms>MacOS,Linux</Platforms>
+      <Link>atk-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
+      <Platforms>MacOS,Linux</Platforms>
+      <Link>gdk-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
+      <Platforms>MacOS,Linux</Platforms>
+      <Link>glade-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
+      <Platforms>MacOS,Linux</Platforms>
+      <Link>glib-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
+      <Platforms>MacOS,Linux</Platforms>
+      <Link>gtk-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
+      <Platforms>MacOS,Linux</Platforms>
+      <Link>pango-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Copy the template resources to the output -->
     <None Include="Templates\Xml.png">
@@ -175,6 +272,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
+    <BundleResource Include="Resources\App.icns">
+      <Platforms>MacOS</Platforms>
+    </BundleResource>
+
+    <Content Include="Resources\background.png">
+      <Platforms>MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="distribution.xml">
+      <Platforms>MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </Files>
 
 </Project>

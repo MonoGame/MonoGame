@@ -18,6 +18,9 @@
 			<ProjectItem ReplaceParameters="true" TargetFileName="GamePage.xaml">GamePage.xaml</ProjectItem>
 			<ProjectItem ReplaceParameters="true" TargetFileName="GamePage.xaml.cs">GamePage.xaml.cs</ProjectItem>
 			<ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
-		</Project>
+			<Folder Name="Content" TargetFolderName="Content">
+				<ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
+			</Folder>
+	  </Project>
 	</TemplateContent>
 </VSTemplate>

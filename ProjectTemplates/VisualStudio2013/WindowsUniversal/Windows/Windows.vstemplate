@@ -22,7 +22,7 @@
 				<ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">Windows.AssemblyInfo.cs</ProjectItem>
 			</Folder>
 			<ProjectItem ReplaceParameters="true" TargetFileName="Package.appxmanifest">Package-managed.appxmanifest</ProjectItem>
-			<ProjectItem ReplaceParameters="false" TargetFileName="$ext_projectname$.Windows_TemporaryKey.pfx" BlendDoNotCreate="true">Windows.TemporaryKey.pfx</ProjectItem>
+			<ProjectItem ReplaceParameters="false" TargetFileName="$ext_safeprojectname$.Windows_TemporaryKey.pfx" BlendDoNotCreate="true">Windows.TemporaryKey.pfx</ProjectItem>
 		</Project>
 	</TemplateContent>
 	<WizardExtension>

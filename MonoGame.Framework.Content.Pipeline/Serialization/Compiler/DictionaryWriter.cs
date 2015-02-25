@@ -13,26 +13,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     [ContentTypeWriter]
     class DictionaryWriter<K,V> : BuiltInContentWriter<Dictionary<K,V>>
     {
-        ContentTypeWriter keyWriter;
-        ContentTypeWriter valueWriter;
+        ContentTypeWriter _keyWriter;
+        ContentTypeWriter _valueWriter;
 
-        /// <summary>
-        /// Initialize the writer.
-        /// </summary>
-        /// <param name="compiler">Compiler instance calling this writer.</param>
         protected override void Initialize(ContentCompiler compiler)
         {
             base.Initialize(compiler);
 
-            keyWriter = compiler.GetTypeWriter(typeof(K));
-            valueWriter = compiler.GetTypeWriter(typeof(V));
+            _keyWriter = compiler.GetTypeWriter(typeof(K));
+            _valueWriter = compiler.GetTypeWriter(typeof(V));
         }
 
-        /// <summary>
-        /// Writes the value to the output.
-        /// </summary>
-        /// <param name="output">The output writer object.</param>
-        /// <param name="value">The value to write to the output.</param>
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return true; }
+        }
+
         protected internal override void Write(ContentWriter output, Dictionary<K,V> value)
         {
             if (value == null)
@@ -40,8 +36,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             output.Write(value.Count);
             foreach (var element in value)
             {
-                output.WriteObject(element.Key, keyWriter);
-                output.WriteObject(element.Value, valueWriter);
+                output.WriteObject(element.Key, _keyWriter);
+                output.WriteObject(element.Value, _valueWriter);
             }
         }
     }

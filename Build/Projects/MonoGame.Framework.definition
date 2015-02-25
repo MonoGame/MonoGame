@@ -74,7 +74,7 @@
       <Platforms>Web</Platforms>
     </Uses>
     <Uses Name="_XNADesignProvided">
-      <Platforms>Windows,Linux,MacOS</Platforms>
+      <Platforms>Windows,WindowsGL,Linux,MacOS</Platforms>
     </Uses>
     <Uses Name="_FrameworkDispatcherProvided">
       <Platforms>Windows,WindowsGL,MacOS</Platforms>
@@ -481,7 +481,6 @@
     <Compile Include="Graphics\ModelMesh.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\ModelMeshPart.cs" />
-    <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\NoSuitableGraphicsDeviceException.cs" />
     <Compile Include="Graphics\OcclusionQuery.cs">
       <ExcludePlatforms>iOS,Android,Ouya</ExcludePlatforms>
@@ -707,7 +706,6 @@
     <Compile Include="Graphics\TextureCube.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
@@ -802,9 +800,39 @@
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>PSMobile,Android,Ouya</ExcludePlatforms>
     </Compile>
+    <Compile Include="Input\KeyboardInput.cs">
+      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
-    <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Input\KeyState.cs" />    
+    <Compile Include="Input\MessageBox.cs">
+      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
@@ -817,9 +845,14 @@
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
     <Compile Include="Input\Touch\TouchQueue.cs">
-		<Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
-	</Compile>
-
+			<Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
+		</Compile>
+		
+    <Page Include="Themes\generic.xaml">
+			<Platforms>Windows8,WindowsPhone81</Platforms>
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+    </Page>
 
     <!-- Microsoft.Xna.Framework.Media -->
     <Compile Include="Media\Album.cs" />
@@ -975,10 +1008,14 @@
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
-    <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
+    <Compile Include="Utilities\ZlibStream\ZlibStream.cs" />
+    <Compile Include="Utilities\Png\PngCommon.cs" />
+    <Compile Include="Utilities\Png\PngReader.cs" />
+    <Compile Include="Utilities\Png\PngWriter.cs" />
+
 
     <!-- Android/OUYA Platform -->
     <Compile Include="Android\AndroidCompatibility.cs">

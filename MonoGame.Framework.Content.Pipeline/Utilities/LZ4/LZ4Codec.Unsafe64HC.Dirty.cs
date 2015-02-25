@@ -64,9 +64,9 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ReSharper disable InconsistentNaming
 
-namespace LZ4n
+namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities.LZ4
 {
-	public static partial class LZ4Codec
+	internal static partial class LZ4Codec
 	{
 		// Update chains up to ip (excluded)
 		private static unsafe void LZ4HC_Insert_64(LZ4HC_Data_Structure hc4, byte* src_p)

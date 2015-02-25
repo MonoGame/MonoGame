@@ -10,12 +10,6 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using PixelFormat = OpenTK.Graphics.ES20.All;
-using PixelType = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureParameterName = OpenTK.Graphics.ES20.All;
-using TextureMinFilter = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -28,11 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Threading.BlockOnUIThread(() =>
             {
-#if IOS
-			GL.GenTextures(1, ref this.glTexture);
-#else
-            GL.GenTextures(1, out this.glTexture);
-#endif
+			GL.GenTextures(1, out this.glTexture);
             GraphicsExtensions.CheckGLError();
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();
@@ -62,11 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 else
                 {
-#if IOS || ANDROID
-					GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
-#else
                     GL.TexImage2D(target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
-#endif
                     GraphicsExtensions.CheckGLError();
                 }
             }

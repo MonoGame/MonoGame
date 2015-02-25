@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -89,15 +88,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			// This might need to change slightly if/when we support
 			// shared constant buffers as 'new' should return unique
 			// effects without any shared instance state.
-            
+ 
+#if PSM 
+			var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
+			int headerSize=0;
+#else
             //Read the header
             MGFXHeader header = ReadHeader(effectCode);
+			var effectKey = header.EffectKey;
+			int headerSize = header.HeaderSize;
+#endif
+
             // First look for it in the cache.
             //
             Effect cloneSource;
-            if (!EffectCache.TryGetValue(header.EffectKey, out cloneSource))
+            if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
-                using (var stream = new MemoryStream(effectCode, header.HeaderSize, effectCode.Length - header.HeaderSize, false))
+                using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
             	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
@@ -105,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     cloneSource.ReadEffect(reader);
 
                 // Cache the effect for later in its original unmodified state.
-                    EffectCache.Add(header.EffectKey, cloneSource);
+                    graphicsDevice.EffectCache.Add(effectKey, cloneSource);
                 }
             }
 
@@ -556,26 +563,5 @@ namespace Microsoft.Xna.Framework.Graphics
         
 #endif
         #endregion // Effect File Reader
-
-
-        #region Effect Cache        
-
-        /// <summary>
-        /// The cache of effects from unique byte streams.
-        /// </summary>
-        private static readonly Dictionary<int, Effect> EffectCache = new Dictionary<int, Effect>();
-
-        internal static void FlushCache()
-        {
-            // Dispose all the cached effects.
-            foreach (var effect in EffectCache)
-                effect.Value.Dispose();
-
-            // Clear the cache.
-            EffectCache.Clear();
-        }
-
-        #endregion // Effect Cache
-
 	}
 }

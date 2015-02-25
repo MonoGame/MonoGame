@@ -128,15 +128,27 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
-        /*
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             if (this == frustum)                // We check to see if the two frustums are equal
                 return ContainmentType.Contains;// If they are, there's no need to go any further.
 
-            throw new NotImplementedException();
+            var intersects = false;
+            for (var i = 0; i < PlaneCount; ++i)
+            {
+                PlaneIntersectionType planeIntersectionType;
+                frustum.Intersects(ref planes[i], out planeIntersectionType);
+                switch (planeIntersectionType)
+                {
+                    case PlaneIntersectionType.Front:
+                        return ContainmentType.Disjoint;
+                    case PlaneIntersectionType.Intersecting:
+                        intersects = true;
+                        break;
+                }
+            }
+            return intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
-        */
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
@@ -231,12 +243,10 @@ namespace Microsoft.Xna.Framework
 			result = containment != ContainmentType.Disjoint;
 		}
 
-        /*
         public bool Intersects(BoundingFrustum frustum)
         {
-            throw new NotImplementedException();
+            return Contains(frustum) != ContainmentType.Disjoint;
         }
-        */
 
         public bool Intersects(BoundingSphere sphere)
         {
@@ -252,17 +262,22 @@ namespace Microsoft.Xna.Framework
             result = containment != ContainmentType.Disjoint;
         }
 
-        /*
         public PlaneIntersectionType Intersects(Plane plane)
         {
-            throw new NotImplementedException();
+            PlaneIntersectionType result;
+            Intersects(ref plane, out result);
+            return result;
         }
 
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
-            throw new NotImplementedException();
+            result = plane.Intersects(ref corners[0]);
+            for (int i = 1; i < corners.Length; i++)
+                if (plane.Intersects(ref corners[i]) != result)
+                    result = PlaneIntersectionType.Intersecting;
         }
 
+        /*
         public Nullable<float> Intersects(Ray ray)
         {
             throw new NotImplementedException();

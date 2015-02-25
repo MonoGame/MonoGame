@@ -56,6 +56,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return null;
         }
+		
+        internal void PlatformBeginApplyState()
+        {
+        }
 
         internal void PlatformApplyState(bool applyShaders)
         {
@@ -77,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
         }
 

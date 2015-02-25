@@ -175,9 +175,13 @@ namespace Microsoft.Xna.Framework.Graphics
             WriteableBitmap bitmap = null;
             Threading.BlockOnUIThread(() =>
             {
+                try
+                {
                     BitmapImage bitmapImage = new BitmapImage();
                     bitmapImage.SetSource(stream);
                     bitmap = new WriteableBitmap(bitmapImage);
+                }
+                catch { }
             });
 
             // Convert from ARGB to ABGR 
@@ -391,16 +395,20 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_PHONE
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                BitmapImage bitmapImage = new BitmapImage();
-                bitmapImage.SetSource(textureStream);
-                WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
+                try
+                {
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.SetSource(textureStream);
+                    WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
 
-                // Convert from ARGB to ABGR 
-                ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+                    // Convert from ARGB to ABGR 
+                    ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
 
-                this.SetData<int>(bitmap.Pixels);
+                    this.SetData<int>(bitmap.Pixels);
 
-                textureStream.Dispose();
+                    textureStream.Dispose();
+                }
+                catch { }
             });
 #endif
         }

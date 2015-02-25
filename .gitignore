@@ -2,6 +2,9 @@
 [Tt]humbs.db
 *.DS_Store
 
+#Linux installer file
+*.run
+
 #Visual Studio files
 *.pidb
 *.userprefs

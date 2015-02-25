@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace TwoMGFX
 {
@@ -54,7 +55,13 @@ namespace TwoMGFX
 			if (options.Debug)
 				macros.Add(new SharpDX.Direct3D.ShaderMacro("DEBUG", 1));
 
-			// Use the D3DCompiler to pre-process the file resolving 
+		    if (!string.IsNullOrEmpty(options.Defines))
+		    {
+		        var defines = options.Defines.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+		        macros.AddRange(defines.Select(define => new SharpDX.Direct3D.ShaderMacro(define, 1)));
+		    }
+
+		    // Use the D3DCompiler to pre-process the file resolving 
 			// all #includes and macros.... this even works for GLSL.
 			string newFile;
 		    var fullPath = Path.GetFullPath(filePath);
@@ -78,7 +85,8 @@ namespace TwoMGFX
             result.Dependencies = dependencies;
             result.FilePath = fullPath;
             result.FileContent = newFile;
-            result.OutputFilePath = Path.GetFullPath(options.OutputFile);
+            if (!string.IsNullOrEmpty(options.OutputFile))
+                result.OutputFilePath = Path.GetFullPath(options.OutputFile);
             result.AdditionalOutputFiles = new List<string>();
 
             // Remove empty techniques.

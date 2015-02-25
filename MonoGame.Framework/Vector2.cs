@@ -11,6 +11,9 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Describes a 2D-vector.
     /// </summary>
+#if WINDOWS
+    [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector2TypeConverter))]
+#endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector2 : IEquatable<Vector2>
@@ -837,7 +840,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="Vector2"/>.</returns>
         public override string ToString()
         {
-            return "{{X:" + X + " Y:" + Y + "}}";
+            return "{X:" + X + " Y:" + Y + "}";
         }
 
         /// <summary>

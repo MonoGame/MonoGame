@@ -16,8 +16,7 @@ using OpenTK.Graphics.OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
-using BufferTarget = OpenTK.Graphics.ES20.All;
-using BufferUsageHint = OpenTK.Graphics.ES20.All;
+using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -46,11 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 //GLExt.Oes.GenVertexArrays(1, out this.vao);
                 //GLExt.Oes.BindVertexArray(this.vao);
-#if IOS
-                GL.GenBuffers(1, ref this.vbo);
-#else
                 GL.GenBuffers(1, out this.vbo);
-#endif
                 GraphicsExtensions.CheckGLError();
                 GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
                 GraphicsExtensions.CheckGLError();
@@ -173,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                GraphicsDevice.AddDisposeAction(() =>
+                Threading.BlockOnUIThread(() =>
                 {
                     GL.DeleteBuffers(1, ref vbo);
                     GraphicsExtensions.CheckGLError();

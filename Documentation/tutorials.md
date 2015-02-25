@@ -11,7 +11,7 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Part 4: Adding and Processing Player (User) Input](http://blogs.msdn.com/b/tarawalker/archive/2013/02/23/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-4-adding-and-processing-player-user-input.aspx)
  - [Part 5: Animating the Player/Ship and Creating a Parallaxing Background](http://blogs.msdn.com/b/tarawalker/archive/2013/04/12/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-5-animating-the-player-ship-and-creating-a-parallaxing-background.aspx)
  - [Part 6: Creating Enemies and Detecting Collisions](http://blogs.msdn.com/b/tarawalker/archive/2013/08/26/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-6-creating-enemies-and-detecting-collisions.aspx)
-
+ - [Part 7: Creating Projectiles and Detecting Collisions](http://chrisongames.blogspot.com/2014/12/windows-8-game-development-using-c-xna.html)
 
 ### Nokia
  - [XNA Games On Windows Phone 8 with MonoGame](http://www.developer.nokia.com/Community/Wiki/XNA_Games_On_Windows_Phone_8_with_Monogame) ([in Portugese](http://www.developer.nokia.com/Community/Wiki/XNA_Jogos_no_Windows_Phone_8_com_Monogame))

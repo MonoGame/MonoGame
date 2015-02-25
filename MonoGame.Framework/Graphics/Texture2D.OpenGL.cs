@@ -14,9 +14,9 @@ using MonoMac.Foundation;
 #endif
 
 #if IOS
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
+using UIKit;
+using CoreGraphics;
+using Foundation;
 #endif
 
 #if OPENGL
@@ -32,14 +32,7 @@ using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 #if GLES
 using OpenTK.Graphics.ES20;
-using GLPixelFormat = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureParameterName = OpenTK.Graphics.ES20.All;
-using TextureMinFilter = OpenTK.Graphics.ES20.All;
-using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using PixelType = OpenTK.Graphics.ES20.All;
-using PixelStoreParameter = OpenTK.Graphics.ES20.All;
-using ErrorCode = OpenTK.Graphics.ES20.All;
+using GLPixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #endif
 
 #if ANDROID
@@ -99,12 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 else
                 {
-                    GL.TexImage2D(TextureTarget.Texture2D, 0,
-#if IOS || ANDROID
-                        (int)glInternalFormat,
-#else				           
-					    glInternalFormat,
-#endif
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
                         this.width, this.height, 0,
                         glFormat, glType, IntPtr.Zero);
                     GraphicsExtensions.CheckGLError();
@@ -170,14 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         if (rect.HasValue)
                         {
-                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D,
-                                level, x, y, w, h,
-#if GLES
-                                glInternalFormat,
-#else
-                                glFormat,
-#endif
-                                data.Length - startBytes, dataPtr);
+                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glFormat, data.Length - startBytes, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                         else
@@ -200,11 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         else
                         {
                             GL.TexImage2D(TextureTarget.Texture2D, level,
-#if GLES && !ANGLE
-                                (int)glInternalFormat,
-#else
                                 glInternalFormat,
-#endif
                                 w, h, 0, glFormat, glType, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
@@ -239,15 +216,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: check for data size and for non renderable formats (formats that can't be attached to FBO)
 
             var framebufferId = 0;
-#if !ANDROID
+			#if (IOS || ANDROID)
+			GL.GenFramebuffers(1, out framebufferId);
+			#else
             GL.GenFramebuffers(1, ref framebufferId);
-#else
-            GL.GenFramebuffers(1, out framebufferId);
-#endif
+			#endif
             GraphicsExtensions.CheckGLError();
-            GL.BindFramebuffer(All.Framebuffer, framebufferId);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, this.glTexture, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferSlot.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
             GraphicsExtensions.CheckGLError();
             var x = 0;
             var y = 0;
@@ -370,9 +347,35 @@ namespace Microsoft.Xna.Framework.Graphics
         [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Bitmap bitmap)
         {
-            var texture = PlatformFromStream(graphicsDevice, bitmap);
-            bitmap.Recycle();
-            return texture;
+            return PlatformFromStream(graphicsDevice, bitmap);
+        }
+
+        [CLSCompliant(false)]
+        public void Reload(Bitmap image)
+        {
+            var width = image.Width;
+            var height = image.Height;
+
+            int[] pixels = new int[width * height];
+            if ((width != image.Width) || (height != image.Height))
+            {
+                using (Bitmap imagePadded = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+                {
+                    Canvas canvas = new Canvas(imagePadded);
+                    canvas.DrawARGB(0, 0, 0, 0);
+                    canvas.DrawBitmap(image, 0, 0, null);
+                    imagePadded.GetPixels(pixels, 0, width, 0, 0, width, height);
+                    imagePadded.Recycle();
+                }
+            }
+            else
+            {
+                image.GetPixels(pixels, 0, width, 0, 0, width, height);
+            }
+
+            image.Recycle();
+
+            this.SetData<int>(pixels);
         }
 #endif
 
@@ -388,8 +391,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS || MONOMAC
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
-            var width = cgImage.Width;
-            var height = cgImage.Height;
+			var width = cgImage.Width;
+			var height = cgImage.Height;
 
             var data = new byte[width * height * 4];
 
@@ -402,7 +405,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Texture2D texture = null;
             Threading.BlockOnUIThread(() =>
             {
-                texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
+                texture = new Texture2D(graphicsDevice, (int)width, (int)height, false, SurfaceFormat.Color);
                 texture.SetData(data);
             });
 
@@ -477,6 +480,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if MONOMAC || WINDOWS
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
+#elif ANDROID
+            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
 #else
             throw new NotImplementedException();
 #endif
@@ -486,6 +491,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if MONOMAC || WINDOWS
             SaveAsImage(stream, width, height, ImageFormat.Png);
+#elif ANDROID
+            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else
             throw new NotImplementedException();
 #endif
@@ -548,6 +555,24 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
+#elif ANDROID
+        private void SaveAsImage(Stream stream, int width, int height, Bitmap.CompressFormat format)
+        {
+            int[] data = new int[width * height];
+            GetData(data);
+            // internal structure is BGR while bitmap expects RGB
+            for (int i = 0; i < data.Length; ++i)
+            {
+                uint pixel = (uint)data[i];
+                data[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+            }
+            using (Bitmap bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+            {
+                bitmap.SetPixels(data, 0, width, 0, 0, width, height);
+                bitmap.Compress(format, 100, stream);
+                bitmap.Recycle();
+            }
+        }
 #endif
 
         // This method allows games that use Texture2D.FromStream 
@@ -562,11 +587,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (this.glTexture < 0)
             {
-#if IOS
-                GL.GenTextures(1, ref this.glTexture);
-#else
                 GL.GenTextures(1, out this.glTexture);
-#endif
                 GraphicsExtensions.CheckGLError();
 
                 // For best compatibility and to keep the default wrap mode of XNA, only set ClampToEdge if either

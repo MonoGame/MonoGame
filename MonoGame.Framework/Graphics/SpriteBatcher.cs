@@ -163,14 +163,14 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Reference comparison of the underlying Texture objects for each given SpriteBatchitem.
+        /// Comparison of the underlying Texture objects for each given SpriteBatchitem.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
-        /// <returns>0 if they are not reference equal, and 1 if so.</returns>
+        /// <returns>0 if they are equal, -1 or 1 if not.</returns>
 	    static int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
 		{
-            return ReferenceEquals( a.Texture, b.Texture ) ? 0 : 1;
+            return a.Texture.SortingKey.CompareTo(b.Texture.SortingKey);
 		}
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var shouldFlush = !ReferenceEquals(item.Texture, tex);
                     if (shouldFlush)
                     {
-                        FlushVertexArray(startIndex, index, effect);
+                        FlushVertexArray(startIndex, index, effect, tex);
 
                         tex = item.Texture;
                         startIndex = index = 0;
@@ -265,21 +265,22 @@ namespace Microsoft.Xna.Framework.Graphics
                     _freeBatchItemQueue.Enqueue(item);
                 }
                 // flush the remaining vertexArray data
-                FlushVertexArray(startIndex, index, effect);
+                FlushVertexArray(startIndex, index, effect, tex);
                 // Update our batch count to continue the process of culling down
                 // large batches
                 batchCount -= numBatchesToProcess;
             }
 			_batchItemList.Clear();
 		}
-				
+
         /// <summary>
         /// Sends the triangle list to the graphics device. Here is where the actual drawing starts.
         /// </summary>
         /// <param name="start">Start index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="end">End index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="effect">The custom effect to apply to the geometry</param>
-        private void FlushVertexArray(int start, int end, Effect effect)
+        /// <param name="texture">The texture to draw.</param>
+        private void FlushVertexArray(int start, int end, Effect effect, Texture texture)
         {
             if (start == end)
                 return;
@@ -293,6 +294,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 foreach (var pass in passes)
                 {
                     pass.Apply();
+
+                    // Whatever happens in pass.Apply, make sure the texture being drawn
+                    // ends up in Textures[0].
+                    _device.Textures[0] = texture;
 
                     _device.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,

@@ -3,8 +3,8 @@
 
   <Platform Type="iOS">
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
-    <Reference Include="OpenTK" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="OpenTK-1.0" />
   </Platform>
 
   <Platform Type="Linux">
@@ -162,7 +162,11 @@
     <Reference Include="Microsoft.Xna.Framework">
       <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
     </Reference>
+    <Reference Include="Microsoft.Xna.Framework.GamerServices">
+      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
+    </Reference>
   </Platform>
+  
   <Platform Type="WindowsPhone81">
     <Binary
       Name="SharpDX"

@@ -53,5 +53,7 @@ namespace MonoGame.Tools.Pipeline
         void OnTemplateDefined(ContentItemTemplate item);
 
         Process CreateProcess(string exe, string commands);
+
+        void ItemExistanceChanged(IProjectItem item);
     }
 }
