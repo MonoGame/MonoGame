@@ -94,6 +94,11 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
+            // When the game is resumed from a portrait orientation it may receive a portrait surface at first.
+            // If the game does not support portrait we should ignore it because we will receive the landscape surface a moment later.
+            if (width < height && (_game.graphicsDeviceManager.SupportedOrientations & DisplayOrientation.Portrait) == 0)
+                return;
+
             var manager = _game.graphicsDeviceManager;
             
             manager.PreferredBackBufferWidth = width;
