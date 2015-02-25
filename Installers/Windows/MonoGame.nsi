@@ -162,11 +162,13 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$INSTDIR\Assemblies\WindowsPhone\ARM'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.winmd'
 
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$INSTDIR\Assemblies\WindowsPhone\x86'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.winmd'
 
   ; Intall iOS Assemblies
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
