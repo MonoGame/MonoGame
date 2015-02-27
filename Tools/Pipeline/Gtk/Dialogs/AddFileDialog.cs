@@ -6,7 +6,7 @@ namespace MonoGame.Tools.Pipeline
     public partial class AddFileDialog : Dialog
     {
         public bool applyforall;
-        public int responce;
+        public CopyAction responce;
 
         public AddFileDialog(string fileloc, bool exists)
         {
@@ -29,9 +29,14 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnButtonOkClicked(object sender, EventArgs e)
         {
-            responce = radiobuttonCopy.Active ? 1 : 2;
-            applyforall = checkbutton1.Active;
+            if (radiobuttonCopy.Active)
+                responce = CopyAction.Copy;
+            else if (radiobuttonLink.Active)
+                responce = CopyAction.Link;
+            else
+                responce = CopyAction.Skip;
 
+            applyforall = checkbutton1.Active;
             Respond(ResponseType.Ok);
         }
     }

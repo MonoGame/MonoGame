@@ -564,9 +564,12 @@ namespace MonoGame.Tools.Pipeline
                     if (daction == 0)
                     {
                         bool applyforall;
-                        if (!View.CopyOrLink(files[i], File.Exists(newfile), out daction, out applyforall))
+                        CopyAction act;
+
+                        if (!View.CopyOrLink(files[i], File.Exists(newfile), out act, out applyforall))
                             return;
 
+                        daction = (int)act + 1;
                         if (applyforall)
                             def = daction;
                     }
@@ -577,8 +580,16 @@ namespace MonoGame.Tools.Pipeline
                         dc.Add(newfile);
                         files[i] = newfile;
                     }
+                    else if (daction == 3)
+                    {
+                        files.RemoveAt(i);
+                        i--;
+                    }
                 }
             }
+
+            if (files.Count == 0)
+                return;
 
             try
             {

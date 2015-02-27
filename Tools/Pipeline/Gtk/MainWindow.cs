@@ -317,19 +317,19 @@ namespace MonoGame.Tools.Pipeline
             return result;
         }
 
-        public bool CopyOrLink(string file, bool exists, out int def, out bool applyforall)
+        public bool CopyOrLink(string file, bool exists, out CopyAction action, out bool applyforall)
         {
             var afd = new AddFileDialog(file, exists);
             afd.TransientFor = this;
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
-                def = afd.responce;
+                action = afd.responce;
                 applyforall = afd.applyforall;
                 return true;
             }
 
-            def = 0;
+            action = CopyAction.Link;
             applyforall = false;
             return false;
         }

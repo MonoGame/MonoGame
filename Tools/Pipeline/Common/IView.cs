@@ -14,6 +14,13 @@ namespace MonoGame.Tools.Pipeline
         Cancel
     }
 
+    public enum CopyAction
+    {
+        Copy,
+        Link,
+        Skip
+    }
+
     interface IView
     {
         void Attach(IController controller);
@@ -50,7 +57,7 @@ namespace MonoGame.Tools.Pipeline
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);        
 
-        bool CopyOrLink(string file, bool exists, out int def, out bool applyforall);
+        bool CopyOrLink(string file, bool exists, out CopyAction action, out bool applyforall);
         
         void OnTemplateDefined(ContentItemTemplate item);
 
