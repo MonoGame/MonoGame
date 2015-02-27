@@ -163,6 +163,9 @@
     <Compile Include="Gtk\Dialogs\AboutDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\AddFileDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -203,6 +206,9 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AboutDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AddFileDialog.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="IgeMacIntegration.cs">

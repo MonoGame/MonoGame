@@ -901,5 +901,12 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
         }
+
+        public bool CopyOrLink(string file, bool exists, out int def, out bool applyforall)
+        {
+            def = 2;
+            applyforall = true;
+            return true;
+        }
     }
 }

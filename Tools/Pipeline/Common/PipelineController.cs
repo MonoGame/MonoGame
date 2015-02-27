@@ -547,9 +547,52 @@ namespace MonoGame.Tools.Pipeline
             if (!View.ChooseContentFile(initialDirectory, out files))
                 return;
 
-            var action = new IncludeAction(this, files);
-            action.Do();
-            _actionStack.Add(action);  
+            List<string> sc = new List<string>(), dc = new List<string>();
+            int def = 0;
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                if (!files[i].StartsWith(initialDirectory))
+                {
+                    string newfile = Path.Combine(initialDirectory, Path.GetFileName(files[i]));
+                    int daction = def;
+
+                    if (daction == 1)
+                        if (File.Exists(newfile))
+                            daction = 2;
+
+                    if (daction == 0)
+                    {
+                        bool applyforall;
+                        if (!View.CopyOrLink(files[i], File.Exists(newfile), out daction, out applyforall))
+                            return;
+
+                        if (applyforall)
+                            def = daction;
+                    }
+
+                    if (daction == 1)
+                    {
+                        sc.Add(files[i]);
+                        dc.Add(newfile);
+                        files[i] = newfile;
+                    }
+                }
+            }
+
+            try
+            {
+                for (int i = 0; i < sc.Count; i++)
+                    File.Copy(sc[i], dc[i]);
+
+                var action = new IncludeAction(this, files);
+                action.Do();
+                _actionStack.Add(action);  
+            }
+            catch
+            {
+                View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, aborting.");
+            }
         }
 
         public void Exclude(IEnumerable<ContentItem> items)

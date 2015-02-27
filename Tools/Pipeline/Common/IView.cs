@@ -49,6 +49,8 @@ namespace MonoGame.Tools.Pipeline
         void OutputClear();
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);        
+
+        bool CopyOrLink(string file, bool exists, out int def, out bool applyforall);
         
         void OnTemplateDefined(ContentItemTemplate item);
 

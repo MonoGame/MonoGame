@@ -59,6 +59,7 @@ namespace MonoGame.Tools.Pipeline
                         var item = _con._project.ContentItems[i];
                         if (item.OriginalPath == f)
                         {
+                            _con.View.RemoveTreeItem(item);
                             _con._project.ContentItems.Remove(item);
                             _con.Selection.Remove(item, _con);
                             break;
