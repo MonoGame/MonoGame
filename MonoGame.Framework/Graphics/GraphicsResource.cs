@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
         ~GraphicsResource()
         {
             // Pass false so the managed objects are not released
-            DisposeExit();
+            Dispose(false);
         }
 
         /// <summary>
@@ -115,14 +115,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 disposed = true;
             }
         }
-
-		/// <summary>
-		/// The method that derived classes should override to implement disposing of managed and native resources in case if Dispose will not work when the game is exiting.
-		/// </summary>
-		protected virtual void DisposeExit()
-		{
-			Dispose (false);
-		}
 
 		public event EventHandler<EventArgs> Disposing;
 		
