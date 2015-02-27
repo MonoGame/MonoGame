@@ -27,11 +27,13 @@ namespace Microsoft.Xna.Framework.Input
                 alert.AddButton("Ok");
                 UITextField alertTextField = alert.GetTextField(0);
                 alertTextField.KeyboardType = UIKeyboardType.ASCIICapable;
-                alertTextField.Placeholder = defaultText;
+                alertTextField.AutocorrectionType = UITextAutocorrectionType.No;
+                alertTextField.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
+                alertTextField.Text = defaultText;
                 alert.Dismissed += (sender, e) =>
                 {
                     if (!tcs.Task.IsCompleted)
-                        tcs.SetResult(e.ButtonIndex == 1 ? null : alert.GetTextField(0).Text);
+                        tcs.SetResult(e.ButtonIndex == 0 ? null : alert.GetTextField(0).Text);
                 };
                 alert.Show();
             });
