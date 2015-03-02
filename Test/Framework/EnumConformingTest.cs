@@ -9,6 +9,40 @@ namespace MonoGame.Tests.Framework
     class EnumConformingTest
     {
         [Test]
+        public void DepthFormatEnum()
+        {
+            Assert.AreEqual(0, (int)DepthFormat.None);
+            Assert.AreEqual(1, (int)DepthFormat.Depth16);
+            Assert.AreEqual(2, (int)DepthFormat.Depth24);
+            Assert.AreEqual(3, (int)DepthFormat.Depth24Stencil8);
+        }
+
+        [Test]
+        public void EffectParameterClassEnum()
+        {
+            Assert.AreEqual(0, (int)EffectParameterClass.Scalar);
+            Assert.AreEqual(1, (int)EffectParameterClass.Vector);
+            Assert.AreEqual(2, (int)EffectParameterClass.Matrix);
+            Assert.AreEqual(3, (int)EffectParameterClass.Object);
+            Assert.AreEqual(4, (int)EffectParameterClass.Struct);
+        }
+
+        [Test]
+        public void EffectParameterTypeEnum()
+        {
+            Assert.AreEqual(0, (int) EffectParameterType.Void);
+		    Assert.AreEqual(1, (int)EffectParameterType.Bool);
+		    Assert.AreEqual(2, (int)EffectParameterType.Int32);
+		    Assert.AreEqual(3, (int)EffectParameterType.Single);
+		    Assert.AreEqual(4, (int)EffectParameterType.String);
+		    Assert.AreEqual(5, (int)EffectParameterType.Texture);
+		    Assert.AreEqual(6, (int)EffectParameterType.Texture1D);
+		    Assert.AreEqual(7, (int)EffectParameterType.Texture2D);
+		    Assert.AreEqual(8, (int)EffectParameterType.Texture3D);
+            Assert.AreEqual(9, (int)EffectParameterType.TextureCube);
+        }
+
+        [Test]
         public void FillModeEnum()
         {
             Assert.AreEqual(0, (int)FillMode.Solid);
