@@ -72,7 +72,12 @@ namespace ${Namespace}
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-           	graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+			//Welcome to MonoGame - Feel free to remove this line or replace with "GraphicsDevice.Clear(Color.Black);"
+            GraphicsDevice.Clear(
+               new Color(
+                   Vector3.Lerp(Color.CornflowerBlue.ToVector3(),
+                                new Vector3(0.9059f, 0.2353f, 0f),
+                                MathHelper.Clamp((float)gameTime.TotalGameTime.TotalSeconds / 2f, 0f, 1f))));
 		
             //TODO: Add your drawing code here
             
