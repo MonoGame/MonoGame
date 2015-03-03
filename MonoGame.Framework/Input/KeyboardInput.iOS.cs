@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading.Tasks;
-using CoreGraphics;
-using Foundation;
+﻿using System.Threading.Tasks;
 using UIKit;
 
 namespace Microsoft.Xna.Framework.Input
@@ -35,6 +30,12 @@ namespace Microsoft.Xna.Framework.Input
                     if (!tcs.Task.IsCompleted)
                         tcs.SetResult(e.ButtonIndex == 0 ? null : alert.GetTextField(0).Text);
                 };
+
+                // UIAlertView's textfield does not show keyboard in iOS8
+                // http://stackoverflow.com/questions/25563108/uialertviews-textfield-does-not-show-keyboard-in-ios8
+                if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
+                    alert.Presented += (sender, args) => alertTextField.SelectAll(alert);
+
                 alert.Show();
             });
 
