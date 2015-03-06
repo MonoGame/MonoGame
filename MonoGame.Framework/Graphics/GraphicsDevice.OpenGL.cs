@@ -60,6 +60,18 @@ namespace Microsoft.Xna.Framework.Graphics
         internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 
+        // Keeps track of last applied state to avoid redundant OpenGL calls
+        internal bool _lastBlendEnable = false;
+        internal BlendState _lastBlendState = new BlendState();
+        internal DepthStencilState _lastDepthStencilState = new DepthStencilState();
+        internal RasterizerState _lastRasterizerState = new RasterizerState();
+        private Vector4 _lastClearColor = Vector4.Zero;
+        private float _lastClearDepth = 1.0f;
+        private int _lastClearStencil = 0;
+        private bool _vertexBufferApplied = false;
+        private bool _vertexShaderApplied = false;
+        private IntPtr _lastVertexOffset = IntPtr.Zero;
+
         internal void SetVertexAttributeArray(bool[] attrs)
         {
             for(int x = 0; x < attrs.Length; x++)
@@ -240,6 +252,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
                     "Try updating your graphics drivers.");
             }
+
+            // Force reseting states
+            this.BlendState.PlatformApplyState(this, true);
+            this.DepthStencilState.PlatformApplyState(this, true);
+            this.RasterizerState.PlatformApplyState(this, true);            
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -274,25 +291,37 @@ namespace Microsoft.Xna.Framework.Graphics
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
             {
-                GL.ClearColor(color.X, color.Y, color.Z, color.W);
-                GraphicsExtensions.CheckGLError();
+                if (color != _lastClearColor)
+                {
+                    GL.ClearColor(color.X, color.Y, color.Z, color.W);
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearColor = color;
+                }
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
 			if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
-				GL.ClearStencil(stencil);
-                GraphicsExtensions.CheckGLError();
+                if (stencil != _lastClearStencil)
+                {
+				    GL.ClearStencil(stencil);
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearStencil = stencil;
+                }
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
 			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
-#if GLES
-                GL.ClearDepth (depth);
-#else
-                GL.ClearDepth((double)depth);
-#endif
-                GraphicsExtensions.CheckGLError();
+                if (depth != _lastClearDepth)
+                {
+ #if GLES
+                    GL.ClearDepth (depth);
+ #else
+                    GL.ClearDepth((double)depth);
+ #endif
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearDepth = depth;
+                }
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
@@ -788,17 +817,6 @@ namespace Microsoft.Xna.Framework.Graphics
 	            _scissorRectangleDirty = false;
 	        }
 
-	        if ( _depthStencilStateDirty )
-            {
-	            _depthStencilState.PlatformApplyState(this);
-                _depthStencilStateDirty = false;
-            }
-	        if ( _rasterizerStateDirty )
-            {
-	            _rasterizerState.PlatformApplyState(this);
-	            _rasterizerStateDirty = false;
-            }
-
             // If we're not applying shaders then early out now.
             if (!applyShaders)
                 return;
@@ -819,6 +837,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
                     GraphicsExtensions.CheckGLError();
+                    _vertexBufferApplied = false;
                 }
             }
 
@@ -831,6 +850,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ActivateShaderProgram();
                 _vertexShaderDirty = _pixelShaderDirty = false;
+                _vertexShaderApplied = false;
             }
 
             _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
@@ -853,7 +873,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			var target = PrimitiveTypeGL(primitiveType);
 			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
 
-			_vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
+            if (!_vertexBufferApplied || !_vertexShaderApplied || _lastVertexOffset != vertexOffset)
+            {
+                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
+                _vertexBufferApplied = true;
+                _vertexShaderApplied = true;
+                _lastVertexOffset = vertexOffset;
+            }
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -879,6 +905,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
+            _vertexBufferApplied = false;
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
@@ -894,7 +921,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             ApplyState(true);
 
-            _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
+            if (!_vertexBufferApplied || !_vertexShaderApplied || _lastVertexOffset != IntPtr.Zero)
+            {
+                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
+                _vertexBufferApplied = true;
+                _vertexShaderApplied = true;
+                _lastVertexOffset = IntPtr.Zero;
+            }
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -922,6 +955,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vertexAddr);
+            _vertexBufferApplied = false;
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
@@ -935,7 +969,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vbHandle.Free();
         }
 
-        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
             ApplyState(true);
 
@@ -955,6 +989,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vertexAddr);
+            _vertexBufferApplied = false;
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),

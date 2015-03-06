@@ -130,9 +130,6 @@
     <Compile Include="..\..\MonoGame.Framework\Ray.cs">
       <Link>MonoGame.Framework\Ray.cs</Link>
     </Compile>
-    <Compile Include="..\..\MonoGame.Framework\Utilities\ObjectFactoryWithReset.cs">
-      <Link>MonoGame.Framework\ObjectFactoryWithReset.cs</Link>
-    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Vector2.cs">
       <Link>MonoGame.Framework\Vector2.cs</Link>
     </Compile>

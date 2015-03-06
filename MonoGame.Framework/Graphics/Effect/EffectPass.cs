@@ -113,10 +113,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var param = _effect.Parameters[sampler.parameter];
                     var texture = param.Data as Texture;
 										
-					// If there is no texture assigned then skip it
-					// and leave whatever set directly on the device.
-					if (texture != null)
-						device.Textures[sampler.textureSlot] = texture;
+                    device.Textures[sampler.textureSlot] = texture;
 
                     // If there is a sampler state set it.
                     if (sampler.state != null)

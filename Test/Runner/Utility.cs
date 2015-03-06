@@ -72,6 +72,29 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class Vector2Comparer : IEqualityComparer<Vector2>
+    {
+        static public Vector2Comparer Epsilon = new Vector2Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector2Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector2 x, Vector2 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon;
+        }
+
+        public int GetHashCode(Vector2 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class PlaneComparer : IEqualityComparer<Plane>
     {
         static public PlaneComparer Epsilon = new PlaneComparer(0.000001f);
@@ -134,16 +157,16 @@ namespace MonoGame.Tests {
         }
     }
 
-	static class MathUtility 
+	static class MathUtility
     {
 		public static void MinMax (int a, int b, out int min, out int max)
 		{
-			if (a > b) 
+			if (a > b)
             {
 				min = b;
 				max = a;
-			} 
-            else 
+			}
+            else
             {
 				min = a;
 				max = b;
@@ -151,7 +174,7 @@ namespace MonoGame.Tests {
 		}
 	}
 
-	static class Paths 
+	static class Paths
     {
 		private const string AssetFolder = "Assets";
 		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
@@ -220,5 +243,4 @@ namespace MonoGame.Tests {
 			Directory.SetCurrentDirectory(directory);
 		}
 	}
-
 }
