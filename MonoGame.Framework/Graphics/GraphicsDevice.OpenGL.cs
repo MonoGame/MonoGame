@@ -68,6 +68,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private Vector4 _lastClearColor = Vector4.Zero;
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
+        private bool _vertexBufferApplied = false;
+        private bool _vertexShaderApplied = false;
+        private IntPtr _lastVertexOffset = IntPtr.Zero;
 
         internal void SetVertexAttributeArray(bool[] attrs)
         {
@@ -833,6 +836,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
                     GraphicsExtensions.CheckGLError();
+                    _vertexBufferApplied = false;
                 }
             }
 
@@ -845,6 +849,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ActivateShaderProgram();
                 _vertexShaderDirty = _pixelShaderDirty = false;
+                _vertexShaderApplied = false;
             }
 
             _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
@@ -867,7 +872,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			var target = PrimitiveTypeGL(primitiveType);
 			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
 
-			_vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
+            if (!_vertexBufferApplied || !_vertexShaderApplied || _lastVertexOffset != vertexOffset)
+            {
+                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
+                _vertexBufferApplied = true;
+                _vertexShaderApplied = true;
+                _lastVertexOffset = vertexOffset;
+            }
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -893,6 +904,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
+            _vertexBufferApplied = false;
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
@@ -908,7 +920,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             ApplyState(true);
 
-            _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
+            if (!_vertexBufferApplied || !_vertexShaderApplied || _lastVertexOffset != IntPtr.Zero)
+            {
+                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
+                _vertexBufferApplied = true;
+                _vertexShaderApplied = true;
+                _lastVertexOffset = IntPtr.Zero;
+            }
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -936,6 +954,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vertexAddr);
+            _vertexBufferApplied = false;
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
@@ -969,6 +988,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
             vertexDeclaration.Apply(_vertexShader, vertexAddr);
+            _vertexBufferApplied = false;
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
