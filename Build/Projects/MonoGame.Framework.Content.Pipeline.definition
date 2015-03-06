@@ -540,6 +540,11 @@
       <Link>PVRTexLibWrapper.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>ATI.TextureConverter.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Mac Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib">
@@ -635,6 +640,11 @@
     <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibWrapper.dll.config">
       <Platforms>MacOS</Platforms>
       <Link>PVRTexLibWrapper.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>ATI.TextureConverter.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </Files>

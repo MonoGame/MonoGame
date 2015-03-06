@@ -138,8 +138,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 bmp.SetPixelData(data);
             }
 
-            if (GraphicsUtil.IsCompressedTextureFormat(format))
-                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, PremultiplyAlpha, true);
+			if (GraphicsUtil.IsCompressedTextureFormat (format)) {
+				try {
+					GraphicsUtil.CompressTexture (context.TargetProfile, output.Texture, format, context, false, PremultiplyAlpha, true);
+				}
+				catch(Exception ex) {
+					context.Logger.LogImportantMessage("{0}", ex.ToString());
+				}
+			}
 
 			return output;
 		}

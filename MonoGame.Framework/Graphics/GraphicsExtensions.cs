@@ -657,7 +657,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case SurfaceFormat.RgbaATCInterpolatedAlpha:
 				glInternalFormat = (PixelInternalFormat)All.AtcRgbaInterpolatedAlphaAmd;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
-				break
+				break;
 #endif
                     
 

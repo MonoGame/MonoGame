@@ -512,7 +512,57 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
   
         static void CompressAti(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
         {
+			var face = content.Faces[0][0];
+			var pixelData = face.GetPixelData ();
+			var alphaRange = CalculateAlphaRange (pixelData);
 
+			AtcBitmapContent atc;
+			if (generateMipMaps) {
+				for (int i = 0; i < content.Faces.Count; ++i)
+				{
+					var src = content.Faces[i][0];
+					var w = src.Width;
+					var h = src.Height;
+
+					content.Faces[i].Clear();
+
+					if (alphaRange == AlphaRange.Full)
+						atc = new AtcExplicitBitmapContent (w, h);
+					else
+						atc = new AtcInterpolatedBitmapContent (w, h);
+					BitmapContent.Copy(src, atc);
+					content.Faces[i].Add(atc);
+					while (w > 1 && h > 1)
+					{
+						if (w > 1)
+							w = w >> 1;
+						if (h > 1)
+							h = h >> 1;
+						if (alphaRange == AlphaRange.Full)
+							atc = new AtcExplicitBitmapContent (w, h);
+						else
+							atc = new AtcInterpolatedBitmapContent (w, h);
+						BitmapContent.Copy(src.Resize(w, h), atc);
+						content.Faces[i].Add(atc);
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < content.Faces.Count; ++i)
+				{
+					for (int j = 0; j < content.Faces[i].Count; ++j)
+					{
+						var src = content.Faces[i][j];
+						if (alphaRange == AlphaRange.Full)
+							atc = new AtcExplicitBitmapContent (src.Width, src.Height);
+						else
+							atc = new AtcInterpolatedBitmapContent (src.Width, src.Height);
+						BitmapContent.Copy(src, atc);
+						content.Faces[i][j] = atc;
+					}
+				}
+			}
         }
 
         static void CompressEtc1(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
