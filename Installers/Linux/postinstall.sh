@@ -30,22 +30,22 @@ echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
 #setup nvtt libraries
 if [ ! -f /lib/libnvcore.so ]
 then
-	ln $IDIR/libnvcore.so lib/libnvcore.so
+	ln $IDIR/libnvcore.so /lib/libnvcore.so
 fi
 
 if [ ! -f /lib/libnvimage.so ]
 then
-	ln $IDIR/libnvimage.so lib/libnvimage.so
+	ln $IDIR/libnvimage.so /lib/libnvimage.so
 fi
 
 if [ ! -f /lib/libnvmath.so ]
 then
-	ln $IDIR/libnvmath.so lib/libnvmath.so
+	ln $IDIR/libnvmath.so /lib/libnvmath.so
 fi
 
 if [ ! -f /lib/libnvtt.so ]
 then
-	ln $IDIR/libnvtt.so lib/libnvtt.so
+	ln $IDIR/libnvtt.so /lib/libnvtt.so
 fi
 
 #fix permissions
