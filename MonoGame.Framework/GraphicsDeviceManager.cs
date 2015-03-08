@@ -367,7 +367,7 @@ namespace Microsoft.Xna.Framework
             }
 #endif
 
-#if IOS || MONOMAC
+#if IOS || LINUX || MONOMAC
 			presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
 #endif
 
