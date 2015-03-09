@@ -41,8 +41,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var tex = _textures[i];
 
-                GL.ActiveTexture(TextureUnit.Texture0 + i);
-                GraphicsExtensions.CheckGLError();
+                if (device._lastTextureActive != i)
+                {
+                    GL.ActiveTexture(TextureUnit.Texture0 + i);
+                    GraphicsExtensions.CheckGLError();
+                    device._lastTextureActive = i;
+                }
 
                 // Clear the previous binding if the 
                 // target is different from the new one.
