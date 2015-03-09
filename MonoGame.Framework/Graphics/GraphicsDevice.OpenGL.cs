@@ -196,6 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// So on OS X in particular, we need to default to preserving contents.
 			PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
 #endif
+
             _extensions = GetGLExtensions();
         }
 

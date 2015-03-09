@@ -64,6 +64,7 @@ change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
+using Microsoft.Xna.Framework.Input;
 
 
 #endregion License
@@ -71,9 +72,9 @@ non-infringement.
 using System;
 using System.Drawing;
 using System.Text;
+
 using System.Collections.Generic;
 using System.Linq;
-
 using CoreAnimation;
 using Foundation;
 using ObjCRuntime;
@@ -86,7 +87,6 @@ using OpenTK.Graphics.ES20;
 using OpenTK.Platform.iPhoneOS;
 
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework {
 
@@ -115,8 +115,19 @@ namespace Microsoft.Xna.Framework {
     public enum Keypresses
     {
         backspaceDeleteKey,
+		enterKey,
         whatelse
     }
+
+	public class SelectionChangedEventArgs : EventArgs 
+	{
+		public NSRange Range;
+
+		public SelectionChangedEventArgs(NSRange range)
+		{
+			Range = range;
+		}
+	}
 
 
     [Register("iOSGameView")]
@@ -126,17 +137,11 @@ namespace Microsoft.Xna.Framework {
 		private int _depthbuffer;
 		private int _framebuffer;
 
-<<<<<<< HEAD
-
 		public EditableCoreTextView textView;
 
-
-	#region Construction/Destruction
-		public iOSGameView (iOSGamePlatform platform, RectangleF frame)
-=======
 		#region Construction/Destruction
+
 		public iOSGameView (iOSGamePlatform platform, CGRect frame)
->>>>>>> ac0a53ad4e527f86fd0adc4288686c7c1942c9ac
 			: base(frame)
 		{
 			if (platform == null)
@@ -278,20 +283,13 @@ namespace Microsoft.Xna.Framework {
 
 			_glapi.GenFramebuffers (1, ref _framebuffer);
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
-			
+
 			// Create our Depth buffer. Color buffer must be the last one bound
-<<<<<<< HEAD
-			GL.GenRenderbuffers(1, ref _depthbuffer);
+			GL.GenRenderbuffers(1, out _depthbuffer);
 			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
             GL.RenderbufferStorage (All.Renderbuffer, All.Depth24Stencil8Oes, viewportWidth, viewportHeight);
             GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
             GL.FramebufferRenderbuffer(All.Framebuffer, All.StencilAttachment, All.Renderbuffer, _depthbuffer);
-=======
-			GL.GenRenderbuffers(1, out _depthbuffer);
-			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthbuffer);
-            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16, viewportWidth, viewportHeight);
-			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
->>>>>>> ac0a53ad4e527f86fd0adc4288686c7c1942c9ac
 
 			_glapi.GenRenderbuffers(1, ref _colorbuffer);
 			_glapi.BindRenderbuffer(All.Renderbuffer, _colorbuffer);
