@@ -26,12 +26,10 @@ namespace MonoGame.Utilities.Png
             colorType = ColorType.Rgb;
         }
 
-        public Stream Write(Texture2D texture2D)
+        public void Write(Texture2D texture2D, Stream outputStream)
         {
             textureData = new Color[texture2D.Width * texture2D.Height];
             texture2D.GetData<Color>(textureData);
-            
-            var outputStream = new MemoryStream();
 
             // write PNG signature
             outputStream.Write(HeaderChunk.PngSignature, 0, HeaderChunk.PngSignature.Length);
@@ -74,8 +72,6 @@ namespace MonoGame.Utilities.Png
             var endChunk = new EndChunk();
             var endChunkBytes = endChunk.Encode();
             outputStream.Write(endChunkBytes, 0, endChunkBytes.Length);
-            
-            return outputStream;
         }
 
         private byte[] EncodePixelData(Texture2D texture2D)

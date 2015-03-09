@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using MonoGame.Utilities.Png;
 
 #if MONOMAC
 using MonoMac.AppKit;
@@ -494,7 +495,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else
-            throw new NotImplementedException();
+            var pngWriter = new PngWriter();
+            pngWriter.Write(this, stream);
 #endif
         }
 
