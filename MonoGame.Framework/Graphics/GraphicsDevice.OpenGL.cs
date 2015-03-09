@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal BlendState _lastBlendState = new BlendState();
         internal DepthStencilState _lastDepthStencilState = new DepthStencilState();
         internal RasterizerState _lastRasterizerState = new RasterizerState();
+        internal int _lastTextureActive = -1;
         private Vector4 _lastClearColor = Vector4.Zero;
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
@@ -256,7 +257,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Force reseting states
             this.BlendState.PlatformApplyState(this, true);
             this.DepthStencilState.PlatformApplyState(this, true);
-            this.RasterizerState.PlatformApplyState(this, true);            
+            this.RasterizerState.PlatformApplyState(this, true);
+
+            _lastTextureActive = -1;
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
