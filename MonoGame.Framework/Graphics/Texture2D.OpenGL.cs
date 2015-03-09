@@ -494,9 +494,11 @@ namespace Microsoft.Xna.Framework.Graphics
             SaveAsImage(stream, width, height, ImageFormat.Png);
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
-#else
+#elif IOS
             var pngWriter = new PngWriter();
             pngWriter.Write(this, stream);
+#else
+            throw new NotImplementedException();
 #endif
         }
 
