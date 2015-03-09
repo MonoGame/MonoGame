@@ -748,12 +748,15 @@ namespace Microsoft.Xna.Framework.Graphics
             var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
             if (shaderProgram.Program == -1)
                 return;
+
             // Set the new program if it has changed.
+            bool dirty = false;
             if (_shaderProgram != shaderProgram)
             {
                 GL.UseProgram(shaderProgram.Program);
                 GraphicsExtensions.CheckGLError();
                 _shaderProgram = shaderProgram;
+                dirty = true;
             }
 
             var posFixupLoc = shaderProgram.GetUniformLocation("posFixup");
@@ -786,6 +789,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
             // contains 1.0 to allow a mad.
 
+            float oldFixup1 = _posFixup[1];
+            float oldFixup2 = _posFixup[2];
+            float oldFixup3 = _posFixup[3];
+
             _posFixup[0] = 1.0f;
             _posFixup[1] = 1.0f;
             _posFixup[2] = (63.0f/64.0f)/Viewport.Width;
@@ -799,8 +806,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-            GL.Uniform4(posFixupLoc, 1, _posFixup);
-            GraphicsExtensions.CheckGLError();
+            if (dirty || oldFixup1 != _posFixup[1] || oldFixup2 != _posFixup[2] || oldFixup3 != _posFixup[3])
+            {
+                GL.Uniform4(posFixupLoc, 1, _posFixup);
+                GraphicsExtensions.CheckGLError();
+            }
         }
 
         internal void PlatformBeginApplyState()
