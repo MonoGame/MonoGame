@@ -1,30 +1,44 @@
 #!/bin/bash
 DIR="Data"
+PDIR="$DIR/Pipeline"
 
+#create temp directories for generating the installer
 if [ ! -d "$DIR" ]
 then
 	mkdir "$DIR"
 fi
 
-cp ../../Tools/Pipeline/bin/Linux/AnyCPU/Release/. $DIR/ -R
+if [ ! -d "$PDIR" ]
+then
+	mkdir "$PDIR"
+fi
 
-rm $DIR/atk-sharp.dll
-rm $DIR/atk-sharp.dll.config
-rm $DIR/gdk-sharp.dll
-rm $DIR/gdk-sharp.dll.config
-rm $DIR/glade-sharp.dll
-rm $DIR/glade-sharp.dll.config
-rm $DIR/glib-sharp.dll
-rm $DIR/glib-sharp.dll.config
-rm $DIR/gtk-dotnet.dll
-rm $DIR/gtk-sharp.dll
-rm $DIR/gtk-sharp.dll.config
-rm $DIR/Mono.Posix.dll
-rm $DIR/pango-sharp.dll
-rm $DIR/pango-sharp.dll.config
+#copy pipeline data
+cp ../../Tools/Pipeline/bin/Linux/AnyCPU/Release/. $PDIR/ -R
+cp ../monogame.ico $PDIR
+cp uninstall.sh $PDIR
 
-cp ../monogame.ico $DIR
+#remove gtk libraries so that the pipeline tool would use system libraries instead
+rm $PDIR/atk-sharp.dll
+rm $PDIR/atk-sharp.dll.config
+rm $PDIR/gdk-sharp.dll
+rm $PDIR/gdk-sharp.dll.config
+rm $PDIR/glade-sharp.dll
+rm $PDIR/glade-sharp.dll.config
+rm $PDIR/glib-sharp.dll
+rm $PDIR/glib-sharp.dll.config
+rm $PDIR/gtk-dotnet.dll
+rm $PDIR/gtk-sharp.dll
+rm $PDIR/gtk-sharp.dll.config
+rm $PDIR/Mono.Posix.dll
+rm $PDIR/pango-sharp.dll
+rm $PDIR/pango-sharp.dll.config
+
+#copy the script thats gonna be doing the actual install
 cp postinstall.sh $DIR
-cp uninstall.sh $DIR
-./../../ThirdParty/Dependencies/makeself/makeself.sh Data/ ../../monogame-linux.run "Monogame Pipeline Installer" ./postinstall.sh
+
+#build the installer
+./../../ThirdParty/Dependencies/makeself/makeself.sh Data/ monogame-linux.run "Monogame Pipeline Installer" ./postinstall.sh
+
+#remove temp directory
 rm -rf Data
