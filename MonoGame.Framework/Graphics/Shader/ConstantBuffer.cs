@@ -176,7 +176,7 @@ namespace Microsoft.Xna.Framework.Graphics
             { 
                 for (int i = 0; i < _compareBuffer.Length; i++)
                 {
-                    if (_buffer[i] != _compareBuffer[i] || true)
+                    if (_buffer[i] != _compareBuffer[i])
                     {
                         _dirty = true;
                         break;
