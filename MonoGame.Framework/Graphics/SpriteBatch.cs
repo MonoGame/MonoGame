@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
-        ulong _drawCount;
+        uint _drawCount;
 
         /// <summary>
         /// Gets the internal amount of draw calls which happened between <see cref="SpriteBatch.Begin"/> and <see cref="SpriteBatch.End"/>.
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>
         /// String drawing will increase this value by the amount of characters in text.
         /// </remarks>
-        public ulong DrawCount { get { return _drawCount; } }
+        public uint DrawCount { get { return _drawCount; } }
 
         /// <summary>
         /// Creates a new instance of <see cref="SpriteBatch"/> class.
