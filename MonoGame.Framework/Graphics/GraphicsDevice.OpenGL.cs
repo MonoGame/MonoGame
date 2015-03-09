@@ -956,8 +956,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var vertexAddr = (IntPtr)(vbHandle.AddrOfPinnedObject().ToInt64() + vertexDeclaration.VertexStride * vertexOffset);
 
             // Setup the vertex declaration to point at the VB data.
-            vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vertexAddr, true);
+            if (_lastVertexOffset != vertexAddr || !_vertexShaderApplied)
+            {
+                vertexDeclaration.GraphicsDevice = this;
+                vertexDeclaration.Apply(_vertexShader, vertexAddr, _lastVertexOffset != vertexAddr);
+                _vertexShaderApplied = true;
+                _lastVertexOffset = vertexAddr;
+            }
             _vertexBufferApplied = false;
 
             //Draw
@@ -990,8 +995,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var vertexAddr = (IntPtr)(vbHandle.AddrOfPinnedObject().ToInt64() + vertexDeclaration.VertexStride * vertexOffset);
 
             // Setup the vertex declaration to point at the VB data.
-            vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vertexAddr, true);
+            if (_lastVertexOffset != vertexAddr || !_vertexShaderApplied)
+            {
+                vertexDeclaration.GraphicsDevice = this;
+                vertexDeclaration.Apply(_vertexShader, vertexAddr, _lastVertexOffset != vertexAddr);
+                _vertexShaderApplied = true;
+                _lastVertexOffset = vertexAddr;
+            }
             _vertexBufferApplied = false;
 
             //Draw
