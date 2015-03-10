@@ -266,12 +266,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if WINDOWS_STOREAPP
-            SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
-#else
             var pngWriter = new PngWriter();
             pngWriter.Write(this, stream);
-#endif
         }
 
 #if WINDOWS_STOREAPP
