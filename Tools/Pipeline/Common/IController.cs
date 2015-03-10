@@ -102,7 +102,9 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(IEnumerable<ContentItem> items);        
+        void Exclude(IEnumerable<ContentItem> items);
+
+        void AddFiles(IEnumerable<string> files);
 
         void NewItem(string name, string location, ContentItemTemplate template);
 

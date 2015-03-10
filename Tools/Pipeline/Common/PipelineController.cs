@@ -596,14 +596,19 @@ namespace MonoGame.Tools.Pipeline
                 for (int i = 0; i < sc.Count; i++)
                     File.Copy(sc[i], dc[i]);
 
-                var action = new IncludeAction(this, files);
-                action.Do();
-                _actionStack.Add(action);  
+                AddFiles(files);
             }
             catch
             {
                 View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, aborting.");
             }
+        }
+
+        public void AddFiles(IEnumerable<string> files)
+        {
+            var action = new IncludeAction(this, files);
+            action.Do();
+            _actionStack.Add(action);
         }
 
         public void Exclude(IEnumerable<ContentItem> items)
