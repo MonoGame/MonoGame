@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Utilities.Png;
 
 #if WINDOWS_PHONE
 using System.Threading;
@@ -268,9 +269,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
 #else
-            // TODO: We need to find a simple stand alone
-            // PNG encoder if we want to support this.
-            throw new NotImplementedException();
+            var pngWriter = new PngWriter();
+            pngWriter.Write(this, stream);
 #endif
         }
 
