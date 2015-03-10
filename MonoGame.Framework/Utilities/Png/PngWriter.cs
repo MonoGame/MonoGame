@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using MonoGame.Utilities;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace MonoGame.Utilities.Png
 {
@@ -18,7 +19,9 @@ namespace MonoGame.Utilities.Png
     {
         private const int bitsPerSample = 8;
         private ColorType colorType;
-        private Color[] textureData;
+        private Color[] colorData;
+        private int width;
+        private int height;
 
         public PngWriter()
         {
@@ -26,10 +29,105 @@ namespace MonoGame.Utilities.Png
             colorType = ColorType.Rgb;
         }
 
+        private void GetColorData(Texture2D texture2D)
+        {
+            int colorDataLength = texture2D.Width * texture2D.Height;
+            colorData = new Color[colorDataLength];
+            
+            switch (texture2D.Format)
+            {
+                case SurfaceFormat.Color:
+                    texture2D.GetData<Color>(colorData);
+                    break;
+                
+                case SurfaceFormat.Bgr565:
+                    var bgr565Data = new Bgr565[colorDataLength];
+                    texture2D.GetData<Bgr565>(bgr565Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)bgr565Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Bgra4444:
+                    var bgra4444Data = new Bgra4444[colorDataLength];
+                    texture2D.GetData<Bgra4444>(bgra4444Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)bgra4444Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.HalfSingle:
+                    var halfSingleData = new HalfSingle[colorDataLength];
+                    texture2D.GetData<HalfSingle>(halfSingleData);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)halfSingleData[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.HalfVector2:
+                    var halfVector2Data = new HalfVector2[colorDataLength];
+                    texture2D.GetData<HalfVector2>(halfVector2Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)halfVector2Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.HalfVector4:
+                    var halfVector4Data = new HalfVector4[colorDataLength];
+                    texture2D.GetData<HalfVector4>(halfVector4Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)halfVector4Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.NormalizedByte2:
+                    var normalizedByte2Data = new NormalizedByte2[colorDataLength];
+                    texture2D.GetData<NormalizedByte2>(normalizedByte2Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)normalizedByte2Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.NormalizedByte4:
+                    var normalizedByte4Data = new NormalizedByte4[colorDataLength];
+                    texture2D.GetData<NormalizedByte4>(normalizedByte4Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)normalizedByte4Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                default:
+                    throw new Exception("Texture surface format not supported");
+            }
+        }
+
         public void Write(Texture2D texture2D, Stream outputStream)
         {
-            textureData = new Color[texture2D.Width * texture2D.Height];
-            texture2D.GetData<Color>(textureData);
+            width = texture2D.Width;
+            height = texture2D.Height;
+
+            GetColorData(texture2D);
 
             // write PNG signature
             outputStream.Write(HeaderChunk.PngSignature, 0, HeaderChunk.PngSignature.Length);
@@ -78,14 +176,12 @@ namespace MonoGame.Utilities.Png
         {
             List<byte[]> filteredScanlines = new List<byte[]>();
 
-            int width = texture2D.Width;
-            int height = texture2D.Height;
             int bytesPerPixel = CalculateBytesPerPixel();
             byte[] previousScanline = new byte[width * bytesPerPixel];
 
             for (int y = 0; y < height; y++)
             {
-                var rawScanline = GetRawScanline(texture2D, y);
+                var rawScanline = GetRawScanline(y);
 
                 var filteredScanline = GetOptimalFilteredScanline(rawScanline, previousScanline, bytesPerPixel);
 
@@ -161,15 +257,13 @@ namespace MonoGame.Utilities.Png
             return totalVariation;
         }
 
-        private byte[] GetRawScanline(Texture2D texture2D, int y)
+        private byte[] GetRawScanline(int y)
         {
-            int width = texture2D.Width;
-
             var rawScanline = new byte[3 * width];
             
             for (int x = 0; x < width; x++)
             {
-                var color = textureData[(y * width) + x];
+                var color = colorData[(y * width) + x];
 
                 rawScanline[3 * x] = color.R;
                 rawScanline[(3 * x) + 1] = color.G;
