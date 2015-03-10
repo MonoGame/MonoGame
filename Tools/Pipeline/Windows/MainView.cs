@@ -775,7 +775,7 @@ namespace MonoGame.Tools.Pipeline
                     items.Add(item);                    
             }
 
-            _controller.Exclude(items, "");      
+            _controller.Exclude(items, new List<string>());      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)

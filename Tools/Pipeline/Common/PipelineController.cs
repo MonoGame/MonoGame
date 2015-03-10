@@ -620,7 +620,11 @@ namespace MonoGame.Tools.Pipeline
                 folder += Path.DirectorySeparatorChar;
 
             List<string> files = new List<string>();
+            List<string> directories = new List<string>();
+
             files.AddRange(GetFiles(folder));
+            directories.Add(folder);
+            directories.AddRange(GetDirectories(folder));
 
             if (!folder.StartsWith(initialDirectory))
             {
@@ -631,6 +635,26 @@ namespace MonoGame.Tools.Pipeline
 
                 if (caction == CopyAction.Copy)
                 {
+
+                    for (int i = 0; i < directories.Count; i++)
+                    {
+                        try
+                        {
+                            DirectoryInfo dinfo = new DirectoryInfo(folder);
+                            string newdir = directories[i].Replace(folder, initialDirectory + dinfo.Name + Path.DirectorySeparatorChar);
+
+                            if (!Directory.Exists(newdir))
+                                Directory.CreateDirectory(newdir);
+
+                            directories[i] = newdir;
+                        }
+                        catch
+                        {
+                            View.ShowError("Error While Creating Directories", "An error occurred while the directories were beeing created, aborting.");
+                            return;
+                        }
+                    }
+
                     for (int i = 0; i < files.Count; i++)
                     {
                         try
@@ -638,10 +662,7 @@ namespace MonoGame.Tools.Pipeline
                             DirectoryInfo dinfo = new DirectoryInfo(folder);
                             string newfile = files[i].Replace(folder, initialDirectory + dinfo.Name + Path.DirectorySeparatorChar);
 
-                            if(!Directory.Exists(Path.GetDirectoryName(newfile)))
-                                Directory.CreateDirectory(Path.GetDirectoryName(newfile));
-
-                            if(!File.Exists(newfile))
+                            if (!File.Exists(newfile))
                                 File.Copy(files[i], newfile);
                             else
                             {
@@ -659,29 +680,57 @@ namespace MonoGame.Tools.Pipeline
                         }
                     }
                 }
+                else
+                {
+                    string pl = _project.Location;
+                    if (!pl.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                        pl += Path.DirectorySeparatorChar;
+
+                    Uri folderUri = new Uri(pl);
+
+                    for (int i = 0; i < directories.Count; i++)
+                    {
+                        Uri pathUri = new Uri(directories[i]);
+                        directories[i] = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+                    }
+                }
             }
 
-            var action = new IncludeAction(this, files);
-            action.Do();
-            _actionStack.Add(action);
+            var action2 = new IncludeAction(this, files, directories);
+            action2.Do();
+            _actionStack.Add(action2);
         }
 
         private List<string> GetFiles(string folder)
         {
-            List<string> files = new List<string>();
+            List<string> ret = new List<string>();
 
             string[] directories = Directory.GetDirectories(folder);
             foreach (string d in directories)
-                files.AddRange(GetFiles(d));
+                ret.AddRange(GetFiles(d));
 
-            files.AddRange(Directory.GetFiles(folder));
+            ret.AddRange(Directory.GetFiles(folder));
 
-            return files;
+            return ret;
         }
 
-        public void Exclude(IEnumerable<ContentItem> items, string folder)
+        private List<string> GetDirectories(string folder)
         {
-            var action = new ExcludeAction(this, items, folder);
+            List<string> ret = new List<string>();
+
+            string[] directories = Directory.GetDirectories(folder);
+            foreach (string d in directories)
+            {
+                ret.Add(d);
+                ret.AddRange(GetDirectories(d));
+            }
+
+            return ret;
+        }
+
+        public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders)
+        {
+            var action = new ExcludeAction(this, items, folders);
             action.Do();
             _actionStack.Add(action);
         }
@@ -697,10 +746,13 @@ namespace MonoGame.Tools.Pipeline
         {
             string folder = Path.Combine(location, name);
 
+            if (!Path.IsPathRooted(folder))
+                folder = _project.Location + Path.DirectorySeparatorChar + folder;
+
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            var action = new IncludeFolderAction(this, folder);
+            var action = new IncludeAction(this, null, new List<string> { folder });
             action.Do();
             _actionStack.Add(action);
         }

@@ -49,7 +49,6 @@
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
-    <Compile Include="Common\PipelineController.IncludeFolderAction.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />

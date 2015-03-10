@@ -281,6 +281,7 @@ namespace MonoGame.Tools.Pipeline
             string[] path = GetSelectedTreePath (out iter, out icon);
 
             var items = new List<ContentItem>();
+            var directories = new List<string>();
 
             for (int i = 0; i < path.Length; i++) {
                 if (icon [i] == ICON_OTHER[0] || icon [i] == ICON_OTHER[1]) {
@@ -288,6 +289,9 @@ namespace MonoGame.Tools.Pipeline
                     if(!items.Contains(item))
                         items.Add (item);
                 } else {
+                    if (icon[i] == ICON_FOLDER)
+                        directories.Add(path[i]);
+
                     List<string> paths = GetAllPaths (iter [i]);
                     foreach (string pth in paths) {
                         var item = window._controller.GetItem (pth) as ContentItem;
@@ -299,10 +303,8 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            if(items.Count > 0)
-                window._controller.Exclude (items, (icon[0] == ICON_FOLDER) ? path[0] : "");
-            else if(path.Length > 0)
-                window._controller.Exclude (items, path[0]);
+            if(items.Count > 0 || directories.Count > 0)
+                window._controller.Exclude (items, directories);
         }
 
         public void Rebuild()
