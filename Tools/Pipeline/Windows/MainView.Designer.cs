@@ -40,12 +40,14 @@ namespace MonoGame.Tools.Pipeline
             System.Windows.Forms.ToolStripSeparator _toolStripSeparator2;
             System.Windows.Forms.SplitContainer _splitTreeProps;
             System.Windows.Forms.SplitContainer _splitEditorOutput;
+            this._treeView = new MonoGame.Tools.Pipeline.MultiSelectTreeview();
             this._propertyGrid = new System.Windows.Forms.PropertyGrid();
             this._outputWindow = new System.Windows.Forms.RichTextBox();
             this._mainMenu = new System.Windows.Forms.MenuStrip();
             this._fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._newProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._openRecentMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._closeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._importProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -80,8 +82,6 @@ namespace MonoGame.Tools.Pipeline
             this._treeOpenFileLocationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this._treeRebuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._treeView = new MonoGame.Tools.Pipeline.MultiSelectTreeview();
-            this._openRecentMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -133,7 +133,20 @@ namespace MonoGame.Tools.Pipeline
             _splitTreeProps.TabIndex = 1;
             _splitTreeProps.TabStop = false;
             // 
+            // _treeView
+            // 
+            this._treeView.AllowDrop = true;
+            this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._treeView.Location = new System.Drawing.Point(0, 0);
+            this._treeView.Name = "_treeView";
+            this._treeView.Size = new System.Drawing.Size(249, 210);
+            this._treeView.TabIndex = 0;
+            this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
+            this._treeView.DragDrop += new System.Windows.Forms.DragEventHandler(this.TreeViewDragDrop);
+            this._treeView.DragEnter += new System.Windows.Forms.DragEventHandler(this.TreeViewDragEnter);
             this._treeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TreeViewOnKeyDown);
+            this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
+            // 
             // _propertyGrid
             // 
             this._propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -222,6 +235,12 @@ namespace MonoGame.Tools.Pipeline
             this._openProjectMenuItem.Size = new System.Drawing.Size(182, 22);
             this._openProjectMenuItem.Text = "Open...";
             this._openProjectMenuItem.Click += new System.EventHandler(this.OnOpenProjectClick);
+            // 
+            // _openRecentMenuItem
+            // 
+            this._openRecentMenuItem.Name = "_openRecentMenuItem";
+            this._openRecentMenuItem.Size = new System.Drawing.Size(182, 22);
+            this._openRecentMenuItem.Text = "Open Recent";
             // 
             // _closeMenuItem
             // 
@@ -485,22 +504,6 @@ namespace MonoGame.Tools.Pipeline
             this._treeRebuildMenuItem.Size = new System.Drawing.Size(173, 22);
             this._treeRebuildMenuItem.Text = "Rebuild";
             this._treeRebuildMenuItem.Click += new System.EventHandler(this.RebuildItemsMenuItemClick);
-            // 
-            // _treeView
-            // 
-            this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._treeView.Location = new System.Drawing.Point(0, 0);
-            this._treeView.Name = "_treeView";
-            this._treeView.Size = new System.Drawing.Size(249, 210);
-            this._treeView.TabIndex = 0;
-            this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
-            this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
-            // 
-            // _openRecentMenuItem
-            // 
-            this._openRecentMenuItem.Name = "_openRecentMenuItem";
-            this._openRecentMenuItem.Size = new System.Drawing.Size(182, 22);
-            this._openRecentMenuItem.Text = "Open Recent";
             // 
             // MainView
             // 

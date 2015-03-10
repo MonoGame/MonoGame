@@ -716,6 +716,26 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        private void TreeViewDragEnter(object sender, DragEventArgs e)
+        {
+            if (_controller.ProjectOpen && e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void TreeViewDragDrop(object sender, DragEventArgs e)
+        {
+            IEnumerable<string> fileNames = (IEnumerable<string>)e.Data.GetData(DataFormats.FileDrop);
+
+            var node = _treeView.GetNodeAt(e.X, e.Y) ?? _treeView.Nodes[0];
+            var item = node.Tag as IProjectItem;
+
+
+            _controller.AddFiles(fileNames);
+
+        }
+
         private void MainMenuMenuActivate(object sender, EventArgs e)
         {
             UpdateMenus();
