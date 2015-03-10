@@ -14,10 +14,12 @@ namespace MonoGame.Tools.Pipeline
         {
             private readonly PipelineController _con;
             private readonly ContentItemState[] _state;
+            private readonly string _folder;
 
-            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items)
+            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items, string folder)
             {
                 _con = controller;
+                _folder = folder;
                 
                 _state = new ContentItemState[items.Count()];
                 
@@ -46,6 +48,8 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
 
+                if(_folder != "")
+                    _con.View.RemoveTreeFolder(_folder);
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
@@ -53,6 +57,8 @@ namespace MonoGame.Tools.Pipeline
             public void Undo()
             {
                 _con.View.BeginTreeUpdate();
+                if(_folder != "")
+                    _con.View.AddTreeFolder(_folder);
 
                 foreach (var obj in _state)
                 {

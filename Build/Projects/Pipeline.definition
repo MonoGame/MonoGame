@@ -49,6 +49,7 @@
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
+    <Compile Include="Common\PipelineController.IncludeFolderAction.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
@@ -166,7 +167,13 @@
     <Compile Include="Gtk\Dialogs\AddFileDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\AddFolderDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\TextEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
@@ -209,6 +216,12 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AddFileDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AddFolderDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.TextEditorDialog.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="IgeMacIntegration.cs">

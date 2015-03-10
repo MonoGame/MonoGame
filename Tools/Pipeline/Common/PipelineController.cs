@@ -566,7 +566,7 @@ namespace MonoGame.Tools.Pipeline
                         bool applyforall;
                         CopyAction act;
 
-                        if (!View.CopyOrLink(files[i], File.Exists(newfile), out act, out applyforall))
+                        if (!View.CopyOrLinkFile(files[i], File.Exists(newfile), out act, out applyforall))
                             return;
 
                         daction = (int)act + 1;
@@ -606,9 +606,82 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void Exclude(IEnumerable<ContentItem> items)
+        public void IncludeFolder(string initialDirectory)
         {
-            var action = new ExcludeAction(this, items);
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+
+            string folder;
+            if (!View.ChooseContentFolder(initialDirectory, out folder))
+                return;
+
+            if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                folder += Path.DirectorySeparatorChar;
+
+            List<string> files = new List<string>();
+            files.AddRange(GetFiles(folder));
+
+            if (!folder.StartsWith(initialDirectory))
+            {
+                CopyAction caction;
+
+                if (!View.CopyOrLinkFolder(folder, out caction))
+                    return;
+
+                if (caction == CopyAction.Copy)
+                {
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        try
+                        {
+                            DirectoryInfo dinfo = new DirectoryInfo(folder);
+                            string newfile = files[i].Replace(folder, initialDirectory + dinfo.Name + Path.DirectorySeparatorChar);
+
+                            if(!Directory.Exists(Path.GetDirectoryName(newfile)))
+                                Directory.CreateDirectory(Path.GetDirectoryName(newfile));
+
+                            if(!File.Exists(newfile))
+                                File.Copy(files[i], newfile);
+                            else
+                            {
+                                View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, the file:" +
+                                    newfile + " already exists, aborting.");
+                                return;
+                            }
+
+                            files[i] = newfile;
+                        }
+                        catch
+                        {
+                            View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, aborting.");
+                            return;
+                        }
+                    }
+                }
+            }
+
+            var action = new IncludeAction(this, files);
+            action.Do();
+            _actionStack.Add(action);
+        }
+
+        private List<string> GetFiles(string folder)
+        {
+            List<string> files = new List<string>();
+
+            string[] directories = Directory.GetDirectories(folder);
+            foreach (string d in directories)
+                files.AddRange(GetFiles(d));
+
+            files.AddRange(Directory.GetFiles(folder));
+
+            return files;
+        }
+
+        public void Exclude(IEnumerable<ContentItem> items, string folder)
+        {
+            var action = new ExcludeAction(this, items, folder);
             action.Do();
             _actionStack.Add(action);
         }
@@ -616,6 +689,18 @@ namespace MonoGame.Tools.Pipeline
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
             var action = new NewAction(this, name, location, template);
+            action.Do();
+            _actionStack.Add(action);
+        }
+
+        public void NewFolder(string name, string location)
+        {
+            string folder = Path.Combine(location, name);
+
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            var action = new IncludeFolderAction(this, folder);
             action.Do();
             _actionStack.Add(action);
         }

@@ -253,12 +253,22 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddTreeItem (IProjectItem item)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, expand);
+            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand);
+        }
+
+        public void AddTreeFolder (string folder)
+        {
+            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand);
         }
 
         public void RemoveTreeItem (ContentItem contentItem)
         {
             projectview1.RemoveItem (projectview1.GetBaseIter (), contentItem.OriginalPath);
+        }
+
+        public void RemoveTreeFolder (string folder)
+        {
+            projectview1.RemoveItem (projectview1.GetBaseIter (), folder);
         }
 
         public void UpdateTreeItem (IProjectItem item)
@@ -317,7 +327,25 @@ namespace MonoGame.Tools.Pipeline
             return result;
         }
 
-        public bool CopyOrLink(string file, bool exists, out CopyAction action, out bool applyforall)
+        public bool ChooseContentFolder (string initialDirectory, out string folder)
+        {
+            var folderchooser =
+                new FileChooserDialog("Add Content Folder",
+                    this,
+                    FileChooserAction.SelectFolder,
+                    "Cancel", ResponseType.Cancel,
+                    "Open", ResponseType.Accept);
+
+            folderchooser.SetCurrentFolder (initialDirectory);
+            bool result = folderchooser.Run() == (int)ResponseType.Accept;
+
+            folder = folderchooser.Filename;
+            folderchooser.Destroy ();
+
+            return result;
+        }
+
+        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
             var afd = new AddFileDialog(file, exists);
             afd.TransientFor = this;
@@ -331,6 +359,21 @@ namespace MonoGame.Tools.Pipeline
 
             action = CopyAction.Link;
             applyforall = false;
+            return false;
+        }
+
+        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        {
+            var afd = new AddFolderDialog(folder);
+            afd.TransientFor = this;
+
+            if (afd.Run() == (int)ResponseType.Ok)
+            {
+                action = afd.responce;
+                return true;
+            }
+
+            action = CopyAction.Link;
             return false;
         }
 
@@ -460,6 +503,56 @@ namespace MonoGame.Tools.Pipeline
             expand = false;
         }
 
+        public void OnNewFolderActionActivated(object sender, EventArgs e)
+        {
+            string foldername = "";
+
+            TextEditorDialog ted = new TextEditorDialog("New Folder", "Folder Name:", "");
+            ted.TransientFor = this;
+            if (ted.Run() != (int)ResponseType.Ok)
+                return;
+            foldername = ted.text;
+
+            expand = true;
+            List<TreeIter> iters;
+            List<Gdk.Pixbuf> icons;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+
+            if (paths.Length == 1) {
+                if (icons [0] == projectview1.ICON_FOLDER)
+                    _controller.NewFolder (foldername, paths [0]);
+                else if (icons[0] == projectview1.ICON_BASE)
+                    _controller.NewFolder (foldername, _controller.GetFullPath (""));
+                else
+                    _controller.NewFolder (foldername, System.IO.Path.GetDirectoryName (paths [0]));
+            }
+            else
+                _controller.NewFolder (foldername, _controller.GetFullPath (""));
+
+            expand = false;
+        }
+
+        public void OnAddFolderActionActivated(object sender, EventArgs e)
+        {
+            expand = true;
+            List<TreeIter> iters;
+            List<Gdk.Pixbuf> icons;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+
+            if (paths.Length == 1) {
+                if (icons [0] == projectview1.ICON_FOLDER)
+                    _controller.IncludeFolder (paths [0]);
+                else if (icons[0] == projectview1.ICON_BASE)
+                    _controller.IncludeFolder (_controller.GetFullPath (""));
+                else
+                    _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));
+            }
+            else
+                _controller.IncludeFolder (_controller.GetFullPath (""));
+            UpdateMenus();
+            expand = false;
+        }
+
         public void OnDeleteActionActivated (object sender, EventArgs e)
         {
             projectview1.Remove ();
@@ -519,6 +612,7 @@ namespace MonoGame.Tools.Pipeline
 
             NewItemAction.Sensitive = projectOpen;
             AddItemAction.Sensitive = projectOpen;
+            AddFolderAction.Sensitive = projectOpen;
             DeleteAction.Sensitive = projectOpen && somethingSelected;
 
             BuildAction.Sensitive = projectOpen;
