@@ -678,7 +678,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private IRenderTarget PlatformApplyRenderTargets()
-        {
+		{
             var glFramebuffer = 0;
             if (!this.glFramebuffers.TryGetValue(this._currentRenderTargetBindings, out glFramebuffer))
             {
@@ -750,13 +750,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             // Set the new program if it has changed.
-            bool dirty = false;
             if (_shaderProgram != shaderProgram)
             {
                 GL.UseProgram(shaderProgram.Program);
                 GraphicsExtensions.CheckGLError();
                 _shaderProgram = shaderProgram;
-                dirty = true;
             }
 
             var posFixupLoc = shaderProgram.GetUniformLocation("posFixup");
@@ -789,10 +787,6 @@ namespace Microsoft.Xna.Framework.Graphics
             // 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
             // contains 1.0 to allow a mad.
 
-            float oldFixup1 = _posFixup[1];
-            float oldFixup2 = _posFixup[2];
-            float oldFixup3 = _posFixup[3];
-
             _posFixup[0] = 1.0f;
             _posFixup[1] = 1.0f;
             _posFixup[2] = (63.0f/64.0f)/Viewport.Width;
@@ -806,10 +800,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-            if (dirty || oldFixup1 != _posFixup[1] || oldFixup2 != _posFixup[2] || oldFixup3 != _posFixup[3])
+			if (_shaderProgram._lastPosFixup == null ||
+				_shaderProgram._lastPosFixup[0] != _posFixup[0] ||
+				_shaderProgram._lastPosFixup[1] != _posFixup[1] ||
+				_shaderProgram._lastPosFixup[2] != _posFixup[2] ||
+				_shaderProgram._lastPosFixup[3] != _posFixup[3])
             {
                 GL.Uniform4(posFixupLoc, 1, _posFixup);
                 GraphicsExtensions.CheckGLError();
+
+				if (_shaderProgram._lastPosFixup == null)
+				{
+					_shaderProgram._lastPosFixup = new float[4];
+				}
+				_shaderProgram._lastPosFixup[0] = _posFixup[0];
+				_shaderProgram._lastPosFixup[1] = _posFixup[1];
+				_shaderProgram._lastPosFixup[2] = _posFixup[2];
+				_shaderProgram._lastPosFixup[3] = _posFixup[3];
             }
         }
 

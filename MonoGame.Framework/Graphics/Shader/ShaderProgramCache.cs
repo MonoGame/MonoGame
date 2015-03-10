@@ -41,6 +41,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _uniformLocations[name] = location;
             return location;
         }
+
+		internal float[] _lastPosFixup;
     }
 
     /// <summary>
