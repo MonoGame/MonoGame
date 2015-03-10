@@ -7,6 +7,8 @@ namespace Microsoft.Xna.Framework.Graphics
     [DebuggerDisplay("{DebugDisplayString}")]
 	public class EffectParameter
 	{
+        private float[] _newMatrixBuffer;
+
         /// <summary>
         /// The next state key used when an effect parameter
         /// is updated by any of the 'set' methods.
@@ -39,6 +41,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Data = data;
             StateKey = unchecked(NextStateKey++);
+
+            if (ParameterClass == EffectParameterClass.Matrix)
+            {
+                _newMatrixBuffer = new float[16];
+            }
 		}
 
         internal EffectParameter(EffectParameter cloneSource)
@@ -61,6 +68,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (array != null)
                 Data = array.Clone();
             StateKey = unchecked(NextStateKey++);
+
+            if (ParameterClass == EffectParameterClass.Matrix)
+            {
+                _newMatrixBuffer = new float[16];
+            }
         }
 
 		public string Name { get; private set; }
@@ -403,9 +415,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             // We store the bool as an integer as that
             // is what the constant buffers expect.
+            if (((int[])Data)[0] == (value ? 1 : 0))
+            {
+                return;
+            }
             ((int[])Data)[0] = value ? 1 : 0;
 #else
             // MojoShader encodes even booleans into a float.
+            if (((float[])Data)[0] == (value ? 1 : 0))
+            {
+                return;
+            }
             ((float[])Data)[0] = value ? 1 : 0;
 #endif
             StateKey = unchecked(NextStateKey++);
@@ -424,9 +444,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidCastException();
 
 #if DIRECTX
+            if (((int[])Data)[0] == value)
+            {
+                return;
+            }
             ((int[])Data)[0] = value;
 #else
             // MojoShader encodes integers into a float.
+            if (((float[])Data)[0] == value)
+            {
+                return;
+            }
             ((float[])Data)[0] = value;
 #endif
             StateKey = unchecked(NextStateKey++);
@@ -446,99 +474,138 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // HLSL expects matrices to be transposed by default.
             // These unrolled loops do the transpose during assignment.
+            bool changed = false;
             if (RowCount == 4 && ColumnCount == 4)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M21;
+                _newMatrixBuffer[2] = value.M31;
+                _newMatrixBuffer[3] = value.M41;
+
+                _newMatrixBuffer[4] = value.M12;
+                _newMatrixBuffer[5] = value.M22;
+                _newMatrixBuffer[6] = value.M32;
+                _newMatrixBuffer[7] = value.M42;
+
+                _newMatrixBuffer[8] = value.M13;
+                _newMatrixBuffer[9] = value.M23;
+                _newMatrixBuffer[10] = value.M33;
+                _newMatrixBuffer[11] = value.M43;
+
+                _newMatrixBuffer[12] = value.M14;
+                _newMatrixBuffer[13] = value.M24;
+                _newMatrixBuffer[14] = value.M34;
+                _newMatrixBuffer[15] = value.M44;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 16; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
-                fData[3] = value.M41;
-
-                fData[4] = value.M12;
-                fData[5] = value.M22;
-                fData[6] = value.M32;
-                fData[7] = value.M42;
-
-                fData[8] = value.M13;
-                fData[9] = value.M23;
-                fData[10] = value.M33;
-                fData[11] = value.M43;
-
-                fData[12] = value.M14;
-                fData[13] = value.M24;
-                fData[14] = value.M34;
-                fData[15] = value.M44;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 16 * 4);
+                }
             }
             else if (RowCount == 4 && ColumnCount == 3)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M21;
+                _newMatrixBuffer[2] = value.M31;
+                _newMatrixBuffer[3] = value.M41;
+
+                _newMatrixBuffer[4] = value.M12;
+                _newMatrixBuffer[5] = value.M22;
+                _newMatrixBuffer[6] = value.M32;
+                _newMatrixBuffer[7] = value.M42;
+
+                _newMatrixBuffer[8] = value.M13;
+                _newMatrixBuffer[9] = value.M23;
+                _newMatrixBuffer[10] = value.M33;
+                _newMatrixBuffer[11] = value.M43;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 12; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
-                fData[3] = value.M41;
-
-                fData[4] = value.M12;
-                fData[5] = value.M22;
-                fData[6] = value.M32;
-                fData[7] = value.M42;
-
-                fData[8] = value.M13;
-                fData[9] = value.M23;
-                fData[10] = value.M33;
-                fData[11] = value.M43;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 12 * 4);
+                }
             }
             else if (RowCount == 3 && ColumnCount == 4)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M21;
+                _newMatrixBuffer[2] = value.M31;
+
+                _newMatrixBuffer[3] = value.M12;
+                _newMatrixBuffer[4] = value.M22;
+                _newMatrixBuffer[5] = value.M32;
+
+                _newMatrixBuffer[6] = value.M13;
+                _newMatrixBuffer[7] = value.M23;
+                _newMatrixBuffer[8] = value.M33;
+
+                _newMatrixBuffer[9] = value.M14;
+                _newMatrixBuffer[10] = value.M24;
+                _newMatrixBuffer[11] = value.M34;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 12; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
-
-                fData[3] = value.M12;
-                fData[4] = value.M22;
-                fData[5] = value.M32;
-
-                fData[6] = value.M13;
-                fData[7] = value.M23;
-                fData[8] = value.M33;
-
-                fData[9] = value.M14;
-                fData[10] = value.M24;
-                fData[11] = value.M34;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 12 * 4);
+                }
             }
             else if (RowCount == 3 && ColumnCount == 3)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M21;
+                _newMatrixBuffer[2] = value.M31;
+
+                _newMatrixBuffer[3] = value.M12;
+                _newMatrixBuffer[4] = value.M22;
+                _newMatrixBuffer[5] = value.M32;
+
+                _newMatrixBuffer[6] = value.M13;
+                _newMatrixBuffer[7] = value.M23;
+                _newMatrixBuffer[8] = value.M33;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 9; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
-
-                fData[3] = value.M12;
-                fData[4] = value.M22;
-                fData[5] = value.M32;
-
-                fData[6] = value.M13;
-                fData[7] = value.M23;
-                fData[8] = value.M33;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 9 * 4);
+                }
             }
             else if (RowCount == 3 && ColumnCount == 2)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M21;
+                _newMatrixBuffer[2] = value.M31;
+
+                _newMatrixBuffer[3] = value.M12;
+                _newMatrixBuffer[4] = value.M22;
+                _newMatrixBuffer[5] = value.M32;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 6; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M21;
-                fData[2] = value.M31;
-
-                fData[3] = value.M12;
-                fData[4] = value.M22;
-                fData[5] = value.M32;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 6 * 4);
+                }
             }
 
-            StateKey = unchecked(NextStateKey++);
+            if (changed)
+            {
+                StateKey = unchecked(NextStateKey++);
+            }
         }
 
 		public void SetValueTranspose(Matrix value)
@@ -548,99 +615,138 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // HLSL expects matrices to be transposed by default, so copying them straight
             // from the in-memory version effectively transposes them back to row-major.
+            bool changed = false;
             if (RowCount == 4 && ColumnCount == 4)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M12;
+                _newMatrixBuffer[2] = value.M13;
+                _newMatrixBuffer[3] = value.M14;
+
+                _newMatrixBuffer[4] = value.M21;
+                _newMatrixBuffer[5] = value.M22;
+                _newMatrixBuffer[6] = value.M23;
+                _newMatrixBuffer[7] = value.M24;
+
+                _newMatrixBuffer[8] = value.M31;
+                _newMatrixBuffer[9] = value.M32;
+                _newMatrixBuffer[10] = value.M33;
+                _newMatrixBuffer[11] = value.M34;
+
+                _newMatrixBuffer[12] = value.M41;
+                _newMatrixBuffer[13] = value.M42;
+                _newMatrixBuffer[14] = value.M43;
+                _newMatrixBuffer[15] = value.M44;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 16; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-                fData[3] = value.M14;
-
-                fData[4] = value.M21;
-                fData[5] = value.M22;
-                fData[6] = value.M23;
-                fData[7] = value.M24;
-
-                fData[8] = value.M31;
-                fData[9] = value.M32;
-                fData[10] = value.M33;
-                fData[11] = value.M34;
-
-                fData[12] = value.M41;
-                fData[13] = value.M42;
-                fData[14] = value.M43;
-                fData[15] = value.M44;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 16 * 4);
+                }
             }
             else if (RowCount == 4 && ColumnCount == 3)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M12;
+                _newMatrixBuffer[2] = value.M13;
+
+                _newMatrixBuffer[3] = value.M21;
+                _newMatrixBuffer[4] = value.M22;
+                _newMatrixBuffer[5] = value.M23;
+
+                _newMatrixBuffer[6] = value.M31;
+                _newMatrixBuffer[7] = value.M32;
+                _newMatrixBuffer[8] = value.M33;
+
+                _newMatrixBuffer[9] = value.M41;
+                _newMatrixBuffer[10] = value.M42;
+                _newMatrixBuffer[11] = value.M43;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 12; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-
-                fData[3] = value.M21;
-                fData[4] = value.M22;
-                fData[5] = value.M23;
-
-                fData[6] = value.M31;
-                fData[7] = value.M32;
-                fData[8] = value.M33;
-
-                fData[9] = value.M41;
-                fData[10] = value.M42;
-                fData[11] = value.M43;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 12 * 4);
+                }
             }
             else if (RowCount == 3 && ColumnCount == 4)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M12;
+                _newMatrixBuffer[2] = value.M13;
+                _newMatrixBuffer[3] = value.M14;
+
+                _newMatrixBuffer[4] = value.M21;
+                _newMatrixBuffer[5] = value.M22;
+                _newMatrixBuffer[6] = value.M23;
+                _newMatrixBuffer[7] = value.M24;
+
+                _newMatrixBuffer[8] = value.M31;
+                _newMatrixBuffer[9] = value.M32;
+                _newMatrixBuffer[10] = value.M33;
+                _newMatrixBuffer[11] = value.M34;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 12; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-                fData[3] = value.M14;
-
-                fData[4] = value.M21;
-                fData[5] = value.M22;
-                fData[6] = value.M23;
-                fData[7] = value.M24;
-
-                fData[8] = value.M31;
-                fData[9] = value.M32;
-                fData[10] = value.M33;
-                fData[11] = value.M34;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 12 * 4);
+                }
             }
             else if (RowCount == 3 && ColumnCount == 3)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M12;
+                _newMatrixBuffer[2] = value.M13;
+
+                _newMatrixBuffer[3] = value.M21;
+                _newMatrixBuffer[4] = value.M22;
+                _newMatrixBuffer[5] = value.M23;
+
+                _newMatrixBuffer[6] = value.M31;
+                _newMatrixBuffer[7] = value.M32;
+                _newMatrixBuffer[8] = value.M33;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 9; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-
-                fData[3] = value.M21;
-                fData[4] = value.M22;
-                fData[5] = value.M23;
-
-                fData[6] = value.M31;
-                fData[7] = value.M32;
-                fData[8] = value.M33;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 9 * 4);
+                }
             }
             else if (RowCount == 3 && ColumnCount == 2)
             {
+                _newMatrixBuffer[0] = value.M11;
+                _newMatrixBuffer[1] = value.M12;
+                _newMatrixBuffer[2] = value.M13;
+
+                _newMatrixBuffer[3] = value.M21;
+                _newMatrixBuffer[4] = value.M22;
+                _newMatrixBuffer[5] = value.M23;
+
                 var fData = (float[])Data;
+                for (int i = 0; i < 6; i++)
+                    changed |= _newMatrixBuffer[i] != fData[i];
 
-                fData[0] = value.M11;
-                fData[1] = value.M12;
-                fData[2] = value.M13;
-
-                fData[3] = value.M21;
-                fData[4] = value.M22;
-                fData[5] = value.M23;
+                if (changed)
+                {
+                    Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 6 * 4);
+                }
             }
 
-			StateKey = unchecked(NextStateKey++);
+            if (changed)
+            {
+                StateKey = unchecked(NextStateKey++);
+            }
 		}
 
 		public void SetValue (Matrix[] value)
@@ -648,114 +754,163 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
+            bool changed = false;
 		    if (RowCount == 4 && ColumnCount == 4)
 		    {
 		        for (var i = 0; i < value.Length; i++)
 		        {
-		            var fData = (float[])Elements[i].Data;
+		            _newMatrixBuffer[0] = value[i].M11;
+                    _newMatrixBuffer[1] = value[i].M21;
+                    _newMatrixBuffer[2] = value[i].M31;
+                    _newMatrixBuffer[3] = value[i].M41;
 
-		            fData[0] = value[i].M11;
-		            fData[1] = value[i].M21;
-		            fData[2] = value[i].M31;
-		            fData[3] = value[i].M41;
+                    _newMatrixBuffer[4] = value[i].M12;
+                    _newMatrixBuffer[5] = value[i].M22;
+                    _newMatrixBuffer[6] = value[i].M32;
+                    _newMatrixBuffer[7] = value[i].M42;
 
-		            fData[4] = value[i].M12;
-		            fData[5] = value[i].M22;
-		            fData[6] = value[i].M32;
-		            fData[7] = value[i].M42;
+                    _newMatrixBuffer[8] = value[i].M13;
+                    _newMatrixBuffer[9] = value[i].M23;
+                    _newMatrixBuffer[10] = value[i].M33;
+                    _newMatrixBuffer[11] = value[i].M43;
 
-		            fData[8] = value[i].M13;
-		            fData[9] = value[i].M23;
-		            fData[10] = value[i].M33;
-		            fData[11] = value[i].M43;
+                    _newMatrixBuffer[12] = value[i].M14;
+                    _newMatrixBuffer[13] = value[i].M24;
+                    _newMatrixBuffer[14] = value[i].M34;
+                    _newMatrixBuffer[15] = value[i].M44;
+                    
+                    var fData = (float[])Elements[i].Data;
+                    bool different = false;
+                    for (int j = 0; j < 16; j++)
+                        different |= _newMatrixBuffer[j] != fData[j];
 
-		            fData[12] = value[i].M14;
-		            fData[13] = value[i].M24;
-		            fData[14] = value[i].M34;
-		            fData[15] = value[i].M44;
+                    if (different)
+                    {
+                        Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 16 * 4);
+                        changed = true;
+                    }
 		        }
 		    }
 		    else if (RowCount == 4 && ColumnCount == 3)
             {
                 for (var i = 0; i < value.Length; i++)
                 {
+                    _newMatrixBuffer[0] = value[i].M11;
+                    _newMatrixBuffer[1] = value[i].M21;
+                    _newMatrixBuffer[2] = value[i].M31;
+                    _newMatrixBuffer[3] = value[i].M41;
+
+                    _newMatrixBuffer[4] = value[i].M12;
+                    _newMatrixBuffer[5] = value[i].M22;
+                    _newMatrixBuffer[6] = value[i].M32;
+                    _newMatrixBuffer[7] = value[i].M42;
+
+                    _newMatrixBuffer[8] = value[i].M13;
+                    _newMatrixBuffer[9] = value[i].M23;
+                    _newMatrixBuffer[10] = value[i].M33;
+                    _newMatrixBuffer[11] = value[i].M43;
+
                     var fData = (float[])Elements[i].Data;
+                    bool different = false;
+                    for (int j = 0; j < 12; j++)
+                        different |= _newMatrixBuffer[j] != fData[j];
 
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-                    fData[3] = value[i].M41;
-
-                    fData[4] = value[i].M12;
-                    fData[5] = value[i].M22;
-                    fData[6] = value[i].M32;
-                    fData[7] = value[i].M42;
-
-                    fData[8] = value[i].M13;
-                    fData[9] = value[i].M23;
-                    fData[10] = value[i].M33;
-                    fData[11] = value[i].M43;
+                    if (different)
+                    {
+                        Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 12 * 4);
+                        changed = true;
+                    }
                 }
             }
             else if (RowCount == 3 && ColumnCount == 4)
             {
                 for (var i = 0; i < value.Length; i++)
                 {
+                    _newMatrixBuffer[0] = value[i].M11;
+                    _newMatrixBuffer[1] = value[i].M21;
+                    _newMatrixBuffer[2] = value[i].M31;
+
+                    _newMatrixBuffer[3] = value[i].M12;
+                    _newMatrixBuffer[4] = value[i].M22;
+                    _newMatrixBuffer[5] = value[i].M32;
+
+                    _newMatrixBuffer[6] = value[i].M13;
+                    _newMatrixBuffer[7] = value[i].M23;
+                    _newMatrixBuffer[8] = value[i].M33;
+
+                    _newMatrixBuffer[9] = value[i].M14;
+                    _newMatrixBuffer[10] = value[i].M24;
+                    _newMatrixBuffer[11] = value[i].M34;
+
                     var fData = (float[])Elements[i].Data;
+                    bool different = false;
+                    for (int j = 0; j < 12; j++)
+                        different |= _newMatrixBuffer[j] != fData[j];
 
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-
-                    fData[3] = value[i].M12;
-                    fData[4] = value[i].M22;
-                    fData[5] = value[i].M32;
-
-                    fData[6] = value[i].M13;
-                    fData[7] = value[i].M23;
-                    fData[8] = value[i].M33;
-
-                    fData[9] = value[i].M14;
-                    fData[10] = value[i].M24;
-                    fData[11] = value[i].M34;
+                    if (different)
+                    {
+                        Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 12 * 4);
+                        changed = true;
+                    }
                 }
             }
             else if (RowCount == 3 && ColumnCount == 3)
             {
                 for (var i = 0; i < value.Length; i++)
                 {
+                    _newMatrixBuffer[0] = value[i].M11;
+                    _newMatrixBuffer[1] = value[i].M21;
+                    _newMatrixBuffer[2] = value[i].M31;
+
+                    _newMatrixBuffer[3] = value[i].M12;
+                    _newMatrixBuffer[4] = value[i].M22;
+                    _newMatrixBuffer[5] = value[i].M32;
+
+                    _newMatrixBuffer[6] = value[i].M13;
+                    _newMatrixBuffer[7] = value[i].M23;
+                    _newMatrixBuffer[8] = value[i].M33;
+
                     var fData = (float[])Elements[i].Data;
+                    bool different = false;
+                    for (int j = 0; j < 9; j++)
+                        different |= _newMatrixBuffer[j] != fData[j];
 
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-
-                    fData[3] = value[i].M12;
-                    fData[4] = value[i].M22;
-                    fData[5] = value[i].M32;
-
-                    fData[6] = value[i].M13;
-                    fData[7] = value[i].M23;
-                    fData[8] = value[i].M33;
+                    if (different)
+                    {
+                        Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 9 * 4);
+                        changed = true;
+                    }
                 }
             }
             else if (RowCount == 3 && ColumnCount == 2)
             {
                 for (var i = 0; i < value.Length; i++)
                 {
+                    _newMatrixBuffer[0] = value[i].M11;
+                    _newMatrixBuffer[1] = value[i].M21;
+                    _newMatrixBuffer[2] = value[i].M31;
+
+                    _newMatrixBuffer[3] = value[i].M12;
+                    _newMatrixBuffer[4] = value[i].M22;
+                    _newMatrixBuffer[5] = value[i].M32;
+
                     var fData = (float[])Elements[i].Data;
+                    bool different = false;
+                    for (int j = 0; j < 6; j++)
+                        different |= _newMatrixBuffer[j] != fData[j];
 
-                    fData[0] = value[i].M11;
-                    fData[1] = value[i].M21;
-                    fData[2] = value[i].M31;
-
-                    fData[3] = value[i].M12;
-                    fData[4] = value[i].M22;
-                    fData[5] = value[i].M32;
+                    if (different)
+                    {
+                        Buffer.BlockCopy(_newMatrixBuffer, 0, fData, 0, 6 * 4);
+                        changed = true;
+                    }
                 }
             }
 
-            StateKey = unchecked(NextStateKey++);
+            if (changed)
+            {
+                StateKey = unchecked(NextStateKey++);
+            }
 		}
 
 		public void SetValue (Quaternion value)
@@ -764,6 +919,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidCastException();
 
             var fData = (float[])Data;
+            if (fData[0] == value.X && fData[1] == value.Y && fData[2] == value.Z && fData[3] == value.W)
+            {
+                return;
+            }
             fData[0] = value.X;
             fData[1] = value.Y;
             fData[2] = value.Z;
@@ -778,7 +937,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
         */
 
-		public void SetValue (Single value)
+		public bool SetValue (Single value)
 		{
             if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
@@ -787,16 +946,26 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 #endif
-			((float[])Data)[0] = value;
+            if (((float[])Data)[0] == value)
+            {
+                return false;
+            }
+            ((float[])Data)[0] = value;
             StateKey = unchecked(NextStateKey++);
+
+            return true;
 		}
 
 		public void SetValue (Single[] value)
 		{
-			for (var i=0; i<value.Length; i++)
-				Elements[i].SetValue (value[i]);
+            bool changed = false;
+            for (var i = 0; i < value.Length; i++)
+				changed |= Elements[i].SetValue (value[i]);
 
-            StateKey = unchecked(NextStateKey++);
+            if (changed)
+            {
+                StateKey = unchecked(NextStateKey++);
+            }
 		}
 		
         /*
@@ -817,65 +986,102 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidCastException();
             }
 
+            if (Data == value)
+            {
+                return;
+            }
 			Data = value;
             StateKey = unchecked(NextStateKey++);
 		}
 
-		public void SetValue (Vector2 value)
+		public bool SetValue (Vector2 value)
 		{
             if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
             var fData = (float[])Data;
+            if (fData[0] == value.X && fData[1] == value.Y)
+            {
+                return false;
+            }
             fData[0] = value.X;
             fData[1] = value.Y;
             StateKey = unchecked(NextStateKey++);
+
+            return true;
 		}
 
 		public void SetValue (Vector2[] value)
 		{
+            bool changed = false;
             for (var i = 0; i < value.Length; i++)
-				Elements[i].SetValue (value[i]);
-            StateKey = unchecked(NextStateKey++);
+				changed |= Elements[i].SetValue (value[i]);
+
+            if (changed)
+            {
+                StateKey = unchecked(NextStateKey++);
+            }
 		}
 
-		public void SetValue (Vector3 value)
+		public bool SetValue (Vector3 value)
 		{
             if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
             var fData = (float[])Data;
+            if (fData[0] == value.X && fData[1] == value.Y && fData[2] == value.Z)
+            {
+                return false;
+            }
             fData[0] = value.X;
             fData[1] = value.Y;
             fData[2] = value.Z;
             StateKey = unchecked(NextStateKey++);
+
+            return true;
 		}
 
 		public void SetValue (Vector3[] value)
 		{
+            bool changed = false;
             for (var i = 0; i < value.Length; i++)
-				Elements[i].SetValue (value[i]);
-            StateKey = unchecked(NextStateKey++);
+				changed |= Elements[i].SetValue (value[i]);
+
+            if (changed)
+            {
+                StateKey = unchecked(NextStateKey++);
+            }
 		}
 
-		public void SetValue (Vector4 value)
+		public bool SetValue (Vector4 value)
 		{
             if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
 			var fData = (float[])Data;
+            if (fData[0] == value.X && fData[1] == value.Y && fData[2] == value.Z && fData[3] == value.W)
+            {
+                return false;
+            }
             fData[0] = value.X;
             fData[1] = value.Y;
             fData[2] = value.Z;
             fData[3] = value.W;
             StateKey = unchecked(NextStateKey++);
+
+            return true;
 		}
 
 		public void SetValue (Vector4[] value)
 		{
+            bool changed = false;
             for (var i = 0; i < value.Length; i++)
-				Elements[i].SetValue (value[i]);
-            StateKey = unchecked(NextStateKey++);
+				changed |= Elements[i].SetValue (value[i]);
+
+            if (changed)
+            {
+                StateKey = unchecked(NextStateKey++);
+            }
 		}
 	}
 }

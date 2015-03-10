@@ -10,8 +10,6 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly byte[] _buffer;
 
-        private readonly byte[] _compareBuffer;
-
         private readonly int[] _parameters;
 
         private readonly int[] _offsets;
@@ -37,7 +35,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clone the mutable types.
             _buffer = (byte[])cloneSource._buffer.Clone();
-            _compareBuffer = new byte[_buffer.Length];
             PlatformInitialize();
         }
 
@@ -50,7 +47,6 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsDevice = device;
 
             _buffer = new byte[sizeInBytes];
-            _compareBuffer = new byte[_buffer.Length];
 
             _parameters = parameterIndexes;
             _offsets = parameterOffsets;
@@ -146,13 +142,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Update(EffectParameterCollection parameters)
         {
+            // TODO:  We should be doing some sort of dirty state 
+            // testing here.
+            //
+            // It should let us skip all parameter updates if
+            // nothing has changed.  It should not be per-parameter
+            // as that is why you should use multiple constant
+            // buffers.
+
             // If our state key becomes larger than the 
             // next state key then the keys have rolled 
             // over and we need to reset.
             if (_stateKey > EffectParameter.NextStateKey)
                 _stateKey = 0;
-
-            bool copiedForCompare = false;
+            
             for (var p = 0; p < _parameters.Length; p++)
             {
                 var index = _parameters[p];
@@ -161,27 +164,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (param.StateKey < _stateKey)
                     continue;
 
-                if (!_dirty && !copiedForCompare)
-                {
-                    _buffer.CopyTo(_compareBuffer, 0);
-                    copiedForCompare = true;
-                }
-
                 var offset = _offsets[p];
+                _dirty = true;
 
                 SetParameter(offset, param);
-            }
-
-            if (copiedForCompare)
-            { 
-                for (int i = 0; i < _compareBuffer.Length; i++)
-                {
-                    if (_buffer[i] != _compareBuffer[i])
-                    {
-                        _dirty = true;
-                        break;
-                    }
-                }
             }
 
             _stateKey = EffectParameter.NextStateKey;
