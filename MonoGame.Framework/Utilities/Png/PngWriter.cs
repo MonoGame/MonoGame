@@ -25,8 +25,7 @@ namespace MonoGame.Utilities.Png
 
         public PngWriter()
         {
-            // TODO: currently ignoring alpha values while writing PNG images
-            colorType = ColorType.Rgb;
+            colorType = ColorType.RgbWithAlpha;
         }
 
         public void Write(Texture2D texture2D, Stream outputStream)
@@ -166,15 +165,16 @@ namespace MonoGame.Utilities.Png
 
         private byte[] GetRawScanline(int y)
         {
-            var rawScanline = new byte[3 * width];
+            var rawScanline = new byte[4 * width];
             
             for (int x = 0; x < width; x++)
             {
                 var color = colorData[(y * width) + x];
 
-                rawScanline[3 * x] = color.R;
-                rawScanline[(3 * x) + 1] = color.G;
-                rawScanline[(3 * x) + 2] = color.B;
+                rawScanline[4 * x] = color.R;
+                rawScanline[(4 * x) + 1] = color.G;
+                rawScanline[(4 * x) + 2] = color.B;
+                rawScanline[(4 * x) + 3] = color.A;
             }
 
             return rawScanline;
