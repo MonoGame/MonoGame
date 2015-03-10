@@ -66,6 +66,9 @@ namespace Microsoft.Xna.Framework.Graphics
         internal DepthStencilState _lastDepthStencilState = new DepthStencilState();
         internal RasterizerState _lastRasterizerState = new RasterizerState();
         internal int _lastTextureActive = -1;
+        internal CullFaceMode _lastCullFaceMode;
+        internal CullMode _lastCullMode;
+        internal FrontFaceDirection _lastCullDirection;
         private Vector4 _lastClearColor = Vector4.Zero;
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
@@ -254,12 +257,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     "Try updating your graphics drivers.");
             }
 
+            _lastTextureActive = -1;
+
             // Force reseting states
             this.BlendState.PlatformApplyState(this, true);
             this.DepthStencilState.PlatformApplyState(this, true);
             this.RasterizerState.PlatformApplyState(this, true);
-
-            _lastTextureActive = -1;
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };

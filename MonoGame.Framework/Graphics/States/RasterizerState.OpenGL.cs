@@ -29,31 +29,54 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (CullMode == CullMode.None)
             {
-                GL.Disable(EnableCap.CullFace);
-                GraphicsExtensions.CheckGLError();
+                if (force || device._lastCullMode != CullMode)
+                {
+                    GL.Disable(EnableCap.CullFace);
+                    GraphicsExtensions.CheckGLError();
+
+                    device._lastCullMode = CullMode;
+                }
             }
             else
             {
-                GL.Enable(EnableCap.CullFace);
-                GraphicsExtensions.CheckGLError();
-                GL.CullFace(CullFaceMode.Back);
-                GraphicsExtensions.CheckGLError();
+                if (force || device._lastCullMode != CullMode)
+                {
+                    GL.Enable(EnableCap.CullFace);
+                    GraphicsExtensions.CheckGLError();
 
+                    device._lastCullMode = CullMode;
+                }
+
+                if (force || device._lastCullFaceMode != CullFaceMode.Back)
+                {
+                    GL.CullFace(CullFaceMode.Back);
+                    GraphicsExtensions.CheckGLError();
+
+                    device._lastCullFaceMode = CullFaceMode.Back;
+                }
+
+                FrontFaceDirection dir;
                 if (CullMode == CullMode.CullClockwiseFace)
                 {
                     if (offscreen)
-                        GL.FrontFace(FrontFaceDirection.Cw);
+                        dir = FrontFaceDirection.Cw;
                     else
-                        GL.FrontFace(FrontFaceDirection.Ccw);
-                    GraphicsExtensions.CheckGLError();
+                        dir = FrontFaceDirection.Ccw;
                 }
                 else
                 {
                     if (offscreen)
-                        GL.FrontFace(FrontFaceDirection.Ccw);
+                        dir = FrontFaceDirection.Ccw;
                     else
-                        GL.FrontFace(FrontFaceDirection.Cw);
+                        dir = FrontFaceDirection.Cw;
+                }
+
+                if (force || device._lastCullDirection != dir)
+                {
+                    GL.FrontFace(dir);
                     GraphicsExtensions.CheckGLError();
+
+                    device._lastCullDirection = dir;
                 }
             }
 
