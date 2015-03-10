@@ -127,6 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         internal int MaxTextureSlots;
+        internal int MaxVertexTextureSlots;
 
         public bool IsDisposed
         {
@@ -208,8 +209,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            VertexTextures = new TextureCollection(MaxTextureSlots, true);
-            VertexSamplerStates = new SamplerStateCollection(this, MaxTextureSlots, true);
+            VertexTextures = new TextureCollection(MaxVertexTextureSlots, true);
+            VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);
 
             Textures = new TextureCollection(MaxTextureSlots, false);
             SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);

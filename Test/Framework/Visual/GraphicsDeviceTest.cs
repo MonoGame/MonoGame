@@ -249,5 +249,60 @@ namespace MonoGame.Tests.Visual
             assertMethod(() => Game.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexData, vertexOffset, numVertices, intIndexData, indexOffset, primitiveCount));
             assertMethod(() => Game.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexData, vertexOffset, numVertices, intIndexData, indexOffset, primitiveCount, VertexPositionColorTexture.VertexDeclaration));
         }
+
+        [Test]
+        public void VertexTexturesGetSet()
+        {
+            // TODO: The availability of vertex textures should depend on GraphicsProfile.
+
+            Game.DrawWith += (sender, e) =>
+            {
+#if XNA
+                var supportedVertexTextureFormats = new[]
+                {
+                    SurfaceFormat.Single, 
+                    SurfaceFormat.Vector2, 
+                    SurfaceFormat.Vector4,
+                    SurfaceFormat.HalfSingle, 
+                    SurfaceFormat.HalfVector2, 
+                    SurfaceFormat.HalfVector4,
+                    SurfaceFormat.HdrBlendable
+                };
+#else
+                var supportedVertexTextureFormats = Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>().ToArray();
+#endif
+                foreach (var format in Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>())
+                {
+                    var texture = new Texture2D(Game.GraphicsDevice, 4, 4, false, format);
+
+                    if (supportedVertexTextureFormats.Contains(format))
+                    {
+                        Game.GraphicsDevice.VertexTextures[0] = texture;
+                        var retrievedTexture = Game.GraphicsDevice.VertexTextures[0];
+                        Assert.That(retrievedTexture, Is.SameAs(texture));
+                    }
+                    else
+                    {
+                        Assert.Throws<NotSupportedException>(() =>
+                            Game.GraphicsDevice.VertexTextures[0] = texture);
+                    }
+                }
+            };
+            Game.Run();
+        }
+
+        [Test]
+        public void VertexSamplerStatesGetSet()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var samplerState = new SamplerState { Filter = TextureFilter.Point };
+                Game.GraphicsDevice.VertexSamplerStates[0] = samplerState;
+
+                var retrievedSamplerState = Game.GraphicsDevice.VertexSamplerStates[0];
+                Assert.That(retrievedSamplerState, Is.SameAs(samplerState));
+            };
+            Game.Run();
+        }
     }
 }

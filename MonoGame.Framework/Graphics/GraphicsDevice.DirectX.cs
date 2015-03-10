@@ -108,6 +108,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetup()
         {
             MaxTextureSlots = 16;
+            MaxVertexTextureSlots = 16;
         }
 
         private void PlatformInitialize()
