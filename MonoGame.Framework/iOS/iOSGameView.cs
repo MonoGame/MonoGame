@@ -137,7 +137,6 @@ namespace Microsoft.Xna.Framework {
 		private int _depthbuffer;
 		private int _framebuffer;
 
-		public EditableCoreTextView textView;
 
 		#region Construction/Destruction
 
@@ -148,17 +147,6 @@ namespace Microsoft.Xna.Framework {
 				throw new ArgumentNullException ("platform");
 			_platform = platform;
 			Initialize ();
-
-
-			//***********************************
-
-			// Create and set up our SimpleCoreTextView that will do the drawing
-			textView = new EditableCoreTextView (Bounds.Inset (5, 5));
-			textView.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-			UserInteractionEnabled = true;
-			AutosizesSubviews = true;
-			AddSubview (textView);
-			textView.UserInteractionEnabled = false;
 		}
 
 		private void Initialize ()
@@ -176,11 +164,6 @@ namespace Microsoft.Xna.Framework {
 
 			base.Dispose (disposing);
 			_isDisposed = true;
-
-			//***********************
-
-
-			textView = null;
 		}
 
 #endregion Construction/Destruction
@@ -381,6 +364,7 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
+			var discard = new All[]{ All.DepthAttachment, All.StencilAttachment };
 			GL.Ext.DiscardFramebuffer(All.Framebuffer, discard.Length, discard);
 
 			__renderbuffergraphicsContext.MakeCurrent (null);

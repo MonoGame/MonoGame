@@ -8,6 +8,7 @@ using System.Drawing;
 using UIKit;
 using Foundation;
 using CoreGraphics;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -131,8 +132,9 @@ namespace Microsoft.Xna.Framework
 
 		public override void DidReceiveMemoryWarning()
 		{
-			base.DidReceiveMemoryWarning();
+			Trace.WriteLine("Received memory warning. Trying to collect in GC.");
 			GC.Collect();
+			base.DidReceiveMemoryWarning();
 		}
 
         #endregion
