@@ -6,6 +6,9 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#if DIRECTX || XNA
+using MonoGame.Tests.ContentPipeline;
+#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
@@ -290,6 +293,86 @@ namespace MonoGame.Tests.Visual
             };
             Game.Run();
         }
+
+        private struct VertexPosition2 : IVertexType
+        {
+            public Vector2 Position;
+
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(
+                new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0));
+
+            VertexDeclaration IVertexType.VertexDeclaration
+            {
+                get { return VertexDeclaration; }
+            }
+        }
+
+#if DIRECTX || XNA
+        [Test]
+        public void VertexTextureVisualTest()
+        {
+            // Implements an extremely simple terrain that reads from a heightmap in the vertex shader.
+
+            Game.DrawWith += (sender, e) =>
+            {
+                const int heightMapSize = 64;
+                var heightMapTexture = new Texture2D(Game.GraphicsDevice, heightMapSize, heightMapSize, false, SurfaceFormat.Single);
+                var heightMapData = new float[heightMapSize * heightMapSize];
+                for (var y = 0; y < heightMapSize; y++)
+                    for (var x = 0; x < heightMapSize; x++)
+                        heightMapData[(y * heightMapSize) + x] = (float) Math.Sin(x / 2.0f) + (float) Math.Sin(y / 3.0f);
+                heightMapTexture.SetData(heightMapData);
+
+                var viewMatrix = Matrix.CreateLookAt(new Vector3(32, 10, 60), new Vector3(32, 0, 30), Vector3.Up);
+                var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
+                    Game.GraphicsDevice.Viewport.AspectRatio, 1.0f, 100.0f);
+
+                var effect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "VertexTextureEffect.fx");
+                effect.Parameters["WorldViewProj"].SetValue(viewMatrix * projectionMatrix);
+                effect.Parameters["HeightMapTexture"].SetValue(heightMapTexture);
+                effect.Parameters["HeightMapSize"].SetValue((float) heightMapSize);
+
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                const int numVertices = heightMapSize * heightMapSize;
+                var vertexBuffer = new VertexBuffer(Game.GraphicsDevice, typeof(VertexPosition2), numVertices, BufferUsage.WriteOnly);
+                var vertices = new VertexPosition2[numVertices];
+                for (var y = 0; y < heightMapSize; y++)
+                    for (var x = 0; x < heightMapSize; x++)
+                        vertices[(y * heightMapSize) + x] = new VertexPosition2 { Position = new Vector2(x, y) };
+                vertexBuffer.SetData(vertices);
+                Game.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+                const int numIndices = (heightMapSize - 1) * (heightMapSize - 1) * 2 * 3;
+                var indexBuffer = new IndexBuffer(Game.GraphicsDevice, IndexElementSize.SixteenBits, numIndices, BufferUsage.WriteOnly);
+                var indexData = new short[numIndices];
+                var indexIndex = 0;
+                for (short y = 0; y < heightMapSize - 1; y++)
+                    for (short x = 0; x < heightMapSize - 1; x++)
+                    {
+                        var baseIndex = (short) ((y * heightMapSize) + x);
+
+                        indexData[indexIndex++] = baseIndex;
+                        indexData[indexIndex++] = (short) (baseIndex + heightMapSize);
+                        indexData[indexIndex++] = (short) (baseIndex + 1);
+
+                        indexData[indexIndex++] = (short) (baseIndex + 1);
+                        indexData[indexIndex++] = (short) (baseIndex + heightMapSize);
+                        indexData[indexIndex++] = (short) (baseIndex + heightMapSize + 1);
+                    }
+                indexBuffer.SetData(indexData);
+                Game.GraphicsDevice.Indices = indexBuffer;
+
+                Game.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+                Game.GraphicsDevice.Clear(Color.CornflowerBlue);
+
+                Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                    0, 0, numVertices, 0, numIndices / 3);
+            };
+            RunSingleFrameTest();
+        }
+#endif
 
         [Test]
         public void VertexSamplerStatesGetSet()
