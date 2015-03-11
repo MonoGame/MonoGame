@@ -749,8 +749,14 @@ namespace MonoGame.Tools.Pipeline
             if (!Path.IsPathRooted(folder))
                 folder = _project.Location + Path.DirectorySeparatorChar + folder;
 
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
+            try
+            {
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+            }
+            catch {
+                View.ShowError ("Error While Creating a Directory", "An error has occured while the directory was beeing created, aborting...");
+            }
 
             var action = new IncludeAction(this, null, new List<string> { folder });
             action.Do();
