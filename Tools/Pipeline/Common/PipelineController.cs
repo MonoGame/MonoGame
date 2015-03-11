@@ -666,8 +666,8 @@ namespace MonoGame.Tools.Pipeline
                                 File.Copy(files[i], newfile);
                             else
                             {
-                                View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, the file:" +
-                                    newfile + " already exists, aborting.");
+                                View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, the file:\"" +
+                                    newfile + "\" already exists, aborting.");
                                 return;
                             }
 
@@ -755,7 +755,8 @@ namespace MonoGame.Tools.Pipeline
                     Directory.CreateDirectory(folder);
             }
             catch {
-                View.ShowError ("Error While Creating a Directory", "An error has occured while the directory was beeing created, aborting...");
+                View.ShowError ("Error While Creating a Directory", "An error has occured while the directory: \"" + folder + "\" was beeing created, aborting...");
+                return;
             }
 
             var action = new IncludeAction(this, null, new List<string> { folder });
