@@ -69,6 +69,8 @@ namespace Microsoft.Xna.Framework.Graphics
         internal CullFaceMode _lastCullFaceMode;
         internal CullMode _lastCullMode;
         internal FrontFaceDirection _lastCullDirection;
+        internal Dictionary<int, TextureMagFilter> _lastTextureMagFilter = new Dictionary<int, TextureMagFilter>();
+        internal Dictionary<int, TextureMinFilter> _lastTextureMinFilter = new Dictionary<int, TextureMinFilter>();
         private Vector4 _lastClearColor = Vector4.Zero;
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
@@ -258,6 +260,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             _lastTextureActive = -1;
+            _lastTextureMagFilter.Clear();
+            _lastTextureMinFilter.Clear();
 
             // Force reseting states
             this.BlendState.PlatformApplyState(this, true);
