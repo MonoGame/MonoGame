@@ -25,8 +25,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 #endif
 
-        internal void Activate(GraphicsDevice device, TextureTarget target, bool useMipmaps, int glTexture)
+        internal void Activate(GraphicsDevice device, Texture texture)
         {
+			TextureTarget target = texture.glTarget;
+			bool useMipmaps = texture.LevelCount > 1;
+			int glTexture = texture.glTexture;
+
             if (GraphicsDevice == null)
             {
                 // We're now bound to a device... no one should
@@ -36,54 +40,54 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
 
             float newMaxAnisotropy;
-            TextureMinFilter newMinFilter;
-            TextureMagFilter newMagFilter;
+            int newMinFilter;
+            int newMagFilter;
             switch (Filter)
       {
       case TextureFilter.Point:
                 newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest;
-                newMagFilter = TextureMagFilter.Nearest;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest);
+				newMagFilter = (int)TextureMagFilter.Nearest;
         break;
       case TextureFilter.Linear:
 				newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear;
-                newMagFilter = TextureMagFilter.Linear;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear);
+				newMagFilter = (int)TextureMagFilter.Linear;
         break;
       case TextureFilter.Anisotropic:
 				newMaxAnisotropy = MathHelper.Clamp(this.MaxAnisotropy, 1.0f, GraphicsDevice.GraphicsCapabilities.MaxTextureAnisotropy);
-                newMinFilter = useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear;
-                newMagFilter = TextureMagFilter.Linear;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear);
+				newMagFilter = (int)TextureMagFilter.Linear;
         break;
       case TextureFilter.PointMipLinear:
 				newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ? TextureMinFilter.NearestMipmapLinear : TextureMinFilter.Nearest;
-                newMagFilter = TextureMagFilter.Nearest;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.NearestMipmapLinear : TextureMinFilter.Nearest);
+				newMagFilter = (int)TextureMagFilter.Nearest;
         break;
             case TextureFilter.LinearMipPoint:
 				newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ?  TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Linear;
-                newMagFilter = TextureMagFilter.Linear;
+				newMinFilter = (int)(useMipmaps ?  TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Linear);
+				newMagFilter = (int)TextureMagFilter.Linear;
                 break;
             case TextureFilter.MinLinearMagPointMipLinear:
 				newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear;
-                newMagFilter = TextureMagFilter.Nearest;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear);
+				newMagFilter = (int)TextureMagFilter.Nearest;
                 break;
             case TextureFilter.MinLinearMagPointMipPoint:
 				newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Linear;
-                newMagFilter = TextureMagFilter.Nearest;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Linear);
+				newMagFilter = (int)TextureMagFilter.Nearest;
                 break;
             case TextureFilter.MinPointMagLinearMipLinear:
 				newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ? TextureMinFilter.NearestMipmapLinear: TextureMinFilter.Nearest;
-                newMagFilter = TextureMagFilter.Linear;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.NearestMipmapLinear: TextureMinFilter.Nearest);
+				newMagFilter = (int)TextureMagFilter.Linear;
                 break;
             case TextureFilter.MinPointMagLinearMipPoint:
 				newMaxAnisotropy = 1.0f;
-                newMinFilter = useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest;
-                newMagFilter = TextureMagFilter.Linear;
+				newMinFilter = (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest);
+				newMagFilter = (int)TextureMagFilter.Linear;
                 break;
       default:
         throw new NotSupportedException();
@@ -95,29 +99,40 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
             }
 
-            TextureMinFilter lastTextureMinFilter;
-            if (!device._lastTextureMinFilter.TryGetValue(glTexture, out lastTextureMinFilter) || lastTextureMinFilter != newMinFilter)
+			if (texture._lastTextureMinFilter != newMinFilter)
             {
-                GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)newMinFilter);
+                GL.TexParameter(target, TextureParameterName.TextureMinFilter, newMinFilter);
                 GraphicsExtensions.CheckGLError();
 
-                device._lastTextureMinFilter[glTexture] = newMinFilter;
+				texture._lastTextureMinFilter = newMinFilter;
             }
             
-            TextureMagFilter lastTextureMagFilter;
-            if (!device._lastTextureMagFilter.TryGetValue(glTexture, out lastTextureMagFilter) || lastTextureMagFilter != newMagFilter)
+			if (texture._lastTextureMagFilter != newMagFilter)
             {
-                GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)newMagFilter);
+                GL.TexParameter(target, TextureParameterName.TextureMagFilter, newMagFilter);
                 GraphicsExtensions.CheckGLError();
 
-                device._lastTextureMagFilter[glTexture] = newMagFilter;
+				texture._lastTextureMagFilter = newMagFilter;
             }
 
-      // Set up texture addressing.
-      GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
-            GraphicsExtensions.CheckGLError();
-            GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
-            GraphicsExtensions.CheckGLError();
+      		// Set up texture addressing.
+			int newWrapS = (int)GetWrapMode(AddressU);
+			if (texture._lastTextureWrapS != newWrapS)
+			{
+				GL.TexParameter(target, TextureParameterName.TextureWrapS, newWrapS);
+            	GraphicsExtensions.CheckGLError();
+
+				texture._lastTextureWrapS = newWrapS;
+			}
+
+			int newWrapT = (int)GetWrapMode(AddressV);
+			if (texture._lastTextureWrapT != newWrapT)
+			{
+				GL.TexParameter(target, TextureParameterName.TextureWrapT, newWrapT);
+				GraphicsExtensions.CheckGLError();
+
+				texture._lastTextureWrapT = newWrapT;
+			}
 #if !GLES
             // LOD bias is not supported by glTexParameter in OpenGL ES 2.0
             GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);

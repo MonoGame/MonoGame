@@ -31,31 +31,21 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();
 
-            TextureMinFilter lastTextureMinFilter;
-            if (!GraphicsDevice._lastTextureMinFilter.TryGetValue(glTexture, out lastTextureMinFilter) || lastTextureMinFilter != newMinFilter)
-            {
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)newMinFilter);
-                GraphicsExtensions.CheckGLError();
+					GL.TexParameter(glTarget, TextureParameterName.TextureMinFilter, (int)newMinFilter);
+					GraphicsExtensions.CheckGLError();
+					_lastTextureMinFilter = (int)newMinFilter;
 
-                GraphicsDevice._lastTextureMinFilter[glTexture] = newMinFilter;
-            }
+					GL.TexParameter(glTarget, TextureParameterName.TextureMagFilter, (int)newMagFilter);
+					GraphicsExtensions.CheckGLError();
+					_lastTextureMagFilter = (int)newMagFilter;
 
-            TextureMagFilter lastTextureMagFilter;
-            if (!GraphicsDevice._lastTextureMagFilter.TryGetValue(glTexture, out lastTextureMagFilter) || lastTextureMagFilter != newMagFilter)
-            {
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)newMagFilter);
-                GraphicsExtensions.CheckGLError();
+					GL.TexParameter(glTarget, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+					GraphicsExtensions.CheckGLError();
+					_lastTextureWrapS = (int)TextureWrapMode.ClampToEdge;
 
-                GraphicsDevice._lastTextureMagFilter[glTexture] = newMagFilter;
-            }
-
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
-                            (int)TextureWrapMode.ClampToEdge);
-            GraphicsExtensions.CheckGLError();
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
-                            (int)TextureWrapMode.ClampToEdge);
-            GraphicsExtensions.CheckGLError();
-
+					GL.TexParameter(glTarget, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+					GraphicsExtensions.CheckGLError();
+					_lastTextureWrapT = (int)TextureWrapMode.ClampToEdge;
 
             format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 

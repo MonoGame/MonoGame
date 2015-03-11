@@ -47,8 +47,8 @@ using System.Drawing.Imaging;
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
-    {
-        private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
+	{
+		private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             this.glTarget = TextureTarget.Texture2D;
             
@@ -602,28 +602,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 GraphicsExtensions.CheckGLError();
 
-                TextureMinFilter lastTextureMinFilter;
-                if (!GraphicsDevice._lastTextureMinFilter.TryGetValue(glTexture, out lastTextureMinFilter) || lastTextureMinFilter != newMinFilter)
-                {
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)newMinFilter);
-                    GraphicsExtensions.CheckGLError();
+				GL.TexParameter(glTarget, TextureParameterName.TextureMinFilter, (int)newMinFilter);
+				GraphicsExtensions.CheckGLError();
+				_lastTextureMinFilter = (int)newMinFilter;
 
-                    GraphicsDevice._lastTextureMinFilter[glTexture] = newMinFilter;
-                }
+				GL.TexParameter(glTarget, TextureParameterName.TextureMagFilter, (int)newMagFilter);
+				GraphicsExtensions.CheckGLError();
+				_lastTextureMagFilter = (int)newMagFilter;
 
-                TextureMagFilter lastTextureMagFilter;
-                if (!GraphicsDevice._lastTextureMagFilter.TryGetValue(glTexture, out lastTextureMagFilter) || lastTextureMagFilter != newMagFilter)
-                {
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)newMagFilter);
-                    GraphicsExtensions.CheckGLError();
-
-                    GraphicsDevice._lastTextureMagFilter[glTexture] = newMagFilter;
-                }
-
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrap);
+				GL.TexParameter(glTarget, TextureParameterName.TextureWrapS, (int)wrap);
                 GraphicsExtensions.CheckGLError();
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrap);
-                GraphicsExtensions.CheckGLError();
+				_lastTextureWrapS = (int)wrap;
+
+				GL.TexParameter(glTarget, TextureParameterName.TextureWrapT, (int)wrap);
+				GraphicsExtensions.CheckGLError();
+				_lastTextureWrapT = (int)wrap;
             }
         }
     }

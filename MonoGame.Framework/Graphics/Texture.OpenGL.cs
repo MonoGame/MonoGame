@@ -22,7 +22,12 @@ namespace Microsoft.Xna.Framework.Graphics
         internal PixelType glType;
         internal SamplerState glLastSamplerState;
 
-        private void PlatformGraphicsDeviceResetting()
+		internal int _lastTextureMinFilter = -1;
+		internal int _lastTextureMagFilter = -1;
+		internal int _lastTextureWrapS = -1;
+		internal int _lastTextureWrapT = -1;
+
+		private void PlatformGraphicsDeviceResetting()
         {
             DeleteGLTexture();
             glLastSamplerState = null;
