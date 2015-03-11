@@ -410,7 +410,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		    unchecked
 		    {
-                ++_drawCount;
+                _drawCount++;
 		    }
 			if (autoFlush)
 			{
