@@ -893,7 +893,7 @@ namespace Microsoft.Xna.Framework.Graphics
             bool vertexBufferChanged = !_vertexBufferApplied || _lastVertexOffset != vertexOffset;
             if (vertexBufferChanged || !_vertexShaderApplied)
             {
-                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset, vertexBufferChanged);
+                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
                 _vertexBufferApplied = true;
                 _vertexShaderApplied = true;
                 _lastVertexOffset = vertexOffset;
@@ -922,7 +922,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject(), true);
+            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
             _vertexBufferApplied = false;
 
             //Draw
@@ -942,7 +942,7 @@ namespace Microsoft.Xna.Framework.Graphics
             bool vertexBufferChanged = !_vertexBufferApplied || _lastVertexOffset != IntPtr.Zero;
             if (vertexBufferChanged || !_vertexShaderApplied)
             {
-                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero, vertexBufferChanged);
+                _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
                 _vertexBufferApplied = true;
                 _vertexShaderApplied = true;
                 _lastVertexOffset = IntPtr.Zero;
@@ -975,7 +975,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_lastVertexOffset != vertexAddr || !_vertexShaderApplied)
             {
                 vertexDeclaration.GraphicsDevice = this;
-                vertexDeclaration.Apply(_vertexShader, vertexAddr, _lastVertexOffset != vertexAddr);
+                vertexDeclaration.Apply(_vertexShader, vertexAddr);
                 _vertexShaderApplied = true;
                 _lastVertexOffset = vertexAddr;
             }
@@ -1014,7 +1014,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_lastVertexOffset != vertexAddr || !_vertexShaderApplied)
             {
                 vertexDeclaration.GraphicsDevice = this;
-                vertexDeclaration.Apply(_vertexShader, vertexAddr, _lastVertexOffset != vertexAddr);
+                vertexDeclaration.Apply(_vertexShader, vertexAddr);
                 _vertexShaderApplied = true;
                 _lastVertexOffset = vertexAddr;
             }

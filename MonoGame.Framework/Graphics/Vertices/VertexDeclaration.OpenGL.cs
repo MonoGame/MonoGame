@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         Dictionary<int, VertexDeclarationAttributeInfo> shaderAttributeInfo = new Dictionary<int, VertexDeclarationAttributeInfo>();
 
-		internal void Apply(Shader shader, IntPtr offset, bool applyAttributeInfo)
+		internal void Apply(Shader shader, IntPtr offset)
 		{
             VertexDeclarationAttributeInfo attrInfo;
             int shaderHash = shader.GetHashCode();
@@ -50,18 +50,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Apply the vertex attribute info
-            if (applyAttributeInfo)
+            foreach (var element in attrInfo.Elements)
             {
-                foreach (var element in attrInfo.Elements)
-                {
-                    GL.VertexAttribPointer(element.AttributeLocation,
-                        element.NumberOfElements,
-                        element.VertexAttribPointerType,
-                        element.Normalized,
-                        this.VertexStride,
-                        (IntPtr)(offset.ToInt64() + element.Offset));
-                    GraphicsExtensions.CheckGLError();
-                }
+                GL.VertexAttribPointer(element.AttributeLocation,
+                    element.NumberOfElements,
+                    element.VertexAttribPointerType,
+                    element.Normalized,
+                    this.VertexStride,
+                    (IntPtr)(offset.ToInt64() + element.Offset));
+                GraphicsExtensions.CheckGLError();
             }
 
             GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
