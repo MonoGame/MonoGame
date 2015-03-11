@@ -943,7 +943,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidCastException();
 #if PSM
             if(Data == null) {
-                return;
+                return false;
             }
 #endif
             if (((float[])Data)[0] == value)
