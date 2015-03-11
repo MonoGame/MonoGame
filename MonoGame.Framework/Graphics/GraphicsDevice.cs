@@ -667,7 +667,18 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformResolveRenderTargets();
 
             // Clear the current bindings.
-            Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
+			Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
+
+#if IOS
+			// On iOS, tell OpenGL ES it can discard depth and stencil buffers.
+			OpenTK.Graphics.ES20.GL.Ext.DiscardFramebuffer(
+				OpenTK.Graphics.ES20.All.Framebuffer, 2,
+				new OpenTK.Graphics.ES20.All[]
+				{
+					OpenTK.Graphics.ES20.All.DepthAttachment,
+					OpenTK.Graphics.ES20.All.StencilAttachment,
+				});
+#endif
 
             int renderTargetWidth;
             int renderTargetHeight;

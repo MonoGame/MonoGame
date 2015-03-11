@@ -381,8 +381,10 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
+			GL.Ext.DiscardFramebuffer(All.Framebuffer, discard.Length, discard);
+
 			__renderbuffergraphicsContext.MakeCurrent (null);
-            GL.BindRenderbuffer (All.Renderbuffer, this._colorbuffer);
+			GL.BindRenderbuffer (All.Renderbuffer, this._colorbuffer);
             __renderbuffergraphicsContext.SwapBuffers();
 		}
 
