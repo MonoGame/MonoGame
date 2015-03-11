@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Defines a frustum and helps determine whether forms intersect with it.
+    /// </summary>
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public class BoundingFrustum : IEquatable<BoundingFrustum>
     {
@@ -22,11 +25,18 @@ namespace Microsoft.Xna.Framework
         #endregion Private Fields
 
         #region Public Fields
+        /// <summary>
+        /// Specifies the total number of corners (8) in the <see cref="BoundingFrustum"/>.
+        /// </summary>
         public const int CornerCount = 8;
         #endregion
 
         #region Public Constructors
 
+        /// <summary>
+        /// Creates a new instance of <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="value">Combined matrix that usually takes view × projection matrix.</param>
         public BoundingFrustum(Matrix value)
         {
             this.matrix = value;
@@ -36,9 +46,13 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Constructors
 
-
         #region Public Properties
 
+        /// <summary>
+        /// Gets or sets the <see cref="Matrix"/> that describes this bounding frustum.
+        /// </summary>
+        /// <value>The <see cref="Matrix"/> that describes this bounding frustum.</value>
+        /// <remarks>This property can be used to reset an existing <see cref="BoundingFrustum"/> to new values, instead of creating a new one.</remarks>
         public Matrix Matrix
         {
             get { return this.matrix; }
@@ -50,31 +64,55 @@ namespace Microsoft.Xna.Framework
 			}
         }
 
+        /// <summary>
+        /// Gets the near plane of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <value>Returns the near plane of the <see cref="BoundingFrustum"/>.</value>
         public Plane Near
         {
             get { return this.planes[0]; }
         }
-        
+
+        /// <summary>
+        /// Gets the far plane of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <value>Returns the far plane of the <see cref="BoundingFrustum"/>.</value>
         public Plane Far
         {
             get { return this.planes[1]; }
         }
-        
+
+        /// <summary>
+        /// Gets the left plane of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <value>Returns the left plane of the <see cref="BoundingFrustum"/>.</value>
         public Plane Left
         {
             get { return this.planes[2]; }
         }
 
+        /// <summary>
+        /// Gets the right plane of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <value>Returns the right plane of the <see cref="BoundingFrustum"/>.</value>
         public Plane Right
         {
             get { return this.planes[3]; }
         }
 
+        /// <summary>
+        /// Gets the top plane of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <value>Returns the top plane of the <see cref="BoundingFrustum"/>.</value>
         public Plane Top
         {
             get { return this.planes[4]; }
         }
 
+        /// <summary>
+        /// Gets the bottom plane of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <value>Returns the bottom plane of the <see cref="BoundingFrustum"/>.</value>
         public Plane Bottom
         {
             get { return this.planes[5]; }
@@ -101,6 +139,11 @@ namespace Microsoft.Xna.Framework
             return !(a == b);
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> contains the specified <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="box">The <see cref="BoundingBox"/> to check against the current <see cref="BoundingFrustum"/>.</param>
+        /// <returns>Enumeration indicating the relationship of the current <see cref="BoundingFrustum"/> to the specified <see cref="BoundingBox"/>.</returns>
         public ContainmentType Contains(BoundingBox box)
         {
             var result = default(ContainmentType);
@@ -108,6 +151,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> contains the specified <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="box">The <see cref="BoundingBox"/> to test for overlap.</param>
+        /// <param name="result">Enumeration indicating the extent of overlap.</param>
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
             var intersects = false;
@@ -128,6 +176,11 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> contains the specified <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="frustum">The <see cref="BoundingFrustum"/> to check against the current <see cref="BoundingFrustum"/>.</param>
+        /// <returns>Enumeration indicating the relationship of the current <see cref="BoundingFrustum"/> to the specified <see cref="BoundingFrustum"/>.</returns>
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             if (this == frustum)                // We check to see if the two frustums are equal
@@ -150,6 +203,11 @@ namespace Microsoft.Xna.Framework
             return intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> contains the specified <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to check against the current <see cref="BoundingFrustum"/>.</param>
+        /// <returns>Enumeration indicating the relationship of the current <see cref="BoundingFrustum"/> to the specified <see cref="BoundingSphere"/>.</returns>
         public ContainmentType Contains(BoundingSphere sphere)
         {
             var result = default(ContainmentType);
@@ -157,6 +215,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> contains the specified <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to test for overlap.</param>
+        /// <param name="result">Enumeration indicating the extent of overlap.</param>
         public void Contains(ref BoundingSphere sphere, out ContainmentType result)
         {
             var intersects = false;
@@ -179,6 +242,11 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> contains the specified point.
+        /// </summary>
+        /// <param name="point">The point to check against the current <see cref="BoundingFrustum"/>.</param>
+        /// <returns>Enumeration indicating the relationship of the current <see cref="BoundingFrustum"/> to the specified point.</returns>
         public ContainmentType Contains(Vector3 point)
         {
             var result = default(ContainmentType);
@@ -186,6 +254,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> contains the specified point.
+        /// </summary>
+        /// <param name="point">The point to test for overlap.</param>
+        /// <param name="result">Enumeration indicating the extent of overlap.</param>
         public void Contains(ref Vector3 point, out ContainmentType result)
         {
             for (var i = 0; i < PlaneCount; ++i)
@@ -200,22 +273,44 @@ namespace Microsoft.Xna.Framework
             result = ContainmentType.Contains;
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="BoundingFrustum"/> is equal to the current <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="BoundingFrustum"/> to compare with the current <see cref="BoundingFrustum"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="BoundingFrustum"/> is equal to the current <see cref="BoundingFrustum"/>; <c>false</c> otherwise.</returns>
         public bool Equals(BoundingFrustum other)
         {
             return (this == other);
         }
 
+        /// <summary>
+        /// Determines whether the specified Object is equal to the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="obj">The Object to compare with the current <see cref="BoundingFrustum"/>.</param>
+        /// <returns><c>true</c> if the specified Object is equal to the current <see cref="BoundingFrustum"/>; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
             BoundingFrustum f = obj as BoundingFrustum;
             return (object.Equals(f, null)) ? false : (this == f);
         }
 
+        /// <summary>
+        /// Gets an array of points that make up the corners of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <returns>Array of Vector3 points that make up the corners of the <see cref="BoundingFrustum"/>.</returns>
+        /// <remarks>The points returned correspond to the corners of the <see cref="BoundingFrustum"/> faces that are perpendicular to the z-axis. The near face is the face with the larger z value, and the far face is the face with the smaller z value. Points 0 to 3 correspond to the near face in a clockwise order starting at its upper-left corner when looking toward the origin from the positive z direction. Points 4 to 7 correspond to the far face in a clockwise order starting at its upper-left corner when looking toward the origin from the positive z direction.</remarks>
         public Vector3[] GetCorners()
         {
             return (Vector3[])this.corners.Clone();
         }
 		
+        /// <summary>
+        /// Gets an array of points that make up the corners of the <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="corners">An existing array of at least 8 <see cref="Vector3"/> points where the corners of the <see cref="BoundingFrustum"/> are written.</param>
+        /// <exception cref="ArgumentNullException">corners is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">You have to have at least 8 elements to copy corners.</exception>
+        /// <remarks>The points returned correspond to the corners of the <see cref="BoundingFrustum"/> faces that are perpendicular to the z-axis. The near face is the face with the larger z value, and the far face is the face with the smaller z value. Points 0 to 3 correspond to the near face in a clockwise order starting at its upper-left corner when looking toward the origin from the positive z direction. Points 4 to 7 correspond to the far face in a clockwise order starting at its upper-left corner when looking toward the origin from the positive z direction.</remarks>
 		public void GetCorners(Vector3[] corners)
         {
 			if (corners == null) throw new ArgumentNullException("corners");
@@ -224,11 +319,20 @@ namespace Microsoft.Xna.Framework
             this.corners.CopyTo(corners, 0);
         }
 
+        /// <summary>
+        /// Gets the hash code for this instance.
+        /// </summary>
+        /// <returns>A hash code for the current <see cref="BoundingFrustum"/>.</returns>
         public override int GetHashCode()
         {
             return this.matrix.GetHashCode();
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects the specified <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="box">The <see cref="BoundingBox"/> to check for intersection.</param>
+        /// <returns><c>true</c> if the <see cref="BoundingFrustum"/> intersects the <see cref="BoundingBox"/>; <c>false</c> otherwise.</returns>
         public bool Intersects(BoundingBox box)
         {
 			var result = false;
@@ -236,6 +340,11 @@ namespace Microsoft.Xna.Framework
 			return result;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects a <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="box">The <see cref="BoundingBox"/> to check for intersection with.</param>
+        /// <param name="result"><c>true</c> if the <see cref="BoundingFrustum"/> and <see cref="BoundingBox"/> intersect; <c>false</c> otherwise.</param>
         public void Intersects(ref BoundingBox box, out bool result)
         {
 			var containment = default(ContainmentType);
@@ -243,11 +352,22 @@ namespace Microsoft.Xna.Framework
 			result = containment != ContainmentType.Disjoint;
 		}
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects the specified <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="frustum">The <see cref="BoundingFrustum"/> to check for intersection.</param>
+        /// <returns><c>true</c> if the current <see cref="BoundingFrustum"/> intersects the specified <see cref="BoundingFrustum"/>; <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentNullException">frustum is <c>null</c>.</exception>
         public bool Intersects(BoundingFrustum frustum)
         {
             return Contains(frustum) != ContainmentType.Disjoint;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects the specified <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to check for intersection.</param>
+        /// <returns><c>true</c> if the <see cref="BoundingFrustum"/> intersects the <see cref="BoundingSphere"/>; <c>false</c> otherwise.</returns>
         public bool Intersects(BoundingSphere sphere)
         {
             var result = default(bool);
@@ -255,6 +375,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects a <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="sphere">The <see cref="BoundingSphere"/> to check for intersection with.</param>
+        /// <param name="result"><c>true</c> if the <see cref="BoundingFrustum"/> and <see cref="BoundingSphere"/> intersect; <c>false</c> otherwise.</param>
         public void Intersects(ref BoundingSphere sphere, out bool result)
         {
             var containment = default(ContainmentType);
@@ -262,6 +387,11 @@ namespace Microsoft.Xna.Framework
             result = containment != ContainmentType.Disjoint;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects the specified <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="plane">The <see cref="Plane"/> to check for intersection.</param>
+        /// <returns>An enumeration indicating whether <see cref="BoundingFrustum"/> intersects the specified <see cref="Plane"/>.</returns>
         public PlaneIntersectionType Intersects(Plane plane)
         {
             PlaneIntersectionType result;
@@ -269,6 +399,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects a <see cref="Plane"/>.
+        /// </summary>
+        /// <param name="plane">The <see cref="Plane"/> to check for intersection with.</param>
+        /// <param name="result">An enumeration indicating whether the <see cref="BoundingFrustum"/> intersects the <see cref="Plane"/>.</param>
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
             result = plane.Intersects(ref corners[0]);
@@ -278,11 +413,21 @@ namespace Microsoft.Xna.Framework
         }
 
         /*
+        /// <summary>
+        /// Checks whether the current <see cref="BoundingFrustum"/> intersects the specified <see cref="Ray"/>.
+        /// </summary>
+        /// <param name="ray">The <see cref="Ray"/> to check for intersection.</param>
+        /// <returns>Distance at which the ray intersects the <see cref="BoundingFrustum"/> or <c>null</c> if there is no intersection.</returns>
         public Nullable<float> Intersects(Ray ray)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Checks whether the current BoundingFrustum intersects a <see cref="Ray"/>.
+        /// </summary>
+        /// <param name="ray">The <see cref="Ray"/> to check for intersection with.</param>
+        /// <param name="result">Distance at which the ray intersects the <see cref="BoundingFrustum"/> or <c>null</c> if there is no intersection.</param>
         public void Intersects(ref Ray ray, out Nullable<float> result)
         {
             throw new NotImplementedException();
@@ -304,6 +449,10 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Returns a String that represents the current <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <returns>String representation of the current <see cref="BoundingFrustum"/>.</returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(256);
