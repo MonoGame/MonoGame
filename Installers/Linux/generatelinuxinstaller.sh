@@ -1,6 +1,7 @@
 #!/bin/bash
 DIR="Data"
 PDIR="$DIR/Pipeline"
+DDIR="$DIR/Dependencies"
 
 #create temp directories for generating the installer
 if [ ! -d "$DIR" ]
@@ -11,6 +12,11 @@ fi
 if [ ! -d "$PDIR" ]
 then
 	mkdir "$PDIR"
+fi
+
+if [ ! -d "$DDIR" ]
+then
+	mkdir "$DDIR"
 fi
 
 #copy pipeline data
@@ -34,8 +40,12 @@ rm $PDIR/Mono.Posix.dll
 rm $PDIR/pango-sharp.dll
 rm $PDIR/pango-sharp.dll.config
 
-#copy the script thats gonna be doing the actual install
+#copy the scripts thats gonna be doing the actual install
 cp postinstall.sh $DIR
+cp Dependencies/. $DDIR/ -R
+
+#copy mimetype stuff
+cp mgcb.xml $DIR
 
 #build the installer
 ./../../ThirdParty/Dependencies/makeself/makeself.sh Data/ monogame-linux.run "Monogame Pipeline Installer" ./postinstall.sh

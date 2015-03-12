@@ -82,14 +82,10 @@ echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGene
 
 #mimetype
 echo "Adding mimetype..."
+xdg-mime install mgcb.xml --novendor
 
-GREP=$(grep "text/mgcb" /etc/mime.types)
-size=${#GREP} 
-
-if [ ! $size -gt 0 ] 
-then
-	echo "text/mgcb \t\t\t\tmgcb" >> /etc/mime.types
-fi
+#automatic dependency installer
+./Dependencies/dependencies.sh
 
 #uninstall script
 chmod +x $IDIR/uninstall.sh
