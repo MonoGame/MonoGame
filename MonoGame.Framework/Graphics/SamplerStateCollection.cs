@@ -21,8 +21,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly SamplerState[] _samplers;
         private readonly SamplerState[] _actualSamplers;
+        private readonly bool _applyToVertexStage;
 
-		internal SamplerStateCollection(GraphicsDevice device, int maxSamplers)
+		internal SamplerStateCollection(GraphicsDevice device, int maxSamplers, bool applyToVertexStage)
 		{
 		    _graphicsDevice = device;
 
@@ -35,6 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _samplers = new SamplerState[maxSamplers];
             _actualSamplers = new SamplerState[maxSamplers];
+            _applyToVertexStage = applyToVertexStage;
 
 		    Clear();
         }
