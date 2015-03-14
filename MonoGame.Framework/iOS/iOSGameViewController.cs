@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool ShouldAutorotate()
         {
-            return _platform.Game.Initialized;
+            return true;
         }
         #endregion
 

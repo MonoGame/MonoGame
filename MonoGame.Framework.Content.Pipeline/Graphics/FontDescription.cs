@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -87,32 +88,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 	/// </summary>
 	public class FontDescription : ContentItem
 	{
-		char? defaultCharacter;
-		string fontName;
-		float size;
-		float spacing;
-		FontDescriptionStyle style;
-		bool useKerning;        
-
-		/// <summary>
-		/// Gets or sets the default character for the font.
-		/// </summary>
-		[ContentSerializerAttribute]
-		public Nullable<char> DefaultCharacter
-		{
-			get
-			{
-				return defaultCharacter;
-			}
-			set
-			{
-				defaultCharacter = value;
-			}
-		}
+        private char? defaultCharacter;
+        private string fontName;
+        private float size;
+        private float spacing;
+        private FontDescriptionStyle style;
+        private bool useKerning;
+	    private CharacterCollection characters = new CharacterCollection(CharacterRegion.Default.Characters());
 
 		/// <summary>
 		/// Gets or sets the name of the font, such as "Times New Roman" or "Arial". This value cannot be null or empty.
 		/// </summary>
+        [ContentSerializer(AllowNull = false)]
 		public string FontName
 		{
 			get
@@ -147,6 +134,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <summary>
 		/// Gets or sets the amount of space, in pixels, to insert between letters in a string.
 		/// </summary>
+        [ContentSerializer(Optional = true)]
 		public float Spacing
 		{
 			get
@@ -160,6 +148,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				spacing = value;
 			}
 		}
+
+        /// <summary>
+        /// Indicates if kerning information is used when drawing characters.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public bool UseKerning
+        {
+            get
+            {
+                return useKerning;
+            }
+            set
+            {
+                useKerning = value;
+            }
+        }
 
 		/// <summary>
 		/// Gets or sets the style of the font, expressed as a combination of one or more FontDescriptionStyle flags.
@@ -176,24 +180,49 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			}
 		}
 
-		/// <summary>
-		/// Indicates if kerning information is used when drawing characters.
-		/// </summary>
-		[ContentSerializerAttribute]
-		public bool UseKerning
-		{
-			get
-			{
-				return useKerning;
-			}
-			set
-			{
-				useKerning = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets the default character for the font.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Nullable<char> DefaultCharacter
+        {
+            get
+            {
+                return defaultCharacter;
+            }
+            set
+            {
+                defaultCharacter = value;
+            }
+        }
+
+        [ContentSerializer(CollectionItemName = "CharacterRegion")]
+        internal CharacterRegion[] CharacterRegions
+        {
+            set
+            {
+                for (int index = 0; index < value.Length; ++index)
+                {
+                    CharacterRegion characterRegion = value[index];
+                    if (characterRegion.End < characterRegion.Start)
+                        throw new ArgumentException("CharacterRegion.End must be greater than CharacterRegion.Start");
+
+                    for (var start = characterRegion.Start; start <= characterRegion.End; start++)
+                        Characters.Add(start);
+                }
+            }
+        }
 		
-        [ContentSerializerIgnoreAttribute]
-        public ICollection<char> Characters { get; internal set; }
+	    [ContentSerializerIgnore]
+	    public ICollection<char> Characters
+	    {
+	        get { return characters; } 
+            internal set { characters = new CharacterCollection(value); }
+	    }
+
+        internal FontDescription()
+        {
+        }
 
 		/// <summary>
 		/// Initializes a new instance of FontDescription and initializes its members to the specified font, size, and spacing, using FontDescriptionStyle.Regular as the default value for Style.
@@ -233,8 +262,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			Size = size;
 			Spacing = spacing;
 			Style = fontStyle;
-			UseKerning = useKerning;
-			Characters = new CharacterCollection(CharacterRegion.Default.Characters);
+			UseKerning = useKerning;			
 		}
 	}
 }

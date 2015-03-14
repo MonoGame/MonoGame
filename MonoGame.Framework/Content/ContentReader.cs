@@ -44,6 +44,7 @@ namespace Microsoft.Xna.Framework.Content
         private ContentTypeReader[] typeReaders;
 		internal int version;
 		internal int sharedResourceCount;
+        Dictionary<int, object> sharedResources;
 
         internal ContentTypeReader[] TypeReaders
         {
@@ -105,6 +106,7 @@ namespace Microsoft.Xna.Framework.Content
             typeReaderManager = new ContentTypeReaderManager();
             typeReaders = typeReaderManager.LoadAssetReaders(this);
             sharedResourceCount = Read7BitEncodedInt();
+            sharedResources = new Dictionary<int, object>(sharedResourceCount);
             sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
         }
 
@@ -120,7 +122,16 @@ namespace Microsoft.Xna.Framework.Content
                 if (index > 0)
                 {
                     ContentTypeReader contentReader = typeReaders[index - 1];
+                    int resourceId = i + 1;
+                    if (!this.sharedResources.ContainsKey(resourceId))
+                    {                        
                     sharedResources[i] = ReadObject<object>(contentReader);
+                }
+                else
+                {
+                        object existingInstance = this.sharedResources[resourceId];
+                        sharedResources[i] = contentReader.Read(this, existingInstance);
+                    }
                 }
                 else
                 {
@@ -278,6 +289,27 @@ namespace Microsoft.Xna.Framework.Content
                         }
                         fixup((T)v);
                     }));
+            }
+        }
+
+        public void ReadSharedResource<T>(Action<T> fixup, T existingInstance)
+        {
+            int index = Read7BitEncodedInt();
+            if (index > 0)
+            {
+                sharedResourceFixups.Add(new KeyValuePair<int, Action<object>>(index - 1, delegate(object v)
+                {
+                    if (!(v is T))
+                    {
+                        throw new ContentLoadException(String.Format("Error loading shared resource. Expected type {0}, received type {1}", typeof(T).Name, v.GetType().Name));
+                    }
+                    fixup((T)v);
+                }));
+                if (existingInstance != null)
+                {
+                    if (!sharedResources.ContainsKey(index))
+                        sharedResources.Add(index, existingInstance);
+                }
             }
         }
 

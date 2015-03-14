@@ -204,7 +204,7 @@ namespace MonoGame.Tests {
 
 		[TestFixture]
 		public class Behaviors : FixtureBase {
-			[Test, RequiresSTA]
+			[Test, RequiresSTA, Ignore]
 			public void Nongraphical_run_succeeds ()
 			{
 				Game.Run ();

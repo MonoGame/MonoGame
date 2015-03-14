@@ -9,19 +9,18 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	class XactSound
 	{
-		private bool _complexSound;
-        private XactClip[] _soundClips;
+		private readonly bool _complexSound;
+        private readonly XactClip[] _soundClips;
+        private readonly int _waveBankIndex;
+        private readonly int _trackIndex;
+        private readonly float _volume;
+        private readonly float _pitch;
+        private readonly uint _categoryID;
+        private readonly SoundBank _soundBank;
 
-        private int _waveBankIndex;
-        private int _trackIndex;
         private SoundEffectInstance _wave;
-        private float _volume;
-        private float _pitch;
 
-        private uint _categoryID;
-
-        private SoundBank _soundBank;
-		
+        private float _cueVolume;
 
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
@@ -32,15 +31,14 @@ namespace Microsoft.Xna.Framework.Audio
             _trackIndex = trackIndex;
         }
 
-		public XactSound(SoundBank soundBank, BinaryReader soundReader, uint soundOffset)
+		public XactSound(SoundBank soundBank, BinaryReader soundReader)
 		{
             _soundBank = soundBank;
-
-			var oldPosition = soundReader.BaseStream.Position;
-			soundReader.BaseStream.Seek(soundOffset, SeekOrigin.Begin);
 			
-			var flags = soundReader.ReadByte();
-			_complexSound = (flags & 1) != 0;
+            var flags = soundReader.ReadByte();
+            _complexSound = (flags & 0x1) != 0;
+            var hasRPCs = (flags & 0x0E) != 0;
+            var hasEffects = (flags & 0x10) != 0;
 
             _categoryID = soundReader.ReadUInt16();
             _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
@@ -56,16 +54,21 @@ namespace Microsoft.Xna.Framework.Audio
 				_trackIndex = soundReader.ReadUInt16();
 				_waveBankIndex = soundReader.ReadByte();
 			}
-			
-			if ( (flags & 0x1E) != 0 ) 
-            {
-				var extraDataLen = soundReader.ReadUInt16();
-				//TODO: Parse RPC+DSP stuff
-				
-				// extraDataLen - 2, we need to account for extraDataLen itself!
-				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
+
+			if (hasRPCs)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
 			}
-			
+
+			if (hasEffects)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+			}
+
 			if (_complexSound)
             {
 				_soundClips = new XactClip[numClips];
@@ -75,8 +78,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             var category = soundBank.AudioEngine.Categories[_categoryID];
             category.AddSound(this);
-
-			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
 
         internal void SetFade(float fadeInTime, float fadeOutTime)
@@ -191,7 +192,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 foreach (var sound in _soundClips)
                 {
-                    if(sound.Playing)
+                    if (sound.State == SoundState.Playing)
                         sound.Pause();
                 }
 			}
@@ -208,7 +209,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 foreach (var sound in _soundClips)
                 {
-                    if (sound.IsPaused)
+                    if (sound.State == SoundState.Paused)
                         sound.Resume();
                 }
 			}
@@ -221,13 +222,13 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void UpdateCategoryVolume(float categoryVolume)
         {
-            // The category volume scales our own volume.
-            var volume = _volume * categoryVolume;
+            // The different volumes modulate each other.
+            var volume = _volume * _cueVolume * categoryVolume;
 
             if (_complexSound)
             {
-                foreach (XactClip clip in _soundClips)
-                    clip.Volume = volume;
+                foreach (var clip in _soundClips)
+                    clip.SetVolumeScale(volume);
             }
             else
             {
@@ -236,20 +237,11 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-		public float Volume 
-        {
-			get 
-            {
-                return _volume;
-			}
-
-			set
-            {
-                _volume = value;
-
-                var category = _soundBank.AudioEngine.Categories[_categoryID];
-                UpdateCategoryVolume(category._volume[0]);
-            }
+        internal void SetCueVolume(float volume)
+		{
+            _cueVolume = volume;
+            var category = _soundBank.AudioEngine.Categories[_categoryID];
+            UpdateCategoryVolume(category._volume[0]);
         }
 
 		public bool Playing 
@@ -258,8 +250,8 @@ namespace Microsoft.Xna.Framework.Audio
             {
 				if (_complexSound)
                 {
-					foreach (XactClip clip in _soundClips)
-						if (clip.Playing)
+                    foreach (var clip in _soundClips)
+                        if (clip.State == SoundState.Playing)
                             return true;
 
                     return false;
@@ -275,11 +267,11 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (_complexSound)
                 {
-                    foreach (XactClip clip in _soundClips)
-                        if (clip.Playing)
-                            return false;
+                    foreach (var clip in _soundClips)
+                        if (clip.State == SoundState.Stopped)
+                            return true;
 
-                    return true;
+                    return false;
                 }
 
                 return _wave == null || _wave.State == SoundState.Stopped;
@@ -292,8 +284,8 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				if (_complexSound) 
                 {
-					foreach (XactClip clip in _soundClips)
-						if (clip.IsPaused) 
+					foreach (var clip in _soundClips)
+						if (clip.State == SoundState.Paused) 
                             return true;
 
 					return false;

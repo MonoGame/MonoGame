@@ -91,10 +91,11 @@ namespace Microsoft.Xna.Framework
         public MetroGamePlatform(Game game)
             : base(game)
         {
+#if !WINDOWS_PHONE81
             // Set the starting view state so the Game class can
             // query it during construction.
             ViewState = ApplicationView.Value;
-
+#endif
             // Setup the game window.
             Window = MetroGameWindow.Instance;
             MetroGameWindow.Instance.Game = game;

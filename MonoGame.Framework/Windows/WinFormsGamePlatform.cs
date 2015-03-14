@@ -109,6 +109,12 @@ namespace MonoGame.Framework
             _window.MouseVisibleToggled();
         }
 
+        public override bool BeforeRun()
+        {
+            _window.UpdateWindows();
+            return base.BeforeRun();
+        }
+
         public override void BeforeInitialize()
         {
             _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);

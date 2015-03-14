@@ -14,16 +14,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Gets or sets the identity of the content item.
         /// </summary>
+        [ContentSerializer(Optional = true)]
         public ContentIdentity Identity { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the content item.
         /// </summary>
+        [ContentSerializer(Optional = true)]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets the opaque data of the content item.
         /// </summary>
+        [ContentSerializer(Optional = true)]
         public OpaqueDataDictionary OpaqueData { get { return opaqueData; } }
 
         /// <summary>

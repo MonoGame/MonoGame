@@ -3,22 +3,27 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
     internal static class FileHelpers
     {
+        public static readonly char ForwardSlash = '/';
+        public static readonly string ForwardSlashString = new string(ForwardSlash, 1);
+        public static readonly char BackwardSlash = '\\';
+
 #if WINRT
-        public static char notSeparator = '/';
-        public static char separator = '\\';
+        public static readonly char NotSeparator = ForwardSlash;
+        public static readonly char Separator = BackwardSlash;
 #else
-        public static char notSeparator = '\\';
-        public static char separator = System.IO.Path.DirectorySeparatorChar;
+        public static readonly char NotSeparator = Path.DirectorySeparatorChar == BackwardSlash ? ForwardSlash : BackwardSlash;
+        public static readonly char Separator = Path.DirectorySeparatorChar;
 #endif
 
         public static string NormalizeFilePathSeparators(string name)
         {
-            return name.Replace(notSeparator, separator);
+            return name.Replace(NotSeparator, Separator);
         }
 
         /// <summary>
@@ -31,15 +36,28 @@ namespace Microsoft.Xna.Framework.Utilities
         /// <param name="relativeFile">Relative location of another file to resolve the path to</param>
         public static string ResolveRelativePath(string filePath, string relativeFile)
         {
-            // Get a uri for filePath using the file:// schema and no host
-            var src = new Uri("file:///" + filePath);
+            // Uri accepts forward slashes
+            filePath = filePath.Replace(BackwardSlash, ForwardSlash);
 
-            // Add the relative path to relativeFile
+            bool hasForwardSlash = filePath.StartsWith(ForwardSlashString);
+            if (!hasForwardSlash)
+                filePath = ForwardSlashString + filePath;
+
+            // Get a uri for filePath using the file:// schema and no host.
+            var src = new Uri("file://" + filePath);
+
             var dst = new Uri(src, relativeFile);
 
-            // The uri now contains the path to the relativeFile with relative addresses resolved
-            // Get the local path and skip the first character (the path separator)
-            return NormalizeFilePathSeparators(dst.LocalPath.Substring(1));
+            // The uri now contains the path to the relativeFile with 
+            // relative addresses resolved... get the local path.
+            var localPath = dst.LocalPath;
+
+            if (!hasForwardSlash && localPath.StartsWith("/"))
+                localPath = localPath.Substring(1);
+
+            // Convert the directory separator characters to the 
+            // correct platform specific separator.
+            return NormalizeFilePathSeparators(localPath);
         }
     }
 }

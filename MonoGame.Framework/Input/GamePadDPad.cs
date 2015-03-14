@@ -73,17 +73,21 @@ namespace Microsoft.Xna.Framework.Input
             Left = leftValue;
             Right = rightValue;
         }
-        internal GamePadDPad(Buttons b)
+
+        internal GamePadDPad(params Buttons[] buttons)
             : this()
         {
-            if ((b & Buttons.DPadDown) == Buttons.DPadDown)
-                Down = ButtonState.Pressed;
-            if ((b & Buttons.DPadLeft) == Buttons.DPadLeft)
-                Left = ButtonState.Pressed;
-            if ((b & Buttons.DPadRight) == Buttons.DPadRight)
-                Right = ButtonState.Pressed;
-            if ((b & Buttons.DPadUp) == Buttons.DPadUp)
-                Up = ButtonState.Pressed;
+            foreach (var b in buttons)
+            {
+                if ((b & Buttons.DPadDown) == Buttons.DPadDown)
+                    Down = ButtonState.Pressed;
+                if ((b & Buttons.DPadLeft) == Buttons.DPadLeft)
+                    Left = ButtonState.Pressed;
+                if ((b & Buttons.DPadRight) == Buttons.DPadRight)
+                    Right = ButtonState.Pressed;
+                if ((b & Buttons.DPadUp) == Buttons.DPadUp)
+                    Up = ButtonState.Pressed;
+            }
         }
 
         /// <summary>

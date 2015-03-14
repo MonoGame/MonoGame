@@ -57,16 +57,12 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-
-
 	public static class Guide
 	{
 		private static bool isScreenSaverEnabled;
 		private static bool isTrialMode;
 		private static bool isVisible;
 		private static bool simulateTrialMode;
-		private static bool isMessageBoxShowing = false;
-		private static bool isKeyboardInputShowing = false;
 
         internal static void Initialise(Game game)
         {
@@ -82,56 +78,53 @@ namespace Microsoft.Xna.Framework.GamerServices
 
          public static string ShowKeyboardInput(
           PlayerIndex player,           
-         string title,
-         string description,
-         string defaultText,
+          string title,
+          string description,
+          string defaultText,
           bool usePasswordMode)
          {
-            string result = defaultText; 
-            if (!isKeyboardInputShowing)
-            {
-                isKeyboardInputShowing = true;
-            }
+            string result = null;
+            EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
 
-            isVisible = isKeyboardInputShowing;
+            IsVisible = true;
 
             Game.Activity.RunOnUiThread(() => 
+            {
+                var alert = new AlertDialog.Builder(Game.Activity);
+
+                alert.SetTitle(title);
+                alert.SetMessage(description);
+
+                var input = new EditText(Game.Activity) { Text = defaultText };
+                if (defaultText != null)
                 {
-                    var alert = new AlertDialog.Builder(Game.Activity);
+                    input.SetSelection(defaultText.Length);
+                }
+                if (usePasswordMode)
+                {
+                    input.InputType = Android.Text.InputTypes.ClassText | Android.Text.InputTypes.TextVariationPassword;
+                }
+                alert.SetView(input);
 
-                    alert.SetTitle(title);
-                    alert.SetMessage(description);
-
-                    var input = new EditText(Game.Activity) { Text = defaultText };
-                    if (defaultText != null)
-                    {
-                        input.SetSelection(defaultText.Length);
-                    }
-                    if (usePasswordMode)
-                    {
-                        input.InputType = Android.Text.InputTypes.ClassText | Android.Text.InputTypes.TextVariationPassword;
-                    }
-                    alert.SetView(input);
-
-                    alert.SetPositiveButton("Ok", (dialog, whichButton) =>
-                        {
-                            result = input.Text;
-                            isVisible = false;
-                        });
-
-                    alert.SetNegativeButton("Cancel", (dialog, whichButton) =>
-                        {
-                            result = null;
-                            isVisible = false;
-                        });
-                    
-                    alert.Show();
+                alert.SetPositiveButton("Ok", (dialog, whichButton) =>
+                {
+                    result = input.Text;
+                    IsVisible = false;
+                    waitHandle.Set();
                 });
 
-            while (isVisible)
-            {
-                Thread.Sleep(1);
-            }
+                alert.SetNegativeButton("Cancel", (dialog, whichButton) =>
+                {
+                    result = null;
+                    IsVisible = false;
+                    waitHandle.Set();
+                });
+                alert.SetCancelable(false);
+                alert.Show();
+
+            });
+            waitHandle.WaitOne();
+            IsVisible = false;
 
             return result;
         }
@@ -156,6 +149,11 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state,
          bool usePasswordMode)
 		{
+			if (IsVisible)
+				throw new GuideAlreadyVisibleException("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
+
+			IsVisible = true;
+
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
 			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
@@ -165,13 +163,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			try 
 			{
-				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
-
-				return ski.EndInvoke(result);
+				return (result.AsyncState as ShowKeyboardInputDelegate).EndInvoke(result);
 			} 
 			finally 
 			{
-				isVisible = false;
+				IsVisible = false;
 			}			
 		}
 
@@ -188,37 +184,37 @@ namespace Microsoft.Xna.Framework.GamerServices
          MessageBoxIcon icon)
 		{
 			Nullable<int> result = null;
-			
-			if ( !isMessageBoxShowing )
-			{
-				isMessageBoxShowing = true;	
-	
-				/*UIAlertView alert = new UIAlertView();
-				alert.Title = title;
-				foreach( string btn in buttons )
-				{
-					alert.AddButton(btn);
-				}
-				alert.Message = text;
-				alert.Dismissed += delegate(object sender, UIButtonEventArgs e) 
-								{ 
-									result = e.ButtonIndex;
-									isMessageBoxShowing = false;
-								};
-				alert.Clicked += delegate(object sender, UIButtonEventArgs e) 
-								{ 
-									result = e.ButtonIndex; 
-									isMessageBoxShowing = false;
-								};
-				
-				GetInvokeOnMainThredObj().InvokeOnMainThread(delegate {    
-       		 		alert.Show();   
-    			});*/
-				
-			}
-			
-			isVisible = isMessageBoxShowing;
 
+			IsVisible = true;
+			EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+
+			Game.Activity.RunOnUiThread(() => {
+				AlertDialog.Builder alert = new AlertDialog.Builder(Game.Activity);
+
+				alert.SetTitle(title);
+				alert.SetMessage(text);
+
+				alert.SetPositiveButton(buttons.ElementAt(0), (dialog, whichButton) =>
+				{ 
+					result = 0;
+					IsVisible = false;
+					waitHandle.Set();
+				});
+
+				if (buttons.Count() == 2)
+					alert.SetNegativeButton(buttons.ElementAt(1), (dialog, whichButton) => 
+					{ 
+						result = 1;
+						IsVisible = false;
+						waitHandle.Set();
+					});
+				alert.SetCancelable(false);
+                
+				alert.Show();
+			});
+			waitHandle.WaitOne();
+			IsVisible = false;
+	
 			return result;
 		}
 
@@ -232,7 +228,12 @@ namespace Microsoft.Xna.Framework.GamerServices
          AsyncCallback callback,
          Object state
 		)
-		{	
+		{
+			if (IsVisible)
+				throw new GuideAlreadyVisibleException("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
+			
+			IsVisible = true;
+			
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
 			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
@@ -255,20 +256,32 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			try
 			{
-				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
-
-				return smbd.EndInvoke(result);
+				return (result.AsyncState as ShowMessageBoxDelegate).EndInvoke(result);
 			} 
 			finally 
 			{
-				isVisible = false;
+				IsVisible = false;
 			}
 		}
 
 
 		public static void ShowMarketplace (PlayerIndex player )
 		{
-			
+			string packageName = Game.Activity.PackageName;
+			try
+			{
+				Intent intent = new Intent(Intent.ActionView);
+				intent.SetData(Android.Net.Uri.Parse("market://details?id=" + packageName));
+				intent.SetFlags(ActivityFlags.NewTask);
+				Game.Activity.StartActivity(intent);
+			}
+			catch (ActivityNotFoundException)
+			{
+				Intent intent = new Intent(Intent.ActionView);
+				intent.SetData(Android.Net.Uri.Parse("http://play.google.com/store/apps/details?id=" + packageName));
+				intent.SetFlags(ActivityFlags.NewTask);
+				Game.Activity.StartActivity(intent);
+			}
 		}
 
 		public static void Show ()
@@ -370,7 +383,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				return isVisible;
 			}
-			set
+			internal set
 			{
 				isVisible = value;
 			}

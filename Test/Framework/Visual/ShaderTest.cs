@@ -67,11 +67,7 @@ non-infringement.
 #endregion License
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -119,7 +115,6 @@ namespace MonoGame.Tests.Visual {
 
 			Game.DrawWith += (sender, e) => {
 				spriteBatch.Begin (SpriteSortMode.Immediate, BlendState.AlphaBlend);
-
 				spriteBatch.Draw (background, Vector2.Zero, Color.White);
 
 				effect.CurrentTechnique.Passes [0].Apply ();

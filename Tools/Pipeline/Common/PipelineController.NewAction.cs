@@ -29,7 +29,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 var ext = Path.GetExtension(_template.TemplateFile);
                 var filename = Path.ChangeExtension(_name, ext);
-                var fullpath = Path.Combine(_location, filename);
+                var fullpath = _con.GetFullPath(Path.Combine(_location, filename));
 
                 if (File.Exists(fullpath))
                 {
@@ -47,7 +47,7 @@ namespace MonoGame.Tools.Pipeline
                 if (parser.AddContent(fullpath, true))
                 {
                     var item = _con._project.ContentItems.Last();
-                    item.Controller = _con;
+                    item.Observer = _con;
                     item.ImporterName = _template.ImporterName;
                     item.ProcessorName = _template.ProcessorName;
                     item.ResolveTypes();
