@@ -3,7 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.Remoting.Activation;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 
@@ -79,14 +81,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
         public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
-            throw new NotImplementedException();
+            var imageAttr = new ImageAttributes();
+            imageAttr.SetWrapMode(WrapMode.TileFlipXY);
+
+            // If we already have mipmaps and we're not supposed to overwrite
+            // them then return without any generation.
+            if (!overwriteExistingMipmaps && faces.Any(f => f.Count > 1))
+                return;
+
+            // Generate the mips for each face.
+            foreach (var face in faces)
+            {
+                // Remove any existing mipmaps.
+                var faceBitmap = face[0];
+                face.Clear();
+                face.Add(faceBitmap);
+
+                int width = faceBitmap.Width, height = faceBitmap.Height;
+                while (width > 1 && height > 1)
+                {
+                    var systemBitmap = face[face.Count-1].ToSystemBitmap();
+                    width /= 2;
+                    height /= 2;
+
+                    var bitmap = new Bitmap(width,height);
+                    using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
+                    {
+                        var destRect = new System.Drawing.Rectangle(0, 0, width, height);
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
+                        graphics.DrawImage(systemBitmap, destRect, 0, 0, width * 2, height * 2, GraphicsUnit.Pixel, imageAttr);
+                    }
+
+                    face.Add(bitmap.ToXnaBitmap(false)); //we dont want to flip textures twice
+                    systemBitmap.Dispose();
+                }
+            }
         }
 
         /// <summary>
         /// Verifies that all contents of this texture are present, correct and match the capabilities of the device.
         /// </summary>
         /// <param name="targetProfile">The profile identifier that defines the capabilities of the device.</param>
-        public abstract void Validate(Nullable<GraphicsProfile> targetProfile);
+        public abstract void Validate(GraphicsProfile? targetProfile);
 
         public virtual void Dispose()
         {

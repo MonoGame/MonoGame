@@ -9,19 +9,18 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	class XactSound
 	{
-		private bool _complexSound;
-        private XactClip[] _soundClips;
+		private readonly bool _complexSound;
+        private readonly XactClip[] _soundClips;
+        private readonly int _waveBankIndex;
+        private readonly int _trackIndex;
+        private readonly float _volume;
+        private readonly float _pitch;
+        private readonly uint _categoryID;
+        private readonly SoundBank _soundBank;
 
-        private int _waveBankIndex;
-        private int _trackIndex;
         private SoundEffectInstance _wave;
-        private float _volume;
-        private float _pitch;
 
-        private uint _categoryID;
-
-        private SoundBank _soundBank;
-		
+        private float _cueVolume;
 
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
@@ -193,7 +192,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 foreach (var sound in _soundClips)
                 {
-                    if(sound.Playing)
+                    if (sound.State == SoundState.Playing)
                         sound.Pause();
                 }
 			}
@@ -210,7 +209,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 foreach (var sound in _soundClips)
                 {
-                    if (sound.IsPaused)
+                    if (sound.State == SoundState.Paused)
                         sound.Resume();
                 }
 			}
@@ -223,13 +222,13 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void UpdateCategoryVolume(float categoryVolume)
         {
-            // The category volume scales our own volume.
-            var volume = _volume * categoryVolume;
+            // The different volumes modulate each other.
+            var volume = _volume * _cueVolume * categoryVolume;
 
             if (_complexSound)
             {
-                foreach (XactClip clip in _soundClips)
-                    clip.Volume = volume;
+                foreach (var clip in _soundClips)
+                    clip.SetVolumeScale(volume);
             }
             else
             {
@@ -238,20 +237,11 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-		public float Volume 
-        {
-			get 
-            {
-                return _volume;
-			}
-
-			set
-            {
-                _volume = value;
-
-                var category = _soundBank.AudioEngine.Categories[_categoryID];
-                UpdateCategoryVolume(category._volume[0]);
-            }
+        internal void SetCueVolume(float volume)
+		{
+            _cueVolume = volume;
+            var category = _soundBank.AudioEngine.Categories[_categoryID];
+            UpdateCategoryVolume(category._volume[0]);
         }
 
 		public bool Playing 
@@ -260,8 +250,8 @@ namespace Microsoft.Xna.Framework.Audio
             {
 				if (_complexSound)
                 {
-					foreach (XactClip clip in _soundClips)
-						if (clip.Playing)
+                    foreach (var clip in _soundClips)
+                        if (clip.State == SoundState.Playing)
                             return true;
 
                     return false;
@@ -277,11 +267,11 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (_complexSound)
                 {
-                    foreach (XactClip clip in _soundClips)
-                        if (clip.Playing)
-                            return false;
+                    foreach (var clip in _soundClips)
+                        if (clip.State == SoundState.Stopped)
+                            return true;
 
-                    return true;
+                    return false;
                 }
 
                 return _wave == null || _wave.State == SoundState.Stopped;
@@ -294,8 +284,8 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				if (_complexSound) 
                 {
-					foreach (XactClip clip in _soundClips)
-						if (clip.IsPaused) 
+					foreach (var clip in _soundClips)
+						if (clip.State == SoundState.Paused) 
                             return true;
 
 					return false;

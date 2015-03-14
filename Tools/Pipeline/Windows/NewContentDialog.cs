@@ -1,47 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
     public partial class NewContentDialog : Form
     {
-        public ContentItemTemplate SelectedTemplate
-        {
-            get { return _listBox.SelectedItem as ContentItemTemplate; }
-        }
-
-        public string ContentName
+        public ContentItemTemplate Selected
         {
             get
             {
-                if (!string.IsNullOrWhiteSpace(_name.Text))
-                    return _name.Text;
+                if (_listView.SelectedItems.NullOrEmpty())
+                    return null;
 
-                var item = _listBox.SelectedItem as ContentItemTemplate;
-                return Path.GetFileNameWithoutExtension(item.TemplateFile);
+                return _listView.SelectedItems[0].Tag as ContentItemTemplate;
             }
         }
-                
-        public NewContentDialog(IEnumerable<ContentItemTemplate> items)
-        {
-            InitializeComponent();
 
-            _listBox.Items.Clear();
-            foreach (var i in items)
-                _listBox.Items.Add(i);
+        public string NameGiven
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_name.Text))
+                {
+                    var item = Selected;
+                    if (item == null)
+                        return "NewContentItem";
+
+                    return string.Concat("New", Path.GetFileNameWithoutExtension(item.TemplateFile));
+                }
+
+                return _name.Text;
+            }
         }
 
-        private void OnListBoxSelectedValueChanged(object sender, EventArgs e)
+        public NewContentDialog(IEnumerable<ContentItemTemplate> items, ImageList icons)
+        {            
+            InitializeComponent();
+
+            _listView.SmallImageList = icons;
+
+            _listView.Items.Clear();
+            foreach (var i in items)
+            {
+                var obj = new ListViewItem(i.Label, i.Icon);
+                obj.Tag = i;
+                _listView.Items.Add(obj);
+            }
+        }
+
+        private void OnSelectedValueChanged(object sender, EventArgs e)
         {
-            _okBtn.Enabled = _listBox.SelectedItem != null;
+            _okBtn.Enabled = _listView.SelectedItems.Count > 0;
+        }
+
+        private void OnDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (Selected != null)
+            {
+                _okBtn.PerformClick();
+            }
         }
     }
 }

@@ -4,10 +4,12 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Nvidia.TextureTools;
+using WrapMode = System.Drawing.Drawing2D.WrapMode;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -95,20 +97,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         internal static void Resize(this TextureContent content, int newWidth, int newHeight)
         {
-            var source = content.Faces[0][0].ToSystemBitmap();
+            // TODO: This should be refactored to use FreeImage 
+            // with a higher quality filter.
 
             var destination = new Bitmap(newWidth, newHeight);
+
+            using (var source = content.Faces[0][0].ToSystemBitmap())
             using (var graphics = System.Drawing.Graphics.FromImage(destination))
             {
-                graphics.DrawImage(source, 0, 0, newWidth, newHeight);
-                source.Dispose();
+                var imageAttr = new ImageAttributes();
+                imageAttr.SetWrapMode(WrapMode.TileFlipXY);
+
+                var destRect = new System.Drawing.Rectangle(0, 0, newWidth, newHeight);
+
+                graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
+                graphics.DrawImage(source, destRect, 0, 0, source.Width, source.Height, GraphicsUnit.Pixel, imageAttr);
             }
 
-            content.Faces.Clear();
-            content.Faces.Add(new MipmapChain(destination.ToXnaBitmap()));
+            content.Faces[0][0] = destination.ToXnaBitmap(false); //we dont want to flip colors twice            
         }
 
-        public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap)
+        public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap, bool flipColors)
         {
             // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
             // swizzle the channels later
@@ -130,7 +139,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RGBA.
             // Because of this we flip the R and B channels.
 
-            BGRAtoRGBA(pixelData);
+            if(flipColors)
+                BGRAtoRGBA(pixelData);
 
             var xnaBitmap = new PixelBitmapContent<Color>(systemBitmap.Width, systemBitmap.Height);
             xnaBitmap.SetPixelData(pixelData);

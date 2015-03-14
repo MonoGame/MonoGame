@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -48,5 +49,9 @@ namespace MonoGame.Tools.Pipeline
         void OutputClear();
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);        
+        
+        void OnTemplateDefined(ContentItemTemplate item);
+
+        Process CreateProcess(string exe, string commands);
     }
 }

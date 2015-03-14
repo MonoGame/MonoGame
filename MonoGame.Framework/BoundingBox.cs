@@ -522,7 +522,7 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
-            return string.Format("{{Min:{0} Max:{1}}}", this.Min.ToString(), this.Max.ToString());
+            return "{{Min:" + this.Min.ToString() + " Max:" + this.Max.ToString() + "}}";
         }
 
         #endregion Public Methods

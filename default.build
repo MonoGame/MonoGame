@@ -4,7 +4,8 @@
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
   <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
-  
+  <property name="msbuild12dir" value="C:\Program Files (x86)\MSBuild\12.0\Bin" />
+
   <!-- Temporary work around so that we don't need to change the targets on the build server -->
   <target name="build" depends="build_code,run_tests,build_docs,build_installer" />
 
@@ -31,6 +32,7 @@
     <call target="build_windows"/>
     <call target="build_windows8" />
     <call target="build_windowsphone" />
+    <call target="build_windowsphone81" />
     <call target="build_psm" />
     <call target="build_web" />
     <call target="build_linux"/>
@@ -162,6 +164,16 @@
     </if>
   </target>
 
+  <target name="build_windowsphone81" description="Build Windows Phone 8.1" depends="clean">
+    <if test="${os == 'Win32NT'}">
+      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.1\Microsoft.Cpp.WindowsPhone.8.1.targets')}">
+        <exec program="Protobuild" commandline="-generate WindowsPhone81" />
+        <exec program="${msbuild12dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild12dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+      </if>
+    </if>
+  </target>
+
   <target name="build_contentprocessor" description="Build the old content processors" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Clean /p:Configuration=Release" />
@@ -170,8 +182,10 @@
   </target>
 
   <target name="run_tests" description="Run all the tests" depends="build_code">
-    <if test="${os == 'Win32NT'}">
-    </if>
+    <nunit2 if="${os == 'Win32NT'}">
+      <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
+      <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
+    </nunit2>
   </target>
 
   <target name="build_docs" description="Build the documentation." depends="build_code,run_tests">

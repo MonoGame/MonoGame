@@ -56,11 +56,11 @@ namespace MonoGame.Tools.Pipeline
             _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;            
 
             _treeIcons = new ImageList();
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.font.png")));
+            var asm = Assembly.GetExecutingAssembly();
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
             
             _treeView.ImageList = _treeIcons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
@@ -91,6 +91,28 @@ namespace MonoGame.Tools.Pipeline
 
             _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
             _controller.Selection.Modified += OnSelectionModified;
+        }
+
+        public void OnTemplateDefined(ContentItemTemplate template)
+        {
+            // Load icon
+            try
+            {
+                var iconPath = Path.Combine(Path.GetDirectoryName(template.TemplateFile), template.Icon);                
+                var iconName = Path.GetFileNameWithoutExtension(iconPath);
+
+                if (!EditorIcons.Templates.Images.ContainsKey(iconName))
+                {
+                    var iconImage = Image.FromFile(iconPath);
+                    EditorIcons.Templates.Images.Add(iconName, iconImage);
+                }
+
+                template.Icon = iconName;
+            }
+            catch (Exception)
+            {
+                template.Icon = "Default";
+            }
         }
 
         private void OnSelectionModified(Selection selection, object sender)
@@ -192,6 +214,23 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             ContextMenu_OpenFile_Click(sender, args);            
+        }
+
+        public void UpdateRecentProjectList()
+        {
+            _openRecentMenuItem.DropDownItems.Clear();
+
+            foreach (var project in History.Default.ProjectHistory)
+            {
+                var recentItem = new ToolStripMenuItem(project);
+                recentItem.Click += (sender, args) =>
+                {
+                    _controller.OpenProject(project);
+                };
+
+                _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
+            }
+
         }
 
         public AskResult AskSaveOrCancel()
@@ -480,7 +519,15 @@ namespace MonoGame.Tools.Pipeline
         public void OutputClear()
         {
             _outputWindow.Clear();
-        }        
+        }
+
+        public Process CreateProcess(string exe, string commands)
+        {
+            var _buildProcess = new Process();
+            _buildProcess.StartInfo.FileName = exe;
+            _buildProcess.StartInfo.Arguments = commands;
+            return _buildProcess;
+        }
 
         private void ExitMenuItemClick(object sender, System.EventArgs e)
         {
@@ -489,12 +536,17 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void MainView_Load(object sender, EventArgs e)
-        {
-            //Priority is given to any command line arguments.
-            if (string.IsNullOrEmpty(OpenProjectPath) && History.Default.ProjectHistory.Count > 0)
+        {            
+            // We only load the History.StartupProject if there was not
+            // already a project specified via command line.
+            if (string.IsNullOrEmpty(OpenProjectPath))
             {
-                OpenProjectPath = History.Default.ProjectHistory.Last();
+                var startupProject = History.Default.StartupProject;
+                if (!string.IsNullOrEmpty(startupProject) && File.Exists(startupProject))                
+                    OpenProjectPath = startupProject;                
             }
+
+            History.Default.StartupProject = null;
             
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {
@@ -661,6 +713,7 @@ namespace MonoGame.Tools.Pipeline
             _cancelBuildMenuItem.Visible = !notBuilding;
       
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
+            UpdateRecentProjectList();
         }
         
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
@@ -703,12 +756,14 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnNewItemClick(object sender, System.EventArgs e)
         {
-            var dlg = new NewContentDialog(_controller.Templates);
+            var dlg = new NewContentDialog(_controller.Templates, EditorIcons.Templates);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                var template = dlg.SelectedTemplate;
+                var template = dlg.Selected;
                 var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
-                _controller.NewItem(dlg.ContentName, location, template);
+
+                // Ensure name is unique among files at this location?
+                _controller.NewItem(dlg.NameGiven, location, template);
             }
         }
 

@@ -318,12 +318,20 @@ namespace Microsoft.Xna.Framework.Graphics
             // Manually resetting the device is not currently supported.
             throw new NotImplementedException();
         }
+        */
 
+#if WINDOWS && DIRECTX
         public void Reset(PresentationParameters presentationParameters)
         {
-            throw new NotImplementedException();
-        }
+            PresentationParameters = presentationParameters;
 
+            // Update the back buffer.
+            CreateSizeDependentResources();
+            ApplyRenderTargets(null);        
+        }
+#endif
+
+        /*
         public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();

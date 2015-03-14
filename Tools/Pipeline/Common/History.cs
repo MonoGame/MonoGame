@@ -19,17 +19,18 @@ namespace MonoGame.Tools.Pipeline
         private List<string> _projectHistory;
 
         public static History Default { get; private set; }
+
+        public string StartupProject { get; set; }
+
         static History()
         {
             Default = new History();
         }
-
+        
         public History()
         {
             _projectHistory = new List<string>();
-            _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
-
-            LoadProjectHistory();
+            _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);            
         }
 
         /// <summary>
@@ -48,44 +49,33 @@ namespace MonoGame.Tools.Pipeline
             _projectHistory.Remove(cleanFile);
         }
 
-        public IList<string> ProjectHistory
+        public IEnumerable<string> ProjectHistory
         {
             get
             {
-                return _projectHistory.AsReadOnly();
+                return _projectHistory;
             }
-        }
+        }        
 
-        public void LoadProjectHistory()
-        {
-            if (_isoStore.FileExists(ProjectHistoryPath))
-            {
-                using (IsolatedStorageFileStream isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, FileMode.Open, _isoStore))
-                {
-                    using (StreamReader reader = new StreamReader(isoStream))
-                    {
-                        var projects = reader.ReadToEnd().Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries );
-                        foreach (var file in projects)
-                        {
-                            AddProjectHistory(file);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void Reset()
+        public void Clear()
         {
             _projectHistory.Clear();
+            StartupProject = null;
             Save();
         }
 
         public void Save()
         {
-            using (IsolatedStorageFileStream isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, FileMode.Create, _isoStore))
+            var mode = FileMode.CreateNew;
+            if (_isoStore.FileExists(ProjectHistoryPath)) 
+                mode = FileMode.Truncate;
+
+            using (var isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, mode, _isoStore))
             {
-                using (StreamWriter writer = new StreamWriter(isoStream))
+                using (var writer = new StreamWriter(isoStream))
                 {
+                    writer.WriteLine(StartupProject);
+
                     foreach (var file in _projectHistory)
                     {
                         writer.WriteLine(file);
@@ -94,5 +84,37 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        public void Load()
+        {
+            if (_isoStore.FileExists(ProjectHistoryPath))
+            {
+                using (var isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, FileMode.Open, _isoStore))
+                {
+                    using (var reader = new StreamReader(isoStream))
+                    {
+                        var line = reader.ReadLine();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            line = line.Trim();
+                            if (File.Exists(line))
+                                StartupProject = line;
+                        }
+
+                        while (!reader.EndOfStream)
+                        {
+                            line = reader.ReadLine();
+                            if (string.IsNullOrEmpty(line))
+                                continue;
+
+                            line = line.Trim();
+                            if (!File.Exists(line))
+                                continue;
+
+                            AddProjectHistory(line);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

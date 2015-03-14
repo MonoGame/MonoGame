@@ -134,33 +134,31 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 try
                 {
                     Assembly a;
-                    if (string.IsNullOrEmpty(assemblyPath))
-                    {
-                        // Get the types from this assembly, which includes all of the
-                        // built-in importers, processors and type writers
-                        a = Assembly.GetExecutingAssembly();
-                        // The built-in types may not be public, so get all types
-                        exportedTypes = a.GetTypes();
-                    }
-                    else
-                    {
+                    if (string.IsNullOrEmpty(assemblyPath))                                            
+                        a = Assembly.GetExecutingAssembly();                    
+                    else                    
                         a = Assembly.LoadFrom(assemblyPath);
-                        // We only look at public types for external importers, processors
-                        // and type writers.
-                        exportedTypes = a.GetExportedTypes();
-                    }
+
+                    exportedTypes = a.GetTypes();
+                }
+                catch (BadImageFormatException e)
+                {
+                    Logger.LogWarning(null, null, "Assembly is either corrupt or built using a different " +
+                        "target platform than this process. Reference another target architecture (x86, x64, " +
+                        "AnyCPU, etc.) of this assembly. '{0}': {1}", assemblyPath, e.Message);
+                    // The assembly failed to load... nothing
+                    // we can do but ignore it.
+                    continue;
                 }
                 catch (Exception e)
                 {
                     Logger.LogWarning(null, null, "Failed to load assembly '{0}': {1}", assemblyPath, e.Message);
-                    // The assembly failed to load... nothing
-                    // we can do but ignore it.
                     continue;
                 }
 
                 foreach (var t in exportedTypes)
                 {
-                    if (!t.IsPublic || t.IsAbstract) 
+                    if (t.IsAbstract) 
                         continue;
 
                     if (t.GetInterface(@"IContentImporter") != null)
