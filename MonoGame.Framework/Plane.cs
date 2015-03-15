@@ -1,32 +1,9 @@
-﻿#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+﻿// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -59,6 +36,7 @@ namespace Microsoft.Xna.Framework
     }
 	
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Plane : IEquatable<Plane>
     {
         #region Public Fields
@@ -136,28 +114,67 @@ namespace Microsoft.Xna.Framework
         {
             result = ((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z);
         }
-        
-        /*
-        public static void Transform(ref Plane plane, ref Quaternion rotation, out Plane result)
-        {
-            throw new NotImplementedException();
-        }
 
-        public static void Transform(ref Plane plane, ref Matrix matrix, out Plane result)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static Plane Transform(Plane plane, Quaternion rotation)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary>
+        /// Transforms a normalized plane by a matrix.
+        /// </summary>
+        /// <param name="plane">The normalized plane to transform.</param>
+        /// <param name="matrix">The transformation matrix.</param>
+        /// <returns>The transformed plane.</returns>
         public static Plane Transform(Plane plane, Matrix matrix)
         {
-            throw new NotImplementedException();
+            Plane result;
+            Transform(ref plane, ref matrix, out result);
+            return result;
         }
-        */
+
+        /// <summary>
+        /// Transforms a normalized plane by a matrix.
+        /// </summary>
+        /// <param name="plane">The normalized plane to transform.</param>
+        /// <param name="matrix">The transformation matrix.</param>
+        /// <param name="result">The transformed plane.</param>
+        public static void Transform(ref Plane plane, ref Matrix matrix, out Plane result)
+        {
+            // See "Transforming Normals" in http://www.glprogramming.com/red/appendixf.html
+            // for an explanation of how this works.
+
+            Matrix transformedMatrix;
+            Matrix.Invert(ref matrix, out transformedMatrix);
+            Matrix.Transpose(ref transformedMatrix, out transformedMatrix);
+
+            var vector = new Vector4(plane.Normal, plane.D);
+
+            Vector4 transformedVector;
+            Vector4.Transform(ref vector, ref transformedMatrix, out transformedVector);
+
+            result = new Plane(transformedVector);
+        }
+
+        /// <summary>
+        /// Transforms a normalized plane by a quaternion rotation.
+        /// </summary>
+        /// <param name="plane">The normalized plane to transform.</param>
+        /// <param name="rotation">The quaternion rotation.</param>
+        /// <returns>The transformed plane.</returns>
+        public static Plane Transform(Plane plane, Quaternion rotation)
+        {
+            Plane result;
+            Transform(ref plane, ref rotation, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Transforms a normalized plane by a quaternion rotation.
+        /// </summary>
+        /// <param name="plane">The normalized plane to transform.</param>
+        /// <param name="rotation">The quaternion rotation.</param>
+        /// <param name="result">The transformed plane.</param>
+        public static void Transform(ref Plane plane, ref Quaternion rotation, out Plane result)
+        {
+            Vector3.Transform(ref plane.Normal, ref rotation, out result.Normal);
+            result.D = plane.D;
+        }
 
         public void Normalize()
         {
@@ -220,12 +237,10 @@ namespace Microsoft.Xna.Framework
             box.Intersects (ref this, out result);
         }
 
-        /*
         public PlaneIntersectionType Intersects(BoundingFrustum frustum)
         {
             return frustum.Intersects(this);
         }
-        */
 
         public PlaneIntersectionType Intersects(BoundingSphere sphere)
         {
@@ -237,9 +252,34 @@ namespace Microsoft.Xna.Framework
             sphere.Intersects(ref this, out result);
         }
 
+        internal PlaneIntersectionType Intersects(ref Vector3 point)
+        {
+            float distance;
+            DotCoordinate(ref point, out distance);
+
+            if (distance > 0)
+                return PlaneIntersectionType.Front;
+
+            if (distance < 0)
+                return PlaneIntersectionType.Back;
+
+            return PlaneIntersectionType.Intersecting;
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.Normal.DebugDisplayString, "  ",
+                    this.D.ToString()
+                    );
+            }
+        }
+
         public override string ToString()
         {
-            return string.Format("{{Normal:{0} D:{1}}}", Normal, D);
+            return "{Normal:" + Normal + " D:" + D + "}";
         }
 
         #endregion

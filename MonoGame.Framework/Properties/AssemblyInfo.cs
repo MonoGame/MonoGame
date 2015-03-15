@@ -41,6 +41,14 @@ using System.Resources;
 // Mark the assembly as CLS compliant so it can be safely used in other .NET languages
 [assembly:CLSCompliant(true)]
 
+// Allow the content pipeline assembly to access 
+// some of our internal helper methods that it needs.
+[assembly: InternalsVisibleTo("MonoGame.Framework.Content.Pipeline")]
+[assembly: InternalsVisibleTo("MonoGame.Framework.Net")]
+
+//Tests projects need access too
+[assembly: InternalsVisibleTo("MonoGameTests")]
+
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
@@ -62,5 +70,4 @@ using System.Resources;
 
 [assembly: AssemblyVersion("3.1.2.0")]
 [assembly: AssemblyFileVersion("3.1.2.0")]
-
 [assembly: NeutralResourcesLanguageAttribute("en-US")]

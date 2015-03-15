@@ -19,6 +19,8 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Lidgren.Network
 {
@@ -43,7 +45,7 @@ namespace Lidgren.Network
 		// [7] item
 		//
 		private T[] m_items;
-		private readonly object m_lock;
+		private readonly ReaderWriterLockSlim m_lock = new ReaderWriterLockSlim();
 		private int m_size;
 		private int m_head;
 
@@ -62,7 +64,6 @@ namespace Lidgren.Network
 		/// </summary>
 		public NetQueue(int initialCapacity)
 		{
-			m_lock = new object();
 			m_items = new T[initialCapacity];
 		}
 
@@ -71,7 +72,8 @@ namespace Lidgren.Network
 		/// </summary>
 		public void Enqueue(T item)
 		{
-			lock (m_lock)
+			m_lock.EnterWriteLock();
+			try
 			{
 				if (m_size == m_items.Length)
 					SetCapacity(m_items.Length + 8);
@@ -80,6 +82,34 @@ namespace Lidgren.Network
 				m_items[slot] = item;
 				m_size++;
 			}
+			finally
+			{
+				m_lock.ExitWriteLock();
+			}
+		}
+
+		/// <summary>
+		/// Adds an item last/tail of the queue
+		/// </summary>
+		public void Enqueue(IEnumerable<T> items)
+		{
+			m_lock.EnterWriteLock();
+			try
+			{
+				foreach (var item in items)
+				{
+					if (m_size == m_items.Length)
+						SetCapacity(m_items.Length + 8); // @TODO move this out of loop
+
+					int slot = (m_head + m_size) % m_items.Length;
+					m_items[slot] = item;
+					m_size++;
+				}
+			}
+			finally
+			{
+				m_lock.ExitWriteLock();
+			}
 		}
 
 		/// <summary>
@@ -87,7 +117,8 @@ namespace Lidgren.Network
 		/// </summary>
 		public void EnqueueFirst(T item)
 		{
-			lock (m_lock)
+			m_lock.EnterWriteLock();
+			try
 			{
 				if (m_size >= m_items.Length)
 					SetCapacity(m_items.Length + 8);
@@ -98,9 +129,13 @@ namespace Lidgren.Network
 				m_items[m_head] = item;
 				m_size++;
 			}
+			finally
+			{
+				m_lock.ExitWriteLock();
+			}
 		}
 
-		// must be called from within a lock(m_lock) !
+		// must be called from within a write locked m_lock!
 		private void SetCapacity(int newCapacity)
 		{
 			if (m_size == 0)
@@ -141,7 +176,8 @@ namespace Lidgren.Network
 				return false;
 			}
 
-			lock (m_lock)
+			m_lock.EnterWriteLock();
+			try
 			{
 				if (m_size == 0)
 				{
@@ -157,6 +193,48 @@ namespace Lidgren.Network
 
 				return true;
 			}
+			catch
+			{
+#if DEBUG
+				throw;
+#else
+				item = default(T);
+				return false;
+#endif
+			}
+			finally
+			{
+				m_lock.ExitWriteLock();
+			}
+		}
+
+		/// <summary>
+		/// Gets all items from the head of the queue, or returns number of items popped
+		/// </summary>
+		public int TryDrain(IList<T> addTo)
+		{
+			if (m_size == 0)
+				return 0;
+
+			m_lock.EnterWriteLock();
+			try
+			{
+				int added = m_size;
+				while (m_size > 0)
+				{
+					var item = m_items[m_head];
+					addTo.Add(item);
+
+					m_items[m_head] = default(T);
+					m_head = (m_head + 1) % m_items.Length;
+					m_size--;
+				}
+				return added;
+			}
+			finally
+			{
+				m_lock.ExitWriteLock();
+			}
 		}
 
 		/// <summary>
@@ -167,11 +245,16 @@ namespace Lidgren.Network
 			if (m_size == 0)
 				return default(T);
 
-			lock (m_lock)
+			m_lock.EnterReadLock();
+			try
 			{
 				if (m_size == 0)
 					return default(T);
 				return m_items[(m_head + offset) % m_items.Length];
+			}
+			finally
+			{
+				m_lock.ExitReadLock();
 			}
 		}
 
@@ -180,7 +263,8 @@ namespace Lidgren.Network
 		/// </summary>
 		public bool Contains(T item)
 		{
-			lock (m_lock)
+			m_lock.EnterReadLock();
+			try
 			{
 				int ptr = m_head;
 				for (int i = 0; i < m_size; i++)
@@ -197,8 +281,12 @@ namespace Lidgren.Network
 					}
 					ptr = (ptr + 1) % m_items.Length;
 				}
+				return false;
 			}
-			return false;
+			finally
+			{
+				m_lock.ExitReadLock();
+			}
 		}
 
 		/// <summary>
@@ -206,7 +294,8 @@ namespace Lidgren.Network
 		/// </summary>
 		public T[] ToArray()
 		{
-			lock (m_lock)
+			m_lock.EnterReadLock();
+			try
 			{
 				T[] retval = new T[m_size];
 				int ptr = m_head;
@@ -218,6 +307,10 @@ namespace Lidgren.Network
 				}
 				return retval;
 			}
+			finally
+			{
+				m_lock.ExitReadLock();
+			}
 		}
 
 		/// <summary>
@@ -225,12 +318,17 @@ namespace Lidgren.Network
 		/// </summary>
 		public void Clear()
 		{
-			lock (m_lock)
+			m_lock.EnterWriteLock();
+			try
 			{
 				for (int i = 0; i < m_items.Length; i++)
 					m_items[i] = default(T);
 				m_head = 0;
 				m_size = 0;
+			}
+			finally
+			{
+				m_lock.ExitWriteLock();
 			}
 		}
 	}

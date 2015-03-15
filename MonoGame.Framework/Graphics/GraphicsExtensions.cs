@@ -5,28 +5,23 @@ using System.Diagnostics;
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
+#if ANGLE
+using OpenTK.Graphics;
+#endif
 using OpenTK.Graphics.ES20;
-using BlendEquationMode = OpenTK.Graphics.ES20.All;
-using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
-using BlendingFactorDest = OpenTK.Graphics.ES20.All;
-using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
-using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using PixelType = OpenTK.Graphics.ES20.All;
-using PixelFormat = OpenTK.Graphics.ES20.All;
 using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
-using GetPName = OpenTK.Graphics.ES20.All;
 #endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	[CLSCompliant(false)]
-    public static class GraphicsExtensions
+    static class GraphicsExtensions
     {
 #if OPENGL
         public static All OpenGL11(CullMode cull)
@@ -346,9 +341,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				return BlendEquationMode.FuncAdd;
 #if IOS
 			case BlendFunction.Max:
-				return BlendEquationMode.MaxExt;
+				return (BlendEquationMode)All.MaxExt;
 			case BlendFunction.Min:
-				return BlendEquationMode.MinExt;
+				return (BlendEquationMode)All.MinExt;
 #elif MONOMAC || WINDOWS || LINUX
 			case BlendFunction.Max:
 				return BlendEquationMode.Max;
@@ -442,6 +437,69 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 		}
+
+#if WINDOWS || LINUX || ANGLE
+        /// <summary>
+        /// Convert a <see cref="SurfaceFormat"/> to an OpenTK.Graphics.ColorFormat.
+        /// This is used for setting up the backbuffer format of the OpenGL context.
+        /// </summary>
+        /// <returns>An OpenTK.Graphics.ColorFormat instance.</returns>
+        /// <param name="format">The <see cref="SurfaceFormat"/> to convert.</param>
+        internal static ColorFormat GetColorFormat(this SurfaceFormat format)
+        {
+            switch (format)
+            {
+                case SurfaceFormat.Alpha8:
+                    return new ColorFormat(0, 0, 0, 8);
+                case SurfaceFormat.Bgr565:
+                    return new ColorFormat(5, 6, 5, 0);
+                case SurfaceFormat.Bgra4444:
+                    return new ColorFormat(4, 4, 4, 4);
+                case SurfaceFormat.Bgra5551:
+                    return new ColorFormat(5, 5, 5, 1);
+                case SurfaceFormat.Bgr32:
+                    return new ColorFormat(8, 8, 8, 0);
+                case SurfaceFormat.Bgra32:
+                case SurfaceFormat.Color:
+                    return new ColorFormat(8, 8, 8, 8);
+                case SurfaceFormat.Rgba1010102:
+                    return new ColorFormat(10, 10, 10, 2);
+                default:
+                    // Floating point backbuffers formats could be implemented
+                    // but they are not typically used on the backbuffer. In
+                    // those cases it is better to create a render target instead.
+                    throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Converts <see cref="PresentInterval"/> to OpenGL swap interval.
+        /// </summary>
+        /// <returns>A value according to EXT_swap_control</returns>
+        /// <param name="interval">The <see cref="PresentInterval"/> to convert.</param>
+        internal static int GetSwapInterval(this PresentInterval interval)
+        {
+            // See http://www.opengl.org/registry/specs/EXT/swap_control.txt
+            // and https://www.opengl.org/registry/specs/EXT/glx_swap_control_tear.txt
+            // OpenTK checks for EXT_swap_control_tear:
+            // if supported, a swap interval of -1 enables adaptive vsync;
+            // otherwise -1 is converted to 1 (vsync enabled.)
+
+            switch (interval)
+            {
+
+                case PresentInterval.Immediate:
+                    return 0;
+                case PresentInterval.One:
+                    return 1;
+                case PresentInterval.Two:
+                    return 2;
+                case PresentInterval.Default:
+                default:
+                    return -1;
+            }
+        }
+#endif
 		
 		
 		internal static void GetGLFormat (this SurfaceFormat format,
@@ -483,7 +541,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
-#if !IOS && !ANDROID
+#if !IOS && !ANDROID && !ANGLE
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
@@ -594,20 +652,24 @@ namespace Microsoft.Xna.Framework.Graphics
                     
 
 #if IOS || ANDROID
+            case SurfaceFormat.RgbEtc1:
+                glInternalFormat = (PixelInternalFormat)0x8D64; // GL_ETC1_RGB8_OES
+                glFormat = (PixelFormat)All.CompressedTextureFormats;
+                break;
 			case SurfaceFormat.RgbPvrtc2Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 			case SurfaceFormat.RgbPvrtc4Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc4Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbPvrtc4Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 			case SurfaceFormat.RgbaPvrtc2Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbaPvrtc2Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbaPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 			case SurfaceFormat.RgbaPvrtc4Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbaPvrtc4Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbaPvrtc4Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 #endif
@@ -633,7 +695,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public static int Size(this SurfaceFormat surfaceFormat)
+        public static int GetSize(this SurfaceFormat surfaceFormat)
         {
             switch (surfaceFormat)
             {
@@ -664,6 +726,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.HalfVector2:
                 case SurfaceFormat.NormalizedByte4:
                 case SurfaceFormat.Rgba1010102:
+                case SurfaceFormat.Bgra32:
+                case SurfaceFormat.Bgr32:
                     return 4;
                 case SurfaceFormat.HalfVector4:
                 case SurfaceFormat.Rgba64:
@@ -675,8 +739,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new ArgumentException();
             }
         }
-		
-        public static int GetTypeSize(this VertexElementFormat elementFormat)
+
+        public static int GetSize(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
@@ -724,11 +788,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static int GetBoundTexture2D()
         {
             var prevTexture = 0;
-#if GLES
-            GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
-#else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
-#endif
             GraphicsExtensions.LogGLError("GraphicsExtensions.GetBoundTexture2D() GL.GetInteger");
             return prevTexture;
         }
@@ -738,15 +798,12 @@ namespace Microsoft.Xna.Framework.Graphics
         public static void CheckGLError()
         {
 #if GLES
-            All error = GL.GetError();
-            if (error != All.False)
-                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
-#elif OPENGL
-            ErrorCode error = GL.GetError();
+            var error = GL.GetErrorCode();
+#else
+            var error = GL.GetError();
+#endif
             if (error != ErrorCode.NoError)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
-#endif
-
         }
 #endif
 
@@ -771,7 +828,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
     }
 
-    public class MonoGameGLException : Exception
+    internal class MonoGameGLException : Exception
     {
         public MonoGameGLException(string message)
             : base(message)

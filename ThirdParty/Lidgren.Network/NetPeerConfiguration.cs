@@ -27,13 +27,27 @@ namespace Lidgren.Network
 	/// </summary>
 	public sealed class NetPeerConfiguration
 	{
+		// Maximum transmission unit
+		// Ethernet can take 1500 bytes of payload, so lets stay below that.
+		// The aim is for a max full packet to be 1440 bytes (30 x 48 bytes, lower than 1468)
+		// -20 bytes IP header
+		//  -8 bytes UDP header
+		//  -4 bytes to be on the safe side and align to 8-byte boundary
+		// Total 1408 bytes
+		// Note that lidgren headers (5 bytes) are not included here; since it's part of the "mtu payload"
+		
+		/// <summary>
+		/// Default MTU value in bytes
+		/// </summary>
+		public const int kDefaultMTU = 1408;
+		
 		private const string c_isLockedMessage = "You may not modify the NetPeerConfiguration after it has been used to initialize a NetPeer";
 
 		private bool m_isLocked;
 		private readonly string m_appIdentifier;
 		private string m_networkThreadName;
 		private IPAddress m_localAddress;
-        private IPAddress m_broadcastAddress;
+		private IPAddress m_broadcastAddress;
 		internal bool m_acceptIncomingConnections;
 		internal int m_maximumConnections;
 		internal int m_defaultOutgoingMessageCapacity;
@@ -41,6 +55,8 @@ namespace Lidgren.Network
 		internal bool m_useMessageRecycling;
 		internal float m_connectionTimeout;
 		internal bool m_enableUPnP;
+		internal bool m_autoFlushSendQueue;
+		private NetUnreliableSizeBehaviour m_unreliableSizeBehaviour;
 
 		internal NetIncomingMessageType m_disabledTypes;
 		internal int m_port;
@@ -68,15 +84,15 @@ namespace Lidgren.Network
 		{
 			if (string.IsNullOrEmpty(appIdentifier))
 				throw new NetException("App identifier must be at least one character long");
-			m_appIdentifier = appIdentifier.ToString(System.Globalization.CultureInfo.InvariantCulture);
+			m_appIdentifier = appIdentifier;
 
 			//
 			// default values
 			//
-			m_disabledTypes = NetIncomingMessageType.ConnectionApproval | NetIncomingMessageType.UnconnectedData | NetIncomingMessageType.VerboseDebugMessage | NetIncomingMessageType.ConnectionLatencyUpdated;
+			m_disabledTypes = NetIncomingMessageType.ConnectionApproval | NetIncomingMessageType.UnconnectedData | NetIncomingMessageType.VerboseDebugMessage | NetIncomingMessageType.ConnectionLatencyUpdated | NetIncomingMessageType.NatIntroductionSuccess;
 			m_networkThreadName = "Lidgren network thread";
 			m_localAddress = IPAddress.Any;
-            m_broadcastAddress = IPAddress.Broadcast;
+			m_broadcastAddress = IPAddress.Broadcast;
 			var ip = NetUtility.GetBroadcastAddress();
 			if (ip != null)
 			{
@@ -93,19 +109,13 @@ namespace Lidgren.Network
 			m_useMessageRecycling = true;
 			m_resendHandshakeInterval = 3.0f;
 			m_maximumHandshakeAttempts = 5;
+			m_autoFlushSendQueue = true;
 
-			// Maximum transmission unit
-			// Ethernet can take 1500 bytes of payload, so lets stay below that.
-			// The aim is for a max full packet to be 1440 bytes (30 x 48 bytes, lower than 1468)
-			// -20 bytes IP header
-			//  -8 bytes UDP header
-			//  -4 bytes to be on the safe side and align to 8-byte boundary
-			// Total 1408 bytes
-			// Note that lidgren headers (5 bytes) are not included here; since it's part of the "mtu payload"
-			m_maximumTransmissionUnit = 1408;
+			m_maximumTransmissionUnit = kDefaultMTU;
 			m_autoExpandMTU = false;
 			m_expandMTUFrequency = 2.0f;
 			m_expandMTUFailAttempts = 5;
+			m_unreliableSizeBehaviour = NetUnreliableSizeBehaviour.IgnoreMTU;
 
 			m_loss = 0.0f;
 			m_minimumOneWayLatency = 0.0f;
@@ -164,6 +174,15 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
+		/// Gets or sets the behaviour of unreliable sends above MTU
+		/// </summary>
+		public NetUnreliableSizeBehaviour UnreliableSizeBehaviour
+		{
+			get { return m_unreliableSizeBehaviour; }
+			set { m_unreliableSizeBehaviour = value; }
+		}
+
+		/// <summary>
 		/// Gets or sets the name of the library network thread. Cannot be changed once NetPeer is initialized.
 		/// </summary>
 		public string NetworkThreadName
@@ -192,13 +211,15 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
-		/// Gets or sets the maximum amount of bytes to send in a single packet, excluding ip, udp and lidgren headers
+		/// Gets or sets the maximum amount of bytes to send in a single packet, excluding ip, udp and lidgren headers. Cannot be changed once NetPeer is initialized.
 		/// </summary>
 		public int MaximumTransmissionUnit
 		{
 			get { return m_maximumTransmissionUnit; }
 			set
 			{
+				if (m_isLocked)
+					throw new NetException(c_isLockedMessage);
 				if (value < 1 || value >= ((ushort.MaxValue + 1) / 8))
 					throw new NetException("MaximumTransmissionUnit must be between 1 and " + (((ushort.MaxValue + 1) / 8) - 1) + " bytes");
 				m_maximumTransmissionUnit = value;
@@ -266,6 +287,15 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
+		/// Enables or disables automatic flushing of the send queue. If disabled, you must manully call NetPeer.FlushSendQueue() to flush sent messages to network.
+		/// </summary>
+		public bool AutoFlushSendQueue
+		{
+			get { return m_autoFlushSendQueue; }
+			set { m_autoFlushSendQueue = value; }
+		}
+
+		/// <summary>
 		/// Gets or sets the local ip address to bind to. Defaults to IPAddress.Any. Cannot be changed once NetPeer is initialized.
 		/// </summary>
 		public IPAddress LocalAddress
@@ -280,18 +310,18 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
-		/// Gets or sets the broadcast address to bind to. Defaults to IPAddress.Broadcast. Cannot be changed once NetPeer is initialized.
+		/// Gets or sets the local broadcast address to use when broadcasting
 		/// </summary>
-        public IPAddress BroadcastAddress
-        {
-            get { return m_broadcastAddress; }
-            set
-            {
-                if (m_isLocked)
-                    throw new NetException(c_isLockedMessage);
-                m_broadcastAddress = value;
-            }
-        }
+		public IPAddress BroadcastAddress
+		{
+			get { return m_broadcastAddress; }
+			set
+			{
+				if (m_isLocked)
+					throw new NetException(c_isLockedMessage);
+				m_broadcastAddress = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the local port to bind to. Defaults to 0. Cannot be changed once NetPeer is initialized.
@@ -454,5 +484,26 @@ namespace Lidgren.Network
 			retval.m_isLocked = false;
 			return retval;
 		}
+	}
+
+	/// <summary>
+	/// Behaviour of unreliable sends above MTU
+	/// </summary>
+	public enum NetUnreliableSizeBehaviour
+	{
+		/// <summary>
+		/// Sending an unreliable message will ignore MTU and send everything in a single packet; this is the new default
+		/// </summary>
+		IgnoreMTU = 0,
+
+		/// <summary>
+		/// Old behaviour; use normal fragmentation for unreliable messages - if a fragment is dropped, memory for received fragments are never reclaimed!
+		/// </summary>
+		NormalFragmentation = 1,
+
+		/// <summary>
+		/// Alternate behaviour; just drops unreliable messages above MTU
+		/// </summary>
+		DropAboveMTU = 2,
 	}
 }

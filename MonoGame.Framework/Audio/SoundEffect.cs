@@ -1,421 +1,239 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 ﻿
 using System;
-using System.Collections.Generic;
 using System.IO;
-
-using Microsoft.Xna;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-
-#if DIRECTX
-using SharpDX;
-using SharpDX.XAudio2;
-using SharpDX.Multimedia;
-using SharpDX.X3DAudio;
-#elif (WINDOWS && OPENGL) || LINUX
-using OpenTK.Audio.OpenAL;
-#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed class SoundEffect : IDisposable
+    /// <summary>Represents a loaded sound resource.</summary>
+    /// <remarks>
+    /// <para>A SoundEffect represents the buffer used to hold audio data and metadata. SoundEffectInstances are used to play from SoundEffects. Multiple SoundEffectinstance objects can be created and played from the same SoundEffect object.</para>
+    /// <para>The only limit on the number of loaded SoundEffects is restricted by available memory. When a SoundEffect is disposed, all SoundEffectInstances created from it will become invalid.</para>
+    /// <para>SoundEffect.Play() can be used for 'fire and forget' sounds. If advanced playback controls like volume or pitch is required, use SoundEffect.CreateInstance().</para>
+    /// </remarks>
+    public sealed partial class SoundEffect : IDisposable
     {
-        private bool isDisposed = false;
-
         #region Internal Audio Data
 
         private string _name;
-
-#if DIRECTX
-        internal DataStream _dataStream;
-        internal AudioBuffer _buffer;
-        internal AudioBuffer _loopedBuffer;
-        internal WaveFormat _format;
         
-        // These three fields are used for keeping track of instances created
-        // internally when Play is called directly on SoundEffect.
-        private List<SoundEffectInstance> _playingInstances;
-        private List<SoundEffectInstance> _availableInstances;
-        private List<SoundEffectInstance> _toBeRecycledInstances;
-#else
-        private string _filename = "";
-        internal byte[] _data;
-
-#if (WINDOWS && OPENGL) || LINUX
-
-        // OpenAL-specific information
-
-        internal int Size
-        {
-            get;
-            set;
-        }
-
-        internal float Rate
-        {
-            get;
-            set;
-        }
-
-        internal ALFormat Format
-        {
-            get;
-            set;
-        }
-#else
-        private Sound _sound;
-        private SoundEffectInstance _instance;
-#endif
-
-#endif
+        private bool _isDisposed = false;
+        private TimeSpan _duration = TimeSpan.Zero;
 
         #endregion
 
         #region Internal Constructors
 
-#if DIRECTX
-        internal SoundEffect()
-        {
-        }
-
-        // Extended constructor which supports custom formats / compression.
-        internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
-        {
-            Initialize(format, buffer, offset, count, loopStart, loopLength);
-        }
-
-#else
-        internal SoundEffect(string fileName)
-        {
-            _filename = fileName;
-
-            if (_filename == string.Empty )
-            {
-                throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
-            }
-
-            _name = Path.GetFileNameWithoutExtension(fileName);
-
-#if (WINDOWS && OPENGL) || LINUX
-            Stream s;
-            try
-            {
-                s = File.OpenRead(fileName);
-            }
-            catch (IOException e)
-            {
-                throw new Content.ContentLoadException("Could not load audio data", e);
-            }
-
-            _data = LoadAudioStream(s, 1.0f, false);
-            s.Close();
-#else
-            _sound = new Sound(_filename, 1.0f, false);
-#endif
-        }
-
-        //SoundEffect from playable audio data
-        internal SoundEffect(string name, byte[] data)
-        {
-            _data = data;
-            _name = name;
-
-#if (WINDOWS && OPENGL) || LINUX
-            Stream s;
-            try
-            {
-                s = new MemoryStream(data);
-            }
-            catch (IOException e)
-            {
-                throw new Content.ContentLoadException("Could not load audio data", e);
-            }
-            _data = LoadAudioStream(s, 1.0f, false);
-            s.Close();
-#else
-            _sound = new Sound(_data, 1.0f, false);
-#endif
-        }        
-#endif
-
-        internal SoundEffect(Stream s)
-        {
-#if (WINDOWS && OPENGL) || LINUX
-            _data = LoadAudioStream(s, 1.0f, false);
-#elif !DIRECTX
-            var data = new byte[s.Length];
-            s.Read(data, 0, (int)s.Length);
-
-            _data = data;
-            _sound = new Sound(_data, 1.0f, false);
-#endif
-        }
-
-        internal SoundEffect(string name, byte[] buffer, int sampleRate, AudioChannels channels)
-            : this(buffer, sampleRate, channels)
-        {
-            _name = name;
-        }
+        internal SoundEffect() { }
 
         #endregion
 
         #region Public Constructors
 
+        /// <param name="buffer">Buffer containing PCM wave data.</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz)</param>
+        /// <param name="channels">Number of channels (mono or stereo).</param>
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
         {
-#if DIRECTX            
-            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
-#elif (WINDOWS && OPENGL) || LINUX
-            _data = buffer;
-            Size = buffer.Length;
-            Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-            Rate = sampleRate;
-#else
-            //buffer should contain 16-bit PCM wave data
-            short bitsPerSample = 16;
+            _duration = GetSampleDuration(buffer.Length, sampleRate, channels);
 
-            _name = "";
-
-            using (var mStream = new MemoryStream(44+buffer.Length))
-            using (var writer = new BinaryWriter(mStream))
-            {
-                writer.Write("RIFF".ToCharArray()); //chunk id
-                writer.Write((int)(36 + buffer.Length)); //chunk size
-                writer.Write("WAVE".ToCharArray()); //RIFF type
-
-                writer.Write("fmt ".ToCharArray()); //chunk id
-                writer.Write((int)16); //format header size
-                writer.Write((short)1); //format (PCM)
-                writer.Write((short)channels);
-                writer.Write((int)sampleRate);
-                short blockAlign = (short)((bitsPerSample / 8) * (int)channels);
-                writer.Write((int)(sampleRate * blockAlign)); //byte rate
-                writer.Write((short)blockAlign);
-                writer.Write((short)bitsPerSample);
-
-                writer.Write("data".ToCharArray()); //chunk id
-                writer.Write((int)buffer.Length); //data size   MonoGame.Framework.Windows8.DLL!Microsoft.Xna.Framework.Audio.Sound.Sound(byte[] audiodata, float volume, bool looping) Line 199    C#
-
-                writer.Write(buffer);
-
-                _data = mStream.ToArray();
-            }
-
-            _sound = new Sound(_data, 1.0f, false);
-#endif
+            PlatformInitialize(buffer, sampleRate, channels);
         }
 
+        /// <param name="buffer">Buffer containing PCM wave data.</param>
+        /// <param name="offset">Offset, in bytes, to the starting position of the audio data.</param>
+        /// <param name="count">Amount, in bytes, of audio data.</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz)</param>
+        /// <param name="channels">Number of channels (mono or stereo).</param>
+        /// <param name="loopStart">The position, in samples, where the audio should begin looping.</param>
+        /// <param name="loopLength">The duration, in samples, that audio should loop over.</param>
+        /// <remarks>Use SoundEffect.GetSampleDuration() to convert time to samples.</remarks>
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-#if DIRECTX
-            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
-#else
-            throw new NotImplementedException();
-#endif
+            _duration = GetSampleDuration(count, sampleRate, channels);
+
+            PlatformInitialize(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
+        }
+
+        #endregion
+
+        #region Finalizer
+
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/> is reclaimed by garbage collection.
+        /// </summary>
+        ~SoundEffect()
+        {
+            Dispose(false);
         }
 
         #endregion
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
 
+        /// <summary>
+        /// Creates a new SoundEffectInstance for this SoundEffect.
+        /// </summary>
+        /// <returns>A new SoundEffectInstance for this SoundEffect.</returns>
+        /// <remarks>Creating a SoundEffectInstance before calling SoundEffectInstance.Play() allows you to access advanced playback features, such as volume, pitch, and 3D positioning.</remarks>
         public SoundEffectInstance CreateInstance()
         {
-#if DIRECTX
-            SourceVoice voice = null;
-            if (Device != null)
-                voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
+            var inst = new SoundEffectInstance();
+            PlatformSetupInstance(inst);
 
-            var instance = new SoundEffectInstance(this, voice);
-#elif (WINDOWS && OPENGL) || LINUX
-            var instance = new SoundEffectInstance(this);
-#else
-            var instance = new SoundEffectInstance();
-            instance.Sound = _sound;
-#endif
-            return instance;
+            inst._isPooled = false;
+            inst._effect = this;
+
+            return inst;
         }
 
-        public static SoundEffect FromStream(Stream stream)
-        {            
-            return new SoundEffect(stream);
+        /// <summary>
+        /// Creates a SoundEffect object based on the specified data stream.
+        /// </summary>
+        /// <param name="s">Stream object containing PCM wave data.</param>
+        /// <returns>A new SoundEffect object.</returns>
+        /// <remarks>The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.</remarks>
+        public static SoundEffect FromStream(Stream s)
+        {
+            if (s == null)
+                throw new ArgumentNullException();
+
+            // Notes from the docs:
+
+            /*The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.
+              The audio format has the following restrictions:
+              Must be a PCM wave file
+              Can only be mono or stereo
+              Must be 8 or 16 bit
+              Sample rate must be between 8,000 Hz and 48,000 Hz*/
+
+            var sfx = new SoundEffect();
+
+            sfx.PlatformLoadAudioStream(s);
+
+            return sfx;
+        }
+
+        /// <summary>
+        /// Gets the TimeSpan representation of a single sample.
+        /// </summary>
+        /// <param name="sizeInBytes">Size, in bytes, of audio data.</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz). Must be between 8000 Hz and 48000 Hz</param>
+        /// <param name="channels">Number of channels in the audio data.</param>
+        /// <returns>TimeSpan object that represents the calculated sample duration.</returns>
+        public static TimeSpan GetSampleDuration(int sizeInBytes, int sampleRate, AudioChannels channels)
+        {
+            if (sampleRate < 8000 || sampleRate > 48000)
+                throw new ArgumentOutOfRangeException();
+
+            // Reference: http://social.msdn.microsoft.com/Forums/windows/en-US/5a92be69-3b4e-4d92-b1d2-141ef0a50c91/how-to-calculate-duration-of-wave-file-from-its-size?forum=winforms
+            var numChannels = (int)channels;
+
+            var dur = sizeInBytes / (sampleRate * numChannels * 16f / 8f);
+
+            var duration = TimeSpan.FromSeconds(dur);
+
+            return duration;
+        }
+
+        /// <summary>
+        /// Gets the size of a sample from a TimeSpan.
+        /// </summary>
+        /// <param name="duration">TimeSpan object that contains the sample duration.</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz), of audio data. Must be between 8,000 and 48,000 Hz.</param>
+        /// <param name="channels">Number of channels in the audio data.</param>
+        /// <returns>Size of a single sample of audio data.</returns>
+        public static int GetSampleSizeInBytes(TimeSpan duration, int sampleRate, AudioChannels channels)
+        {
+            if (sampleRate < 8000 || sampleRate > 48000)
+                throw new ArgumentOutOfRangeException();
+
+            // Reference: http://social.msdn.microsoft.com/Forums/windows/en-US/5a92be69-3b4e-4d92-b1d2-141ef0a50c91/how-to-calculate-duration-of-wave-file-from-its-size?forum=winforms
+
+            var numChannels = (int)channels;
+
+            var sizeInBytes = duration.TotalSeconds * (sampleRate * numChannels * 16f / 8f);
+
+            return (int)sizeInBytes;
         }
 
         #endregion
 
         #region Play
 
+        /// <summary>Gets an internal SoundEffectInstance and plays it.</summary>
+        /// <returns>True if a SoundEffectInstance was successfully played, false if not.</returns>
+        /// <remarks>
+        /// <para>Play returns false if more SoundEffectInstances are currently playing then the platform allows.</para>
+        /// <para>To loop a sound or apply 3D effects, call SoundEffect.CreateInstance() and SoundEffectInstance.Play() instead.</para>
+        /// <para>SoundEffectInstances used by SoundEffect.Play() are pooled internally.</para>
+        /// </remarks>
         public bool Play()
         {
-#if (WINDOWS && OPENGL) || LINUX
-            return Play(MasterVolume, 0.0f, 0.0f);
-#else
-            return Play(1.0f, 0.0f, 0.0f);
-#endif
+            var inst = GetPooledInstance(false);
+            if (inst == null)
+                return false;
+
+            inst.Play();
+
+            return true;
         }
 
+        /// <summary>Gets an internal SoundEffectInstance and plays it with the specified volume, pitch, and panning.</summary>
+        /// <returns>True if a SoundEffectInstance was successfully created and played, false if not.</returns>
+        /// <param name="volume">Volume, ranging from 0.0 (silence) to 1.0 (full volume). Volume during playback is scaled by SoundEffect.MasterVolume.</param>
+        /// <param name="pitch">Pitch adjustment, ranging from -1.0 (down an octave) to 0.0 (no change) to 1.0 (up an octave).</param>
+        /// <param name="pan">Panning, ranging from -1.0 (left speaker) to 0.0 (centered), 1.0 (right speaker).</param>
+        /// <remarks>
+        /// <para>Play returns false if more SoundEffectInstances are currently playing then the platform allows.</para>
+        /// <para>To apply looping or simulate 3D audio, call SoundEffect.CreateInstance() and SoundEffectInstance.Play() instead.</para>
+        /// <para>SoundEffectInstances used by SoundEffect.Play() are pooled internally.</para>
+        /// </remarks>
         public bool Play(float volume, float pitch, float pan)
         {
-#if DIRECTX
-            if (MasterVolume > 0.0f)
-            {
-                if (_playingInstances == null)
-                {
-                    // Allocate lists first time we need them.
-                    _playingInstances = new List<SoundEffectInstance>();
-                    _availableInstances = new List<SoundEffectInstance>();
-                    _toBeRecycledInstances = new List<SoundEffectInstance>();
-                }
-                else
-                {
-                    // Cleanup instances which have finished playing.                    
-                    foreach (var inst in _playingInstances)
-                    {
-                        if (inst.State == SoundState.Stopped)
-                        {
-                            _toBeRecycledInstances.Add(inst);
-                        }
-                    }                    
-                }
+            var inst = GetPooledInstance(false);
+            if (inst == null)
+                return false;
 
-                // Locate a SoundEffectInstance either one already
-                // allocated and not in use or allocate a new one.
-                SoundEffectInstance instance = null;
-                if (_toBeRecycledInstances.Count > 0)
-                {
-                    foreach (var inst in _toBeRecycledInstances)
-                    {
-                        _availableInstances.Add(inst);
-                        _playingInstances.Remove(inst);
-                    }
-                    _toBeRecycledInstances.Clear();
-                }
-                if (_availableInstances.Count > 0)
-                {
-                    instance = _availableInstances[0];
-                    _playingInstances.Add(instance);
-                    _availableInstances.Remove(instance);
-                }
-                else
-                {
-                    instance = CreateInstance();
-                    _playingInstances.Add(instance);
-                }
+            inst.Volume = volume;
+            inst.Pitch = pitch;
+            inst.Pan = pan;
 
-                instance.Volume = volume;
-                instance.Pitch = pitch;
-                instance.Pan = pan;
-                instance.Play();
-            }
+            inst.Play();
 
-            // XNA documentation says this method returns false if the sound limit
-            // has been reached. However, there is no limit on PC.
             return true;
-#elif (WINDOWS && OPENGL) || LINUX
-            if (MasterVolume > 0.0f)
-            {
-                SoundEffectInstance instance = CreateInstance();
-                instance.Volume = volume;
-                instance.Pitch = pitch;
-                instance.Pan = pan;
-                instance.Play();
-            }
-            return false;
-#else
-            if ( MasterVolume > 0.0f )
-            {
-                if(_instance == null)
-                    _instance = CreateInstance();
-                _instance.Volume = volume;
-                _instance.Pitch = pitch;
-                _instance.Pan = pan;
-                _instance.Play();
-                return _instance.Sound.Playing;
-            }
-            return false;
-#endif
+        }
+
+        /// <summary>
+        /// Returns a sound effect instance from the pool or null if none are available.
+        /// </summary>
+        internal SoundEffectInstance GetPooledInstance(bool forXAct)
+        {
+            if (!SoundEffectInstancePool.SoundsAvailable)
+                return null;
+
+            var inst = SoundEffectInstancePool.GetInstance(forXAct);
+            inst._effect = this;
+            PlatformSetupInstance(inst);
+
+            return inst;
         }
 
         #endregion
 
         #region Public Properties
 
-#if (WINDOWS && OPENGL) || LINUX
-        private TimeSpan _duration = TimeSpan.Zero;
-#endif
+        /// <summary>Gets the duration of the SoundEffect.</summary>
+        public TimeSpan Duration { get { return _duration; } }
 
-        public TimeSpan Duration
-        {
-            get
-            {
-#if DIRECTX                    
-                var sampleCount = _buffer.PlayLength;
-                var avgBPS = _format.AverageBytesPerSecond;
-                
-                return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
-#elif (WINDOWS && OPENGL) || LINUX
-                return _duration;
-#else
-                if ( _sound != null )
-                {
-                    return new TimeSpan(0,0,(int)_sound.Duration);
-                }
-                else
-                {
-                    return new TimeSpan(0);
-                }
-#endif
-            }
-        }
-
+        /// <summary>Gets or sets the asset name of the SoundEffect.</summary>
         public string Name
         {
-            get
-            {
-                return _name;
-            }
-            set 
-            {
-                _name = value;
-            }
+            get { return _name; }
+            set { _name = value; }
         }
 
         #endregion
@@ -423,70 +241,87 @@ namespace Microsoft.Xna.Framework.Audio
         #region Static Members
 
         static float _masterVolume = 1.0f;
+        /// <summary>
+        /// Gets or sets the master volume scale applied to all SoundEffectInstances.
+        /// </summary>
+        /// <remarks>
+        /// <para>Each SoundEffectInstance has its own Volume property that is independent to SoundEffect.MasterVolume. During playback SoundEffectInstance.Volume is multiplied by SoundEffect.MasterVolume.</para>
+        /// <para>This property is used to adjust the volume on all current and newly created SoundEffectInstances. The volume of an individual SoundEffectInstance can be adjusted on its own.</para>
+        /// </remarks>
         public static float MasterVolume 
         { 
-            get
-            {
-                return _masterVolume;
-            }
+            get { return _masterVolume; }
             set
             {
-                if (_masterVolume != value)
-                {
-                    _masterVolume = value;
-                }
-#if DIRECTX
-                MasterVoice.SetVolume(_masterVolume, 0);
-#endif
+                if (value < 0.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                if (_masterVolume == value)
+                    return;
+                
+                _masterVolume = value;
+                SoundEffectInstancePool.UpdateMasterVolume();
             }
         }
 
         static float _distanceScale = 1.0f;
+        /// <summary>
+        /// Gets or sets the scale of distance calculations.
+        /// </summary>
+        /// <remarks> 
+        /// <para>DistanceScale defaults to 1.0 and must be greater than 0.0.</para>
+        /// <para>Higher values reduce the rate of falloff between the sound and listener.</para>
+        /// </remarks>
         public static float DistanceScale
         {
-            get
-            {
-                return _distanceScale;
-            }
+            get { return _distanceScale; }
             set
             {
                 if (value <= 0f)
-                {
                     throw new ArgumentOutOfRangeException ("value of DistanceScale");
-                }
+
                 _distanceScale = value;
             }
         }
 
         static float _dopplerScale = 1f;
+        /// <summary>
+        /// Gets or sets the scale of Doppler calculations applied to sounds.
+        /// </summary>
+        /// <remarks>
+        /// <para>DopplerScale defaults to 1.0 and must be greater or equal to 0.0</para>
+        /// <para>Affects the relative velocity of emitters and listeners.</para>
+        /// <para>Higher values more dramatically shift the pitch for the given relative velocity of the emitter and listener.</para>
+        /// </remarks>
         public static float DopplerScale
         {
-            get
-            {
-                return _dopplerScale;
-            }
+            get { return _dopplerScale; }
             set
             {
                 // As per documenation it does not look like the value can be less than 0
                 //   although the documentation does not say it throws an error we will anyway
                 //   just so it is like the DistanceScale
-                if (value < 0f)
-                {
+                if (value < 0.0f)
                     throw new ArgumentOutOfRangeException ("value of DopplerScale");
-                }
+
                 _dopplerScale = value;
             }
         }
 
         static float speedOfSound = 343.5f;
+        /// <summary>Returns the speed of sound used when calculating the Doppler effect..</summary>
+        /// <remarks>
+        /// <para>Defaults to 343.5. Value is measured in meters per second.</para>
+        /// <para>Has no effect on distance attenuation.</para>
+        /// </remarks>
         public static float SpeedOfSound
         {
-            get
-            {
-                return speedOfSound;
-            }
+            get { return speedOfSound; }
             set
             {
+                if (value <= 0.0f)
+                    throw new ArgumentOutOfRangeException();
+
                 speedOfSound = value;
             }
         }
@@ -495,212 +330,35 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region IDisposable Members
 
-        public bool IsDisposed
-        {
-            get
-            {
-                return isDisposed;
-            }
-        }
+        /// <summary>Indicates whether the object is disposed.</summary>
+        public bool IsDisposed { get { return _isDisposed; } }
 
+        /// <summary>Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/>.</summary>
         public void Dispose()
         {
-#if (WINDOWS && OPENGL) || LINUX
-            // No-op. Note that isDisposed remains false!
-#else
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-#if DIRECTX
-            _dataStream.Dispose();
-#else
-            _sound.Dispose();
-#endif
-            isDisposed = true;
-
-#endif
+        /// <summary>
+        /// Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/>.
+        /// </summary>
+        /// <param name="disposing">If set to <c>true</c>, Dispose was called explicitly.</param>
+        /// <remarks>If the disposing parameter is true, the Dispose method was called explicitly. This
+        /// means that managed objects referenced by this instance should be disposed or released as
+        /// required.  If the disposing parameter is false, Dispose was called by the finalizer and
+        /// no managed objects should be touched because we do not know if they are still valid or
+        /// not at that time.  Unmanaged resources should always be released.</remarks>
+        void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                PlatformDispose(disposing);
+                _isDisposed = true;
+            }
         }
 
         #endregion
 
-        #region Additional OpenTK SoundEffect Code
-
-#if (WINDOWS && OPENGL) || LINUX
-        byte[] LoadAudioStream(Stream s, float volume, bool looping)
-        {
-            ALFormat format;
-            int size;
-            int freq;
-            byte[] data;
-
-            data = AudioLoader.Load(s, out format, out size, out freq);
-
-            Format = format;
-            Size = size;
-            Rate = freq;
-            return data;
-        }
-#endif
-
-        #endregion
-
-        #region Additional DirectX SoundEffect Code
-
-#if DIRECTX
-        internal static XAudio2 Device { get; private set; }
-        internal static MasteringVoice MasterVoice { get; private set; }
-
-        private static bool _device3DDirty = true;
-        private static Speakers _speakers = Speakers.Stereo;
-
-        // XNA does not expose this, but it exists in X3DAudio.
-        [CLSCompliant(false)]
-        public static Speakers Speakers
-        {
-            get
-            {
-                return _speakers;
-            }
-
-            set
-            {
-                if (_speakers != value)
-                {
-                    _speakers = value;
-                    _device3DDirty = true;
-                }
-            }
-        }
-
-        private static X3DAudio _device3D;
-
-        internal static X3DAudio Device3D
-        {
-            get
-            {
-                if (_device3DDirty)
-                {
-                    _device3DDirty = false;
-                    _device3D = new X3DAudio(_speakers);
-                }
-
-                return _device3D;
-            }
-        }
-
-        internal static void InitializeSoundEffect()
-        {
-            try
-            {
-                if (Device == null)
-                {
-#if !WINRT && DEBUG
-                    try
-                    {
-                        //Fails if the XAudio2 SDK is not installed
-                        Device = new XAudio2(XAudio2Flags.DebugEngine, ProcessorSpecifier.DefaultProcessor);
-                        Device.StartEngine();
-                    }
-                    catch
-#endif
-                    {
-                        Device = new XAudio2(XAudio2Flags.None, ProcessorSpecifier.DefaultProcessor);
-                        Device.StartEngine();
-                    }
-                }
-
-                // Just use the default device.
-#if WINRT
-                string deviceId = null;
-#else
-                const int deviceId = 0;
-#endif
-
-                if (MasterVoice == null)
-                {
-                    // Let windows autodetect number of channels and sample rate.
-                    MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);
-                    MasterVoice.SetVolume(_masterVolume, 0);
-                }
-
-                // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
-#if WINRT
-                Speakers = (Speakers)MasterVoice.ChannelMask;
-#else
-                var deviceDetails = Device.GetDeviceDetails(deviceId);
-                Speakers = deviceDetails.OutputFormat.ChannelMask;
-#endif
-            }
-            catch
-            {
-                // Release the device and null it as
-                // we have no audio support.
-                if (Device != null)
-                {
-                    Device.Dispose();
-                    Device = null;
-                }
-
-                MasterVoice = null;
-            }
-        }
-
-        private void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
-        {
-            _format = format;
-
-            _dataStream = DataStream.Create<byte>(buffer, true, false);
-
-            // Use the loopStart and loopLength also as the range
-            // when playing this SoundEffect a single time / unlooped.
-            _buffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = count,
-                Flags = BufferFlags.EndOfStream,
-                PlayBegin = loopStart,
-                PlayLength = loopLength,
-                Context = new IntPtr(42),
-            };
-
-            _loopedBuffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = count,
-                Flags = BufferFlags.EndOfStream,
-                LoopBegin = loopStart,
-                LoopLength = loopLength,
-                LoopCount = AudioBuffer.LoopInfinite,
-                Context = new IntPtr(42),
-            };            
-        }
-
-        static SoundEffect()
-        {
-            InitializeSoundEffect();
-        }
-
-        // Does someone actually need to call this if it only happens when the whole
-        // game closes? And if so, who would make the call?
-        internal static void Shutdown()
-        {
-            if (MasterVoice != null)
-            {
-                MasterVoice.DestroyVoice();
-                MasterVoice.Dispose();
-                MasterVoice = null;
-            }
-
-            if (Device != null)
-            {
-                Device.StopEngine();
-                Device.Dispose();
-                Device = null;
-            }
-
-            _device3DDirty = true;
-            _speakers = Speakers.Stereo;
-        }
-#endif
-        #endregion
     }
 }
-

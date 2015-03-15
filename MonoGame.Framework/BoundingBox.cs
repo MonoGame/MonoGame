@@ -1,41 +1,16 @@
-﻿#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Authors:
-Olivier Dufour (Duff)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+﻿// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingBox : IEquatable<BoundingBox>
     {
 
@@ -497,14 +472,16 @@ namespace Microsoft.Xna.Framework
                 negativeVertex.Z = Max.Z;
             }
 
-            var distance = Vector3.Dot(plane.Normal, negativeVertex) + plane.D;
+            // Inline Vector3.Dot(plane.Normal, negativeVertex) + plane.D;
+            var distance = plane.Normal.X * negativeVertex.X + plane.Normal.Y * negativeVertex.Y + plane.Normal.Z * negativeVertex.Z + plane.D;
             if (distance > 0)
             {
                 result = PlaneIntersectionType.Front;
                 return;
             }
 
-            distance = Vector3.Dot(plane.Normal, positiveVertex) + plane.D;
+            // Inline Vector3.Dot(plane.Normal, positiveVertex) + plane.D;
+            distance = plane.Normal.X * positiveVertex.X + plane.Normal.Y * positiveVertex.Y + plane.Normal.Z * positiveVertex.Z + plane.D;
             if (distance < 0)
             {
                 result = PlaneIntersectionType.Back;
@@ -534,9 +511,20 @@ namespace Microsoft.Xna.Framework
             return !a.Equals(b);
         }
 
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    "Min( ", this.Min.DebugDisplayString, " )  \r\n",
+                    "Max( ",this.Max.DebugDisplayString, " )"
+                    );
+            }
+        }
+
         public override string ToString()
         {
-            return string.Format("{{Min:{0} Max:{1}}}", this.Min.ToString(), this.Max.ToString());
+            return "{{Min:" + this.Min.ToString() + " Max:" + this.Max.ToString() + "}}";
         }
 
         #endregion Public Methods

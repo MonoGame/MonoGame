@@ -73,6 +73,6 @@ using System.Text;
 
 namespace MonoGame.Tests {
 	static class Constants {
-		public const float StandardRequiredSimilarity = 0.993f;
+		public const float StandardRequiredSimilarity = 0.99f;
 	}
 }

@@ -1,13 +1,14 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
     <Name>MonoGame OUYA Project</Name>
-    <Description>A MonoGame game project for OUYA which requires "Mono for Android" by Xamarin.</Description>
+    <Description>A MonoGame game project for OUYA using Xamarin.Android 4.8.2 or greater.</Description>
     <ProjectType>CSharp</ProjectType>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <ProjectSubType>
     </ProjectSubType>
-    <SortOrder>1000</SortOrder>
+    <SortOrder>43210</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>GameName</DefaultName>
+    <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
@@ -19,9 +20,6 @@
       <ProjectItem ReplaceParameters="true" TargetFileName="Activity1.cs">Activity1.cs</ProjectItem>
       <Folder Name="Assets" TargetFolderName="Assets">
         <ProjectItem ReplaceParameters="true" TargetFileName="AboutAssets.txt">AboutAssets.txt</ProjectItem>
-        <Folder Name="Content" TargetFolderName="Content">
-          <ProjectItem ReplaceParameters="false" TargetFileName="spriteFont1.xnb">spriteFont1.xnb</ProjectItem>
-        </Folder>
       </Folder>
       <ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
       <Folder Name="Properties" TargetFolderName="Properties">
@@ -37,11 +35,17 @@
           <ProjectItem ReplaceParameters="false" TargetFileName="ouya_icon.png">ouya_icon.png</ProjectItem>
         </Folder>
         <Folder Name="Layout" TargetFolderName="Layout" />
+        <Folder Name="Raw" TargetFolderName="Raw">
+          <ProjectItem ReplaceParameters="false" TargetFileName="key.der">key.der</ProjectItem>
+        </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="Resource.Designer.cs">Resource.Designer.cs</ProjectItem>
         <Folder Name="Values" TargetFolderName="Values">
           <ProjectItem ReplaceParameters="true" TargetFileName="Strings.xml">Strings.xml</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Styles.xml">Styles.xml</ProjectItem>
         </Folder>
+      </Folder>
+      <Folder Name="Content" TargetFolderName="Content">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
       </Folder>
     </Project>
   </TemplateContent>

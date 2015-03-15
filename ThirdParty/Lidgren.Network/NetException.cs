@@ -25,7 +25,6 @@ namespace Lidgren.Network
 	/// <summary>
 	/// Exception thrown in the Lidgren Network Library
 	/// </summary>
-	[Serializable]
 	public sealed class NetException : Exception
 	{
 		/// <summary>
@@ -49,14 +48,6 @@ namespace Lidgren.Network
 		/// </summary>
 		public NetException(string message, Exception inner)
 			: base(message, inner)
-		{
-		}
-
-		/// <summary>
-		/// NetException constructor
-		/// </summary>
-		private NetException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
 		{
 		}
 

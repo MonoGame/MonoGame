@@ -15,5 +15,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             output.Write(code.Length);
             output.Write(code);
         }
+
+        public override string GetRuntimeReader(TargetPlatform targetPlatform)
+        {
+            var type = typeof(ContentReader);
+            var readerType = type.Namespace + ".EffectReader, " + type.Assembly.FullName;
+            return readerType;
+        }
     }
 }

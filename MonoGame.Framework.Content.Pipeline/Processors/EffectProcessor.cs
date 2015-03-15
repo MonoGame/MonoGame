@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 #if WINDOWS
@@ -52,11 +53,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #if WINDOWS
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
-            options.DX11Profile =   context.TargetPlatform == TargetPlatform.Windows ||
-                                    context.TargetPlatform == TargetPlatform.WindowsPhone8 ||
-                                    context.TargetPlatform == TargetPlatform.WindowsStoreApp ||
-                                    context.TargetPlatform == TargetPlatform.Xbox360;
+
+            switch (context.TargetPlatform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                    options.Profile = ShaderProfile.DirectX_11;
+                    break;
+                case TargetPlatform.WindowsGL:
+                case TargetPlatform.iOS:
+                case TargetPlatform.Android:
+                case TargetPlatform.Linux:
+                case TargetPlatform.MacOSX:
+                case TargetPlatform.Ouya:
+                case TargetPlatform.RaspberryPi:
+                    options.Profile = ShaderProfile.OpenGL;
+                    break;
+                default:
+                    throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+            }
+
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
+            options.Defines = Defines;
             options.OutputFile = context.OutputFilename;
 
             // Parse the MGFX file expanding includes, macros, and returning the techniques.
@@ -64,6 +83,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             try
             {
                 shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+
+                // Add the include dependencies so that if they change
+                // it will trigger a rebuild of this effect.
                 foreach (var dep in shaderInfo.Dependencies)
                     context.AddDependency(dep);
             }
@@ -74,15 +96,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // Create the effect object.
-            DXEffectObject effect = null;
+            EffectObject effect = null;
+            var shaderErrorsAndWarnings = string.Empty;
             try
             {
-                effect = DXEffectObject.FromShaderInfo(shaderInfo);
+                effect = EffectObject.CompileEffect(shaderInfo, out shaderErrorsAndWarnings);
+
+                // If there were any additional output files we register
+                // them so that the cleanup process can manage them.
+                foreach (var outfile in shaderInfo.AdditionalOutputFiles)
+                    context.AddOutputFile(outfile);
             }
-            catch (Exception ex)
+            catch (ShaderCompilerException ex)
             {
-                throw ProcessErrorsAndWarnings(ex.Message, input, context);
+                // This will log any warnings and errors and throw.
+                ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
             }
+
+            // Process any warning messages that the shader compiler might have produced.
+            ProcessErrorsAndWarnings(false, shaderErrorsAndWarnings, input, context);
 
             // Write out the effect to a runtime format.
             CompiledEffectContent result;
@@ -107,65 +139,65 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #endif
         }
 
-        private static Exception ProcessErrorsAndWarnings(string errorsAndWarnings, EffectContent input, ContentProcessorContext context)
+        private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {
-            // Split the errors by lines.
-            var errors = errorsAndWarnings.Split('\n');
+            // Split the errors and warnings into individual lines.
+            var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] {"\n", "\r", Environment.NewLine},
+                                                                      StringSplitOptions.RemoveEmptyEntries);
 
-            // Process each error line extracting the location and message information.
-            for (var i = 0; i < errors.Length; i++)
+            var errorOrWarning = new Regex(@"(.*)\(([0-9,]*)\)\s*:\s*(.*)", RegexOptions.Compiled);
+            ContentIdentity identity = null;
+            var allErrorsAndWarnings = string.Empty;
+
+            // Process all the lines.
+            for (var i = 0; i < errorsAndWarningArray.Length; i++)
             {
-                // Skip blank lines.
-                if (errors[i].StartsWith(Environment.NewLine))
-                    break;
-
-                // find some unique characters in the error string
-                var openIndex = errors[i].IndexOf('(');
-                var closeIndex = errors[i].IndexOf(')');
-
-                // can't process the message if it has no line counter
-                if (openIndex == -1 || closeIndex == -1)
+                var match = errorOrWarning.Match(errorsAndWarningArray[i]);
+                if (!match.Success || match.Groups.Count != 4)
+                {
+                    // Just log anything we don't recognize as a warning.
+                    if (buildFailed)
+                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
+                    else
+                        context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
+                        
                     continue;
+                }
 
-                // find the error number, then move forward into the message
-                var errorIndex = errors[i].IndexOf('X', closeIndex);
-                if (errorIndex < 0)
-                    return new InvalidContentException(errors[i], input.Identity);
+                var fileName = match.Groups[1].Value;
+                var lineAndColumn = match.Groups[2].Value;
+                var message = match.Groups[3].Value;
 
-                // trim out the data we need to feed the logger
-                var fileName = errors[i].Remove(openIndex);
-                var lineAndColumn = errors[i].Substring(openIndex + 1, closeIndex - openIndex - 1);
-                var description = errors[i].Substring(errorIndex);
-
-                // when the file name is not present, the error can be found in the root file
+                // Try to ensure a good file name for the error message.
                 if (string.IsNullOrEmpty(fileName))
                     fileName = input.Identity.SourceFilename;
-
-                // ensure that the file data points toward the correct file
-                var fileInfo = new FileInfo(fileName);
-                if (!fileInfo.Exists)
+                else if (!File.Exists(fileName))
                 {
-                    var parentFile = new FileInfo(input.Identity.SourceFilename);
-                    fileInfo = new FileInfo(Path.Combine(parentFile.Directory.FullName, fileName));
+                    var folder = Path.GetDirectoryName(input.Identity.SourceFilename);
+                    fileName = Path.Combine(folder, fileName);
                 }
-                fileName = fileInfo.FullName;
 
-                // construct the temporary content identity and file the error or warning
-                var identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                if (errors[i].Contains("warning"))
+                // If we got an exception then we'll be throwing an exception 
+                // below, so just gather the lines to throw later.
+                if (buildFailed)
                 {
-                    description = "A warning was generated when compiling the effect.\n" + description;
-                    context.Logger.LogWarning(string.Empty, identity, description, string.Empty);
+                    if (identity == null)
+                    {
+                        identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
+                        allErrorsAndWarnings = message + Environment.NewLine;
+                    }
+                    else
+                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
                 }
-                else if (errors[i].Contains("error"))
+                else
                 {
-                    description = "Unable to compile the effect.\n" + description;
-                    return new InvalidContentException(description, identity);
+                    identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
+                    context.Logger.LogWarning(string.Empty, identity, message, string.Empty);
                 }
             }
 
-            // if no exceptions were created in the above loop, generate a generic one here
-            return new InvalidContentException(errorsAndWarnings, input.Identity);
+            if (buildFailed)
+                throw new InvalidContentException(allErrorsAndWarnings, identity ?? input.Identity);
         }
     }
 }

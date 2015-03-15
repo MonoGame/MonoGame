@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    class PvrtcBitmapContent : BitmapContent
+    public class PvrtcBitmapContent : BitmapContent
     {
         internal byte[] _bitmapData;
         internal int _bitsPerPixel;

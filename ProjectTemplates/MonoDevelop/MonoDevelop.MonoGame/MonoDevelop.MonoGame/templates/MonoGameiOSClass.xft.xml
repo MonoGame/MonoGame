@@ -15,7 +15,6 @@
 	<TemplateFiles>
 		<File name="${Name}.${LanguageExtension}" >
 		<AssemblyReference>MonoGame.Framework.iOS</AssemblyReference>
-		<AssemblyReference>Lidgren.Network.iOS</AssemblyReference>
 <![CDATA[
 using System;
 using System.Collections.Generic;

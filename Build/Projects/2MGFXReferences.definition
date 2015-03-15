@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="2MGFXReferences">
+
+  <Platform Type="Windows">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
+    <Binary
+      Name="SharpDX.D3DCompiler"
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.D3DCompiler.dll" />
+  </Platform>
+
+</ExternalProject>

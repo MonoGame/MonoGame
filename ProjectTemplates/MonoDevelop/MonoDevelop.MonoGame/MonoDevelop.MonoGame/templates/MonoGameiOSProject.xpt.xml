@@ -26,7 +26,6 @@
 				<Reference type="Gac" refto="monotouch" />
 				<Reference type="Gac" refto="OpenTK" />
 				<Reference type="Gac" refto="MonoGame.Framework.iOS" />
-				<Reference type="Gac" refto="Lidgren.Network.iOS" />
 			</References>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="MonoGameApplication/iOSGame.cs" />
