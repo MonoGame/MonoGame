@@ -18,16 +18,10 @@
         <language>en-US</language>
         <references>
             <reference file="MonoGame.Framework.dll" />
-            <reference file="SharpDX.dll" />
-            <reference file="SharpDX.Direct2D1.dll" />
-            <reference file="SharpDX.Direct3D11.dll" />
-            <reference file="SharpDX.DXGI.dll" />
-            <reference file="SharpDX.MediaFoundation.dll" />
-            <reference file="SharpDX.XAudio2.dll" />
-            <reference file="SharpDX.XInput.dll" />
         </references>		
     </metadata>
     <files>
+        <file src="Windows8\AnyCPU\Release\Themes\Generic.xaml" target="lib\netcore\MonoGame.Framework\Themes\Generic.xaml" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
         <file src="Windows8\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\netcore\SharpDX.Direct2D1.dll" />
