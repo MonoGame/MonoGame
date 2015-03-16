@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override string ToString()
         {
-            return string.Format("{{Offset:{0} Format:{1} Usage:{2} UsageIndex:{3}}}", new object[] { this.Offset, this.VertexElementFormat, this.VertexElementUsage, this.UsageIndex });
+            return "{{Offset:" + this.Offset + " Format:" + this.VertexElementFormat + " Usage:" + this.VertexElementUsage + " UsageIndex: " + this.UsageIndex +  "}}";
         }
 
         public override bool Equals(object obj)

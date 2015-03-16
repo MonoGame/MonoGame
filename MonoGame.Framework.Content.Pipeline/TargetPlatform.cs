@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public enum TargetPlatform
     {
         /// <summary>
-        /// All supported versions of Windows (excluding Windows Phone)
+        /// All desktop versions of Windows using DirectX.
         /// </summary>
         Windows,
 
@@ -85,5 +85,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// (MonoGame)
         /// </summary>
         RaspberryPi,
+
+        /// <summary>
+        /// Sony PlayStation4
+        /// </summary>
+        PlayStation4,
+
+        /// <summary>
+        /// All desktop versions of Windows using OpenGL.
+        /// (MonoGame)
+        /// </summary>
+        WindowsGL,
     }
 }

@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using Microsoft.Xna.Framework;
 using System;
 
 namespace Microsoft.Xna.Framework.Input
@@ -8,8 +12,15 @@ namespace Microsoft.Xna.Framework.Input
     //     Represents specific information about the state of an Xbox 360 Controller,
     //     including the current state of buttons and sticks. Reference page contains
     //     links to related code samples.
-    public struct GamePadState
+    //     This is implemented as a partial struct to allow for individual platforms
+    //     to offer additional data without separate state queries to GamePad.
+    public partial struct GamePadState
     {
+        /// <summary>
+        /// The default initialized gamepad state.
+        /// </summary>
+        public static readonly GamePadState Default = new GamePadState();
+
         //
         // Summary:
         //     Indicates whether the Xbox 360 Controller is connected. Reference page contains
@@ -66,15 +77,6 @@ namespace Microsoft.Xna.Framework.Input
             internal set;
         }
 
-	private static GamePadState initializedGamePadState = new GamePadState();
-
-	internal static GamePadState InitializedState
-	{
-		get {
-				return initializedGamePadState;
-		}
-	}
-
         //
         // Summary:
         //     Initializes a new instance of the GamePadState class using the specified
@@ -100,6 +102,8 @@ namespace Microsoft.Xna.Framework.Input
             Buttons = buttons;
             DPad = dPad;
 			IsConnected = true;
+
+            PlatformConstruct();
         }
         //
         // Summary:
@@ -122,9 +126,15 @@ namespace Microsoft.Xna.Framework.Input
         //   buttons:
         //     Array or parameter list of Buttons to initialize as pressed.
         public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, params Buttons[] buttons)
-            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad())
+            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad(buttons))
         {
         }
+
+        /// <summary>
+        /// Define this method in platform partial classes to initialize default
+        /// values for platform-specific fields.
+        /// </summary>
+        partial void PlatformConstruct();
   
         /// <summary>
         /// Gets the button mask along with 'virtual buttons' like LeftThumbstickLeft.
@@ -132,7 +142,6 @@ namespace Microsoft.Xna.Framework.Input
         private Buttons GetVirtualButtons () {
             var result = Buttons.buttons;
             var sticks = ThumbSticks;
-            sticks.ApplyDeadZone(GamePadDeadZone.IndependentAxes, 7849 / 32767f);
             
             if (sticks.Left.X < 0)
                 result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickLeft;

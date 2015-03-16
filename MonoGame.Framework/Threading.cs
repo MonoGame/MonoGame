@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
+MonoGame - Copyright Â© 2009 The MonoGame Team
 
 All rights reserved.
 
@@ -44,39 +44,53 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
 #if IOS
-using MonoTouch.Foundation;
-using MonoTouch.OpenGLES;
+using Foundation;
+using OpenGLES;
 #if ES11
 using OpenTK.Graphics.ES11;
 #else
 using OpenTK.Graphics.ES20;
 #endif
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || ANGLE
 using OpenTK.Graphics;
 using OpenTK.Platform;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+#endif
+#if WINDOWS_PHONE
+using System.Windows;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
+        public const int kMaxWaitForUIThread = 750; // In milliseconds
+
+#if !WINDOWS_PHONE
         static int mainThreadId;
-        //static int currentThreadId;
+#endif
+
 #if ANDROID
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
 #elif IOS
         public static EAGLContext BackgroundContext;
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || ANGLE
         public static IGraphicsContext BackgroundContext;
         public static IWindowInfo WindowInfo;
 #endif
+
+#if !WINDOWS_PHONE
         static Threading()
         {
+#if WINDOWS_STOREAPP
+            mainThreadId = Environment.CurrentManagedThreadId;
+#else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
+#endif
         }
+#endif
 
         /// <summary>
         /// Checks if the code is currently running on the UI thread.
@@ -84,7 +98,13 @@ namespace Microsoft.Xna.Framework
         /// <returns>true if the code is currently running on the UI thread.</returns>
         public static bool IsOnUIThread()
         {
+#if WINDOWS_PHONE
+            return Deployment.Current.Dispatcher.CheckAccess();
+#elif WINDOWS_STOREAPP
+            return (mainThreadId == Environment.CurrentManagedThreadId);
+#else
             return mainThreadId == Thread.CurrentThread.ManagedThreadId;
+#endif
         }
 
         /// <summary>
@@ -93,9 +113,39 @@ namespace Microsoft.Xna.Framework
         /// <exception cref="InvalidOperationException">Thrown if the code is not currently running on the UI thread.</exception>
         public static void EnsureUIThread()
         {
-            if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
-                throw new InvalidOperationException(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
+            if (!IsOnUIThread())
+                throw new InvalidOperationException("Operation not called on UI thread.");
         }
+
+#if WINDOWS_PHONE
+        internal static void RunOnUIThread(Action action)
+        {
+            RunOnContainerThread(Deployment.Current.Dispatcher, action);
+        }
+        
+        internal static void RunOnContainerThread(System.Windows.Threading.Dispatcher target, Action action)
+        {
+            target.BeginInvoke(action);
+        }
+
+        internal static void BlockOnContainerThread(System.Windows.Threading.Dispatcher target, Action action)
+        {
+            if (target.CheckAccess())
+            {
+                action();
+            }
+            else
+            {
+                EventWaitHandle wait = new AutoResetEvent(false);
+                target.BeginInvoke(() =>
+                {
+                    action();
+                    wait.Set();
+                });
+                wait.WaitOne(kMaxWaitForUIThread);
+            }
+        }
+#endif
 
         /// <summary>
         /// Runs the given action on the UI thread and blocks the current thread while the action is running.
@@ -107,13 +157,25 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if DIRECTX || PSM
+#if (DIRECTX && !WINDOWS_PHONE) || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
-            if (mainThreadId == Thread.CurrentThread.ManagedThreadId)
+            if (IsOnUIThread())
             {
+#if WINDOWS_PHONE
+                try
+                {
+                    action();
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // Need to be on a different thread
+                    BlockOnContainerThread(Deployment.Current.Dispatcher, action);
+                }
+#else
                 action();
+#endif
                 return;
             }
 
@@ -129,7 +191,7 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif WINDOWS || LINUX
+#elif WINDOWS || LINUX || ANGLE
             lock (BackgroundContext)
             {
                 // Make the context current on this thread
@@ -142,6 +204,8 @@ namespace Microsoft.Xna.Framework
                 // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
                 BackgroundContext.MakeCurrent(null);
             }
+#elif WINDOWS_PHONE
+            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
@@ -152,7 +216,7 @@ namespace Microsoft.Xna.Framework
             {
 #if ANDROID
                 //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                Game.Instance.Window.MakeCurrent();
+                ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
 #endif
                 action();
                 resetEvent.Set();

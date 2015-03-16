@@ -1,59 +1,46 @@
-// #region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-// #endregion License
-// 
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 
 #if PSM
 using Sce.PlayStation.Core.Graphics;
+#endif
+#if WINRT
+using System.Reflection;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
     {
+        struct MGFXHeader 
+        {
+            /// <summary>
+            /// The MonoGame Effect file format header identifier ("MGFX"). 
+            /// </summary>
+            public static readonly int MGFXSignature = (BitConverter.IsLittleEndian) ? 0x5846474D: 0x4D474658;
+
+            /// <summary>
+            /// The current MonoGame Effect file format versions
+            /// used to detect old packaged content.
+            /// </summary>
+            /// <remarks>
+            /// We should avoid supporting old versions for very long if at all 
+            /// as users should be rebuilding content when packaging their game.
+            /// </remarks>
+            public const int MGFXVersion = 6;
+
+            public int Signature;
+            public int Version;
+            public int Profile;
+            public int EffectKey;
+            public int HeaderSize;
+        }
+
         public EffectParameterCollection Parameters { get; private set; }
 
         public EffectTechniqueCollection Techniques { get; private set; }
@@ -101,32 +88,65 @@ namespace Microsoft.Xna.Framework.Graphics
 			// This might need to change slightly if/when we support
 			// shared constant buffers as 'new' should return unique
 			// effects without any shared instance state.
-            
+ 
+#if PSM 
+			var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
+			int headerSize=0;
+#else
+            //Read the header
+            MGFXHeader header = ReadHeader(effectCode);
+			var effectKey = header.EffectKey;
+			int headerSize = header.HeaderSize;
+#endif
 
             // First look for it in the cache.
             //
-            // TODO: We could generate a strong and unique signature
-            // offline during content processing and just read it from 
-            // the front of the effectCode instead of computing a fast
-            // hash here at runtime.
-            //
-            var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
             Effect cloneSource;
-            if (!EffectCache.TryGetValue(effectKey, out cloneSource))
+            if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
+            {
+                using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
+            	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
                 cloneSource = new Effect(graphicsDevice);
-                using (var stream = new MemoryStream(effectCode))
-                using (var reader = new BinaryReader(stream))
                     cloneSource.ReadEffect(reader);
 
                 // Cache the effect for later in its original unmodified state.
-                EffectCache.Add(effectKey, cloneSource);
+                    graphicsDevice.EffectCache.Add(effectKey, cloneSource);
+                }
             }
 
             // Clone it.
             _isClone = true;
             Clone(cloneSource);
+        }
+
+        private MGFXHeader ReadHeader(byte[] effectCode)
+        {
+            MGFXHeader header;
+            int i=0;
+            header.Signature = BitConverter.ToInt32(effectCode, i); i += 4;
+            header.Version = (int)effectCode[i++];
+            header.Profile = (int)effectCode[i++];
+            header.EffectKey = BitConverter.ToInt32(effectCode, i); i += 4;
+            header.HeaderSize = i;
+
+            if (header.Signature != MGFXHeader.MGFXSignature)
+                throw new Exception("This does not appear to be a MonoGame MGFX file!");
+            if (header.Version < MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
+            if (header.Version > MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
+
+#if DIRECTX
+            if (header.Profile != 1)
+#else
+			if (header.Profile != 0)
+#endif
+                throw new Exception("This MGFX effect was built for a different platform!");
+            
+            
+            return header;
         }
 
         /// <summary>
@@ -234,41 +254,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        /// <summary>
-        /// The MonoGame Effect file format header identifier.
-        /// </summary>
-        private const string MGFXHeader = "MGFX";
 
-        /// <summary>
-        /// The current MonoGame Effect file format versions
-        /// used to detect old packaged content.
-        /// </summary>
-        /// <remarks>
-        /// We should avoid supporting old versions for very long if at all 
-        /// as users should be rebuilding content when packaging their game.
-        /// </remarks>
-        private const int MGFXVersion = 5;
 
 #if !PSM
 
 		private void ReadEffect (BinaryReader reader)
 		{
-			// Check the header to make sure the file and version is correct!
-			var header = new string (reader.ReadChars (MGFXHeader.Length));
-			var version = (int)reader.ReadByte ();
-			if (header != MGFXHeader)
-				throw new Exception ("The MGFX file is corrupt!");
-            if (version != MGFXVersion)
-                throw new Exception("Wrong MGFX file version!");
-
-			var profile = reader.ReadByte ();
-#if DIRECTX
-            if (profile != 1)
-#else
-			if (profile != 0)
-#endif
-				throw new Exception("The MGFX effect is the wrong profile for this platform!");
-
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.
 
@@ -572,26 +563,5 @@ namespace Microsoft.Xna.Framework.Graphics
         
 #endif
         #endregion // Effect File Reader
-
-
-        #region Effect Cache        
-
-        /// <summary>
-        /// The cache of effects from unique byte streams.
-        /// </summary>
-        private static readonly Dictionary<int, Effect> EffectCache = new Dictionary<int, Effect>();
-
-        internal static void FlushCache()
-        {
-            // Dispose all the cached effects.
-            foreach (var effect in EffectCache)
-                effect.Value.Dispose();
-
-            // Clear the cache.
-            EffectCache.Clear();
-        }
-
-        #endregion // Effect Cache
-
 	}
 }

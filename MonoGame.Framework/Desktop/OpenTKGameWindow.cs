@@ -54,17 +54,23 @@ using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-    public class OpenTKGameWindow : GameWindow, IDisposable
+    class OpenTKGameWindow : GameWindow, IDisposable
     {
         private bool _isResizable;
         private bool _isBorderless;
-#if WINDOWS
-        private bool _isMouseHidden;
         private bool _isMouseInBounds;
+
+#if LINUX
+        private bool _init;
+        WindowState pstate;
+        int pwidth = 0;
+        int pheight = 0;
 #endif
+
 		//private DisplayOrientation _currentOrientation;
-        private IntPtr _windowHandle = IntPtr.Zero;
-        private OpenTK.GameWindow window;
+        private IntPtr _windowHandle;
+        private INativeWindow window;
+
         protected Game game;
         private List<Microsoft.Xna.Framework.Input.Keys> keys;
 		//private OpenTK.Graphics.GraphicsContext backgroundContext;
@@ -90,7 +96,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        internal OpenTK.GameWindow Window { get { return window; } }
+        internal INativeWindow Window { get { return window; } }
 
         #endregion
 
@@ -122,7 +128,13 @@ namespace Microsoft.Xna.Framework
         {
             get { return DisplayOrientation.LandscapeLeft; }
         }
-
+#if (WINDOWS && OPENGL) || LINUX
+        public override Microsoft.Xna.Framework.Point Position
+        {
+            get { return new Microsoft.Xna.Framework.Point(window.Location.X,window.Location.Y); }
+            set { window.Location = new System.Drawing.Point(value.X,value.Y); }
+        }
+#endif
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
             // Do nothing.  Desktop platforms don't do orientation.
@@ -148,9 +160,9 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        public OpenTKGameWindow()
+        public OpenTKGameWindow(Game game)
         {
-            Initialize();
+            Initialize(game);
         }
 
         ~OpenTKGameWindow()
@@ -174,10 +186,10 @@ namespace Microsoft.Xna.Framework
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (keys.Contains(xnaKey)) keys.Remove(xnaKey);
         }
-
+        
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            if (e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
+            if (_allowAltF4 && e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
             {
                 window.Close();
                 return;
@@ -185,18 +197,22 @@ namespace Microsoft.Xna.Framework
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
         }
-        
+
         #endregion
 
         private void OnResize(object sender, EventArgs e)
         {
+            // Ignore resize events until intialization is complete
+            if (Game == null)
+                return;
+
             var winWidth = window.ClientRectangle.Width;
             var winHeight = window.ClientRectangle.Height;
             var winRect = new Rectangle(0, 0, winWidth, winHeight);
 
             // If window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
-            if (winWidth <= 1 || winHeight <= 1)
+            if (winWidth <= 1 || winHeight <= 1) 
                 return;
 
             //If we've already got a pending change, do nothing
@@ -211,18 +227,39 @@ namespace Microsoft.Xna.Framework
             clientBounds = winRect;
 
             OnClientSizeChanged();
+
+#if LINUX
+            if(!_init)
+            {
+                if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
+                    window.WindowBorder = WindowBorder.Fixed;
+
+                pwidth = window.Width;
+                pheight = window.Height;
+                pstate = window.WindowState;
+                _init = true;
+            }
+#endif
         }
 
-        private void OnRenderFrame(object sender, FrameEventArgs e)
+        internal void ProcessEvents()
         {
-            if (GraphicsContext.CurrentContext == null || GraphicsContext.CurrentContext.IsDisposed)
-                return;
-
-            //Should not happen at all..
-            if (!GraphicsContext.CurrentContext.IsCurrent)
-                window.MakeCurrent();
-
+            Window.ProcessEvents();
             UpdateWindowState();
+            HandleInput();
+
+#if LINUX
+            if (_init) {
+                if (pwidth != window.Width || pheight != window.Height || pstate != window.WindowState) {
+                    if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
+                        window.WindowBorder = WindowBorder.Fixed;
+
+                    pwidth = window.Width;
+                    pheight = window.Height;
+                    pstate = window.WindowState;
+                }
+            }
+#endif
         }
 
         private void UpdateWindowState()
@@ -230,6 +267,11 @@ namespace Microsoft.Xna.Framework
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds)
             {
+#if LINUX
+                if(window.WindowBorder == WindowBorder.Fixed)
+                    window.WindowBorder = WindowBorder.Resizable;
+#endif
+
                 updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
@@ -250,30 +292,18 @@ namespace Microsoft.Xna.Framework
                     desired = WindowBorder.Hidden;
                 else
 #if LINUX
-                    // OpenTK on Linux currently does not allow the window to be resized if the border is fixed.
-                    // We get the resize event for the intended size, then immediately get a resize event for the original size.
-                    // This was preventing GraphicsDeviceManager.PreferredBackBufferWidth and PreferredBackBufferHeight from
-                    // having any effect.
-                    // http://www.opentk.com/node/3132
                     desired = WindowBorder.Resizable;
 #else
                     desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
 #endif
                 if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
                     window.WindowBorder = desired;
-            }
 
-
-        }
-
-        private void OnUpdateFrame(object sender, FrameEventArgs e)
-        {
-            UpdateWindowState();
-
-            if (Game != null)
-            {
-                HandleInput();
-                Game.Tick();
+                var context = GraphicsContext.CurrentContext;
+                if (context != null)
+                {
+                    context.Update(window.WindowInfo);
+                }
             }
         }
 
@@ -289,11 +319,6 @@ namespace Microsoft.Xna.Framework
         private void OnMouseEnter(object sender, EventArgs e)
         {
             _isMouseInBounds = true;
-            if (!game.IsMouseVisible && !_isMouseHidden)
-            {
-                _isMouseHidden = true;
-                System.Windows.Forms.Cursor.Hide();
-            }
         }
 
         private void OnMouseLeave(object sender, EventArgs e)
@@ -303,11 +328,6 @@ namespace Microsoft.Xna.Framework
             if (Mouse.GetState().LeftButton == ButtonState.Released)
             {
                 _isMouseInBounds = false;
-                if (_isMouseHidden)
-                {
-                    _isMouseHidden = false;
-                    System.Windows.Forms.Cursor.Show();
-                }
             }
         }
 #endif
@@ -319,17 +339,20 @@ namespace Microsoft.Xna.Framework
         
         #endregion
 
-        private void Initialize()
+        private void Initialize(Game game)
         {
+            Game = game;
+#if LINUX
+            _init = false;
+#endif
+
             GraphicsContext.ShareContexts = true;
 
-            window = new OpenTK.GameWindow();
-            window.RenderFrame += OnRenderFrame;
-            window.UpdateFrame += OnUpdateFrame;
+            window = new NativeWindow();
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
-            window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+            window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
 #if LINUX
             window.WindowBorder = WindowBorder.Resizable;
 #endif
@@ -339,54 +362,40 @@ namespace Microsoft.Xna.Framework
 #endif
 
             window.KeyPress += OnKeyPress;
-            
+
             // Set the window icon.
             var assembly = Assembly.GetEntryAssembly();
             if(assembly != null)
                 window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;            
 
-#if WINDOWS
-            {
-                var windowInfoType = window.WindowInfo.GetType();
-                var propertyInfo = windowInfoType.GetProperty("WindowHandle");
-                _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
-            }
-#endif
-            // Provide the graphics context for background loading
-            Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
-            Threading.WindowInfo = window.WindowInfo;
+            _windowHandle = window.WindowInfo.Handle;
 
             keys = new List<Keys>();
 
-            // Make the foreground context the current context
-            if (GraphicsContext.CurrentContext == null || !GraphicsContext.CurrentContext.IsCurrent)
-                window.MakeCurrent();
-            
             // mouse
             // TODO review this when opentk 1.1 is released
-#if WINDOWS || LINUX
-            Mouse.setWindows(window);
+#if WINDOWS || LINUX || ANGLE
+            Mouse.setWindows(this);
 #else
             Mouse.UpdateMouseInfo(window.Mouse);
 #endif
 
-            //Default no resizing
+            // Default no resizing
             AllowUserResizing = false;
+
+            // Default mouse cursor hidden 
+            SetMouseVisible(false);
         }
 
         protected override void SetTitle(string title)
         {
             window.Title = title;            
-        }
-
-        internal void Run(double updateRate)
-        {
-            window.Run(updateRate);
         }
 
         internal void ToggleFullScreen()
@@ -395,6 +404,9 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
+#if LINUX
+            updateClientBounds = true;
+#endif
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)
@@ -425,14 +437,8 @@ namespace Microsoft.Xna.Framework
                     // Dispose/release managed objects
                     window.Dispose();
                 }
-
-                // Release native resources
-                if (Threading.BackgroundContext != null)
-                {
-                    Threading.BackgroundContext.Dispose();
-                    Threading.BackgroundContext = null;
-                    Threading.WindowInfo = null;
-                }
+                // The window handle no longer exists
+                _windowHandle = IntPtr.Zero;
 
                 disposed = true;
             }
@@ -447,24 +453,10 @@ namespace Microsoft.Xna.Framework
 
         }
 
-#if WINDOWS
-        public void MouseVisibleToggled()
+        public void SetMouseVisible(bool visible)
         {
-            if (game.IsMouseVisible)
-            {
-                if (_isMouseHidden)
-                {
-                    System.Windows.Forms.Cursor.Show();
-                    _isMouseHidden = false;
-                }
-            }
-            else if (!_isMouseHidden && _isMouseInBounds)
-            {
-                System.Windows.Forms.Cursor.Hide();
-                _isMouseHidden = true;
-            }
+            window.Cursor = visible ? MouseCursor.Default : MouseCursor.Empty;
         }
-#endif
 
         #endregion
     }

@@ -82,9 +82,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 result = (ContentTypeWriter)Activator.CreateInstance(typeof(ArrayWriter<>).MakeGenericType(type.GetElementType()));
                 typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
-            else
+            else if (type.IsEnum)
             {
-				var inputTypeDef = type.GetGenericTypeDefinition ();
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type));
+                typeWriterMap.Add(contentTypeWriterType, result.GetType());
+            }
+            else if (type.IsGenericType)
+            {
+                var inputTypeDef = type.GetGenericTypeDefinition();
 
                 Type chosen = null;
                 foreach (var kvp in typeWriterMap)
@@ -94,12 +99,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     if (args.Length == 0)
                         continue;
 
+                    if (!kvp.Value.IsGenericTypeDefinition)
+                        continue;
+
                     if (!args[0].IsGenericType)
                         continue;
 
                     // Compare generic type definition
                     var keyTypeDef = args[0].GetGenericTypeDefinition();
-                    if (inputTypeDef.Equals(keyTypeDef))
+                    if (inputTypeDef == keyTypeDef)
                     {
                         chosen = kvp.Value;
                         break;
@@ -108,8 +116,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
                 try
                 {
-                    var concreteType = type.GetGenericArguments();
-                    result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
+                    if (chosen == null)
+                        result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type));
+                    else
+                    {
+                        var concreteType = type.GetGenericArguments();
+                        result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
+                    }
 
                     // save it for next time.
                     typeWriterMap.Add(contentTypeWriterType, result.GetType());
@@ -118,14 +131,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 {
                     throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
                 }
-				
+            }
+            else
+            {
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type));
+                typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
 
-            if (result != null)
-            {
-                MethodInfo dynMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
-                dynMethod.Invoke(result, new object[] { this });
-            }
+
+            var initMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
+            initMethod.Invoke(result, new object[] { this });
+
             return result;
         }
 
@@ -136,7 +152,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="content">The content to write to the XNB file.</param>
         /// <param name="targetPlatform">The platform the XNB is intended for.</param>
         /// <param name="targetProfile">The graphics profile of the target.</param>
-        /// <param name="compress">True if the content should be compressed.</param>
+        /// <param name="compressContent">True if the content should be compressed.</param>
         /// <param name="rootDirectory">The root directory of the content.</param>
         /// <param name="referenceRelocationPath">The path of the XNB file, used to calculate relative paths for external references.</param>
         public void Compile(Stream stream, object content, TargetPlatform targetPlatform, GraphicsProfile targetProfile, bool compressContent, string rootDirectory, string referenceRelocationPath)

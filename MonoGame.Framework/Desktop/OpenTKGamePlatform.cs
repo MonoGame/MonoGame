@@ -70,11 +70,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
+
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -84,28 +88,16 @@ namespace Microsoft.Xna.Framework
 		private OpenALSoundController soundControllerInstance = null;
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
-        
-        
-        public override bool VSyncEnabled
-        {
-            get
-            {
-                return _view.Window.VSync == OpenTK.VSyncMode.On ? true : false;
-            }
-            
-            set
-            {
-                _view.Window.VSync = value ? OpenTK.VSyncMode.On : OpenTK.VSyncMode.Off;
-            }
-        }
+        private Toolkit toolkit;
+        private int isExiting; // int, so we can use Interlocked.Increment
         
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
-            _view = new OpenTKGameWindow();
-            _view.Game = game;
+            toolkit = Toolkit.Init();
+            _view = new OpenTKGameWindow(game);
             this.Window = _view;
-			
+
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
             try
             {
@@ -132,35 +124,58 @@ namespace Microsoft.Xna.Framework
             get { return GameRunBehavior.Synchronous; }
         }
 
-#if WINDOWS
         protected override void OnIsMouseVisibleChanged()
         {
-            _view.MouseVisibleToggled();
+            _view.SetMouseVisible(IsMouseVisible);
         }
-#endif
 
         public override void RunLoop()
         {
-            ResetWindowBounds(false);
-            _view.Window.Run(0);
+            ResetWindowBounds();
+            while (true)
+            {
+                _view.ProcessEvents();
+
+                // Stop the main loop iff Game.Exit() has been called.
+                // This can happen under the following circumstances:
+                // 1. Game.Exit() is called programmatically.
+                // 2. The GameWindow is closed through the 'X' (close) button
+                // 3. The GameWindow is closed through Alt-F4 or Cmd-Q
+                // Note: once Game.Exit() is called, we must stop raising 
+                // Update or Draw events as the GameWindow and/or OpenGL context
+                // may no longer be available. 
+                // Note 2: Game.Exit() can be called asynchronously from
+                // _view.ProcessEvents() (cases #2 and #3 above), so the
+                // isExiting check must be placed *after* _view.ProcessEvents()
+                if (isExiting > 0)
+                {
+                    break;
+                }
+
+                Game.Tick();
+            }
         }
 
         public override void StartRunLoop()
         {
             throw new NotSupportedException("The desktop platform does not support asynchronous run loops");
         }
-        
+
         public override void Exit()
         {
-            if (!_view.Window.IsExiting)
-            {
-                Net.NetworkSession.Exit();
-                _view.Window.Exit();
-            }
+            //(SJ) Why is this called here when it's not in any other project
+            //Net.NetworkSession.Exit();
+            Interlocked.Increment(ref isExiting);
 #if LINUX
             Tao.Sdl.SdlMixer.Mix_CloseAudio();
 #endif
             OpenTK.DisplayDevice.Default.RestoreResolution();
+        }
+
+        public override void BeforeInitialize()
+        {
+            _view.Window.Visible = true;
+            base.BeforeInitialize();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -180,15 +195,15 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
         public override void ExitFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
-        internal void ResetWindowBounds(bool toggleFullScreen)
+        internal void ResetWindowBounds()
         {
             Rectangle bounds;
 
@@ -265,16 +280,6 @@ namespace Microsoft.Xna.Framework
         {
             
         }
-#if LINUX
-        protected override void OnIsMouseVisibleChanged()
-        {
-            MouseState oldState = Mouse.GetState();
-            _view.Window.CursorVisible = IsMouseVisible;
-            // IsMouseVisible changes the location of the cursor on Linux and we have to manually set it back to the correct position
-            System.Drawing.Point mousePos = _view.Window.PointToScreen(new System.Drawing.Point(oldState.X, oldState.Y));
-            OpenTK.Input.Mouse.SetPosition(mousePos.X, mousePos.Y);
-        }
-#endif
         
         public override void Log(string Message)
         {
@@ -288,15 +293,18 @@ namespace Microsoft.Xna.Framework
             var device = Game.GraphicsDevice;
             if (device != null)
                 device.Present();
-
-            if (_view != null)
-                _view.Window.SwapBuffers();
         }
 		
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
             {
+                if (toolkit != null)
+                {
+                    toolkit.Dispose();
+                    toolkit = null;
+                }
+
                 if (_view != null)
                 {
                     _view.Dispose();

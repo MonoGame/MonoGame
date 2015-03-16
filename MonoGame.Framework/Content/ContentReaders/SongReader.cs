@@ -43,6 +43,7 @@ using System;
 using System.IO;
 
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -65,27 +66,11 @@ namespace Microsoft.Xna.Framework.Content
 			
 			if (!String.IsNullOrEmpty(path))
 			{
-#if WINRT
-				const char notSeparator = '/';
-				const char separator = '\\';
-#else
-				const char notSeparator = '\\';
-				var separator = Path.DirectorySeparatorChar;
-#endif
-				path = path.Replace(notSeparator, separator);
-				
-				// Get a uri for the asset path using the file:// schema and no host
-				var src = new Uri("file:///" + input.AssetName.Replace(notSeparator, separator));
-				
-				// Add the relative path to the external reference
-				var dst = new Uri(src, path);
-				
-				// The uri now contains the path to the external reference within the content manager
-				// Get the local path and skip the first character (the path separator)
-				path = dst.LocalPath.Substring(1);
-				
-				// Adds the ContentManager's RootDirectory
-                path = Path.Combine(input.ContentManager.RootDirectoryFullPath, path);
+                // Add the ContentManager's RootDirectory
+                var dirPath = Path.Combine(input.ContentManager.RootDirectoryFullPath, input.AssetName);
+
+                // Resolve the relative path
+                path = FileHelpers.ResolveRelativePath(dirPath, path);
 			}
 			
 			var durationMs = input.ReadObject<int>();

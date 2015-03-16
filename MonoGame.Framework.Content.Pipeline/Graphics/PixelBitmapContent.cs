@@ -6,6 +6,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -13,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     {
         internal T[][] _pixelData;
 
-        internal SurfaceFormat _format = SurfaceFormat.Color;
+        internal SurfaceFormat _format;
 
         public PixelBitmapContent(int width, int height)
         {
@@ -24,14 +25,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             for (int y = 0; y < height; y++)
                 _pixelData[y] = new T[width];
+
+            TryGetFormat(out _format);
         }
 
         public override byte[] GetPixelData()
         {
-            if (_format != SurfaceFormat.Color)
-                throw new NotImplementedException();
-
-            var formatSize = _format.Size();
+            var formatSize = _format.GetSize();
             var dataSize = Width * Height * formatSize;
             var outputData = new byte[dataSize];
 
@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public override void SetPixelData(byte[] sourceData)
         {
-            var size = _format.Size();
+            var size = _format.GetSize();
 
             for(var x = 0; x < Height; x++)
             {
@@ -78,7 +78,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The GPU texture format of the bitmap type.</returns>
         public override bool TryGetFormat(out SurfaceFormat format)
         {
-            format = _format;
+            if (typeof(T) == typeof(Color))
+                format = SurfaceFormat.Color;
+            else if (typeof(T) == typeof(Bgra4444))
+                format = SurfaceFormat.Bgra4444;
+            else if (typeof(T) == typeof(Bgr565))
+                format = SurfaceFormat.Bgr565;
+            else
+            {
+                format = SurfaceFormat.Color;
+                return false;
+            }
+
             return true;
         }
 
@@ -104,19 +115,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destRegion)
+        protected override bool TryCopyFrom(BitmapContent srcBitmap, Rectangle srcRect, Rectangle dstRect)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
-        protected override bool TryCopyTo(BitmapContent destBitmap, Rectangle sourceRegion, Rectangle destRegion)
+        protected override bool TryCopyTo(BitmapContent dstBitmap, Rectangle srcRect, Rectangle dstRect)
         {
-            throw new NotImplementedException();
-        }
+            SurfaceFormat format;
+            if (!dstBitmap.TryGetFormat(out format) || format != _format)
+                return false;
 
-        public override string ToString()
-        {
-            return base.ToString();
+            var dst = dstBitmap as PixelBitmapContent<T>;
+            for (var i = 0; i < dstRect.Height; i++)
+            {
+                var dy = dstRect.Y + i;
+                for (var j = 0; j < dstRect.Width; j++)
+                {
+                    var dx = dstRect.X + j;
+
+                    var uv = new Vector2()
+                    {
+                        X = j / (float)dstRect.Width,
+                        Y = i / (float)dstRect.Height,
+                    };
+
+                    var sx = MathHelper.Clamp((int)Math.Round(uv.X * srcRect.Width) + srcRect.X, 0, Width - 1);
+                    var sy = MathHelper.Clamp((int)Math.Round(uv.Y * srcRect.Height) + srcRect.Y, 0, Height - 1);
+                    var pixel = GetPixel(sx, sy);
+                    dst.SetPixel(dx, dy, pixel);
+                }
+            }
+
+            return true;
         }
     }
 }

@@ -47,7 +47,7 @@ using Windows.UI.Xaml.Controls;
 #if MONOMAC
 using MonoMac.AppKit;
 #elif IOS
-using MonoTouch.UIKit;
+using UIKit;
 using Microsoft.Xna.Framework.Input.Touch;
 #endif
 
@@ -68,9 +68,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private int backBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;
         private int backBufferWidth = GraphicsDeviceManager.DefaultBackBufferWidth;
         private IntPtr deviceWindowHandle;
-        private bool isFullScreen;
         private int multiSampleCount;
-        private bool disposed;       	
+        private bool disposed;
+#if !WINRT
+        private bool isFullScreen;
+#endif
 
         #endregion Private Fields
 
@@ -121,7 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINDOWS_STOREAPP
         [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
+        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif
 
         public DepthFormat DepthStencilFormat
@@ -206,7 +208,7 @@ namespace Microsoft.Xna.Framework.Graphics
             depthStencilFormat = DepthFormat.None;
             multiSampleCount = 0;
             PresentationInterval = PresentInterval.Default;
-            DisplayOrientation = DisplayOrientation.Default;
+            DisplayOrientation = Microsoft.Xna.Framework.DisplayOrientation.Default;
         }
 
         public PresentationParameters Clone()

@@ -80,7 +80,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 throw new ArgumentNullException("sourceBitmap");
             if (destinationBitmap == null)
                 throw new ArgumentNullException("destinationBitmap");
-            Copy(sourceBitmap, new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), destinationBitmap, new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height));
+
+            var sourceRegion = new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height);
+            var destinationRegion = new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height);
+
+            Copy(sourceBitmap, sourceRegion, destinationBitmap, destinationRegion);
         }
 
         /// <summary>
@@ -94,6 +98,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void Copy(BitmapContent sourceBitmap, Rectangle sourceRegion, BitmapContent destinationBitmap, Rectangle destinationRegion)
         {
             ValidateCopyArguments(sourceBitmap, sourceRegion, destinationBitmap, destinationRegion);
+
+            if (sourceBitmap.TryCopyTo(destinationBitmap, sourceRegion, destinationRegion) ||
+                destinationBitmap.TryCopyFrom(sourceBitmap, sourceRegion, destinationRegion))
+                return;
+
             throw new NotImplementedException();
         }
 
@@ -115,8 +124,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Description of the bitmap.</returns>
         public override string ToString()
         {
-            // See what Microsoft's implementation returns
-            throw new NotImplementedException();
+            return string.Format("{0}, {1}x{2}", GetType().Name, Width, Height);
         }
 
         /// <summary>

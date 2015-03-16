@@ -67,10 +67,7 @@ non-infringement.
 #endregion License
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -99,6 +96,12 @@ namespace MonoGame.Tests.Visual {
 			// The texture to apply the effect to
 			Texture2D surge = null;
 
+#if XNA
+            effectName = Path.Combine("XNA", effectName);
+#elif WINDOWS
+            effectName = Path.Combine("DirectX", effectName);
+#endif
+
 			Game.LoadContentWith += (sender, e) => {
 				spriteBatch = new SpriteBatch (Game.GraphicsDevice);
 				effect = Game.Content.Load<Effect> (Paths.Effect (effectName));
@@ -112,7 +115,6 @@ namespace MonoGame.Tests.Visual {
 
 			Game.DrawWith += (sender, e) => {
 				spriteBatch.Begin (SpriteSortMode.Immediate, BlendState.AlphaBlend);
-
 				spriteBatch.Draw (background, Vector2.Zero, Color.White);
 
 				effect.CurrentTechnique.Passes [0].Apply ();

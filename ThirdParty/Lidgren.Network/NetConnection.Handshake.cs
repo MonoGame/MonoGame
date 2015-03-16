@@ -8,8 +8,9 @@ namespace Lidgren.Network
 	{
 		internal bool m_connectRequested;
 		internal bool m_disconnectRequested;
-		internal bool m_connectionInitiator;
+		internal bool m_disconnectReqSendBye;
 		internal string m_disconnectMessage;
+		internal bool m_connectionInitiator;
 		internal NetIncomingMessage m_remoteHailMessage;
 		internal float m_lastHandshakeSendTime;
 		internal int m_handshakeAttempts;
@@ -43,7 +44,8 @@ namespace Lidgren.Network
 						break;
 
 					case NetConnectionStatus.Disconnected:
-						throw new NetException("This connection is Disconnected; spent. A new one should have been created");
+						m_peer.ThrowOrLog("This connection is Disconnected; spent. A new one should have been created");
+						break;
 
 					case NetConnectionStatus.Disconnecting:
 						// let disconnect finish first
@@ -75,12 +77,12 @@ namespace Lidgren.Network
 					case NetConnectionStatus.RespondedConnect:
 						SendConnectResponse(now, true);
 						break;
-					case NetConnectionStatus.None:
-						if (m_peerConfiguration.IsMessageTypeEnabled(NetIncomingMessageType.ConnectionApproval))
-							break; // we're probably waiting for connection approval here
-						m_peer.LogWarning("Time to resend handshake, but status is " + m_status);
+					case NetConnectionStatus.RespondedAwaitingApproval:
+						// awaiting approval
+						m_lastHandshakeSendTime = now; // postpone handshake resend
 						break;
-
+					case NetConnectionStatus.None:
+					case NetConnectionStatus.ReceivedInitiation:
 					default:
 						m_peer.LogWarning("Time to resend handshake, but status is " + m_status);
 						break;
@@ -91,8 +93,6 @@ namespace Lidgren.Network
 		internal void ExecuteDisconnect(string reason, bool sendByeMessage)
 		{
 			m_peer.VerifyNetworkThread();
-
-			// m_peer.LogDebug("Executing disconnect");
 
 			// clear send queues
 			for (int i = 0; i < m_sendChannels.Length; i++)
@@ -105,11 +105,19 @@ namespace Lidgren.Network
 			if (sendByeMessage)
 				SendDisconnect(reason, true);
 
-			SetStatus(NetConnectionStatus.Disconnected, reason);
+			if (m_status == NetConnectionStatus.ReceivedInitiation)
+			{
+				// nothing much has happened yet; no need to send disconnected status message
+				m_status = NetConnectionStatus.Disconnected;
+			}
+			else
+			{
+				SetStatus(NetConnectionStatus.Disconnected, reason);
+			}
 
 			// in case we're still in handshake
 			lock (m_peer.m_handshakes)
-				m_peer.m_handshakes.Remove(m_remoteEndpoint);
+				m_peer.m_handshakes.Remove(m_remoteEndPoint);
 
 			m_disconnectRequested = false;
 			m_connectRequested = false;
@@ -120,7 +128,10 @@ namespace Lidgren.Network
 		{
 			m_peer.VerifyNetworkThread();
 
-			NetOutgoingMessage om = m_peer.CreateMessage(m_peerConfiguration.AppIdentifier.Length + 1 + 4);
+			int preAllocate = 13 + m_peerConfiguration.AppIdentifier.Length;
+			preAllocate += (m_localHailMessage == null ? 0 : m_localHailMessage.LengthBytes);
+
+			NetOutgoingMessage om = m_peer.CreateMessage(preAllocate);
 			om.m_messageType = NetMessageType.Connect;
 			om.Write(m_peerConfiguration.AppIdentifier);
 			om.Write(m_peer.m_uniqueIdentifier);
@@ -128,7 +139,7 @@ namespace Lidgren.Network
 
 			WriteLocalHail(om);
 			
-			m_peer.SendLibrary(om, m_remoteEndpoint);
+			m_peer.SendLibrary(om, m_remoteEndPoint);
 
 			m_connectRequested = false;
 			m_lastHandshakeSendTime = now;
@@ -144,7 +155,7 @@ namespace Lidgren.Network
 			if (onLibraryThread)
 				m_peer.VerifyNetworkThread();
 
-			NetOutgoingMessage om = m_peer.CreateMessage(m_peerConfiguration.AppIdentifier.Length + 1 + 4);
+			NetOutgoingMessage om = m_peer.CreateMessage(m_peerConfiguration.AppIdentifier.Length + 13 + (m_localHailMessage == null ? 0 : m_localHailMessage.LengthBytes));
 			om.m_messageType = NetMessageType.ConnectResponse;
 			om.Write(m_peerConfiguration.AppIdentifier);
 			om.Write(m_peer.m_uniqueIdentifier);
@@ -153,9 +164,9 @@ namespace Lidgren.Network
 			WriteLocalHail(om);
 
 			if (onLibraryThread)
-				m_peer.SendLibrary(om, m_remoteEndpoint);
+				m_peer.SendLibrary(om, m_remoteEndPoint);
 			else
-				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<System.Net.IPEndPoint, NetOutgoingMessage>(m_remoteEndpoint, om));
+				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<System.Net.IPEndPoint, NetOutgoingMessage>(m_remoteEndPoint, om));
 
 			m_lastHandshakeSendTime = now;
 			m_handshakeAttempts++;
@@ -174,31 +185,31 @@ namespace Lidgren.Network
 			NetOutgoingMessage om = m_peer.CreateMessage(reason);
 			om.m_messageType = NetMessageType.Disconnect;
 			if (onLibraryThread)
-				m_peer.SendLibrary(om, m_remoteEndpoint);
+				m_peer.SendLibrary(om, m_remoteEndPoint);
 			else
-				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<System.Net.IPEndPoint, NetOutgoingMessage>(m_remoteEndpoint, om));
+				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<System.Net.IPEndPoint, NetOutgoingMessage>(m_remoteEndPoint, om));
 		}
 
 		private void WriteLocalHail(NetOutgoingMessage om)
 		{
 			if (m_localHailMessage != null)
 			{
-				byte[] hi = m_localHailMessage.PeekDataBuffer();
+				byte[] hi = m_localHailMessage.Data;
 				if (hi != null && hi.Length >= m_localHailMessage.LengthBytes)
 				{
 					if (om.LengthBytes + m_localHailMessage.LengthBytes > m_peerConfiguration.m_maximumTransmissionUnit - 10)
-						throw new NetException("Hail message too large; can maximally be " + (m_peerConfiguration.m_maximumTransmissionUnit - 10 - om.LengthBytes));
-					om.Write(m_localHailMessage.PeekDataBuffer(), 0, m_localHailMessage.LengthBytes);
+						m_peer.ThrowOrLog("Hail message too large; can maximally be " + (m_peerConfiguration.m_maximumTransmissionUnit - 10 - om.LengthBytes));
+					om.Write(m_localHailMessage.Data, 0, m_localHailMessage.LengthBytes);
 				}
 			}
 		}
 
 		internal void SendConnectionEstablished()
 		{
-			NetOutgoingMessage om = m_peer.CreateMessage(0);
+			NetOutgoingMessage om = m_peer.CreateMessage(4);
 			om.m_messageType = NetMessageType.ConnectionEstablished;
 			om.Write((float)NetTime.Now);
-			m_peer.SendLibrary(om, m_remoteEndpoint);
+			m_peer.SendLibrary(om, m_remoteEndPoint);
 
 			m_handshakeAttempts = 0;
 
@@ -212,6 +223,12 @@ namespace Lidgren.Network
 		/// </summary>
 		public void Approve()
 		{
+			if (m_status != NetConnectionStatus.RespondedAwaitingApproval)
+			{
+				m_peer.LogWarning("Approve() called in wrong status; expected RespondedAwaitingApproval; got " + m_status);
+				return;
+			}
+
 			m_localHailMessage = null;
 			m_handshakeAttempts = 0;
 			SendConnectResponse((float)NetTime.Now, false);
@@ -223,6 +240,12 @@ namespace Lidgren.Network
 		/// <param name="localHail">The local hail message that will be set as RemoteHailMessage on the remote host</param>
 		public void Approve(NetOutgoingMessage localHail)
 		{
+			if (m_status != NetConnectionStatus.RespondedAwaitingApproval)
+			{
+				m_peer.LogWarning("Approve() called in wrong status; expected RespondedAwaitingApproval; got " + m_status);
+				return;
+			}
+
 			m_localHailMessage = localHail;
 			m_handshakeAttempts = 0;
 			SendConnectResponse((float)NetTime.Now, false);
@@ -233,7 +256,7 @@ namespace Lidgren.Network
 		/// </summary>
 		public void Deny()
 		{
-			Deny("");
+			Deny(string.Empty);
 		}
 
 		/// <summary>
@@ -246,7 +269,8 @@ namespace Lidgren.Network
 			SendDisconnect(reason, false);
 
 			// remove from handshakes
-			m_peer.m_handshakes.Remove(m_remoteEndpoint); // TODO: make this more thread safe? we're on user thread
+			lock (m_peer.m_handshakes)
+				m_peer.m_handshakes.Remove(m_remoteEndPoint);
 		}
 
 		internal void ReceivedHandshake(double now, NetMessageType tp, int ptr, int payloadLength)
@@ -257,7 +281,7 @@ namespace Lidgren.Network
 			switch (tp)
 			{
 				case NetMessageType.Connect:
-					if (m_status == NetConnectionStatus.None)
+					if (m_status == NetConnectionStatus.ReceivedInitiation)
 					{
 						// Whee! Server full has already been checked
 						bool ok = ValidateHandshakeData(ptr, payloadLength, out hail);
@@ -279,15 +303,21 @@ namespace Lidgren.Network
 								NetIncomingMessage appMsg = m_peer.CreateIncomingMessage(NetIncomingMessageType.ConnectionApproval, (m_remoteHailMessage == null ? 0 : m_remoteHailMessage.LengthBytes));
 								appMsg.m_receiveTime = now;
 								appMsg.m_senderConnection = this;
-								appMsg.m_senderEndpoint = this.m_remoteEndpoint;
+								appMsg.m_senderEndPoint = this.m_remoteEndPoint;
 								if (m_remoteHailMessage != null)
 									appMsg.Write(m_remoteHailMessage.m_data, 0, m_remoteHailMessage.LengthBytes);
+								SetStatus(NetConnectionStatus.RespondedAwaitingApproval, "Awaiting approval");
 								m_peer.ReleaseMessage(appMsg);
 								return;
 							}
 
 							SendConnectResponse((float)now, true);
 						}
+						return;
+					}
+					if (m_status == NetConnectionStatus.RespondedAwaitingApproval)
+					{
+						m_peer.LogWarning("Ignoring multiple Connect() most likely due to a delayed Approval");
 						return;
 					}
 					if (m_status == NetConnectionStatus.RespondedConnect)
@@ -299,42 +329,9 @@ namespace Lidgren.Network
 					m_peer.LogDebug("Unhandled Connect: " + tp + ", status is " + m_status + " length: " + payloadLength);
 					break;
 				case NetMessageType.ConnectResponse:
-					switch (m_status)
-					{
-						case NetConnectionStatus.InitiatedConnect:
-							// awesome
-							bool ok = ValidateHandshakeData(ptr, payloadLength, out hail);
-							if (ok)
-							{
-								if (hail != null)
-								{
-									m_remoteHailMessage = m_peer.CreateIncomingMessage(NetIncomingMessageType.Data, hail);
-									m_remoteHailMessage.LengthBits = (hail.Length * 8);
-								}
-								else
-								{
-									m_remoteHailMessage = null;
-								}
-
-								m_peer.AcceptConnection(this);
-								SendConnectionEstablished();
-								return;
-							}
-							break;
-						case NetConnectionStatus.RespondedConnect:
-							// hello, wtf?
-							break;
-						case NetConnectionStatus.Disconnecting:
-						case NetConnectionStatus.Disconnected:
-						case NetConnectionStatus.None:
-							// wtf? anyway, bye!
-							break;
-						case NetConnectionStatus.Connected:
-							// my ConnectionEstablished must have been lost, send another one
-							SendConnectionEstablished();
-							return;
-					}
+					HandleConnectResponse(now, tp, ptr, payloadLength);
 					break;
+
 				case NetMessageType.ConnectionEstablished:
 					switch (m_status)
 					{
@@ -346,8 +343,11 @@ namespace Lidgren.Network
 						case NetConnectionStatus.None:
 							// too bad, almost made it
 							break;
+						case NetConnectionStatus.ReceivedInitiation:
+							// uh, a little premature... ignore
+							break;
 						case NetConnectionStatus.InitiatedConnect:
-							// weird, should have been ConnectResponse...
+							// weird, should have been RespondedConnect...
 							break;
 						case NetConnectionStatus.RespondedConnect:
 							// awesome
@@ -377,11 +377,11 @@ namespace Lidgren.Network
 					break;
 
 				case NetMessageType.Discovery:
-					m_peer.HandleIncomingDiscoveryRequest(now, m_remoteEndpoint, ptr, payloadLength);
+					m_peer.HandleIncomingDiscoveryRequest(now, m_remoteEndPoint, ptr, payloadLength);
 					return;
 
 				case NetMessageType.DiscoveryResponse:
-					m_peer.HandleIncomingDiscoveryResponse(now, m_remoteEndpoint, ptr, payloadLength);
+					m_peer.HandleIncomingDiscoveryResponse(now, m_remoteEndPoint, ptr, payloadLength);
 					return;
 
 				case NetMessageType.Ping:
@@ -391,6 +391,47 @@ namespace Lidgren.Network
 				default:
 					m_peer.LogDebug("Unhandled type during handshake: " + tp + " length: " + payloadLength);
 					break;
+			}
+		}
+
+		private void HandleConnectResponse(double now, NetMessageType tp, int ptr, int payloadLength)
+		{
+			byte[] hail;
+			switch (m_status)
+			{
+				case NetConnectionStatus.InitiatedConnect:
+					// awesome
+					bool ok = ValidateHandshakeData(ptr, payloadLength, out hail);
+					if (ok)
+					{
+						if (hail != null)
+						{
+							m_remoteHailMessage = m_peer.CreateIncomingMessage(NetIncomingMessageType.Data, hail);
+							m_remoteHailMessage.LengthBits = (hail.Length * 8);
+						}
+						else
+						{
+							m_remoteHailMessage = null;
+						}
+
+						m_peer.AcceptConnection(this);
+						SendConnectionEstablished();
+						return;
+					}
+					break;
+				case NetConnectionStatus.RespondedConnect:
+					// hello, wtf?
+					break;
+				case NetConnectionStatus.Disconnecting:
+				case NetConnectionStatus.Disconnected:
+				case NetConnectionStatus.ReceivedInitiation:
+				case NetConnectionStatus.None:
+					// wtf? anyway, bye!
+					break;
+				case NetConnectionStatus.Connected:
+					// my ConnectionEstablished must have been lost, send another one
+					SendConnectionEstablished();
+					return;
 			}
 		}
 
@@ -412,7 +453,6 @@ namespace Lidgren.Network
 
 				if (remoteAppIdentifier != m_peer.m_configuration.AppIdentifier)
 				{
-					// wrong app identifier
 					ExecuteDisconnect("Wrong application identifier!", true);
 					return false;
 				}
@@ -447,6 +487,7 @@ namespace Lidgren.Network
 
 			m_handshakeAttempts = 0;
 			m_disconnectRequested = true;
+			m_disconnectReqSendBye = true;
 		}
 	}
 }

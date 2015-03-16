@@ -1,42 +1,14 @@
-﻿
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Authors:
-Olivier Dufour (Duff)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+﻿// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public class BoundingFrustum : IEquatable<BoundingFrustum>
     {
         #region Private Fields
@@ -156,15 +128,27 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
-        /*
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             if (this == frustum)                // We check to see if the two frustums are equal
                 return ContainmentType.Contains;// If they are, there's no need to go any further.
 
-            throw new NotImplementedException();
+            var intersects = false;
+            for (var i = 0; i < PlaneCount; ++i)
+            {
+                PlaneIntersectionType planeIntersectionType;
+                frustum.Intersects(ref planes[i], out planeIntersectionType);
+                switch (planeIntersectionType)
+                {
+                    case PlaneIntersectionType.Front:
+                        return ContainmentType.Disjoint;
+                    case PlaneIntersectionType.Intersecting:
+                        intersects = true;
+                        break;
+                }
+            }
+            return intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
-        */
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
@@ -259,12 +243,10 @@ namespace Microsoft.Xna.Framework
 			result = containment != ContainmentType.Disjoint;
 		}
 
-        /*
         public bool Intersects(BoundingFrustum frustum)
         {
-            throw new NotImplementedException();
+            return Contains(frustum) != ContainmentType.Disjoint;
         }
-        */
 
         public bool Intersects(BoundingSphere sphere)
         {
@@ -280,17 +262,22 @@ namespace Microsoft.Xna.Framework
             result = containment != ContainmentType.Disjoint;
         }
 
-        /*
         public PlaneIntersectionType Intersects(Plane plane)
         {
-            throw new NotImplementedException();
+            PlaneIntersectionType result;
+            Intersects(ref plane, out result);
+            return result;
         }
 
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
-            throw new NotImplementedException();
+            result = plane.Intersects(ref corners[0]);
+            for (int i = 1; i < corners.Length; i++)
+                if (plane.Intersects(ref corners[i]) != result)
+                    result = PlaneIntersectionType.Intersecting;
         }
 
+        /*
         public Nullable<float> Intersects(Ray ray)
         {
             throw new NotImplementedException();
@@ -301,6 +288,21 @@ namespace Microsoft.Xna.Framework
             throw new NotImplementedException();
         }
         */
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    "Near( ", this.planes[0].DebugDisplayString, " )  \r\n",
+                    "Far( ", this.planes[1].DebugDisplayString, " )  \r\n",
+                    "Left( ", this.planes[2].DebugDisplayString, " )  \r\n",
+                    "Right( ", this.planes[3].DebugDisplayString, " )  \r\n",
+                    "Top( ", this.planes[4].DebugDisplayString, " )  \r\n",
+                    "Bottom( ", this.planes[5].DebugDisplayString, " )  "                  
+                    );
+            }
+        }
 
         public override string ToString()
         {

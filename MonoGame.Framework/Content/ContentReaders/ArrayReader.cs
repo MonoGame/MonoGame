@@ -26,13 +26,11 @@ SOFTWARE.
 #endregion License
 
 using System;
-#if WINRT
-using System.Reflection;
-#endif
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    public class ArrayReader<T> : ContentTypeReader<T[]>
+    internal class ArrayReader<T> : ContentTypeReader<T[]>
     {
         ContentTypeReader elementReader;
 
@@ -53,11 +51,7 @@ namespace Microsoft.Xna.Framework.Content
             if (array == null)
                 array = new T[count];
 
-#if WINRT
-            if (typeof(T).GetTypeInfo().IsValueType)
-#else
-            if (typeof(T).IsValueType)
-#endif
+            if (ReflectionHelpers.IsValueType(typeof(T)))
 			{
                 for (uint i = 0; i < count; i++)
                 {
@@ -68,7 +62,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
                 for (uint i = 0; i < count; i++)
                 {
-                    int readerType = input.Read7BitEncodedInt();
+                    var readerType = input.Read7BitEncodedInt();
                 	array[i] = readerType > 0 ? input.ReadObject<T>(input.TypeReaders[readerType - 1]) : default(T);
                 }
 			}

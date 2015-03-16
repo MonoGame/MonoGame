@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -119,8 +120,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // We always have a position channel
             result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, VertexElementFormat.Vector3,
-                                                                          VertexElementUsage.Position, 0));
-            offset += VertexElementFormat.Vector3.GetTypeSize();
+                                                                           VertexElementUsage.Position, 0));
+            offset += VertexElementFormat.Vector3.GetSize();
 
             // Optional channels
             foreach (var channel in Channels)
@@ -129,23 +130,42 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 VertexElementUsage usage;
 
                 // Try to determine the vertex format
-                // TODO: Add support for additional formats as they become testable
-                if (channel.ElementType == typeof(Vector3))
-                    format = VertexElementFormat.Vector3;
+                if (channel.ElementType == typeof(Single))
+                    format = VertexElementFormat.Single;
                 else if (channel.ElementType == typeof(Vector2))
                     format = VertexElementFormat.Vector2;
+                else if (channel.ElementType == typeof(Vector3))
+                    format = VertexElementFormat.Vector3;
+                else if (channel.ElementType == typeof(Vector4))
+                    format = VertexElementFormat.Vector4;
+                else if (channel.ElementType == typeof(Color))
+                    format = VertexElementFormat.Color;
+                else if (channel.ElementType == typeof(Byte4))
+                    format = VertexElementFormat.Byte4;
+                else if (channel.ElementType == typeof(Short2))
+                    format = VertexElementFormat.Short2;
+                else if (channel.ElementType == typeof(Short4))
+                    format = VertexElementFormat.Short4;
+                else if (channel.ElementType == typeof(NormalizedShort2))
+                    format = VertexElementFormat.NormalizedShort2;
+                else if (channel.ElementType == typeof(NormalizedShort4))
+                    format = VertexElementFormat.NormalizedShort4;
+                else if (channel.ElementType == typeof(HalfVector2))
+                    format = VertexElementFormat.HalfVector2;
+                else if (channel.ElementType == typeof(HalfVector4))
+                    format = VertexElementFormat.HalfVector4;
                 else
-                    throw new InvalidContentException("Unrecognized vertex content type.");
+                    throw new InvalidContentException(string.Format("Unrecognized vertex content type: '{0}'", channel.ElementType));
 
                 // Try to determine the vertex usage
                 if (!VertexChannelNames.TryDecodeUsage(channel.Name, out usage))
-                    throw new InvalidContentException("Unknown vertex element usage.");
+                    throw new InvalidContentException(string.Format("Unknown vertex element usage for channel '{0}'", channel.Name));
 
                 // Try getting the usage index
                 var usageIndex = VertexChannelNames.DecodeUsageIndex(channel.Name);
 
                 result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, format, usage, usageIndex));
-                offset += format.GetTypeSize();
+                offset += format.GetSize();
                 result.VertexDeclaration.VertexStride = offset;
             }
             return offset;
@@ -174,7 +194,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
-        /// Removes a vertex index from the specified location in both PositionIndices and VertexChannel<T>.
+        /// Removes a vertex index from the specified location in both PositionIndices and VertexChannel&lt;T&gt;.
         /// </summary>
         /// <param name="index">Index of the vertex to be removed.</param>
         public void RemoveAt(int index)
@@ -186,7 +206,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
-        /// Removes a range of vertex indices from the specified location in both PositionIndices and VertexChannel<T>.
+        /// Removes a range of vertex indices from the specified location in both PositionIndices and VertexChannel&lt;T&gt;.
         /// </summary>
         /// <param name="index">Index of the first vertex index to be removed.</param>
         /// <param name="count">Number of indices to remove.</param>

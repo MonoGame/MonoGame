@@ -14,12 +14,46 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public const string TextureKey = "Texture";
         public const string VertexColorEnabledKey = "VertexColorEnabled";
 
-        public float? Alpha { get; set; }
-        public Vector3? DiffuseColor { get; set; }
-        public Vector3? EmissiveColor { get; set; }
-        public Vector3? SpecularColor { get; set; }
-        public float? SpecularPower { get; set; }
-        public ExternalReference<TextureContent> Texture { get; set; }
-        public bool? VertexColorEnabled { get; set; }
+        public float? Alpha
+        {
+            get { return GetValueTypeProperty<float>(AlphaKey); }
+            set { SetProperty(AlphaKey, value); }
+        }
+
+        public Vector3? DiffuseColor
+        {
+            get { return GetValueTypeProperty<Vector3>(DiffuseColorKey); }
+            set { SetProperty(DiffuseColorKey, value); }
+        }
+
+        public Vector3? EmissiveColor
+        {
+            get { return GetValueTypeProperty<Vector3>(EmissiveColorKey); }
+            set { SetProperty(EmissiveColorKey, value); }
+        }
+
+        public Vector3? SpecularColor
+        {
+            get { return GetValueTypeProperty<Vector3>(SpecularColorKey); }
+            set { SetProperty(SpecularColorKey, value); }
+        }
+
+        public float? SpecularPower
+        {
+            get { return GetValueTypeProperty<float>(SpecularPowerKey); }
+            set { SetProperty(SpecularPowerKey, value); }
+        }
+
+        public ExternalReference<TextureContent> Texture
+        {
+            get { return GetTexture(TextureKey); }
+            set { SetTexture(TextureKey, value); }
+        }
+
+        public bool? VertexColorEnabled
+        {
+            get { return GetValueTypeProperty<bool>(VertexColorEnabledKey); }
+            set { SetProperty(VertexColorEnabledKey, value); }
+        }
     }
 }

@@ -1,24 +1,16 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// SpriteEffect.cs
-//
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-#endregion
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
     /// The default effect used by SpriteBatch.
     /// </summary>
-    public class SpriteEffect : Effect
+    internal class SpriteEffect : Effect
     {
         #region Effect Parameters
 
@@ -30,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"
 #elif PSM
-            "MonoGame.Framework.PSMobile.PSSuite.Graphics.Resources.SpriteEffect.cgx" //FIXME: This shader is totally incomplete
+            "Microsoft.Xna.Framework.PSSuite.Graphics.Resources.SpriteEffect.cgx" //FIXME: This shader is totally incomplete
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
 #endif

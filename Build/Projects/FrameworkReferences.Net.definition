@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="FrameworkReferences.Net">
+
+  <Platform Type="iOS">
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
+  <Platform Type="Linux">
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
+  <Platform Type="Android">
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="mscorlib" />
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
+  <Platform Type="Ouya">
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="mscorlib" />
+    <Reference Include="Lidgren.Network" />
+    <Binary
+      Name="Ouya.Console.Api"
+      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
+  </Platform>
+
+  <Platform Type="PSMobile">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Sce.PlayStation.Core" />
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
+  <Platform Type="Windows">
+    <Reference Include="System.Core" />
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
+  <Platform Type="Windows8">
+    <Reference Include="MonoGame.Framework.Windows8" />
+  </Platform>
+
+  <Platform Type="WindowsGL">
+    <Reference Include="System.Core" />
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
+  <Platform Type="WindowsPhone">
+    <Reference Include="Microsoft.Xna.Framework.GamerServices">
+      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework">
+      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
+    </Reference>
+  </Platform>
+  
+  <Platform Type="WindowsPhone81">
+    <Reference Include="MonoGame.Framework.WindowsPhone81" />
+  </Platform>
+   
+  <Platform Type="Web">
+    <Reference Include="JSIL.Meta" />
+  </Platform>
+
+</ExternalProject>

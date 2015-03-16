@@ -1,7 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
 !include "header.nsh"
-!define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
 ;Include Modern UI
@@ -14,16 +13,17 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
-Name '${APPNAME} ${INSTALLERVERSION}'
-OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
+Name '${APPNAME} SDK ${INSTALLERVERSION}'
+OutFile 'MonoGameSetup.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
-VIProductVersion "${VERSION}.${REVISION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development Tools"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame"
+!define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
+VIProductVersion "${INSTALLERVERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} SDK"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "ï¿½ Copyright MonoGame 2013"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -39,29 +39,31 @@ RequestExecutionLevel admin
 
 !insertmacro MUI_PAGE_WELCOME
 
-;!insertmacro MUI_PAGE_LICENSE "License.txt"
+!insertmacro MUI_PAGE_LICENSE "..\..\License.txt"
 
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 
-;Page custom XamarinPageEnter XamarinPageLeave
-
-;  Function XamarinPageEnter
-;      ReserveFile "xamarin.ini"
-;      ReserveFile "mono.bmp"
-;      ReserveFile "xamarin.bmp"
-;      !insertmacro INSTALLOPTIONS_EXTRACT "xamarin.ini"
-;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 1" "Text" "mono.bmp"
-;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 2" "Text" "xamarin.bmp"
-;      !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
-;  FunctionEnd
-  
-;  Function XamarinPageLeave
-;  FunctionEnd
-
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
+
+
+!macro VS_ASSOCIATE_EDITOR TOOLNAME VSVERSION EXT TOOLPATH
+  WriteRegStr   HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}' 'Custom' '${TOOLNAME}'
+  WriteRegDWORD HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}' 'Type' 0x00000002
+  WriteRegStr   HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}\${TOOLNAME}' '' '${TOOLPATH}'
+  WriteRegStr   HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}\${TOOLNAME}' 'Arguments' ''
+!macroend
+
+!macro APP_ASSOCIATE EXT FILECLASS DESCRIPTION ICON COMMANDTEXT COMMAND
+  WriteRegStr HKCR ".${EXT}" "" "${FILECLASS}" 
+  WriteRegStr HKCR "${FILECLASS}" "" `${DESCRIPTION}`
+  WriteRegStr HKCR "${FILECLASS}\DefaultIcon" "" `${ICON}`
+  WriteRegStr HKCR "${FILECLASS}\shell" "" "open"
+  WriteRegStr HKCR "${FILECLASS}\shell\open" "" `${COMMANDTEXT}`
+  WriteRegStr HKCR "${FILECLASS}\shell\open\command" "" `${COMMAND}`
+!macroend
 
 ;--------------------------------
 ;Languages
@@ -70,109 +72,117 @@ RequestExecutionLevel admin
 
 ;--------------------------------
 
-Function CustomPageFunction ;Function name defined with Page command
-  !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
-FunctionEnd
-
-
 ; The stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
   SectionIn RO
-  SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}
+
+  
+  ; TODO: This stuff below is a bit of a mess and i 
+  ; suspect some of it can be removed now.  Some can
+  ; be removed after we kill off the old XNA content 
+  ; pipeline support.
+
+  SetOutPath ${MSBuildInstallDir}
   File '..\monogame.ico'
   File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
-  File '..\..\ThirdParty\Libs\NAudio\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.*'
-  File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.xml'
-  File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.txt'
-  File '..\..\Tools\2MGFX\bin\Release\*.exe'
+  File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
+  File '..\..\ThirdParty\Dependencies\NAudio\*.dll'
+  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.*'
+  File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.xml'
+  File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.txt' 
+  File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
+  File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_32.dll'
+  File '..\..\ThirdParty\Dependencies\lame_enc.dll'
   
-  File '..\..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll'
-  File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
-  File '..\..\ThirdParty\Libs\lame_enc.dll'
+  ; Install the MonoGame tools to a single shared folder.
+  SetOutPath ${MSBuildInstallDir}\Tools
+  File /r '..\..\Tools\2MGFX\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\2MGFX\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\Templates'
 
-  ; Install the MonoGame Content Builder to a subfolder both
-  ; to avoid conflicting assemblies and to make it easy for end
-  ; users to copy all the necessary files for distribution.
-  SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}\MGCB
-  File /r '..\..\Tools\MGCB\bin\Release\*.exe'
-  File /r '..\..\Tools\MGCB\bin\Release\*.dll'
+  ; Associate .mgcb files open in the Pipeline tool.
+  !insertmacro VS_ASSOCIATE_EDITOR 'MonoGame Pipeline' '10.0' 'mgcb' '${MSBuildInstallDir}\Tools\Pipeline.exe'
+  !insertmacro VS_ASSOCIATE_EDITOR 'MonoGame Pipeline' '11.0' 'mgcb' '${MSBuildInstallDir}\Tools\Pipeline.exe'
+  !insertmacro VS_ASSOCIATE_EDITOR 'MonoGame Pipeline' '12.0' 'mgcb' '${MSBuildInstallDir}\Tools\Pipeline.exe'
+  !insertmacro APP_ASSOCIATE 'mgcb' 'MonoGame.ContentBuilderFile' 'A MonoGame content builder project.' '${MSBuildInstallDir}\Tools\Pipeline.exe,0' 'Open with Pipeline' '${MSBuildInstallDir}\Tools\Pipeline.exe'
 
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\Release\*.xml'  
+  ; Install the assemblies for all the platforms we can 
+  ; target from a Windows desktop system.
 
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
-  File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\OUYA\Release\*.xml'  
-  File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
+  ; Install Android Assemblies
+  SetOutPath '$INSTDIR\Assemblies\Android'
+  File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.xml'
   
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\Release\*.xml'
-  File '..\..\ThirdParty\Libs\OpenTK.dll'
-  File '..\..\ThirdParty\Libs\OpenTK.dll.config'
-  File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
+  ; Install OUYA Assemblies
+  SetOutPath '$INSTDIR\Assemblies\OUYA'
+  File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'
+  
+  ; Install Windows Desktop OpenGL Assemblies
+  SetOutPath '$INSTDIR\Assemblies\WindowsGL'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Windows\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Windows\Release\*.xml'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.xml'
-
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\Release\*.xml'
-  File '..\..\ThirdParty\Libs\OpenTK.dll'
-  File '..\..\ThirdParty\Libs\OpenTK.dll.config'
-  File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
+  ; Install Windows Desktop DirectX Assemblies
+  SetOutPath '$INSTDIR\Assemblies\Windows'
+  File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
+  
+  ; Install Linux Assemblies
+  SetOutPath '$INSTDIR\Assemblies\Linux'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
 
-    
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
+  ; Install Windows 8 Store Assemblies
+  SetOutPath '$INSTDIR\Assemblies\Windows8'
+  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.xml'
 
-  File '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.xml'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.xml'
+    ; Install Windows Phone 8.1 Assemblies
+  SetOutPath '$INSTDIR\Assemblies\WindowsPhone81'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone81\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone81\AnyCPU\Release\*.xml'
 
   ; Install Windows Phone ARM Assemblies
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
-
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.xml'
+  SetOutPath '$INSTDIR\Assemblies\WindowsPhone\ARM'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.winmd'
 
   ; Install Windows Phone x86 Assemblies
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
-
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\86\Release\MonoGame.Framework.xml'
-
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone'
-
-  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.dll'
-  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.xml'  
+  SetOutPath '$INSTDIR\Assemblies\WindowsPhone\x86'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.winmd'
 
   ; Intall iOS Assemblies
-
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
   InstalliOSAssemblies:
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\iOS'
-
+  SetOutPath '$INSTDIR\Assemblies\iOS'
   File /nonfatal 'iOS\*.dll'
- ;File /nonfatal 'iOS\*.xml'  
-
+  ;File /nonfatal 'iOS\*.xml'  
   SkipiOSAssemblies:
 
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL' '' '$INSTDIR\Assemblies\WindowsGL'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows' '' '$INSTDIR\Assemblies\Windows'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Linux' '' '$INSTDIR\Assemblies\Linux'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store' '' '$INSTDIR\Assemblies\Windows8'
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Phone 8.1' '' '$INSTDIR\Assemblies\WindowsPhone81'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android' '' '$INSTDIR\Assemblies\Android'
@@ -186,25 +196,27 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL' '' '$INSTDIR\Assemblies\WindowsGL'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows' '' '$INSTDIR\Assemblies\Windows'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store' '' '$INSTDIR\Assemblies\Windows8'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Phone 8.1' '' '$INSTDIR\Assemblies\WindowsPhone81'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android' '' '$INSTDIR\Assemblies\Android'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA' '' '$INSTDIR\Assemblies\OUYA'
-	WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoTouch\v1.0\AssemblyFoldersEx\${APPNAME} for iOS' '' '$INSTDIR\Assemblies\iOS'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoTouch\v1.0\AssemblyFoldersEx\${APPNAME} for iOS' '' '$INSTDIR\Assemblies\iOS'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Linux' '' '$INSTDIR\Assemblies\Linux'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
 
   End32Bitvs64BitCheck:
   ; Add remote programs
-  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayName' '${APPNAME}'
-  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayVersion' '${VERSION}'
+  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayName' '${APPNAME} SDK'
+  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayVersion' '${INSTALLERVERSION}'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayIcon' '$INSTDIR\monogame.ico'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'InstallLocation' '$INSTDIR\'
-  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'Publisher' 'MonoGame'
+  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'Publisher' 'The MonoGame Team'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'UninstallString' '$INSTDIR\uninstall.exe'
 
 
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}'
+  SetOutPath '$INSTDIR'
   File '..\monogame.ico'
+
   ; Uninstaller
   WriteUninstaller "uninstall.exe"
 
@@ -213,7 +225,7 @@ SectionEnd
 
 Section "OpenAL" OpenAL
   ; SetOutPath $INSTDIR
-  File '..\..\ThirdParty\Libs\oalinst.exe'
+  File '..\..\ThirdParty\Dependencies\oalinst.exe'
   ExecWait '"$INSTDIR\oalinst.exe /S"'
 SectionEnd
 
@@ -261,7 +273,7 @@ Section "Visual Studio 2013 Templates" VS2013
     SetOutPath "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
 
     ; install the Templates for MonoDevelop
-    File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
     ; Install the VS 2010 templates as well 
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
@@ -274,12 +286,23 @@ SectionEnd
 
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts" Menu
-	CreateDirectory $SMPROGRAMS\MonoGame
-	CreateShortCut "$SMPROGRAMS\MonoGame\Uninstall.lnk" "$PROGRAMFILES\${APPNAME}\v${VERSION}\uninstall.exe" "" "$PROGRAMFILES\${APPNAME}\v${VERSION}\uninstall.exe" 0
-	;CreateShortCut "$SMPROGRAMS\MonoGame\GettingStarted.lnk" "$PROGRAMFILES\${APPNAME}\v${VERSION}\GettingStarted.pdf" "" "$PROGRAMFILES\${APPNAME}\v${VERSION}\GettingStarted.pdf" 0
-	WriteINIStr "$SMPROGRAMS\MonoGame\MonoGame Web Site.url" "InternetShortcut" "URL" "http://www.monogame.net"
-	WriteINIStr "$SMPROGRAMS\MonoGame\MonoGame Web Site.url" "InternetShortcut" "IconFile" "$PROGRAMFILES\${APPNAME}\v${VERSION}\monogame.ico"
-	WriteINIStr "$SMPROGRAMS\MonoGame\MonoGame Web Site.url" "InternetShortcut" "IconIndex" "0"
+	CreateDirectory $SMPROGRAMS\${APPNAME}
+	SetOutPath "$INSTDIR"
+	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall MonoGame.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+	SetOutPath "${MSBuildInstallDir}\Tools"
+	CreateShortCut "$SMPROGRAMS\${APPNAME}\MonoGame Pipeline.lnk" "${MSBuildInstallDir}\Tools\Pipeline.exe" "" "${MSBuildInstallDir}\Tools\Pipeline.exe" 0
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "URL" "http://www.monogame.net"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "URL" "http://www.monogame.net/documentation"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "URL" "http://community.monogame.net/"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "URL" "https://github.com/mono/MonoGame/issues"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconIndex" "0"
 
 SectionEnd
 
@@ -318,11 +341,19 @@ Section "Uninstall"
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Linux'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store' 
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Phone 8.1' 
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoTouch\v1.0\AssemblyFoldersEx\${APPNAME} for iOS'
+
+  DeleteRegKey HKCU 'Software\Microsoft\VisualStudio\10.0\Default Editors\mgcb'
+  DeleteRegKey HKCU 'Software\Microsoft\VisualStudio\11.0\Default Editors\mgcb'
+  DeleteRegKey HKCU 'Software\Microsoft\VisualStudio\12.0\Default Editors\mgcb'
+
+  DeleteRegKey HKCR '.mgcb'
+  DeleteRegKey HKCR 'MonoGame.ContentBuilderFile'
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
@@ -332,6 +363,7 @@ Section "Uninstall"
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows'
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Linux'
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Phone 8.1'
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM'
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86'
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
@@ -354,8 +386,8 @@ Section "Uninstall"
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
-  RMDir /r "$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}"
-  RMDir /r "$SMPROGRAMS\MonoGame"
+  RMDir /r "${MSBuildInstallDir}"
+  RMDir /r "$SMPROGRAMS\${APPNAME}"
 
   Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"

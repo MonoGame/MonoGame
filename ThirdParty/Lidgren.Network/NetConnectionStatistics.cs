@@ -45,6 +45,7 @@ namespace Lidgren.Network
 
 		internal int m_sentMessages;
 		internal int m_receivedMessages;
+		internal int m_receivedFragments;
 
 		internal int m_sentBytes;
 		internal int m_receivedBytes;
@@ -62,8 +63,13 @@ namespace Lidgren.Network
 		{
 			m_sentPackets = 0;
 			m_receivedPackets = 0;
+			m_sentMessages = 0;
+			m_receivedMessages = 0;
+			m_receivedFragments = 0;
 			m_sentBytes = 0;
 			m_receivedBytes = 0;
+			m_resentMessagesDueToDelay = 0;
+			m_resentMessagesDueToHole = 0;
 		}
 
 		/// <summary>
@@ -122,12 +128,13 @@ namespace Lidgren.Network
 		}
 #else
 		[Conditional("DEBUG")]
-		internal void PacketReceived(int numBytes, int numMessages)
+		internal void PacketReceived(int numBytes, int numMessages, int numFragments)
 		{
 			NetException.Assert(numBytes > 0 && numMessages > 0);
 			m_receivedPackets++;
 			m_receivedBytes += numBytes;
 			m_receivedMessages += numMessages;
+			m_receivedFragments += numFragments;
 		}
 #endif
 
@@ -157,8 +164,9 @@ namespace Lidgren.Network
 		{
 			StringBuilder bdr = new StringBuilder();
 			//bdr.AppendLine("Average roundtrip time: " + NetTime.ToReadable(m_connection.m_averageRoundtripTime));
+			bdr.AppendLine("Current MTU: " + m_connection.m_currentMTU);
 			bdr.AppendLine("Sent " + m_sentBytes + " bytes in " + m_sentMessages + " messages in " + m_sentPackets + " packets");
-			bdr.AppendLine("Received " + m_receivedBytes + " bytes in " + m_receivedMessages + " messages in " + m_receivedPackets + " packets");
+			bdr.AppendLine("Received " + m_receivedBytes + " bytes in " + m_receivedMessages + " messages (of which " + m_receivedFragments + " fragments) in " + m_receivedPackets + " packets");
 
 			if (m_resentMessagesDueToDelay > 0)
 				bdr.AppendLine("Resent messages (delay): " + m_resentMessagesDueToDelay);
