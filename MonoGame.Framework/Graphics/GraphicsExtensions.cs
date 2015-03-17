@@ -12,18 +12,10 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics;
 #endif
 using OpenTK.Graphics.ES20;
-using BlendEquationMode = OpenTK.Graphics.ES20.All;
-using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
-using BlendingFactorDest = OpenTK.Graphics.ES20.All;
-using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
-using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using PixelType = OpenTK.Graphics.ES20.All;
-using PixelFormat = OpenTK.Graphics.ES20.All;
 using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
-using GetPName = OpenTK.Graphics.ES20.All;
 #endif
 #endif
 
@@ -349,9 +341,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				return BlendEquationMode.FuncAdd;
 #if IOS
 			case BlendFunction.Max:
-				return BlendEquationMode.MaxExt;
+				return (BlendEquationMode)All.MaxExt;
 			case BlendFunction.Min:
-				return BlendEquationMode.MinExt;
+				return (BlendEquationMode)All.MinExt;
 #elif MONOMAC || WINDOWS || LINUX
 			case BlendFunction.Max:
 				return BlendEquationMode.Max;
@@ -665,19 +657,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 glFormat = (PixelFormat)All.CompressedTextureFormats;
                 break;
 			case SurfaceFormat.RgbPvrtc2Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 			case SurfaceFormat.RgbPvrtc4Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc4Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbPvrtc4Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 			case SurfaceFormat.RgbaPvrtc2Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbaPvrtc2Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbaPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 			case SurfaceFormat.RgbaPvrtc4Bpp:
-				glInternalFormat = PixelInternalFormat.CompressedRgbaPvrtc4Bppv1Img;
+				glInternalFormat = (PixelInternalFormat)All.CompressedRgbaPvrtc4Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
 #endif
@@ -796,11 +788,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static int GetBoundTexture2D()
         {
             var prevTexture = 0;
-#if GLES && !ANGLE && !ANDROID
-            GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
-#else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
-#endif
             GraphicsExtensions.LogGLError("GraphicsExtensions.GetBoundTexture2D() GL.GetInteger");
             return prevTexture;
         }
@@ -809,16 +797,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		[DebuggerHidden]
         public static void CheckGLError()
         {
-#if GLES && !ANGLE
-			All error = (All)GL.GetError();
-            if (error != All.False)
-                throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
-#elif OPENGL
-            ErrorCode error = GL.GetError();
+#if GLES
+            var error = GL.GetErrorCode();
+#else
+            var error = GL.GetError();
+#endif
             if (error != ErrorCode.NoError)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
-#endif
-
         }
 #endif
 

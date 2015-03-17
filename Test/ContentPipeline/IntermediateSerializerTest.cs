@@ -145,11 +145,15 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void RenamingXmlElements()
         {
-            SerializeAndAssert("05_RenamingXmlElements.xml", new RenamingXmlElements
+            var value = new RenamingXmlElements
             {
                 hello = "world",
-                elf = 23
-            });
+                elf = 23,
+                speed = 80.2f,
+                isOrganic = true
+            };
+            value.SetDimensions(new Vector2(32, 32));
+            SerializeAndAssert("05_RenamingXmlElements.xml", value);
         }
 
         [Test]
@@ -191,7 +195,14 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 StringArray = new[] { "Hello", "World" },
                 StringList = new List<string> { "This", "is", "a", "test" },
-                IntArray = new[] { 1, 2, 3, 23, 42 }
+                IntArray = new[] { 1, 2, 3, 23, 42 },
+                ColorArray = new[]
+                {
+                    new Color(0x88, 0x65, 0x42, 0xFF),
+                    new Color(0x91, 0x6B, 0x46, 0xFF),
+                    new Color(0x91, 0x7B, 0x46, 0xFF),
+                    new Color(0x88, 0x65, 0x43, 0xFF)
+                }
             });
         }
 
@@ -224,6 +235,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Point = new Point(1, 2),
                 Rectangle = new Rectangle(1, 2, 3, 4),
+                Vector2 = new Vector2(1, 2),
                 Vector3 = new Vector3(1, 2, 3.1f),
                 Vector4 = new Vector4(1, 2, 3, 4),
                 Quaternion = new Quaternion(1, 2, 3, 4),
@@ -231,7 +243,8 @@ namespace MonoGame.Tests.ContentPipeline
                 Matrix = new Matrix(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16),
                 Color = new Color{ A = 0xFF, R = 0x64, G = 0x95, B = 0xED },
                 Vector2Array = new []{ new Vector2(0, 0), new Vector2(1, 1) },
-                Vector2List = new List<Vector2>(new[] { new Vector2(1, 7), new Vector2(1, 9), new Vector2(1, 10) })
+                Vector2List = new List<Vector2>(new[] { new Vector2(1, 7), new Vector2(1, 9), new Vector2(1, 10) }),
+                Vector2ListEmpty = new List<Vector2>()
             });
         }
 
@@ -255,6 +268,14 @@ namespace MonoGame.Tests.ContentPipeline
                     new PolymorphicA { Value = true },
                     new PolymorphicB { Value = true },
                     new PolymorphicC { Value = true }
+                },
+
+                IntCollection = new List<int> { 1, 4, 6 },
+
+                UntypedDictionary = new Dictionary<int, PolymorphicA>
+                {
+                    { 1, new PolymorphicA { Value = true } },
+                    { 5, new PolymorphicA { Value = false } }
                 }
             });
         }
@@ -270,7 +291,8 @@ namespace MonoGame.Tests.ContentPipeline
                 D = new Nested.ContentPipeline.ClassInsideNestedAmbiguousNamespace { Value = true },
                 E = new Nested.ClassInsideNestedNamespace { Value = true },
                 F = new Nested.ContentPipeline2.ClassInsideNestedUnambiguousNamespace { Value = true },
-                G = new SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace { Value = true }
+                G = new SomethingElse.ContentPipeline.ClassInsideAmbiguousNamespace { Value = true },
+                H = null
             });
         }
 
@@ -317,9 +339,20 @@ namespace MonoGame.Tests.ContentPipeline
             resource2.Next = resource3;
             resource3.Next = resource1;
 
+            var resourceArray1 = new Linked2();
+            var resourceArray2 = new Linked2();
+            var resourceArray3 = new Linked2();
+            resourceArray1.Next = new[] { resourceArray2, resourceArray3 };
+            resourceArray2.Next = new[] { resourceArray1 };
+
             SerializeAndAssert("16_SharedResources.xml", new SharedResources
             {
-                Head = resource1
+                Head = resource1,
+                LinkedArray = new[]
+                {
+                    resourceArray1,
+                    resourceArray2
+                }
             });
         }
 
@@ -386,6 +419,42 @@ namespace MonoGame.Tests.ContentPipeline
             SerializeAndAssert("20_SystemTypes.xml", new SystemTypes
             {
                 TimeSpan = TimeSpan.FromSeconds(42.5f)
+            });
+        }
+
+        // Test 21 (CustomFormatting) specifically tests IntermediateDeserializer,
+        // and isn't relevant for IntermediateSerializer.
+
+        [Test]
+        public void GetterOnlyProperties()
+        {
+            var value = new GetterOnlyProperties();
+            value.IntList.Add(1);
+            value.IntList.Add(2);
+            value.IntList.Add(3);
+            value.IntStringDictionary.Add(1, "Foo");
+            value.IntStringDictionary.Add(5, "Bar");
+            value.IntStringDictionaryWithPrivateSetter.Add(2, "Baz");
+            value.IntStringDictionaryWithPrivateSetter.Add(6, "Shawn");
+            value.CustomClass.A = 42;
+
+            SerializeAndAssert("22_GetterOnlyProperties.xml", value);
+        }
+
+        [Test]
+        public void GetterOnlyPolymorphicArrayProperties()
+        {
+            var value = new GetterOnlyPolymorphicArrayProperties();
+            SerializeAndAssert("23_GetterOnlyPolymorphicArrayProperties.xml", value);
+        }
+
+        [Test]
+        public void GenericTypes()
+        {
+            SerializeAndAssert("24_GenericTypes.xml", new GenericTypes
+            {
+                A = new GenericClass<int> { Value = 3 },
+                B = new GenericClass<float> { Value = 4.2f }
             });
         }
     }

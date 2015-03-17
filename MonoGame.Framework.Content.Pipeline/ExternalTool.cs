@@ -150,7 +150,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="path">The full path to the executable.</param>
         private static void EnsureExecutable(string path)
         {
-#if LINUX || MONOMAC
+#if LINUX || MACOS
+            if(path == "/bin/bash")
+                return;
+
             try
             {
                 var p = Process.Start("chmod", "u+x '" + path + "'");

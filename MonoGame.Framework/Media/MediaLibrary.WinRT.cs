@@ -14,6 +14,8 @@ namespace Microsoft.Xna.Framework.Media
 {
     public partial class MediaLibrary
     {
+        private const string CacheFile = "MediaLibrary.cache";
+
         private static StorageFolder musicFolder;
         private static AlbumCollection albumCollection;
         private static SongCollection songCollection;
@@ -35,10 +37,10 @@ namespace Microsoft.Xna.Framework.Media
                 var albums = new Dictionary<string, Album>();
                 var genres = new Dictionary<string, Genre>();
 
-                var cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("MediaLibrary.cache", CreationCollisionOption.OpenIfExists);
                 var cache = new Dictionary<string, MusicProperties>();
 
                 // Read cache
+                var cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(CacheFile, CreationCollisionOption.OpenIfExists);
                 using (var stream = new BinaryReader(await cacheFile.OpenStreamForReadAsync()))
                     try
                     {
@@ -51,6 +53,7 @@ namespace Microsoft.Xna.Framework.Media
                     catch { }
 
                 // Write cache
+                cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(CacheFile, CreationCollisionOption.ReplaceExisting);
                 using (var stream = new BinaryWriter(await cacheFile.OpenStreamForWriteAsync()))
                 {
                     int prevProgress = 0;

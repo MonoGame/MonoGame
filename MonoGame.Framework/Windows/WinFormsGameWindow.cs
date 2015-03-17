@@ -41,6 +41,7 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -59,10 +60,11 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    class WinFormsGameWindow : GameWindow
+    class WinFormsGameWindow : GameWindow, IDisposable
     {
         internal WinFormsGameForm _form;
 
+        static private ReaderWriterLockSlim _allWindowsReaderWriterLockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
 
         private readonly WinFormsGamePlatform _platform;
@@ -195,11 +197,58 @@ namespace MonoGame.Framework
 
             _form.KeyPress += OnKeyPress;
 
-            _allWindows.Add(this);
+            RegisterToAllWindows();
+        }
+
+        ~WinFormsGameWindow()
+        {
+            Dispose(false);
+        }
+
+        private void RegisterToAllWindows()
+        {
+            _allWindowsReaderWriterLockSlim.EnterWriteLock();
+
+            try
+            {
+                _allWindows.Add(this);
+            }
+            finally
+            {
+                _allWindowsReaderWriterLockSlim.ExitWriteLock();
+            }
+        }
+
+        private void UnregisterFromAllWindows()
+        {
+            _allWindowsReaderWriterLockSlim.EnterWriteLock();
+
+            try
+            {
+                _allWindows.Remove(this);
+            }
+            finally
+            {
+                _allWindowsReaderWriterLockSlim.ExitWriteLock();
+            }
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
+#if (WINDOWS && DIRECTX)
+            if (Game.GraphicsDevice != null)
+            {
+                if (Game.graphicsDeviceManager.HardwareModeSwitch)
+                {
+                    if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
+                   {
+                       Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
+                       Game.GraphicsDevice.CreateSizeDependentResources(true);
+                        Game.GraphicsDevice.ApplyRenderTargets(null);
+                   }
+                }
+          }
+#endif
             _platform.IsActive = true;
         }
 
@@ -338,9 +387,11 @@ namespace MonoGame.Framework
 
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
+
+#if !(WINDOWS && DIRECTX)
                 manager.PreferredBackBufferWidth = newWidth;
                 manager.PreferredBackBufferHeight = newHeight;
-
+#endif
                 if (manager.GraphicsDevice == null)
                     return;
             }
@@ -358,10 +409,28 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            Application.Idle += OnIdle;
-            Application.Run(_form);
-            Application.Idle -= OnIdle;
+            // https://bugzilla.novell.com/show_bug.cgi?id=487896
+            // Since there's existing bug from implementation with mono WinForms since 09'
+            // Application.Idle is not working as intended
+            // So we're just going to emulate Application.Run just like Microsoft implementation
+            _form.Show();
 
+            var nativeMsg = new NativeMessage();
+            while (_form != null && _form.IsDisposed == false)
+            {
+                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
+                {
+                    Application.DoEvents();
+
+                    if (nativeMsg.msg == WM_QUIT)
+                        break;
+
+                    continue;
+                }
+
+                UpdateWindows();
+                Game.Tick();
+            }
 
             // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
@@ -382,23 +451,20 @@ namespace MonoGame.Framework
             while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
         }
 
-        private void OnIdle(object sender, EventArgs eventArgs)
-        {
-            // While there are no pending messages 
-            // to be processed tick the game.
-            NativeMessage msg;
-            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
-            {
-                UpdateWindows();
-                Game.Tick();
-            }
-        }
-
         internal void UpdateWindows()
         {
-            // Update the mouse state for each window.
-            foreach (var window in _allWindows)
-                window.UpdateMouseState();
+            _allWindowsReaderWriterLockSlim.EnterReadLock();
+
+            try
+            {
+                // Update the mouse state for each window.
+                foreach (var window in _allWindows.Where(w => w.Game == Game))
+                    window.UpdateMouseState();
+            }
+            finally
+            {
+                _allWindowsReaderWriterLockSlim.ExitReadLock();
+            }
         }
 
         private const uint WM_QUIT = 0x12;
@@ -427,11 +493,20 @@ namespace MonoGame.Framework
 
         public void Dispose()
         {
-            if (_form != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _allWindows.Remove(this);
-                _form.Dispose();
-                _form = null;
+                if (_form != null)
+                {
+                    UnregisterFromAllWindows(); 
+                    _form.Dispose();
+                    _form = null;
+                }
             }
         }
 

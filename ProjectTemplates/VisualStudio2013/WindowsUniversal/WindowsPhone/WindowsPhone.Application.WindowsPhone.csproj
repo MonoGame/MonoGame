@@ -8,13 +8,15 @@
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>$ext_safeprojectname$</RootNamespace>
-    <AssemblyName>$ext_projectname$.WindowsPhone</AssemblyName>
+    <AssemblyName>$ext_safeprojectname$.WindowsPhone</AssemblyName>
     <DefaultLanguage>$currentuiculturename$</DefaultLanguage>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{76F1466A-8B6D-4E39-A767-685A06062A39};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
+    <MonoGamePlatform>WindowsPhone8</MonoGamePlatform>
+    <MonoGameContentBuilderExe></MonoGameContentBuilderExe>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -98,6 +100,11 @@
     <Content Include="Assets\StoreLogo.scale-240.png" />
     <Content Include="Assets\WideLogo.scale-240.png" />
   </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="..\$ext_projectname$.Shared\Content\Content.mgcb">
+      <Link>Content\Content.mgcb</Link>
+    </MonoGameContentReference>
+  </ItemGroup>  
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
@@ -111,6 +118,7 @@
   </ItemGroup>
   <Import Project="..\$ext_projectname$.Shared\Shared.Application.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

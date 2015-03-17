@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using MonoGame.Utilities.Png;
 
 #if MONOMAC
 using MonoMac.AppKit;
@@ -32,14 +33,7 @@ using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 #if GLES
 using OpenTK.Graphics.ES20;
-using GLPixelFormat = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureParameterName = OpenTK.Graphics.ES20.All;
-using TextureMinFilter = OpenTK.Graphics.ES20.All;
-using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using PixelType = OpenTK.Graphics.ES20.All;
-using PixelStoreParameter = OpenTK.Graphics.ES20.All;
-using ErrorCode = OpenTK.Graphics.ES20.All;
+using GLPixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #endif
 
 #if ANDROID
@@ -99,12 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 else
                 {
-                    GL.TexImage2D(TextureTarget.Texture2D, 0,
-#if IOS || ANDROID
-                        (int)glInternalFormat,
-#else				           
-					    glInternalFormat,
-#endif
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
                         this.width, this.height, 0,
                         glFormat, glType, IntPtr.Zero);
                     GraphicsExtensions.CheckGLError();
@@ -170,14 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         if (rect.HasValue)
                         {
-                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D,
-                                level, x, y, w, h,
-#if GLES
-                                glInternalFormat,
-#else
-                                glFormat,
-#endif
-                                data.Length - startBytes, dataPtr);
+                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glFormat, data.Length - startBytes, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                         else
@@ -200,11 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         else
                         {
                             GL.TexImage2D(TextureTarget.Texture2D, level,
-#if GLES && !ANGLE
-                                (int)glInternalFormat,
-#else
                                 glInternalFormat,
-#endif
                                 w, h, 0, glFormat, glType, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
@@ -245,9 +223,9 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GenFramebuffers(1, ref framebufferId);
 			#endif
             GraphicsExtensions.CheckGLError();
-            GL.BindFramebuffer(All.Framebuffer, framebufferId);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, this.glTexture, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferSlot.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
             GraphicsExtensions.CheckGLError();
             var x = 0;
             var y = 0;
@@ -512,8 +490,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS
-            SaveAsImage(stream, width, height, ImageFormat.Png);
+#if MONOMAC || WINDOWS || IOS
+            var pngWriter = new PngWriter();
+            pngWriter.Write(this, stream);
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else

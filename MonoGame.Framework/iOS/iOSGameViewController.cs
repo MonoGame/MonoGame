@@ -104,40 +104,29 @@ namespace Microsoft.Xna.Framework
 
         #region iOS 8 or newer
 
-        bool _orientationChanged;
-        UIInterfaceOrientation _prevOrientation;
-
 		public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
         {
 			CGSize oldSize = View.Bounds.Size;
 
             if (oldSize != toSize)
             {
-                _orientationChanged = true;
+                UIInterfaceOrientation prevOrientation = InterfaceOrientation;
 
-                // At this point, the new orientation hasn't been set
-                _prevOrientation = InterfaceOrientation;
+                // In iOS 8+ DidRotate is no longer called after a rotation
+                // But we need to notify iOSGamePlatform to update back buffer so we explicitly call it 
+
+                // We do this within the animateAlongside action, which at the point of calling
+                // will have the new InterfaceOrientation set
+                coordinator.AnimateAlongsideTransition((context) =>
+                    {
+                        DidRotate(prevOrientation);
+                    }, (context) => 
+                    {
+                    });
+
             }
 
             base.ViewWillTransitionToSize(toSize, coordinator);
-        } 
-
-        public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
-        {
-            if (previousTraitCollection != null)
-            {
-                base.TraitCollectionDidChange(previousTraitCollection);
-
-                // Not every trait change is related to rotation, so avoid unnecessarily updating
-                if(_orientationChanged)
-                {
-                    // In iOS 8+ DidRotate is no longer called after a rotation
-                    // But we need to notify iOSGamePlatform to update back buffer so we explicitly call it 
-                    DidRotate(_prevOrientation);
-
-                    _orientationChanged = false;
-                }
-            }
         }
 
         #endregion

@@ -24,7 +24,29 @@ fi
 mkdir "$IDIR"
 echo "Copying files..."
 
-cp "$DIR/." "$IDIR/" -R
+cp "$DIR/Pipeline/." "$IDIR/" -R
+echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
+
+#setup nvtt libraries
+if [ ! -f /lib/libnvcore.so ]
+then
+	ln $IDIR/libnvcore.so /lib/libnvcore.so
+fi
+
+if [ ! -f /lib/libnvimage.so ]
+then
+	ln $IDIR/libnvimage.so /lib/libnvimage.so
+fi
+
+if [ ! -f /lib/libnvmath.so ]
+then
+	ln $IDIR/libnvmath.so /lib/libnvmath.so
+fi
+
+if [ ! -f /lib/libnvtt.so ]
+then
+	ln $IDIR/libnvtt.so /lib/libnvtt.so
+fi
 
 #fix permissions
 usr="$SUDO_USER"
@@ -60,14 +82,10 @@ echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGene
 
 #mimetype
 echo "Adding mimetype..."
+xdg-mime install mgcb.xml --novendor
 
-GREP=$(grep "text/mgcb" /etc/mime.types)
-size=${#GREP} 
-
-if [ ! $size -gt 0 ] 
-then
-	echo "text/mgcb \t\t\t\tmgcb" >> /etc/mime.types
-fi
+#automatic dependency installer
+./Dependencies/dependencies.sh
 
 #uninstall script
 chmod +x $IDIR/uninstall.sh

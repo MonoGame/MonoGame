@@ -44,7 +44,7 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// The view this controller is attached to.
         /// </summary>
-        IView View { get; set; }
+        IView View { get; }
 
         /// <summary>
         /// Triggered when the project starts loading.

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -24,6 +25,11 @@ namespace Microsoft.Xna.Framework.Content
         internal ReflectiveReader() 
             : base(typeof(T))
         {
+        }
+
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return TargetType.IsClass(); }
         }
 
         protected internal override void Initialize(ContentTypeReaderManager manager)
@@ -70,15 +76,8 @@ namespace Microsoft.Xna.Framework.Content
                     return null;
 
                 // Skip over indexer properties.
-                if (property.Name == "Item")
-                {
-                    var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
-                    var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
-
-                    if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
-                        (setMethod != null && setMethod.GetParameters().Length > 0))
-                        return null;
-                }
+                if (property.GetIndexParameters().Any())
+                    return null;
             }
 
             // Are we explicitly asked to ignore this item?
@@ -95,10 +94,15 @@ namespace Microsoft.Xna.Framework.Content
                     if (!ReflectionHelpers.PropertyIsPublic(property))
                         return null;
 
-                    // If the read-only property has a type reader then
-                    // it is safe to deserialize into the existing type.
-                    if (!property.CanWrite && manager.GetTypeReader(property.PropertyType) == null)
-                        return null;
+                    // If the read-only property has a type reader,
+                    // and CanDeserializeIntoExistingObject is true,
+                    // then it is safe to deserialize into the existing object.
+                    if (!property.CanWrite)
+                    {
+                        var typeReader = manager.GetTypeReader(property.PropertyType);
+                        if (typeReader == null || !typeReader.CanDeserializeIntoExistingObject)
+                            return null;
+                    }
                 }
                 else
                 {
@@ -149,12 +153,6 @@ namespace Microsoft.Xna.Framework.Content
             Func<object, object> construct = parent => null;
             if (property != null && !property.CanWrite)
                 construct = parent => property.GetValue(parent, null);
-            else if (ReflectionHelpers.IsConcreteClass(elementType))
-            {
-                var constructor = elementType.GetDefaultConstructor();
-                if (constructor != null)
-                    construct = parent => constructor.Invoke(null);
-            }
 
             return (input, parent) =>
             {

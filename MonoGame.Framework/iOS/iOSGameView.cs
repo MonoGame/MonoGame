@@ -85,8 +85,6 @@ using OpenTK.Platform.iPhoneOS;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-using All = OpenTK.Graphics.ES20.All;
-
 namespace Microsoft.Xna.Framework {
 
     [Register("iOSGameView")]
@@ -225,9 +223,9 @@ namespace Microsoft.Xna.Framework {
 			
 			// Create our Depth buffer. Color buffer must be the last one bound
 			GL.GenRenderbuffers(1, out _depthbuffer);
-			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
-            GL.RenderbufferStorage (All.Renderbuffer, All.DepthComponent16, viewportWidth, viewportHeight);
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthbuffer);
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16, viewportWidth, viewportHeight);
+			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
 
 			_glapi.GenRenderbuffers(1, ref _colorbuffer);
 			_glapi.BindRenderbuffer(All.Renderbuffer, _colorbuffer);
@@ -242,8 +240,8 @@ namespace Microsoft.Xna.Framework {
 			
 			_glapi.FramebufferRenderbuffer (All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
 			
-			var status = GL.CheckFramebufferStatus (All.Framebuffer);
-			if (status != All.FramebufferComplete)
+			var status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+			if (status != FramebufferErrorCode.FramebufferComplete)
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
 

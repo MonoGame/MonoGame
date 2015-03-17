@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,7 +38,7 @@ namespace MonoGame.Tests.Visual
                 vertexBuffer.GetData(readData, 0, 4);
                 Assert.AreEqual(savedData, readData);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -58,7 +59,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(vertexZero, readData[2]);
                 Assert.AreEqual(vertexZero, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -79,7 +80,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[0], readData[2]);
                 Assert.AreEqual(savedData[1], readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
         
         //[TestCase(true)]
@@ -100,7 +101,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2], readData[0]);
                 Assert.AreEqual(savedData[3], readData[1]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -119,7 +120,7 @@ namespace MonoGame.Tests.Visual
                 vertexBuffer.GetData(readData, 0, 4);
                 Assert.AreEqual(savedData, readData);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -161,7 +162,7 @@ namespace MonoGame.Tests.Visual
                         readDataBytes.Skip(startIndex).Take(elementCount).ToArray());
                 }
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -200,7 +201,7 @@ namespace MonoGame.Tests.Visual
                         readDataBytes.Take(elementCount).ToArray());
                 }
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -233,7 +234,7 @@ namespace MonoGame.Tests.Visual
                         readData.Take(elementCount).ToArray());
                 }
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -255,7 +256,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].Position, readData[2]);
                 Assert.AreEqual(savedData[3].Position, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -284,7 +285,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].Position, readData[2]);
                 Assert.AreEqual(savedData[3].Position, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -307,7 +308,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                 Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
 
         //[TestCase(true)]
@@ -337,7 +338,67 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                 Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
             };
-            Game.RunOneFrame();
+            Game.Run();
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct VertexTextureCoordinateTest : IVertexType
+        {
+            public Vector3 Normal;
+            public Vector2 TextureCoordinate;
+
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+                new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
+
+            VertexDeclaration IVertexType.VertexDeclaration
+            {
+                get { return VertexDeclaration; }
+            }
+        }
+
+        [Test]
+        public void ShouldSucceedWhenVertexFormatDoesMatchShader()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = new VertexBuffer(
+                    Game.GraphicsDevice, VertexPositionTexture.VertexDeclaration, 3,
+                    BufferUsage.None);
+                Game.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+                var effect = new BasicEffect(Game.GraphicsDevice);
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
+            };
+            Game.Run();
+        }
+
+        [Test]
+        public void ShouldThrowHelpfulExceptionWhenVertexFormatDoesNotMatchShader()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = new VertexBuffer(
+                    Game.GraphicsDevice, VertexTextureCoordinateTest.VertexDeclaration, 3,
+                    BufferUsage.None);
+                Game.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+                var effect = new BasicEffect(Game.GraphicsDevice);
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                var ex = Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
+#if XNA
+                Assert.That(ex.Message, Is.EqualTo("The current vertex declaration does not include all the elements required by the current vertex shader. Position0 is missing."));
+#else
+                Assert.That(ex.Message, Is.EqualTo("An error occurred while preparing to draw. "
+                    + "This is probably because the current vertex declaration does not include all the elements "
+                    + "required by the current vertex shader. The current vertex declaration includes these elements: " 
+                    + "NORMAL0, TEXCOORD0."));
+#endif
+            };
+            Game.Run();
         }
     }
 }

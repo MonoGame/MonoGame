@@ -21,10 +21,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_state == null)
             {
-                // We're now bound to a device... no one should
-                // be changing the state of this object now!
-                GraphicsDevice = device;
-
                 // Build the description.
                 var desc = new SharpDX.Direct3D11.DepthStencilStateDescription();
 

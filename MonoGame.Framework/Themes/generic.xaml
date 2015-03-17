@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:gamerServices="using:Microsoft.Xna.Framework.Windows8.GamerServices">
+    xmlns:input="using:Microsoft.Xna.Framework.Input">
 
-    <Style TargetType="gamerServices:InputDialog">
+    <Style TargetType="input:InputDialog">
         <Setter
             Property="BackgroundScreenBrush"
             Value="#80000000" />
@@ -142,7 +142,7 @@
             Property="Template">
             <Setter.Value>
                 <ControlTemplate
-                    TargetType="gamerServices:InputDialog">
+                    TargetType="input:InputDialog">
                     <Grid
                         x:Name="LayoutRoot"
                         Background="{TemplateBinding BackgroundScreenBrush}">

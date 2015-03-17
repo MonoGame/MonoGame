@@ -2,26 +2,26 @@
 
 namespace MonoGame.Tools.Pipeline
 {
-	public partial class AboutDialog : Gtk.Dialog
-	{
-		public AboutDialog ()
-		{
-			this.Build ();
+    public partial class AboutDialog : Gtk.Dialog
+    {
+        public AboutDialog ()
+        {
+            Build();
 
-			this.Title = String.Format("About {0}", AssemblyAttributes.AssemblyTitle);
+            Title = String.Format("About {0}", AssemblyAttributes.AssemblyTitle);
 
-			label1.Text = AssemblyAttributes.AssemblyProduct;
-			label2.Text = String.Format("Version {0}", AssemblyAttributes.AssemblyVersion);
-			label3.Text = AssemblyAttributes.AssemblyCopyright;
-			label4.Text = AssemblyAttributes.AssemblyCompany;
+            label1.Text = AssemblyAttributes.AssemblyProduct;
+            label2.Text = String.Format("Version {0}", AssemblyAttributes.AssemblyVersion);
+            label3.Text = AssemblyAttributes.AssemblyCopyright;
+            label4.Text = AssemblyAttributes.AssemblyCompany;
 
-			textview1.Buffer.Text = AssemblyAttributes.AssemblyDescription;
-		}
+            textview1.Buffer.Text = AssemblyAttributes.AssemblyDescription;
+        }
 
-		protected void OnResponse(object sender, EventArgs e)
-		{
-			this.Destroy ();
-		}
-	}
+        protected void OnResponse(object sender, EventArgs e)
+        {
+            Destroy();
+        }
+    }
 }
 
