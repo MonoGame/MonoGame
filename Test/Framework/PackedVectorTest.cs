@@ -7,6 +7,82 @@ namespace MonoGame.Tests.Framework
     class PackedVectorTest
     {
         [Test]
+        public void Alpha8()
+        {
+            // Test the limits.
+            Assert.AreEqual(0x0, new Alpha8(0f).PackedValue);
+            Assert.AreEqual(0xFF, new Alpha8(1f).PackedValue);
+
+            // Test clamping.
+            Assert.AreEqual(0x0, new Alpha8(-1234f).PackedValue);
+            Assert.AreEqual(0xFF, new Alpha8(1234f).PackedValue);
+        }
+
+        [Test]
+        public void Bgra5551()
+        {
+            // Test the limits.
+            Assert.AreEqual(0x0, new Bgra5551(Vector4.Zero).PackedValue);
+            Assert.AreEqual(0xFFFF, new Bgra5551(Vector4.One).PackedValue);
+
+            // Test ToVector4
+            Assert.AreEqual(Vector4.Zero, new Bgra5551(Vector4.Zero).ToVector4());
+            Assert.AreEqual(Vector4.One, new Bgra5551(Vector4.One).ToVector4());
+
+            // Test clamping.
+            Assert.AreEqual(Vector4.Zero, new Bgra5551(Vector4.One * -1234.0f).ToVector4());
+            Assert.AreEqual(Vector4.One, new Bgra5551(Vector4.One * 1234.0f).ToVector4());
+        }
+
+        [Test]
+        public void Rg32()
+        {
+            // Test the limits.
+            Assert.AreEqual(0x0, new Rg32(Vector2.Zero).PackedValue);
+            Assert.AreEqual(0xFFFFFFFF, new Rg32(Vector2.One).PackedValue);
+
+            // Test ToVector2
+            Assert.AreEqual(Vector2.Zero, new Rg32(Vector2.Zero).ToVector2());
+            Assert.AreEqual(Vector2.One, new Rg32(Vector2.One).ToVector2());
+
+            // Test clamping.
+            Assert.AreEqual(Vector2.Zero, new Rg32(Vector2.One * -1234.0f).ToVector2());
+            Assert.AreEqual(Vector2.One, new Rg32(Vector2.One * 1234.0f).ToVector2());
+        }
+
+        [Test]
+        public void Rgba1010102()
+        {
+            // Test the limits.
+            Assert.AreEqual(0x0, new Rgba1010102(Vector4.Zero).PackedValue);
+            Assert.AreEqual(0xFFFFFFFF, new Rgba1010102(Vector4.One).PackedValue);
+
+            // Test ToVector4
+            Assert.AreEqual(Vector4.Zero, new Rgba1010102(Vector4.Zero).ToVector4());
+            Assert.AreEqual(Vector4.One, new Rgba1010102(Vector4.One).ToVector4());
+
+            // Test clamping.
+            Assert.AreEqual(Vector4.Zero, new Rgba1010102(Vector4.One * -1234.0f).ToVector4());
+            Assert.AreEqual(Vector4.One, new Rgba1010102(Vector4.One * 1234.0f).ToVector4());
+        }
+
+        [Test]
+        public void Rgba64()
+        {
+            // Test the limits.
+            Assert.AreEqual(0x0, new Rgba64(Vector4.Zero).PackedValue);
+            Assert.AreEqual(0xFFFFFFFFFFFFFFFF, new Rgba64(Vector4.One).PackedValue);
+
+            // Test ToVector4
+            Assert.AreEqual(Vector4.Zero, new Rgba64(Vector4.Zero).ToVector4());
+            Assert.AreEqual(Vector4.One, new Rgba64(Vector4.One).ToVector4());
+
+            // Test clamping.
+            Assert.AreEqual(Vector4.Zero, new Rgba64(Vector4.One * -1234.0f).ToVector4());
+            Assert.AreEqual(Vector4.One, new Rgba64(Vector4.One * 1234.0f).ToVector4());
+        }
+
+        [Test]
         public void NormalizedByte4()
         {
             Assert.AreEqual(0x0, new NormalizedByte4(Vector4.Zero).PackedValue);
