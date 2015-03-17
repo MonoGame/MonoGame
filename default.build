@@ -40,8 +40,6 @@
     <call target="build_mac" />
     <call target="build_ios" />
 
-    <call target="build_contentprocessor"/>
-
   </target>
 
   <target name="build_psm" description="Build Play Station Mobile" depends="clean">
