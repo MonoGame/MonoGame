@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Input
 
         public PadConfig(string name, int index)
         {
-            // TODO: Complete member initialization
             this.name = name;
             this.index = index;
             this.LeftStick = new Stick();

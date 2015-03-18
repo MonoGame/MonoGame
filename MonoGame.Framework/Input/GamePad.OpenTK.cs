@@ -2,11 +2,15 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
+        #if DEBUG
         static bool prepDone = false;
+        #endif
 
         static void PrepSettings()
         {
@@ -28,9 +32,9 @@ namespace Microsoft.Xna.Framework.Input
                     Console.WriteLine(ex.Message);
                 }
             }
-            #endif
 
             prepDone = true;
+            #endif
         }
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
@@ -43,7 +47,7 @@ namespace Microsoft.Xna.Framework.Input
                 return new GamePadCapabilities ();
             }
 
-            return new GamePadCapabilities()
+            return new GamePadCapabilities 
             {
                 IsConnected = true, // otherwise, GamePadType would have been Unknown
                 HasAButton = capabilitiesTK.HasAButton,
@@ -79,10 +83,8 @@ namespace Microsoft.Xna.Framework.Input
 
             var stateTK = OpenTK.Input.GamePad.GetState (index);
 
-            if (!stateTK.IsConnected) 
-            {
+            if (!stateTK.IsConnected)
                 return GamePadState.Default;
-            }
 
             var sticks = 
                 new GamePadThumbSticks (

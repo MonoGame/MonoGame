@@ -7,8 +7,7 @@ namespace Microsoft.Xna.Framework.Input
     public class Capabilities
     {
         public Capabilities(OpenTK.Input.JoystickCapabilities cap)
-        {
-            // TODO: Complete member initialization            
+        {      
             this.NumberOfAxis = cap.AxisCount;
             this.NumberOfButtons = cap.ButtonCount;
             this.NumberOfPovHats = cap.HatCount;

@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Input
 
         public Joystick(int id)
         {
-            // TODO: Complete member initialization
             this.id = id;
 
             var cap = OpenTK.Input.Joystick.GetCapabilities(id);

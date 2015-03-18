@@ -21,7 +21,6 @@ namespace Microsoft.Xna.Framework.Input
             return (this.Positive.ReadFloat(device) - this.Negative.ReadFloat(device));
         }
 
-
         internal void AssignAxis(int id, bool negative)
         {
             this.Negative.ID = id;
