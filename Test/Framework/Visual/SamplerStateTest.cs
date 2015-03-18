@@ -66,6 +66,7 @@ namespace MonoGame.Tests.Visual
             assertMethod(() => samplerState.AddressU = TextureAddressMode.Clamp);
             assertMethod(() => samplerState.AddressV = TextureAddressMode.Clamp);
             assertMethod(() => samplerState.AddressW = TextureAddressMode.Clamp);
+            assertMethod(() => samplerState.BorderColor = Color.Red);
             assertMethod(() => samplerState.Filter = TextureFilter.Anisotropic);
             assertMethod(() => samplerState.MaxAnisotropy = 0);
             assertMethod(() => samplerState.MaxMipLevel = 0);
