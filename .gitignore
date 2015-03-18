@@ -69,3 +69,13 @@ Test/*.csproj
 *.speccache
 *.ncrunchproject
 *.ncrunchsolution
+
+#Mac Package Files
+*.pkg
+*.mpack
+
+#Nuget Packages
+**/*.nupkg
+
+#Zip files
+*.zip
