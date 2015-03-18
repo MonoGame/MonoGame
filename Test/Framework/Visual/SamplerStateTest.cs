@@ -66,6 +66,7 @@ namespace MonoGame.Tests.Visual
             assertMethod(() => samplerState.MaxAnisotropy = 0);
             assertMethod(() => samplerState.MaxMipLevel = 0);
             assertMethod(() => samplerState.MipMapLevelOfDetailBias = 0);
+            assertMethod(() => samplerState.ComparisonFunction = CompareFunction.Always);
         }
     }
 }
