@@ -149,6 +149,19 @@ namespace Microsoft.Xna.Framework.Graphics
             // LOD bias is not supported by glTexParameter in OpenGL ES 2.0
             GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
             GraphicsExtensions.CheckGLError();
+            // Comparison samplers are not supported in OpenGL ES 2.0 (without an extension, anyway)
+            if (ComparisonFunction != CompareFunction.Never)
+            {
+                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.CompareRefToTexture);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(target, TextureParameterName.TextureCompareFunc, (int) ComparisonFunction.GetDepthFunction());
+                GraphicsExtensions.CheckGLError();
+            }
+            else
+            {
+                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.None);
+                GraphicsExtensions.CheckGLError();
+            }
 #endif
             if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel)
             {
