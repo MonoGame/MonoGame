@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Text;
 
@@ -26,6 +30,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
+        uint _drawCount;
+
+        /// <summary>
+        /// Gets the internal amount of draw calls which happened between <see cref="SpriteBatch.Begin"/> and <see cref="SpriteBatch.End"/>.
+        /// </summary>
+        /// <remarks>
+        /// String drawing will increase this value by the amount of characters in text.
+        /// </remarks>
+        public uint DrawCount { get { return _drawCount; } }
 
         /// <summary>
         /// Creates a new instance of <see cref="SpriteBatch"/> class.
@@ -85,6 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
             _effect = effect;
             _matrix = transformMatrix ?? Matrix.Identity;
+            _drawCount = 0;
 
             // Setup things now so a user can change them.
             if (sortMode == SpriteSortMode.Immediate)
@@ -394,6 +408,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					_texCoordTL, 
 					_texCoordBR);			
 			
+		    unchecked
+		    {
+                _drawCount++;
+		    }
 			if (autoFlush)
 			{
 				FlushIfNeeded();
