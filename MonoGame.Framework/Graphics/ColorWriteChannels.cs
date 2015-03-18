@@ -17,19 +17,19 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		None = 0,
         /// <summary>
-        /// Red channel.
+        /// Red channel selected.
         /// </summary>
 		Red = 1,
         /// <summary>
-        /// Green channel.
+        /// Green channel selected.
         /// </summary>
 		Green = 2,
         /// <summary>
-        /// Blue channel.
+        /// Blue channel selected.
         /// </summary>
 		Blue = 4,
         /// <summary>
-        /// Alpha channel.
+        /// Alpha channel selected.
         /// </summary>
 		Alpha = 8,
         /// <summary>
