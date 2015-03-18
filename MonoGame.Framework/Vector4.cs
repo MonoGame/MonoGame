@@ -9,6 +9,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Describes a 4D-vector.
+    /// </summary>
 #if WINDOWS
     [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector4TypeConverter))]
 #endif
@@ -29,16 +32,28 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-        
+
+        /// <summary>
+        /// The x coordinate of this vector.
+        /// </summary>
         [DataMember]
         public float X;
 
+        /// <summary>
+        /// The y coordinate of this vector.
+        /// </summary>
         [DataMember]
         public float Y;
-      
+
+        /// <summary>
+        /// The z coordinate of this vector.
+        /// </summary>
         [DataMember]
         public float Z;
-      
+
+        /// <summary>
+        /// The w coordinate of this vector.
+        /// </summary>
         [DataMember]
         public float W;
 
