@@ -40,8 +40,6 @@
     <call target="build_mac" />
     <call target="build_ios" />
 
-    <call target="build_contentprocessor"/>
-
   </target>
 
   <target name="build_psm" description="Build Play Station Mobile" depends="clean">
@@ -177,13 +175,6 @@
     </if>
   </target>
 
-  <target name="build_contentprocessor" description="Build the old content processors" depends="clean">
-    <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Build /p:Configuration=Release" />
-    </if>
-  </target>
-
   <target name="run_tests" description="Run all the tests" depends="build_code">
     <nunit2 if="${os == 'Win32NT'}">
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
@@ -204,7 +195,6 @@
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
-    <nant buildfile="IDE/MonoDevelop/default.build" target="build"/>
 
     <nant buildfile="Installers/default.build" target="build" />
 
