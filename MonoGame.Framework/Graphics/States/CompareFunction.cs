@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Defines comparison functions for the various rendering tests.
+    /// The comparison function used for depth, stencil, and alpha tests.
     /// </summary>
     public enum CompareFunction
     {
