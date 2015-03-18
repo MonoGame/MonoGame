@@ -7,9 +7,7 @@ using System;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-#pragma warning disable 1574 // disabling ambigious overload of <see cref="GraphicsDevice.Clear"/> warning
     /// Defines the buffers for clearing when calling <see cref="GraphicsDevice.Clear"/> operation.
-#pragma warning restore 1574 // restoring warning behaviour
     /// </summary>
     [Flags]
     public enum ClearOptions
