@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Defines special usage for the graphics buffers.
+    /// A usage hint for optimizing memory placement of graphics buffers.
     /// </summary>
     public enum BufferUsage
     {
