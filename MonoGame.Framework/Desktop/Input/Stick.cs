@@ -46,7 +46,6 @@ namespace Microsoft.Xna.Framework.Input
 {
     public class Stick
     {
-
         public Stick()
         {
             this.X = new Axis();
@@ -58,8 +57,7 @@ namespace Microsoft.Xna.Framework.Input
         public Axis X { get; set; }
         public Axis Y { get; set; }
 
-
-        internal Vector2 ReadAxisPair(IntPtr device)
+        internal Vector2 ReadAxisPair(int device)
         {
             return new Vector2(this.X.ReadAxis(device), -this.Y.ReadAxis(device));
         }
