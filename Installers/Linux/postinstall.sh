@@ -12,8 +12,9 @@ IDIR="/opt/monogame-pipeline"
 
 read -p "The pipeline will be installed in $IDIR, ok(Y, n): " choice
 case "$choice" in 
-  n|N ) echo "Type in the directory that will be used for installation:" 
-		read IDIR
+	n|N ) 
+	echo "Type in the directory that will be used for installation:" 
+	read IDIR
 esac
 
 if [ -d "$IDIR" ]
@@ -26,6 +27,9 @@ echo "Copying files..."
 
 cp "$DIR/Pipeline/." "$IDIR/" -R
 echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
+
+#automatic dependency installer
+./Dependencies/dependencies.sh
 
 #setup nvtt libraries
 if [ ! -f /lib/libnvcore.so ]
@@ -46,6 +50,27 @@ fi
 if [ ! -f /lib/libnvtt.so ]
 then
 	ln $IDIR/libnvtt.so /lib/libnvtt.so
+fi
+
+#check GLIBCXX_3.4.20 support
+if [ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]
+then
+	GREP=$(strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX_3.4.20)
+	size=${#GREP} 
+
+	if [ ! $size -gt 0 ] 
+	then
+		echo "Your libstdc++.so.6 does not support GLIBCXX_3.4.20. Want to copy newer version of it?"
+		echo "Old version will be copied renamed to libstdc++.so.6.old"
+		read -p "(Y, n): " choice
+	
+		case "$choice" in 
+			n|N ) ;;
+			*)
+			sudo mv /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.old
+			sudo cp $DIR/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+		esac
+	fi
 fi
 
 #fix permissions
@@ -83,9 +108,6 @@ echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGene
 #mimetype
 echo "Adding mimetype..."
 xdg-mime install mgcb.xml --novendor
-
-#automatic dependency installer
-./Dependencies/dependencies.sh
 
 #uninstall script
 chmod +x $IDIR/uninstall.sh

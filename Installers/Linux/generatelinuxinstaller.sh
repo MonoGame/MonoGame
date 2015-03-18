@@ -36,6 +36,12 @@ rm $PDIR/glib-sharp.dll.config
 rm $PDIR/gtk-dotnet.dll
 rm $PDIR/gtk-sharp.dll
 rm $PDIR/gtk-sharp.dll.config
+rm $PDIR/libatksharpglue-2.so
+rm $PDIR/libgdksharpglue-2.so
+rm $PDIR/libgladesharpglue-2.so
+rm $PDIR/libglibsharpglue-2.so
+rm $PDIR/libgtksharpglue-2.so
+rm $PDIR/libpangosharpglue-2.so
 rm $PDIR/Mono.Posix.dll
 rm $PDIR/pango-sharp.dll
 rm $PDIR/pango-sharp.dll.config
@@ -46,6 +52,8 @@ cp Dependencies/. $DDIR/ -R
 
 #copy mimetype stuff
 cp mgcb.xml $DIR
+
+cp ../../ThirdParty/Dependencies/assimp/libstdc++.so.6 $DIR
 
 #build the installer
 ./../../ThirdParty/Dependencies/makeself/makeself.sh Data/ monogame-linux.run "Monogame Pipeline Installer" ./postinstall.sh
