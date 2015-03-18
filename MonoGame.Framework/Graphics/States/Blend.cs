@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Defines color blending options.
+    /// Defines a blend mode.
     /// </summary>
 	public enum Blend
 	{
