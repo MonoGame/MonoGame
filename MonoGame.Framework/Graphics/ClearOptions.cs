@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public enum ClearOptions
     {
         /// <summary>
-        /// Render target buffer.
+        /// Color buffer.
         /// </summary>
 		Target = 1,
         /// <summary>
