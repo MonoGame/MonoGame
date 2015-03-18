@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         None,
         /// <summary>
-        /// Buffer will not be readable and will fails if reading occurs, but it will have better performance than <see cref="BufferUsage.None"/>.
+        /// The buffer will not be readable and will be optimized for rendering and writing.
         /// </summary>
         WriteOnly
     }
