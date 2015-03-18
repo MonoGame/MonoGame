@@ -357,7 +357,7 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var i in Importers)
             {
-                if (i.FileExtensions.Contains(fileExtension))
+                if (i.FileExtensions.Contains(fileExtension.ToLowerInvariant()))
                     return i;
             }
 
