@@ -3,44 +3,45 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Diagnostics;
-using System.Threading;
 using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
-
 
 namespace Microsoft.Xna.Framework.Media
 {
     public static partial class MediaPlayer
     {
         //RAYB: This probably needs to get flipped back into a readonly.
-        private static  MediaSession _session;
-        private static SimpleAudioVolume _volumeController;
+        private static MediaSession _session;
+        private static AudioStreamVolume _volumeController;
         private static PresentationClock _clock;
 
-	    private static Callback _callback;
+        // HACK: Need SharpDX to fix this.
+        private static readonly Guid MRPolicyVolumeService = Guid.Parse("f8b5fa2f-32ef-46f5-b172-1321212fb2c4");
+        private static readonly Guid AudioStreamVolumeGuid = Guid.Parse("76B1BBDB-4EC8-4f36-B106-70A9316DF593");
 
-	    private class Callback : IAsyncCallback
-	    {
-		    public void Dispose()
-		    {
-		    }
+        private static Callback _callback;
 
-		    public IDisposable Shadow { get; set; }
-		    public void Invoke(AsyncResult asyncResultRef)
-		    {
-			    var ev = _session.EndGetEvent(asyncResultRef);
-			
-			    if (ev.TypeInfo == MediaEventTypes.EndOfPresentation)
-				    OnSongFinishedPlaying(null, null);
+        private class Callback : IAsyncCallback
+        {
+            public void Dispose()
+            {
+            }
 
-			    _session.BeginGetEvent(this, null);
-		    }
+            public IDisposable Shadow { get; set; }
+            public void Invoke(AsyncResult asyncResultRef)
+            {
+                var ev = _session.EndGetEvent(asyncResultRef);
 
-		    public AsyncCallbackFlags Flags { get; private set; }
-		    public WorkQueueId WorkQueueId { get; private set; }
-	    }
+                if (ev.TypeInfo == MediaEventTypes.EndOfPresentation)
+                    OnSongFinishedPlaying(null, null);
+
+                _session.BeginGetEvent(this, null);
+            }
+
+            public AsyncCallbackFlags Flags { get; private set; }
+            public WorkQueueId WorkQueueId { get; private set; }
+        }
 
         private static void PlatformInitialize()
         {
@@ -59,8 +60,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             _isMuted = muted;
 
-            if (_volumeController != null)
-                _volumeController.Mute = _isMuted;
+            SetVolumeControllerChannelVolume();
         }
 
         private static bool PlatformGetIsRepeating()
@@ -104,15 +104,28 @@ namespace Microsoft.Xna.Framework.Media
             return _volume;
         }
 
+        private static void SetVolumeControllerChannelVolume()
+        {
+            if (_volumeController != null)
+            {
+                float volume = _volume;
+                if (IsMuted)
+                    volume = 0.0f;
+
+                for (int i = 0; i < _volumeController.ChannelCount; i++)
+                {
+                    _volumeController.SetChannelVolume(i, volume);
+                }
+            }
+        }
+
         private static void PlatformSetVolume(float volume)
         {
             _volume = volume;
-
-			if (_volumeController != null)
-                _volumeController.MasterVolume = _volume;
+            SetVolumeControllerChannelVolume();
         }
-		
-		#endregion
+
+        #endregion
 
         private static void PlatformPause()
         {
@@ -124,29 +137,39 @@ namespace Microsoft.Xna.Framework.Media
             // Cleanup the last song first.
             if (State != MediaState.Stopped)
             {
-				_session.Stop();
+                _session.Stop();
                 _session.ClearTopologies();
                 _session.Close();
                 _volumeController.Dispose();
                 _clock.Dispose();
-			}
+            }
 
             // Set the new song.
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
 
-            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(VideoPlayer.GetVolumeObj(_session));
-            _volumeController.Mute = _isMuted;
-            _volumeController.MasterVolume = _volume;
+            // Get the volume interface.
+            IntPtr volumeObj;
+            try
+            {
+                MediaFactory.GetService(_session, MRPolicyVolumeService, AudioStreamVolumeGuid, out volumeObj);
+            }
+            catch
+            {
+                MediaFactory.GetService(_session, MRPolicyVolumeService, AudioStreamVolumeGuid, out volumeObj);
+            }
+
+            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObj);
+            SetVolumeControllerChannelVolume();
 
             // Get the clock.
             _clock = _session.Clock.QueryInterface<PresentationClock>();
 
-			//create the callback if it hasn't been created yet
-			if (_callback == null)
-			{
-				_callback = new Callback();
-				_session.BeginGetEvent(_callback, null);
-			}
+            //create the callback if it hasn't been created yet
+            if (_callback == null)
+            {
+                _callback = new Callback();
+                _session.BeginGetEvent(_callback, null);
+            }
 
             // Start playing.
             var varStart = new Variant();
@@ -160,10 +183,10 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         private static void PlatformStop()
-		{
-			_session.ClearTopologies();
-			_session.Stop();
-			_session.Close();
+        {
+            _session.ClearTopologies();
+            _session.Stop();
+            _session.Close();
             _volumeController.Dispose();
             _volumeController = null;
             _clock.Dispose();
@@ -171,4 +194,3 @@ namespace Microsoft.Xna.Framework.Media
         }
     }
 }
-
