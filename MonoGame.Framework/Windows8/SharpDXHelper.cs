@@ -1,6 +1,10 @@
-﻿
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 namespace Microsoft.Xna.Framework
 {
+    using System;
     using Microsoft.Xna.Framework.Graphics;
 
     static internal class SharpDXHelper
@@ -195,6 +199,39 @@ namespace Microsoft.Xna.Framework
                 OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z),
                 OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z),                
             };
+        }
+
+        static public SharpDX.Direct3D11.Comparison ToComparison(this CompareFunction compare)
+        {
+            switch (compare)
+            {
+                case CompareFunction.Always:
+                    return SharpDX.Direct3D11.Comparison.Always;
+
+                case CompareFunction.Equal:
+                    return SharpDX.Direct3D11.Comparison.Equal;
+
+                case CompareFunction.Greater:
+                    return SharpDX.Direct3D11.Comparison.Greater;
+
+                case CompareFunction.GreaterEqual:
+                    return SharpDX.Direct3D11.Comparison.GreaterEqual;
+
+                case CompareFunction.Less:
+                    return SharpDX.Direct3D11.Comparison.Less;
+
+                case CompareFunction.LessEqual:
+                    return SharpDX.Direct3D11.Comparison.LessEqual;
+
+                case CompareFunction.Never:
+                    return SharpDX.Direct3D11.Comparison.Never;
+
+                case CompareFunction.NotEqual:
+                    return SharpDX.Direct3D11.Comparison.NotEqual;
+
+                default:
+                    throw new ArgumentException("Invalid comparison!");
+            }
         }
     }
 }
