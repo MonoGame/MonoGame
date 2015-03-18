@@ -22,12 +22,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         ReverseSubtract,
         /// <summary>
-        /// The function will extracts maximum of the source and destination. max((srcColor * srcBlend),(destColor * destBlend))
-        /// </summary>
-        Max,
-        /// <summary>
         /// The function will extracts minimum of the source and destination. min((srcColor * srcBlend),(destColor * destBlend))
         /// </summary>
-		Min,
+        Min, 
+        /// <summary>
+        /// The function will extracts maximum of the source and destination. max((srcColor * srcBlend),(destColor * destBlend))
+        /// </summary>
+		Max
 	}
 }
