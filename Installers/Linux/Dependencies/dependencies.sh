@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "Do you want to automatically install required packages(Y, n)" choice
+read -p "Do you want to automatically install required packages(Y, n): " choice
 case "$choice" in 
 	n|N ) exit;
 esac
