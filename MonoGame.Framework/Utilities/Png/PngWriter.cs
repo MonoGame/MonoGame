@@ -215,6 +215,17 @@ namespace MonoGame.Utilities.Png
                     texture2D.GetData<Color>(colorData);
                     break;
 
+                case SurfaceFormat.Alpha8:
+                    var alpha8Data = new Alpha8[colorDataLength];
+                    texture2D.GetData<Alpha8>(alpha8Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)alpha8Data[i]).ToVector4());
+                    }
+
+                    break;
+                
                 case SurfaceFormat.Bgr565:
                     var bgr565Data = new Bgr565[colorDataLength];
                     texture2D.GetData<Bgr565>(bgr565Data);
@@ -235,6 +246,16 @@ namespace MonoGame.Utilities.Png
                         colorData[i] = new Color(((IPackedVector)bgra4444Data[i]).ToVector4());
                     }
 
+                    break;
+
+                case SurfaceFormat.Bgra5551:
+                    var bgra5551Data = new Bgra5551[colorDataLength];
+                    texture2D.GetData<Bgra5551>(bgra5551Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)bgra5551Data[i]).ToVector4());
+                    }
                     break;
 
                 case SurfaceFormat.HalfSingle:
@@ -288,6 +309,39 @@ namespace MonoGame.Utilities.Png
                     for (int i = 0; i < colorDataLength; i++)
                     {
                         colorData[i] = new Color(((IPackedVector)normalizedByte4Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Rg32:
+                    var rg32Data = new Rg32[colorDataLength];
+                    texture2D.GetData<Rg32>(rg32Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)rg32Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Rgba64:
+                    var rgba64Data = new Rgba64[colorDataLength];
+                    texture2D.GetData<Rgba64>(rgba64Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)rgba64Data[i]).ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Rgba1010102:
+                    var rgba1010102Data = new Rgba1010102[colorDataLength];
+                    texture2D.GetData<Rgba1010102>(rgba1010102Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(((IPackedVector)rgba1010102Data[i]).ToVector4());
                     }
 
                     break;
