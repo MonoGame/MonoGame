@@ -66,13 +66,76 @@ namespace MonoGame.Tests.Visual
             assertMethod(() => samplerState.AddressU = TextureAddressMode.Clamp);
             assertMethod(() => samplerState.AddressV = TextureAddressMode.Clamp);
             assertMethod(() => samplerState.AddressW = TextureAddressMode.Clamp);
+#if !XNA
             assertMethod(() => samplerState.BorderColor = Color.Red);
+#endif
             assertMethod(() => samplerState.Filter = TextureFilter.Anisotropic);
             assertMethod(() => samplerState.MaxAnisotropy = 0);
             assertMethod(() => samplerState.MaxMipLevel = 0);
             assertMethod(() => samplerState.MipMapLevelOfDetailBias = 0);
+#if !XNA
             assertMethod(() => samplerState.ComparisonFunction = CompareFunction.Always);
+#endif
         }
+
+#if !XNA
+        [Test]
+        public void VisualTestAddressModes()
+        {
+            var addressModes = new[]
+            {
+                TextureAddressMode.Border,
+                TextureAddressMode.Clamp, 
+                TextureAddressMode.Mirror, 
+                TextureAddressMode.Wrap
+            };
+
+            SpriteBatch spriteBatch = null;
+            Texture2D texture = null;
+            SamplerState[] samplerStates = null;
+            Effect effect = null;
+
+            Game.LoadContentWith += (sender, e) =>
+            {
+                spriteBatch = new SpriteBatch(Game.GraphicsDevice);
+
+                texture = Game.Content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
+
+                samplerStates = new SamplerState[addressModes.Length];
+                for (var i = 0; i < addressModes.Length; i++)
+                    samplerStates[i] = new SamplerState
+                    {
+                        AddressU = addressModes[i],
+                        AddressV = addressModes[i],
+                        AddressW = addressModes[i],
+                        BorderColor = Color.Purple
+                    };
+            };
+
+            Game.DrawWith += (sender, e) =>
+            {
+                var size = new Vector2(texture.Width * 2, texture.Height * 2);
+                var offset = new Vector2(10, 10);
+
+                Game.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+
+                for (var i = 0; i < addressModes.Length; i++)
+                {
+                    var x = i % 4;
+                    var pos = offset + new Vector2(x * size.X, 0);
+
+                    spriteBatch.Begin(SpriteSortMode.Deferred, samplerState: samplerStates[i]);
+                    spriteBatch.Draw(texture, 
+                        new Rectangle((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y),
+                        new Rectangle(-20, -20, texture.Width + 40, texture.Height + 40),
+                        Color.White);
+                    spriteBatch.End();
+                }
+            };
+
+            RunSingleFrameTest();
+        }
+#endif
 
 #if DIRECTX && !XNA
         [Test]
