@@ -3,7 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#if DIRECTX
+using MonoGame.Tests.ContentPipeline;
+#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
@@ -68,5 +72,78 @@ namespace MonoGame.Tests.Visual
             assertMethod(() => samplerState.MipMapLevelOfDetailBias = 0);
             assertMethod(() => samplerState.ComparisonFunction = CompareFunction.Always);
         }
+
+#if DIRECTX && !XNA
+        [Test]
+        public void VisualTestComparisonFunction()
+        {
+            var compares = new[]
+            {
+                CompareFunction.Always,
+                CompareFunction.Equal, 
+                CompareFunction.Greater, 
+                CompareFunction.GreaterEqual,
+                CompareFunction.Less, 
+                CompareFunction.LessEqual, 
+                CompareFunction.Never, 
+                CompareFunction.NotEqual
+            };
+
+            SpriteBatch spriteBatch = null;
+            Texture2D texture = null;
+            SamplerState[] samplerStates = null;
+            Effect customEffect = null;
+
+            Game.LoadContentWith += (sender, e) =>
+            {
+                spriteBatch = new SpriteBatch(Game.GraphicsDevice);
+
+                // Texture contains a horizontal gradient [0..1].
+                // In the shader, we compare samples from this texture to a hardcoded "0.5" value, 
+                // and run the test once for each comparison function.
+                texture = new Texture2D(Game.GraphicsDevice, 16, 1, false, SurfaceFormat.Single);
+                var textureData = new float[texture.Width];
+                for (var x = 0; x < texture.Width; x++)
+                    textureData[x] = x / (float) texture.Width;
+                texture.SetData(textureData);
+
+                samplerStates = new SamplerState[compares.Length];
+                for (var i = 0; i < compares.Length; i++)
+                    samplerStates[i] = new SamplerState
+                    {
+                        AddressU = TextureAddressMode.Clamp,
+                        AddressV = TextureAddressMode.Clamp,
+                        AddressW = TextureAddressMode.Clamp,
+                        ComparisonFunction = compares[i]
+                    };
+
+                customEffect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, 
+                    "CustomSpriteBatchEffectComparisonSampler.fx");
+            };
+
+            Game.DrawWith += (sender, e) =>
+            {
+                var size = new Vector2(100, 100);
+                var offset = new Vector2(10, 10);
+
+                Game.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+
+                for (var i = 0; i < compares.Length; i++)
+                {
+                    var x = i % 4;
+                    var y = (i > 3) ? 1 : 0;
+                    var pos = offset + new Vector2(x * size.X, y * size.Y);
+
+                    spriteBatch.Begin(SpriteSortMode.Deferred, samplerState: samplerStates[i], effect: customEffect);
+                    spriteBatch.Draw(texture, 
+                        new Rectangle((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y),
+                        Color.White);
+                    spriteBatch.End();
+                }
+            };
+
+            RunSingleFrameTest();
+        }
+#endif
     }
 }
