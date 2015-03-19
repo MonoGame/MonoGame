@@ -281,6 +281,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     channelCount,
                     format,
                     sampleRate);
+
+                // Loop start and length in number of samples. Defaults to entire sound
+                loopStart = 0;
+                loopLength = data.Count / ((bitsPerSample / 8) * channelCount);
             }
             finally
             {
