@@ -785,7 +785,7 @@
     <Compile Include="Input\GamePad.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.SDL.cs">
+    <Compile Include="Input\GamePad.OpenTK.cs">
       <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.Web.cs">
@@ -1065,30 +1065,6 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\Input\Axis.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Capabilities.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\DPad.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Input.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Joystick.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\PadConfig.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Settings.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Stick.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="Desktop\OpenTKGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
