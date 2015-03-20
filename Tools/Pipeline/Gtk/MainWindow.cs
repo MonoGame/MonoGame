@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System;
 using Gtk;
 using System.Reflection;
+
 #if MONOMAC
 using IgeMacIntegration;
 #endif
@@ -75,6 +76,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             propertiesview1.Initalize (this);
+            this.textview2.SizeAllocated += AutoScroll;
         }
             
         void BuildMenu() {
@@ -286,22 +288,40 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenus ();
         }
 
+        public void AutoScroll(object sender, SizeAllocatedArgs e)
+        {
+            textview2.ScrollToIter(textview2.Buffer.EndIter, 0, false, 0, 0);
+        }
+
         public void OutputAppend (string text)
         {
             if (text == null)
                 return;
 
             Application.Invoke (delegate { 
-                textview2.Buffer.Text += text + "\r\n";
-                UpdateMenus();
+                try {
+                    lock(textview2.Buffer) {
+                        textview2.Buffer.Text += text + "\r\n";
+                        UpdateMenus();
+                        System.Threading.Thread.Sleep(1);
+                    }
+                }
+                catch {
+                }
             });
         }
 
         public void OutputClear ()
         {
             Application.Invoke (delegate { 
-                textview2.Buffer.Text = "";
-                UpdateMenus();
+                try {
+                    lock(textview2.Buffer) {
+                        textview2.Buffer.Text = "";
+                        UpdateMenus();
+                    }
+                }
+                catch {
+                }
             });
         }
 
@@ -505,13 +525,11 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            string foldername = "";
-
-            TextEditorDialog ted = new TextEditorDialog("New Folder", "Folder Name:", "");
+            var ted = new TextEditorDialog("New Folder", "Folder Name:", "", true);
             ted.TransientFor = this;
             if (ted.Run() != (int)ResponseType.Ok)
                 return;
-            foldername = ted.text;
+            var foldername = ted.text;
 
             expand = true;
             List<TreeIter> iters;
@@ -610,9 +628,8 @@ namespace MonoGame.Tools.Pipeline
 
             ExitAction.Sensitive = notBuilding;
 
-            NewItemAction.Sensitive = projectOpen;
-            AddItemAction.Sensitive = projectOpen;
-            AddFolderAction.Sensitive = projectOpen;
+            AddAction.Sensitive = projectOpen;
+
             DeleteAction.Sensitive = projectOpen && somethingSelected;
 
             BuildAction.Sensitive = projectOpen;
@@ -670,16 +687,6 @@ namespace MonoGame.Tools.Pipeline
         {
             UndoAction.Sensitive = canUndo;
             RedoAction.Sensitive = canRedo;
-        }
-
-        protected void OnFileActionActivated (object sender, EventArgs e)
-        {
-
-        }
-
-        protected void OnBuildActionActivated (object sender, EventArgs e)
-        {
-
         }
     }
 }

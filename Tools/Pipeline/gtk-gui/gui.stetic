@@ -14,7 +14,6 @@
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">File</property>
         <property name="ShortLabel" translatable="yes">File</property>
-        <signal name="Activated" handler="OnFileActionActivated" />
       </action>
       <action id="NewAction">
         <property name="Type">Action</property>
@@ -86,18 +85,6 @@
         <property name="ShortLabel" translatable="yes">Redo</property>
         <signal name="Activated" handler="OnRedoActionActivated" />
       </action>
-      <action id="NewItemAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes">New Item...</property>
-        <property name="ShortLabel" translatable="yes">New Item...</property>
-        <signal name="Activated" handler="OnNewItemActionActivated" />
-      </action>
-      <action id="AddItemAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Add Item...</property>
-        <property name="ShortLabel" translatable="yes">Add Item...</property>
-        <signal name="Activated" handler="OnAddItemActionActivated" />
-      </action>
       <action id="DeleteAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Delete</property>
@@ -108,7 +95,6 @@
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Build</property>
         <property name="ShortLabel" translatable="yes">Build</property>
-        <signal name="Activated" handler="OnBuildActionActivated" />
       </action>
       <action id="BuildAction1">
         <property name="Type">Action</property>
@@ -157,11 +143,16 @@
         <property name="Label" translatable="yes">Cancel Build</property>
         <property name="ShortLabel" translatable="yes">Cancel Build</property>
       </action>
-      <action id="AddFolderAction">
+      <action id="AddAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Add Folder...</property>
-        <property name="ShortLabel" translatable="yes">Add Folder...</property>
-        <signal name="Activated" handler="OnAddFolderActionActivated" />
+        <property name="Label" translatable="yes">Add</property>
+        <property name="ShortLabel" translatable="yes">Add</property>
+      </action>
+      <action id="NewItemAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">New Item...</property>
+        <property name="ShortLabel" translatable="yes">New Item...</property>
+        <signal name="Activated" handler="OnNewItemActionActivated" />
       </action>
       <action id="NewFolderAction">
         <property name="Type">Action</property>
@@ -169,10 +160,22 @@
         <property name="ShortLabel" translatable="yes">New Folder...</property>
         <signal name="Activated" handler="OnNewFolderActionActivated" />
       </action>
+      <action id="ExistingItemAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Existing Item...</property>
+        <property name="ShortLabel" translatable="yes">Add Existing Item...</property>
+        <signal name="Activated" handler="OnAddItemActionActivated" />
+      </action>
+      <action id="ExistingFolderAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Existing Folder...</property>
+        <property name="ShortLabel" translatable="yes">Add Existing Folder...</property>
+        <signal name="Activated" handler="OnAddFolderActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="GeneratePublic">False</property>
-    <property name="Title" translatable="yes">Monogame Pipeline</property>
+    <property name="Title" translatable="yes">MonoGame Pipeline</property>
     <property name="Icon">resource:MonoGame.Tools.Pipeline.App.ico</property>
     <property name="WindowPosition">CenterOnParent</property>
     <signal name="DeleteEvent" handler="OnDeleteEvent" />
@@ -200,10 +203,13 @@
                 <node type="Menuitem" action="UndoAction" />
                 <node type="Menuitem" action="RedoAction" />
                 <node type="Separator" />
-                <node type="Menuitem" action="NewItemAction" />
-                <node type="Menuitem" action="AddItemAction" />
-                <node type="Menuitem" action="NewFolderAction" />
-                <node type="Menuitem" action="AddFolderAction" />
+                <node type="Menu" action="AddAction">
+                  <node type="Menuitem" action="NewItemAction" />
+                  <node type="Menuitem" action="NewFolderAction" />
+                  <node type="Separator" />
+                  <node type="Menuitem" action="ExistingItemAction" />
+                  <node type="Menuitem" action="ExistingFolderAction" />
+                </node>
                 <node type="Separator" />
                 <node type="Menuitem" action="DeleteAction" />
               </node>
@@ -973,6 +979,7 @@
             <property name="MemberName" />
             <property name="CanFocus">True</property>
             <property name="Label" translatable="yes">Copy the file to the directory</property>
+            <property name="Active">True</property>
             <property name="DrawIndicator">True</property>
             <property name="HasLabel">True</property>
             <property name="UseUnderline">True</property>
@@ -1213,7 +1220,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.TextEditorDialog" design-size="367 118">
+  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.TextEditorDialog" design-size="367 143">
     <property name="MemberName" />
     <property name="WindowPosition">CenterOnParent</property>
     <property name="BorderWidth">4</property>
@@ -1233,9 +1240,7 @@
           </widget>
           <packing>
             <property name="Position">0</property>
-            <property name="AutoSize">True</property>
-            <property name="Expand">False</property>
-            <property name="Fill">False</property>
+            <property name="AutoSize">False</property>
           </packing>
         </child>
         <child>
@@ -1244,9 +1249,22 @@
             <property name="CanFocus">True</property>
             <property name="IsEditable">True</property>
             <property name="InvisibleChar">●</property>
+            <signal name="Changed" handler="OnEntry1Changed" />
           </widget>
           <packing>
             <property name="Position">1</property>
+            <property name="AutoSize">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Label" id="label3">
+            <property name="MemberName" />
+            <property name="HeightRequest">0</property>
+            <property name="Visible">False</property>
+            <property name="LabelProp" translatable="yes">Only Letters, numbers, space and "_" are allowed.</property>
+          </widget>
+          <packing>
+            <property name="Position">2</property>
             <property name="AutoSize">True</property>
             <property name="Expand">False</property>
             <property name="Fill">False</property>
@@ -1280,6 +1298,7 @@
         <child>
           <widget class="Gtk.Button" id="buttonOk">
             <property name="MemberName" />
+            <property name="Sensitive">False</property>
             <property name="CanDefault">True</property>
             <property name="CanFocus">True</property>
             <property name="UseStock">True</property>
