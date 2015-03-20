@@ -175,7 +175,7 @@
     </action-group>
     <property name="MemberName" />
     <property name="GeneratePublic">False</property>
-    <property name="Title" translatable="yes">Monogame Pipeline</property>
+    <property name="Title" translatable="yes">MonoGame Pipeline</property>
     <property name="Icon">resource:MonoGame.Tools.Pipeline.App.ico</property>
     <property name="WindowPosition">CenterOnParent</property>
     <signal name="DeleteEvent" handler="OnDeleteEvent" />
