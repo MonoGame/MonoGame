@@ -775,7 +775,7 @@ namespace MonoGame.Tools.Pipeline
                     items.Add(item);                    
             }
 
-            _controller.Exclude(items);      
+            _controller.Exclude(items, new List<string>());      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -902,11 +902,31 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public bool CopyOrLink(string file, bool exists, out CopyAction action, out bool applyforall)
+        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
             action = CopyAction.Link;
             applyforall = true;
             return true;
+        }
+
+        public void AddTreeFolder(string folder)
+        {
+
+        }
+
+        public void RemoveTreeFolder(string folder)
+        {
+
+        }
+
+        public bool ChooseContentFolder(string initialDirectory, out string folder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        {
+            throw new NotImplementedException();
         }
     }
 }

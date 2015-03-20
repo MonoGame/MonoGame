@@ -157,6 +157,18 @@
         <property name="Label" translatable="yes">Cancel Build</property>
         <property name="ShortLabel" translatable="yes">Cancel Build</property>
       </action>
+      <action id="AddFolderAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Add Folder...</property>
+        <property name="ShortLabel" translatable="yes">Add Folder...</property>
+        <signal name="Activated" handler="OnAddFolderActionActivated" />
+      </action>
+      <action id="NewFolderAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">New Folder...</property>
+        <property name="ShortLabel" translatable="yes">New Folder...</property>
+        <signal name="Activated" handler="OnNewFolderActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="GeneratePublic">False</property>
@@ -190,6 +202,8 @@
                 <node type="Separator" />
                 <node type="Menuitem" action="NewItemAction" />
                 <node type="Menuitem" action="AddItemAction" />
+                <node type="Menuitem" action="NewFolderAction" />
+                <node type="Menuitem" action="AddFolderAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="DeleteAction" />
               </node>
@@ -959,7 +973,6 @@
             <property name="MemberName" />
             <property name="CanFocus">True</property>
             <property name="Label" translatable="yes">Copy the file to the directory</property>
-            <property name="Active">True</property>
             <property name="DrawIndicator">True</property>
             <property name="HasLabel">True</property>
             <property name="UseUnderline">True</property>
@@ -1082,18 +1095,77 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.donotsync" design-size="400 300">
+  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.AddFolderDialog" design-size="411 216">
     <property name="MemberName" />
-    <property name="Title" translatable="yes">dialog1</property>
     <property name="WindowPosition">CenterOnParent</property>
+    <property name="BorderWidth">4</property>
     <property name="Buttons">2</property>
     <property name="HelpButton">False</property>
+    <signal name="Response" handler="OnResponse" />
     <child internal-child="VBox">
       <widget class="Gtk.VBox" id="dialog1_VBox">
         <property name="MemberName" />
+        <property name="Spacing">6</property>
         <property name="BorderWidth">2</property>
         <child>
-          <placeholder />
+          <widget class="Gtk.Label" id="label1">
+            <property name="MemberName" />
+            <property name="Xalign">0</property>
+            <property name="LabelProp" translatable="yes">The folder &lt;b&gt;%folder&lt;/b&gt; is outside of the target directory. What would you like to do?</property>
+            <property name="Wrap">True</property>
+          </widget>
+          <packing>
+            <property name="Position">0</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.RadioButton" id="radiobutton1">
+            <property name="MemberName" />
+            <property name="CanFocus">True</property>
+            <property name="Label" translatable="yes">Copy the folder to the directory</property>
+            <property name="DrawIndicator">True</property>
+            <property name="HasLabel">True</property>
+            <property name="UseUnderline">True</property>
+            <property name="Group">group1</property>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.RadioButton" id="radiobutton2">
+            <property name="MemberName" />
+            <property name="CanFocus">True</property>
+            <property name="Label" translatable="yes">Add a link to the folder</property>
+            <property name="DrawIndicator">True</property>
+            <property name="HasLabel">True</property>
+            <property name="UseUnderline">True</property>
+            <property name="Group">group1</property>
+          </widget>
+          <packing>
+            <property name="Position">2</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Alignment" id="alignment1">
+            <property name="MemberName" />
+            <child>
+              <placeholder />
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">3</property>
+            <property name="AutoSize">True</property>
+          </packing>
         </child>
       </widget>
     </child>
@@ -1128,7 +1200,93 @@
             <property name="UseStock">True</property>
             <property name="Type">StockItem</property>
             <property name="StockId">gtk-ok</property>
-            <property name="ResponseId">-5</property>
+            <property name="ResponseId">-1</property>
+            <signal name="Clicked" handler="OnButtonOkClicked" />
+            <property name="label">gtk-ok</property>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.TextEditorDialog" design-size="367 118">
+    <property name="MemberName" />
+    <property name="WindowPosition">CenterOnParent</property>
+    <property name="BorderWidth">4</property>
+    <property name="Buttons">2</property>
+    <property name="HelpButton">False</property>
+    <signal name="Response" handler="OnResponse" />
+    <child internal-child="VBox">
+      <widget class="Gtk.VBox" id="dialog1_VBox">
+        <property name="MemberName" />
+        <property name="Spacing">4</property>
+        <property name="BorderWidth">2</property>
+        <child>
+          <widget class="Gtk.Label" id="label2">
+            <property name="MemberName" />
+            <property name="Xalign">0</property>
+            <property name="LabelProp" translatable="yes">label2</property>
+          </widget>
+          <packing>
+            <property name="Position">0</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Entry" id="entry1">
+            <property name="MemberName" />
+            <property name="CanFocus">True</property>
+            <property name="IsEditable">True</property>
+            <property name="InvisibleChar">●</property>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+    <child internal-child="ActionArea">
+      <widget class="Gtk.HButtonBox" id="dialog1_ActionArea">
+        <property name="MemberName" />
+        <property name="Spacing">10</property>
+        <property name="BorderWidth">5</property>
+        <property name="Size">2</property>
+        <property name="LayoutStyle">End</property>
+        <child>
+          <widget class="Gtk.Button" id="buttonCancel">
+            <property name="MemberName" />
+            <property name="CanDefault">True</property>
+            <property name="CanFocus">True</property>
+            <property name="UseStock">True</property>
+            <property name="Type">StockItem</property>
+            <property name="StockId">gtk-cancel</property>
+            <property name="ResponseId">-6</property>
+            <property name="label">gtk-cancel</property>
+          </widget>
+          <packing>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Button" id="buttonOk">
+            <property name="MemberName" />
+            <property name="CanDefault">True</property>
+            <property name="CanFocus">True</property>
+            <property name="UseStock">True</property>
+            <property name="Type">StockItem</property>
+            <property name="StockId">gtk-ok</property>
+            <property name="ResponseId">-1</property>
+            <signal name="Clicked" handler="OnButtonOkClicked" />
             <property name="label">gtk-ok</property>
           </widget>
           <packing>

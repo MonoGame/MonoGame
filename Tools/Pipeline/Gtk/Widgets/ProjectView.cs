@@ -23,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
         MainWindow window;
         PropertiesView propertiesView;
 
-        MenuItem treenewitem, treeadditem, treeopenfile, treedelete, treeopenfilelocation;
+        MenuItem treenewitem, treeadditem, treenewfolder, treeaddfolder, treeopenfile, treedelete, treeopenfilelocation;
         SeparatorMenuItem seperator, seperator2;
 
         public ProjectView ()
@@ -72,6 +72,14 @@ namespace MonoGame.Tools.Pipeline
             treeadditem = new MenuItem ("Add Item...");
             treeadditem.Activated += window.OnAddItemActionActivated;
             menu.Add (treeadditem);
+
+            treenewfolder = new MenuItem ("New Folder...");
+            treenewfolder.Activated += window.OnNewFolderActionActivated;
+            menu.Add (treenewfolder);
+
+            treeaddfolder = new MenuItem ("Add Folder...");
+            treeaddfolder.Activated += window.OnAddFolderActionActivated;
+            menu.Add (treeaddfolder);
 
             treedelete = new MenuItem ("Delete");
             treedelete.Activated += window.OnDeleteActionActivated;
@@ -134,11 +142,11 @@ namespace MonoGame.Tools.Pipeline
             listStore.Clear ();
         }
 
-        public void AddItem(TreeIter iter, string path, bool exists, bool expand)
+        public void AddItem(TreeIter iter, string path, bool exists, bool folder, bool expand)
         {
             Gdk.Pixbuf icon = ICON_OTHER[Convert.ToInt32(!exists)];
 
-            if (path.Contains ("/")) 
+            if (path.Contains ("/") || folder) 
                 icon = ICON_FOLDER;
 
             string[] split = path.Split ('/');
@@ -153,7 +161,7 @@ namespace MonoGame.Tools.Pipeline
                 for(int i = 2;i < split.Length;i++)
                     newpath += "/" + split[i];
 
-                AddItem (itr, newpath, exists, expand);
+                AddItem (itr, newpath, exists, folder,  expand);
             }
         }
 
@@ -169,8 +177,8 @@ namespace MonoGame.Tools.Pipeline
                         newpath += "/" + split [i];
 
                     RemoveItem (itr, newpath);
-                } else 
-                    RemoveIterAndUneededParents (itr);
+                } else if (treeview1.Model.GetValue(itr, 0) != ICON_BASE) 
+                    listStore.Remove (ref itr);
             }
         }
 
@@ -190,21 +198,6 @@ namespace MonoGame.Tools.Pipeline
             } else {
                 Gdk.Pixbuf icon = ICON_OTHER [Convert.ToInt32 (!exists)];
                 treeview1.Model.SetValue (itr, 0, icon);
-            }
-        }
-
-        public void RemoveIterAndUneededParents(TreeIter iter)
-        {
-            if (treeview1.Model.GetValue(iter, 0) != ICON_BASE) {
-                TreeIter piter;
-
-                treeview1.Model.IterParent (out piter, iter);
-                int nc = treeview1.Model.IterNChildren (piter);
-                listStore.Remove (ref iter);
-
-                if (nc <= 1) 
-                    RemoveIterAndUneededParents (piter);
-                
             }
         }
 
@@ -288,6 +281,7 @@ namespace MonoGame.Tools.Pipeline
             string[] path = GetSelectedTreePath (out iter, out icon);
 
             var items = new List<ContentItem>();
+            var directories = new List<string>();
 
             for (int i = 0; i < path.Length; i++) {
                 if (icon [i] == ICON_OTHER[0] || icon [i] == ICON_OTHER[1]) {
@@ -295,6 +289,9 @@ namespace MonoGame.Tools.Pipeline
                     if(!items.Contains(item))
                         items.Add (item);
                 } else {
+                    if (icon[i] == ICON_FOLDER)
+                        directories.Add(path[i]);
+
                     List<string> paths = GetAllPaths (iter [i]);
                     foreach (string pth in paths) {
                         var item = window._controller.GetItem (pth) as ContentItem;
@@ -306,8 +303,8 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            if(items.Count > 0)
-                window._controller.Exclude (items);
+            if(items.Count > 0 || directories.Count > 0)
+                window._controller.Exclude (items, directories);
         }
 
         public void Rebuild()
@@ -454,14 +451,20 @@ namespace MonoGame.Tools.Pipeline
                     if (icons[0] == ICON_BASE) {
                         treenewitem.Visible = true;
                         treeadditem.Visible = true;
+                        treenewfolder.Visible = true;
+                        treeaddfolder.Visible = true;
                         treeopenfile.Visible = true;
                     } else if (icons[0] == ICON_FOLDER) {
                         treenewitem.Visible = true;
                         treeadditem.Visible = true;
+                        treenewfolder.Visible = true;
+                        treeaddfolder.Visible = true;
                         treeopenfile.Visible = false;
                     } else {
                         treenewitem.Visible = false;
                         treeadditem.Visible = false;
+                        treenewfolder.Visible = false;
+                        treeaddfolder.Visible = false;
                         treeopenfile.Visible = true;
                     }
 
