@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
@@ -16,6 +17,8 @@ namespace TwoMGFX
         private TextureAddressMode _addressU;
         private TextureAddressMode _addressV;
         private TextureAddressMode _addressW;
+
+        private Color _borderColor;
 
         private int _maxAnisotropy;
         private int _maxMipLevel;
@@ -88,6 +91,15 @@ namespace TwoMGFX
             }
         }
 
+        public Color BorderColor
+        {
+            set
+            {
+                _borderColor = value;
+                _dirty = true;
+            }
+        }
+
         public int MaxAnisotropy
         {
             set
@@ -124,6 +136,8 @@ namespace TwoMGFX
             _state.AddressU = _addressU;
             _state.AddressV = _addressV;
             _state.AddressW = _addressW;
+
+            _state.BorderColor = _borderColor;
 
             _state.MaxAnisotropy = _maxAnisotropy;
             _state.MaxMipLevel = _maxMipLevel;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Microsoft.Xna.Framework;
 
 namespace TwoMGFX
 {
@@ -29,5 +30,32 @@ namespace TwoMGFX
 
 		    throw new Exception("Invalid boolean value '" + value + "'");
 		}
+
+	    public static Color ParseColor(string value)
+	    {
+	        var hexValue = Convert.ToUInt32(value, 16);
+
+	        byte r, g, b, a;
+	        if (value.Length == 8)
+	        {
+	            r = (byte) ((hexValue >> 16) & 0xFF);
+                g = (byte) ((hexValue >> 8) & 0xFF);
+                b = (byte) ((hexValue >> 0) & 0xFF);
+	            a = 255;
+	        }
+	        else if (value.Length == 10)
+	        {
+                r = (byte) ((hexValue >> 24) & 0xFF);
+                g = (byte) ((hexValue >> 16) & 0xFF);
+                b = (byte) ((hexValue >> 8) & 0xFF);
+                a = (byte) ((hexValue >> 0) & 0xFF);
+	        }
+	        else
+	        {
+	            throw new NotSupportedException();
+	        }
+
+            return new Color(r, g, b, a);
+	    }
 	}
 }

@@ -28,14 +28,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.AddressV = GetAddressMode(AddressV);
                 desc.AddressW = GetAddressMode(AddressW);
 
+                desc.BorderColor = BorderColor.ToColor4();
                 desc.Filter = GetFilter(Filter, ComparisonFunction != CompareFunction.Never);
                 desc.MaximumAnisotropy = MaxAnisotropy;
                 desc.MipLodBias = MipMapLevelOfDetailBias;
                 desc.ComparisonFunction = ComparisonFunction.ToComparison();
 
-                // TODO: How do i do these?
+                // TODO: How do i do this?
                 desc.MinimumLod = 0.0f;
-                desc.BorderColor = new SharpDX.Color4(0, 0, 0, 0);
 
                 // To support feature level 9.1 these must 
                 // be set to these exact values.
@@ -136,6 +136,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 case TextureAddressMode.Wrap:
                     return SharpDX.Direct3D11.TextureAddressMode.Wrap;
+
+                case TextureAddressMode.Border:
+                    return SharpDX.Direct3D11.TextureAddressMode.Border;
 
                 default:
                     throw new ArgumentException("Invalid texture address mode!");

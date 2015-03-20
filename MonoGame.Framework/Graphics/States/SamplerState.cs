@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private TextureAddressMode _addressU;
         private TextureAddressMode _addressV;
         private TextureAddressMode _addressW;
+        private Color _borderColor;
         private TextureFilter _filter;
         private int _maxAnisotropy;
         private int _maxMipLevel;
@@ -63,6 +64,16 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ThrowIfBound();
                 _addressW = value;
+            }
+        }
+
+        public Color BorderColor
+        {
+            get { return _borderColor; }
+            set
+            {
+                ThrowIfBound();
+                _borderColor = value;
             }
         }
 
@@ -139,6 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
             AddressU = TextureAddressMode.Wrap;
             AddressV = TextureAddressMode.Wrap;
             AddressW = TextureAddressMode.Wrap;
+            BorderColor = Color.White;
             MaxAnisotropy = 4;
             MaxMipLevel = 0;
             MipMapLevelOfDetailBias = 0.0f;
@@ -163,6 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _addressU = cloneSource._addressU;
             _addressV = cloneSource._addressV;
             _addressW = cloneSource._addressW;
+            _borderColor = cloneSource._borderColor;
             _maxAnisotropy = cloneSource._maxAnisotropy;
             _maxMipLevel = cloneSource._maxMipLevel;
             _mipMapLevelOfDetailBias = cloneSource._mipMapLevelOfDetailBias;

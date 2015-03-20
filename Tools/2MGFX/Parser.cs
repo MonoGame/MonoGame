@@ -1942,6 +1942,25 @@ namespace TwoMGFX
             parent.Token.UpdateRange(node.Token);
         } // NonTerminalSymbol: AddressMode_Mirror
 
+        private void ParseAddressMode_Border(ParseNode parent) // NonTerminalSymbol: AddressMode_Border
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddressMode_Border), "AddressMode_Border");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.Border); // Terminal Rule: Border
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Border) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Border.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: AddressMode_Border
+
         private void ParseAddressMode(ParseNode parent) // NonTerminalSymbol: AddressMode
         {
             Token tok;
@@ -1949,7 +1968,7 @@ namespace TwoMGFX
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddressMode), "AddressMode");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Clamp, TokenType.Wrap, TokenType.Mirror); // Choice Rule
+            tok = scanner.LookAhead(TokenType.Clamp, TokenType.Wrap, TokenType.Mirror, TokenType.Border); // Choice Rule
             switch (tok.Type)
             { // Choice Rule
                 case TokenType.Clamp:
@@ -1961,8 +1980,11 @@ namespace TwoMGFX
                 case TokenType.Mirror:
                     ParseAddressMode_Mirror(node); // NonTerminal Rule: AddressMode_Mirror
                     break;
+                case TokenType.Border:
+                    ParseAddressMode_Border(node); // NonTerminal Rule: AddressMode_Border
+                    break;
                 default:
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Clamp, Wrap, or Mirror.", 0x0002, tok));
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Clamp, Wrap, Mirror, or Border.", 0x0002, tok));
                     break;
             } // Choice Rule
 
@@ -2492,6 +2514,57 @@ namespace TwoMGFX
             parent.Token.UpdateRange(node.Token);
         } // NonTerminalSymbol: Sampler_State_AddressW
 
+        private void ParseSampler_State_BorderColor(ParseNode parent) // NonTerminalSymbol: Sampler_State_BorderColor
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Sampler_State_BorderColor), "Sampler_State_BorderColor");
+            parent.Nodes.Add(node);
+
+
+             // Concat Rule
+            tok = scanner.Scan(TokenType.BorderColor); // Terminal Rule: BorderColor
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.BorderColor) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.BorderColor.ToString(), 0x1001, tok));
+                return;
+            }
+
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Equals) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Equals.ToString(), 0x1001, tok));
+                return;
+            }
+
+             // Concat Rule
+            tok = scanner.Scan(TokenType.HexColor); // Terminal Rule: HexColor
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.HexColor) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.HexColor.ToString(), 0x1001, tok));
+                return;
+            }
+
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Semicolon) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Semicolon.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Sampler_State_BorderColor
+
         private void ParseSampler_State_MaxMipLevel(ParseNode parent) // NonTerminalSymbol: Sampler_State_MaxMipLevel
         {
             Token tok;
@@ -2652,7 +2725,7 @@ namespace TwoMGFX
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Sampler_State_Expression), "Sampler_State_Expression");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // Choice Rule
+            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // Choice Rule
             switch (tok.Type)
             { // Choice Rule
                 case TokenType.Texture:
@@ -2679,6 +2752,9 @@ namespace TwoMGFX
                 case TokenType.AddressW:
                     ParseSampler_State_AddressW(node); // NonTerminal Rule: Sampler_State_AddressW
                     break;
+                case TokenType.BorderColor:
+                    ParseSampler_State_BorderColor(node); // NonTerminal Rule: Sampler_State_BorderColor
+                    break;
                 case TokenType.MaxMipLevel:
                     ParseSampler_State_MaxMipLevel(node); // NonTerminal Rule: Sampler_State_MaxMipLevel
                     break;
@@ -2689,7 +2765,7 @@ namespace TwoMGFX
                     ParseSampler_State_MipLodBias(node); // NonTerminal Rule: Sampler_State_MipLodBias
                     break;
                 default:
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Texture, MinFilter, MagFilter, MipFilter, Filter, AddressU, AddressV, AddressW, MaxMipLevel, MaxAnisotropy, or MipLodBias.", 0x0002, tok));
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Texture, MinFilter, MagFilter, MipFilter, Filter, AddressU, AddressV, AddressW, BorderColor, MaxMipLevel, MaxAnisotropy, or MipLodBias.", 0x0002, tok));
                     break;
             } // Choice Rule
 
@@ -2898,7 +2974,7 @@ namespace TwoMGFX
                 }
 
                  // Concat Rule
-                tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // ZeroOrMore Rule
+                tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // ZeroOrMore Rule
                 while (tok.Type == TokenType.Texture
                     || tok.Type == TokenType.MinFilter
                     || tok.Type == TokenType.MagFilter
@@ -2907,12 +2983,13 @@ namespace TwoMGFX
                     || tok.Type == TokenType.AddressU
                     || tok.Type == TokenType.AddressV
                     || tok.Type == TokenType.AddressW
+                    || tok.Type == TokenType.BorderColor
                     || tok.Type == TokenType.MaxMipLevel
                     || tok.Type == TokenType.MaxAnisotropy
                     || tok.Type == TokenType.MipLodBias)
                 {
                     ParseSampler_State_Expression(node); // NonTerminal Rule: Sampler_State_Expression
-                tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // ZeroOrMore Rule
+                tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // ZeroOrMore Rule
                 }
 
                  // Concat Rule

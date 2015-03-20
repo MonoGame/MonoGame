@@ -128,6 +128,11 @@ namespace Microsoft.Xna.Framework
             return new SharpDX.Vector4(vec.X, vec.Y, vec.Z, vec.W);
         }
 
+        static public SharpDX.Color4 ToColor4(this Color color)
+        {
+            return new SharpDX.Color4(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
+        }
+
         static public SharpDX.X3DAudio.Emitter ToEmitter(this Audio.AudioEmitter emitter)
         {           
             // Pulling out Vector properties for efficiency.

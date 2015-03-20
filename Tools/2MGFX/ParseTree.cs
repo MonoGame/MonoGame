@@ -350,6 +350,9 @@ namespace TwoMGFX
                 case TokenType.AddressMode_Mirror:
                     Value = EvalAddressMode_Mirror(tree, paramlist);
                     break;
+                case TokenType.AddressMode_Border:
+                    Value = EvalAddressMode_Border(tree, paramlist);
+                    break;
                 case TokenType.AddressMode:
                     Value = EvalAddressMode(tree, paramlist);
                     break;
@@ -391,6 +394,9 @@ namespace TwoMGFX
                     break;
                 case TokenType.Sampler_State_AddressW:
                     Value = EvalSampler_State_AddressW(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_BorderColor:
+                    Value = EvalSampler_State_BorderColor(tree, paramlist);
                     break;
                 case TokenType.Sampler_State_MaxMipLevel:
                     Value = EvalSampler_State_MaxMipLevel(tree, paramlist);
@@ -749,9 +755,14 @@ namespace TwoMGFX
             return TextureAddressMode.Mirror;
         }
 
+        protected virtual object EvalAddressMode_Border(ParseTree tree, params object[] paramlist)
+        {
+            return TextureAddressMode.Border;
+        }
+
         protected virtual object EvalAddressMode(ParseTree tree, params object[] paramlist)
         {
-            return this.GetValue(tree, TokenType.AddressMode_Clamp, 0) ?? this.GetValue(tree, TokenType.AddressMode_Wrap, 0) ?? this.GetValue(tree, TokenType.AddressMode_Mirror, 0);
+            return this.GetValue(tree, TokenType.AddressMode_Clamp, 0) ?? this.GetValue(tree, TokenType.AddressMode_Wrap, 0) ?? this.GetValue(tree, TokenType.AddressMode_Mirror, 0) ?? this.GetValue(tree, TokenType.AddressMode_Border, 0);
         }
 
         protected virtual object EvalTextureFilter_None(ParseTree tree, params object[] paramlist)
@@ -817,6 +828,11 @@ namespace TwoMGFX
         protected virtual object EvalSampler_State_AddressW(ParseTree tree, params object[] paramlist)
         {
             (paramlist[0] as SamplerStateInfo).AddressW = (TextureAddressMode)this.GetValue(tree, TokenType.AddressMode, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_BorderColor(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).BorderColor = ParseTreeTools.ParseColor((string)this.GetValue(tree, TokenType.HexColor, 0)); return null;
         }
 
         protected virtual object EvalSampler_State_MaxMipLevel(ParseTree tree, params object[] paramlist)

@@ -355,6 +355,9 @@
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_True_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\SamplerState\VisualTestAddressModes.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\SamplerState\VisualTestComparisonFunction.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
