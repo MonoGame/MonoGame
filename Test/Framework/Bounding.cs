@@ -128,6 +128,17 @@ namespace MonoGame.Tests.Framework
 
             Assert.That(testFrustum.Contains(otherFrustum), Is.EqualTo(ContainmentType.Intersects));
             Assert.That(testFrustum.Intersects(otherFrustum), Is.True);
+
+            var bf =
+                new BoundingFrustum(Matrix.CreateLookAt(new Vector3(0, 1, 1), new Vector3(0, 0, 0), Vector3.Up) *
+                                    Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
+                                        1.3f, 0.1f, 1000.0f));
+            var ray = new Ray(new Vector3(0, 0.5f, 0.5f), new Vector3(0, 0, 0));
+            var ray2 = new Ray(new Vector3(0, 1.0f, 1.0f), new Vector3(0, 0, 0));
+            var value = bf.Intersects(ray);
+            var value2 = bf.Intersects(ray2);
+            Assert.AreEqual(0.0f, value);
+            Assert.AreEqual(null, value2);
         }
     }
 }
