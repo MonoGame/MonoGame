@@ -8,7 +8,7 @@ namespace MonoGame.Tools.Pipeline
     [System.ComponentModel.ToolboxItem (true)]
     partial class ProjectView : Bin
     {
-        public Menu menu;
+        public Menu menu, addmenu;
         public string openedProject;
 
         public Gdk.Pixbuf ICON_BASE = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.settings.png");
@@ -23,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
         MainWindow window;
         PropertiesView propertiesView;
 
-        MenuItem treenewitem, treeadditem, treenewfolder, treeaddfolder, treeopenfile, treedelete, treeopenfilelocation;
+        MenuItem treeadd, treeaddseperator, treenewitem, treeadditem, treenewfolder, treeaddfolder, treeopenfile, treedelete, treeopenfilelocation;
         SeparatorMenuItem seperator, seperator2;
 
         public ProjectView ()
@@ -64,44 +64,44 @@ namespace MonoGame.Tools.Pipeline
             this.propertiesView = propertiesView;
 
             menu = new Menu ();
+            addmenu = new Menu();
+
+            treeadd = new MenuItem("Add");
+            treeadd.Submenu = addmenu;
+
+            treeaddseperator = new SeparatorMenuItem ();
 
             treenewitem = new MenuItem ("New Item...");
             treenewitem.Activated += window.OnNewItemActionActivated;
-            menu.Add (treenewitem);
-
-            treeadditem = new MenuItem ("Add Item...");
-            treeadditem.Activated += window.OnAddItemActionActivated;
-            menu.Add (treeadditem);
 
             treenewfolder = new MenuItem ("New Folder...");
             treenewfolder.Activated += window.OnNewFolderActionActivated;
-            menu.Add (treenewfolder);
 
-            treeaddfolder = new MenuItem ("Add Folder...");
+            treeadditem = new MenuItem ("Existing Item...");
+            treeadditem.Activated += window.OnAddItemActionActivated;
+
+            treeaddfolder = new MenuItem ("Existing Folder...");
             treeaddfolder.Activated += window.OnAddFolderActionActivated;
-            menu.Add (treeaddfolder);
 
             treedelete = new MenuItem ("Delete");
             treedelete.Activated += window.OnDeleteActionActivated;
-            menu.Add (treedelete);
 
-            seperator = new SeparatorMenuItem ();
-            menu.Add (seperator);
-
-            treeopenfile = new MenuItem ("Open File");
+            treeopenfile = new MenuItem ("Open");
             treeopenfile.Activated += delegate {
                 List<TreeIter> iters;
                 List<Gdk.Pixbuf> icons;
                 GetSelectedTreePath(out iters, out icons);
+
+                if (icons.Count != 1)
+                    return;
 
                 if(icons[0] != ICON_BASE)
                     Process.Start(window._controller.GetFullPath(GetPathFromIter(iters[0])));
                 else
                     Process.Start(openedProject);
             };
-            menu.Add (treeopenfile);
 
-            treeopenfilelocation = new MenuItem ("Open File Location");
+            treeopenfilelocation = new MenuItem ("Open Item Directory");
             treeopenfilelocation.Activated += delegate {
                 List<TreeIter> iters;
                 List<Gdk.Pixbuf> icons;
@@ -112,12 +112,21 @@ namespace MonoGame.Tools.Pipeline
                 else
                     Process.Start(System.IO.Path.GetDirectoryName(window._controller.GetFullPath("")));
             };
+
+            addmenu.Add (treenewitem);
+            addmenu.Add (treenewfolder);
+            addmenu.Add (new SeparatorMenuItem ());
+            addmenu.Add (treeadditem);
+            addmenu.Add (treeaddfolder);
+
+            menu.Add (treeopenfile);
+            menu.Add (new SeparatorMenuItem ());
+            menu.Add (treeadd);
+            menu.Add (treeaddseperator);
             menu.Add (treeopenfilelocation);
-
-            seperator2 = new SeparatorMenuItem ();
-            menu.Add (seperator2);
-
             menu.Add (treerebuild);
+            menu.Add (new SeparatorMenuItem ());
+            menu.Add (treedelete);
         }
 
         public void SetBaseIter(string name)
@@ -350,6 +359,21 @@ namespace MonoGame.Tools.Pipeline
         [GLib.ConnectBefore]
         protected void OnTreeview1ButtonPressEvent (object o, ButtonPressEventArgs args)
         {
+            if (args.Event.Type == Gdk.EventType.TwoButtonPress && args.Event.Button == 1)
+            {
+                List<TreeIter> iters;
+                List<Gdk.Pixbuf> icons;
+                GetSelectedTreePath(out iters, out icons);
+
+                if (icons.Count != 1)
+                    return;
+
+                if(icons[0] == ICON_BASE)
+                    Process.Start(openedProject);
+                else if(icons[0] != ICON_FOLDER)
+                    Process.Start(window._controller.GetFullPath(GetPathFromIter(iters[0])));
+            }
+
             if (args.Event.Button == 3) {
                 var paths = new List<TreePath> ();
                 paths.AddRange (treeview1.Selection.GetSelectedRows ());
@@ -449,24 +473,16 @@ namespace MonoGame.Tools.Pipeline
 
                     menu.ShowAll ();
                     if (icons[0] == ICON_BASE) {
-                        treenewitem.Visible = true;
-                        treeadditem.Visible = true;
-                        treenewfolder.Visible = true;
-                        treeaddfolder.Visible = true;
+                        treeadd.Visible = true;
                         treeopenfile.Visible = true;
                     } else if (icons[0] == ICON_FOLDER) {
-                        treenewitem.Visible = true;
-                        treeadditem.Visible = true;
-                        treenewfolder.Visible = true;
-                        treeaddfolder.Visible = true;
+                        treeadd.Visible = true;
                         treeopenfile.Visible = false;
                     } else {
-                        treenewitem.Visible = false;
-                        treeadditem.Visible = false;
-                        treenewfolder.Visible = false;
-                        treeaddfolder.Visible = false;
+                        treeadd.Visible = false;
                         treeopenfile.Visible = true;
                     }
+                    treeaddseperator.Visible = treeadd.Visible;
 
                     menu.Popup ();
                 }

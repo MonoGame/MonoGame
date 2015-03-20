@@ -30,10 +30,6 @@ namespace MonoGame.Tools.Pipeline
 		
 		private global::Gtk.Action RedoAction;
 		
-		private global::Gtk.Action NewItemAction;
-		
-		private global::Gtk.Action AddItemAction;
-		
 		private global::Gtk.Action DeleteAction;
 		
 		private global::Gtk.Action BuildAction;
@@ -54,9 +50,15 @@ namespace MonoGame.Tools.Pipeline
 		
 		private global::Gtk.Action CancelBuildAction;
 		
-		private global::Gtk.Action AddFolderAction;
+		private global::Gtk.Action AddAction;
+		
+		private global::Gtk.Action NewItemAction;
 		
 		private global::Gtk.Action NewFolderAction;
+		
+		private global::Gtk.Action ExistingItemAction;
+		
+		private global::Gtk.Action ExistingFolderAction;
 		
 		private global::Gtk.VBox vbox2;
 		
@@ -117,12 +119,6 @@ namespace MonoGame.Tools.Pipeline
 			this.RedoAction = new global::Gtk.Action ("RedoAction", global::Mono.Unix.Catalog.GetString ("Redo"), null, null);
 			this.RedoAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Redo");
 			w1.Add (this.RedoAction, "<Control>y");
-			this.NewItemAction = new global::Gtk.Action ("NewItemAction", global::Mono.Unix.Catalog.GetString ("New Item..."), null, null);
-			this.NewItemAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("New Item...");
-			w1.Add (this.NewItemAction, null);
-			this.AddItemAction = new global::Gtk.Action ("AddItemAction", global::Mono.Unix.Catalog.GetString ("Add Item..."), null, null);
-			this.AddItemAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Add Item...");
-			w1.Add (this.AddItemAction, null);
 			this.DeleteAction = new global::Gtk.Action ("DeleteAction", global::Mono.Unix.Catalog.GetString ("Delete"), null, null);
 			this.DeleteAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Delete");
 			w1.Add (this.DeleteAction, null);
@@ -153,12 +149,21 @@ namespace MonoGame.Tools.Pipeline
 			this.CancelBuildAction = new global::Gtk.Action ("CancelBuildAction", global::Mono.Unix.Catalog.GetString ("Cancel Build"), null, null);
 			this.CancelBuildAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Cancel Build");
 			w1.Add (this.CancelBuildAction, null);
-			this.AddFolderAction = new global::Gtk.Action ("AddFolderAction", global::Mono.Unix.Catalog.GetString ("Add Folder..."), null, null);
-			this.AddFolderAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Add Folder...");
-			w1.Add (this.AddFolderAction, null);
+			this.AddAction = new global::Gtk.Action ("AddAction", global::Mono.Unix.Catalog.GetString ("Add"), null, null);
+			this.AddAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Add");
+			w1.Add (this.AddAction, null);
+			this.NewItemAction = new global::Gtk.Action ("NewItemAction", global::Mono.Unix.Catalog.GetString ("New Item..."), null, null);
+			this.NewItemAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("New Item...");
+			w1.Add (this.NewItemAction, null);
 			this.NewFolderAction = new global::Gtk.Action ("NewFolderAction", global::Mono.Unix.Catalog.GetString ("New Folder..."), null, null);
 			this.NewFolderAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("New Folder...");
 			w1.Add (this.NewFolderAction, null);
+			this.ExistingItemAction = new global::Gtk.Action ("ExistingItemAction", global::Mono.Unix.Catalog.GetString ("Existing Item..."), null, null);
+			this.ExistingItemAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Add Existing Item...");
+			w1.Add (this.ExistingItemAction, null);
+			this.ExistingFolderAction = new global::Gtk.Action ("ExistingFolderAction", global::Mono.Unix.Catalog.GetString ("Existing Folder..."), null, null);
+			this.ExistingFolderAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Add Existing Folder...");
+			w1.Add (this.ExistingFolderAction, null);
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "MonoGame.Tools.Pipeline.MainWindow";
@@ -169,7 +174,7 @@ namespace MonoGame.Tools.Pipeline
 			this.vbox2 = new global::Gtk.VBox ();
 			this.vbox2.Name = "vbox2";
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='OpenAction' action='OpenAction'/><menuitem name='OpenRecentAction' action='OpenRecentAction'/><menuitem name='CloseAction' action='CloseAction'/><separator/><menuitem name='ImportAction' action='ImportAction'/><separator/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><separator/><menuitem name='ExitAction' action='ExitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='UndoAction' action='UndoAction'/><menuitem name='RedoAction' action='RedoAction'/><separator/><menuitem name='NewItemAction' action='NewItemAction'/><menuitem name='AddItemAction' action='AddItemAction'/><menuitem name='NewFolderAction' action='NewFolderAction'/><menuitem name='AddFolderAction' action='AddFolderAction'/><separator/><menuitem name='DeleteAction' action='DeleteAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/><menuitem name='CancelBuildAction' action='CancelBuildAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='ViewHelpAction' action='ViewHelpAction'/><separator/><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='OpenAction' action='OpenAction'/><menuitem name='OpenRecentAction' action='OpenRecentAction'/><menuitem name='CloseAction' action='CloseAction'/><separator/><menuitem name='ImportAction' action='ImportAction'/><separator/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><separator/><menuitem name='ExitAction' action='ExitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='UndoAction' action='UndoAction'/><menuitem name='RedoAction' action='RedoAction'/><separator/><menu name='AddAction' action='AddAction'><menuitem name='NewItemAction' action='NewItemAction'/><menuitem name='NewFolderAction' action='NewFolderAction'/><separator/><menuitem name='ExistingItemAction' action='ExistingItemAction'/><menuitem name='ExistingFolderAction' action='ExistingFolderAction'/></menu><separator/><menuitem name='DeleteAction' action='DeleteAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/><menuitem name='CancelBuildAction' action='CancelBuildAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='ViewHelpAction' action='ViewHelpAction'/><separator/><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
 			this.menubar1 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar1")));
 			this.menubar1.Name = "menubar1";
 			this.vbox2.Add (this.menubar1);
@@ -226,7 +231,6 @@ namespace MonoGame.Tools.Pipeline
 			this.DefaultHeight = 557;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
-			this.FileAction.Activated += new global::System.EventHandler (this.OnFileActionActivated);
 			this.NewAction.Activated += new global::System.EventHandler (this.OnNewActionActivated);
 			this.OpenAction.Activated += new global::System.EventHandler (this.OnOpenActionActivated);
 			this.CloseAction.Activated += new global::System.EventHandler (this.OnCloseActionActivated);
@@ -236,17 +240,16 @@ namespace MonoGame.Tools.Pipeline
 			this.ExitAction.Activated += new global::System.EventHandler (this.OnExitActionActivated);
 			this.UndoAction.Activated += new global::System.EventHandler (this.OnUndoActionActivated);
 			this.RedoAction.Activated += new global::System.EventHandler (this.OnRedoActionActivated);
-			this.NewItemAction.Activated += new global::System.EventHandler (this.OnNewItemActionActivated);
-			this.AddItemAction.Activated += new global::System.EventHandler (this.OnAddItemActionActivated);
 			this.DeleteAction.Activated += new global::System.EventHandler (this.OnDeleteActionActivated);
-			this.BuildAction.Activated += new global::System.EventHandler (this.OnBuildActionActivated);
 			this.BuildAction1.Activated += new global::System.EventHandler (this.OnBuildAction1Activated);
 			this.RebuildAction.Activated += new global::System.EventHandler (this.OnRebuildActionActivated);
 			this.CleanAction.Activated += new global::System.EventHandler (this.OnCleanActionActivated);
 			this.ViewHelpAction.Activated += new global::System.EventHandler (this.OnViewHelpActionActivated);
 			this.AboutAction.Activated += new global::System.EventHandler (this.OnAboutActionActivated);
-			this.AddFolderAction.Activated += new global::System.EventHandler (this.OnAddFolderActionActivated);
+			this.NewItemAction.Activated += new global::System.EventHandler (this.OnNewItemActionActivated);
 			this.NewFolderAction.Activated += new global::System.EventHandler (this.OnNewFolderActionActivated);
+			this.ExistingItemAction.Activated += new global::System.EventHandler (this.OnAddItemActionActivated);
+			this.ExistingFolderAction.Activated += new global::System.EventHandler (this.OnAddFolderActionActivated);
 		}
 	}
 }

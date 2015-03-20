@@ -284,7 +284,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 // Loop start and length in number of samples. Defaults to entire sound
                 loopStart = 0;
-                loopLength = data.Count / ((bitsPerSample / 8) * channelCount);
+
+                //this line of code breaks audio compilation and therefor it has been commented
+                //2 things that this line of code does wrong are:
+                //1) data can be null, set by line 222
+                //2) bitsPerSample can be 0 ???
+                //loopLength = data.Count / ((bitsPerSample / 8) * channelCount);
             }
             finally
             {
