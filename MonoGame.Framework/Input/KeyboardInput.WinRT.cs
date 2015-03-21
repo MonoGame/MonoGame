@@ -15,7 +15,7 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class KeyboardInput
+    public static partial class KeyboardInput
     {
         private static readonly CoreDispatcher dispatcher;
         private static TaskCompletionSource<string> tcs;

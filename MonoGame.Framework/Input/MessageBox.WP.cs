@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class MessageBox
+    public static partial class MessageBox
     {
         private static TaskCompletionSource<int?> tcs;
 
