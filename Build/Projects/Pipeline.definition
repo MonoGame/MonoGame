@@ -111,6 +111,39 @@
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
+	<Compile Include="Windows\AddFileDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AddFileDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFileDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\AddFileDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFileDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	<Compile Include="Windows\AddFolderDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AddFolderDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFolderDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\AddFolderDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFolderDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	<Compile Include="Windows\TextEditDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\TextEditDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>TextEditDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\TextEditDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>TextEditDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
