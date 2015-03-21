@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Defines a frustum for intersection operations.
+    /// Defines a viewing frustum for intersection operations.
     /// </summary>
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public class BoundingFrustum : IEquatable<BoundingFrustum>
@@ -24,12 +24,12 @@ namespace Microsoft.Xna.Framework
         #region Public Fields
 
         /// <summary>
-        /// Plane count(6).
+        /// The number of planes in the frustum.
         /// </summary>
         public const int PlaneCount = 6;
 
         /// <summary>
-        /// Corner count(8).
+        /// The number of corner points in the frustum.
         /// </summary>
         public const int CornerCount = 8;
 
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
         /// <summary>
-        /// Gets or sets the <see cref="Matrix"/> of this frustum.
+        /// Gets or sets the <see cref="Matrix"/> of the frustum.
         /// </summary>
         public Matrix Matrix
         {
@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets the near plane of this frustum.
+        /// Gets the near plane of the frustum.
         /// </summary>
         public Plane Near
         {
@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets the far plane of this frustum.
+        /// Gets the far plane of the frustum.
         /// </summary>
         public Plane Far
         {
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets the left plane of this frustum.
+        /// Gets the left plane of the frustum.
         /// </summary>
         public Plane Left
         {
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets the right plane of this frustum.
+        /// Gets the right plane of the frustum.
         /// </summary>
         public Plane Right
         {
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets the top plane of this frustum.
+        /// Gets the top plane of the frustum.
         /// </summary>
         public Plane Top
         {
@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets the bottom plane of this frustum.
+        /// Gets the bottom plane of the frustum.
         /// </summary>
         public Plane Bottom
         {
