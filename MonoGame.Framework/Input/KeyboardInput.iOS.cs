@@ -8,7 +8,7 @@ using UIKit;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class KeyboardInput
+    public static partial class KeyboardInput
     {
         private static UIViewController gameViewController;
         private static TaskCompletionSource<string> tcs;

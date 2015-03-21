@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class KeyboardInput
+    public static partial class KeyboardInput
     {
         public static bool IsVisible { get; private set; }
 
