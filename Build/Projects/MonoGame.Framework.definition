@@ -1004,7 +1004,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81</Platforms>
+      <Platforms>Android,Angle,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,iOS,Web</Platforms>
     </Compile>
 
 
@@ -1071,6 +1071,9 @@
     <Compile Include="Desktop\OpenTKGameWindow.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
+    <Compile Include="Input\KeyboardUtil.OpenTK.cs">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </Compile>
 
 
     <!-- iOS Platform -->
@@ -1100,15 +1103,6 @@
     </Compile>
     <Compile Include="iOS\OrientationConverter.cs">
       <Platforms>iOS</Platforms>
-    </Compile>
-
-
-    <!-- Linux Platform -->
-    <Compile Include="Linux\Input\KeyboardUtil.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
-    <Compile Include="Linux\Storage\StorageDeviceHelper.cs">
-      <Platforms>Linux</Platforms>
     </Compile>
 
 
@@ -1192,10 +1186,8 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
 
+
     <!-- Windows Desktop Platfom -->
-    <Compile Include="Windows\Input\KeyboardUtil.cs">
-      <Platforms>Angle,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>
     </Compile>
