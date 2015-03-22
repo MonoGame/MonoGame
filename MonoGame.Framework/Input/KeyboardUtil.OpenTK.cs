@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Input
                     return Keys.Back;
 
                 case OpenTK.Input.Key.BackSlash:
-                    return Keys.OemBackslash;
+                    return Keys.OemPipe;
 
                 case OpenTK.Input.Key.BracketLeft:
                     return Keys.OemOpenBrackets;

@@ -1004,7 +1004,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,iOS,Web</Platforms>
+      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,Linux</Platforms>
     </Compile>
 
 
