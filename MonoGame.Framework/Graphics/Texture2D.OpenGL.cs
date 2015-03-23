@@ -51,6 +51,9 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
+            if (ArraySize > 1)
+                throw new NotImplementedException();
+
             this.glTarget = TextureTarget.Texture2D;
             
             Threading.BlockOnUIThread(() =>
