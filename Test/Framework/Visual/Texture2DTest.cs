@@ -123,6 +123,35 @@ namespace MonoGame.Tests.Visual
             Game.Run();
         }
 
+#if !XNA
+        [TestCase(1, 1)]
+        [TestCase(8, 8)]
+        [TestCase(31, 7)]
+        public void ShouldSetAndGetDataForTextureArray(int width, int height)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                const int arraySize = 4;
+                var texture2D = new Texture2D(Game.GraphicsDevice, width, height, false, SurfaceFormat.Color, 4);
+                var dataSize = width * height;
+
+                for (var i = 0; i < arraySize; i++)
+                {
+                    var savedData = new Color[dataSize];
+                    for (var index = 0; index < dataSize; index++)
+                        savedData[index] = new Color((index + i) % 255, (index + i) % 255, (index + i) % 255);
+                    texture2D.SetData(0, i, null, savedData, 0, savedData.Length);
+
+                    var readData = new Color[dataSize];
+                    texture2D.GetData(0, i, null, readData, 0, readData.Length);
+
+                    Assert.AreEqual(savedData, readData);
+                }
+            };
+            Game.Run();
+        }
+#endif
+
 #if DIRECTX
         [Test]
         public void TextureArrayAsRenderTargetAndShaderResource()
