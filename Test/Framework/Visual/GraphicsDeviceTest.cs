@@ -6,9 +6,7 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#if DIRECTX || XNA
 using MonoGame.Tests.ContentPipeline;
-#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
@@ -307,7 +305,6 @@ namespace MonoGame.Tests.Visual
             }
         }
 
-#if DIRECTX || XNA
         [Test]
         public void VertexTextureVisualTest()
         {
@@ -372,7 +369,6 @@ namespace MonoGame.Tests.Visual
             };
             RunSingleFrameTest();
         }
-#endif
 
         [Test]
         public void VertexSamplerStatesGetSet()

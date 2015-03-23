@@ -68,9 +68,7 @@ non-infringement.
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#if DIRECTX
 using MonoGame.Tests.ContentPipeline;
-#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
