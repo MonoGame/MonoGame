@@ -68,7 +68,9 @@ non-infringement.
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+#if DIRECTX
+using MonoGame.Tests.ContentPipeline;
+#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
@@ -122,5 +124,56 @@ namespace MonoGame.Tests.Visual
             };
             Game.Run();
         }
+
+#if DIRECTX
+        [Test]
+        public void TextureArrayAsRenderTargetAndShaderResource()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var solidColorTexture = new Texture2D(Game.GraphicsDevice, 1, 1);
+                solidColorTexture.SetData(new[] { Color.White });
+
+                const int arraySize = 4;
+
+                // Create texture array.
+                var textureArray = new RenderTarget2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color,
+                    DepthFormat.None, 1, RenderTargetUsage.PlatformContents, false, arraySize);
+
+                var colors = new[] { Color.Red, Color.Green, Color.Blue, Color.Yellow };
+
+                var originalRenderTargets = Game.GraphicsDevice.GetRenderTargets();
+
+                // Bind each slice of texture array as render target, and render (different) solid color to each slice.
+                var spriteBatch = new SpriteBatch(Game.GraphicsDevice);
+                for (var i = 0; i < arraySize; i++)
+                {
+                    Game.GraphicsDevice.SetRenderTarget(textureArray, i);
+
+                    spriteBatch.Begin();
+                    spriteBatch.Draw(solidColorTexture, Game.GraphicsDevice.Viewport.Bounds, colors[i]);
+                    spriteBatch.End();
+                }
+
+                // Unbind texture array.
+                Game.GraphicsDevice.SetRenderTargets(originalRenderTargets);
+
+                // Now render into backbuffer, using texture array as a shader resource.
+                var effect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "TextureArrayEffect.fx");
+                effect.Parameters["Texture"].SetValue(textureArray);
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                Game.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
+
+                // Vertex buffer is not actually used, but currently we need to set a
+                // vertex buffer before calling DrawPrimitives.
+                Game.GraphicsDevice.SetVertexBuffer(new VertexBuffer(Game.GraphicsDevice,
+                    typeof(VertexPositionColor), 3, BufferUsage.WriteOnly));
+
+                Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1);
+            };
+            RunSingleFrameTest();
+        }
+#endif
     }
 }
