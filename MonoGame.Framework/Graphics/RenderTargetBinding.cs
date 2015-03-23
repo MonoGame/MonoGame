@@ -82,6 +82,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+        public RenderTargetBinding(RenderTarget2D renderTarget, int arraySlice)
+        {
+            if (renderTarget == null)
+                throw new ArgumentNullException("renderTarget");
+            if (arraySlice < 0 || arraySlice >= renderTarget.ArraySize)
+                throw new ArgumentOutOfRangeException("arraySlice");
+
+            _renderTarget = renderTarget;
+            _arraySlice = arraySlice;
+        }
+
         public RenderTargetBinding(RenderTarget3D renderTarget)
         {
             if (renderTarget == null)

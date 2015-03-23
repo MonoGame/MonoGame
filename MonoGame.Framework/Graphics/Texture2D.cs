@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal int width;
 		internal int height;
+        internal int ArraySize;
 
         public Rectangle Bounds
         {
@@ -28,21 +29,27 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1)
         {
         }
 
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1)
         {
+        }
+
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, int arraySize)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize)
+        {
+            
         }
 
         internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
-            : this(graphicsDevice, width, height, mipmap, format, type, false)
+            : this(graphicsDevice, width, height, mipmap, format, type, false, 1)
         {
         }
 
-        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
+        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
@@ -52,6 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.height = height;
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+            this.ArraySize = arraySize;
 
             // Texture will be assigned by the swap chain.
 		    if (type == SurfaceType.SwapChainRenderTarget)

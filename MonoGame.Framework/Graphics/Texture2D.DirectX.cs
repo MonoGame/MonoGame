@@ -360,7 +360,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Width = width;
             desc.Height = height;
             desc.MipLevels = _levelCount;
-            desc.ArraySize = 1;
+            desc.ArraySize = ArraySize;
             desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
