@@ -53,6 +53,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            if (arraySize > 1 && !graphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySize");
 
             this.GraphicsDevice = graphicsDevice;
             this.width = width;
@@ -89,6 +91,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
                 throw new ArgumentNullException("data");
 
+            if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
+
             PlatformSetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
         }
 
@@ -113,6 +118,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("data cannot be null");
             if (data.Length < startIndex + elementCount)
                 throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+            if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
 
             PlatformGetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
         }

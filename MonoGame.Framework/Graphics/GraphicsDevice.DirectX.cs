@@ -935,6 +935,9 @@ namespace Microsoft.Xna.Framework.Graphics
         // Only implemented for DirectX right now, so not in GraphicsDevice.cs
         public void SetRenderTarget(RenderTarget2D renderTarget, int arraySlice)
         {
+            if (!GraphicsCapabilities.SupportsTextureArrays)
+                throw new InvalidOperationException("Texture arrays are not supported on this graphics device");
+
             if (renderTarget == null)
                 SetRenderTarget(null);
             else

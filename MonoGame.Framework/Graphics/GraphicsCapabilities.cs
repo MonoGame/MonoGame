@@ -90,6 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal bool SupportsTextureMaxLevel { get; private set; }
 
+        internal bool SupportsTextureArrays { get; private set; }
 
         internal void Initialize(GraphicsDevice device)
         {
@@ -148,6 +149,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
             }
             MaxTextureAnisotropy = anisotropy;
+#endif
+
+#if DIRECTX
+            SupportsTextureArrays = device.GraphicsProfile == GraphicsProfile.HiDef;
+#elif OPENGL
+            // TODO: Implement OpenGL support for texture arrays
+            // once we can author shaders that use texture arrays.
+            SupportsTextureArrays = false;
 #endif
         }
 

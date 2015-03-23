@@ -51,9 +51,6 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
-            if (ArraySize > 1)
-                throw new NotImplementedException();
-
             this.glTarget = TextureTarget.Texture2D;
             
             Threading.BlockOnUIThread(() =>
@@ -110,9 +107,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            if (arraySlice > 0)
-                throw new NotImplementedException();
-
             Threading.BlockOnUIThread(() =>
             {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
@@ -219,9 +213,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            if (arraySlice > 0)
-                throw new NotImplementedException();
-
 #if GLES
             // TODO: check for data size and for non renderable formats (formats that can't be attached to FBO)
 
