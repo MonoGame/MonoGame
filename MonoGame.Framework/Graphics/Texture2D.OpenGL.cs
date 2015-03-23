@@ -108,8 +108,11 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
+            if (arraySlice > 0)
+                throw new NotImplementedException();
+
             Threading.BlockOnUIThread(() =>
             {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
@@ -214,8 +217,11 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
+            if (arraySlice > 0)
+                throw new NotImplementedException();
+
 #if GLES
             // TODO: check for data size and for non renderable formats (formats that can't be attached to FBO)
 

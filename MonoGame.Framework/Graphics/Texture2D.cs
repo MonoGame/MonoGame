@@ -84,12 +84,17 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        public void SetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             if (data == null)
-				throw new ArgumentNullException("data");
+                throw new ArgumentNullException("data");
 
-            PlatformSetData<T>(level, rect, data, startIndex, elementCount);
+            PlatformSetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
+        }
+
+        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        {
+            this.SetData(level, 0, rect, data, startIndex, elementCount);
         }
 
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -101,15 +106,20 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			this.SetData(0, null, data, 0, data.Length);
         }
-		
-		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+
+        public void GetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             if (data == null || data.Length == 0)
                 throw new ArgumentException("data cannot be null");
             if (data.Length < startIndex + elementCount)
                 throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
 
-            PlatformGetData<T>(level, rect, data, startIndex, elementCount);
+            PlatformGetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
+        }
+		
+		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            this.GetData(level, 0, rect, data, startIndex, elementCount);
         }
 
 		public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
