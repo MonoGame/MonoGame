@@ -162,7 +162,6 @@
     <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
 
     <!-- The core mgfx generation classes -->
-    <Compile Include="CompilerInclude.cs" />
     <Compile Include="ConstantBufferData.cs" />
     <Compile Include="ConstantBufferData.mojo.cs" />
     <Compile Include="ConstantBufferData.sharpdx.cs" />

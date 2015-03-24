@@ -164,10 +164,6 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\CommandLineParser.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\CompilerInclude.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\CompilerInclude.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\ConstantBufferData.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ConstantBufferData.cs</Link>
