@@ -93,6 +93,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 device._lastRasterizerState.SlopeScaleDepthBias = this.SlopeScaleDepthBias;
             }
 
+            if (device.GraphicsCapabilities.SupportsDepthClamp &&
+                (force || this.DepthClipEnable != device._lastRasterizerState.DepthClipEnable))
+            {
+                if (!DepthClipEnable)
+                    GL.Enable(EnableCap.DepthClamp);
+                else
+                    GL.Disable(EnableCap.DepthClamp);
+                GraphicsExtensions.CheckGLError();
+                device._lastRasterizerState.DepthClipEnable = this.DepthClipEnable;
+            }
+
             // TODO: Implement MultiSampleAntiAlias
         }
     }
