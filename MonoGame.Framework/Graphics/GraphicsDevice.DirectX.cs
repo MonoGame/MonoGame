@@ -718,7 +718,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var dxgiAdapter = dxgiDevice.Adapter)
                 using (var dxgiFactory = dxgiAdapter.GetParent<SharpDX.DXGI.Factory1>())
                 {
-                    _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
+                    try
+                    {
+                        _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
+                    }
+                    catch (SharpDXException)
+                    {
+                        // If we have multisampling turned on, turn it off and try again.
+                        // Fixes a crash on startup that happens on some machines.
+                        if (PresentationParameters.MultiSampleCount > 1)
+                        {
+                            PresentationParameters.MultiSampleCount = 0;
+                            CreateSizeDependentResources();
+                            return;
+                        }
+                        
+                        // Multisampling is turned off, rethrow exception.
+                        throw;
+                    }
+
                     dxgiFactory.MakeWindowAssociation(PresentationParameters.DeviceWindowHandle, WindowAssociationFlags.IgnoreAll);
                     // If VSync is disabled, Ensure that DXGI does not queue more than one frame at a time. This 
                     // both reduces latency and ensures that the application will only render 
