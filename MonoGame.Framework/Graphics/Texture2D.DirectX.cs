@@ -106,9 +106,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: We should probably be pooling these staging resources
             // and not creating a new one each time.
             //
+            var levelWidth = Math.Max(width >> level, 1);
+            var levelHeight = Math.Max(height >> level, 1);
+
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
-            desc.Width = width;
-            desc.Height = height;
+            desc.Width = levelWidth;
+            desc.Height = levelHeight;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(_format);
@@ -136,7 +139,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-                        elementsInRow = width;
+                        elementsInRow = levelWidth;
                         rows = height;
                         d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, null, stagingTex, 0, 0, 0, 0);
                     }

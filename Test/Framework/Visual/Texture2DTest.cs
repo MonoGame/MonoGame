@@ -66,6 +66,7 @@ non-infringement.
 */
 #endregion License
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
@@ -93,6 +94,33 @@ namespace MonoGame.Tests.Visual
                 texture2D.GetData(readData);
 
                 Assert.AreEqual(savedData, readData);
+            };
+            Game.Run();
+        }
+
+        [TestCase(1, 1)]
+        [TestCase(8, 8)]
+        [TestCase(31, 7)]
+        public void ShouldSetAndGetDataForLevel(int width, int height)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var texture2D = new Texture2D(Game.GraphicsDevice, width, height, true, SurfaceFormat.Color);
+
+                for (int i = 0; i < texture2D.LevelCount; i++)
+                {
+                    var levelSize = Math.Max(width >> i, 1) * Math.Max(height >> i, 1);
+
+                    var savedData = new Color[levelSize];
+                    for (var index = 0; index < levelSize; index++)
+                        savedData[index] = new Color(index % 255, index % 255, index % 255);
+                    texture2D.SetData(i, null, savedData, 0, savedData.Length);
+
+                    var readData = new Color[levelSize];
+                    texture2D.GetData(i, null, readData, 0, savedData.Length);
+
+                    Assert.AreEqual(savedData, readData);
+                }
             };
             Game.Run();
         }
@@ -132,21 +160,23 @@ namespace MonoGame.Tests.Visual
             Game.DrawWith += (sender, e) =>
             {
                 const int arraySize = 4;
-                var texture2D = new Texture2D(Game.GraphicsDevice, width, height, false, SurfaceFormat.Color, 4);
-                var dataSize = width * height;
+                var texture2D = new Texture2D(Game.GraphicsDevice, width, height, true, SurfaceFormat.Color, arraySize);
 
                 for (var i = 0; i < arraySize; i++)
-                {
-                    var savedData = new Color[dataSize];
-                    for (var index = 0; index < dataSize; index++)
-                        savedData[index] = new Color((index + i) % 255, (index + i) % 255, (index + i) % 255);
-                    texture2D.SetData(0, i, null, savedData, 0, savedData.Length);
+                    for (var j = 0; j < texture2D.LevelCount; j++)
+                    {
+                        var levelSize = Math.Max(width >> j, 1) * Math.Max(height >> j, 1);
 
-                    var readData = new Color[dataSize];
-                    texture2D.GetData(0, i, null, readData, 0, readData.Length);
+                        var savedData = new Color[levelSize];
+                        for (var index = 0; index < levelSize; index++)
+                            savedData[index] = new Color((index + i) % 255, (index + i) % 255, (index + i) % 255);
+                        texture2D.SetData(j, i, null, savedData, 0, savedData.Length);
 
-                    Assert.AreEqual(savedData, readData);
-                }
+                        var readData = new Color[levelSize];
+                        texture2D.GetData(j, i, null, readData, 0, readData.Length);
+
+                        Assert.AreEqual(savedData, readData);
+                    }
             };
             Game.Run();
         }
