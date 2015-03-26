@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
         }
 
-        private int CalculateSubresourceIndex(int level, int arraySlice)
+        private int CalculateSubresourceIndex(int arraySlice, int level)
         {
             return arraySlice * _levelCount + level;
         }
