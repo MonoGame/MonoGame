@@ -170,6 +170,7 @@
     <Compile Include="EffectObject.hlsl.cs" />
     <Compile Include="EffectObject.pssl.cs" />
     <Compile Include="EffectObject.writer.cs" />    
+    <Compile Include="IEffectCompilerOutput.cs" />
     <Compile Include="ShaderCompilerException.cs" />
     <Compile Include="ShaderData.cs" />
     <Compile Include="ShaderData.mojo.cs" />
@@ -197,6 +198,8 @@
     <Compile Include="ParseTree.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="ParseTreeTools.cs" />
-
+    
+    <!-- The MGFX preprocessor -->
+    <Compile Include="Preprocessor.cs" />
   </Files>
 </Project>

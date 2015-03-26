@@ -235,7 +235,7 @@
     <Content Include="Assets\Effects\ParserTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\PreprocessorEffect.fx">
+    <Content Include="Assets\Effects\PreprocessorTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Effects\Include.fxh">
