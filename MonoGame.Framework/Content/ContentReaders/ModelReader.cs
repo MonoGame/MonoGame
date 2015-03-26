@@ -149,9 +149,6 @@ namespace Microsoft.Xna.Framework.Content
                 var parentBoneIndex = ReadBoneReference(reader, boneCount);
 				var boundingSphere = reader.ReadBoundingSphere();
 
-                // Tag
-                reader.ReadObject<object>();
-
                 // Read the mesh part data.
                 int partCount = reader.ReadInt32();
                 //Debug.WriteLine("Mesh part count: {0}", partCount);
@@ -197,6 +194,10 @@ namespace Microsoft.Xna.Framework.Content
                     continue;
 
 				ModelMesh mesh = new ModelMesh(reader.GraphicsDevice, parts);
+
+                // Tag
+                mesh.Tag = reader.ReadObject<object>();
+
 				mesh.Name = name;
 				mesh.ParentBone = bones[parentBoneIndex];
 				mesh.ParentBone.AddMesh(mesh);
