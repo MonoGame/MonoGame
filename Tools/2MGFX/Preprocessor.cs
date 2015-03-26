@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -8,7 +7,9 @@ namespace TwoMGFX
 {
     public static class Preprocessor
     {
-        public static string Preprocess(string effectCode, string filePath, IDictionary<string, string> defines, List<string> dependencies)
+        public static string Preprocess(
+            string effectCode, string filePath, IDictionary<string, string> defines, List<string> dependencies,
+            IEffectCompilerOutput output)
         {
             var fullPath = Path.GetFullPath(filePath);
 
@@ -16,7 +17,7 @@ namespace TwoMGFX
 
             pp.EmitExtraLineInfo = false;
             pp.addFeature(Feature.LINEMARKERS);
-            pp.setListener(new MGErrorListener());
+            pp.setListener(new MGErrorListener(fullPath, output));
             pp.setFileSystem(new MGFileSystem(dependencies));
             pp.setQuoteIncludePath(new List<string> { Path.GetDirectoryName(fullPath) });
 
@@ -116,15 +117,23 @@ namespace TwoMGFX
 
         private class MGErrorListener : PreprocessorListener
         {
+            private readonly string _fullPath;
+            private readonly IEffectCompilerOutput _output;
+
+            public MGErrorListener(string fullPath, IEffectCompilerOutput output)
+            {
+                _fullPath = fullPath;
+                _output = output;
+            }
+
             public void handleWarning(Source source, int line, int column, string msg)
             {
-                // TODO: Log warning with line number.
+                _output.WriteWarning(_fullPath, line, column, msg);
             }
 
             public void handleError(Source source, int line, int column, string msg)
             {
-                // TODO: Return line number to EffectProcessor.
-                throw new Exception(msg);
+                _output.WriteError(_fullPath, line, column, msg);
             }
 
             public void handleSourceChange(Source source, string ev)

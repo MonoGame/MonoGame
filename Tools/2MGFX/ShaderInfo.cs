@@ -23,13 +23,13 @@ namespace TwoMGFX
 
         public List<string> AdditionalOutputFiles { get; private set; }
 
-		static public ShaderInfo FromFile(string path, Options options)
+        static public ShaderInfo FromFile(string path, Options options, IEffectCompilerOutput output)
 		{
 			var effectSource = File.ReadAllText(path);
-			return FromString(effectSource, path, options);
+			return FromString(effectSource, path, options, output);
 		}
 
-		static public ShaderInfo FromString(string effectSource, string filePath, Options options)
+		static public ShaderInfo FromString(string effectSource, string filePath, Options options, IEffectCompilerOutput output)
 		{
 			var macros = new Dictionary<string, string>();
 			macros.Add("MGFX", "1");
@@ -66,7 +66,7 @@ namespace TwoMGFX
 			string newFile;
 		    var fullPath = Path.GetFullPath(filePath);
 		    var dependencies = new List<string>();
-		    newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies);
+		    newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
 
 			// Parse the resulting file for techniques and passes.
             var tree = new Parser(new Scanner()).Parse(newFile, fullPath);

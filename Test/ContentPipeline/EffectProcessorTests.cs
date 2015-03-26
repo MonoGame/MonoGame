@@ -47,7 +47,7 @@ namespace MonoGame.Tests.ContentPipeline
             var mgPreprocessed = Preprocessor.Preprocess(effectCode, fullPath, new Dictionary<string, string>
             {
                 { "TEST2", "1" }
-            }, mgDependencies);
+            }, mgDependencies, new TestEffectCompilerOutput());
 
             Assert.That(mgDependencies, Has.Count.EqualTo(1));
             Assert.That(Path.GetFileName(mgDependencies[0]), Is.EqualTo("include.fxh"));
@@ -58,6 +58,19 @@ namespace MonoGame.Tests.ContentPipeline
 
             Assert.That(mgPreprocessed, Is.StringContaining("FOO"));
             Assert.That(mgPreprocessed, Is.Not.StringContaining("BAR"));
+        }
+
+        private class TestEffectCompilerOutput : IEffectCompilerOutput
+        {
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Warning: {0}({1},{2}): {3}", file, line, column, message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Error: {0}({1},{2}): {3}", file, line, column, message);
+            }
         }
 #endif
 
