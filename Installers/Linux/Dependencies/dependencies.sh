@@ -15,7 +15,7 @@ NC='\033[0m'
 if [ $OS = Ubuntu ]
 then
 	case "$VER" in 
-	14.04|14.10 ) 
+	14.04|14.10|15.04 ) 
 		./Dependencies/dependencies_deb.sh
 		exit
 	esac
