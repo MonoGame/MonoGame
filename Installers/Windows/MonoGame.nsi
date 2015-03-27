@@ -317,10 +317,32 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
   !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+Function checkVS2010
+IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2010} $0
+  end:
+FunctionEnd
+ 
+Function checkVS2012
+IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2012} $0
+  end:
+FunctionEnd
 
+Function checkVS2013
+IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2013} $0
+  end:
+FunctionEnd
 
-Function .onInit
-
+Function .onInit 
+  IntOp $0 $0 | ${SF_RO}
+  Call checkVS2010
+  Call checkVS2012
+  Call checkVS2013
   IntOp $0 ${SF_SELECTED} | ${SF_RO}
   SectionSetFlags ${core_id} $0
 FunctionEnd
