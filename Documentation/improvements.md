@@ -6,9 +6,17 @@ The new API features which are available in the current development release and 
 
 [GameWindow.IsBorderless](http://www.monogame.net/documentation/?page=P_Microsoft_Xna_Framework_GameWindow_IsBorderless) - boolean that makes border of your window invisible. You cannot move or resize your game window after this boolean setted to true. Works only on desktop platforms.
 
+[GraphicsDeviceManager.HardwareModeSwitch](http://www.monogame.net/documentation/?page=P_Microsoft_Xna_Framework_GraphicsDeviceManager_HardwareModeSwitch) - boolean that enables or disables "hard"(device switching) fullscreen switching for WindowsDX platform. By default it is true but you can change it in the constructor.
+
 ##Math
 
 [MathHelper.Clamp(int,int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_MathHelper_Clamp_1) - this overload clamps integers instead floats which could be useful in some cases. You dont need to convert like this MathHelper.Clamp((float)integer,(float)min,(float)max) anymore.
+
+[MathHelper.Min(int,int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_MathHelper_Min) - 
+same as [MathHelper.Min](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_MathHelper_Min_1) but for integers.
+
+[MathHelper.Max(int,int,int)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_MathHelper_Max_1) - 
+same as [MathHelper.Max](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_MathHelper_Max) but for integers.
 
 [Point.ToVector2()](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Point_ToVector2) - this is easy to use conversion from [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point) to [Vector2](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Vector2). Use it like this 
 ```
@@ -41,3 +49,7 @@ var point = vector2.ToPoint(); // point will be 10,10.
 spriteBatch.Draw(texture,mouseState.Position.ToVector2(),Color.White);
 ```
 and it works fine - your sprite will be drawed under cursor.
+
+[KeyboardInput](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Input_KeyboardInput) static class which could be used to show virtual keyboard on the current platform.
+
+[MessageBox](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Input_MessageBox) static class which could be used to show message dialog on the current platform.
