@@ -24,7 +24,6 @@ namespace MonoGame.Tools.Pipeline
         PropertiesView propertiesView;
 
         MenuItem treeadd, treeaddseperator, treenewitem, treeadditem, treenewfolder, treeaddfolder, treeopenfile, treedelete, treeopenfilelocation;
-        SeparatorMenuItem seperator, seperator2;
 
         public ProjectView ()
         {
@@ -72,16 +71,16 @@ namespace MonoGame.Tools.Pipeline
             treeaddseperator = new SeparatorMenuItem ();
 
             treenewitem = new MenuItem ("New Item...");
-            treenewitem.Activated += window.OnNewItemActionActivated;
+            treenewitem.ButtonPressEvent += window.OnNewItemActionActivated;
 
             treenewfolder = new MenuItem ("New Folder...");
-            treenewfolder.Activated += window.OnNewFolderActionActivated;
+            treenewfolder.ButtonPressEvent += window.OnNewFolderActionActivated;
 
             treeadditem = new MenuItem ("Existing Item...");
-            treeadditem.Activated += window.OnAddItemActionActivated;
+            treeadditem.ButtonPressEvent += window.OnAddItemActionActivated;
 
             treeaddfolder = new MenuItem ("Existing Folder...");
-            treeaddfolder.Activated += window.OnAddFolderActionActivated;
+            treeaddfolder.ButtonPressEvent += window.OnAddFolderActionActivated;
 
             treedelete = new MenuItem ("Delete");
             treedelete.Activated += window.OnDeleteActionActivated;
@@ -120,7 +119,6 @@ namespace MonoGame.Tools.Pipeline
             addmenu.Add (treeaddfolder);
 
             menu.Add (treeopenfile);
-            menu.Add (new SeparatorMenuItem ());
             menu.Add (treeadd);
             menu.Add (treeaddseperator);
             menu.Add (treeopenfilelocation);
@@ -482,7 +480,7 @@ namespace MonoGame.Tools.Pipeline
                         treeadd.Visible = false;
                         treeopenfile.Visible = true;
                     }
-                    treeaddseperator.Visible = treeadd.Visible;
+                    treeaddseperator.Visible = treeadd.Visible || treeopenfile.Visible;
 
                     menu.Popup ();
                 }
@@ -492,7 +490,7 @@ namespace MonoGame.Tools.Pipeline
                 treenewitem.Visible = false;
                 treeadditem.Visible = false;
                 treeopenfile.Visible = false;
-                seperator.Visible = false;
+                treeaddseperator.Visible = false;
                 treeopenfile.Visible = false;
                 treeopenfilelocation.Visible = false;
 

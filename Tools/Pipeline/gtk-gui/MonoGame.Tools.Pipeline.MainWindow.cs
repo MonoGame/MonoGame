@@ -167,7 +167,7 @@ namespace MonoGame.Tools.Pipeline
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "MonoGame.Tools.Pipeline.MainWindow";
-			this.Title = global::Mono.Unix.Catalog.GetString ("Monogame Pipeline");
+			this.Title = global::Mono.Unix.Catalog.GetString ("MonoGame Pipeline");
 			this.Icon = global::Gdk.Pixbuf.LoadFromResource ("MonoGame.Tools.Pipeline.App.ico");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Container child MonoGame.Tools.Pipeline.MainWindow.Gtk.Container+ContainerChild
