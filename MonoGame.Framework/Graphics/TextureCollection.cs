@@ -7,11 +7,13 @@ namespace Microsoft.Xna.Framework.Graphics
     public sealed partial class TextureCollection
     {
         private readonly Texture[] _textures;
+        private readonly bool _applyToVertexStage;
         private int _dirty;
 
-        internal TextureCollection(int maxTextures)
+        internal TextureCollection(int maxTextures, bool applyToVertexStage)
         {
             _textures = new Texture[maxTextures];
+            _applyToVertexStage = applyToVertexStage;
             _dirty = int.MaxValue;
             PlatformInit();
         }

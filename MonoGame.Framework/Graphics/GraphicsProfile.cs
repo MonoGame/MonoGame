@@ -4,6 +4,9 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Defines a set of graphic capabilities.
+    /// </summary>
 	public enum GraphicsProfile
 	{
         /// <summary>
