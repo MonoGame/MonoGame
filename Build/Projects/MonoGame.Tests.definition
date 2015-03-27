@@ -85,6 +85,7 @@
     </Compile>
 
     <Compile Include="Framework\Bounding.cs" />
+	<Compile Include="Framework\CircleTest.cs" />
     <Compile Include="Framework\ColorTest.cs" />
 	<Compile Include="Framework\CurveKeyCollectionTest.cs" />
 	<Compile Include="Framework\CurveKeyTest.cs" />

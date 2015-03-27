@@ -183,6 +183,7 @@
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
     <Compile Include="BoundingSphere.cs" />
+    <Compile Include="Circle.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="ContainmentType.cs" />
     <Compile Include="CurveContinuity.cs" />
@@ -332,6 +333,7 @@
     <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
     <Compile Include="Content\ContentReaders\ByteReader.cs" />
     <Compile Include="Content\ContentReaders\CharReader.cs" />
+    <Compile Include="Content\ContentReaders\CircleReader.cs" />
     <Compile Include="Content\ContentReaders\ColorReader.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
