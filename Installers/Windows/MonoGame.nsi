@@ -338,14 +338,13 @@ IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#
   end:
 FunctionEnd
 
-Function .onInit
-
+Function .onInit 
   IntOp $0 $0 | ${SF_RO}
-  SectionSetFlags ${core_id} $0
-  
   Call checkVS2010
   Call checkVS2012
   Call checkVS2013
+  IntOp $0 ${SF_SELECTED} | ${SF_RO}
+  SectionSetFlags ${core_id} $0
 FunctionEnd
 
 ;--------------------------------
