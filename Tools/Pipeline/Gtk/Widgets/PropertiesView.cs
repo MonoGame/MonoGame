@@ -27,8 +27,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void Initalize(Window window)
         {
-			if (propertygridtable1 == null)
-				return;
+            if (propertygridtable1 == null)
+                return;
 
             propertygridtable1.Initalize (window);
         }

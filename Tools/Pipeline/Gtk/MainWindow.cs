@@ -65,11 +65,11 @@ namespace MonoGame.Tools.Pipeline
             treerebuild = new MenuItem ("Rebuild");
             treerebuild.Activated += delegate {
                 projectview1.Rebuild ();
-			};
+            };
 
-			//This is always returning false, and solves a bug
-			if (projectview1 == null || propertiesview1 == null)
-				return;
+            //This is always returning false, and solves a bug
+            if (projectview1 == null || propertiesview1 == null)
+                return;
 
             projectview1.Initalize (this, treerebuild, propertiesview1);
 
@@ -485,15 +485,15 @@ namespace MonoGame.Tools.Pipeline
             if (dialog.Run () == (int)ResponseType.Ok) {
 
                 List<TreeIter> iters;
-				List<string> ids;
-				string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
+                List<string> ids;
+                string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
                 string location;
 
                 if (paths.Length == 1) {
                     if (ids [0] == projectview1.ID_FOLDER)
                         location = paths [0];
-					else if (ids[0] == projectview1.ID_BASE)
+                    else if (ids[0] == projectview1.ID_BASE)
                         location = _controller.GetFullPath ("");
                     else
                         location = System.IO.Path.GetDirectoryName (paths [0]);
@@ -515,9 +515,9 @@ namespace MonoGame.Tools.Pipeline
             string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-				if (ids [0] == projectview1.ID_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.Include (paths [0]);
-				else if (ids[0] == projectview1.ID_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.Include (_controller.GetFullPath (""));
                 else
                     _controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
@@ -563,9 +563,9 @@ namespace MonoGame.Tools.Pipeline
             string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-				if (ids [0] == projectview1.ID_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.IncludeFolder (paths [0]);
-				else if (ids[0] == projectview1.ID_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.IncludeFolder (_controller.GetFullPath (""));
                 else
                     _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));

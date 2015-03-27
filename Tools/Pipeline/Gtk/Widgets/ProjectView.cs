@@ -11,13 +11,13 @@ namespace MonoGame.Tools.Pipeline
         public Menu menu, addmenu;
         public string openedProject;
 
-		public string ID_BASE = "0", ID_FOLDER = "1", ID_FILE = "2", ID_REFBASE = "3", ID_REF = "4";
+        public string ID_BASE = "0", ID_FOLDER = "1", ID_FILE = "2", ID_REFBASE = "3", ID_REF = "4";
 
         public Gdk.Pixbuf ICON_BASE = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.settings.png");
-		public Gdk.Pixbuf[] ICON_FOLDER = {
-			new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_closed.png"),
-			new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_missing.png")
-		};
+        public Gdk.Pixbuf[] ICON_FOLDER = {
+            new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_closed.png"),
+            new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_missing.png")
+        };
         public Gdk.Pixbuf[] ICON_FILE = { 
             new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.blueprint.png"), 
             new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.missing.png")
@@ -37,23 +37,23 @@ namespace MonoGame.Tools.Pipeline
 
             var column = new TreeViewColumn ();
 
-			var iconCell = new CellRendererPixbuf ();
-			var textCell = new CellRendererText ();
-			var idCell = new CellRendererText ();
+            var iconCell = new CellRendererPixbuf ();
+            var textCell = new CellRendererText ();
+            var idCell = new CellRendererText ();
 
-			idCell.Visible = false;
+            idCell.Visible = false;
 
             column.PackStart (iconCell, false);
             column.PackStart (textCell, false);
-			column.PackStart (idCell, false);
+            column.PackStart (idCell, false);
 
             treeview1.AppendColumn (column);
 
-			column.AddAttribute (iconCell,  "pixbuf", 0);
-			column.AddAttribute (textCell, "text", 1);
-			column.AddAttribute (idCell, "text", 2);
+            column.AddAttribute (iconCell,  "pixbuf", 0);
+            column.AddAttribute (textCell, "text", 1);
+            column.AddAttribute (idCell, "text", 2);
 
-			listStore = new TreeStore (typeof (Gdk.Pixbuf), typeof (string), typeof (string));
+            listStore = new TreeStore (typeof (Gdk.Pixbuf), typeof (string), typeof (string));
 
             treeview1.Model = listStore;
             treeview1.Selection.Mode = SelectionMode.Multiple;
@@ -114,10 +114,10 @@ namespace MonoGame.Tools.Pipeline
             treeopenfilelocation = new MenuItem ("Open Item Directory");
             treeopenfilelocation.Activated += delegate {
                 List<TreeIter> iters;
-				List<string> ids;
+                List<string> ids;
                 GetSelectedTreePath(out iters, out ids);
 
-				if(ids[0] != ID_BASE)
+                if(ids[0] != ID_BASE)
                     Process.Start(System.IO.Path.GetDirectoryName(window._controller.GetFullPath(GetPathFromIter(iters[0]))));
                 else
                     Process.Start(System.IO.Path.GetDirectoryName(window._controller.GetFullPath("")));
@@ -150,8 +150,8 @@ namespace MonoGame.Tools.Pipeline
             TreeIter iter;
         
             if(!treeview1.Model.GetIterFromString (out iter, "0"))
-				iter = listStore.AppendValues (ICON_BASE, basename, ID_BASE);
-			treeview1.ExpandRow(treeview1.Model.GetPath(iter), false);
+                iter = listStore.AppendValues (ICON_BASE, basename, ID_BASE);
+            treeview1.ExpandRow(treeview1.Model.GetPath(iter), false);
 
             return iter;
         }
@@ -163,64 +163,64 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddItem(TreeIter iter, string path, bool exists, bool folder, bool expand)
         {
-			string id = ID_FILE;
+            string id = ID_FILE;
             Gdk.Pixbuf icon = ICON_FILE[Convert.ToInt32(!exists)];
 
-			if (path.Contains ("/") || folder) {
-				icon = ICON_FOLDER [Convert.ToInt32 (!exists)];
-				id = ID_FOLDER;
-			}
+            if (path.Contains ("/") || folder) {
+                icon = ICON_FOLDER [Convert.ToInt32 (!exists)];
+                id = ID_FOLDER;
+            }
 
             string[] split = path.Split ('/');
             TreeIter itr;
             if (!GetIter (iter, split [0], out itr))
-				itr = AddAndSort (iter, icon, split [0], id);
-			else if(treeview1.Model.GetValue(itr, 0) == ICON_FOLDER[0])
-				treeview1.Model.SetValue (itr, 0, ICON_FOLDER [Convert.ToInt32 (!exists)]);
+                itr = AddAndSort (iter, icon, split [0], id);
+            else if(treeview1.Model.GetValue(itr, 0) == ICON_FOLDER[0])
+                treeview1.Model.SetValue (itr, 0, ICON_FOLDER [Convert.ToInt32 (!exists)]);
 
             if(expand)
                 treeview1.ExpandRow(treeview1.Model.GetPath(iter), false);
 
-			if (split.Length > 1) {
+            if (split.Length > 1) {
 
                 string newpath = split [1];
                 for(int i = 2;i < split.Length;i++)
                     newpath += "/" + split[i];
 
-				AddItem (itr, newpath, exists, folder,  expand);
+                AddItem (itr, newpath, exists, folder,  expand);
             }
         }
 
-		public TreeIter AddAndSort(TreeIter piter, Gdk.Pixbuf icon, string name, string id)
-		{
-			TreeIter oiter;
-			int adde = 0;
-			List<string> list = new List<string>();
+        public TreeIter AddAndSort(TreeIter piter, Gdk.Pixbuf icon, string name, string id)
+        {
+            TreeIter oiter;
+            int adde = 0;
+            List<string> list = new List<string>();
 
-			if(treeview1.Model.IterChildren (out oiter, piter)) {
+            if(treeview1.Model.IterChildren (out oiter, piter)) {
 
-				if (treeview1.Model.GetValue (oiter, 2).ToString () == id)
-					list.Add (treeview1.Model.GetValue (oiter, 1).ToString ());
-				else if (id == ID_FILE)
-					adde++;
+                if (treeview1.Model.GetValue (oiter, 2).ToString () == id)
+                    list.Add (treeview1.Model.GetValue (oiter, 1).ToString ());
+                else if (id == ID_FILE)
+                    adde++;
 
-				while (treeview1.Model.IterNext (ref oiter)) {
-					if (treeview1.Model.GetValue (oiter, 2).ToString() == id)
-						list.Add (treeview1.Model.GetValue (oiter, 1).ToString ());
-					else if (id == ID_FILE)
-						adde++;
-				}
-			}
+                while (treeview1.Model.IterNext (ref oiter)) {
+                    if (treeview1.Model.GetValue (oiter, 2).ToString() == id)
+                        list.Add (treeview1.Model.GetValue (oiter, 1).ToString ());
+                    else if (id == ID_FILE)
+                        adde++;
+                }
+            }
 
-			list.Add (name);
-			list.Sort ();
+            list.Add (name);
+            list.Sort ();
 
-			for (int i = 0; i < list.Count; i++) 
-				if (list [i] == name) 
-					return listStore.InsertWithValues (piter, i + adde, icon, name, id);
+            for (int i = 0; i < list.Count; i++) 
+                if (list [i] == name) 
+                    return listStore.InsertWithValues (piter, i + adde, icon, name, id);
 
-			return listStore.AppendValues (piter, icon, name, id);
-		}
+            return listStore.AppendValues (piter, icon, name, id);
+        }
 
         public void RemoveItem(TreeIter iter, string path)
         {
@@ -245,8 +245,8 @@ namespace MonoGame.Tools.Pipeline
             TreeIter itr;
             if (!GetIter (iter, split [0], out itr))
                 return;
-			else if(!exists)
-				treeview1.Model.SetValue (itr, 0, ICON_FOLDER[1]);
+            else if(!exists)
+                treeview1.Model.SetValue (itr, 0, ICON_FOLDER[1]);
 
             if (split.Length > 1) {
                 string newpath = split [1];
@@ -258,32 +258,32 @@ namespace MonoGame.Tools.Pipeline
                 Gdk.Pixbuf icon = ICON_FILE [Convert.ToInt32 (!exists)];
                 treeview1.Model.SetValue (itr, 0, icon);
 
-				if (exists) 
-					RefreshFolders (iter);
+                if (exists) 
+                    RefreshFolders (iter);
             }
         }
 
-		public void RefreshFolders(TreeIter piter)
-		{
-			TreeIter oiter;
+        public void RefreshFolders(TreeIter piter)
+        {
+            TreeIter oiter;
 
-			if (treeview1.Model.GetValue (piter, 0) != ICON_FOLDER [1])
-				return;
+            if (treeview1.Model.GetValue (piter, 0) != ICON_FOLDER [1])
+                return;
 
-			if(treeview1.Model.IterChildren (out oiter, piter)) {
-				if (treeview1.Model.GetValue (oiter, 0) == ICON_FILE [1])
-					return;
+            if(treeview1.Model.IterChildren (out oiter, piter)) {
+                if (treeview1.Model.GetValue (oiter, 0) == ICON_FILE [1])
+                    return;
 
-				while (treeview1.Model.IterNext (ref oiter))
-					if (treeview1.Model.GetValue (oiter, 0) == ICON_FILE [1])
-						return;
-			}
+                while (treeview1.Model.IterNext (ref oiter))
+                    if (treeview1.Model.GetValue (oiter, 0) == ICON_FILE [1])
+                        return;
+            }
 
-			treeview1.Model.SetValue (piter, 0, ICON_FOLDER [0]);
-			treeview1.Model.IterParent (out oiter, piter);
+            treeview1.Model.SetValue (piter, 0, ICON_FOLDER [0]);
+            treeview1.Model.IterParent (out oiter, piter);
 
-			RefreshFolders (oiter);
-		}
+            RefreshFolders (oiter);
+        }
 
         public bool GetIter(TreeIter iter, string name, out TreeIter oiter)
         {
@@ -319,13 +319,13 @@ namespace MonoGame.Tools.Pipeline
             return filePath;
         }
 
-		public string[] GetSelectedTreePath(out List<TreeIter> iters, out List<string> ids)
+        public string[] GetSelectedTreePath(out List<TreeIter> iters, out List<string> ids)
         {
             TreePath[] paths = treeview1.Selection.GetSelectedRows ();
 
             var filePaths = new List<string>();
             iters = new List<TreeIter> ();
-			ids = new List<string> ();
+            ids = new List<string> ();
 
             for (int i = 0; i < paths.Length; i++)
             {
@@ -334,7 +334,7 @@ namespace MonoGame.Tools.Pipeline
                 {
                     filePaths.Add(GetPathFromIter(iter));
                     iters.Add(iter);
-					ids.Add (treeview1.Model.GetValue(iter, 2).ToString());
+                    ids.Add (treeview1.Model.GetValue(iter, 2).ToString());
                 }
             }
 
@@ -348,7 +348,7 @@ namespace MonoGame.Tools.Pipeline
 
             if(treeview1.Model.IterChildren (out oiter, iter)) {
                 do {
-					if (treeview1.Model.GetValue(oiter, 2).ToString() == ID_FILE)
+                    if (treeview1.Model.GetValue(oiter, 2).ToString() == ID_FILE)
                         paths.Add (GetPathFromIter (oiter));
                     else
                         paths.AddRange (GetAllPaths (oiter));
@@ -361,19 +361,19 @@ namespace MonoGame.Tools.Pipeline
         public void Remove()
         {
             List<TreeIter> iter;
-			List<string> ids;
+            List<string> ids;
             string[] path = GetSelectedTreePath (out iter, out ids);
 
             var items = new List<ContentItem>();
             var directories = new List<string>();
 
             for (int i = 0; i < path.Length; i++) {
-				if (ids [i] == ID_FILE) {
+                if (ids [i] == ID_FILE) {
                     var item = window._controller.GetItem (path [i]) as ContentItem;
                     if(!items.Contains(item))
                         items.Add (item);
                 } else {
-					if (ids[i] == ID_FOLDER)
+                    if (ids[i] == ID_FOLDER)
                         directories.Add(path[i]);
 
                     List<string> paths = GetAllPaths (iter [i]);
@@ -394,13 +394,13 @@ namespace MonoGame.Tools.Pipeline
         public void Rebuild()
         {
             List<TreeIter> iter;
-			List<string> ids;
+            List<string> ids;
             string[] path = GetSelectedTreePath (out iter, out ids);
 
             var items = new List<ContentItem>();
 
             for (int i = 0; i < path.Length; i++) {
-				if (ids [i] == ID_FILE) {
+                if (ids [i] == ID_FILE) {
                     var item = window._controller.GetItem (path [i]) as ContentItem;
                     if(!items.Contains(item))
                         items.Add (item);
@@ -443,9 +443,9 @@ namespace MonoGame.Tools.Pipeline
                 if (ids.Count != 1)
                     return;
 
-				if(ids[0] == ID_BASE)
+                if(ids[0] == ID_BASE)
                     Process.Start(openedProject);
-				else if(ids[0] != ID_FOLDER)
+                else if(ids[0] != ID_FOLDER)
                     Process.Start(window._controller.GetFullPath(GetPathFromIter(iters[0])));
             }
 
@@ -495,9 +495,9 @@ namespace MonoGame.Tools.Pipeline
             string name = "????";
             string location = "????";
 
-			for(int i = 0;i < paths.Length;i++)
+            for(int i = 0;i < paths.Length;i++)
             {
-				if (ids [i] == ID_BASE) {
+                if (ids [i] == ID_BASE) {
                     ps = true;
                     name = CombineVariables (name, treeview1.Model.GetValue (iters [i], 1).ToString ());
                     location = CombineVariables (location, project.Location);
@@ -535,7 +535,7 @@ namespace MonoGame.Tools.Pipeline
         void ShowMenu()
         {
             List<TreeIter> iters;
-			List<string> ids;
+            List<string> ids;
             var paths = new List<string> ();
             paths.AddRange (GetSelectedTreePath (out iters, out ids));
 
