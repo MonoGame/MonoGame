@@ -306,6 +306,7 @@ LangString OpenALDesc ${LANG_ENGLISH} "Install the OpenAL drivers"
 LangString MonoDevelopDesc ${LANG_ENGLISH} "Install the project templates for MonoDevelop"
 LangString VS2010Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2010"
 LangString VS2012Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2012"
+LangString VS2013Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2013"
 LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your start menu"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -314,6 +315,7 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
   !insertmacro MUI_DESCRIPTION_TEXT ${MonoDevelop} $(MonoDevelopDesc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2010} $(VS2010Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2012} $(VS2012Desc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${VS2013} $(VS2013Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
