@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Audio
                     }
 					
                     // Complex cues
-                    if (numComplexCues)
+                    if (numComplexCues > 0)
                     {
                         stream.Seek(complexCuesOffset, SeekOrigin.Begin);
                         for (int i = 0; i < numComplexCues; i++)
