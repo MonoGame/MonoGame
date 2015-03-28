@@ -1281,9 +1281,9 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// MonoGame theme color (R:231,G:60,B:0,A:255).
+        /// MonoGame orange theme color (R:231,G:60,B:0,A:255).
         /// </summary>
-        public static Color MonoGame
+        public static Color MonoGameOrange
         {
             get;
             private set;
