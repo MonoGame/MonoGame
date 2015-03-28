@@ -146,9 +146,7 @@
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="ContentPipeline\AssetTestUtility.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
-    </Compile>
+    <Compile Include="ContentPipeline\AssetTestUtility.cs" />
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
     </Compile>
@@ -238,6 +236,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Effects\Include.fxh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\TextureArrayEffect.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Effects\VertexTextureEffect.fx">
@@ -527,6 +528,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Scaled.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\TextureArrayAsRenderTargetAndShaderResource.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Viewport\Affects_draw_origin.png">

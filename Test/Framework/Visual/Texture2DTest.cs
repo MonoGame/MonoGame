@@ -66,9 +66,10 @@ non-infringement.
 */
 #endregion License
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
@@ -93,6 +94,33 @@ namespace MonoGame.Tests.Visual
                 texture2D.GetData(readData);
 
                 Assert.AreEqual(savedData, readData);
+            };
+            Game.Run();
+        }
+
+        [TestCase(1, 1)]
+        [TestCase(8, 8)]
+        [TestCase(31, 7)]
+        public void ShouldSetAndGetDataForLevel(int width, int height)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var texture2D = new Texture2D(Game.GraphicsDevice, width, height, true, SurfaceFormat.Color);
+
+                for (int i = 0; i < texture2D.LevelCount; i++)
+                {
+                    var levelSize = Math.Max(width >> i, 1) * Math.Max(height >> i, 1);
+
+                    var savedData = new Color[levelSize];
+                    for (var index = 0; index < levelSize; index++)
+                        savedData[index] = new Color(index % 255, index % 255, index % 255);
+                    texture2D.SetData(i, null, savedData, 0, savedData.Length);
+
+                    var readData = new Color[levelSize];
+                    texture2D.GetData(i, null, readData, 0, savedData.Length);
+
+                    Assert.AreEqual(savedData, readData);
+                }
             };
             Game.Run();
         }
@@ -122,5 +150,87 @@ namespace MonoGame.Tests.Visual
             };
             Game.Run();
         }
+
+#if !XNA
+        [TestCase(1, 1)]
+        [TestCase(8, 8)]
+        [TestCase(31, 7)]
+        public void ShouldSetAndGetDataForTextureArray(int width, int height)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                const int arraySize = 4;
+                var texture2D = new Texture2D(Game.GraphicsDevice, width, height, true, SurfaceFormat.Color, arraySize);
+
+                for (var i = 0; i < arraySize; i++)
+                    for (var j = 0; j < texture2D.LevelCount; j++)
+                    {
+                        var levelSize = Math.Max(width >> j, 1) * Math.Max(height >> j, 1);
+
+                        var savedData = new Color[levelSize];
+                        for (var index = 0; index < levelSize; index++)
+                            savedData[index] = new Color((index + i) % 255, (index + i) % 255, (index + i) % 255);
+                        texture2D.SetData(j, i, null, savedData, 0, savedData.Length);
+
+                        var readData = new Color[levelSize];
+                        texture2D.GetData(j, i, null, readData, 0, readData.Length);
+
+                        Assert.AreEqual(savedData, readData);
+                    }
+            };
+            Game.Run();
+        }
+#endif
+
+#if DIRECTX
+        [Test]
+        public void TextureArrayAsRenderTargetAndShaderResource()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var solidColorTexture = new Texture2D(Game.GraphicsDevice, 1, 1);
+                solidColorTexture.SetData(new[] { Color.White });
+
+                const int arraySize = 4;
+
+                // Create texture array.
+                var textureArray = new RenderTarget2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color,
+                    DepthFormat.None, 1, RenderTargetUsage.PlatformContents, false, arraySize);
+
+                var colors = new[] { Color.Red, Color.Green, Color.Blue, Color.Yellow };
+
+                var originalRenderTargets = Game.GraphicsDevice.GetRenderTargets();
+
+                // Bind each slice of texture array as render target, and render (different) solid color to each slice.
+                var spriteBatch = new SpriteBatch(Game.GraphicsDevice);
+                for (var i = 0; i < arraySize; i++)
+                {
+                    Game.GraphicsDevice.SetRenderTarget(textureArray, i);
+
+                    spriteBatch.Begin();
+                    spriteBatch.Draw(solidColorTexture, Game.GraphicsDevice.Viewport.Bounds, colors[i]);
+                    spriteBatch.End();
+                }
+
+                // Unbind texture array.
+                Game.GraphicsDevice.SetRenderTargets(originalRenderTargets);
+
+                // Now render into backbuffer, using texture array as a shader resource.
+                var effect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "TextureArrayEffect.fx");
+                effect.Parameters["Texture"].SetValue(textureArray);
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                Game.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
+
+                // Vertex buffer is not actually used, but currently we need to set a
+                // vertex buffer before calling DrawPrimitives.
+                Game.GraphicsDevice.SetVertexBuffer(new VertexBuffer(Game.GraphicsDevice,
+                    typeof(VertexPositionColor), 3, BufferUsage.WriteOnly));
+
+                Game.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1);
+            };
+            RunSingleFrameTest();
+        }
+#endif
     }
 }
