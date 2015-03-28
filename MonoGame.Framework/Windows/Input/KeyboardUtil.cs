@@ -398,6 +398,9 @@ namespace Microsoft.Xna.Framework.Input
                 case OpenTK.Input.Key.Z:
                     return Keys.Z;
                     
+                case OpenTK.Input.Key.Menu:
+                    return Keys.Apps;
+
                 default:
                     return Keys.None;
                     
