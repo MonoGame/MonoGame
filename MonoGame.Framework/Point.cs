@@ -87,6 +87,27 @@ namespace Microsoft.Xna.Framework
             this.Y = value;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Point"/> struct, with the specified position.
+        /// </summary>
+        /// <param name="x">The x coordinate in 2d-space.</param>
+        /// <param name="y">The y coordinate in 2d-space.</param>
+        public Point(float x, float y)
+        {
+            this.X = (int) x;
+            this.Y = (int) y;
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Point"/> struct, with the specified position.
+        /// </summary>
+        /// <param name="value">The x and y coordinates in 2d-space.</param>
+        public Point(float value)
+        {
+            this.X = (int) value;
+            this.Y = (int) value;
+        }
+
         #endregion
 
         #region Operators
