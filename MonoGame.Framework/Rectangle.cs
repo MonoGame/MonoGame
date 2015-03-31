@@ -189,22 +189,6 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Creates a new instance of <see cref="Rectangle"/> struct, with the specified
-        /// position, width, and height.
-        /// </summary>
-        /// <param name="x">The x coordinate of the top-left corner of the created <see cref="Rectangle"/>.</param>
-        /// <param name="y">The y coordinate of the top-left corner of the created <see cref="Rectangle"/>.</param>
-        /// <param name="width">The width of the created <see cref="Rectangle"/>.</param>
-        /// <param name="height">The height of the created <see cref="Rectangle"/>.</param>
-        public Rectangle(float x, float y, float width, float height)
-        {
-            this.X = (int)x;
-            this.Y = (int)y;
-            this.Width = (int)width;
-            this.Height = (int)height;
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="Rectangle"/> struct, with the specified
         /// location and size.
         /// </summary>
         /// <param name="location">The x and y coordinates of the top-left corner of the created <see cref="Rectangle"/>.</param>
@@ -215,21 +199,6 @@ namespace Microsoft.Xna.Framework
             this.Y = location.Y;
             this.Width = size.X;
             this.Height = size.Y;
-        }
-
-
-        /// <summary>
-        /// Creates a new instance of <see cref="Rectangle"/> struct, with the specified
-        /// location and size.
-        /// </summary>
-        /// <param name="location">The x and y coordinates of the top-left corner of the created <see cref="Rectangle"/>.</param>
-        /// <param name="size">The width and height of the created <see cref="Rectangle"/>.</param>
-        public Rectangle(Vector2 location, Vector2 size)
-        {
-            this.X = (int) location.X;
-            this.Y = (int) location.Y;
-            this.Width = (int) size.X;
-            this.Height = (int) size.Y;
         }
 
         #endregion
