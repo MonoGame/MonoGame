@@ -50,6 +50,11 @@ namespace MonoGame.Tools.Pipeline
                 Refresh ();
         }
 
+        public void Clear()
+        {
+            propertygridtable1.Clear();
+        }
+
         object CompareVariables(object a, object b)
         {
             if (a.ToString () == "???" || a.Equals(b))
@@ -74,7 +79,7 @@ namespace MonoGame.Tools.Pipeline
             foreach (var p in props) {
 
                 var attrs = p.GetCustomAttributes(true).Where(x => x is BrowsableAttribute).Cast<BrowsableAttribute>();
-                if (attrs.Any (x => !x.Browsable) || p.Name == "Name" || p.Name == "Location")
+                if (attrs.Any (x => !x.Browsable) || p.Name == "Name" || p.Name == "Location" || p.Name == "References")
                     continue;
 
                 object value = "???";

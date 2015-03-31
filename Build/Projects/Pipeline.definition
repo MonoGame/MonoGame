@@ -237,6 +237,8 @@
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\folder_missing.png" />
+    <EmbeddedResource Include="Icons\folder_ref.png" />
+    <EmbeddedResource Include="Icons\ref.png" />
     <EmbeddedResource Include="Icons\settings.png" />
 
     <!-- Copy config files to output directory -->
