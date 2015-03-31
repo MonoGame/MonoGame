@@ -16,15 +16,7 @@ namespace MonoGame.Tests.Framework
 #if !XNA
             // Constructor 2
 
-            Assert.AreEqual(new Rectangle() { X = 1, Y = 2, Width = 4, Height = 45 }, new Rectangle(1.0f,2.0f,4.0f,45.0f));
-
-            // Constructor 3
-
             Assert.AreEqual(new Rectangle() { X = 1, Y = 2, Width = 4, Height = 45 }, new Rectangle(new Point(1, 2), new Point(4, 45)));
-
-            // Constructor 4
-
-            Assert.AreEqual(new Rectangle() { X = 1, Y = 2, Width = 4, Height = 45 }, new Rectangle(new Vector2(1, 2), new Vector2(4, 45)));
 #endif
             // Left property
 
