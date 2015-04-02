@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Media
 
             using (var musicCursor = Context.ContentResolver.Query(MediaStore.Audio.Media.ExternalContentUri, null, null, null, null))
             {
-                if (musicCursor != null && musicCursor.MoveToFirst())
+                if (musicCursor != null)
                 {
                     Dictionary<string, Artist> artists = new Dictionary<string, Artist>();
                     Dictionary<string, Album> albums = new Dictionary<string, Album>();
@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Media
                         return;
                     }
 
-                    do
+                    for (musicCursor.MoveToFirst(); !musicCursor.IsAfterLast; musicCursor.MoveToNext())
                     {
                         long durationProperty = musicCursor.GetLong(durationColumn);
                         TimeSpan duration = TimeSpan.FromMilliseconds(durationProperty);
@@ -61,17 +61,17 @@ namespace Microsoft.Xna.Framework.Media
                         if (duration < MinimumSongDuration)
                             continue;
 
-                        string albumNameProperty = albumNameColumn > -1 ? musicCursor.GetString(albumNameColumn) : "Unknown Album";
-                        string albumArtistProperty = albumArtistColumn > -1 ? musicCursor.GetString(albumArtistColumn) : "Unknown Artist";
-                        string genreProperty = genreColumn > -1 ? musicCursor.GetString(genreColumn) : "Unknown Genre";
-                        string artistProperty = artistColumn > -1 ? musicCursor.GetString(artistColumn) : "Unknown Artist";
+                        string albumNameProperty = (albumNameColumn > -1 ? musicCursor.GetString(albumNameColumn) : null) ?? "Unknown Album";
+                        string albumArtistProperty = (albumArtistColumn > -1 ? musicCursor.GetString(albumArtistColumn) : null) ?? "Unknown Artist";
+                        string genreProperty = (genreColumn > -1 ? musicCursor.GetString(genreColumn) : null) ?? "Unknown Genre";
+                        string artistProperty = (artistColumn > -1 ? musicCursor.GetString(artistColumn) : null) ?? "Unknown Artist";
                         string titleProperty = musicCursor.GetString(titleColumn);
 
                         long assetId = musicCursor.GetLong(assetIdColumn);
                         var assetUri = ContentUris.WithAppendedId(MediaStore.Audio.Media.ExternalContentUri, assetId);
                         long albumId = albumIdColumn > -1 ? musicCursor.GetInt(albumIdColumn) : -1;
                         var albumArtUri = albumId > -1 ? ContentUris.WithAppendedId(Uri.Parse("content://media/external/audio/albumart"), albumId) : null;
-                        
+
                         Artist artist;
                         if (!artists.TryGetValue(artistProperty, out artist))
                         {
@@ -104,8 +104,7 @@ namespace Microsoft.Xna.Framework.Media
                         var song = new Song(album, artist, genre, titleProperty, duration, assetUri);
                         song.Album.Songs.Add(song);
                         songList.Add(song);
-
-                    } while (musicCursor.MoveToNext()); 
+                    }
                 }
 
                 musicCursor.Close();
