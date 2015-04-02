@@ -217,6 +217,9 @@ namespace MonoGame.Tools.Pipeline
                 var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
                 parser.OpenProject(projectFilePath, errorCallback);
 
+                foreach(string reff in _project.References)
+                    View.AddTreeReference(reff);
+
                 ResolveTypes();
 
                 ProjectOpen = true;
@@ -696,9 +699,32 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            var action2 = new IncludeAction(this, files, directories);
+            var action2 = new IncludeAction(this, files, directories, null);
             action2.Do();
             _actionStack.Add(action2);
+        }
+
+        public void IncludeReferences()
+        {
+            List<string> files;
+            if (!View.ChooseReferenceFile(_project.Location, out files))
+                return;
+
+            string pl = _project.Location;
+            if (!pl.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                pl += Path.DirectorySeparatorChar;
+
+            Uri folderUri = new Uri(pl);
+
+            for (int i = -0; i < files.Count; i++)
+            {
+                Uri pathUri = new Uri(files[i]);
+                files[i] = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+            }
+
+            var action = new IncludeAction(this, null, null, files);
+            action.Do();
+            _actionStack.Add(action);
         }
 
         private List<string> GetFiles(string folder)
@@ -728,9 +754,9 @@ namespace MonoGame.Tools.Pipeline
             return ret;
         }
 
-        public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders)
+        public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, List<string> refs)
         {
-            var action = new ExcludeAction(this, items, folders);
+            var action = new ExcludeAction(this, items, folders, refs);
             action.Do();
             _actionStack.Add(action);
         }
@@ -759,7 +785,7 @@ namespace MonoGame.Tools.Pipeline
                 return;
             }
 
-            var action = new IncludeAction(this, null, new List<string> { folder });
+            var action = new IncludeAction(this, null, new List<string> { folder }, null);
             action.Do();
             _actionStack.Add(action);
         }

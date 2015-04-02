@@ -15,11 +15,13 @@ namespace MonoGame.Tools.Pipeline
             private readonly PipelineController _con;
             private readonly ContentItemState[] _state;
             private readonly string[] _folder;
+            private readonly string[] _refs;
 
-            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items, IEnumerable<string> folders)
+            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items, IEnumerable<string> folders, List<string> refs)
             {
                 _con = controller;
                 _folder = (folders == null) ? new string[0] : folders.ToArray();
+                _refs = (refs == null) ? new string[0] : refs.ToArray();
 
                 if(items == null)
                     _state = new ContentItemState[0];
@@ -56,6 +58,12 @@ namespace MonoGame.Tools.Pipeline
                 foreach(string f in _folder)
                     _con.View.RemoveTreeFolder(f);
 
+                foreach (string r in _refs)
+                {
+                    _con._project.References.Remove(r);
+                    _con.View.RemoveTreeReference(r);
+                }
+
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
@@ -66,6 +74,12 @@ namespace MonoGame.Tools.Pipeline
 
                 foreach(string f in _folder)
                     _con.View.AddTreeFolder(f);
+
+                foreach (string r in _refs)
+                {
+                    _con._project.References.Add(r);
+                    _con.View.AddTreeReference(r);
+                }
 
                 foreach (var obj in _state)
                 {

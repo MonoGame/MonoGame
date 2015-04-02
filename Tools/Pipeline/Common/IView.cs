@@ -43,11 +43,15 @@ namespace MonoGame.Tools.Pipeline
 
         void AddTreeItem(IProjectItem item);
 
+        void AddTreeReference(string reff);
+
         void AddTreeFolder(string folder);
 
         void RemoveTreeItem(ContentItem contentItem);
 
         void RemoveTreeFolder(string folder);
+
+        void RemoveTreeReference(string reff);
 
         void UpdateTreeItem(IProjectItem item);
 
@@ -60,6 +64,8 @@ namespace MonoGame.Tools.Pipeline
         void OutputClear();
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);  
+
+        bool ChooseReferenceFile(string initialDirectory, out List<string> files);  
 
         bool ChooseContentFolder(string initialDirectory, out string folder);        
 

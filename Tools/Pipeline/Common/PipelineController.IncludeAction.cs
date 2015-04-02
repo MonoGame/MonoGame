@@ -14,19 +14,21 @@ namespace MonoGame.Tools.Pipeline
         {
             private readonly PipelineController _con;
             private readonly string[] _folder;
+            private readonly string[] _refs;
             private readonly string[] _files;
 
-            public IncludeAction(PipelineController controller, IEnumerable<string> files) : this(controller, files, null)
+            public IncludeAction(PipelineController controller, IEnumerable<string> files) : this(controller, files, null, null)
             {
                 
             }
 
-            public IncludeAction(PipelineController controller, IEnumerable<string> files, IEnumerable<string> folders)
+            public IncludeAction(PipelineController controller, IEnumerable<string> files, IEnumerable<string> folders, List<string> refs)
             {
                 _con = controller;
 
                 _files = files == null ? new string[0] : files.ToArray();
                 _folder = folders == null ? new string[0] : folders.ToArray();
+                _refs = refs == null ? new string[0] : refs.ToArray();
 
                 for (int i = 0; i < _folder.Length; i++)
                 {
@@ -52,6 +54,12 @@ namespace MonoGame.Tools.Pipeline
                 foreach(string f in _folder)
                     if(f != "")
                         _con.View.AddTreeFolder(f);
+
+                foreach (string r in _refs)
+                {
+                    _con._project.References.Add(r);
+                    _con.View.AddTreeReference(r);
+                }
 
                 for (var i = 0; i < _files.Length; i++ )
                 {
@@ -95,6 +103,12 @@ namespace MonoGame.Tools.Pipeline
                 foreach(string f in _folder)
                     if(f != "")
                         _con.View.RemoveTreeFolder(f);
+
+                foreach (string r in _refs)
+                {
+                    _con._project.References.Remove(r);
+                    _con.View.RemoveTreeReference(r);
+                }
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;

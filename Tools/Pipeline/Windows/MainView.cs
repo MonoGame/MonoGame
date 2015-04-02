@@ -775,7 +775,7 @@ namespace MonoGame.Tools.Pipeline
                     items.Add(item);                    
             }
 
-            _controller.Exclude(items, new List<string>());      
+            _controller.Exclude(items, new List<string>(), null);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -928,5 +928,21 @@ namespace MonoGame.Tools.Pipeline
         {
             throw new NotImplementedException();
         }
+
+        public void AddTreeReference(string reff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveTreeReference(string reff)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ChooseReferenceFile(string initialDirectory, out List<string> files)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

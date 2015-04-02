@@ -28,6 +28,7 @@ namespace MonoGame.Tools.Pipeline
 
         FileFilter MonoGameContentProjectFileFilter;
         FileFilter XnaContentProjectFileFilter;
+        FileFilter ReferenceFilesFilter;
         FileFilter AllFilesFilter;
 
         MenuItem treerebuild;
@@ -46,6 +47,10 @@ namespace MonoGame.Tools.Pipeline
             XnaContentProjectFileFilter = new FileFilter ();
             XnaContentProjectFileFilter.Name = "XNA Content Projects (*.contentproj)";
             XnaContentProjectFileFilter.AddPattern ("*.contentproj");
+
+            ReferenceFilesFilter = new FileFilter ();
+            ReferenceFilesFilter.Name = "Reference Files (*.dll)";
+            ReferenceFilesFilter.AddPattern ("*.dll");
 
             AllFilesFilter = new FileFilter ();
             AllFilesFilter.Name = "All Files (*.*)";
@@ -263,6 +268,11 @@ namespace MonoGame.Tools.Pipeline
             projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand);
         }
 
+        public void AddTreeReference(string reff)
+        {
+            projectview1.AddReference(reff);
+        }
+
         public void AddTreeFolder (string folder)
         {
             projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand);
@@ -276,6 +286,11 @@ namespace MonoGame.Tools.Pipeline
         public void RemoveTreeFolder (string folder)
         {
             projectview1.RemoveItem (projectview1.GetBaseIter (), folder);
+        }
+
+        public void RemoveTreeReference(string reff)
+        {
+            projectview1.RemoveReference(reff);
         }
 
         public void UpdateTreeItem (IProjectItem item)
@@ -340,6 +355,29 @@ namespace MonoGame.Tools.Pipeline
                     "Open", ResponseType.Accept);
             filechooser.SelectMultiple = true;
 
+            filechooser.AddFilter (AllFilesFilter);
+            filechooser.SetCurrentFolder (initialDirectory);
+
+            bool result = filechooser.Run() == (int)ResponseType.Accept;
+
+            files = new List<string>();
+            files.AddRange (filechooser.Filenames);
+            filechooser.Destroy ();
+
+            return result;
+        }
+
+        public bool ChooseReferenceFile (string initialDirectory, out List<string> files)
+        {
+            var filechooser =
+                new FileChooserDialog("Add Reference File",
+                    this,
+                    FileChooserAction.Open,
+                    "Cancel", ResponseType.Cancel,
+                    "Open", ResponseType.Accept);
+            filechooser.SelectMultiple = true;
+
+            filechooser.AddFilter (ReferenceFilesFilter);
             filechooser.AddFilter (AllFilesFilter);
             filechooser.SetCurrentFolder (initialDirectory);
 
@@ -469,11 +507,13 @@ namespace MonoGame.Tools.Pipeline
         protected void OnUndoActionActivated (object sender, EventArgs e)
         {
             _controller.Undo ();
+            UpdateMenus ();
         }
 
         protected void OnRedoActionActivated (object sender, EventArgs e)
         {
             _controller.Redo ();
+            UpdateMenus ();
         }
 
         public void OnNewItemActionActivated (object sender, EventArgs e)
@@ -493,7 +533,7 @@ namespace MonoGame.Tools.Pipeline
                 if (paths.Length == 1) {
                     if (ids [0] == projectview1.ID_FOLDER)
                         location = paths [0];
-                    else if (ids[0] == projectview1.ID_BASE)
+                    else if (ids[0] == projectview1.ID_BASE || ids[0] == projectview1.ID_REFBASE || ids[0] == projectview1.ID_REF)
                         location = _controller.GetFullPath ("");
                     else
                         location = System.IO.Path.GetDirectoryName (paths [0]);
@@ -517,7 +557,7 @@ namespace MonoGame.Tools.Pipeline
             if (paths.Length == 1) {
                 if (ids [0] == projectview1.ID_FOLDER)
                     _controller.Include (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
+                else if (ids[0] == projectview1.ID_BASE || ids[0] == projectview1.ID_REFBASE || ids[0] == projectview1.ID_REF)
                     _controller.Include (_controller.GetFullPath (""));
                 else
                     _controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
@@ -544,7 +584,7 @@ namespace MonoGame.Tools.Pipeline
             if (paths.Length == 1) {
                 if (ids [0] == projectview1.ID_FOLDER)
                     _controller.NewFolder (foldername, paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
+                else if (ids[0] == projectview1.ID_BASE || ids[0] == projectview1.ID_REFBASE || ids[0] == projectview1.ID_REF)
                     _controller.NewFolder (foldername, _controller.GetFullPath (""));
                 else
                     _controller.NewFolder (foldername, System.IO.Path.GetDirectoryName (paths [0]));
@@ -565,7 +605,7 @@ namespace MonoGame.Tools.Pipeline
             if (paths.Length == 1) {
                 if (ids [0] == projectview1.ID_FOLDER)
                     _controller.IncludeFolder (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
+                else if (ids[0] == projectview1.ID_BASE || ids[0] == projectview1.ID_REFBASE || ids[0] == projectview1.ID_REF)
                     _controller.IncludeFolder (_controller.GetFullPath (""));
                 else
                     _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));
