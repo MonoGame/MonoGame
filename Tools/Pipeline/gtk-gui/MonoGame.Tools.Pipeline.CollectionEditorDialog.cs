@@ -37,6 +37,7 @@ namespace MonoGame.Tools.Pipeline
 			global::Stetic.Gui.Initialize (this);
 			// Widget MonoGame.Tools.Pipeline.CollectionEditorDialog
 			this.Name = "MonoGame.Tools.Pipeline.CollectionEditorDialog";
+			this.Title = global::Mono.Unix.Catalog.GetString ("Reference Editor");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child MonoGame.Tools.Pipeline.CollectionEditorDialog.VBox
 			global::Gtk.VBox w1 = this.VBox;

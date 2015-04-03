@@ -808,6 +808,7 @@
   </widget>
   <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.CollectionEditorDialog" design-size="659 397">
     <property name="MemberName" />
+    <property name="Title" translatable="yes">Reference Editor</property>
     <property name="WindowPosition">CenterOnParent</property>
     <property name="Buttons">2</property>
     <property name="HelpButton">False</property>
@@ -999,8 +1000,9 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.ColorPickerDialog" design-size="509 326">
+  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.ColorPickerDialog" design-size="511 334">
     <property name="MemberName" />
+    <property name="Title" translatable="yes">Color Picker</property>
     <property name="WindowPosition">CenterOnParent</property>
     <property name="Buttons">2</property>
     <property name="HelpButton">False</property>
