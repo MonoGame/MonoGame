@@ -33,7 +33,7 @@ namespace MonoGame.Tools.Pipeline
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.image1 = new global::Gtk.Image ();
 			this.image1.Name = "image1";
-			this.image1.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "stock_dialog-question", global::Gtk.IconSize.Dialog);
+			this.image1.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-dialog-question", global::Gtk.IconSize.Dialog);
 			this.hbox1.Add (this.image1);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.image1]));
 			w2.Position = 0;
@@ -99,7 +99,7 @@ namespace MonoGame.Tools.Pipeline
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 373;
-			this.DefaultHeight = 94;
+			this.DefaultHeight = 96;
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 		}
