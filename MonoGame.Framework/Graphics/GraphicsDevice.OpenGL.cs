@@ -88,11 +88,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformSetup()
+       private void PlatformSetup()
         {
 #if WINDOWS || LINUX || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
-            var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+
+            var wnd = OpenTK.Platform.Utilities.CreateWindowsWindowInfo(PresentationParameters.DeviceWindowHandle);
+
+            if (Game.Instance != null)
+                wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
 
             #if GLES
             // Create an OpenGL ES 2.0 context
@@ -118,32 +122,43 @@ namespace Microsoft.Xna.Framework.Graphics
                     0;
 
                 var samples = 0;
-                if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
+                if (Game.Instance != null)
                 {
-                    // Use a default of 4x samples if PreferMultiSampling is enabled
-                    // without explicitly setting the desired MultiSampleCount.
-                    if (PresentationParameters.MultiSampleCount == 0)
+                    if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
                     {
-                        PresentationParameters.MultiSampleCount = 4;
-                    }
+                        // Use a default of 4x samples if PreferMultiSampling is enabled
+                        // without explicitly setting the desired MultiSampleCount.
+                        if (PresentationParameters.MultiSampleCount == 0)
+                        {
+                            PresentationParameters.MultiSampleCount = 4;
+                        }
 
-                    samples = PresentationParameters.MultiSampleCount;
+                        samples = PresentationParameters.MultiSampleCount;
+                    }
                 }
+                else
+                    samples = 4;
 
                 mode = new GraphicsMode(color, depth, stencil, samples);
-                try
+
+                if (Game.Instance != null)
                 {
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                    try
+                    {
+                        Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                    }
+                    catch (Exception e)
+                    {
+                        Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
+                            e.ToString());
+                        major = 1;
+                        minor = 0;
+                        flags = GraphicsContextFlags.Default;
+                        Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                    }
                 }
-                catch (Exception e)
-                {
-                    Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
-                        e.ToString());
-                    major = 1;
-                    minor = 0;
-                    flags = GraphicsContextFlags.Default;
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
+                else
+                    Context = GraphicsContext.CurrentContext;
             }
             Context.MakeCurrent(wnd);
             (Context as IGraphicsContextInternal).LoadAll();
@@ -153,12 +168,23 @@ namespace Microsoft.Xna.Framework.Graphics
             // Note: this context should use the same GraphicsMode,
             // major, minor version and flags parameters as the main
             // context. Otherwise, context sharing will very likely fail.
-            if (Threading.BackgroundContext == null)
+            if (Game.Instance != null)
             {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
-                Threading.WindowInfo = wnd;
-                Threading.BackgroundContext.MakeCurrent(null);
+                if (Threading.BackgroundContext == null)
+                {
+
+                    Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
+                    Threading.WindowInfo = wnd;
+                    Threading.BackgroundContext.MakeCurrent(null);
+                }
             }
+            else
+            {
+                Threading.BackgroundContext = GraphicsContext.CurrentContext;
+                Threading.WindowInfo = wnd;
+                Threading.BackgroundContext.MakeCurrent(wnd);
+            }
+
             Context.MakeCurrent(wnd);
 #endif
 
@@ -208,6 +234,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return extensions;
         }
+
 
         private void PlatformInitialize()
         {
