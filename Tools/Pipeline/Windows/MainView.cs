@@ -212,13 +212,11 @@ namespace MonoGame.Tools.Pipeline
 
             if (node.Tag is ContentItem)
             {
-                _treeAddItemMenuItem.Visible = false;
-                _treeNewItemMenuItem.Visible = false;
+                _treeAddMenu.Visible = false;
             }
             else
             {
-                _treeAddItemMenuItem.Visible = true;
-                _treeNewItemMenuItem.Visible = true;
+                _treeAddMenu.Visible = true;
             }
 
             if (node.Tag is FolderItem)
@@ -739,8 +737,7 @@ namespace MonoGame.Tools.Pipeline
 
             _exitMenuItem.Enabled = notBuilding;
 
-            _newItemMenuItem.Enabled = projectOpen;
-            _addItemMenuItem.Enabled = projectOpen;
+            _addMenuItem.Enabled = projectOpen;
             _deleteMenuItem.Enabled = projectOpen;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
@@ -767,15 +764,18 @@ namespace MonoGame.Tools.Pipeline
         {
             var items = new List<ContentItem>();
             var nodes = _treeView.SelectedNodesRecursive;
+            List<string> dirs = new List<string>();
 
             foreach (var node in nodes)
             {
                 var item = node.Tag as ContentItem;
                 if (item != null && !items.Contains(item))
-                    items.Add(item);                    
+                    items.Add(item);
+                else
+                    dirs.Add(node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1));
             }
 
-            _controller.Exclude(items, new List<string>());      
+            _controller.Exclude(items, dirs);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -807,6 +807,42 @@ namespace MonoGame.Tools.Pipeline
                 // Ensure name is unique among files at this location?
                 _controller.NewItem(dlg.NameGiven, location, template);
             }
+        }
+
+        private void OnAddFolderClick(object sender, EventArgs e)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            string location = "";
+
+            if (node != null)
+            {
+                var item = node.Tag as IProjectItem;
+                if (item != null)
+                    location = item.Location;
+                else
+                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
+            }
+
+            _controller.IncludeFolder(location);
+        }
+
+        private void OnNewFolderClick(object sender, EventArgs e)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            string location = "";
+
+            if (node != null)
+            {
+                var item = node.Tag as IProjectItem;
+                if (item != null)
+                    location = item.Location;
+                else
+                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
+            }
+
+            var dialog = new TextEditDialog("New Folder", "Folder Name:", "");
+            if (dialog.ShowDialog() == DialogResult.OK)
+                _controller.NewFolder(dialog.text, location);
         }
 
         private void OnRedoClick(object sender, EventArgs e)
@@ -904,29 +940,100 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            action = CopyAction.Link;
-            applyforall = true;
-            return true;
+            AddFileDialog afd = new AddFileDialog(file, exists);
+            if (afd.ShowDialog() == DialogResult.OK)
+            {
+                action = afd.responce;
+                applyforall = afd.applyforall;
+                return true;
+            }
+
+            action = CopyAction.Skip;
+            applyforall = false;
+            return false;
         }
 
-        public void AddTreeFolder(string folder)
+        public void AddTreeFolder(string afolder)
         {
+            Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
+            _treeSort = true;
 
+            var path = afolder;
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes[0];
+            var parent = root.Nodes;
+            foreach (var folder in folders)
+            {
+                var found = parent.Find(folder, false);
+                if (found.Length == 0)
+                {
+                    var folderNode = parent.Add(folder, folder, -1);
+                    folderNode.ImageIndex = FolderClosedIcon;
+                    folderNode.SelectedImageIndex = FolderClosedIcon;
+
+                    var idx = path.IndexOf(folder);
+                    var curPath = path.Substring(0, idx + folder.Length);
+                    folderNode.Tag = new FolderItem(curPath);
+
+                    parent = folderNode.Nodes;
+                }
+                else
+                    parent = found[0].Nodes;
+            }
+
+            root.Expand();
         }
 
         public void RemoveTreeFolder(string folder)
         {
+            Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
+            _treeSort = true;
 
+            var path = folder;
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes[0];
+            var parent = root.Nodes;
+
+            for (int i = 0; i < folders.Length;i++)
+            {
+                var found = parent.Find(folders[i], false);
+
+                if (found.Length == 0)
+                    return;
+                else if (i != folders.Length - 1)
+                    parent = found[0].Nodes;
+                else
+                    parent.Remove(found[0]);
+            }
         }
 
         public bool ChooseContentFolder(string initialDirectory, out string folder)
         {
-            throw new NotImplementedException();
+            var dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = initialDirectory;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                folder = dialog.SelectedPath;
+                return true;
+            }
+
+            folder = "";
+            return false;
         }
 
         public bool CopyOrLinkFolder(string folder, out CopyAction action)
         {
-            throw new NotImplementedException();
+            var dialog = new AddFolderDialog(folder);
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                action = dialog.responce;
+                return true;
+            }
+
+            action = CopyAction.Link;
+            return false;
         }
     }
 }
