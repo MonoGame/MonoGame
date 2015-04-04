@@ -908,5 +908,37 @@ namespace MonoGame.Tools.Pipeline
             applyforall = true;
             return true;
         }
+
+        #region drag & drop
+        private void MainView_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.None;
+            string filename = GetDropFile(e.Data, ".mgcb");
+            if (filename != null) 
+                e.Effect = DragDropEffects.Copy;
+        }
+
+        private void MainView_DragDrop(object sender, DragEventArgs e)
+        {
+            string filename = GetDropFile(e.Data, ".mgcb");
+            if (filename != null)
+                _controller.OpenProject(filename);
+        }
+
+        private string GetDropFile(IDataObject dataObject, string extension)
+        {
+            if (dataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])dataObject.GetData(DataFormats.FileDrop);
+                foreach (var filename in files)
+                {
+                    if (Path.GetExtension(filename).Equals(extension, StringComparison.OrdinalIgnoreCase))
+                        return filename;
+                }
+            }
+            return null;
+        }
+      
+        #endregion
     }
 }
