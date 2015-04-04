@@ -572,6 +572,7 @@ namespace MonoGame.Tools.Pipeline
             // 
             // MainView
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 561);
@@ -584,6 +585,8 @@ namespace MonoGame.Tools.Pipeline
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
             this.Load += new System.EventHandler(this.MainView_Load);
             this.Shown += new System.EventHandler(this.MainView_Shown);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainView_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainView_DragEnter);
             _splitTreeProps.Panel1.ResumeLayout(false);
             _splitTreeProps.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(_splitTreeProps)).EndInit();
