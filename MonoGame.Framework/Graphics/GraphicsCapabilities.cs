@@ -90,6 +90,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal bool SupportsTextureMaxLevel { get; private set; }
 
+        /// <summary>
+        /// True, if sRGB is supported. On Direct3D platforms, this is always <code>true</code>.
+        /// On OpenGL platforms, it is <code>true</code> if both framebuffer sRGB
+        /// and texture sRGB are supported.
+        /// </summary>
+        internal bool SupportsSRgb { get; private set; }
+        
         internal bool SupportsTextureArrays { get; private set; }
 
         internal void Initialize(GraphicsDevice device)
@@ -149,6 +156,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
             }
             MaxTextureAnisotropy = anisotropy;
+#endif
+
+            // sRGB
+#if DIRECTX
+            SupportsSRgb = true;
+#elif OPENGL
+#if GLES
+            SupportsSRgb = device._extensions.Contains("GL_EXT_sRGB");
+#else
+            SupportsSRgb = device._extensions.Contains("GL_EXT_texture_sRGB") && device._extensions.Contains("GL_EXT_framebuffer_sRGB");
+#endif
 #endif
 
 #if DIRECTX

@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 GenerateGLTextureIfRequired();
 
-                format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+                format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                 {
@@ -78,8 +78,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         case SurfaceFormat.RgbEtc1:
                         case SurfaceFormat.Dxt1:
                         case SurfaceFormat.Dxt1a:
+                        case SurfaceFormat.Dxt1SRgb:
                         case SurfaceFormat.Dxt3:
+                        case SurfaceFormat.Dxt3SRgb:
                         case SurfaceFormat.Dxt5:
+                        case SurfaceFormat.Dxt5SRgb:
                             imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * GraphicsExtensions.GetSize(format);
                             break;
                         default:

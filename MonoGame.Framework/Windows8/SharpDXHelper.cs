@@ -110,6 +110,19 @@ namespace Microsoft.Xna.Framework
                     return SharpDX.DXGI.Format.B8G8R8X8_UNorm;
                 case SurfaceFormat.Bgra32:
                     return SharpDX.DXGI.Format.B8G8R8A8_UNorm;
+
+                case SurfaceFormat.ColorSRgb:
+                    return SharpDX.DXGI.Format.R8G8B8A8_UNorm_SRgb;
+                case SurfaceFormat.Bgr32SRgb:
+                    return SharpDX.DXGI.Format.B8G8R8X8_UNorm_SRgb;
+                case SurfaceFormat.Bgra32SRgb:
+                    return SharpDX.DXGI.Format.B8G8R8A8_UNorm_SRgb;
+                case SurfaceFormat.Dxt1SRgb:
+                    return SharpDX.DXGI.Format.BC1_UNorm_SRgb;
+                case SurfaceFormat.Dxt3SRgb:
+                    return SharpDX.DXGI.Format.BC2_UNorm_SRgb;
+                case SurfaceFormat.Dxt5SRgb:
+                    return SharpDX.DXGI.Format.BC3_UNorm_SRgb;
             }
         }
 
