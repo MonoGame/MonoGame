@@ -68,14 +68,13 @@ namespace MonoGame.Tools.Pipeline
 
         public event Action OnBuildFinished;
 
-        public PipelineController(IView view, PipelineProject project)
+        public PipelineController(IView view)
         {
             _actionStack = new ActionStack();
             Selection = new Selection();
 
             View = view;
             View.Attach(this);
-            _project = project;
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
