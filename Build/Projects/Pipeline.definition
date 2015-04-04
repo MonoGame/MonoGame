@@ -273,32 +273,32 @@
 
     <!-- Copy gtk libs to output directory -->
     <None Include="..\..\ThirdParty\Dependencies\Gtk\libatksharpglue-2.so">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>Linux</Platforms>
       <Link>libatksharpglue-2.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\libgdksharpglue-2.so">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>Linux</Platforms>
       <Link>libgdksharpglue-2.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\libgladesharpglue-2.so">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>Linux</Platforms>
       <Link>libgladesharpglue-2.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\libglibsharpglue-2.so">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>Linux</Platforms>
       <Link>libglibsharpglue-2.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\libgtksharpglue-2.so">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>Linux</Platforms>
       <Link>libgtksharpglue-2.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\libpangosharpglue-2.so">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>Linux</Platforms>
       <Link>libpangosharpglue-2.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
