@@ -34,8 +34,7 @@ namespace MonoGame.Tools.Pipeline
                 view.OpenProjectPath = projectFilePath;
             }
 
-            var model = new PipelineProject();
-            var controller = new PipelineController(view, model);   
+            var controller = new PipelineController(view);
             Application.Run(view);
 #endif
 #if LINUX || MONOMAC
@@ -43,8 +42,7 @@ namespace MonoGame.Tools.Pipeline
 			Gtk.Application.Init ();
 			MainWindow win = new MainWindow ();
 			win.Show (); 
-			var model = new PipelineProject();
-			new PipelineController(win, model);  
+			new PipelineController(win);
 			if (args != null && args.Length > 0)
 			{
 				var projectFilePath = string.Join(" ", args);
