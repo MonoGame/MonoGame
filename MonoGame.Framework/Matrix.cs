@@ -865,6 +865,20 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
         /// </summary>
+        /// <param name="viewingVolume">The viewing field.</param>
+        /// <param name="zNearPlane">Near plane of z-value of the viewing field.</param>
+        /// <param name="zFarPlane">Far plane of z-value of the viewing field.</param>
+        /// <returns>The new projection <see cref="Matrix"/> for customized orthographic view.</returns>
+        public static Matrix CreateOrthographicOffCenter(Rectangle viewingVolume, float zNearPlane, float zFarPlane)
+        {
+            Matrix matrix;
+            CreateOrthographicOffCenter(viewingVolume.Left, viewingVolume.Right, viewingVolume.Bottom, viewingVolume.Top, zNearPlane, zFarPlane, out matrix);
+            return matrix;
+        }
+
+        /// <summary>
+        /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
+        /// </summary>
         /// <param name="left">Left coordinate of the viewing field.</param>
         /// <param name="right">Right coordinate of the viewing field.</param>
         /// <param name="bottom">Bottom coordinate of the viewing field.</param>
@@ -1008,6 +1022,20 @@ namespace Microsoft.Xna.Framework
         {
             Matrix result;
             CreatePerspectiveOffCenter(left, right, bottom, top, nearPlaneDistance, farPlaneDistance, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
+        /// </summary>
+        /// <param name="viewingVolume">The viewing field.</param>
+        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
+        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <returns>The new <see cref="Matrix"/> for customized perspective view.</returns>
+        public static Matrix CreatePerspectiveOffCenter(Rectangle viewingVolume, float nearPlaneDistance, float farPlaneDistance)
+        {
+            Matrix result;
+            CreatePerspectiveOffCenter(viewingVolume.Left, viewingVolume.Right, viewingVolume.Bottom, viewingVolume.Top, nearPlaneDistance, farPlaneDistance, out result);
             return result;
         }
 
@@ -1965,18 +1993,18 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Copy the values of specified <see cref="Matrix"/> to the float array.
         /// </summary>
-        /// <param name="mat">The source <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The source <see cref="Matrix"/>.</param>
         /// <returns>The array which matrix values will be stored.</returns>
         /// <remarks>
         /// Required for OpenGL 2.0 projection matrix stuff.
         /// </remarks>
-        public static float[] ToFloatArray(Matrix mat)
+        public static float[] ToFloatArray(Matrix matrix)
         {
             float[] matarray = {
-									mat.M11, mat.M12, mat.M13, mat.M14,
-									mat.M21, mat.M22, mat.M23, mat.M24,
-									mat.M31, mat.M32, mat.M33, mat.M34,
-									mat.M41, mat.M42, mat.M43, mat.M44
+									matrix.M11, matrix.M12, matrix.M13, matrix.M14,
+									matrix.M21, matrix.M22, matrix.M23, matrix.M24,
+									matrix.M31, matrix.M32, matrix.M33, matrix.M34,
+									matrix.M41, matrix.M42, matrix.M43, matrix.M44
 								};
             return matarray;
         }
