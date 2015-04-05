@@ -97,9 +97,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 (force || this.DepthClipEnable != device._lastRasterizerState.DepthClipEnable))
             {
                 if (!DepthClipEnable)
-                    GL.Enable(EnableCap.DepthClamp);
+                    GL.Enable((EnableCap) 0x864F); // should be EnableCap.DepthClamp, but not available in OpenTK.Graphics.ES20.EnableCap
                 else
-                    GL.Disable(EnableCap.DepthClamp);
+                    GL.Disable((EnableCap) 0x864F);
                 GraphicsExtensions.CheckGLError();
                 device._lastRasterizerState.DepthClipEnable = this.DepthClipEnable;
             }
