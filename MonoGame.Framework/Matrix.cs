@@ -1993,18 +1993,18 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Copy the values of specified <see cref="Matrix"/> to the float array.
         /// </summary>
-        /// <param name="matrix">The source <see cref="Matrix"/>.</param>
+        /// <param name="mat">The source <see cref="Matrix"/>.</param>
         /// <returns>The array which matrix values will be stored.</returns>
         /// <remarks>
         /// Required for OpenGL 2.0 projection matrix stuff.
         /// </remarks>
-        public static float[] ToFloatArray(Matrix matrix)
+        public static float[] ToFloatArray(Matrix mat)
         {
             float[] matarray = {
-									matrix.M11, matrix.M12, matrix.M13, matrix.M14,
-									matrix.M21, matrix.M22, matrix.M23, matrix.M24,
-									matrix.M31, matrix.M32, matrix.M33, matrix.M34,
-									matrix.M41, matrix.M42, matrix.M43, matrix.M44
+									mat.M11, mat.M12, mat.M13, mat.M14,
+									mat.M21, mat.M22, mat.M23, mat.M24,
+									mat.M31, mat.M32, mat.M33, mat.M34,
+									mat.M41, mat.M42, mat.M43, mat.M44
 								};
             return matarray;
         }
