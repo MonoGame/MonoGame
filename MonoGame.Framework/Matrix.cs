@@ -2398,8 +2398,8 @@ namespace Microsoft.Xna.Framework
         /// Returns a <see cref="String"/> representation of this <see cref="Matrix"/> in the format:
         /// {M11:[<see cref="M11"/>] M12:[<see cref="M12"/>] M13:[<see cref="M13"/>] M14:[<see cref="M14"/>]}
         /// {M21:[<see cref="M21"/>] M12:[<see cref="M22"/>] M13:[<see cref="M23"/>] M14:[<see cref="M24"/>]}
-        /// {M31:[<see cref="M21"/>] M32:[<see cref="M22"/>] M33:[<see cref="M23"/>] M34:[<see cref="M24"/>]}
-        /// {M41:[<see cref="M21"/>] M42:[<see cref="M22"/>] M43:[<see cref="M23"/>] M44:[<see cref="M24"/>]}
+        /// {M31:[<see cref="M31"/>] M32:[<see cref="M32"/>] M33:[<see cref="M33"/>] M34:[<see cref="M34"/>]}
+        /// {M41:[<see cref="M41"/>] M42:[<see cref="M42"/>] M43:[<see cref="M43"/>] M44:[<see cref="M44"/>]}
         /// </summary>
         /// <returns>A <see cref="String"/> representation of this <see cref="Matrix"/>.</returns>
         public override string ToString()
