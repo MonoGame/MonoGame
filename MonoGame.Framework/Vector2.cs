@@ -228,8 +228,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Compares whether two <see cref="Vector2"/> instances are equal.
         /// </summary>
-        /// <param name="value1"><see cref="Vector2"/> instance on the left of the equal sign.</param>
-        /// <param name="value2"><see cref="Vector2"/> instance on the right of the equal sign.</param>
+        /// <param name="value1">Source <see cref="Vector2"/> on the left of the equal sign.</param>
+        /// <param name="value2">Source <see cref="Vector2"/> on the right of the equal sign.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public static bool operator ==(Vector2 value1, Vector2 value2)
         {
@@ -239,8 +239,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Compares whether two <see cref="Vector2"/> instances are not equal.
         /// </summary>
-        /// <param name="value1"><see cref="Vector2"/> instance on the left of the not equal sign.</param>
-        /// <param name="value2"><see cref="Vector2"/> instance on the right of the not equal sign.</param>
+        /// <param name="value1">Source <see cref="Vector2"/> on the left of the not equal sign.</param>
+        /// <param name="value2">Source <see cref="Vector2"/> on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
         public static bool operator !=(Vector2 value1, Vector2 value2)
         {
@@ -252,7 +252,7 @@ namespace Microsoft.Xna.Framework
         #region Public Methods
 
         /// <summary>
-        /// Performs vector addition on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// Creates a new <see cref="Vector2"/> which contains sum of two vectors.
         /// </summary>
         /// <param name="value1">The first vector to add.</param>
         /// <param name="value2">The second vector to add.</param>
@@ -265,13 +265,11 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Performs vector addition on <paramref name="value1"/> and
-        /// <paramref name="value2"/>, storing the result of the
-        /// addition in <paramref name="result"/>.
+        /// Creates a new <see cref="Vector2"/> which contains sum of two vectors.
         /// </summary>
         /// <param name="value1">The first vector to add.</param>
         /// <param name="value2">The second vector to add.</param>
-        /// <param name="result">The result of the vector addition.</param>
+        /// <param name="result">The result of the vector addition as an output parameter.</param>
         public static void Add(ref Vector2 value1, ref Vector2 value2, out Vector2 result)
         {
             result.X = value1.X + value2.X;
@@ -809,7 +807,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector2"/> that contains subtraction of on <see cref="Vector2"/> from a another.
+        /// Creates a new <see cref="Vector2"/> that contains subtraction of one vector from another.
         /// </summary>
         /// <param name="value1">The first <see cref="Vector2"/>.</param>
         /// <param name="value2">The second <see cref="Vector2"/>.</param>
@@ -822,7 +820,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector2"/> that contains subtraction of on <see cref="Vector2"/> from a another.
+        /// Creates a new <see cref="Vector2"/> that contains subtraction of one vector from another.
         /// </summary>
         /// <param name="value1">The first <see cref="Vector2"/>.</param>
         /// <param name="value2">The second <see cref="Vector2"/>.</param>
