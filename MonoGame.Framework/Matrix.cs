@@ -865,20 +865,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
         /// </summary>
-        /// <param name="viewingVolume">The viewing field.</param>
-        /// <param name="zNearPlane">Near plane of z-value of the viewing field.</param>
-        /// <param name="zFarPlane">Far plane of z-value of the viewing field.</param>
-        /// <returns>The new projection <see cref="Matrix"/> for customized orthographic view.</returns>
-        public static Matrix CreateOrthographicOffCenter(Rectangle viewingVolume, float zNearPlane, float zFarPlane)
-        {
-            Matrix matrix;
-            CreateOrthographicOffCenter(viewingVolume.Left, viewingVolume.Right, viewingVolume.Bottom, viewingVolume.Top, zNearPlane, zFarPlane, out matrix);
-            return matrix;
-        }
-
-        /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
-        /// </summary>
         /// <param name="left">Left coordinate of the viewing field.</param>
         /// <param name="right">Right coordinate of the viewing field.</param>
         /// <param name="bottom">Bottom coordinate of the viewing field.</param>
@@ -1022,20 +1008,6 @@ namespace Microsoft.Xna.Framework
         {
             Matrix result;
             CreatePerspectiveOffCenter(left, right, bottom, top, nearPlaneDistance, farPlaneDistance, out result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
-        /// </summary>
-        /// <param name="viewingVolume">The viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
-        /// <returns>The new <see cref="Matrix"/> for customized perspective view.</returns>
-        public static Matrix CreatePerspectiveOffCenter(Rectangle viewingVolume, float nearPlaneDistance, float farPlaneDistance)
-        {
-            Matrix result;
-            CreatePerspectiveOffCenter(viewingVolume.Left, viewingVolume.Right, viewingVolume.Bottom, viewingVolume.Top, nearPlaneDistance, farPlaneDistance, out result);
             return result;
         }
 
