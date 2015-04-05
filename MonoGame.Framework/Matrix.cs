@@ -1894,7 +1894,7 @@ namespace Microsoft.Xna.Framework
 			return matrix1;
         }
 
-        // <summary>
+        /// <summary>
         /// Creates a new <see cref="Matrix"/> that contains a multiplication of two matrix.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/>.</param>
