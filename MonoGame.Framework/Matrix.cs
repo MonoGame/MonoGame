@@ -1238,7 +1238,7 @@ namespace Microsoft.Xna.Framework
         }
 
 
-        / /// <summary>
+        /// <summary>
         /// Creates a new <see cref="Matrix"/> that flattens geometry into a specified <see cref="Plane"/> as if casting a shadow from a specified light source. 
         /// </summary>
         /// <param name="lightDirection">A vector specifying the direction from which the light that will cast the shadow is coming.</param>
