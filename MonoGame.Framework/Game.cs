@@ -69,7 +69,11 @@ namespace Microsoft.Xna.Framework
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
 
+#if (WINDOWS && OPENGL) || LINUX || ANGLE
             Platform = GamePlatform.Create(this, embedContext);
+#else
+            Platform = GamePlatform.Create(this, null);
+#endif
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
