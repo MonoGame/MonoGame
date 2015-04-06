@@ -1047,7 +1047,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void MainView_DragDrop(object sender, DragEventArgs e)
         {
-            string filename = GetDropFile(e.Data, ".mgcb");
+            string filename = GetDropFile(e.Data, ".MGCB");
             if (filename != null)
                 _controller.OpenProject(filename);
         }
@@ -1107,8 +1107,9 @@ namespace MonoGame.Tools.Pipeline
                     string initialDirectory = ((PipelineController)_controller).GetFullPath("");
                     foreach (var filename in files)
                     {                        
-                        //TODO: filter items (existing? unsupported types?)
+                        // filter items
                         if (!filename.StartsWith(initialDirectory)) continue;
+                        if (Path.GetExtension(filename).Equals(".MGCB", StringComparison.OrdinalIgnoreCase)) continue;
                         result.Add(filename);
                     }
                     if(result.Count > 0) return result;
