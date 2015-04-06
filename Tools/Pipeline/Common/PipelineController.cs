@@ -699,6 +699,13 @@ namespace MonoGame.Tools.Pipeline
             action2.Do();
             _actionStack.Add(action2);
         }
+        
+        public void Include(IEnumerable<string> inputfiles, IEnumerable<string> inputfolders)
+        {
+            var action = new PipelineController.IncludeAction(this, inputfiles, inputfolders);
+            action.Do();
+            _actionStack.Add(action);
+        }
 
         private List<string> GetFiles(string folder)
         {

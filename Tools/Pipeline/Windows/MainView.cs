@@ -1052,6 +1052,30 @@ namespace MonoGame.Tools.Pipeline
                 _controller.OpenProject(filename);
         }
 
+        private void _treeView_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.None;
+            var files = GetDropAssetsToAdd(sender, e);
+            if (files != null)
+                e.Effect = DragDropEffects.Link;
+        }
+
+        private void _treeView_DragDrop(object sender, DragEventArgs e)
+        {
+            var droppedFiles = GetDropAssetsToAdd(sender, e);
+            if (droppedFiles != null)
+            {
+                List<string> files = new List<string>();
+                List<string> folders = new List<string>();
+                foreach(var filename in droppedFiles)
+                {
+                    if (File.Exists(filename)) files.Add(filename);
+                    if (Directory.Exists(filename)) folders.Add(filename);
+                }
+                _controller.Include(files, folders);
+            }
+        }
+        
         private string GetDropFile(IDataObject dataObject, string extension)
         {
             if (dataObject.GetDataPresent(DataFormats.FileDrop))
@@ -1065,7 +1089,34 @@ namespace MonoGame.Tools.Pipeline
             }
             return null;
         }
-      
+
+        private List<string> GetDropAssetsToAdd(object sender, DragEventArgs e)
+        {
+            var treeView = sender as TreeView;
+            var targetPoint = treeView.PointToClient(new Point(e.X, e.Y));
+            var targetNode = treeView.GetNodeAt(targetPoint);
+            var tag = (IProjectItem)((targetNode == null) ? null : targetNode.Tag);
+
+            if ((tag is PipelineProjectProxy) || tag == null)
+            {   
+                IDataObject dataObject = e.Data;
+                if (dataObject.GetDataPresent(DataFormats.FileDrop))
+                {
+                    string[] files = (string[])dataObject.GetData(DataFormats.FileDrop);
+                    List<string> result = new List<string>();
+                    string initialDirectory = ((PipelineController)_controller).GetFullPath("");
+                    foreach (var filename in files)
+                    {                        
+                        //TODO: filter items (existing? unsupported types?)
+                        if (!filename.StartsWith(initialDirectory)) continue;
+                        result.Add(filename);
+                    }
+                    if(result.Count > 0) return result;
+                }
+            }
+            return null;
+        }
+
         #endregion
     }
 }

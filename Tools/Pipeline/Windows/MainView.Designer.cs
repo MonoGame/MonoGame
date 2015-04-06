@@ -143,12 +143,15 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _treeView
             // 
+            this._treeView.AllowDrop = true;
             this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._treeView.Location = new System.Drawing.Point(0, 0);
             this._treeView.Name = "_treeView";
             this._treeView.Size = new System.Drawing.Size(249, 210);
             this._treeView.TabIndex = 0;
             this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
+            this._treeView.DragDrop += new System.Windows.Forms.DragEventHandler(this._treeView_DragDrop);
+            this._treeView.DragOver += new System.Windows.Forms.DragEventHandler(this._treeView_DragOver);
             this._treeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TreeViewOnKeyDown);
             this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
             // 
