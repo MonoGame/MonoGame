@@ -92,7 +92,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS || LINUX || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
-            var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+            var wndRef = (Game.Instance.Window as OpenTKGameWindow).Window;
+            OpenTK.Platform.IWindowInfo wnd;
+            if (wndRef == null)
+            {
+                Context = (Game.Instance.Window as OpenTKGameWindow).EmbedContext.GraphicsContext;
+                wnd = (Game.Instance.Window as OpenTKGameWindow).EmbedContext.WindowInfo;
+            }
+            else
+            {
+                wnd = wndRef.WindowInfo;
+            }
 
             #if GLES
             // Create an OpenGL ES 2.0 context
@@ -155,9 +165,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // context. Otherwise, context sharing will very likely fail.
             if (Threading.BackgroundContext == null)
             {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
-                Threading.WindowInfo = wnd;
-                Threading.BackgroundContext.MakeCurrent(null);
+                // We don't permit background operations when MonoGame is embedded, because we can't
+                // pass the real implementation of IWindowInfo across AppDomains (necessary to automatically
+                // reload MonoGame-based games inside MonoDevelop).
+                if (wndRef != null)
+                {
+                    Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
+                    Threading.WindowInfo = wnd;
+                    Threading.BackgroundContext.MakeCurrent(null);
+                }
             }
             Context.MakeCurrent(wnd);
 #endif

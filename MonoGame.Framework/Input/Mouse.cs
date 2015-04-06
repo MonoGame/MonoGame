@@ -69,12 +69,15 @@ namespace Microsoft.Xna.Framework.Input
 
         static OpenTK.INativeWindow Window;
 
+        static IEmbedContext EmbedContext;
+
         internal static void setWindows(GameWindow window)
         {
             PrimaryWindow = window;
             if (window is OpenTKGameWindow)
             {
                 Window = (window as OpenTKGameWindow).Window;
+                EmbedContext = (window as OpenTKGameWindow).EmbedContext;
             }
         }
 
@@ -134,9 +137,18 @@ namespace Microsoft.Xna.Framework.Input
 #elif (WINDOWS && OPENGL) || LINUX || ANGLE
 
             var state = OpenTK.Input.Mouse.GetCursorState();
-            var pc = ((OpenTKGameWindow)window).Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
-            window.MouseState.X = pc.X;
-            window.MouseState.Y = pc.Y;
+            if (((OpenTKGameWindow)window).Window != null)
+            {
+                var pc = ((OpenTKGameWindow)window).Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
+                window.MouseState.X = pc.X;
+                window.MouseState.Y = pc.Y;
+            }
+            else
+            {
+                var pc = EmbedContext.PointToClient(new System.Drawing.Point(state.X, state.Y));
+                window.MouseState.X = pc.X;
+                window.MouseState.Y = pc.Y;
+            }
 
             window.MouseState.LeftButton = (ButtonState)state.LeftButton;
             window.MouseState.RightButton = (ButtonState)state.RightButton;

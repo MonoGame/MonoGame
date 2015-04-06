@@ -26,14 +26,14 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Construction/Destruction
-        public static GamePlatform Create(Game game)
+        public static GamePlatform Create(Game game, IEmbedContext embedContext)
         {
 #if IOS
             return new iOSGamePlatform(game);
 #elif MONOMAC
             return new MacGamePlatform(game);
 #elif (WINDOWS && OPENGL) || LINUX || ANGLE
-            return new OpenTKGamePlatform(game);
+            return new OpenTKGamePlatform(game, embedContext);
 #elif ANDROID
             return new AndroidGamePlatform(game);
 #elif PSM

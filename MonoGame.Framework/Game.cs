@@ -55,8 +55,12 @@ namespace Microsoft.Xna.Framework
 
 
         private bool _suppressDraw;
-        
+
+#if (WINDOWS && OPENGL) || LINUX || ANGLE
+        public Game(IEmbedContext embedContext = null)
+#else
         public Game()
+#endif
         {
             _instance = this;
 
@@ -65,7 +69,7 @@ namespace Microsoft.Xna.Framework
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
 
-            Platform = GamePlatform.Create(this);
+            Platform = GamePlatform.Create(this, embedContext);
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
