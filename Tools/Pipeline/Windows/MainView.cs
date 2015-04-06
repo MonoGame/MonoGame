@@ -1057,7 +1057,7 @@ namespace MonoGame.Tools.Pipeline
             e.Effect = DragDropEffects.None;
             var files = GetDropAssetsToAdd(sender, e);
             if (files != null)
-                e.Effect = DragDropEffects.Link;
+                e.Effect = DragDropEffects.Copy;
         }
 
         private void _treeView_DragDrop(object sender, DragEventArgs e)
