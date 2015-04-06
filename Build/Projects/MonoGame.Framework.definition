@@ -1074,9 +1074,7 @@
     <Compile Include="Input\KeyboardUtil.OpenTK.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Desktop\IEmbedContext.cs">
-      <Platforms>Angle,Linux,WindowsGL</Platforms>
-    </Compile>
+    <Compile Include="Desktop\IEmbedContext.cs" />
 
 
     <!-- iOS Platform -->
