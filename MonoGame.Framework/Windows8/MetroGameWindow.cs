@@ -174,10 +174,10 @@ namespace Microsoft.Xna.Framework
         private void SetClientBounds(double width, double height)
         {
             var dpi = DisplayProperties.LogicalDpi;
-            var pwidth = width * dpi / 96.0;
-            var pheight = height * dpi / 96.0;
+            var pwidth = (int)Math.Round(width * dpi / 96.0);
+            var pheight = (int)Math.Round(height * dpi / 96.0);
 
-            _clientBounds = new Rectangle(0, 0, (int)pwidth, (int)pheight);
+            _clientBounds = new Rectangle(0, 0, pwidth, pheight);
         }
 
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
