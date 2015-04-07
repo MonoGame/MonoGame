@@ -279,6 +279,20 @@ Section "Visual Studio 2013 Templates" VS2013
 
 SectionEnd
 
+Section "Visual Studio 2015 Templates" VS2015
+
+  IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    SetOutPath "$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\MonoGame"
+    File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+    DetailPrint "Visual Studio 2015 not found"
+  EndTemplates:
+
+SectionEnd
+
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\${APPNAME}
@@ -307,6 +321,7 @@ LangString MonoDevelopDesc ${LANG_ENGLISH} "Install the project templates for Mo
 LangString VS2010Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2010"
 LangString VS2012Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2012"
 LangString VS2013Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2013"
+LangString VS2015Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2015"
 LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your start menu"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -316,6 +331,7 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2010} $(VS2010Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2012} $(VS2012Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2013} $(VS2013Desc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${VS2015} $(VS2015Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -340,11 +356,19 @@ IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#
   end:
 FunctionEnd
 
+Function checkVS2015
+IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2015} $0
+  end:
+FunctionEnd
+
 Function .onInit 
   IntOp $0 $0 | ${SF_RO}
   Call checkVS2010
   Call checkVS2012
   Call checkVS2013
+  Call checkVS2015
   IntOp $0 ${SF_SELECTED} | ${SF_RO}
   SectionSetFlags ${core_id} $0
 FunctionEnd
@@ -405,6 +429,7 @@ Section "Uninstall"
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "${MSBuildInstallDir}"
   RMDir /r "$SMPROGRAMS\${APPNAME}"
 
