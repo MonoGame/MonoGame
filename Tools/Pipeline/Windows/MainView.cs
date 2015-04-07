@@ -1055,24 +1055,45 @@ namespace MonoGame.Tools.Pipeline
         private void _treeView_DragOver(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.None;
-            var files = GetDropAssetsToAdd(sender, e);
-            if (files != null)
+            IProjectItem targetItem = GetDropTargetItem(sender, e);
+
+            if (GetDropAssets(e.Data, targetItem) != null)
                 e.Effect = DragDropEffects.Copy;
         }
 
         private void _treeView_DragDrop(object sender, DragEventArgs e)
         {
-            var droppedFiles = GetDropAssetsToAdd(sender, e);
-            if (droppedFiles != null)
+            IProjectItem targetItem = GetDropTargetItem(sender, e);
+            var droppedAssets = GetDropAssets(e.Data, targetItem);
+            if (droppedAssets != null)
             {
+                // seperate assets 
+                List<string> IncludeAssets = new List<string>();
+                List<string> CopyOrLinkAssets = new List<string>();
+                string initialDirectory = ((PipelineController)_controller).GetFullPath("");
+                foreach (var filename in droppedAssets)
+                {
+                    if (filename.StartsWith(initialDirectory))
+                        IncludeAssets.Add(filename);
+                    else
+                        CopyOrLinkAssets.Add(filename);
+                }
+
+                //include assets that are under the project base directory
                 List<string> files = new List<string>();
                 List<string> folders = new List<string>();
-                foreach(var filename in droppedFiles)
+                foreach (var filename in IncludeAssets)
                 {
-                    if (File.Exists(filename)) files.Add(filename);
-                    if (Directory.Exists(filename)) folders.Add(filename);
+                    if (File.GetAttributes(filename).HasFlag(FileAttributes.Directory))
+                        folders.Add(filename);
+                    else
+                        files.Add(filename);
+                        
                 }
                 _controller.Include(files, folders);
+
+                //copy or link assets that are not under the project base directory
+                //TODO:
             }
         }
         
@@ -1090,32 +1111,50 @@ namespace MonoGame.Tools.Pipeline
             return null;
         }
 
-        private List<string> GetDropAssetsToAdd(object sender, DragEventArgs e)
+        // return a list of files that are allowed to drop on target item
+        private List<string> GetDropAssets(IDataObject dataObject, IProjectItem targetItem)
         {
+            if (!dataObject.GetDataPresent(DataFormats.FileDrop))
+                return null; 
+            if (targetItem is ContentItem)
+                return null; //drop to ContentItem is not allowed
+            
+            string initialDirectory = ((PipelineController)_controller).GetFullPath("");
+            string[] files = (string[])dataObject.GetData(DataFormats.FileDrop);
+            
+            if (targetItem is FolderItem)
+            {   
+                return null; //drop to FolderItem is not yet supported
+            }
+
+            if ((targetItem is PipelineProjectProxy) || targetItem == null)
+            {
+                List<string> result = new List<string>();
+                foreach (var filename in files)
+                {
+                    // filter items
+                    if (Path.GetExtension(filename).Equals(".MGCB", StringComparison.OrdinalIgnoreCase))
+                        continue; //drop of .MGCB files is not allowed
+                    if (!filename.StartsWith(initialDirectory))
+                        continue; //Copy/Link items is not yet supported
+                    result.Add(filename);
+                }
+                if (result.Count > 0)
+                    return result;
+            }
+            
+            return null;
+        }
+
+        private static IProjectItem GetDropTargetItem(object sender, DragEventArgs e)
+        {
+            IProjectItem targetItem;
+
             var treeView = sender as TreeView;
             var targetPoint = treeView.PointToClient(new Point(e.X, e.Y));
             var targetNode = treeView.GetNodeAt(targetPoint);
-            var tag = (IProjectItem)((targetNode == null) ? null : targetNode.Tag);
-
-            if ((tag is PipelineProjectProxy) || tag == null)
-            {   
-                IDataObject dataObject = e.Data;
-                if (dataObject.GetDataPresent(DataFormats.FileDrop))
-                {
-                    string[] files = (string[])dataObject.GetData(DataFormats.FileDrop);
-                    List<string> result = new List<string>();
-                    string initialDirectory = ((PipelineController)_controller).GetFullPath("");
-                    foreach (var filename in files)
-                    {                        
-                        // filter items
-                        if (!filename.StartsWith(initialDirectory)) continue;
-                        if (Path.GetExtension(filename).Equals(".MGCB", StringComparison.OrdinalIgnoreCase)) continue;
-                        result.Add(filename);
-                    }
-                    if(result.Count > 0) return result;
-                }
-            }
-            return null;
+            targetItem = (IProjectItem)((targetNode == null) ? null : targetNode.Tag);
+            return targetItem;
         }
 
         #endregion
