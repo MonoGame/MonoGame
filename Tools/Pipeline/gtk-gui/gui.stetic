@@ -6,7 +6,7 @@
   </configuration>
   <import>
     <widget-library name="glade-sharp" />
-    <widget-library name="../bin/Linux/AnyCPU/Debug/Pipeline.exe" internal="true" />
+    <widget-library name="../bin/Linux/AnyCPU/Release/Pipeline.exe" internal="true" />
   </import>
   <widget class="Gtk.Window" id="MonoGame.Tools.Pipeline.MainWindow" design-size="751 557">
     <action-group name="Default">
@@ -408,7 +408,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.YesNoCancelDialog" design-size="373 94">
+  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.YesNoCancelDialog" design-size="373 96">
     <property name="MemberName" />
     <property name="WindowPosition">CenterOnParent</property>
     <property name="Buttons">3</property>
@@ -425,7 +425,7 @@
             <child>
               <widget class="Gtk.Image" id="image1">
                 <property name="MemberName" />
-                <property name="Pixbuf">stock:stock_dialog-question Dialog</property>
+                <property name="Pixbuf">stock:gtk-dialog-question Dialog</property>
               </widget>
               <packing>
                 <property name="Position">0</property>
@@ -806,8 +806,9 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.CollectionEditorDialog" design-size="400 300">
+  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.CollectionEditorDialog" design-size="659 397">
     <property name="MemberName" />
+    <property name="Title" translatable="yes">Reference Editor</property>
     <property name="WindowPosition">CenterOnParent</property>
     <property name="Buttons">2</property>
     <property name="HelpButton">False</property>
@@ -817,15 +818,134 @@
         <property name="MemberName" />
         <property name="BorderWidth">2</property>
         <child>
-          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+          <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
-            <property name="ShadowType">In</property>
+            <property name="CanFocus">True</property>
+            <property name="Position">432</property>
             <child>
-              <widget class="Gtk.TextView" id="textview2">
+              <widget class="Gtk.VBox" id="vbox2">
                 <property name="MemberName" />
-                <property name="CanFocus">True</property>
-                <property name="ShowScrollbars">True</property>
-                <property name="Text" translatable="yes" />
+                <property name="Spacing">6</property>
+                <child>
+                  <widget class="Gtk.FileChooserWidget" id="filechooserwidget1">
+                    <property name="MemberName" />
+                    <signal name="FileActivated" handler="AddFileEvent" />
+                  </widget>
+                  <packing>
+                    <property name="Position">0</property>
+                    <property name="AutoSize">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.HBox" id="hbox2">
+                    <property name="MemberName" />
+                    <property name="Spacing">6</property>
+                    <child>
+                      <widget class="Gtk.Alignment" id="alignment1">
+                        <property name="MemberName" />
+                        <child>
+                          <placeholder />
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="Position">0</property>
+                        <property name="AutoSize">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.Button" id="button9">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="UseStock">True</property>
+                        <property name="Type">StockItem</property>
+                        <property name="StockId">gtk-add</property>
+                        <signal name="Clicked" handler="AddFileEvent" />
+                        <property name="label">gtk-add</property>
+                      </widget>
+                      <packing>
+                        <property name="Position">1</property>
+                        <property name="AutoSize">True</property>
+                        <property name="Expand">False</property>
+                        <property name="Fill">False</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="Resize">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VBox" id="vbox3">
+                <property name="MemberName" />
+                <property name="Spacing">6</property>
+                <child>
+                  <widget class="Gtk.HBox" id="hbox1">
+                    <property name="MemberName" />
+                    <property name="Spacing">6</property>
+                    <child>
+                      <widget class="Gtk.Alignment" id="alignment2">
+                        <property name="MemberName" />
+                        <child>
+                          <placeholder />
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="Position">0</property>
+                        <property name="AutoSize">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.Button" id="button10">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="UseStock">True</property>
+                        <property name="Type">StockItem</property>
+                        <property name="StockId">gtk-remove</property>
+                        <signal name="Clicked" handler="RemoveFileEvent" />
+                        <property name="label">gtk-remove</property>
+                      </widget>
+                      <packing>
+                        <property name="Position">1</property>
+                        <property name="AutoSize">True</property>
+                        <property name="Expand">False</property>
+                        <property name="Fill">False</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">0</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow2">
+                    <property name="MemberName" />
+                    <property name="ShadowType">In</property>
+                    <child>
+                      <widget class="Gtk.TreeView" id="treeview1">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="ShowScrollbars">True</property>
+                        <property name="EnableSearch">False</property>
+                        <property name="HeadersVisible">False</property>
+                      </widget>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                    <property name="AutoSize">False</property>
+                  </packing>
+                </child>
               </widget>
             </child>
           </widget>
@@ -880,8 +1000,9 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.ColorPickerDialog" design-size="509 326">
+  <widget class="Gtk.Dialog" id="MonoGame.Tools.Pipeline.ColorPickerDialog" design-size="511 334">
     <property name="MemberName" />
+    <property name="Title" translatable="yes">Color Picker</property>
     <property name="WindowPosition">CenterOnParent</property>
     <property name="Buttons">2</property>
     <property name="HelpButton">False</property>

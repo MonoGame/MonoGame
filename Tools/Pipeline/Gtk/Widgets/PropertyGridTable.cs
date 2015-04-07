@@ -138,7 +138,7 @@ namespace MonoGame.Tools.Pipeline
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new CollectionEditorDialog(model.GetValue(iter, 14).ToString());
+                    var dialog = new CollectionEditorDialog(model.GetValue(iter, 14).ToString(), window);
                     dialog.TransientFor = window;
                     if(dialog.Run() == (int)ResponseType.Ok)
                     {
