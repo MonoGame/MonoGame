@@ -228,14 +228,10 @@ Section "Visual Studio 2010 Templates" VS2010
 
   IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    ; Set output path to the installation directory.
     SetOutPath "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
-
-    ; install the Templates for MonoDevelop
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
-  
     DetailPrint "Visual Studio 2010 not found"
   EndTemplates:
 
@@ -245,16 +241,11 @@ Section "Visual Studio 2012 Templates" VS2012
 
   IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    ; Set output path to the installation directory.
     SetOutPath "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
-
-    ; install the Templates for MonoDevelop
     File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
-    ; Install the VS 2010 templates as well 
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
-
     DetailPrint "Visual Studio 2012 not found"
   EndTemplates:
 
@@ -264,16 +255,11 @@ Section "Visual Studio 2013 Templates" VS2013
 
   IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    ; Set output path to the installation directory.
     SetOutPath "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
-
-    ; install the Templates for MonoDevelop
     File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
-    ; Install the VS 2010 templates as well 
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
-
     DetailPrint "Visual Studio 2013 not found"
   EndTemplates:
 
