@@ -1092,8 +1092,8 @@ namespace MonoGame.Tools.Pipeline
                 }
                 _controller.Include(files, folders);
 
-                //copy or link assets that are not under the project base directory
-                //TODO:
+                //TODO: copy or link assets that are not under the project base directory
+                //
             }
         }
         
