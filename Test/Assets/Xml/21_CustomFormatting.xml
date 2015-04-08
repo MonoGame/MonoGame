@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
   <!-- A fully qualified type -->
-  <Asset Type="MonoGame.Tests.ContentPipeline.CustomFormatting">
+  <Asset Type="MonoGame.Tests.ContentPipeline.CustomFormatting[System.Byte, Microsoft.Xna.Framework.Rectangle]">
     <A><!-- A comment -->1</A>
     <Vector2ListSpaced>
       <!-- An XML comment inside an element -->
@@ -11,5 +11,6 @@
       0 7
     </Vector2ListSpaced>
     <EmptyString />
+    <Rectangle>0 0 100 100</Rectangle>
   </Asset>
 </XnaContent>

@@ -232,6 +232,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             Type foundType;
 
+            typeName = typeName.Trim();
+
             // Shortcut for friendly C# names
             if (_typeAliases.TryGetValue(typeName, out foundType))
                 return foundType;
