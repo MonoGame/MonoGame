@@ -1313,7 +1313,7 @@ namespace Microsoft.Xna.Framework
         }
         
         /// <summary>
-        /// Create a new translation <see cref="Matrix"/>.
+        /// Creates a new translation <see cref="Matrix"/>.
         /// </summary>
         /// <param name="xPosition">X coordinate of translation.</param>
         /// <param name="yPosition">Y coordinate of translation.</param>
@@ -1327,7 +1327,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Create a new translation <see cref="Matrix"/>.
+        /// Creates a new translation <see cref="Matrix"/>.
         /// </summary>
         /// <param name="position">X,Y and Z coordinates of translation.</param>
         /// <param name="result">The translation <see cref="Matrix"/> as an output parameter.</param>
@@ -1352,7 +1352,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Create a new translation <see cref="Matrix"/>.
+        /// Creates a new translation <see cref="Matrix"/>.
         /// </summary>
         /// <param name="position">X,Y and Z coordinates of translation.</param>
         /// <returns>The translation <see cref="Matrix"/>.</returns>
@@ -1364,7 +1364,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Create a new translation <see cref="Matrix"/>.
+        /// Creates a new translation <see cref="Matrix"/>.
         /// </summary>
         /// <param name="xPosition">X coordinate of translation.</param>
         /// <param name="yPosition">Y coordinate of translation.</param>
@@ -1389,7 +1389,12 @@ namespace Microsoft.Xna.Framework
 			result.M43 = zPosition;
 			result.M44 = 1;
         }
-
+        
+        /// <summary>
+        /// Creates a new reflection <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="value">The plane that used for reflection calculation.</param>
+        /// <returns>The reflection <see cref="Matrix"/>.</returns>
         public static Matrix CreateReflection(Plane value)
         {
             Matrix result;
@@ -1400,7 +1405,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new reflection <see cref="Matrix"/>.
         /// </summary>
-        /// <param name="value">The plane which matrix used for reflection calculation.</param>
+        /// <param name="value">The plane that used for reflection calculation.</param>
         /// <param name="result">The reflection <see cref="Matrix"/> as an output parameter.</param>
         public static void CreateReflection(ref Plane value, out Matrix result)
         {
