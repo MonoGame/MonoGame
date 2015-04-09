@@ -357,7 +357,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Rotation stored in this <see cref="Matrix"/>.
+        /// Rotation stored in this matrix.
         /// </summary>
         public Quaternion Rotation
         {
