@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 { 
     /// <summary>
-    /// Represents the right-handed 4x4 float-based matrix, which can store translation,scale and rotation information.
+    /// Represents the right-handed 4x4 floating point matrix, which can store translation, scale and rotation information.
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
@@ -1475,7 +1475,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Decomposes this matrix to translation,rotation and scale components. Returns <c>true</c> if matrix can be decomposed; <c>false</c> otherwise.
+        /// Decomposes this matrix to translation, rotation and scale elements. Returns <c>true</c> if matrix can be decomposed; <c>false</c> otherwise.
         /// </summary>
         /// <param name="scale">Scale vector as an output parameter.</param>
         /// <param name="rotation">Rotation quaternion as an output parameter.</param>
@@ -1544,7 +1544,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Divides the components of a <see cref="Matrix"/> by the components of another matrix.
+        /// Divides the elements of a <see cref="Matrix"/> by the elements of another matrix.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/>.</param>
         /// <param name="matrix2">Divisor <see cref="Matrix"/>.</param>
@@ -1571,7 +1571,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Divides the components of a <see cref="Matrix"/> by the components of another matrix.
+        /// Divides the elements of a <see cref="Matrix"/> by the elements of another matrix.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/>.</param>
         /// <param name="matrix2">Divisor <see cref="Matrix"/>.</param>
@@ -1597,7 +1597,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Divides the components of a <see cref="Matrix"/> by a scalar.
+        /// Divides the elements of a <see cref="Matrix"/> by a scalar.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/>.</param>
         /// <param name="divider">Divisor scalar.</param>
@@ -1625,7 +1625,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Divides the components of a <see cref="Matrix"/> by a scalar.
+        /// Divides the elements of a <see cref="Matrix"/> by a scalar.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/>.</param>
         /// <param name="divider">Divisor scalar.</param>
@@ -2015,7 +2015,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains the specified matrix negation.
+        /// Returns a matrix with the all values negated.
         /// </summary>
         /// <param name="matrix">Source <see cref="Matrix"/>.</param>
         /// <returns>Result of the matrix negation.</returns>
@@ -2041,7 +2041,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains the specified matrix negation.
+        /// Returns a matrix with the all values negated.
         /// </summary>
         /// <param name="matrix">Source <see cref="Matrix"/>.</param>
         /// <param name="result">Result of the matrix negation as an output parameter.</param>
@@ -2093,7 +2093,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Divides the components of a <see cref="Matrix"/> by the components of another <see cref="Matrix"/>.
+        /// Divides the elements of a <see cref="Matrix"/> by the elements of another <see cref="Matrix"/>.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/> on the left of the div sign.</param>
         /// <param name="matrix2">Divisor <see cref="Matrix"/> on the right of the div sign.</param>
@@ -2120,7 +2120,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Divides the components of a <see cref="Matrix"/> by a scalar.
+        /// Divides the elements of a <see cref="Matrix"/> by a scalar.
         /// </summary>
         /// <param name="matrix">Source <see cref="Matrix"/> on the left of the div sign.</param>
         /// <param name="divider">Divisor scalar on the right of the div sign.</param>
@@ -2250,7 +2250,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Multiplies the components of matrix by a scalar.
+        /// Multiplies the elements of matrix by a scalar.
         /// </summary>
         /// <param name="matrix">Source <see cref="Matrix"/> on the left of the mul sign.</param>
         /// <param name="scaleFactor">Scalar value on the right of the mul sign.</param>
