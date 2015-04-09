@@ -740,7 +740,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="pitch">The pitch rotation value in radians.</param>
         /// <param name="roll">The roll rotation value in radians.</param>
         /// <returns>The rotation <see cref="Matrix"/>.</returns>
-        /// <remarks>For more information about yaw,pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
+        /// <remarks>For more information about yaw, pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
         /// </remarks>
 		public static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 		{
@@ -756,7 +756,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="pitch">The pitch rotation value in radians.</param>
         /// <param name="roll">The roll rotation value in radians.</param>
         /// <param name="result">The rotation <see cref="Matrix"/> as an output parameter.</param>
-        /// <remarks>For more information about yaw,pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
+        /// <remarks>For more information about yaw, pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
         /// </remarks>
 		public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Matrix result)
 		{
@@ -1652,7 +1652,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Compares whether current instance is equal to specified <see cref="Matrix"/>.
+        /// Compares whether current instance is equal to specified <see cref="Matrix"/> without any tolerance.
         /// </summary>
         /// <param name="other">The <see cref="Matrix"/> to compare.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
@@ -1662,7 +1662,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Compares whether current instance is equal to specified <see cref="Object"/>.
+        /// Compares whether current instance is equal to specified <see cref="Object"/> without any tolerance.
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
@@ -2148,7 +2148,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Compares whether two <see cref="Matrix"/> instances are equal.
+        /// Compares whether two <see cref="Matrix"/> instances are equal without any tolerance.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/> on the left of the equal sign.</param>
         /// <param name="matrix2">Source <see cref="Matrix"/> on the right of the equal sign.</param>
@@ -2176,7 +2176,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Compares whether two <see cref="Matrix"/> instances are not equal.
+        /// Compares whether two <see cref="Matrix"/> instances are not equal without any tolerance.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/> on the left of the not equal sign.</param>
         /// <param name="matrix2">Source <see cref="Matrix"/> on the right of the not equal sign.</param>
@@ -2416,7 +2416,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains swapped rows and columns values from the specified <see cref="Matrix"/>.
+        /// Swap the matrix rows and columns.
         /// </summary>
         /// <param name="matrix">The matrix for transposing operation.</param>
         /// <returns>The new <see cref="Matrix"/> which contains the transposing result.</returns>
@@ -2428,7 +2428,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains swapped rows and columns values from the specified <see cref="Matrix"/>.
+        /// Swap the matrix rows and columns.
         /// </summary>
         /// <param name="matrix">The matrix for transposing operation.</param>
         /// <param name="result">The new <see cref="Matrix"/> which contains the transposing result as an output parameter.</param>
