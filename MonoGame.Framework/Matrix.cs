@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework
         #region Public Constructors
 
         /// <summary>
-        /// Creates a new instance of <see cref="Matrix"/> struct.
+        /// Constructs a matrix.
         /// </summary>
         /// <param name="m11">A first row and first column value.</param>
         /// <param name="m12">A first row and second column value.</param>
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Matrix"/> struct.
+        /// Constructs a matrix.
         /// </summary>
         /// <param name="row1">A first row of the created matrix.</param>
         /// <param name="row2">A second row of the created matrix.</param>
@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework
         #region Public Properties
 
         /// <summary>
-        /// Gets or sets the backward vector of this matrix.
+        /// The backward vector formed from the third row M31, M32, M33 elements.
         /// </summary>
         public Vector3 Backward
         {
@@ -281,7 +281,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the down vector of this matrix.
+        /// The down vector formed from the second row -M21, -M22, -M23 elements.
         /// </summary>
         public Vector3 Down
         {
@@ -298,7 +298,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the forward vector of this matrix.
+        /// The forward vector formed from the third row -M31, -M32, -M33 elements.
         /// </summary>
         public Vector3 Forward
         {
@@ -323,7 +323,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the left vector of this matrix.
+        /// The left vector formed from the first row -M11, -M12, -M13 elements.
         /// </summary>
         public Vector3 Left
         {
@@ -340,7 +340,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the right vector of this matrix.
+        /// The right vector formed from the first row M11, M12, M13 elements.
         /// </summary>
         public Vector3 Right
         {
@@ -357,7 +357,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets the rotation stored in this <see cref="Matrix"/>.
+        /// Rotation stored in this <see cref="Matrix"/>.
         /// </summary>
         public Quaternion Rotation
         {
@@ -368,7 +368,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the position stored in this <see cref="Matrix"/>.
+        /// Position stored in this matrix.
         /// </summary>
         public Vector3 Translation
         {
@@ -385,7 +385,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the scale stored in this <see cref="Matrix"/>.
+        /// Scale stored in this matrix.
         /// </summary>
         public Vector3 Scale
         {
@@ -402,7 +402,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the up vector of this matrix.
+        /// The upper vector formed from the second row M21, M22, M23 elements.
         /// </summary>
         public Vector3 Up
         {
@@ -641,7 +641,7 @@ namespace Microsoft.Xna.Framework
         /// Creates a new <see cref="Matrix"/> which contains the rotation moment around specified axis.
         /// </summary>
         /// <param name="axis">The axis of rotation.</param>
-        /// <param name="angle">The angle of rotation.</param>
+        /// <param name="angle">The angle of rotation in radians.</param>
         /// <returns>The rotation <see cref="Matrix"/>.</returns>
         public static Matrix CreateFromAxisAngle(Vector3 axis, float angle)
         {
@@ -654,7 +654,7 @@ namespace Microsoft.Xna.Framework
         /// Creates a new <see cref="Matrix"/> which contains the rotation moment around specified axis.
         /// </summary>
         /// <param name="axis">The axis of rotation.</param>
-        /// <param name="angle">The angle of rotation.</param>
+        /// <param name="angle">The angle of rotation in radians.</param>
         /// <param name="result">The rotation <see cref="Matrix"/> as an output parameter.</param>
         public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix result)
         {
@@ -734,11 +734,11 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> from the specified yaw,pitch and roll values.
+        /// Creates a new rotation <see cref="Matrix"/> from the specified yaw, pitch and roll values.
         /// </summary>
-        /// <param name="yaw">The yaw rotation value.</param>
-        /// <param name="pitch">The pitch rotation value.</param>
-        /// <param name="roll">The roll rotation value.</param>
+        /// <param name="yaw">The yaw rotation value in radians.</param>
+        /// <param name="pitch">The pitch rotation value in radians.</param>
+        /// <param name="roll">The roll rotation value in radians.</param>
         /// <returns>The rotation <see cref="Matrix"/>.</returns>
         /// <remarks>For more information about yaw,pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
         /// </remarks>
@@ -750,11 +750,11 @@ namespace Microsoft.Xna.Framework
 		}
 
         /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> from the specified yaw,pitch and roll values.
+        /// Creates a new rotation <see cref="Matrix"/> from the specified yaw, pitch and roll values.
         /// </summary>
-        /// <param name="yaw">The yaw rotation value.</param>
-        /// <param name="pitch">The pitch rotation value.</param>
-        /// <param name="roll">The roll rotation value.</param>
+        /// <param name="yaw">The yaw rotation value in radians.</param>
+        /// <param name="pitch">The pitch rotation value in radians.</param>
+        /// <param name="roll">The roll rotation value in radians.</param>
         /// <param name="result">The rotation <see cref="Matrix"/> as an output parameter.</param>
         /// <remarks>For more information about yaw,pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
         /// </remarks>
