@@ -6,7 +6,7 @@ using Gtk;
 namespace MonoGame.Tools.Pipeline
 {
     [System.ComponentModel.ToolboxItem (true)]
-    partial class ProjectView : Bin
+    partial class ProjectView : VBox
     {
         public Menu menu, addmenu;
         public string openedProject;
@@ -60,6 +60,8 @@ namespace MonoGame.Tools.Pipeline
 
             treeview1.ButtonPressEvent += OnTreeview1ButtonPressEvent;
             treeview1.KeyReleaseEvent += HandleKeyReleaseEvent;
+            treeview1.ButtonReleaseEvent += OnTreeview1ButtonReleaseEvent;
+            treeview1.CursorChanged += OnTreeview1CursorChanged;
         }
 
         void HandleKeyReleaseEvent (object o, KeyReleaseEventArgs args)

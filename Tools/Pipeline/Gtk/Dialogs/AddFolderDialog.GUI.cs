@@ -24,7 +24,11 @@ namespace MonoGame.Tools.Pipeline
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			this.BorderWidth = ((uint)(4));
 			// Internal child MonoGame.Tools.Pipeline.AddFolderDialog.VBox
+            #if GTK2
 			global::Gtk.VBox w1 = this.VBox;
+            #elif GTK3
+            global::Gtk.Box w1 = this.ContentArea;
+            #endif
 			w1.Name = "dialog1_VBox";
 			w1.Spacing = 6;
 			w1.BorderWidth = ((uint)(2));
@@ -45,7 +49,7 @@ namespace MonoGame.Tools.Pipeline
 			this.radiobutton1.Name = "radiobutton1";
 			this.radiobutton1.DrawIndicator = true;
 			this.radiobutton1.UseUnderline = true;
-			this.radiobutton1.Group = new global::GLib.SList (global::System.IntPtr.Zero);
+			//this.radiobutton1.Group = new global::GLib.SList (global::System.IntPtr.Zero);
 			w1.Add (this.radiobutton1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(w1 [this.radiobutton1]));
 			w3.Position = 1;
@@ -70,7 +74,11 @@ namespace MonoGame.Tools.Pipeline
 			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(w1 [this.alignment1]));
 			w5.Position = 3;
 			// Internal child MonoGame.Tools.Pipeline.AddFolderDialog.ActionArea
+            #if GTK2
 			global::Gtk.HButtonBox w6 = this.ActionArea;
+            #elif GTK3
+            global::Gtk.ButtonBox w6 = this.ActionArea;
+            #endif
 			w6.Name = "dialog1_ActionArea";
 			w6.Spacing = 10;
 			w6.BorderWidth = ((uint)(5));
