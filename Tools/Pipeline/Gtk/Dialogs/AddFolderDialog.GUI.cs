@@ -49,7 +49,6 @@ namespace MonoGame.Tools.Pipeline
 			this.radiobutton1.Name = "radiobutton1";
 			this.radiobutton1.DrawIndicator = true;
 			this.radiobutton1.UseUnderline = true;
-			//this.radiobutton1.Group = new global::GLib.SList (global::System.IntPtr.Zero);
 			w1.Add (this.radiobutton1);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(w1 [this.radiobutton1]));
 			w3.Position = 1;

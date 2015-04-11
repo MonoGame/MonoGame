@@ -46,6 +46,9 @@ namespace MonoGame.Tools.Pipeline
 			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
 			this.treeview1 = new global::Gtk.TreeView ();
+            #if GTK3
+            this.treeview1.Expand = true;
+            #endif
 			this.treeview1.CanFocus = true;
 			this.treeview1.Name = "treeview1";
 			this.treeview1.HeadersVisible = false;

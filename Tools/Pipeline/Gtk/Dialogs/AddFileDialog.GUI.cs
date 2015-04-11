@@ -55,7 +55,6 @@ namespace MonoGame.Tools.Pipeline
 			this.radiobuttonCopy.Active = true;
 			this.radiobuttonCopy.DrawIndicator = true;
 			this.radiobuttonCopy.UseUnderline = true;
-			//this.radiobuttonCopy.Group = new global::GLib.SList (global::System.IntPtr.Zero);
 			w1.Add (this.radiobuttonCopy);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(w1 [this.radiobuttonCopy]));
 			w3.Position = 1;

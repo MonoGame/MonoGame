@@ -51,13 +51,16 @@ namespace MonoGame.Tools.Pipeline
 			this.hpaned1 = new global::Gtk.HPaned ();
 			this.hpaned1.CanFocus = true;
 			this.hpaned1.Name = "hpaned1";
-			this.hpaned1.Position = 432;
+			this.hpaned1.Position = 573;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vbox2 = new global::Gtk.VBox ();
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.filechooserwidget1 = new global::Gtk.FileChooserWidget (((global::Gtk.FileChooserAction)(0)));
+            #if GTK3
+            this.filechooserwidget1.Expand = true;
+            #endif
 			this.filechooserwidget1.Name = "filechooserwidget1";
 			this.vbox2.Add (this.filechooserwidget1);
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.filechooserwidget1]));
@@ -179,7 +182,7 @@ namespace MonoGame.Tools.Pipeline
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 659;
+			this.DefaultWidth = 800;
 			this.DefaultHeight = 397;
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);

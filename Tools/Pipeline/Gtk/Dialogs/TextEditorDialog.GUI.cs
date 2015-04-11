@@ -40,6 +40,9 @@ namespace MonoGame.Tools.Pipeline
 			w2.Position = 0;
 			// Container child dialog1_VBox.Gtk.Box+BoxChild
 			this.entry1 = new global::Gtk.Entry ();
+            #if GTK3
+            entry1.Expand = true;
+            #endif
 			this.entry1.CanFocus = true;
 			this.entry1.Name = "entry1";
 			this.entry1.IsEditable = true;
