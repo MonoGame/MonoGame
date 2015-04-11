@@ -19,6 +19,7 @@
     <NoWarn>1591,0436</NoWarn>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+    <ProjectSpecificOutputFolder>True</ProjectSpecificOutputFolder>
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
     <CustomDefinitions>
       <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
@@ -161,7 +162,7 @@
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk3\gio-sharp.dll.config">
       <Platforms>MacOS,Linux</Platforms>
-      <Link>glade-sharp.dll.config</Link>
+      <Link>gio-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk3\glib-sharp.dll.config">
