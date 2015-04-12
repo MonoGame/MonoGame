@@ -3,20 +3,40 @@
 
   <Platform Type="Linux">
     <Binary
-      Name="Xwt"
-      Path="ThirdParty\Dependencies\Xwt\Xwt.dll" />
+      Name="gtk-sharp"
+      Path="ThirdParty\Dependencies\Gtk\gtk-sharp.dll" />
     <Binary
-      Name="Xwt.Gtk"
-      Path="ThirdParty\Dependencies\Xwt\Xwt.Gtk.dll" />
+      Name="atk-sharp"
+      Path="ThirdParty\Dependencies\Gtk\atk-sharp.dll" />
+    <Binary
+      Name="gdk-sharp"
+      Path="ThirdParty\Dependencies\Gtk\gdk-sharp.dll" />
+    <Binary
+      Name="glade-sharp"
+      Path="ThirdParty\Dependencies\Gtk\glade-sharp.dll" />
+    <Binary
+      Name="glib-sharp"
+      Path="ThirdParty\Dependencies\Gtk\glib-sharp.dll" />
+    <Binary
+      Name="gtk-dotnet"
+      Path="ThirdParty\Dependencies\Gtk\gtk-dotnet.dll" />
+    <Binary
+      Name="pango-sharp"
+      Path="ThirdParty\Dependencies\Gtk\pango-sharp.dll" />
+    <Binary
+      Name="Mono.Posix"
+      Path="ThirdParty\Dependencies\Gtk\Mono.Posix.dll" />
   </Platform>
 
   <Platform Type="MacOS">
-    <Binary
-      Name="Xwt"
-      Path="ThirdParty\Dependencies\Xwt\Xwt.dll" />
-    <Binary
-      Name="Xwt.Mac"
-      Path="ThirdParty\Dependencies\Xwt\Xwt.Mac.dll" />
+    <Reference Include="atk-sharp"/>
+    <Reference Include="gdk-sharp"/>
+    <Reference Include="glade-sharp"/>
+    <Reference Include="glib-sharp"/>
+    <Reference Include="gtk-dotnet"/>
+    <Reference Include="gtk-sharp"/>
+    <Reference Include="pango-sharp"/>
+    <Reference Include="Mono.Posix"/>
   </Platform>
 
   <Platform Type="Windows">

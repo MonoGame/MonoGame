@@ -33,14 +33,14 @@ namespace MonoGame.Tools.Pipeline
 
                 if (File.Exists(fullpath))
                 {
-                    _con._view.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
+                    _con.View.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
                     return;
                 }
 
                 File.Copy(_template.TemplateFile, fullpath);
 
                 var parser = new PipelineProjectParser(_con, _con._project);
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 _con.Selection.Clear(_con);
 
@@ -52,11 +52,11 @@ namespace MonoGame.Tools.Pipeline
                     item.ProcessorName = _template.ProcessorName;
                     item.ResolveTypes();
 
-                    _con._view.AddTreeItem(item);
+                    _con.View.AddTreeItem(item);
                     _con.Selection.Add(item, _con);
                 }
 
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
 
@@ -68,13 +68,13 @@ namespace MonoGame.Tools.Pipeline
 
                 if (!File.Exists(fullpath))
                 {
-                    _con._view.ShowError("Error", string.Format("File does not exist: '{0}'.", fullpath));
+                    _con.View.ShowError("Error", string.Format("File does not exist: '{0}'.", fullpath));
                     return;
                 }
 
                 File.Delete(fullpath);
                 
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 for (var i = 0; i < _con._project.ContentItems.Count; i++)
                 {
@@ -84,14 +84,14 @@ namespace MonoGame.Tools.Pipeline
                     if (fullpath == path)
                     {
                         _con._project.ContentItems.Remove(item);
-                        _con._view.RemoveTreeItem(item);
+                        _con.View.RemoveTreeItem(item);
                         _con.Selection.Remove(item, _con);
                     }
                 }
                     
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
-        }            
+        }
     }
 }

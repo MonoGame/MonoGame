@@ -77,6 +77,16 @@ namespace Microsoft.Xna.Framework
             this.Y = y;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Point"/> struct, with the specified position.
+        /// </summary>
+        /// <param name="value">The x and y coordinates in 2d-space.</param>
+        public Point(int value)
+        {
+            this.X = value;
+            this.Y = value;
+        }
+
         #endregion
 
         #region Operators
@@ -187,7 +197,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><see cref="String"/> representation of this <see cref="Point"/>.</returns>
         public override string ToString()
         {
-            return "{{X:" + X + " Y:" + Y + "}}";
+            return "{X:" + X + " Y:" + Y + "}";
         }
 
         /// <summary>

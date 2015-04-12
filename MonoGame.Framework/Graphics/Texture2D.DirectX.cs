@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Utilities.Png;
 
 #if WINDOWS_PHONE
 using System.Threading;
@@ -37,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GetTexture();
         }
 
-        private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -67,9 +68,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     // a 4x4 block. 
                     // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
                     if (_format == SurfaceFormat.Dxt1 ||
+                        _format == SurfaceFormat.Dxt1SRgb ||
                         _format == SurfaceFormat.Dxt1a ||
                         _format == SurfaceFormat.Dxt3 ||
-                        _format == SurfaceFormat.Dxt5)
+                        _format == SurfaceFormat.Dxt3SRgb ||
+                        _format == SurfaceFormat.Dxt5 ||
+                        _format == SurfaceFormat.Dxt5SRgb)
                     {
                         w = (w + 3) & ~3;
                         h = (h + 3) & ~3;
@@ -87,9 +91,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Right = x + w;
 
                 // TODO: We need to deal with threaded contexts here!
+                int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
                 var d3dContext = GraphicsDevice._d3dContext;
                 lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, GetTexture(), level, region);
+                    d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
             }
             finally
             {
@@ -97,16 +102,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             // Create a temp staging resource for copying the data.
             // 
             // TODO: We should probably be pooling these staging resources
             // and not creating a new one each time.
             //
+            var levelWidth = Math.Max(width >> level, 1);
+            var levelHeight = Math.Max(height >> level, 1);
+
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
-            desc.Width = width;
-            desc.Height = height;
+            desc.Width = levelWidth;
+            desc.Height = levelHeight;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(_format);
@@ -121,6 +129,8 @@ namespace Microsoft.Xna.Framework.Graphics
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
                 lock (d3dContext)
                 {
+                    int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
+
                     // Copy the data from the GPU to the staging texture.
                     int elementsInRow;
                     int rows;
@@ -128,13 +138,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         elementsInRow = rect.Value.Width;
                         rows = rect.Value.Height;
-                        d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1), stagingTex, 0, 0, 0, 0);
+                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1), stagingTex, 0, 0, 0, 0);
                     }
                     else
                     {
-                        elementsInRow = width;
+                        elementsInRow = levelWidth;
                         rows = height;
-                        d3dContext.CopySubresourceRegion(GetTexture(), level, null, stagingTex, 0, 0, 0, 0);
+                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, null, stagingTex, 0, 0, 0, 0);
                     }
 
                     // Copy the data to the array.
@@ -169,15 +179,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
         }
 
+        private int CalculateSubresourceIndex(int arraySlice, int level)
+        {
+            return arraySlice * _levelCount + level;
+        }
+
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
 #if WINDOWS_PHONE
             WriteableBitmap bitmap = null;
             Threading.BlockOnUIThread(() =>
             {
+                try
+                {
                     BitmapImage bitmapImage = new BitmapImage();
                     bitmapImage.SetSource(stream);
                     bitmap = new WriteableBitmap(bitmapImage);
+                }
+                catch { }
             });
 
             // Convert from ARGB to ABGR 
@@ -261,13 +280,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if WINDOWS_STOREAPP
-            SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
-#else
-            // TODO: We need to find a simple stand alone
-            // PNG encoder if we want to support this.
-            throw new NotImplementedException();
-#endif
+            var pngWriter = new PngWriter();
+            pngWriter.Write(this, stream);
         }
 
 #if WINDOWS_STOREAPP
@@ -360,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Width = width;
             desc.Height = height;
             desc.MipLevels = _levelCount;
-            desc.ArraySize = 1;
+            desc.ArraySize = ArraySize;
             desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
@@ -391,16 +405,20 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_PHONE
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                BitmapImage bitmapImage = new BitmapImage();
-                bitmapImage.SetSource(textureStream);
-                WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
+                try
+                {
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.SetSource(textureStream);
+                    WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
 
-                // Convert from ARGB to ABGR 
-                ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+                    // Convert from ARGB to ABGR 
+                    ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
 
-                this.SetData<int>(bitmap.Pixels);
+                    this.SetData<int>(bitmap.Pixels);
 
-                textureStream.Dispose();
+                    textureStream.Dispose();
+                }
+                catch { }
             });
 #endif
         }

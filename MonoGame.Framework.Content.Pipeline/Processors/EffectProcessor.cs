@@ -75,18 +75,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
+            options.Defines = Defines;
             options.OutputFile = context.OutputFilename;
 
             // Parse the MGFX file expanding includes, macros, and returning the techniques.
             ShaderInfo shaderInfo;
             try
             {
-                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options, 
+                    new ContentPipelineEffectCompilerOutput(context));
 
                 // Add the include dependencies so that if they change
                 // it will trigger a rebuild of this effect.
                 foreach (var dep in shaderInfo.Dependencies)
                     context.AddDependency(dep);
+            }
+            catch (InvalidContentException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -137,6 +143,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             throw new NotImplementedException();
 #endif
         }
+
+#if WINDOWS
+        private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
+        {
+            private readonly ContentProcessorContext _context;
+
+            public ContentPipelineEffectCompilerOutput(ContentProcessorContext context)
+            {
+                _context = context;
+            }
+
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                _context.Logger.LogWarning(null, CreateContentIdentity(file, line, column), message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                throw new InvalidContentException(message, CreateContentIdentity(file, line, column));
+            }
+
+            private static ContentIdentity CreateContentIdentity(string file, int line, int column)
+            {
+                return new ContentIdentity(file, null, line + "," + column);
+            }
+        }
+#endif
 
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {

@@ -80,6 +80,7 @@ namespace MonoGame.Tests {
 		public TimeSpan ElapsedGameTime;
 		public TimeSpan TotalGameTime;
 		public bool IsRunningSlowly;
+	    public GameTime GameTime;
 
 		public void AdvanceUpdate (GameTime gameTime)
 		{
@@ -104,6 +105,7 @@ namespace MonoGame.Tests {
 
 		public void UpdateGameTime (GameTime gameTime)
 		{
+		    GameTime = gameTime;
 			ElapsedGameTime = gameTime.ElapsedGameTime;
 			TotalGameTime = gameTime.TotalGameTime;
 			IsRunningSlowly = gameTime.IsRunningSlowly;

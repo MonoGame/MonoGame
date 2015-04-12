@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Utilities
 		}
 
         /// <summary>
-        /// Returns true if the given type represents a class that is not abstract
+        /// Returns true if the given type represents a non-object type that is not abstract.
         /// </summary>
 		public static bool IsConcreteClass(Type t)
 		{
@@ -43,6 +43,9 @@ namespace Microsoft.Xna.Framework.Utilities
 			{
 				throw new NullReferenceException("Must supply the t (type) parameter");
 			}
+
+            if (t == typeof(object))
+                return false;
 #if WINRT
 			var ti = t.GetTypeInfo();
 			if (ti.IsClass && !ti.IsAbstract)
@@ -82,25 +85,22 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
         }
 
-		public static Attribute GetCustomAttribute(MemberInfo member, Type memberType)
+		public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
 		{
 			if (member == null)
-			{
 				throw new NullReferenceException("Must supply the member parameter");
-			}
-			if (memberType == null)
-			{
-				throw new NullReferenceException("Must supply the memberType parameter");
-			}
+
 #if WINRT
-			return member.GetCustomAttribute(memberType);
+			return member.GetCustomAttribute(typeof(T)) as T;
 #else
-			return Attribute.GetCustomAttribute(member, memberType);
+            return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
 		}
 
         /// <summary>
-        /// Returns true if the get and set methods of the given property exist and are public
+        /// Returns true if the get method of the given property exist and are public.
+        /// Note that we allow a getter-only property to be serialized (and deserialized),
+        /// *if* CanDeserializeIntoExistingObject is true for the property type.
         /// </summary>
         public static bool PropertyIsPublic(PropertyInfo property)
         {
@@ -111,10 +111,6 @@ namespace Microsoft.Xna.Framework.Utilities
 
             var getMethod = GetPropertyGetMethod(property);
             if (getMethod == null || !getMethod.IsPublic)
-                return false;
-
-            var setMethod = GetPropertySetMethod(property);
-            if (setMethod == null || !setMethod.IsPublic)
                 return false;
 
             return true;

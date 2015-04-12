@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				output.Kerning.Add (new Vector3 (abc.A, abc.B, abc.C));
 			}
 			
-			output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
+			output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(false));
             systemBitmap.Dispose();
 
             var bmp = output.Texture.Faces[0][0];

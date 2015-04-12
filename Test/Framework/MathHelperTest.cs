@@ -46,5 +46,27 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(MathHelper.Lerp(0f, 0f, 0.5f), 0f, "Distance test failed on [0,0,0.5]");
             Assert.AreEqual(MathHelper.Lerp(-5f, -1f, 0.5f), -3f, "Distance test failed on [-5,-1, 0.5]");
         }
+
+        [Test]
+        public void Min()
+        {
+            Assert.AreEqual(-0.5f, MathHelper.Min(-0.5f, -0.5f));
+            Assert.AreEqual(-0.5f, MathHelper.Min(-0.5f,0.0f));
+            Assert.AreEqual(-0.5f, MathHelper.Min(0.0f, -0.5f));
+            Assert.AreEqual(0, MathHelper.Min(0, 0));
+            Assert.AreEqual(-5, MathHelper.Min(-5, 5));
+            Assert.AreEqual(-5, MathHelper.Min(5, -5));
+        }
+
+        [Test]
+        public void Max()
+        {
+            Assert.AreEqual(-0.5f, MathHelper.Min(-0.5f, -0.5f));
+            Assert.AreEqual(0.0f, MathHelper.Max(-0.5f,0.0f));
+            Assert.AreEqual(0.0f, MathHelper.Max(0.0f, -0.5f));
+            Assert.AreEqual(0, MathHelper.Max(0, 0));
+            Assert.AreEqual(5, MathHelper.Max(-5, 5));
+            Assert.AreEqual(5, MathHelper.Max(5, -5));
+        }
     }
 }

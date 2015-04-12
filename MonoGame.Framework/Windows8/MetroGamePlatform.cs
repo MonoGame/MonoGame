@@ -78,6 +78,9 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
+#if WINDOWS_PHONE81
+using Windows.UI.Xaml;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -187,6 +190,9 @@ namespace Microsoft.Xna.Framework
             if (!MetroGameWindow.Instance.IsExiting)
             {
                 MetroGameWindow.Instance.IsExiting = true;
+#if WINDOWS_PHONE81
+                Application.Current.Exit();
+#endif
             }
         }
 
@@ -214,11 +220,17 @@ namespace Microsoft.Xna.Framework
         public override void EnterFullScreen()
         {
             // Metro has no concept of fullscreen vs windowed!
+#if WINDOWS_PHONE81
+            StatusBar.GetForCurrentView().HideAsync();
+#endif
         }
 
         public override void ExitFullScreen()
         {
             // Metro has no concept of fullscreen vs windowed!
+#if WINDOWS_PHONE81
+            StatusBar.GetForCurrentView().ShowAsync();
+#endif
         }
         
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

@@ -57,9 +57,6 @@
     <Compile Include="Audio\AudioHelper.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
-    <Compile Include="Audio\ConvertAudio.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
 
 
     <!-- MonoGame.Framework.Content.Pipeline.Builder -->
@@ -167,10 +164,6 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\CommandLineParser.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\CompilerInclude.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\CompilerInclude.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\ConstantBufferData.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ConstantBufferData.cs</Link>
@@ -202,6 +195,10 @@
     <Compile Include="..\Tools\2MGFX\EffectObject.writer.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\EffectObject.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\IEffectCompilerOutput.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\IEffectCompilerOutput.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\MarshalHelper.cs">
       <Platforms>Windows</Platforms>
@@ -254,6 +251,10 @@
     <Compile Include="..\Tools\2MGFX\PassInfo.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\PassInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Preprocessor.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\Preprocessor.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\SamplerStateInfo.cs">
       <Platforms>Windows</Platforms>
@@ -329,7 +330,9 @@
     <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
     <Compile Include="Serialization\Compiler\StringWriter.cs" />
+    <Compile Include="Serialization\Compiler\TextureWriter.cs" />
     <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\TextureCubeWriter.cs" />
     <Compile Include="Serialization\Compiler\TimeSpanWriter.cs" />
     <Compile Include="Serialization\Compiler\UInt16Writer.cs" />
     <Compile Include="Serialization\Compiler\UInt32Writer.cs" />
@@ -364,6 +367,9 @@
     <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
     <Compile Include="Serialization\Intermediate\LongSerializer.cs" />
     <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\NamedValueDictionarySerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
+    <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
 	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
@@ -470,6 +476,11 @@
     </None>
 
     <!-- Linux Additional Binaries -->
+    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.so">
+      <Platforms>Linux</Platforms>
+      <Link>libassimp.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
       <Platforms>Linux</Platforms>
       <Link>libnvcore.so</Link>

@@ -26,9 +26,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformSetSamplers(GraphicsDevice device)
         {
-            for (var i = 0; i < _samplers.Length; i++)
+            for (var i = 0; i < _actualSamplers.Length; i++)
             {
-                var sampler = _samplers[i];
+                var sampler = _actualSamplers[i];
                 var texture = device.Textures[i];
 
                 if (sampler != null && texture != null && sampler != texture.glLastSamplerState)

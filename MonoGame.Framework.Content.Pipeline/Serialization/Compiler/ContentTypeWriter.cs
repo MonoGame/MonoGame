@@ -20,10 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <value>true if the object can be deserialized into; false otherwise.</value>
         public virtual bool CanDeserializeIntoExistingObject
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return false; }
         }
 
         /// <summary>

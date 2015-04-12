@@ -5,10 +5,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-#if WINDOWS
-using NAudio.Wave;
-#endif
 using System.IO;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -22,7 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         int blockAlign;
         int channelCount;
         int format;
-        internal List<byte> nativeWaveFormat;
+        List<byte> nativeWaveFormat;
         int sampleRate;
 
         /// <summary>
@@ -67,31 +65,45 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <value>If the audio has not been processed, the source sample rate; otherwise, the new sample rate.</value>
         public int SampleRate { get { return sampleRate; } }
 
-#if WINDOWS
-        /// <summary>
-        /// Creates a new instance of the AudioFormat class
-        /// </summary>
-        /// <param name="waveFormat">The WaveFormat representing the WAV header.</param>
-        internal AudioFormat(WaveFormat waveFormat)
+        internal AudioFormat(
+            int averageBytesPerSecond,
+            int bitsPerSample,
+            int blockAlign,
+            int channelCount,
+            int format,
+            int sampleRate)
         {
-            averageBytesPerSecond = waveFormat.AverageBytesPerSecond;
-            bitsPerSample = waveFormat.BitsPerSample;
-            blockAlign = waveFormat.BlockAlign;
-            channelCount = waveFormat.Channels;
-            format = (int)waveFormat.Encoding;
-            sampleRate = waveFormat.SampleRate;
+            this.averageBytesPerSecond = averageBytesPerSecond;
+            this.bitsPerSample = bitsPerSample;
+            this.blockAlign = blockAlign;
+            this.channelCount = channelCount;
+            this.format = format;
+            this.sampleRate = sampleRate;
 
-            var stream = new MemoryStream();
-            using (var writer = new BinaryWriter(stream))
+            this.nativeWaveFormat = this.ConstructNativeWaveFormat();
+        }
+
+        private List<byte> ConstructNativeWaveFormat()
+        {
+            using (var memory = new MemoryStream())
             {
-                waveFormat.Serialize(writer);
-                nativeWaveFormat = new List<byte>(stream.ToArray());
+                using (var writer = new BinaryWriter(memory))
+                {
+                    writer.Write((int)18); /* header size */
+                    writer.Write((short)this.format);
+                    writer.Write((short)this.channelCount);
+                    writer.Write((int)this.sampleRate);
+                    writer.Write((int)this.averageBytesPerSecond);
+                    writer.Write((short)this.blockAlign);
+                    writer.Write((short)this.bitsPerSample);
+                    writer.Write((short)0);
+
+                    var bytes = new byte[memory.Position];
+                    memory.Seek(0, SeekOrigin.Begin);
+                    memory.Read(bytes, 0, bytes.Length);
+                    return bytes.ToList();
+                }
             }
         }
-#elif MACOS
-		internal AudioFormat(List<byte> nativeWaveFormat) {
-			this.nativeWaveFormat = nativeWaveFormat;
-		}
-#endif
     }
 }

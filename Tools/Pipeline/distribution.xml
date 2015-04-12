@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <title>MonoGame Pipeline Tool</title>
+    <background file="background.png" mime-type="image/png" />
+    <pkg-ref id="com.monogame.pipeline"/>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.monogame.pipeline"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.monogame.pipeline" visible="false">
+        <pkg-ref id="com.monogame.pipeline"/>
+    </choice>
+    <pkg-ref id="com.monogame.pipeline" version="1" onConclusion="none">Pipeline.MacOS.pkg</pkg-ref>
+</installer-gui-script>

@@ -14,6 +14,13 @@ namespace MonoGame.Tools.Pipeline
         Cancel
     }
 
+    public enum CopyAction
+    {
+        Copy,
+        Link,
+        Skip
+    }
+
     interface IView
     {
         void Attach(IController controller);
@@ -36,7 +43,11 @@ namespace MonoGame.Tools.Pipeline
 
         void AddTreeItem(IProjectItem item);
 
+        void AddTreeFolder(string folder);
+
         void RemoveTreeItem(ContentItem contentItem);
+
+        void RemoveTreeFolder(string folder);
 
         void UpdateTreeItem(IProjectItem item);
 
@@ -48,10 +59,18 @@ namespace MonoGame.Tools.Pipeline
 
         void OutputClear();
 
-        bool ChooseContentFile(string initialDirectory, out List<string> files);        
+        bool ChooseContentFile(string initialDirectory, out List<string> files);  
+
+        bool ChooseContentFolder(string initialDirectory, out string folder);        
+
+        bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall);
+
+        bool CopyOrLinkFolder(string folder, out CopyAction action);
         
         void OnTemplateDefined(ContentItemTemplate item);
 
         Process CreateProcess(string exe, string commands);
+
+        void ItemExistanceChanged(IProjectItem item);
     }
 }

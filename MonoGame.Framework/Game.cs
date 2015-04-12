@@ -119,12 +119,6 @@ namespace Microsoft.Xna.Framework
 
                     if (_graphicsDeviceManager != null)
                     {
-                        Effect.FlushCache();
-                        BlendState.ResetStates();
-                        DepthStencilState.ResetStates();
-                        RasterizerState.ResetStates();
-                        SamplerState.ResetStates();
-
                         (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
                         _graphicsDeviceManager = null;
                     }
@@ -324,7 +318,7 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
-#if IOS || WINDOWS_STOREAPP
+#if IOS || WINDOWS_STOREAPP && !WINDOWS_PHONE81
         [Obsolete("This platform's policy does not allow programmatically closing.", true)]
 #endif
         public void Exit()
@@ -632,11 +626,14 @@ namespace Microsoft.Xna.Framework
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+
+#if !(WINDOWS && DIRECTX)
+
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 Platform.EnterFullScreen();
             else
                 Platform.ExitFullScreen();
-
+#endif
             var viewport = new Viewport(0, 0,
 			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
 			                            GraphicsDevice.PresentationParameters.BackBufferHeight);

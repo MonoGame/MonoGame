@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.ApplicationModel.Activation;
+#if WINDOWS_PHONE81
+using Windows.Phone.UI.Input;
+using Microsoft.Xna.Framework.Input;
+#endif
 
 namespace MonoGame.Framework
 {
@@ -47,9 +51,24 @@ namespace MonoGame.Framework
             // Start running the game.
             game.Run(GameRunBehavior.Asynchronous);
 
+#if WINDOWS_PHONE81
+            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+#endif
+
             // Return the created game object.
             return game;
         }
+
+#if WINDOWS_PHONE81
+        static void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                GamePad.Back = true;
+                e.Handled = true;
+            }
+        }
+#endif
         
         /// <summary>
         /// Preserves the previous execution state in MetroGamePlatform and returns the constructed game object initialized with the given window.

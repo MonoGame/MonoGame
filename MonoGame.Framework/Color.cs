@@ -114,6 +114,7 @@ namespace Microsoft.Xna.Framework
             MintCream = new Color(0xfffafff5);
             MistyRose = new Color(0xffe1e4ff);
             Moccasin = new Color(0xffb5e4ff);
+            MonoGameOrange = new Color(0xff003ce7);
             NavajoWhite = new Color(0xffaddeff);
             Navy = new Color(0xff800000);
             OldLace = new Color(0xffe6f5fd);
@@ -296,7 +297,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the blue component of <see cref="Color"/>.
+        /// Gets or sets the blue component.
         /// </summary>
         [DataMember]
         public byte B
@@ -315,7 +316,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the green component of <see cref="Color"/>.
+        /// Gets or sets the green component.
         /// </summary>
         [DataMember]
         public byte G
@@ -334,7 +335,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the red component of <see cref="Color"/>.
+        /// Gets or sets the red component.
         /// </summary>
         [DataMember]
         public byte R
@@ -353,7 +354,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the alpha component of <see cref="Color"/>.
+        /// Gets or sets the alpha component.
         /// </summary>
         [DataMember]
         public byte A
@@ -1280,6 +1281,15 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// MonoGame orange theme color (R:231,G:60,B:0,A:255).
+        /// </summary>
+        public static Color MonoGameOrange
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// NavajoWhite color (R:255,G:222,B:173,A:255).
         /// </summary>
         public static Color NavajoWhite
@@ -1732,19 +1742,19 @@ namespace Microsoft.Xna.Framework
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
-    /// <summary>
-    /// Gets a three-component <see cref="Vector3"/> representation for this object.
-    /// </summary>
-    /// <returns>A three-component <see cref="Vector3"/> representation for this object.</returns>
+        /// <summary>
+        /// Returns the color in a 0-to-1 normalized <see cref="Vector3"/> format.
+        /// </summary>
+        /// <returns>A <see cref="Vector3"/> representation for this object.</returns>
         public Vector3 ToVector3()
         {
             return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
         }
 
         /// <summary>
-        /// Gets a four-component <see cref="Vector4"/> representation for this object.
+        /// Returns the color in a 0-to-1 normalized <see cref="Vector4"/> format.
         /// </summary>
-        /// <returns>A four-component <see cref="Vector4"/> representation for this object.</returns>
+        /// <returns>A <see cref="Vector4"/> representation for this object.</returns>
         public Vector4 ToVector4()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);

@@ -11,16 +11,14 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureMinFilter = OpenTK.Graphics.ES20.All;
-using TextureParameterName = OpenTK.Graphics.ES20.All;
-using GetPName = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
   public partial class SamplerState
   {
+      private readonly float[] _openGLBorderColor = new float[4];
+
 #if GLES
         private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
         private const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
@@ -150,9 +148,29 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
             GraphicsExtensions.CheckGLError();
 #if !GLES
+            // Border color is not supported by glTexParameter in OpenGL ES 2.0
+            _openGLBorderColor[0] = BorderColor.R / 255.0f;
+            _openGLBorderColor[1] = BorderColor.G / 255.0f;
+            _openGLBorderColor[2] = BorderColor.B / 255.0f;
+            _openGLBorderColor[3] = BorderColor.A / 255.0f;
+            GL.TexParameter(target, TextureParameterName.TextureBorderColor, _openGLBorderColor);
+            GraphicsExtensions.CheckGLError();
             // LOD bias is not supported by glTexParameter in OpenGL ES 2.0
             GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
             GraphicsExtensions.CheckGLError();
+            // Comparison samplers are not supported in OpenGL ES 2.0 (without an extension, anyway)
+            if (ComparisonFunction != CompareFunction.Never)
+            {
+                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.CompareRefToTexture);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(target, TextureParameterName.TextureCompareFunc, (int) ComparisonFunction.GetDepthFunction());
+                GraphicsExtensions.CheckGLError();
+            }
+            else
+            {
+                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.None);
+                GraphicsExtensions.CheckGLError();
+            }
 #endif
             if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel)
             {
@@ -177,6 +195,10 @@ namespace Microsoft.Xna.Framework.Graphics
         return (int)TextureWrapMode.Repeat;
       case TextureAddressMode.Mirror:
         return (int)All.MirroredRepeat;
+#if !GLES
+      case TextureAddressMode.Border:
+        return (int)TextureWrapMode.ClampToBorder;
+#endif
       default:
         throw new ArgumentException("No support for " + textureAddressMode);
       }
