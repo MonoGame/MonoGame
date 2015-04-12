@@ -14,7 +14,9 @@ namespace Microsoft.Xna.Framework.Content
 	{
 		protected internal override Song Read(ContentReader input, Song existingInstance)
 		{
-			var path = input.ReadString();
+            var song = existingInstance;
+
+            var path = input.ReadString();
 			
 			if (!String.IsNullOrEmpty(path))
 			{
@@ -27,7 +29,9 @@ namespace Microsoft.Xna.Framework.Content
 			
 			var durationMs = input.ReadObject<int>();
 
-            return new Song(path, durationMs); 
+            if (song == null)
+                song = new Song(path, durationMs); 
+            return song;
 		}
 	}
 }
