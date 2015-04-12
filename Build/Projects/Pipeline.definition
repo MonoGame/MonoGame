@@ -65,6 +65,9 @@
     <Compile Include="Windows\UpdateAction.cs" />
 
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\ContentIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\EditorIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
