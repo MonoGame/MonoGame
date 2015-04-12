@@ -17,13 +17,11 @@ namespace $safeprojectname$
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        SpriteFont font;
         OuyaFacade facade;
 
         public Game1()  
         {
             graphics = new GraphicsDeviceManager(this);
-            
             Content.RootDirectory = "Content";
             
             graphics.IsFullScreen = true;
@@ -31,7 +29,7 @@ namespace $safeprojectname$
             graphics.PreferredBackBufferHeight = 720;
             graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft;
         }
-        
+
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -57,10 +55,18 @@ namespace $safeprojectname$
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch (GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            font = Content.Load<SpriteFont>("spriteFont1");
+        }
+
+        /// <summary>
+        /// UnloadContent will be called once per game and is the place to unload
+        /// all content.
+        /// </summary>
+        protected override void UnloadContent()
+        {
+            // TODO: Unload any non ContentManager content here
         }
 
         /// <summary>
@@ -71,13 +77,11 @@ namespace $safeprojectname$
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-            {
                 Exit();
-            }
 
             // TODO: Add your update logic here
 
-            base.Update (gameTime);
+            base.Update(gameTime);
         }
 
         /// <summary>
@@ -86,13 +90,11 @@ namespace $safeprojectname$
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear (Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
-            spriteBatch.DrawString(font, "Hello from MonoGame!", new Vector2(16, 16), Color.White);
-            spriteBatch.End();
+            // TODO: Add your drawing code here
 
-            base.Draw (gameTime);
+            base.Draw(gameTime);
         }
 
         async void DoIapTest()

@@ -52,10 +52,7 @@ namespace Lidgren.Network
 		internal override NetSendResult Enqueue(NetOutgoingMessage message)
 		{
 			m_queuedSends.Enqueue(message);
-
-			int queueLen = m_queuedSends.Count;
-			int left = m_windowSize - ((m_sendStart + NetConstants.NumSequenceNumbers) - m_windowStart) % NetConstants.NumSequenceNumbers;
-			if (queueLen <= left)
+			if (m_queuedSends.Count <= GetAllowedSends())
 				return NetSendResult.Sent;
 			return NetSendResult.Queued;
 		}
@@ -76,6 +73,7 @@ namespace Lidgren.Network
 				if (t > 0 && (now - t) > m_resendDelay)
 				{
 					// deduce sequence number
+					/*
 					int startSlot = m_windowStart % m_windowSize;
 					int seqNr = m_windowStart;
 					while (startSlot != i)
@@ -85,11 +83,12 @@ namespace Lidgren.Network
 							startSlot = m_windowSize - 1;
 						seqNr--;
 					}
+					*/
 
-					//m_connection.m_peer.LogVerbose("Resending due to delay #" + seqNr + " " + om.ToString());
+					//m_connection.m_peer.LogVerbose("Resending due to delay #" + m_storedMessages[i].SequenceNumber + " " + om.ToString());
 					m_connection.m_statistics.MessageResent(MessageResendReason.Delay);
 
-					m_connection.QueueSendMessage(om, seqNr);
+					m_connection.QueueSendMessage(om, m_storedMessages[i].SequenceNumber);
 
 					m_storedMessages[i].LastSent = now;
 					m_storedMessages[i].NumSent++;
@@ -124,6 +123,7 @@ namespace Lidgren.Network
 			m_storedMessages[storeIndex].NumSent++;
 			m_storedMessages[storeIndex].Message = message;
 			m_storedMessages[storeIndex].LastSent = now;
+			m_storedMessages[storeIndex].SequenceNumber = seqNr;
 
 			return;
 		}
@@ -131,12 +131,19 @@ namespace Lidgren.Network
 		private void DestoreMessage(int storeIndex)
 		{
 			NetOutgoingMessage storedMessage = m_storedMessages[storeIndex].Message;
-			NetException.Assert(storedMessage != null);
-
-			Interlocked.Decrement(ref storedMessage.m_recyclingCount);
-			if (storedMessage.m_recyclingCount <= 0)
+#if DEBUG
+			if (storedMessage == null)
+				throw new NetException("m_storedMessages[" + storeIndex + "].Message is null; sent " + m_storedMessages[storeIndex].NumSent + " times, last time " + (NetTime.Now - m_storedMessages[storeIndex].LastSent) + " seconds ago");
+#else
+			if (storedMessage != null)
+			{
+#endif
+			if (Interlocked.Decrement(ref storedMessage.m_recyclingCount) <= 0)
 				m_connection.m_peer.Recycle(storedMessage);
 
+#if !DEBUG
+			}
+#endif
 			m_storedMessages[storeIndex] = new NetStoredReliableMessage();
 		}
 
@@ -169,6 +176,8 @@ namespace Lidgren.Network
 				{
 					//m_connection.m_peer.LogDebug("Using early ack for #" + m_windowStart + "...");
 					m_receivedAcks[m_windowStart] = false;
+					DestoreMessage(m_windowStart % m_windowSize);
+
 					NetException.Assert(m_storedMessages[m_windowStart % m_windowSize].Message == null); // should already be destored
 					m_windowStart = (m_windowStart + 1) % NetConstants.NumSequenceNumbers;
 					//m_connection.m_peer.LogDebug("Advancing window to #" + m_windowStart);
@@ -196,13 +205,13 @@ namespace Lidgren.Network
 				}
 				else
 				{
-					DestoreMessage(seqNr % m_windowSize);
 					m_receivedAcks[seqNr] = true;
 				}
 			}
 			else if (sendRelate > 0)
 			{
 				// uh... we haven't sent this message yet? Weird, dupe or error...
+				NetException.Assert(false, "Got ack for message not yet sent?");
 				return;
 			}
 

@@ -44,7 +44,7 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// The view this controller is attached to.
         /// </summary>
-        IView View { get; set; }
+        IView View { get; }
 
         /// <summary>
         /// Triggered when the project starts loading.
@@ -102,9 +102,13 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(IEnumerable<ContentItem> items);        
+        void IncludeFolder(string initialDirectory);
+
+        void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders);        
 
         void NewItem(string name, string location, ContentItemTemplate template);
+
+        void NewFolder(string name, string location);
 
         void AddAction(IProjectAction action);
 

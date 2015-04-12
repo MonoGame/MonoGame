@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -30,13 +31,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             info = new ElementInfo();
 
             // Are we ignoring this property?
-            if (ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute)) != null)
+            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null)
                 return false;
 
             var prop = member as PropertyInfo;
             var field = member as FieldInfo;
-            
-            var attrib = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
+
+            var attrib = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
             if (attrib != null)
             {
                 // Store the attribute for later use.
@@ -58,10 +59,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     if (prop.GetGetMethod() == null)
                         return false;
 
-                    // If there is no public setter and the property is a system
-                    // type then we have no way for it to be deserialized.
-                    if (prop.GetSetMethod() == null &&
-                        prop.PropertyType.Namespace == "System")
+                    // If there is a setter, but it's private, then don't include this element
+                    // (although technically we could, as long as we have a serializer with
+                    // CanDeserializeIntoExistingObject=true for this property type)
+                    var setter = prop.GetSetMethod(true);
+                    if (setter != null && !setter.IsPublic)
+                        return false;
+
+                    // If there is no setter, and we don't have a type serializer 
+                    // that can deserialize into an existing object, then we have no way 
+                    // for it to be deserialized.
+                    if (setter == null && !serializer.GetTypeSerializer(prop.PropertyType).CanDeserializeIntoExistingObject)
+                        return false;
+
+                    // Don't serialize or deserialize indexers.
+                    if (prop.GetIndexParameters().Any())
                         return false;
                 }
                 else if (field != null)
@@ -79,7 +91,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 info.Serializer = serializer.GetTypeSerializer(prop.PropertyType);
                 if (prop.CanWrite)
                     info.Setter = (o, v) => prop.SetValue(o, v, null);
-                info.Getter = (o) => prop.GetValue(o, null);
+                info.Getter = o => prop.GetValue(o, null);
             }
             else if (field != null)
             {
@@ -119,6 +131,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 if (GetElementInfo(serializer, field, out info))
                     _elements.Add(info);                
             }
+        }
+
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return TargetType.IsClass && TargetType.BaseType != null; }
         }
 
         protected internal override object Deserialize(IntermediateReader input, ContentSerializerAttribute format, object existingInstance)
@@ -179,17 +196,51 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public override bool ObjectIsEmpty(object value)
         {
-            throw new NotImplementedException(); 
+            if (_baseSerializer != null)
+                return _baseSerializer.ObjectIsEmpty(value);
+            return false;
         }
 
         protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, object value)
         {
-            throw new NotImplementedException();
+            if (serializer.AlreadyScanned(value))
+                return;
+
+            // First scan the base type.
+            if (_baseSerializer != null)
+                _baseSerializer.ScanChildren(serializer, callback, value);
+
+            // Now scan our own elements.
+            foreach (var info in _elements)
+            {
+                var elementValue = info.Getter(value);
+
+                callback(info.Serializer, elementValue);
+
+                var elementSerializer = info.Serializer;
+                if (elementValue != null)
+                    elementSerializer = serializer.GetTypeSerializer(elementValue.GetType());
+
+                elementSerializer.ScanChildren(serializer, callback, elementValue);
+            }
         }
 
         protected internal override void Serialize(IntermediateWriter output, object value, ContentSerializerAttribute format)
         {
-            throw new NotImplementedException();
+            // First serialize the base type.
+            if (_baseSerializer != null)
+                _baseSerializer.Serialize(output, value, format);
+
+            // Now serialize our own elements.
+            foreach (var info in _elements)
+            {
+                var elementValue = info.Getter(value);
+
+                if (info.Attribute.SharedResource)
+                    output.WriteSharedResource(elementValue, info.Attribute);
+                else
+                    output.WriteObjectInternal(elementValue, info.Attribute, info.Serializer, info.Serializer.TargetType);
+            }
         }
     }
 }

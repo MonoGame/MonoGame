@@ -14,23 +14,30 @@ namespace MonoGame.Tools.Pipeline
         {
             private readonly PipelineController _con;
             private readonly ContentItemState[] _state;
+            private readonly string[] _folder;
 
-            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items)
+            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items, IEnumerable<string> folders)
             {
                 _con = controller;
-                
-                _state = new ContentItemState[items.Count()];
-                
-                var i = 0;
-                foreach (var item in items)
+                _folder = (folders == null) ? new string[0] : folders.ToArray();
+
+                if(items == null)
+                    _state = new ContentItemState[0];
+                else
                 {
-                    _state[i++] = ContentItemState.Get(item);
+                    _state = new ContentItemState[items.Count()];
+                    
+                    var i = 0;
+                    foreach (var item in items)
+                    {
+                        _state[i++] = ContentItemState.Get(item);
+                    }
                 }
             }
 
             public void Do()
             {
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 foreach (var obj in _state)
                 {
@@ -40,34 +47,41 @@ namespace MonoGame.Tools.Pipeline
                         if (item.OriginalPath == obj.SourceFile)
                         {
                             _con._project.ContentItems.Remove(item);
-                            _con._view.RemoveTreeItem(item);
+                            _con.View.RemoveTreeItem(item);
                             break;
                         }
                     }
                 }
 
-                _con._view.EndTreeUpdate();
+                foreach(string f in _folder)
+                    _con.View.RemoveTreeFolder(f);
+
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
 
             public void Undo()
             {
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
+
+                foreach(string f in _folder)
+                    _con.View.AddTreeFolder(f);
 
                 foreach (var obj in _state)
                 {
                     var item = new ContentItem()
                         {
                             Observer = _con,
+                            Exists = File.Exists(System.IO.Path.GetDirectoryName(_con._project.OriginalPath) + Path.DirectorySeparatorChar + obj.SourceFile)
                         };
                     obj.Apply(item);
                     item.ResolveTypes();
 
                     _con._project.ContentItems.Add(item);
-                    _con._view.AddTreeItem(item);                        
+                    _con.View.AddTreeItem(item);
                 }
 
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
             }
         }

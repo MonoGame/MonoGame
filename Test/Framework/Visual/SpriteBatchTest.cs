@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual {
@@ -13,6 +9,8 @@ namespace MonoGame.Tests.Visual {
 	class SpriteBatchTest : VisualTestFixtureBase {
 		private SpriteBatch _spriteBatch;
 		private Texture2D _texture;
+        private Texture2D _texture2;
+        private Texture2D _texture3;
 
 		[SetUp]
 		public override void SetUp ()
@@ -22,6 +20,8 @@ namespace MonoGame.Tests.Visual {
 			Game.LoadContentWith += (sender, e) => {
 				_spriteBatch = new SpriteBatch (Game.GraphicsDevice);
 				_texture = Game.Content.Load<Texture2D> (Paths.Texture ("MonoGameIcon"));
+                _texture2 = Game.Content.Load<Texture2D>(Paths.Texture("Surge"));
+                _texture3 = Game.Content.Load<Texture2D> (Paths.Texture ("Lines-64"));
 			};
 
 			Game.UnloadContentWith += (sender, e) => {
@@ -217,6 +217,31 @@ namespace MonoGame.Tests.Visual {
 			RunSingleFrameTest ();
 		}
 
+        [TestCase(SpriteSortMode.BackToFront)]
+        [TestCase(SpriteSortMode.Deferred)]
+        [TestCase(SpriteSortMode.FrontToBack)]
+        [TestCase(SpriteSortMode.Immediate)]
+#if !XNA
+        // Disabled on XNA because the sorting algorithm is probably different
+        [TestCase(SpriteSortMode.Texture)]
+#endif
+        public void Draw_with_SpriteSortMode(SpriteSortMode sortMode)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                _spriteBatch.Begin(sortMode, BlendState.AlphaBlend);
+                _spriteBatch.Draw(_texture, new Vector2(110, 110), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+                _spriteBatch.Draw(_texture2, new Vector2(130, 130), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.2f);
+                _spriteBatch.Draw(_texture3, new Vector2(145, 145), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.3f);
+                _spriteBatch.Draw(_texture, new Vector2(160, 160), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.5f);
+                _spriteBatch.Draw(_texture3, new Vector2(205, 205), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+                _spriteBatch.Draw(_texture2, new Vector2(190, 190), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.1f);
+                _spriteBatch.End();
+            };
+
+            RunSingleFrameTest(0.995f); // The sprites are too small to fail the test with standard similarity
+        }
+
 		// FIXME: This scissoring code is not valid in XNA. It
 		//        complains about RasterizerState being
 		//        immutable after it's bound to a
@@ -232,5 +257,54 @@ namespace MonoGame.Tests.Visual {
 		//_spriteBatch.End ();
 
 		//_spriteBatch.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
+
+        [Test]
+        public void DrawRequiresTexture()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                Assert.Throws<ArgumentNullException>(() => _spriteBatch.Draw(null, new Vector2(20, 20), Color.White));
+                _spriteBatch.End();
+            };
+            Game.Run();
+        }
+
+        [Test]
+        public void DrawWithTexture()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
+
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
+                _spriteBatch.End();
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
+            };
+            Game.Run();
+        }
+
+        [Test]
+        public void DrawWithCustomEffectAndTwoTextures()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var customSpriteEffect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "CustomSpriteBatchEffect.fx");
+                var texture2 = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+
+                customSpriteEffect.Parameters["SourceTexture"].SetValue(texture2);
+                customSpriteEffect.Parameters["OtherTexture"].SetValue(texture2);
+
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, null, null, null, customSpriteEffect);
+                _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
+                _spriteBatch.End();
+
+                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
+                Assert.That(Game.GraphicsDevice.Textures[1], Is.SameAs(texture2));
+            };
+            Game.Run();
+        }
 	}
 }

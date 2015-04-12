@@ -67,8 +67,8 @@ namespace MonoGame.Tools.Pipeline
         public void Save()
         {
             var mode = FileMode.CreateNew;
-            if (_isoStore.FileExists(ProjectHistoryPath)) 
-                mode = FileMode.Truncate;
+			if (_isoStore.FileExists (ProjectHistoryPath)) 
+				mode = FileMode.Truncate;
 
             using (var isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, mode, _isoStore))
             {
@@ -77,15 +77,13 @@ namespace MonoGame.Tools.Pipeline
                     writer.WriteLine(StartupProject);
 
                     foreach (var file in _projectHistory)
-                    {
                         writer.WriteLine(file);
-                    }
                 }
             }
         }
 
         public void Load()
-        {
+		{
             if (_isoStore.FileExists(ProjectHistoryPath))
             {
                 using (var isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, FileMode.Open, _isoStore))

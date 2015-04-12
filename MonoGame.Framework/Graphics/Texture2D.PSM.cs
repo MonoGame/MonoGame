@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this._levelCount = 1;
         }
 
-        private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             int x, y, w, h;
             if (rect.HasValue)
@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
         }
 
-        private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             Rectangle r;
             if (rect.HasValue)

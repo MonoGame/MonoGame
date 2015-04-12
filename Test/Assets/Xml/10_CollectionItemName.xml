@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="MonoGame.Tests.ContentPipeline.CollectionItemName">
+  <Asset Type="CollectionItemName">
     <w00t>
       <Flibble>Hello</Flibble>
       <Flibble>World</Flibble>

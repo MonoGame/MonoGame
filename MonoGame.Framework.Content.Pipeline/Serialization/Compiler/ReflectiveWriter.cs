@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         private FieldInfo[] _fields;
 
         private Type _baseType;
-        private ContentTypeWriter _baseTypeWriter;
 
         private string _runtimeType;
 
@@ -26,14 +25,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
         }
 
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return TargetType.IsClass; }
+        }
+
         protected override void Initialize(ContentCompiler compiler)
         {
-            var type = ReflectionHelpers.GetBaseType(TargetType);
-            if (type != null && type != typeof(object))
-            {
+            var type = ReflectionHelpers.GetBaseType(TargetType);                
+            if (type != null && type != typeof(object) && !TargetType.IsValueType)
                 _baseType = type;
-                _baseTypeWriter = compiler.GetTypeWriter(_baseType);
-            }
 
             var runtimeType = TargetType.GetCustomAttributes(typeof(ContentSerializerRuntimeTypeAttribute), false).FirstOrDefault() as ContentSerializerRuntimeTypeAttribute;
             if (runtimeType != null)
@@ -53,44 +54,47 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             var field = member as FieldInfo;
             Debug.Assert(field != null || property != null);
 
-            // Properties must have public get and set
-            if (property != null && (property.CanWrite == false || property.CanRead == false))
-                return;
-
-            if (property != null && property.Name == "Item")
+            if (property != null)
             {
-                var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
-                var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
-
-                if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
-                    (setMethod != null && setMethod.GetParameters().Length > 0))
-                {
-                    // This is presumably a property like this[indexer] and this
-                    // should not get involved in the object deserialization.
+                // Properties must have at least a getter.
+                if (property.CanRead == false)
                     return;
+
+                // Skip over indexer properties.
+                if (property.Name == "Item")
+                {
+                    var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
+                    var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
+
+                    if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
+                        (setMethod != null && setMethod.GetParameters().Length > 0))
+                        return;
                 }
             }
 
-            var attr = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute));
-            if (attr != null) 
+            // Are we explicitly asked to ignore this item?
+            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null) 
                 return;
 
-            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
-
-            bool isSharedResource = false;
-            if (contentSerializerAttribute != null)
-            {
-                isSharedResource = contentSerializerAttribute.SharedResource;
-            }
-            else
+            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
+            if (contentSerializerAttribute == null)
             {
                 if (property != null)
                 {
+                    // There is no ContentSerializerAttribute, so non-public
+                    // properties cannot be serialized.
                     if (!ReflectionHelpers.PropertyIsPublic(property))
+                        return;
+
+                    // Check the type reader to see if it is safe to
+                    // deserialize into the existing type.
+                    if (!property.CanWrite && !output.CanDeserializeIntoExistingObject(property.PropertyType))
                         return;
                 }
                 else
                 {
+                    // There is no ContentSerializerAttribute, so non-public
+                    // fields cannot be deserialized.
                     if (!field.IsPublic)
                         return;
 
@@ -100,42 +104,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 }
             }
 
-            ContentTypeWriter writer;
             Type elementType;
             object memberObject;
 
             if (property != null)
             {
                 elementType = property.PropertyType;
-                writer = output.GetTypeWriter(elementType);
                 memberObject = property.GetValue(parent, null);
             }
             else
             {
                 elementType = field.FieldType;
-                writer = output.GetTypeWriter(elementType);
                 memberObject = field.GetValue(parent);
             }
 
-            if (!isSharedResource)
-            {
-                if (writer == null && elementType == typeof(object))
-                {
-                    // Write elements serialized as "object".
-                    output.WriteObject(memberObject);
-                }
-                else
-                {
-                    // We can get here and still be NULL, exit gracefully.
-                    if (writer == null)
-                        return;
-
-                    output.WriteObject(memberObject, writer);
-                }
-            }
+            if (contentSerializerAttribute != null && contentSerializerAttribute.SharedResource)
+                output.WriteSharedResource(memberObject);
             else
             {
-                output.WriteSharedResource(memberObject);
+                var writer = output.GetTypeWriter(elementType);
+                if (writer == null || elementType == typeof(object) || elementType == typeof(Array))
+                    output.WriteObject(memberObject);
+                else
+                    output.WriteObject(memberObject, writer);
             }
         }
 
@@ -156,8 +147,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         protected internal override void Write(ContentWriter output, object value)
         {
-            if(_baseTypeWriter != null)
-                _baseTypeWriter.Write(output, value);
+            if (_baseType != null)
+            {
+                var baseTypeWriter = output.GetTypeWriter(_baseType);
+                baseTypeWriter.Write(output, value);
+            }
 
             foreach (var property in _properties)
                 Write(value, output, property);

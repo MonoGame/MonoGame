@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="ExtendedFontDescription">
+    <FontName>Foo</FontName>
+    <Size>30</Size>
+    <Spacing>0.75</Spacing>
+    <UseKerning>true</UseKerning>
+    <Style>Bold</Style>
+    <DefaultCharacter>*</DefaultCharacter>
+    <CharacterRegions>
+      <CharacterRegion>
+        <Start> </Start>
+        <End>~</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <Start>°</Start>
+        <End>°</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <Start>Δ</Start>
+        <End>Δ</End>
+      </CharacterRegion>
+    </CharacterRegions>
+    <ExtendedListProperty>
+      <Item>item0</Item>
+      <Item>item1</Item>
+      <Item>item2</Item>
+    </ExtendedListProperty>
+  </Asset>
+</XnaContent>

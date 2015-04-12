@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
-#if WINDOWS
+#if WINDOWS || MACOS
 using FreeImageAPI;
 #endif
 
@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// <summary>
     /// Provides methods for reading texture files for use in the Content Pipeline.
     /// </summary>
-#if WINDOWS
+#if WINDOWS || MACOS
     [ContentImporter(   ".bmp", // Bitmap Image File
                         ".cut", // Dr Halo CUT
                         ".dds", // Direct Draw Surface
@@ -70,10 +70,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
         /// <returns>Resulting game asset.</returns>
         public override TextureContent Import (string filename, ContentImporterContext context)
-		{
-			var output = new Texture2DContent ();
+        {
+            var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-#if WINDOWS
+#if WINDOWS || MACOS
 
             // TODO: This is a pretty lame way to do this. It would be better
             // if we could completely get rid of the System.Drawing.Bitmap
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 				systemBitmap = bitmap;
 			}
 
-            output.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap(true)));
+            output.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
             systemBitmap.Dispose();
 
             return output;

@@ -19,6 +19,8 @@ namespace Microsoft.Xna.Framework
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
         bool disposed;
+        protected bool _alreadyInFullScreenMode = false;
+        protected bool _alreadyInWindowedMode = false;
         protected bool IsDisposed { get { return disposed; } }
 
         #endregion

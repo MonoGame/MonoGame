@@ -187,6 +187,20 @@ namespace Microsoft.Xna.Framework
             this.Height = height;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Rectangle"/> struct, with the specified
+        /// location and size.
+        /// </summary>
+        /// <param name="location">The x and y coordinates of the top-left corner of the created <see cref="Rectangle"/>.</param>
+        /// <param name="size">The width and height of the created <see cref="Rectangle"/>.</param>
+        public Rectangle(Point location,Point size)
+        {
+            this.X = location.X;
+            this.Y = location.Y;
+            this.Width = size.X;
+            this.Height = size.Y;
+        }
+
         #endregion
 
         #region Operators
@@ -250,6 +264,16 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Gets whether or not the provided <see cref="Point"/> lies within the bounds of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="value">The coordinates to check for inclusion in this <see cref="Rectangle"/>.</param>
+        /// <param name="result"><c>true</c> if the provided <see cref="Point"/> lies inside this <see cref="Rectangle"/>; <c>false</c> otherwise. As an output parameter.</param>
+        public void Contains(ref Point value, out bool result)
+        {
+            result = ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
+        }
+
+        /// <summary>
         /// Gets whether or not the provided <see cref="Vector2"/> lies within the bounds of this <see cref="Rectangle"/>.
         /// </summary>
         /// <param name="value">The coordinates to check for inclusion in this <see cref="Rectangle"/>.</param>
@@ -260,6 +284,16 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Gets whether or not the provided <see cref="Vector2"/> lies within the bounds of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="value">The coordinates to check for inclusion in this <see cref="Rectangle"/>.</param>
+        /// <param name="result"><c>true</c> if the provided <see cref="Vector2"/> lies inside this <see cref="Rectangle"/>; <c>false</c> otherwise. As an output parameter.</param>
+        public void Contains(ref Vector2 value, out bool result)
+        {
+            result = ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
+        }
+
+        /// <summary>
         /// Gets whether or not the provided <see cref="Rectangle"/> lies within the bounds of this <see cref="Rectangle"/>.
         /// </summary>
         /// <param name="value">The <see cref="Rectangle"/> to check for inclusion in this <see cref="Rectangle"/>.</param>
@@ -267,6 +301,16 @@ namespace Microsoft.Xna.Framework
         public bool Contains(Rectangle value)
         {
             return ((((this.X <= value.X) && ((value.X + value.Width) <= (this.X + this.Width))) && (this.Y <= value.Y)) && ((value.Y + value.Height) <= (this.Y + this.Height)));
+        }
+
+        /// <summary>
+        /// Gets whether or not the provided <see cref="Rectangle"/> lies within the bounds of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Rectangle"/> to check for inclusion in this <see cref="Rectangle"/>.</param>
+        /// <param name="result"><c>true</c> if the provided <see cref="Rectangle"/>'s bounds lie entirely inside this <see cref="Rectangle"/>; <c>false</c> otherwise. As an output parameter.</param>
+        public void Contains(ref Rectangle value,out bool result)
+        {
+            result = ((((this.X <= value.X) && ((value.X + value.Width) <= (this.X + this.Width))) && (this.Y <= value.Y)) && ((value.Y + value.Height) <= (this.Y + this.Height)));
         }
 
         /// <summary>
@@ -309,6 +353,19 @@ namespace Microsoft.Xna.Framework
             Y -= verticalAmount;
             Width += horizontalAmount * 2;
             Height += verticalAmount * 2;
+        }
+
+        /// <summary>
+        /// Adjusts the edges of this <see cref="Rectangle"/> by specified horizontal and vertical amounts. 
+        /// </summary>
+        /// <param name="horizontalAmount">Value to adjust the left and right edges.</param>
+        /// <param name="verticalAmount">Value to adjust the top and bottom edges.</param>
+        public void Inflate(float horizontalAmount, float verticalAmount)
+        {
+            X -= (int)horizontalAmount;
+            Y -= (int)verticalAmount;
+            Width += (int)horizontalAmount * 2;
+            Height += (int)verticalAmount * 2;
         }
 
         /// <summary>
@@ -422,7 +479,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><see cref="String"/> representation of this <see cref="Rectangle"/>.</returns>
         public override string ToString()
         {
-            return "{{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}}";
+            return "{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}";
         }
 
         /// <summary>

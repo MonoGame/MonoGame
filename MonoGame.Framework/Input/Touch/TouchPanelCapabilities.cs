@@ -7,7 +7,7 @@ using System;
 using Android.Content.PM;
 #endif
 #if IOS
-using MonoTouch.UIKit;
+using UIKit;
 #endif
 
 
@@ -35,14 +35,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 #if WINDOWS_STOREAPP
                 // Is a touch device present?
-                var caps = new Windows.Devices.Input.TouchCapabilities();
-                isConnected = caps.TouchPresent != 0;
-
                 // Iterate through all pointer devices and find the maximum number of concurrent touches possible
                 maximumTouchCount = 0;
                 var pointerDevices = Windows.Devices.Input.PointerDevice.GetPointerDevices();
                 foreach (var pointerDevice in pointerDevices)
+                {
                     maximumTouchCount = Math.Max(maximumTouchCount, (int)pointerDevice.MaxContacts);
+
+                    if (pointerDevice.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch)
+                        isConnected = true;
+                }
 #elif WINDOWS
                 maximumTouchCount = GetSystemMetrics(SM_MAXIMUMTOUCHES);
                 isConnected = (maximumTouchCount > 0);

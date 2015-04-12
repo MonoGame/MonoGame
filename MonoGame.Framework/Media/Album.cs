@@ -12,9 +12,9 @@ using System.IO;
 using Windows.Storage.FileProperties;
 #elif IOS
 using System.Drawing;
-using MonoTouch.CoreGraphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using MediaPlayer;
+using UIKit;
 #elif ANDROID
 using Android.Graphics;
 using Android.Provider;
@@ -200,8 +200,31 @@ namespace Microsoft.Xna.Framework.Media
                 this.thumbnail.Dispose();
 #endif
         }
+        
+#if IOS
+        [CLSCompliant(false)]
+        public UIImage GetAlbumArt(int width = 0, int height = 0)
+        {
+            if (width == 0)
+                width = (int)this.thumbnail.Bounds.Width;
+            if (height == 0)
+                height = (int)this.thumbnail.Bounds.Height;
 
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
+			return this.thumbnail.ImageWithSize(new CGSize(width, height));
+        }
+#elif ANDROID
+        [CLSCompliant(false)]
+        public Bitmap GetAlbumArt(int width = 0, int height = 0)
+        {
+            var albumArt = MediaStore.Images.Media.GetBitmap(MediaLibrary.Context.ContentResolver, this.thumbnail);
+            if (width == 0 || height == 0)
+                return albumArt;
+
+            var scaledAlbumArt = Bitmap.CreateScaledBitmap(albumArt, width, height, true);
+            albumArt.Dispose();
+            return scaledAlbumArt;
+        }
+#else
         /// <summary>
         /// Returns the stream that contains the album art image data.
         /// </summary>
@@ -213,24 +236,25 @@ namespace Microsoft.Xna.Framework.Media
             if (this.HasArt)
                 return this.thumbnail.AsStream();
             return null;
+#else
+            throw new NotImplementedException();
 #endif
         }
+#endif
 
-#elif IOS
+#if IOS
         [CLSCompliant(false)]
-        public UIImage GetAlbumArt()
+        public UIImage GetThumbnail()
         {
-            return this.thumbnail.ImageWithSize(new SizeF(this.thumbnail.Bounds.Width, this.thumbnail.Bounds.Height));
+            return this.GetAlbumArt(220, 220);
         }
 #elif ANDROID
         [CLSCompliant(false)]
-        public Bitmap GetAlbumArt()
+        public Bitmap GetThumbnail()
         {
-            return MediaStore.Images.Media.GetBitmap(MediaLibrary.Context.ContentResolver, this.thumbnail);
+            return this.GetAlbumArt(220, 220);
         }
-#endif
-
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
+#else
         /// <summary>
         /// Returns the stream that contains the album thumbnail image data.
         /// </summary>
@@ -243,22 +267,9 @@ namespace Microsoft.Xna.Framework.Media
                 return this.thumbnail.AsStream();
 
             return null;
+#else
+            throw new NotImplementedException();
 #endif
-        }
-#elif IOS
-        [CLSCompliant(false)]
-        public UIImage GetThumbnail()
-        {
-            return this.thumbnail.ImageWithSize(new SizeF(100, 100)); // TODO: Check size
-        }
-#elif ANDROID
-        [CLSCompliant(false)]
-        public Bitmap GetThumbnail()
-        {
-            using (var albumArt = this.GetAlbumArt())
-            {
-                return Bitmap.CreateScaledBitmap(albumArt, 100, 100, false); // TODO: Check size
-            }
         }
 #endif
 

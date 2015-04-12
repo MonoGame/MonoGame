@@ -169,9 +169,9 @@ namespace Microsoft.Xna.Framework.Net
 						break;
 					case NetIncomingMessageType.NatIntroductionSuccess:
 #if !WINDOWS_PHONE
-                        Game.Instance.Log("NAT punch through OK " + msg.SenderEndpoint);                            
+                        Game.Instance.Log("NAT punch through OK " + msg.SenderEndPoint);                            
 #endif
-						peer.Connect (msg.SenderEndpoint);                            
+						peer.Connect (msg.SenderEndPoint);                            
 						break;
 					case NetIncomingMessageType.DiscoveryRequest:
 						//
@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework.Net
 							om.Write (propertyData [x]);
 						}
 
-						peer.SendDiscoveryResponse (om, msg.SenderEndpoint);
+						peer.SendDiscoveryResponse (om, msg.SenderEndPoint);
 						break;
 					case NetIncomingMessageType.VerboseDebugMessage:
 					case NetIncomingMessageType.DebugMessage:
@@ -210,7 +210,7 @@ namespace Microsoft.Xna.Framework.Net
 						NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte ();
 						if (status == NetConnectionStatus.Disconnected) {
 #if !WINDOWS_PHONE
-                            Game.Instance.Log(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " disconnected! from " + msg.SenderEndpoint);
+                            Game.Instance.Log(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " disconnected! from " + msg.SenderEndPoint);
 #endif
 							CommandGamerLeft cgj = new CommandGamerLeft (msg.SenderConnection.RemoteUniqueIdentifier);
 							CommandEvent cmde = new CommandEvent (cgj);
@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Net
 							//
 							if (!pendingGamers.ContainsKey (msg.SenderConnection.RemoteUniqueIdentifier)) {
 #if !WINDOWS_PHONE
-                                Game.Instance.Log(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " connected! from " + msg.SenderEndpoint);
+                                Game.Instance.Log(NetUtility.ToHexString(msg.SenderConnection.RemoteUniqueIdentifier) + " connected! from " + msg.SenderEndPoint);
 #endif
 								pendingGamers.Add (msg.SenderConnection.RemoteUniqueIdentifier, msg.SenderConnection);
 								SendProfileRequest (msg.SenderConnection);
@@ -257,7 +257,7 @@ namespace Microsoft.Xna.Framework.Net
 
 #if !WINDOWS_PHONE
                                     Game.Instance.Log("Received Introduction for: " + introductionAddress + 
-									" and I am: " + myLocalEndPoint + " from: " + msg.SenderEndpoint);
+									" and I am: " + myLocalEndPoint + " from: " + msg.SenderEndPoint);
 #endif
 									peer.Connect (endPoint);
 								}
@@ -293,7 +293,7 @@ namespace Microsoft.Xna.Framework.Net
 							break;
 						case NetworkMessageType.RequestGamerProfile:
 #if !WINDOWS_PHONE
-                            Game.Instance.Log("Profile Request recieved from: " + msg.SenderEndpoint);
+                            Game.Instance.Log("Profile Request recieved from: " + msg.SenderEndPoint);
 #endif
 							SendProfile (msg.SenderConnection);
 							break;	
@@ -301,7 +301,7 @@ namespace Microsoft.Xna.Framework.Net
 							GamerStates gamerstate = (GamerStates)msg.ReadInt32 ();
 							gamerstate &= ~GamerStates.Local;
 #if !WINDOWS_PHONE
-                            Game.Instance.Log("State Change from: " + msg.SenderEndpoint + " new State: " + gamerstate);
+                            Game.Instance.Log("State Change from: " + msg.SenderEndPoint + " new State: " + gamerstate);
 #endif
 							foreach (var gamer in session.RemoteGamers) {
 								if (gamer.RemoteUniqueIdentifier == msg.SenderConnection.RemoteUniqueIdentifier)
@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework.Net
 		private bool AlreadyConnected (IPEndPoint endPoint)
 		{
 			foreach (NetConnection player in peer.Connections) {
-				if (player.RemoteEndpoint == endPoint) {
+				if (player.RemoteEndPoint == endPoint) {
 					return true;
 				}
 			}
@@ -425,11 +425,11 @@ namespace Microsoft.Xna.Framework.Net
 
 			foreach (NetConnection player in peer.Connections) {
 #if !WINDOWS_PHONE
-                Game.Instance.Log("Introduction sent to: " + player.RemoteEndpoint);
+                Game.Instance.Log("Introduction sent to: " + player.RemoteEndPoint);
 #endif
 				NetOutgoingMessage om = peer.CreateMessage ();
 				om.Write ((byte)NetworkMessageType.Introduction);
-				om.Write (playerConnection.RemoteEndpoint.ToString ()); 
+				om.Write (playerConnection.RemoteEndPoint.ToString ()); 
 
 				peer.SendMessage (om, player, NetDeliveryMethod.ReliableOrdered);
 			}
@@ -658,12 +658,12 @@ namespace Microsoft.Xna.Framework.Net
 						discoveryMsgs.Add (msg);
 						break;
 					case NetIncomingMessageType.UnconnectedData:
-						if (msg.SenderEndpoint.Equals (m_masterServer)) {
+						if (msg.SenderEndPoint.Equals (m_masterServer)) {
 							discoveryMsgs.Add (msg);
 							/*
 				* // it's from the master server - must be a host
-				IPEndPoint hostInternal = msg.ReadIPEndpoint();
-				IPEndPoint hostExternal = msg.ReadIPEndpoint();
+				IPEndPoint hostInternal = msg.ReadIPEndPoint();
+				IPEndPoint hostExternal = msg.ReadIPEndPoint();
 
 				m_hostList.Add(new IPEndPoint[] { hostInternal, hostExternal });                            
 				*/
@@ -754,18 +754,18 @@ namespace Microsoft.Xna.Framework.Net
 					available.HostGamertag = gamerTag;
 					available.OpenPrivateGamerSlots = openPrivateGamerSlots;
 					available.OpenPublicGamerSlots = openPublicGamerSlots;
-					available.EndPoint = im.SenderEndpoint;
+					available.EndPoint = im.SenderEndPoint;
 					available.InternalEndpont = null;
 					break;
 				case NetIncomingMessageType.UnconnectedData :
-					if (im.SenderEndpoint.Equals (m_masterServer)) {
+					if (im.SenderEndPoint.Equals (m_masterServer)) {
 						currentGameCount = im.ReadInt32 ();
 						gamerTag = im.ReadString ();
 						openPrivateGamerSlots = im.ReadInt32 ();
 						openPublicGamerSlots = im.ReadInt32 ();
 						im.ReadBoolean (); // isHost
-						IPEndPoint hostInternal = im.ReadIPEndpoint ();
-						IPEndPoint hostExternal = im.ReadIPEndpoint ();
+						IPEndPoint hostInternal = im.ReadIPEndPoint ();
+						IPEndPoint hostExternal = im.ReadIPEndPoint ();
 						available.SessionType = NetworkSessionType.PlayerMatch;
 						available.CurrentGamerCount = currentGameCount;
 						available.HostGamertag = gamerTag;

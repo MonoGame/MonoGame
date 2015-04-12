@@ -5,7 +5,7 @@
 using System;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Runtime.Remoting.Activation;
+using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 
@@ -81,21 +81,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
         public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
-            ImageAttributes imageAttr = new ImageAttributes();
+            var imageAttr = new ImageAttributes();
             imageAttr.SetWrapMode(WrapMode.TileFlipXY);
 
-            foreach (MipmapChain face in faces)
+            // If we already have mipmaps and we're not supposed to overwrite
+            // them then return without any generation.
+            if (!overwriteExistingMipmaps && faces.Any(f => f.Count > 1))
+                return;
+
+            // Generate the mips for each face.
+            foreach (var face in faces)
             {
-                BitmapContent faceBitmap = face[0];
+                // Remove any existing mipmaps.
+                var faceBitmap = face[0];
+                face.Clear();
+                face.Add(faceBitmap);
+
                 int width = faceBitmap.Width, height = faceBitmap.Height;
-                Bitmap systemBitmap;
                 while (width > 1 && height > 1)
                 {
-                    systemBitmap = face[face.Count-1].ToSystemBitmap();
+                    var systemBitmap = face[face.Count-1].ToSystemBitmap();
                     width /= 2;
                     height /= 2;
 
-                    Bitmap bitmap=new Bitmap(width,height);
+                    var bitmap = new Bitmap(width,height);
                     using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
                     {
                         var destRect = new System.Drawing.Rectangle(0, 0, width, height);
@@ -113,7 +122,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Verifies that all contents of this texture are present, correct and match the capabilities of the device.
         /// </summary>
         /// <param name="targetProfile">The profile identifier that defines the capabilities of the device.</param>
-        public abstract void Validate(Nullable<GraphicsProfile> targetProfile);
+        public abstract void Validate(GraphicsProfile? targetProfile);
 
         public virtual void Dispose()
         {

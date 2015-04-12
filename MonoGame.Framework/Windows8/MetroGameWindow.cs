@@ -52,6 +52,7 @@ using Windows.Graphics.Display;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
@@ -135,10 +136,10 @@ namespace Microsoft.Xna.Framework
             Instance = new MetroGameWindow();
         }
 
-        public void Initialize(CoreWindow coreWindow, UIElement inputElement)
+        public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement);
+            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
@@ -173,10 +174,10 @@ namespace Microsoft.Xna.Framework
         private void SetClientBounds(double width, double height)
         {
             var dpi = DisplayProperties.LogicalDpi;
-            var pwidth = width * dpi / 96.0;
-            var pheight = height * dpi / 96.0;
+            var pwidth = (int)Math.Round(width * dpi / 96.0);
+            var pheight = (int)Math.Round(height * dpi / 96.0);
 
-            _clientBounds = new Rectangle(0, 0, (int)pwidth, (int)pheight);
+            _clientBounds = new Rectangle(0, 0, pwidth, pheight);
         }
 
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)

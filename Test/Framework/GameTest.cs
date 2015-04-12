@@ -308,6 +308,14 @@ namespace MonoGame.Tests {
 				DrawCount = 0;
 			}
 
+            protected override void EndRun()
+            {
+                base.EndRun();
+#if XNA
+                AbsorbQuitMessage();
+#endif
+            }
+
 			protected override void Update (GameTime gameTime)
 			{
 				base.Update (gameTime);

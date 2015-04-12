@@ -3,10 +3,13 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
+using System.Xml;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -23,63 +26,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 		{
 		}
 
-		/// <summary>
-		/// Called by the XNA Framework when importing a .spritefont file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
-		/// </summary>
-		/// <param name="filename">Name of a game asset file.</param>
-		/// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
-		/// <returns>Resulting game asset.</returns>
-		public override FontDescription Import(string filename, ContentImporterContext context)
-		{
-			var xmldoc = XElement.Load(filename, LoadOptions.PreserveWhitespace);
-			xmldoc = xmldoc.Element("Asset");
+	    /// <summary>
+	    /// Called by the XNA Framework when importing a .spritefont file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
+	    /// </summary>
+	    /// <param name="filename">Name of a game asset file.</param>
+	    /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+	    /// <returns>Resulting game asset.</returns>
+	    public override FontDescription Import(string filename, ContentImporterContext context)
+	    {
+	        FontDescription fontDescription = null;
 
-			var fontName = xmldoc.Element("FontName").Value;
-			var fontSize = float.Parse(xmldoc.Element("Size").Value);
-			var spacing = float.Parse(xmldoc.Element("Spacing").Value);
-			var useKerning = false;
-			var useKerningElement = xmldoc.Element ("UseKerning");
-			if (useKerningElement != null)
-				useKerning = bool.Parse(useKerningElement.Value);
+	        using (var input = XmlReader.Create(filename))
+	            fontDescription = IntermediateSerializer.Deserialize<FontDescription>(input, filename);
 
-			FontDescriptionStyle style = FontDescriptionStyle.Regular;
-			var styleElement = xmldoc.Element ("Style");
-			if (styleElement != null) {
-				var styleVal = styleElement.Value;
+	        fontDescription.Identity = new ContentIdentity(new FileInfo(filename).FullName, "FontDescriptionImporter");
 
-				if (styleVal.Contains ("Bold") && styleVal.Contains ("Italic"))
-					style = FontDescriptionStyle.Bold | FontDescriptionStyle.Italic;
-				else
-					style = (FontDescriptionStyle)Enum.Parse (typeof (FontDescriptionStyle), styleVal, false);
-			}
-
-			char? defaultCharacter = null;
-			var defChar = xmldoc.Element("DefaultCharacter");
-			if (defChar != null)
-				defaultCharacter = defChar.Value[0];
-
-			var characterRegions = new List<CharacterRegion> ();
-
-			foreach (var region in xmldoc.Descendants("CharacterRegion"))
-			{
-				var Start = (int)region.Element("Start").Value[0];
-				var End = (int)region.Element("End").Value[0];
-
-				characterRegions.Add(new CharacterRegion((char)Start, (char)End));
-			}
-
-            var characters = new CharacterCollection();
-            foreach (var r in characterRegions)
-            {
-                foreach (var c in r.Characters)
-                    characters.Add(c);
-            }
-
-			var fontDescription = new FontDescription(fontName, fontSize, spacing, style, useKerning);
-            fontDescription.Characters = characters;
-			fontDescription.DefaultCharacter = defaultCharacter;
-			fontDescription.Identity = new ContentIdentity (filename);
-			return fontDescription;
-		}
+	        return fontDescription;
+	    }
 	}
 }

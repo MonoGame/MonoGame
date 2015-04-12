@@ -48,7 +48,7 @@ namespace Lidgren.Network
 		public static byte[] CreateRandomSalt()
 		{
 			byte[] retval = new byte[16];
-			NetRandom.Instance.NextBytes(retval);
+			CryptoRandom.Instance.NextBytes(retval);
 			return retval;
 		}
 
@@ -58,7 +58,7 @@ namespace Lidgren.Network
 		public static byte[] CreateRandomEphemeral()
 		{
 			byte[] retval = new byte[32];
-			NetRandom.Instance.NextBytes(retval);
+			CryptoRandom.Instance.NextBytes(retval);
 			return retval;
 		}
 
@@ -185,7 +185,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Create XTEA symmetrical encryption object from sessionValue
 		/// </summary>
-		public static NetXtea CreateEncryption(byte[] sessionValue)
+		public static NetXtea CreateEncryption(NetPeer peer, byte[] sessionValue)
 		{
 			var sha = GetHashAlgorithm();
 			var hash = sha.ComputeHash(sessionValue);
@@ -198,7 +198,7 @@ namespace Lidgren.Network
 					key[i] ^= hash[i + (j * 16)];
 			}
 
-			return new NetXtea(key);
+			return new NetXtea(peer, key);
 		}
 	}
 }
