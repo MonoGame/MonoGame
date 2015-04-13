@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _multiSampleAntiAlias;
         private bool _scissorTestEnable;
         private float _slopeScaleDepthBias;
+        private bool _depthClipEnable;
 
         public CullMode CullMode
 	    {
@@ -77,6 +78,16 @@ namespace Microsoft.Xna.Framework.Graphics
 	        }
 	    }
 
+        public bool DepthClipEnable
+        {
+            get { return _depthClipEnable; }
+            set
+            {
+                ThrowIfBound();
+                _depthClipEnable = value;
+            }
+        }
+
         internal void BindToGraphicsDevice(GraphicsDevice device)
         {
             if (_defaultStateObject)
@@ -106,6 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			MultiSampleAntiAlias = true;
 			ScissorTestEnable = false;
 			SlopeScaleDepthBias = 0;
+            DepthClipEnable = true;
 		}
 
 	    private RasterizerState(string name, CullMode cullMode)
@@ -125,6 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        _multiSampleAntiAlias = cloneSource._multiSampleAntiAlias;
 	        _scissorTestEnable = cloneSource._scissorTestEnable;
 	        _slopeScaleDepthBias = cloneSource._slopeScaleDepthBias;
+	        _depthClipEnable = cloneSource._depthClipEnable;
 	    }
 
 		static RasterizerState ()
