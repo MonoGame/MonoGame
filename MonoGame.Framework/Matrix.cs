@@ -812,10 +812,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for orthographic view.
         /// </summary>
-        /// <param name="width">Width of the viewing field.</param>
-        /// <param name="height">Height of the viewing field.</param>
-        /// <param name="zNearPlane">Near plane of z-value of the viewing field.</param>
-        /// <param name="zFarPlane">Far plane of z-value of the viewing field.</param>
+        /// <param name="width">Width of the viewing volume.</param>
+        /// <param name="height">Height of the viewing volume.</param>
+        /// <param name="zNearPlane">Depth of the near plane.</param>
+        /// <param name="zFarPlane">Depth of the far plane.</param>
         /// <returns>The new projection <see cref="Matrix"/> for orthographic view.</returns>
         public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
         {
@@ -827,10 +827,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for orthographic view.
         /// </summary>
-        /// <param name="width">Width of the viewing field.</param>
-        /// <param name="height">Height of the viewing field.</param>
-        /// <param name="zNearPlane">Near plane of z-value of the viewing field.</param>
-        /// <param name="zFarPlane">Far plane of z-value of the viewing field.</param>
+        /// <param name="width">Width of the viewing volume.</param>
+        /// <param name="height">Height of the viewing volume.</param>
+        /// <param name="zNearPlane">Depth of the near plane.</param>
+        /// <param name="zFarPlane">Depth of the far plane.</param>
         /// <param name="result">The new projection <see cref="Matrix"/> for orthographic view as an output parameter.</param>
         public static void CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane, out Matrix result)
         {
@@ -848,12 +848,12 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
         /// </summary>
-        /// <param name="left">Left coordinate of the viewing field.</param>
-        /// <param name="right">Right coordinate of the viewing field.</param>
-        /// <param name="bottom">Bottom coordinate of the viewing field.</param>
-        /// <param name="top">Top coordinate of the viewing field.</param>
-        /// <param name="zNearPlane">Near plane of z-value of the viewing field.</param>
-        /// <param name="zFarPlane">Far plane of z-value of the viewing field.</param>
+        /// <param name="left">Lower x-value at the near plane.</param>
+        /// <param name="right">Upper x-value at the near plane.</param>
+        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
+        /// <param name="top">Upper y-value at the near plane.</param>
+        /// <param name="zNearPlane">Depth of the near plane.</param>
+        /// <param name="zFarPlane">Depth of the far plane.</param>
         /// <returns>The new projection <see cref="Matrix"/> for customized orthographic view.</returns>
         public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
         {
@@ -865,9 +865,9 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
         /// </summary>
-        /// <param name="viewingVolume">The viewing field.</param>
-        /// <param name="zNearPlane">Near plane of z-value of the viewing field.</param>
-        /// <param name="zFarPlane">Far plane of z-value of the viewing field.</param>
+        /// <param name="viewingVolume">The viewing volume.</param>
+        /// <param name="zNearPlane">Depth of the near plane.</param>
+        /// <param name="zFarPlane">Depth of the far plane.</param>
         /// <returns>The new projection <see cref="Matrix"/> for customized orthographic view.</returns>
         public static Matrix CreateOrthographicOffCenter(Rectangle viewingVolume, float zNearPlane, float zFarPlane)
         {
@@ -879,12 +879,12 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
         /// </summary>
-        /// <param name="left">Left coordinate of the viewing field.</param>
-        /// <param name="right">Right coordinate of the viewing field.</param>
-        /// <param name="bottom">Bottom coordinate of the viewing field.</param>
-        /// <param name="top">Top coordinate of the viewing field.</param>
-        /// <param name="zNearPlane">Near plane of z-value of the viewing field.</param>
-        /// <param name="zFarPlane">Far plane of z-value of the viewing field.</param>
+        /// <param name="left">Lower x-value at the near plane.</param>
+        /// <param name="right">Upper x-value at the near plane.</param>
+        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
+        /// <param name="top">Upper y-value at the near plane.</param>
+        /// <param name="zNearPlane">Depth of the near plane.</param>
+        /// <param name="zFarPlane">Depth of the far plane.</param>
         /// <param name="result">The new projection <see cref="Matrix"/> for customized orthographic view as an output parameter.</param>
         public static void CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane, out Matrix result)
         {
@@ -909,10 +909,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for perspective view.
         /// </summary>
-        /// <param name="width">Width of the viewing field.</param>
-        /// <param name="height">Height of the viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <param name="width">Width of the viewing volume.</param>
+        /// <param name="height">Height of the viewing volume.</param>
+        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane.</param>
         /// <returns>The new projection <see cref="Matrix"/> for perspective view.</returns>
         public static Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance)
         {
@@ -924,10 +924,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for perspective view.
         /// </summary>
-        /// <param name="width">Width of the viewing field.</param>
-        /// <param name="height">Height of the viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <param name="width">Width of the viewing volume.</param>
+        /// <param name="height">Height of the viewing volume.</param>
+        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane.</param>
         /// <param name="result">The new projection <see cref="Matrix"/> for perspective view as an output parameter.</param>
         public static void CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
@@ -955,12 +955,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for perspective view with FOV.
+        /// Creates a new projection <see cref="Matrix"/> for perspective view with field of view.
         /// </summary>
         /// <param name="fieldOfView">Field of view in the y direction in radians.</param>
-        /// <param name="aspectRatio">Width divided by height of the viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <param name="aspectRatio">Width divided by height of the viewing volume.</param>
+        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane.</param>
         /// <returns>The new projection <see cref="Matrix"/> for perspective view with FOV.</returns>
         public static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
         {
@@ -970,12 +970,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for perspective view with FOV.
+        /// Creates a new projection <see cref="Matrix"/> for perspective view with field of view.
         /// </summary>
         /// <param name="fieldOfView">Field of view in the y direction in radians.</param>
-        /// <param name="aspectRatio">Width divided by height of the viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <param name="aspectRatio">Width divided by height of the viewing volume.</param>
+        /// <param name="nearPlaneDistance">Depth of the near plane.</param>
+        /// <param name="farPlaneDistance">Depth of the far plane.</param>
         /// <param name="result">The new projection <see cref="Matrix"/> for perspective view with FOV as an output parameter.</param>
         public static void CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
@@ -1011,12 +1011,12 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
         /// </summary>
-        /// <param name="left">Left coordinate of the viewing field.</param>
-        /// <param name="right">Right coordinate of the viewing field.</param>
-        /// <param name="bottom">Bottom coordinate of the viewing field.</param>
-        /// <param name="top">Top coordinate of the viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <param name="left">Lower x-value at the near plane.</param>
+        /// <param name="right">Upper x-value at the near plane.</param>
+        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
+        /// <param name="top">Upper y-value at the near plane.</param>
+        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane.</param>
         /// <returns>The new <see cref="Matrix"/> for customized perspective view.</returns>
         public static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance)
         {
@@ -1024,13 +1024,12 @@ namespace Microsoft.Xna.Framework
             CreatePerspectiveOffCenter(left, right, bottom, top, nearPlaneDistance, farPlaneDistance, out result);
             return result;
         }
-
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
         /// </summary>
-        /// <param name="viewingVolume">The viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <param name="viewingVolume">The viewing volume.</param>
+        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane.</param>
         /// <returns>The new <see cref="Matrix"/> for customized perspective view.</returns>
         public static Matrix CreatePerspectiveOffCenter(Rectangle viewingVolume, float nearPlaneDistance, float farPlaneDistance)
         {
@@ -1042,12 +1041,12 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
         /// </summary>
-        /// <param name="left">Left coordinate of the viewing field.</param>
-        /// <param name="right">Right coordinate of the viewing field.</param>
-        /// <param name="bottom">Bottom coordinate of the viewing field.</param>
-        /// <param name="top">Top coordinate of the viewing field.</param>
-        /// <param name="nearPlaneDistance">Near plane of the viewing field.</param>
-        /// <param name="farPlaneDistance">Far plane of the viewing field.</param>
+        /// <param name="left">Lower x-value at the near plane.</param>
+        /// <param name="right">Upper x-value at the near plane.</param>
+        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
+        /// <param name="top">Upper y-value at the near plane.</param>
+        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
+        /// <param name="farPlaneDistance">Distance to the far plane.</param>
         /// <param name="result">The new <see cref="Matrix"/> for customized perspective view as an output parameter.</param>
         public static void CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
