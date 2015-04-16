@@ -12,7 +12,7 @@ using TP = Microsoft.Xna.Framework.Content.Pipeline;
 namespace MonoGame.Tools.Pipeline
 {
     [System.ComponentModel.ToolboxItem (true)]
-    public partial class PropertiesView : Bin
+    public partial class PropertiesView : VBox
     {
         List<object> currentObjects;
         internal IController controller { get; set; }

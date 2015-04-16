@@ -22,8 +22,8 @@
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;GTK</Platform>
-      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -273,66 +273,65 @@
     <EmbeddedResource Include="Icons\settings.png" />
 
     <!-- Copy config files to output directory -->
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\atk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>atk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gdk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>gdk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>glade-sharp.dll.config</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gio-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>gio-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\glib-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>glib-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gtk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>gtk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\pango-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>pango-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
-    <!-- Copy gtk libs to output directory -->
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libatksharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libatksharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>atk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libgdksharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libgdksharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>gdk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libgladesharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libgladesharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>glade-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libglibsharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libglibsharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>glib-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libgtksharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libgtksharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>gtk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libpangosharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libpangosharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>pango-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 

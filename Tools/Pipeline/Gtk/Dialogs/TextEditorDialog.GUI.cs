@@ -22,7 +22,11 @@ namespace MonoGame.Tools.Pipeline
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			this.BorderWidth = ((uint)(4));
 			// Internal child MonoGame.Tools.Pipeline.TextEditorDialog.VBox
+            #if GTK2
 			global::Gtk.VBox w1 = this.VBox;
+            #elif GTK3
+            global::Gtk.Box w1 = this.ContentArea;
+            #endif
 			w1.Name = "dialog1_VBox";
 			w1.Spacing = 4;
 			w1.BorderWidth = ((uint)(2));
@@ -36,6 +40,9 @@ namespace MonoGame.Tools.Pipeline
 			w2.Position = 0;
 			// Container child dialog1_VBox.Gtk.Box+BoxChild
 			this.entry1 = new global::Gtk.Entry ();
+            #if GTK3
+            entry1.Expand = true;
+            #endif
 			this.entry1.CanFocus = true;
 			this.entry1.Name = "entry1";
 			this.entry1.IsEditable = true;
@@ -54,7 +61,11 @@ namespace MonoGame.Tools.Pipeline
 			w4.Expand = false;
 			w4.Fill = false;
 			// Internal child MonoGame.Tools.Pipeline.TextEditorDialog.ActionArea
+            #if GTK2
 			global::Gtk.HButtonBox w5 = this.ActionArea;
+            #elif GTK3
+            global::Gtk.ButtonBox w5 = this.ActionArea;
+            #endif
 			w5.Name = "dialog1_ActionArea";
 			w5.Spacing = 10;
 			w5.BorderWidth = ((uint)(5));
