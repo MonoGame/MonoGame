@@ -22,6 +22,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformLoad(Action<int> progressCallback)
         {
+#if !WINDOWS_UAP
             Task.Run(async () =>
             {
                 if (musicFolder == null)
@@ -126,6 +127,7 @@ namespace Microsoft.Xna.Framework.Media
                 albumCollection = new AlbumCollection(albumList);
                 songCollection = new SongCollection(songList);
             }).Wait();
+#endif
         }
 
         private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
