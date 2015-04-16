@@ -46,6 +46,13 @@ namespace MonoGame.Tools.Pipeline
 
         public bool LaunchDebugger { get; set; }
 
+        public string ProjectLocation {
+            get
+            {
+                return _project.Location;
+            }
+        }
+
         public bool ProjectOpen { get; private set; }
 
         public bool ProjectDirty { get; set; }
@@ -68,14 +75,13 @@ namespace MonoGame.Tools.Pipeline
 
         public event Action OnBuildFinished;
 
-        public PipelineController(IView view, PipelineProject project)
+        public PipelineController(IView view)
         {
             _actionStack = new ActionStack();
             Selection = new Selection();
 
             View = view;
             View.Attach(this);
-            _project = project;
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
@@ -641,7 +647,7 @@ namespace MonoGame.Tools.Pipeline
                         try
                         {
                             DirectoryInfo dinfo = new DirectoryInfo(folder);
-                            string newdir = directories[i].Replace(folder, initialDirectory + dinfo.Name + Path.DirectorySeparatorChar);
+                            string newdir = directories[i].Replace(folder, initialDirectory + Path.DirectorySeparatorChar + dinfo.Name + Path.DirectorySeparatorChar);
 
                             if (!Directory.Exists(newdir))
                                 Directory.CreateDirectory(newdir);
@@ -660,7 +666,7 @@ namespace MonoGame.Tools.Pipeline
                         try
                         {
                             DirectoryInfo dinfo = new DirectoryInfo(folder);
-                            string newfile = files[i].Replace(folder, initialDirectory + dinfo.Name + Path.DirectorySeparatorChar);
+                            string newfile = files[i].Replace(folder, initialDirectory + Path.DirectorySeparatorChar + dinfo.Name + Path.DirectorySeparatorChar);
 
                             if (!File.Exists(newfile))
                                 File.Copy(files[i], newfile);

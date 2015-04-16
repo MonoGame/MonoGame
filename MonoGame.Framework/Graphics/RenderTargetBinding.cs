@@ -82,6 +82,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+        public RenderTargetBinding(RenderTarget2D renderTarget, int arraySlice)
+        {
+            if (renderTarget == null)
+                throw new ArgumentNullException("renderTarget");
+            if (arraySlice < 0 || arraySlice >= renderTarget.ArraySize)
+                throw new ArgumentOutOfRangeException("arraySlice");
+            if (!renderTarget.GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new InvalidOperationException("Texture arrays are not supported on this graphics device");
+
+            _renderTarget = renderTarget;
+            _arraySlice = arraySlice;
+        }
+
         public RenderTargetBinding(RenderTarget3D renderTarget)
         {
             if (renderTarget == null)

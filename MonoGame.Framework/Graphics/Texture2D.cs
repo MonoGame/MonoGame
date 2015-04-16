@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal int width;
 		internal int height;
+        internal int ArraySize;
 
         public Rectangle Bounds
         {
@@ -28,30 +29,39 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1)
         {
         }
 
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1)
         {
+        }
+
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, int arraySize)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize)
+        {
+            
         }
 
         internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
-            : this(graphicsDevice, width, height, mipmap, format, type, false)
+            : this(graphicsDevice, width, height, mipmap, format, type, false, 1)
         {
         }
 
-        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
+        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
+            if (arraySize > 1 && !graphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySize");
 
             this.GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+            this.ArraySize = arraySize;
 
             // Texture will be assigned by the swap chain.
 		    if (type == SurfaceType.SwapChainRenderTarget)
@@ -76,12 +86,20 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        public void SetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             if (data == null)
-				throw new ArgumentNullException("data");
+                throw new ArgumentNullException("data");
 
-            PlatformSetData<T>(level, rect, data, startIndex, elementCount);
+            if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
+
+            PlatformSetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
+        }
+
+        public void SetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct 
+        {
+            this.SetData(level, 0, rect, data, startIndex, elementCount);
         }
 
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
@@ -93,15 +111,22 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			this.SetData(0, null, data, 0, data.Length);
         }
-		
-		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+
+        public void GetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             if (data == null || data.Length == 0)
                 throw new ArgumentException("data cannot be null");
             if (data.Length < startIndex + elementCount)
                 throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+            if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
 
-            PlatformGetData<T>(level, rect, data, startIndex, elementCount);
+            PlatformGetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
+        }
+		
+		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            this.GetData(level, 0, rect, data, startIndex, elementCount);
         }
 
 		public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct

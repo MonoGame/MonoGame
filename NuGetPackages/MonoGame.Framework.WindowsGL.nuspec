@@ -20,9 +20,6 @@
     <files>
         <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
         <file src="WindowsGL\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
-        <file src="WindowsGL\AnyCPU\Release\Tao.Sdl.dll" target="lib\net40\Tao.Sdl.dll" />
-        <file src="..\..\ThirdParty\GamepadConfig\SDL.dll" target="content\net40\SDL.dll" />
-        <file src="..\..\NuGetPackages\tools\MonoGame.Framework\WindowsGL\install.ps1" target="tools\install.ps1" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
 </package>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework
@@ -8,6 +9,71 @@ namespace MonoGame.Tests.Framework
     /// </summary>
     class EnumConformingTest
     {
+        #region MonoGame.Framework
+
+        [Test]
+        public void ContainmentTypeEnum()
+        {
+            Assert.AreEqual(0, (int)ContainmentType.Disjoint);
+            Assert.AreEqual(1, (int)ContainmentType.Contains);
+            Assert.AreEqual(2, (int)ContainmentType.Intersects);
+        }
+
+        [Test]
+        public void CurveContinuityEnum()
+        {
+            Assert.AreEqual(0, (int)CurveContinuity.Smooth);
+            Assert.AreEqual(1, (int)CurveContinuity.Step);
+        }
+
+        [Test]
+        public void CurveLoopTypeEnum()
+        {
+            Assert.AreEqual(0, (int)CurveLoopType.Constant);
+            Assert.AreEqual(1, (int)CurveLoopType.Cycle);
+            Assert.AreEqual(2, (int)CurveLoopType.CycleOffset);
+            Assert.AreEqual(3, (int)CurveLoopType.Oscillate);
+            Assert.AreEqual(4, (int)CurveLoopType.Linear);
+        }
+
+        [Test]
+        public void CurveTangentEnum()
+        {
+            Assert.AreEqual(0, (int)CurveTangent.Flat);
+            Assert.AreEqual(1, (int)CurveTangent.Linear);
+            Assert.AreEqual(2, (int)CurveTangent.Smooth);
+        }
+
+        [Test]
+        public void DisplayOrientationEnum()
+        {
+            Assert.AreEqual(0, (int)DisplayOrientation.Default);
+            Assert.AreEqual(1, (int)DisplayOrientation.LandscapeLeft);
+            Assert.AreEqual(2, (int)DisplayOrientation.LandscapeRight);
+            Assert.AreEqual(4, (int)DisplayOrientation.Portrait);
+        }
+
+        [Test]
+        public void PlaneIntersectionTypeEnum()
+        {
+            Assert.AreEqual(0, (int)PlaneIntersectionType.Front);
+            Assert.AreEqual(1, (int)PlaneIntersectionType.Back);
+            Assert.AreEqual(2, (int)PlaneIntersectionType.Intersecting);
+        }
+
+        [Test]
+        public void PlayerIndexEnum()
+        {
+            Assert.AreEqual(0, (int)PlayerIndex.One);
+            Assert.AreEqual(1, (int)PlayerIndex.Two);
+            Assert.AreEqual(2, (int)PlayerIndex.Three);
+            Assert.AreEqual(3, (int)PlayerIndex.Four);
+        }
+
+        #endregion
+
+        #region MonoGame.Framework.Graphics
+
         [Test]
         public void BlendEnum()
         {
@@ -297,5 +363,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(11, (int)VertexElementUsage.Sample);
             Assert.AreEqual(12, (int)VertexElementUsage.TessellateFactor);
         }
+
+        #endregion
     }
 }

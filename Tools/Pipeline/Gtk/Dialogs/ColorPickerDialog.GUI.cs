@@ -15,6 +15,7 @@ namespace MonoGame.Tools.Pipeline
 			global::Stetic.Gui.Initialize (this);
 			// Widget MonoGame.Tools.Pipeline.ColorPickerDialog
 			this.Name = "MonoGame.Tools.Pipeline.ColorPickerDialog";
+			this.Title = global::Mono.Unix.Catalog.GetString ("Color Picker");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child MonoGame.Tools.Pipeline.ColorPickerDialog.VBox
 			global::Gtk.VBox w1 = this.VBox;
@@ -62,8 +63,8 @@ namespace MonoGame.Tools.Pipeline
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 509;
-			this.DefaultHeight = 326;
+			this.DefaultWidth = 511;
+			this.DefaultHeight = 334;
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 			this.buttonOk.Clicked += new global::System.EventHandler (this.OnButtonOkClicked);

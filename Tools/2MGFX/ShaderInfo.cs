@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace TwoMGFX
 {
@@ -24,27 +23,27 @@ namespace TwoMGFX
 
         public List<string> AdditionalOutputFiles { get; private set; }
 
-		static public ShaderInfo FromFile(string path, Options options)
+        static public ShaderInfo FromFile(string path, Options options, IEffectCompilerOutput output)
 		{
 			var effectSource = File.ReadAllText(path);
-			return FromString(effectSource, path, options);
+			return FromString(effectSource, path, options, output);
 		}
 
-		static public ShaderInfo FromString(string effectSource, string filePath, Options options)
+		static public ShaderInfo FromString(string effectSource, string filePath, Options options, IEffectCompilerOutput output)
 		{
-			var macros = new List<SharpDX.Direct3D.ShaderMacro>();
-			macros.Add(new SharpDX.Direct3D.ShaderMacro("MGFX", 1));
+			var macros = new Dictionary<string, string>();
+			macros.Add("MGFX", "1");
 
 			// Under the DX11 profile we pass a few more macros.
 			if (options.Profile == ShaderProfile.DirectX_11)
 			{
-				macros.Add(new SharpDX.Direct3D.ShaderMacro("HLSL", 1));
-				macros.Add(new SharpDX.Direct3D.ShaderMacro("SM4", 1));
+				macros.Add("HLSL", "1");
+				macros.Add("SM4", "1");
 			}
             else if (options.Profile == ShaderProfile.OpenGL)
             {
-                macros.Add(new SharpDX.Direct3D.ShaderMacro("GLSL", 1));
-                macros.Add(new SharpDX.Direct3D.ShaderMacro("OPENGL", 1));
+                macros.Add("GLSL", "1");
+                macros.Add("OPENGL", "1");
             }
             else if (options.Profile == ShaderProfile.PlayStation4)
             {
@@ -53,12 +52,13 @@ namespace TwoMGFX
 
 			// If we're building shaders for debug set that flag too.
 			if (options.Debug)
-				macros.Add(new SharpDX.Direct3D.ShaderMacro("DEBUG", 1));
+				macros.Add("DEBUG", "1");
 
 		    if (!string.IsNullOrEmpty(options.Defines))
 		    {
 		        var defines = options.Defines.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-		        macros.AddRange(defines.Select(define => new SharpDX.Direct3D.ShaderMacro(define, 1)));
+                foreach (var define in defines)
+                    macros.Add(define, "1");
 		    }
 
 		    // Use the D3DCompiler to pre-process the file resolving 
@@ -66,8 +66,7 @@ namespace TwoMGFX
 			string newFile;
 		    var fullPath = Path.GetFullPath(filePath);
 		    var dependencies = new List<string>();
-            using (var includer = new CompilerInclude(Path.GetDirectoryName(Path.GetFullPath(filePath)), dependencies))
-                newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer, fullPath);
+		    newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
 
 			// Parse the resulting file for techniques and passes.
             var tree = new Parser(new Scanner()).Parse(newFile, fullPath);

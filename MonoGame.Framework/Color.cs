@@ -114,6 +114,7 @@ namespace Microsoft.Xna.Framework
             MintCream = new Color(0xfffafff5);
             MistyRose = new Color(0xffe1e4ff);
             Moccasin = new Color(0xffb5e4ff);
+            MonoGameOrange = new Color(0xff003ce7);
             NavajoWhite = new Color(0xffaddeff);
             Navy = new Color(0xff800000);
             OldLace = new Color(0xffe6f5fd);
@@ -1274,6 +1275,15 @@ namespace Microsoft.Xna.Framework
         /// Moccasin color (R:255,G:228,B:181,A:255).
         /// </summary>
         public static Color Moccasin
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// MonoGame orange theme color (R:231,G:60,B:0,A:255).
+        /// </summary>
+        public static Color MonoGameOrange
         {
             get;
             private set;

@@ -228,14 +228,10 @@ Section "Visual Studio 2010 Templates" VS2010
 
   IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    ; Set output path to the installation directory.
     SetOutPath "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
-
-    ; install the Templates for MonoDevelop
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
-  
     DetailPrint "Visual Studio 2010 not found"
   EndTemplates:
 
@@ -245,16 +241,11 @@ Section "Visual Studio 2012 Templates" VS2012
 
   IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    ; Set output path to the installation directory.
     SetOutPath "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
-
-    ; install the Templates for MonoDevelop
     File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
-    ; Install the VS 2010 templates as well 
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
-
     DetailPrint "Visual Studio 2012 not found"
   EndTemplates:
 
@@ -264,17 +255,25 @@ Section "Visual Studio 2013 Templates" VS2013
 
   IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    ; Set output path to the installation directory.
     SetOutPath "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
-
-    ; install the Templates for MonoDevelop
     File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
-    ; Install the VS 2010 templates as well 
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
-
     DetailPrint "Visual Studio 2013 not found"
+  EndTemplates:
+
+SectionEnd
+
+Section "Visual Studio 2015 Templates" VS2015
+
+  IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    SetOutPath "$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\MonoGame"
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+    DetailPrint "Visual Studio 2015 not found"
   EndTemplates:
 
 SectionEnd
@@ -306,6 +305,8 @@ LangString OpenALDesc ${LANG_ENGLISH} "Install the OpenAL drivers"
 LangString MonoDevelopDesc ${LANG_ENGLISH} "Install the project templates for MonoDevelop"
 LangString VS2010Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2010"
 LangString VS2012Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2012"
+LangString VS2013Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2013"
+LangString VS2015Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2015"
 LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your start menu"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -314,13 +315,45 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
   !insertmacro MUI_DESCRIPTION_TEXT ${MonoDevelop} $(MonoDevelopDesc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2010} $(VS2010Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2012} $(VS2012Desc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${VS2013} $(VS2013Desc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${VS2015} $(VS2015Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+Function checkVS2010
+IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2010} $0
+  end:
+FunctionEnd
+ 
+Function checkVS2012
+IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2012} $0
+  end:
+FunctionEnd
 
+Function checkVS2013
+IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2013} $0
+  end:
+FunctionEnd
 
-Function .onInit
+Function checkVS2015
+IfFileExists `$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\*.*` end disable
+  disable:
+	 SectionSetFlags ${VS2015} $0
+  end:
+FunctionEnd
 
+Function .onInit 
+  IntOp $0 $0 | ${SF_RO}
+  Call checkVS2010
+  Call checkVS2012
+  Call checkVS2013
+  Call checkVS2015
   IntOp $0 ${SF_SELECTED} | ${SF_RO}
   SectionSetFlags ${core_id} $0
 FunctionEnd
@@ -381,6 +414,7 @@ Section "Uninstall"
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "${MSBuildInstallDir}"
   RMDir /r "$SMPROGRAMS\${APPNAME}"
 

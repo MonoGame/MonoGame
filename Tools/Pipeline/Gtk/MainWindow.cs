@@ -66,6 +66,11 @@ namespace MonoGame.Tools.Pipeline
             treerebuild.Activated += delegate {
                 projectview1.Rebuild ();
             };
+
+            //This is always returning false, and solves a bug
+            if (projectview1 == null || propertiesview1 == null)
+                return;
+
             projectview1.Initalize (this, treerebuild, propertiesview1);
 
             if (Assembly.GetEntryAssembly ().FullName.Contains ("Pipeline"))
@@ -162,7 +167,7 @@ namespace MonoGame.Tools.Pipeline
         public bool AskSaveName (ref string filePath, string title)
         {
             var filechooser =
-                new FileChooserDialog(title,
+                new FileChooserDialog("Save MGCB Project As",
                     this,
                     FileChooserAction.Save,
                     "Cancel", ResponseType.Cancel,
@@ -170,6 +175,9 @@ namespace MonoGame.Tools.Pipeline
 
             filechooser.AddFilter (MonoGameContentProjectFileFilter);
             filechooser.AddFilter (AllFilesFilter);
+
+            if (title != null)
+                filechooser.Title = title;
 
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
@@ -480,15 +488,15 @@ namespace MonoGame.Tools.Pipeline
             if (dialog.Run () == (int)ResponseType.Ok) {
 
                 List<TreeIter> iters;
-                List<Gdk.Pixbuf> icons;
-                string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+                List<string> ids;
+                string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
                 string location;
 
                 if (paths.Length == 1) {
-                    if (icons [0] == projectview1.ICON_FOLDER)
+                    if (ids [0] == projectview1.ID_FOLDER)
                         location = paths [0];
-                    else if (icons[0] == projectview1.ICON_BASE)
+                    else if (ids[0] == projectview1.ID_BASE)
                         location = _controller.GetFullPath ("");
                     else
                         location = System.IO.Path.GetDirectoryName (paths [0]);
@@ -506,13 +514,13 @@ namespace MonoGame.Tools.Pipeline
         {
             expand = true;
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-                if (icons [0] == projectview1.ICON_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.Include (paths [0]);
-                else if (icons[0] == projectview1.ICON_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.Include (_controller.GetFullPath (""));
                 else
                     _controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
@@ -533,13 +541,13 @@ namespace MonoGame.Tools.Pipeline
 
             expand = true;
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-                if (icons [0] == projectview1.ICON_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.NewFolder (foldername, paths [0]);
-                else if (icons[0] == projectview1.ICON_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.NewFolder (foldername, _controller.GetFullPath (""));
                 else
                     _controller.NewFolder (foldername, System.IO.Path.GetDirectoryName (paths [0]));
@@ -554,13 +562,13 @@ namespace MonoGame.Tools.Pipeline
         {
             expand = true;
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-                if (icons [0] == projectview1.ICON_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.IncludeFolder (paths [0]);
-                else if (icons[0] == projectview1.ICON_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.IncludeFolder (_controller.GetFullPath (""));
                 else
                     _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));
@@ -608,8 +616,8 @@ namespace MonoGame.Tools.Pipeline
         public void UpdateMenus()
         {
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             var notBuilding = !_controller.ProjectBuilding;
             var projectOpen = _controller.ProjectOpen;
