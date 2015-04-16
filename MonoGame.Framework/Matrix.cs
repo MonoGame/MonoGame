@@ -974,8 +974,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="fieldOfView">Field of view in the y direction in radians.</param>
         /// <param name="aspectRatio">Width divided by height of the viewing volume.</param>
-        /// <param name="nearPlaneDistance">Depth of the near plane.</param>
-        /// <param name="farPlaneDistance">Depth of the far plane.</param>
+        /// <param name="nearPlaneDistance">Distance of the near plane.</param>
+        /// <param name="farPlaneDistance">Distance of the far plane.</param>
         /// <param name="result">The new projection <see cref="Matrix"/> for perspective view with FOV as an output parameter.</param>
         public static void CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
         {
