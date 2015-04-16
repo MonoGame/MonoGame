@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public ModelMeshCollection Meshes { get; private set; }
 
         /// <summary>
-        // Root bone for this model.
+        /// Root bone for this model.
         /// </summary>
         public ModelBone Root { get; set; }
 
