@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Copies bone transforms relative to all parent bones of the each bone from this model to a given array.
         /// </summary>
-        /// <param name="destinationBoneTransforms">An array where bone transform data will be copied.</param>
+        /// <param name="destinationBoneTransforms">The array to receive transform of bones.</param>
         public void CopyAbsoluteBoneTransformsTo(Matrix[] destinationBoneTransforms)
 		{
 			if (destinationBoneTransforms == null)
@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Copies bone transforms relative to <see cref="Model.Root"/> bone from a given array to this model.
         /// </summary>
-        /// <param name="sourceBoneTransforms">An array of prepared bone transform data.</param>
+        /// <param name="sourceBoneTransforms">The array of prepared bone transform data.</param>
         public void CopyBoneTransformsFrom(Matrix[] sourceBoneTransforms)
         {
             if(sourceBoneTransforms==null)
@@ -196,7 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Copies bone transforms relative to <see cref="Model.Root"/> bone from this model to a given array.
         /// </summary>
-        /// <param name="destinationBoneTransforms">An array which will be filled with bone data.</param>
+        /// <param name="destinationBoneTransforms">The array to receive transform of bones.</param>
         public void CopyBoneTransformsTo(Matrix[] destinationBoneTransforms)
         {
             if (destinationBoneTransforms == null)
