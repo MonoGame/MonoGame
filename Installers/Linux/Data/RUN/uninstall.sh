@@ -11,6 +11,12 @@ then
 	rm /bin/mgcb
 fi
 
+#remove application icon
+if [ -f /usr/share/icons/gnome/scalable/mimetypes/monogame.svg ]
+then
+	rm -rf /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
+fi
+
 #remove pipeline tool application launcher
 if [ -f /usr/share/applications/Monogame\ Pipeline.desktop ]
 then
