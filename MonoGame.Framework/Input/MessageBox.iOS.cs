@@ -4,7 +4,7 @@ using UIKit;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class MessageBox
+    public static partial class MessageBox
     {
         private static TaskCompletionSource<int?> tcs;
         private static UIAlertView alert;
@@ -32,7 +32,9 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void PlatformCancel(int? result)
         {
-            tcs.SetResult(result);
+            if (!tcs.Task.IsCompleted)
+                tcs.SetResult(result);
+
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
                 alert.DismissWithClickedButtonIndex(0, true);

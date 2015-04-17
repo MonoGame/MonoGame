@@ -785,7 +785,7 @@
     <Compile Include="Input\GamePad.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.SDL.cs">
+    <Compile Include="Input\GamePad.OpenTK.cs">
       <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.Web.cs">
@@ -1004,7 +1004,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81</Platforms>
+      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,Linux</Platforms>
     </Compile>
 
 
@@ -1065,34 +1065,13 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\Input\Axis.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Capabilities.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\DPad.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Input.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Joystick.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\PadConfig.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Settings.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\Stick.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="Desktop\OpenTKGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\OpenTKGameWindow.cs">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardUtil.OpenTK.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
 
@@ -1124,15 +1103,6 @@
     </Compile>
     <Compile Include="iOS\OrientationConverter.cs">
       <Platforms>iOS</Platforms>
-    </Compile>
-
-
-    <!-- Linux Platform -->
-    <Compile Include="Linux\Input\KeyboardUtil.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
-    <Compile Include="Linux\Storage\StorageDeviceHelper.cs">
-      <Platforms>Linux</Platforms>
     </Compile>
 
 
@@ -1216,10 +1186,8 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
 
+
     <!-- Windows Desktop Platfom -->
-    <Compile Include="Windows\Input\KeyboardUtil.cs">
-      <Platforms>Angle,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>
     </Compile>

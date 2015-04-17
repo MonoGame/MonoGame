@@ -30,10 +30,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private TextureAddressMode _addressU;
         private TextureAddressMode _addressV;
         private TextureAddressMode _addressW;
+        private Color _borderColor;
         private TextureFilter _filter;
         private int _maxAnisotropy;
         private int _maxMipLevel;
         private float _mipMapLevelOfDetailBias;
+        private CompareFunction _comparisonFunction;
 
         public TextureAddressMode AddressU
         {
@@ -62,6 +64,16 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 ThrowIfBound();
                 _addressW = value;
+            }
+        }
+
+        public Color BorderColor
+        {
+            get { return _borderColor; }
+            set
+            {
+                ThrowIfBound();
+                _borderColor = value;
             }
         }
 
@@ -105,6 +117,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public CompareFunction ComparisonFunction
+        {
+            get { return _comparisonFunction; }
+            set
+            {
+                ThrowIfBound();
+                _comparisonFunction = value;
+            }
+        }
+
         internal void BindToGraphicsDevice(GraphicsDevice device)
         {
             if (_defaultStateObject)
@@ -128,9 +150,11 @@ namespace Microsoft.Xna.Framework.Graphics
             AddressU = TextureAddressMode.Wrap;
             AddressV = TextureAddressMode.Wrap;
             AddressW = TextureAddressMode.Wrap;
+            BorderColor = Color.White;
             MaxAnisotropy = 4;
             MaxMipLevel = 0;
             MipMapLevelOfDetailBias = 0.0f;
+            ComparisonFunction = CompareFunction.Never;
         }
 
         private SamplerState(string name, TextureFilter filter, TextureAddressMode addressMode)
@@ -151,9 +175,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _addressU = cloneSource._addressU;
             _addressV = cloneSource._addressV;
             _addressW = cloneSource._addressW;
+            _borderColor = cloneSource._borderColor;
             _maxAnisotropy = cloneSource._maxAnisotropy;
             _maxMipLevel = cloneSource._maxMipLevel;
             _mipMapLevelOfDetailBias = cloneSource._mipMapLevelOfDetailBias;
+            _comparisonFunction = cloneSource._comparisonFunction;
         }
 
         internal SamplerState Clone()

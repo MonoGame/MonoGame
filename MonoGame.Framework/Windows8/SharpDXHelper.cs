@@ -1,6 +1,10 @@
-﻿
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 namespace Microsoft.Xna.Framework
 {
+    using System;
     using Microsoft.Xna.Framework.Graphics;
 
     static internal class SharpDXHelper
@@ -106,6 +110,19 @@ namespace Microsoft.Xna.Framework
                     return SharpDX.DXGI.Format.B8G8R8X8_UNorm;
                 case SurfaceFormat.Bgra32:
                     return SharpDX.DXGI.Format.B8G8R8A8_UNorm;
+
+                case SurfaceFormat.ColorSRgb:
+                    return SharpDX.DXGI.Format.R8G8B8A8_UNorm_SRgb;
+                case SurfaceFormat.Bgr32SRgb:
+                    return SharpDX.DXGI.Format.B8G8R8X8_UNorm_SRgb;
+                case SurfaceFormat.Bgra32SRgb:
+                    return SharpDX.DXGI.Format.B8G8R8A8_UNorm_SRgb;
+                case SurfaceFormat.Dxt1SRgb:
+                    return SharpDX.DXGI.Format.BC1_UNorm_SRgb;
+                case SurfaceFormat.Dxt3SRgb:
+                    return SharpDX.DXGI.Format.BC2_UNorm_SRgb;
+                case SurfaceFormat.Dxt5SRgb:
+                    return SharpDX.DXGI.Format.BC3_UNorm_SRgb;
             }
         }
 
@@ -122,6 +139,11 @@ namespace Microsoft.Xna.Framework
         static public SharpDX.Vector4 ToVector4(this Vector4 vec)
         {
             return new SharpDX.Vector4(vec.X, vec.Y, vec.Z, vec.W);
+        }
+
+        static public SharpDX.Color4 ToColor4(this Color color)
+        {
+            return new SharpDX.Color4(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
         }
 
         static public SharpDX.X3DAudio.Emitter ToEmitter(this Audio.AudioEmitter emitter)
@@ -195,6 +217,39 @@ namespace Microsoft.Xna.Framework
                 OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z),
                 OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z),                
             };
+        }
+
+        static public SharpDX.Direct3D11.Comparison ToComparison(this CompareFunction compare)
+        {
+            switch (compare)
+            {
+                case CompareFunction.Always:
+                    return SharpDX.Direct3D11.Comparison.Always;
+
+                case CompareFunction.Equal:
+                    return SharpDX.Direct3D11.Comparison.Equal;
+
+                case CompareFunction.Greater:
+                    return SharpDX.Direct3D11.Comparison.Greater;
+
+                case CompareFunction.GreaterEqual:
+                    return SharpDX.Direct3D11.Comparison.GreaterEqual;
+
+                case CompareFunction.Less:
+                    return SharpDX.Direct3D11.Comparison.Less;
+
+                case CompareFunction.LessEqual:
+                    return SharpDX.Direct3D11.Comparison.LessEqual;
+
+                case CompareFunction.Never:
+                    return SharpDX.Direct3D11.Comparison.Never;
+
+                case CompareFunction.NotEqual:
+                    return SharpDX.Direct3D11.Comparison.NotEqual;
+
+                default:
+                    throw new ArgumentException("Invalid comparison!");
+            }
         }
     }
 }

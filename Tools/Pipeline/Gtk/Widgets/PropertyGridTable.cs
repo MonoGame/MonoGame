@@ -50,7 +50,7 @@ namespace MonoGame.Tools.Pipeline
     }
 
     [System.ComponentModel.ToolboxItem (true)]
-    public partial class PropertyGridTable : Bin
+    public partial class PropertyGridTable : VBox
     {
         Window window;
 
@@ -105,7 +105,11 @@ namespace MonoGame.Tools.Pipeline
             var editTextCell = new CellRendererText ();
 
             editTextCell.Edited += delegate(object o, EditedArgs args) {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
@@ -133,12 +137,16 @@ namespace MonoGame.Tools.Pipeline
             var editTextCell2 = new CellRendererText ();
             editTextCell2.Editable = true;
             editTextCell2.EditingStarted += delegate {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new CollectionEditorDialog(model.GetValue(iter, 14).ToString());
+                    var dialog = new CollectionEditorDialog(model.GetValue(iter, 14).ToString(), window);
                     dialog.TransientFor = window;
                     if(dialog.Run() == (int)ResponseType.Ok)
                     {
@@ -165,7 +173,11 @@ namespace MonoGame.Tools.Pipeline
             var editTextCell4 = new CellRendererText ();
             editTextCell4.Editable = true;
             editTextCell4.EditingStarted += delegate {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
@@ -204,7 +216,11 @@ namespace MonoGame.Tools.Pipeline
             comboCell.Editable = true;
             comboCell.HasEntry = false;
             comboCell.Edited += delegate(object o, EditedArgs args) {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {

@@ -1,49 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading.Tasks;
-using CoreGraphics;
-using Foundation;
+﻿using System.Threading.Tasks;
 using UIKit;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class KeyboardInput
+    public static partial class KeyboardInput
     {
-        private static UIViewController gameViewController;
         private static TaskCompletionSource<string> tcs;
-
-        static KeyboardInput()
-        {
-            gameViewController = (UIViewController)Game.Instance.Services.GetService(typeof(UIViewController));
-        }
+        private static UIAlertView alert;
 
         private static Task<string> PlatformShow(string title, string description, string defaultText, bool usePasswordMode)
         {
             tcs = new TaskCompletionSource<string>();
 
-            var keyboardViewController = new KeyboardInputViewController(
-                title, description, defaultText, usePasswordMode, gameViewController);
-
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                gameViewController.PresentViewController(keyboardViewController, true, null);
-
-                keyboardViewController.View.InputAccepted += (sender, e) =>
+                alert = new UIAlertView();
+                alert.Title = title;
+                alert.Message = description;
+                alert.AlertViewStyle = usePasswordMode ? UIAlertViewStyle.SecureTextInput : UIAlertViewStyle.PlainTextInput;
+                alert.AddButton("Cancel");
+                alert.AddButton("Ok");
+                UITextField alertTextField = alert.GetTextField(0);
+                alertTextField.KeyboardType = UIKeyboardType.ASCIICapable;
+                alertTextField.AutocorrectionType = UITextAutocorrectionType.No;
+                alertTextField.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
+                alertTextField.Text = defaultText;
+                alert.Dismissed += (sender, e) =>
                 {
-                    gameViewController.DismissViewController(true, null);
-
                     if (!tcs.Task.IsCompleted)
-                        tcs.SetResult(keyboardViewController.View.Text);
+                        tcs.SetResult(e.ButtonIndex == 0 ? null : alert.GetTextField(0).Text);
                 };
 
-                keyboardViewController.View.InputCanceled += (sender, e) =>
-                {
-                    gameViewController.DismissViewController(true, null);
+                // UIAlertView's textfield does not show keyboard in iOS8
+                // http://stackoverflow.com/questions/25563108/uialertviews-textfield-does-not-show-keyboard-in-ios8
+                if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
+                    alert.Presented += (sender, args) => alertTextField.SelectAll(alert);
 
-                    if (!tcs.Task.IsCompleted)
-                        tcs.SetResult(null);
-                };
+                alert.Show();
             });
 
             return tcs.Task;
@@ -51,387 +44,13 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void PlatformCancel(string result)
         {
-            UIApplication.SharedApplication.InvokeOnMainThread(delegate
-            {
-                gameViewController.DismissViewController(true, null);
-            });
-
             if (!tcs.Task.IsCompleted)
                 tcs.SetResult(result);
+
+            UIApplication.SharedApplication.InvokeOnMainThread(delegate
+            {
+                alert.DismissWithClickedButtonIndex(0, true);
+            });
         }
-
-        #region Keyboard input UI
-        class KeyboardInputViewController : UIViewController
-        {
-            private readonly string _titleText;
-            private readonly string _descriptionText;
-            private readonly string _defaultText;
-            private readonly bool _usePasswordMode;
-            private UIViewController _gameViewController;
-
-            public KeyboardInputViewController(
-                string titleText, string descriptionText, string defaultText, bool usePasswordMode, UIViewController gameViewController)
-            {
-                _titleText = titleText;
-                _descriptionText = descriptionText;
-                _defaultText = defaultText;
-                _usePasswordMode = usePasswordMode;
-                _gameViewController = gameViewController;
-            }
-
-            private readonly List<NSObject> _keyboardObservers = new List<NSObject>();
-            public override void LoadView()
-            {
-                var view = new KeyboardInputView(new RectangleF(0, 0, 240, 320));
-                view.Title = _titleText;
-                view.Description = _descriptionText;
-                view.Text = _defaultText;
-                view.UsePasswordMode = _usePasswordMode;
-
-                view.ActivateFirstField();
-
-                base.View = view;
-
-                _keyboardObservers.Add(
-                    NSNotificationCenter.DefaultCenter.AddObserver(
-                        UIKeyboard.DidShowNotification, Keyboard_DidShow));
-                _keyboardObservers.Add(
-                    NSNotificationCenter.DefaultCenter.AddObserver(
-                        UIKeyboard.WillHideNotification, Keyboard_WillHide));
-            }
-
-            public new KeyboardInputView View
-            {
-                get { return (KeyboardInputView)base.View; }
-            }
-
-            public override void ViewDidUnload()
-            {
-                base.ViewDidUnload();
-
-                NSNotificationCenter.DefaultCenter.RemoveObservers(_keyboardObservers);
-                _keyboardObservers.Clear();
-
-                _gameViewController = null;
-            }
-
-            private void Keyboard_DidShow(NSNotification notification)
-            {
-                var keyboardSize = UIKeyboard.FrameBeginFromNotification(notification).Size;
-
-                if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft ||
-                    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
-                {
-                    var tmpkeyboardSize = keyboardSize;
-					keyboardSize.Width = (nfloat)Math.Max(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
-					keyboardSize.Height = (nfloat)Math.Min(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
-                }
-
-                var view = (KeyboardInputView)View;
-                var contentInsets = new UIEdgeInsets(0f, 0f, keyboardSize.Height, 0f);
-                view.ContentInset = contentInsets;
-                view.ScrollIndicatorInsets = contentInsets;
-
-                view.ScrollActiveFieldToVisible();
-            }
-
-            private void Keyboard_WillHide(NSNotification notification)
-            {
-                var view = (KeyboardInputView)View;
-                view.ContentInset = UIEdgeInsets.Zero;
-                view.ScrollIndicatorInsets = UIEdgeInsets.Zero;
-            }
-
-            #region Autorotation for iOS 5 or older
-            public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
-            {
-                var requestedOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);
-                var supportedOrientations = (_gameViewController as iOSGameViewController).SupportedOrientations;
-
-                return (supportedOrientations & requestedOrientation) != 0;
-            }
-            #endregion
-
-            #region Autorotation for iOS 6 or newer
-            public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations()
-            {
-                return OrientationConverter.ToUIInterfaceOrientationMask((_gameViewController as iOSGameViewController).SupportedOrientations);
-            }
-
-            public override bool ShouldAutorotate()
-            {
-                return true;
-            }
-
-            public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation()
-            {
-                return _gameViewController.PreferredInterfaceOrientationForPresentation();
-            }
-            #endregion
-
-            public override void WillRotate(UIInterfaceOrientation toInterfaceOrientation, double duration)
-            {
-                base.WillRotate(toInterfaceOrientation, duration);
-                View.LayoutSubviews();
-            }
-        }
-
-        struct PaddingF
-        {
-            public float Left;
-            public float Top;
-            public float Right;
-            public float Bottom;
-
-            public float Horizontal
-            {
-                get { return Left + Right; }
-            }
-
-            public float Vertical
-            {
-                get { return Top + Bottom; }
-            }
-
-            public PaddingF(float all)
-            {
-                Left = Top = Right = Bottom = all;
-            }
-
-            public PaddingF(float left, float top, float right, float bottom)
-            {
-                Left = left;
-                Top = top;
-                Right = right;
-                Bottom = bottom;
-            }
-        }
-
-        class KeyboardInputView : UIScrollView
-        {
-            private static readonly PaddingF TitleMargin = new PaddingF(10, 7, 10, 2);
-            private static readonly PaddingF DescriptionMargin = new PaddingF(12, 2, 10, 5);
-            private static readonly PaddingF TextFieldMargin = new PaddingF(10, 5, 10, 5);
-
-            private readonly UIToolbar _toolbar;
-            private readonly UILabel _title;
-            private readonly UILabel _description;
-            private readonly UITextField _textField;
-            private readonly UIScrollView _textFieldContainer;
-
-            public KeyboardInputView(RectangleF frame)
-                : base(frame)
-            {
-                _toolbar = new UIToolbar(frame);
-
-                var toolbarItems = new UIBarButtonItem[] {
-				new UIBarButtonItem (UIBarButtonSystemItem.Cancel, CancelButton_Tapped),
-				new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace, null),
-				new UIBarButtonItem (UIBarButtonSystemItem.Done, DoneButton_Tapped)
-			};
-
-                _toolbar.SetItems(toolbarItems, false);
-                _toolbar.SizeToFit();
-
-                _title = new UILabel(RectangleF.Empty);
-                _title.Font = UIFont.SystemFontOfSize(UIFont.LabelFontSize * 1.2f);
-                _title.BackgroundColor = UIColor.Clear;
-                _title.LineBreakMode = UILineBreakMode.TailTruncation;
-                _title.Lines = 2;
-
-                _description = new UILabel(RectangleF.Empty);
-                _description.Font = UIFont.SystemFontOfSize(UIFont.LabelFontSize);
-                _description.TextColor = UIColor.DarkTextColor.ColorWithAlpha(0.95f);
-                _description.BackgroundColor = UIColor.Clear;
-                _title.LineBreakMode = UILineBreakMode.TailTruncation;
-                _description.Lines = 2;
-
-                _textFieldContainer = new UIScrollView(new RectangleF(0, 0, 100, 100));
-
-                _textField = new UITextField(_textFieldContainer.Bounds);
-                _textField.AutoresizingMask =
-                    UIViewAutoresizing.FlexibleWidth |
-                    UIViewAutoresizing.FlexibleHeight;
-                _textField.BorderStyle = UITextBorderStyle.RoundedRect;
-                _textField.Delegate = new TextFieldDelegate(this);
-
-                _textFieldContainer.Add(_textField);
-
-                Add(_toolbar);
-                Add(_title);
-                Add(_description);
-                Add(_textFieldContainer);
-
-                AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-                AutosizesSubviews = false;
-                Opaque = true;
-                BackgroundColor = UIColor.FromRGB(0xC5, 0xCC, 0xD4);
-
-                SetNeedsLayout();
-            }
-
-            #region Properties
-
-            public string Title
-            {
-                get { return _title.Text; }
-                set
-                {
-                    if (_title.Text != value)
-                    {
-                        _title.Text = value;
-                        SetNeedsLayout();
-                    }
-                }
-            }
-
-            public new string Description
-            {
-                get { return _description.Text; }
-                set
-                {
-                    if (_description.Text != value)
-                    {
-                        _description.Text = value;
-                        SetNeedsLayout();
-                    }
-                }
-            }
-
-            public string Text
-            {
-                get { return _textField.Text; }
-                set
-                {
-                    if (_textField.Text != value)
-                    {
-                        _textField.Text = value;
-                    }
-                }
-            }
-
-            public bool UsePasswordMode
-            {
-                get { return _textField.SecureTextEntry; }
-                set
-                {
-                    if (_textField.SecureTextEntry != value)
-                    {
-                        _textField.SecureTextEntry = value;
-                    }
-                }
-            }
-
-            #endregion Properties
-
-            #region Events
-
-            public event EventHandler<EventArgs> InputAccepted;
-            public event EventHandler<EventArgs> InputCanceled;
-
-            #endregion Events
-
-            public void ActivateFirstField()
-            {
-                _textField.BecomeFirstResponder();
-            }
-
-            public void ScrollActiveFieldToVisible()
-            {
-                if (!_textField.IsFirstResponder)
-                    return;
-
-                var bounds = Bounds;
-                bounds.X += ContentInset.Left;
-                bounds.Width -= (ContentInset.Left + ContentInset.Right);
-                bounds.Y += ContentInset.Top;
-                bounds.Height -= (ContentInset.Top + ContentInset.Bottom);
-
-                if (!bounds.Contains(_textFieldContainer.Frame))
-                {
-                    ScrollRectToVisible(_textFieldContainer.Frame, true);
-                }
-            }
-
-            public override void TouchesEnded(NSSet touches, UIEvent evt)
-            {
-                base.TouchesEnded(touches, evt);
-                _textField.ResignFirstResponder();
-            }
-
-            public override void LayoutSubviews()
-            {
-                _toolbar.SizeToFit();
-
-                var titleSize = SizeThatFitsWidth(_title, Bounds.Width - TitleMargin.Horizontal);
-				_title.Frame = new CGRect(
-                    TitleMargin.Left, _toolbar.Bounds.Bottom + TitleMargin.Top,
-                    titleSize.Width, titleSize.Height);
-
-                var descriptionSize = SizeThatFitsWidth(
-                    _description, Bounds.Width - DescriptionMargin.Horizontal);
-				_description.Frame = new CGRect(
-                    DescriptionMargin.Left,
-                    _title.Frame.Bottom + TitleMargin.Bottom + DescriptionMargin.Top,
-                    descriptionSize.Width, descriptionSize.Height);
-
-                var textFieldSize = _textField.SizeThatFits(
-                    new CGSize(Bounds.Width - TextFieldMargin.Horizontal, Bounds.Height));
-				_textFieldContainer.Frame = new CGRect(
-                    TextFieldMargin.Left,
-                    _description.Frame.Bottom + DescriptionMargin.Bottom + TextFieldMargin.Top,
-                    Bounds.Width - TextFieldMargin.Horizontal, textFieldSize.Height);
-
-				ContentSize = new CGSize(Bounds.Width, _textFieldContainer.Frame.Bottom + TextFieldMargin.Bottom);
-            }
-
-            private static CGSize SizeThatFitsWidth(UILabel label, nfloat width)
-            {
-                var font = label.Font;
-				return label.SizeThatFits(new CGSize(width, font.LineHeight * label.Lines));
-            }
-
-            private void DoneButton_Tapped(object sender, EventArgs e)
-            {
-                OnInputAccepted(e);
-            }
-
-            private void CancelButton_Tapped(object sender, EventArgs e)
-            {
-                OnInputCanceled(e);
-            }
-
-            private void OnInputAccepted(EventArgs e)
-            {
-                var handler = InputAccepted;
-                if (handler != null)
-                    handler(this, e);
-            }
-
-            private void OnInputCanceled(EventArgs e)
-            {
-                var handler = InputCanceled;
-                if (handler != null)
-                    handler(this, e);
-            }
-
-            private class TextFieldDelegate : UITextFieldDelegate
-            {
-                private readonly KeyboardInputView _owner;
-                public TextFieldDelegate(KeyboardInputView owner)
-                {
-                    if (owner == null)
-                        throw new ArgumentNullException("owner");
-                    _owner = owner;
-                }
-
-                public override bool ShouldReturn(UITextField textField)
-                {
-                    _owner.OnInputAccepted(EventArgs.Empty);
-                    return true;
-                }
-            }
-        }
-        #endregion
     }
 }

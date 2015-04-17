@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
 
-            format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+            format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
             for (int i = 0; i < 6; i++)
             {

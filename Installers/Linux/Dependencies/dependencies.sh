@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "Do you want to automatically install required packages(Y, n)" choice
+read -p "Do you want to automatically install required packages(Y, n): " choice
 case "$choice" in 
 	n|N ) exit;
 esac
@@ -14,11 +14,11 @@ NC='\033[0m'
 
 if [ $OS = Ubuntu ]
 then
-	case "$VER" in 
-	14.04|14.10 ) 
+	if [ ${VER%.*} -ge 14 ]
+	then
 		./Dependencies/dependencies_deb.sh
 		exit
-	esac
+	fi
 fi
 
 echo -e "${red}There is no automatic installer of dependencies for your version of linux, please look at http://www.monogame.net/documentation/?page=Setting_Up_MonoGame_Linux for information on how to install MonoGame.${NC}"

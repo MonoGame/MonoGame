@@ -12,7 +12,7 @@ using TP = Microsoft.Xna.Framework.Content.Pipeline;
 namespace MonoGame.Tools.Pipeline
 {
     [System.ComponentModel.ToolboxItem (true)]
-    public partial class PropertiesView : Bin
+    public partial class PropertiesView : VBox
     {
         List<object> currentObjects;
         internal IController controller { get; set; }
@@ -27,6 +27,9 @@ namespace MonoGame.Tools.Pipeline
 
         public void Initalize(Window window)
         {
+            if (propertygridtable1 == null)
+                return;
+
             propertygridtable1.Initalize (window);
         }
 

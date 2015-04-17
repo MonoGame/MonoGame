@@ -116,10 +116,19 @@ namespace Microsoft.Xna.Framework.Content
                     if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
                         convertedFormat = SurfaceFormat.Color;
                     break;
-				case SurfaceFormat.Dxt3:
+                case SurfaceFormat.Dxt1SRgb:
+                    if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
+                        convertedFormat = SurfaceFormat.ColorSRgb;
+                    break;
+                case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
                     if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
 					    convertedFormat = SurfaceFormat.Color;
+					break;
+                case SurfaceFormat.Dxt3SRgb:
+                case SurfaceFormat.Dxt5SRgb:
+                    if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
+					    convertedFormat = SurfaceFormat.ColorSRgb;
 					break;
 #endif
 				case SurfaceFormat.NormalizedByte4:
@@ -149,15 +158,18 @@ namespace Microsoft.Xna.Framework.Content
 				{
 #if !IOS
 					case SurfaceFormat.Dxt1:
+                    case SurfaceFormat.Dxt1SRgb:
                     case SurfaceFormat.Dxt1a:
                         if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
 						    levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
 						break;
 					case SurfaceFormat.Dxt3:
+                    case SurfaceFormat.Dxt3SRgb:
                         if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
 						    levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
 						break;
 					case SurfaceFormat.Dxt5:
+                    case SurfaceFormat.Dxt5SRgb:
                         if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
     						levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
 						break;

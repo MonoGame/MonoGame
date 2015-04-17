@@ -21,6 +21,7 @@
 [IgnoreCase] Register -> @"register";
 [IgnoreCase] Boolean -> @"true|false|0|1";
 Number -> @"[+-]? ?[0-9]?\.?[0-9]+[fF]?";
+[IgnoreCase] HexColor -> @"0x[0-9a-f]{6}([0-9a-f][0-9a-f])?";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
 CloseBracket -> @"}";
@@ -49,6 +50,7 @@ EndOfFile -> @"^$";
 [IgnoreCase] AddressU -> @"AddressU";
 [IgnoreCase] AddressV -> @"AddressV";
 [IgnoreCase] AddressW -> @"AddressW";
+[IgnoreCase] BorderColor -> @"BorderColor";
 [IgnoreCase] MaxAnisotropy -> @"MaxAnisotropy";
 [IgnoreCase] MaxMipLevel -> @"MaxMipLevel|MaxLod";
 [IgnoreCase] MipLodBias -> @"MipLodBias";
@@ -57,6 +59,7 @@ EndOfFile -> @"^$";
 [IgnoreCase] Clamp -> @"Clamp";
 [IgnoreCase] Wrap -> @"Wrap";
 [IgnoreCase] Mirror -> @"Mirror";
+[IgnoreCase] Border -> @"Border";
 
 // Texture Filters
 [IgnoreCase] None -> @"None";
@@ -280,9 +283,10 @@ PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier
 AddressMode_Clamp -> Clamp { return TextureAddressMode.Clamp; };
 AddressMode_Wrap -> Wrap { return TextureAddressMode.Wrap; };
 AddressMode_Mirror -> Mirror { return TextureAddressMode.Mirror; };
-AddressMode -> (AddressMode_Clamp|AddressMode_Wrap|AddressMode_Mirror)
+AddressMode_Border -> Border { return TextureAddressMode.Border; };
+AddressMode -> (AddressMode_Clamp|AddressMode_Wrap|AddressMode_Mirror|AddressMode_Border)
 {
-	return $AddressMode_Clamp ?? $AddressMode_Wrap ?? $AddressMode_Mirror;
+	return $AddressMode_Clamp ?? $AddressMode_Wrap ?? $AddressMode_Mirror ?? $AddressMode_Border;
 };
 
 TextureFilter_None -> None { return TextureFilterType.None; };
@@ -303,6 +307,7 @@ Sampler_State_Filter -> Filter Equals TextureFilter Semicolon { (paramlist[0] as
 Sampler_State_AddressU -> AddressU Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressU = (TextureAddressMode)$AddressMode; return null; };
 Sampler_State_AddressV -> AddressV Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressV = (TextureAddressMode)$AddressMode; return null; };
 Sampler_State_AddressW -> AddressW Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressW = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_BorderColor -> BorderColor Equals HexColor Semicolon { (paramlist[0] as SamplerStateInfo).BorderColor = ParseTreeTools.ParseColor((string)$HexColor); return null; };
 Sampler_State_MaxMipLevel -> MaxMipLevel Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxMipLevel = ParseTreeTools.ParseInt((string)$Number); return null; };
 Sampler_State_MaxAnisotropy -> MaxAnisotropy Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxAnisotropy = ParseTreeTools.ParseInt((string)$Number); return null; };
 Sampler_State_MipLodBias -> MipLodBias Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MipMapLevelOfDetailBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
@@ -317,6 +322,7 @@ Sampler_State_Expression ->
 				Sampler_State_AddressU |
 				Sampler_State_AddressV |
 				Sampler_State_AddressW |
+                Sampler_State_BorderColor |
 				Sampler_State_MaxMipLevel |
 				Sampler_State_MaxAnisotropy |
 				Sampler_State_MipLodBias;

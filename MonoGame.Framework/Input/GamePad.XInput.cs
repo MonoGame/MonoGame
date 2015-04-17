@@ -220,9 +220,9 @@ namespace Microsoft.Xna.Framework.Input
             if (thumbX > deadZone)
                 result |= thumbStickRight;
             if (thumbY < -deadZone)
-                result |= thumbStickUp;
-            else if (thumbY > deadZone)
                 result |= thumbStickDown;
+            else if (thumbY > deadZone)
+                result |= thumbStickUp;
             return result;
         }
 
