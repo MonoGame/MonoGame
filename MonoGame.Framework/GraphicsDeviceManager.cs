@@ -189,8 +189,7 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS_PHONE
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
-            // Display orientation is always portrait on WP8
-            _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
+            _graphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
 #elif WINDOWS_STOREAPP
 
             // TODO:  Does this need to occur here?
