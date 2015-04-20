@@ -14,13 +14,11 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
-#if WINDOWS_PHONE81
 using Windows.UI.Xaml;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    class MetroGamePlatform : GamePlatform
+    class UAPGamePlatform : GamePlatform
     {
 		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
@@ -29,17 +27,12 @@ namespace Microsoft.Xna.Framework
 
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
-        public MetroGamePlatform(Game game)
+        public UAPGamePlatform(Game game)
             : base(game)
         {
-#if !WINDOWS_PHONE81
-            // Set the starting view state so the Game class can
-            // query it during construction.
-            ViewState = ApplicationView.Value;
-#endif
             // Setup the game window.
-            Window = MetroGameWindow.Instance;
-            MetroGameWindow.Instance.Game = game;
+            Window = UAPGameWindow.Instance;
+			UAPGameWindow.Instance.Game = game;
 
             // Setup the launch parameters.
             // - Parameters can optionally start with a forward slash.
@@ -110,25 +103,23 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            MetroGameWindow.Instance.RunLoop();
+            UAPGameWindow.Instance.RunLoop();
         }
 
         public override void StartRunLoop()
         {
             CompositionTarget.Rendering += (o, a) =>
             {
-                MetroGameWindow.Instance.Tick();
+				UAPGameWindow.Instance.Tick();
             };
         }
         
         public override void Exit()
         {
-            if (!MetroGameWindow.Instance.IsExiting)
+            if (!UAPGameWindow.Instance.IsExiting)
             {
-                MetroGameWindow.Instance.IsExiting = true;
-#if WINDOWS_PHONE81
+				UAPGameWindow.Instance.IsExiting = true;
                 Application.Current.Exit();
-#endif
             }
         }
 
@@ -143,11 +134,11 @@ namespace Microsoft.Xna.Framework
             var device = Game.GraphicsDevice;
             if (device != null)
             {
-                // For a Metro app we need to re-apply the
-                // render target before every draw.  
-                // 
-                // I guess the OS changes it and doesn't restore it?
-                device.ResetRenderTargets();
+				// For a UAP app we need to re-apply the
+				// render target before every draw.  
+				// 
+				// I guess the OS changes it and doesn't restore it?
+				device.ResetRenderTargets();
             }
 
             return true;
@@ -155,21 +146,16 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            // Metro has no concept of fullscreen vs windowed!
-#if WINDOWS_PHONE81
-            StatusBar.GetForCurrentView().HideAsync();
-#endif
-        }
+			// UAP has no concept of fullscreen vs windowed!
+            //StatusBar.GetForCurrentView().HideAsync();
+		}
 
-        public override void ExitFullScreen()
+		public override void ExitFullScreen()
         {
-            // Metro has no concept of fullscreen vs windowed!
-#if WINDOWS_PHONE81
-            StatusBar.GetForCurrentView().ShowAsync();
-#endif
-        }
-        
-        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+			// UAP has no concept of fullscreen vs windowed!
+		}
+
+		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
         }
 
@@ -191,7 +177,7 @@ namespace Microsoft.Xna.Framework
 
         protected override void OnIsMouseVisibleChanged() 
         {
-            MetroGameWindow.Instance.SetCursor(Game.IsMouseVisible);
+			UAPGameWindow.Instance.SetCursor(Game.IsMouseVisible);
         }
 		
         protected override void Dispose(bool disposing)
@@ -201,7 +187,7 @@ namespace Microsoft.Xna.Framework
             if (graphicsDeviceManager != null)
                 graphicsDeviceManager.Dispose();
 
-            MetroGameWindow.Instance.Dispose();
+			UAPGameWindow.Instance.Dispose();
 			
 			base.Dispose(disposing);
         }

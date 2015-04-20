@@ -12,7 +12,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.ES20;
 #elif OPENGL
 using OpenTK.Graphics.OpenGL;
-#elif WINDOWS_STOREAPP
+#elif WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
             // Display orientation is always portrait on WP8
             _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
-#elif WINDOWS_STOREAPP
+#elif WINDOWS_STOREAPP || WINDOWS_UAP
 
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -207,6 +207,10 @@ namespace Microsoft.Xna.Framework
             // hardware feature level.
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
+#if WINDOWS_UAP
+			_graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
+			_graphicsDevice.PresentationParameters.SwapChainPanel = this.SwapChainPanel;
+#else
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
             if (this.SwapChainBackgroundPanel != null)
@@ -219,12 +223,12 @@ namespace Microsoft.Xna.Framework
                 _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
                 _graphicsDevice.PresentationParameters.SwapChainBackgroundPanel = null;
             }
-
-            // Update the back buffer.
-            _graphicsDevice.CreateSizeDependentResources();
+#endif
+			// Update the back buffer.
+			_graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
-#elif WINDOWS && DIRECTX
+#elif	WINDOWS && DIRECTX
 
             _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
@@ -321,11 +325,14 @@ namespace Microsoft.Xna.Framework
             presentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-
             presentationParameters.IsFullScreen = false;
-#if WINDOWS_PHONE
 
-#elif WINRT
+#if WINDOWS_PHONE
+			// Nothing to do!
+#elif WINDOWS_UAP
+			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
+			presentationParameters.SwapChainPanel = this.SwapChainPanel;
+#elif WINDOWS_STORE
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
             if (this.SwapChainBackgroundPanel != null)
@@ -400,7 +407,12 @@ namespace Microsoft.Xna.Framework
         public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif
 
-        public GraphicsProfile GraphicsProfile { get; set; }
+#if WINDOWS_UAP
+        [CLSCompliant(false)]
+        public SwapChainPanel SwapChainPanel { get; set; }
+#endif
+
+		public GraphicsProfile GraphicsProfile { get; set; }
 
         public GraphicsDevice GraphicsDevice
         {

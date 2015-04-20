@@ -3,10 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 using Windows.UI.Core;
@@ -20,15 +16,13 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    partial class MetroGameWindow : GameWindow
+    partial class UAPGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         private Rectangle _clientBounds;
-#if !WINDOWS_PHONE81
-        private ApplicationViewState _currentViewState;
-#endif
+
         private InputEvents _windowEvents;
 
 
@@ -64,7 +58,7 @@ namespace Microsoft.Xna.Framework
             get { return _orientation; }
         }
 
-        private MetroGamePlatform Platform { get { return Game.Instance.Platform as MetroGamePlatform; } }
+        private UAPGamePlatform Platform { get { return Game.Instance.Platform as UAPGamePlatform; } }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
@@ -88,16 +82,16 @@ namespace Microsoft.Xna.Framework
             else
                 supported = FromOrientation(orientations);
 
-            DisplayProperties.AutoRotationPreferences = supported;
+            DisplayInformation.AutoRotationPreferences = supported;
         }
 
         #endregion
 
-        static public MetroGameWindow Instance { get; private set; }
+        static public UAPGameWindow Instance { get; private set; }
 
-        static MetroGameWindow()
+        static UAPGameWindow()
         {
-            Instance = new MetroGameWindow();
+            Instance = new UAPGameWindow();
         }
 
         public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
@@ -105,16 +99,15 @@ namespace Microsoft.Xna.Framework
             _coreWindow = coreWindow;
             _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
-            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
-            DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
+			var dinfo = DisplayInformation.GetForCurrentView();
+            _orientation = ToOrientation(dinfo.CurrentOrientation);
+			dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
 
             _coreWindow.SizeChanged += Window_SizeChanged;
             _coreWindow.Closed += Window_Closed;
 
             _coreWindow.Activated += Window_FocusChanged;
-#if !WINDOWS_PHONE81
-            _currentViewState = ApplicationView.Value;
-#endif
+
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
 
@@ -137,10 +130,8 @@ namespace Microsoft.Xna.Framework
 
         private void SetClientBounds(double width, double height)
         {
-            var dpi = DisplayProperties.LogicalDpi;
-            var pwidth = (int)Math.Round(width * dpi / 96.0);
-            var pheight = (int)Math.Round(height * dpi / 96.0);
-
+            var pwidth = (int)Math.Round(width);
+            var pheight = (int)Math.Round(height);
             _clientBounds = new Rectangle(0, 0, pwidth, pheight);
         }
 
@@ -189,9 +180,6 @@ namespace Microsoft.Xna.Framework
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
-#if !WINDOWS_PHONE81
-            Platform.ViewState = ApplicationView.Value;
-#endif
             OnClientSizeChanged();
         }
 
@@ -225,10 +213,10 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
-        private void DisplayProperties_OrientationChanged(object sender)
+        private void DisplayProperties_OrientationChanged(DisplayInformation dinfo, object sender)
         {
             // Set the new orientation.
-            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            _orientation = ToOrientation(dinfo.CurrentOrientation);
 
             // Call the user callback.
             OnOrientationChanged();
@@ -306,17 +294,5 @@ namespace Microsoft.Xna.Framework
 
         #endregion
     }
-#if !WINDOWS_PHONE81
-    [CLSCompliant(false)]
-    public class ViewStateChangedEventArgs : EventArgs
-    {
-        public readonly ApplicationViewState ViewState;
-
-        public ViewStateChangedEventArgs(ApplicationViewState newViewstate)
-        {
-            ViewState = newViewstate;
-        }
-    }
-#endif
 }
 
