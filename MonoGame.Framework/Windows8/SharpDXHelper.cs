@@ -126,7 +126,9 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        static public SharpDX.Vector2 ToVector2(this Vector2 vec)
+#if !WINDOWS_UAP
+
+		static public SharpDX.Vector2 ToVector2(this Vector2 vec)
         {
             return new SharpDX.Vector2(vec.X, vec.Y);
         }
@@ -146,7 +148,9 @@ namespace Microsoft.Xna.Framework
             return new SharpDX.Color4(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
         }
 
-        static public SharpDX.X3DAudio.Emitter ToEmitter(this Audio.AudioEmitter emitter)
+#endif // !WINDOWS_UAP
+
+		static public SharpDX.X3DAudio.Emitter ToEmitter(this Audio.AudioEmitter emitter)
         {           
             // Pulling out Vector properties for efficiency.
             var pos = emitter.Position;
