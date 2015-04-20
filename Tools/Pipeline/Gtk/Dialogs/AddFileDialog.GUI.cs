@@ -29,7 +29,11 @@ namespace MonoGame.Tools.Pipeline
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			this.BorderWidth = ((uint)(4));
 			// Internal child MonoGame.Tools.Pipeline.AddFileDialog.VBox
-			global::Gtk.VBox w1 = this.VBox;
+            #if GTK2
+            global::Gtk.VBox w1 = this.VBox;
+            #elif GTK3
+            global::Gtk.Box w1 = this.ContentArea;
+            #endif
 			w1.Name = "dialog1_VBox";
 			w1.Spacing = 6;
 			w1.BorderWidth = ((uint)(2));
@@ -51,7 +55,6 @@ namespace MonoGame.Tools.Pipeline
 			this.radiobuttonCopy.Active = true;
 			this.radiobuttonCopy.DrawIndicator = true;
 			this.radiobuttonCopy.UseUnderline = true;
-			this.radiobuttonCopy.Group = new global::GLib.SList (global::System.IntPtr.Zero);
 			w1.Add (this.radiobuttonCopy);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(w1 [this.radiobuttonCopy]));
 			w3.Position = 1;
@@ -102,7 +105,11 @@ namespace MonoGame.Tools.Pipeline
 			w7.PackType = ((global::Gtk.PackType)(1));
 			w7.Position = 6;
 			// Internal child MonoGame.Tools.Pipeline.AddFileDialog.ActionArea
+            #if GTK2
 			global::Gtk.HButtonBox w8 = this.ActionArea;
+            #elif GTK3
+            global::Gtk.ButtonBox w8 = this.ActionArea;
+            #endif
 			w8.Name = "dialog1_ActionArea";
 			w8.Spacing = 10;
 			w8.BorderWidth = ((uint)(5));

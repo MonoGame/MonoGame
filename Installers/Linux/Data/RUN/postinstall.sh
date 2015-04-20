@@ -68,7 +68,7 @@ then
 			n|N ) ;;
 			*)
 			sudo mv /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.old
-			sudo cp $DIR/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+			sudo cp $DIR/Main/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
 		esac
 	fi
 fi
@@ -87,7 +87,7 @@ if [ -f /bin/monogame-pipeline ]
 then
 	rm /bin/monogame-pipeline
 fi
-echo "#!/bin/bash\nmono $IDIR/Pipeline.exe \"\$@\"" >> /bin/monogame-pipeline
+cp $DIR/Main/monogame-pipeline /bin/monogame-pipeline
 chmod +x /bin/monogame-pipeline
 
 #mgcb terminal command
@@ -95,19 +95,23 @@ if [ -f /bin/mgcb ]
 then
 	rm /bin/mgcb
 fi
-echo "#!/bin/bash\nmono $IDIR/MGCB.exe \"\$@\"" >> /bin/mgcb
+cp $DIR/Main/mgcb /bin/mgcb
 chmod +x /bin/mgcb
 
-#application icon
+#application/mimetype icon
+cp $DIR/Main/monogame.svg /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
+sudo gtk-update-icon-cache /usr/share/icons/gnome/ -f
+
+#application launcher
 if [ -f /usr/share/applications/Monogame\ Pipeline.desktop ]
 then
 	rm /usr/share/applications/Monogame\ Pipeline.desktop
 fi
-echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=$IDIR/monogame.ico\nStartupNotify=false\nTerminal=false\nType=Application\nMimeType=text/mgcb;text/plain;\nCategories=Development;" >> /usr/share/applications/Monogame\ Pipeline.desktop
+echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=false\nTerminal=false\nType=Application\nMimeType=text/mgcb;text/plain;\nCategories=Development;" >> /usr/share/applications/Monogame\ Pipeline.desktop
 
 #mimetype
 echo "Adding mimetype..."
-xdg-mime install mgcb.xml --novendor
+xdg-mime install $DIR/Main/mgcb.xml --novendor
 
 #uninstall script
 chmod +x $IDIR/uninstall.sh

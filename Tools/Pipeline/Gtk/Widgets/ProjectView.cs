@@ -6,7 +6,7 @@ using Gtk;
 namespace MonoGame.Tools.Pipeline
 {
     [System.ComponentModel.ToolboxItem (true)]
-    partial class ProjectView : Bin
+    partial class ProjectView : VBox
     {
         public Menu menu, addmenu;
         public string openedProject;
@@ -60,6 +60,8 @@ namespace MonoGame.Tools.Pipeline
 
             treeview1.ButtonPressEvent += OnTreeview1ButtonPressEvent;
             treeview1.KeyReleaseEvent += HandleKeyReleaseEvent;
+            treeview1.ButtonReleaseEvent += OnTreeview1ButtonReleaseEvent;
+            treeview1.CursorChanged += OnTreeview1CursorChanged;
         }
 
         void HandleKeyReleaseEvent (object o, KeyReleaseEventArgs args)
@@ -82,10 +84,12 @@ namespace MonoGame.Tools.Pipeline
             treeaddseperator = new SeparatorMenuItem ();
 
             treenewitem = new MenuItem ("New Item...");
-            treenewitem.ButtonPressEvent += window.OnNewItemActionActivated;
+            treenewitem.ButtonPressEvent += delegate(object o, ButtonPressEventArgs args)
+                { menu.Popdown(); window.OnNewItemActionActivated(o, args); };
 
             treenewfolder = new MenuItem ("New Folder...");
-            treenewfolder.ButtonPressEvent += window.OnNewFolderActionActivated;
+            treenewfolder.ButtonPressEvent += delegate(object o, ButtonPressEventArgs args)
+                { menu.Popdown(); window.OnNewFolderActionActivated(o, args); };
 
             treeadditem = new MenuItem ("Existing Item...");
             treeadditem.ButtonPressEvent += window.OnAddItemActionActivated;
@@ -105,10 +109,16 @@ namespace MonoGame.Tools.Pipeline
                 if (ids.Count != 1)
                     return;
 
+                string start = openedProject;
+
                 if(ids[0] != ID_BASE)
-                    Process.Start(window._controller.GetFullPath(GetPathFromIter(iters[0])));
-                else
-                    Process.Start(openedProject);
+                    start = window._controller.GetFullPath(GetPathFromIter(iters[0]));
+
+                #if LINUX
+                Process.Start("mimeopen", "-n " + start);
+                #else
+                Process.Start(start);
+                #endif
             };
 
             treeopenfilelocation = new MenuItem ("Open Item Directory");
@@ -443,10 +453,16 @@ namespace MonoGame.Tools.Pipeline
                 if (ids.Count != 1)
                     return;
 
-                if(ids[0] == ID_BASE)
-                    Process.Start(openedProject);
-                else if(ids[0] != ID_FOLDER)
-                    Process.Start(window._controller.GetFullPath(GetPathFromIter(iters[0])));
+                string start = openedProject;
+
+                if(ids[0] != ID_BASE)
+                    start = window._controller.GetFullPath(GetPathFromIter(iters[0]));
+
+                #if LINUX
+                Process.Start("mimeopen", "-n " + start);
+                #else
+                Process.Start(start);
+                #endif
             }
 
             if (args.Event.Button == 3) {

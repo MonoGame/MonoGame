@@ -12,7 +12,7 @@ using TP = Microsoft.Xna.Framework.Content.Pipeline;
 namespace MonoGame.Tools.Pipeline
 {
     [System.ComponentModel.ToolboxItem (true)]
-    public partial class PropertiesView : Bin
+    public partial class PropertiesView : VBox
     {
         List<object> currentObjects;
         internal IController controller { get; set; }
@@ -74,7 +74,7 @@ namespace MonoGame.Tools.Pipeline
             foreach (var p in props) {
 
                 var attrs = p.GetCustomAttributes(true).Where(x => x is BrowsableAttribute).Cast<BrowsableAttribute>();
-                if (attrs.Any (x => !x.Browsable) || p.Name == "Name" || p.Name == "Location")
+                if (attrs.Any (x => !x.Browsable) || p.Name == "Name" || p.Name == "Location" || p.Name == "ContentItems" || p.Name == "OriginalPath")
                     continue;
 
                 object value = "???";
@@ -148,12 +148,26 @@ namespace MonoGame.Tools.Pipeline
                         value = "";
 
                     if (p.CanWrite)
-                        propertygridtable1.AddEntry (p.Name, value, 
-                            PropertyGridTable.EntryType.Text, (s,e) => { 
-                                foreach (object o in currentObjects)
-                                    p.SetValue(o, ((FalseWidget)s).newvalue, null);
-                                controller.OnProjectModified();
-                            });
+                    {
+                        if (!p.Name.Contains("Dir"))
+                        {
+                            propertygridtable1.AddEntry(p.Name, value, PropertyGridTable.EntryType.Text, (s, e) =>
+                                { 
+                                    foreach (object o in currentObjects)
+                                        p.SetValue(o, ((FalseWidget)s).newvalue, null);
+                                    controller.OnProjectModified();
+                                });
+                        }
+                        else
+                        {
+                            propertygridtable1.AddEntry(p.Name, value, PropertyGridTable.EntryType.FilePath, (s, e) =>
+                                { 
+                                    foreach (object o in currentObjects)
+                                        p.SetValue(o, ((FalseWidget)s).newvalue, null);
+                                    controller.OnProjectModified();
+                                });
+                        }
+                    }
                     else 
                         propertygridtable1.AddEntry (p.Name, value, 
                             PropertyGridTable.EntryType.Readonly);
@@ -229,7 +243,6 @@ namespace MonoGame.Tools.Pipeline
                 }
 
                 propertygridtable1.AddEntry (p.Name, null, PropertyGridTable.EntryType.Unkown);
-
             }
 
             propertygridtable1.Refresh ();

@@ -18,7 +18,11 @@ namespace MonoGame.Tools.Pipeline
 			this.Title = global::Mono.Unix.Catalog.GetString ("Color Picker");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child MonoGame.Tools.Pipeline.ColorPickerDialog.VBox
+            #if GTK2
 			global::Gtk.VBox w1 = this.VBox;
+            #elif GTK3
+            global::Gtk.Box w1 = this.ContentArea;
+            #endif
 			w1.Name = "dialog1_VBox";
 			w1.BorderWidth = ((uint)(2));
 			// Container child dialog1_VBox.Gtk.Box+BoxChild
@@ -30,7 +34,11 @@ namespace MonoGame.Tools.Pipeline
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(w1 [this.colorselection1]));
 			w2.Position = 0;
 			// Internal child MonoGame.Tools.Pipeline.ColorPickerDialog.ActionArea
+            #if GTK2
 			global::Gtk.HButtonBox w3 = this.ActionArea;
+            #elif GTK3
+            global::Gtk.ButtonBox w3 = this.ActionArea;
+            #endif
 			w3.Name = "dialog1_ActionArea";
 			w3.Spacing = 10;
 			w3.BorderWidth = ((uint)(5));
