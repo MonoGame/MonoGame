@@ -271,6 +271,7 @@ Section "Visual Studio 2015 Templates" VS2015
   InstallTemplates:
     SetOutPath "$DOCUMENTS\Visual Studio 2015\Templates\ProjectTemplates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2015\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
     DetailPrint "Visual Studio 2015 not found"
