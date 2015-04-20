@@ -24,7 +24,6 @@ namespace MonoGame.Tools.Pipeline
 		{
 			global::Stetic.Gui.Initialize (this);
 			// Widget MonoGame.Tools.Pipeline.PropertiesView
-			global::Stetic.BinContainer.Attach (this);
 			this.Name = "MonoGame.Tools.Pipeline.PropertiesView";
 			// Container child MonoGame.Tools.Pipeline.PropertiesView.Gtk.Container+ContainerChild
 			this.vbox2 = new global::Gtk.VBox ();
@@ -92,9 +91,6 @@ namespace MonoGame.Tools.Pipeline
 			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.vpaned1]));
 			w7.Position = 1;
 			this.Add (this.vbox2);
-			if ((this.Child != null)) {
-				this.Child.ShowAll ();
-			}
 			this.Hide ();
 			this.button15.Clicked += new global::System.EventHandler (this.OnButton15Clicked);
 			this.button2.Clicked += new global::System.EventHandler (this.OnButton2Clicked);

@@ -12,7 +12,6 @@ namespace MonoGame.Tools.Pipeline
 		{
 			global::Stetic.Gui.Initialize (this);
 			// Widget MonoGame.Tools.Pipeline.PropertyGridTable
-			global::Stetic.BinContainer.Attach (this);
 			this.Name = "MonoGame.Tools.Pipeline.PropertyGridTable";
 			// Container child MonoGame.Tools.Pipeline.PropertyGridTable.Gtk.Container+ContainerChild
 			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
@@ -24,9 +23,6 @@ namespace MonoGame.Tools.Pipeline
 			this.treeview1.Name = "treeview1";
 			this.GtkScrolledWindow.Add (this.treeview1);
 			this.Add (this.GtkScrolledWindow);
-			if ((this.Child != null)) {
-				this.Child.ShowAll ();
-			}
 			this.Hide ();
 		}
 	}

@@ -104,11 +104,14 @@ namespace MonoGame.Tools.Pipeline
             {
                 foreach (string floc in filechooserwidget1.Filenames)
                 {
-                    Uri pathUri = new Uri(floc);
-                    string fl = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
+                    if (System.IO.File.Exists(floc))
+                    {
+                        Uri pathUri = new Uri(floc);
+                        string fl = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
 
-                    if (!files.Contains(fl))
-                        AddValue(fl);
+                        if (!files.Contains(fl))
+                            AddValue(fl);
+                    }
                 }
             }
         }

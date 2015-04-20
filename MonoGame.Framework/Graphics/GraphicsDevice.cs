@@ -293,6 +293,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_rasterizerState == value)
                     return;
 
+                if (!value.DepthClipEnable && !GraphicsCapabilities.SupportsDepthClamp)
+                    throw new InvalidOperationException("Cannot set RasterizerState.DepthClipEnable to false on this graphics device");
+
                 _rasterizerState = value;
 
                 // Static state properties never actually get bound;

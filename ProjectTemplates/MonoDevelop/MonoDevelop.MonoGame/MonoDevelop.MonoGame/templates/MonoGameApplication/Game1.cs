@@ -10,8 +10,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace ${Namespace}
 {
-	/// <summary>
-    /// This is the main type for your game
+    /// <summary>
+    /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game
     {

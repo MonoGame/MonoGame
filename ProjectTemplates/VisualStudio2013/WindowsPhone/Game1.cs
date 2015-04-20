@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace $safeprojectname$
 {
     /// <summary>
-    /// This is the main type for your game
+    /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game
     {
@@ -44,7 +44,7 @@ namespace $safeprojectname$
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
+        /// game-specific content.
         /// </summary>
         protected override void UnloadContent()
         {
