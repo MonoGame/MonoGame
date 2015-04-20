@@ -22,16 +22,10 @@ namespace MonoGame.Tools.Pipeline
         public string OpenProjectPath;
 
         private IController _controller;
-        private ImageList _treeIcons;
+        private ContentIcons _treeIcons;
 
         private bool _treeUpdating;
         private bool _treeSort;
-
-        private const int ContentItemIcon = 0;
-        private const int ContentMissingIcon = 1;
-        private const int FolderOpenIcon = 2;
-        private const int FolderClosedIcon = 3;
-        private const int ProjectIcon = 4;        
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -56,15 +50,9 @@ namespace MonoGame.Tools.Pipeline
 
             _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;            
 
-            _treeIcons = new ImageList();
-            var asm = Assembly.GetExecutingAssembly();
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.missing.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
+            _treeIcons = new ContentIcons();
             
-            _treeView.ImageList = _treeIcons;
+            _treeView.ImageList = _treeIcons.Icons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
             _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
             _treeView.NodeMouseClick += TreeViewOnNodeMouseClick;
@@ -359,8 +347,8 @@ namespace MonoGame.Tools.Pipeline
 
             var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
             root.Tag = new PipelineProjectProxy(project);
-            root.SelectedImageIndex = ProjectIcon;
-            root.ImageIndex = ProjectIcon;
+            root.SelectedImageIndex = ContentIcons.ProjectIcon;
+            root.ImageIndex = ContentIcons.ProjectIcon;
 
             _propertyGrid.SelectedObject = root.Tag;
         }
@@ -381,8 +369,8 @@ namespace MonoGame.Tools.Pipeline
                 if (found.Length == 0)
                 {
                     var folderNode = parent.Add(folder, folder, -1);
-                    folderNode.ImageIndex = FolderClosedIcon;
-                    folderNode.SelectedImageIndex = FolderClosedIcon;
+                    folderNode.ImageIndex = ContentIcons.FolderClosedIcon;
+                    folderNode.SelectedImageIndex = ContentIcons.FolderClosedIcon;
 
                     var idx = path.IndexOf(folder);
                     var curPath = path.Substring(0, idx + folder.Length);
@@ -394,10 +382,13 @@ namespace MonoGame.Tools.Pipeline
                     parent = found[0].Nodes;
             }
 
+            string fullPath = ((PipelineController)_controller).GetFullPath(item.OriginalPath);
+            int iconIdx = _treeIcons.GetIcon(item.Exists, fullPath);
+
             var node = parent.Add(string.Empty, item.Name, -1);
             node.Tag = item;
-            node.ImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
-            node.SelectedImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
+            node.ImageIndex = iconIdx;
+            node.SelectedImageIndex = iconIdx;
 
             _treeView.SelectedNode = node;
 
@@ -686,19 +677,19 @@ namespace MonoGame.Tools.Pipeline
 
         private void TreeViewOnBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.ImageIndex == FolderOpenIcon)
+            if (e.Node.ImageIndex == ContentIcons.FolderOpenIcon)
             {
-                e.Node.ImageIndex = FolderClosedIcon;
-                e.Node.SelectedImageIndex = FolderClosedIcon;
+                e.Node.ImageIndex = ContentIcons.FolderClosedIcon;
+                e.Node.SelectedImageIndex = ContentIcons.FolderClosedIcon;
             }
         }
 
         private void TreeViewOnBeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.ImageIndex == FolderClosedIcon)
+            if (e.Node.ImageIndex == ContentIcons.FolderClosedIcon)
             {
-                e.Node.ImageIndex = FolderOpenIcon;
-                e.Node.SelectedImageIndex = FolderOpenIcon;
+                e.Node.ImageIndex = ContentIcons.FolderOpenIcon;
+                e.Node.SelectedImageIndex = ContentIcons.FolderOpenIcon;
             }
         }
 
@@ -926,12 +917,15 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (parent[i].Text == item.Name)
                 {
-                    if (parent[i].ImageIndex == ContentItemIcon || parent[i].ImageIndex == ContentMissingIcon)
+                    if (parent[i].ImageIndex >= ContentIcons.MaxDefinedIconIndex || parent[i].ImageIndex == ContentIcons.ContentMissingIcon)
                     {
                         this.Invoke(new MethodInvoker(delegate()
                         {
-                            parent[i].ImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
-                            parent[i].SelectedImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
+                            string fullPath = ((PipelineController)_controller).GetFullPath(item.OriginalPath);
+                            int iconIdx = _treeIcons.GetIcon(item.Exists, fullPath);
+
+                            parent[i].ImageIndex = iconIdx;
+                            parent[i].SelectedImageIndex = iconIdx;
                         }));
                     }
                 }
@@ -969,8 +963,8 @@ namespace MonoGame.Tools.Pipeline
                 if (found.Length == 0)
                 {
                     var folderNode = parent.Add(folder, folder, -1);
-                    folderNode.ImageIndex = FolderClosedIcon;
-                    folderNode.SelectedImageIndex = FolderClosedIcon;
+                    folderNode.ImageIndex = ContentIcons.FolderClosedIcon;
+                    folderNode.SelectedImageIndex = ContentIcons.FolderClosedIcon;
 
                     var idx = path.IndexOf(folder);
                     var curPath = path.Substring(0, idx + folder.Length);

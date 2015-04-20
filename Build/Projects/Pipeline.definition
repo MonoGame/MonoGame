@@ -22,8 +22,8 @@
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;GTK</Platform>
-      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -65,6 +65,9 @@
     <Compile Include="Windows\UpdateAction.cs" />
 
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\ContentIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\EditorIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -217,51 +220,48 @@
     <Compile Include="Gtk\Dialogs\ColorPickerDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\generated.cs">
+    <Compile Include="Gtk\Stetic.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.MainWindow.cs">  
+    <Compile Include="Gtk\MainWindow.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.NewTemplateDialog.cs">  
+    <Compile Include="Gtk\Dialogs\NewTemplateDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ProjectView.cs">  
+    <Compile Include="Gtk\Widgets\ProjectView.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertiesView.cs">
+    <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.YesNoCancelDialog.cs">  
+    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.CollectionEditorDialog.cs">  
+    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ColorPickerDialog.cs">  
+    <Compile Include="Gtk\Dialogs\ColorPickerDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertyGridTable.cs">  
+    <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AboutDialog.cs">  
+    <Compile Include="Gtk\Dialogs\AboutDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AddFileDialog.cs">  
+    <Compile Include="Gtk\Dialogs\AddFileDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AddFolderDialog.cs">  
+    <Compile Include="Gtk\Dialogs\AddFolderDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.TextEditorDialog.cs">  
+    <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="IgeMacIntegration.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <EmbeddedResource Include="gtk-gui\gui.stetic">
-      <Platforms>MacOS,Linux</Platforms>
-    </EmbeddedResource>
 
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="App.ico" />
@@ -273,66 +273,65 @@
     <EmbeddedResource Include="Icons\settings.png" />
 
     <!-- Copy config files to output directory -->
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\atk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>atk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gdk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>gdk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>glade-sharp.dll.config</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gio-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>gio-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\glib-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>glib-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gtk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>gtk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\pango-sharp.dll.config">
+      <Platforms>Linux</Platforms>
       <Link>pango-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
-    <!-- Copy gtk libs to output directory -->
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libatksharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libatksharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>atk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libgdksharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libgdksharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>gdk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libgladesharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libgladesharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>glade-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libglibsharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libglibsharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>glib-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libgtksharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libgtksharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>gtk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\libpangosharpglue-2.so">
-      <Platforms>Linux</Platforms>
-      <Link>libpangosharpglue-2.so</Link>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>pango-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 

@@ -46,6 +46,13 @@ namespace MonoGame.Tools.Pipeline
 
         public bool LaunchDebugger { get; set; }
 
+        public string ProjectLocation {
+            get
+            {
+                return _project.Location;
+            }
+        }
+
         public bool ProjectOpen { get; private set; }
 
         public bool ProjectDirty { get; set; }

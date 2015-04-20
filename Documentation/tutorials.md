@@ -46,6 +46,7 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [MonoGame "Hello World" on Mac OS X and Xamarin Studio](http://jaquadro.com/2013/09/monogame-hello-world-on-mac-os-x-and-xamarin-studio/)
  - [Solving Resolution Independent Rendering And 2D Camera Using Monogame](http://blog.roboblob.com/2013/07/27/solving-resolution-independent-rendering-and-2d-camera-using-monogame/)
  - [XNA is Dead; Long Live the New XNA, MonoGame](http://www.codemag.com/Article/1411081)
+ - [Make Santa Jump - Making an endless runner game in F# using MonoGame](http://timjones.tw/blog/archive/2014/12/28/make-santa-jump-game-in-fsharp-using-monogame)
  
 ## Video Tutorials
 

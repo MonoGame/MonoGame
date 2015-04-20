@@ -12,8 +12,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
         {
-            ClearTargets(targets, device._d3dContext.VertexShader);
-            ClearTargets(targets, device._d3dContext.PixelShader);
+            if (_applyToVertexStage)
+            {
+                ClearTargets(targets, device._d3dContext.VertexShader);
+            }
+            else
+            {
+                ClearTargets(targets, device._d3dContext.PixelShader);
+            }
         }
 
         private void ClearTargets(RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)
@@ -30,6 +36,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Make one pass across all the texture slots.
             for (var i = 0; i < _textures.Length; i++)
             {
+                if (_textures[i] == null)
+                    continue;
+
                 if (_textures[i] != target0 &&
                     _textures[i] != target1 &&
                     _textures[i] != target2 &&

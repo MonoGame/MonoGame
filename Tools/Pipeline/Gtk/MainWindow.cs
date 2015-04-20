@@ -167,7 +167,7 @@ namespace MonoGame.Tools.Pipeline
         public bool AskSaveName (ref string filePath, string title)
         {
             var filechooser =
-                new FileChooserDialog(title,
+                new FileChooserDialog("Save MGCB Project As",
                     this,
                     FileChooserAction.Save,
                     "Cancel", ResponseType.Cancel,
@@ -176,10 +176,13 @@ namespace MonoGame.Tools.Pipeline
             filechooser.AddFilter (MonoGameContentProjectFileFilter);
             filechooser.AddFilter (AllFilesFilter);
 
+            if (title != null)
+                filechooser.Title = title;
+
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter)
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
