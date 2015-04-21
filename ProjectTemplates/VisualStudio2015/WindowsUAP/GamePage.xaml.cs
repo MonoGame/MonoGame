@@ -33,8 +33,5 @@ namespace $safeprojectname$
             _game = MonoGame.Framework.XamlGame<Game1>.Create(launchArguments, Window.Current.CoreWindow, swapChainPanel);
 		}
 
-		private void AppBarButton_Click(object sender, RoutedEventArgs e)
-		{
-		}
 	}
 }

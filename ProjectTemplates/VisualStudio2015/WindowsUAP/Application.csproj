@@ -116,27 +116,6 @@
     <Reference Include="MonoGame.Framework">
        <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.XInput">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\SharpDX.XInput.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct2D1">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\SharpDX.Direct2D1.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct3D11">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\SharpDX.Direct3D11.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\SharpDX.DXGI.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.MediaFoundation">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\SharpDX.MediaFoundation.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.XAudio2">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsUAP\SharpDX.XAudio2.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">

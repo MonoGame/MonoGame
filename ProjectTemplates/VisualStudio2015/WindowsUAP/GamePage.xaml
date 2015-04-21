@@ -8,15 +8,5 @@
     mc:Ignorable="d">
 
   <SwapChainPanel x:Name="swapChainPanel" />
-	
-  <Page.BottomAppBar>
-    <AppBar x:Name="bottomAppBar" Padding="10,0,10,0">
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-        <AppBarButton AutomationProperties.Name="Sample Button"
-                      AutomationProperties.AutomationId="SampleAppBarButton"
-                      Click="AppBarButton_Click"/>
-      </StackPanel>
-    </AppBar>
-  </Page.BottomAppBar>
-  
+	  
 </Page>
