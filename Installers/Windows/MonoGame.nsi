@@ -75,21 +75,11 @@ RequestExecutionLevel admin
 ; The stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
   SectionIn RO
-
   
-  ; TODO: This stuff below is a bit of a mess and i 
-  ; suspect some of it can be removed now.  Some can
-  ; be removed after we kill off the old XNA content 
-  ; pipeline support.
-
+  ; Install the VS support files.
   SetOutPath ${MSBuildInstallDir}
-  File '..\monogame.ico'
   File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.*'
-  File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
-  File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_32.dll'
-  File '..\..\ThirdParty\Dependencies\lame_enc.dll'
-  
+
   ; Install the MonoGame tools to a single shared folder.
   SetOutPath ${MSBuildInstallDir}\Tools
   File /r '..\..\Tools\2MGFX\bin\Windows\AnyCPU\Release\*.exe'
