@@ -44,10 +44,10 @@ namespace Microsoft.Xna.Framework.Input
                 };
 
             int noa = Enum.GetValues(typeof(OpenTK.Input.JoystickButton)).Length;
-            float[] axises = new float[noa];
+            float[] axes = new float[noa];
 
             for (int i = 0; i < noa; i++)
-                axises[i] = state.GetAxis((OpenTK.Input.JoystickAxis)i);
+                axes[i] = state.GetAxis((OpenTK.Input.JoystickAxis)i);
 
             int nob = Enum.GetValues(typeof(OpenTK.Input.JoystickButton)).Length;
             ButtonState[] buttons = new ButtonState[nob];
@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickState
             {
                 IsConnected = true,
-                Axes = axises,
+                Axes = axes,
                 Buttons = buttons,
                 Hats = hats
             };

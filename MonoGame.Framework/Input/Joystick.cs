@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary> 
-    /// Allows interaction with joysticks. Unlike <see cref="GamePad"/> the number of Buttons/Axises/DPads is not limited.
+    /// Allows interaction with joysticks. Unlike <see cref="GamePad"/> the number of Buttons/Axes/DPads is not limited.
     /// </summary>
     public static partial class Joystick
     {

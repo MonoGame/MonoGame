@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Gets the axis count.
         /// </summary>
-        /// <value>The number of axises that the joystick possesses.</value>
+        /// <value>The number of axes that the joystick possesses.</value>
         public int AxisCount { get; internal set; }
 
         /// <summary>
