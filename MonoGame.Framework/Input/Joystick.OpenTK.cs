@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Input
                 return new JoystickState()
                 {
                     IsConnected = false,
-                    Axises = new float[0],
+                    Axes = new float[0],
                     Buttons = new ButtonState[0],
                     Hats = new JoystickHat[0]
                 };
@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickState
             {
                 IsConnected = true,
-                Axises = axises,
+                Axes = axises,
                 Buttons = buttons,
                 Hats = hats
             };

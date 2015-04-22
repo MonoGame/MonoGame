@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Input
         /// Gets the joystick axis values.
         /// </summary>
         /// <value>An array list of floats that indicate axis values.</value>
-        public float[] Axises { get; internal set; }
+        public float[] Axes { get; internal set; }
 
         /// <summary>
         /// Gets the joystick button values.
