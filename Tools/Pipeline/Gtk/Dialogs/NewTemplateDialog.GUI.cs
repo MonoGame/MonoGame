@@ -30,7 +30,11 @@ namespace MonoGame.Tools.Pipeline
 			this.Name = "MonoGame.Tools.Pipeline.NewTemplateDialog";
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child MonoGame.Tools.Pipeline.NewTemplateDialog.VBox
+            #if GTK2
 			global::Gtk.VBox w1 = this.VBox;
+            #elif GTK3
+            global::Gtk.Box w1 = this.ContentArea;
+            #endif
 			w1.Name = "dialog1_VBox";
 			w1.BorderWidth = ((uint)(2));
 			// Container child dialog1_VBox.Gtk.Box+BoxChild
@@ -42,6 +46,9 @@ namespace MonoGame.Tools.Pipeline
 			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
 			this.treeview1 = new global::Gtk.TreeView ();
+            #if GTK3
+            this.treeview1.Expand = true;
+            #endif
 			this.treeview1.CanFocus = true;
 			this.treeview1.Name = "treeview1";
 			this.treeview1.HeadersVisible = false;
@@ -89,7 +96,11 @@ namespace MonoGame.Tools.Pipeline
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(w1 [this.vbox2]));
 			w8.Position = 0;
 			// Internal child MonoGame.Tools.Pipeline.NewTemplateDialog.ActionArea
+            #if GTK2
 			global::Gtk.HButtonBox w9 = this.ActionArea;
+            #elif GTK3
+            global::Gtk.ButtonBox w9 = this.ActionArea;
+            #endif
 			w9.Name = "dialog1_ActionArea";
 			w9.Spacing = 10;
 			w9.BorderWidth = ((uint)(5));

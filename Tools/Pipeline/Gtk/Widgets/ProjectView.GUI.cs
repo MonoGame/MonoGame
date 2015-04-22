@@ -12,7 +12,6 @@ namespace MonoGame.Tools.Pipeline
 		{
 			global::Stetic.Gui.Initialize (this);
 			// Widget MonoGame.Tools.Pipeline.ProjectView
-			global::Stetic.BinContainer.Attach (this);
 			this.Name = "MonoGame.Tools.Pipeline.ProjectView";
 			// Container child MonoGame.Tools.Pipeline.ProjectView.Gtk.Container+ContainerChild
 			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
@@ -25,12 +24,7 @@ namespace MonoGame.Tools.Pipeline
 			this.treeview1.HeadersVisible = false;
 			this.GtkScrolledWindow.Add (this.treeview1);
 			this.Add (this.GtkScrolledWindow);
-			if ((this.Child != null)) {
-				this.Child.ShowAll ();
-			}
 			this.Hide ();
-			this.treeview1.ButtonReleaseEvent += new global::Gtk.ButtonReleaseEventHandler (this.OnTreeview1ButtonReleaseEvent);
-			this.treeview1.CursorChanged += new global::System.EventHandler (this.OnTreeview1CursorChanged);
 		}
 	}
 }

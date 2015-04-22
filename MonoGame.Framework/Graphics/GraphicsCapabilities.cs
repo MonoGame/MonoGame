@@ -99,6 +99,8 @@ namespace Microsoft.Xna.Framework.Graphics
         
         internal bool SupportsTextureArrays { get; private set; }
 
+        internal bool SupportsDepthClamp { get; private set; }
+
         internal void Initialize(GraphicsDevice device)
         {
 			SupportsNonPowerOfTwo = GetNonPowerOfTwo(device);
@@ -175,6 +177,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Implement OpenGL support for texture arrays
             // once we can author shaders that use texture arrays.
             SupportsTextureArrays = false;
+#endif
+
+#if DIRECTX
+            SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
+#elif OPENGL
+            SupportsDepthClamp = device._extensions.Contains("GL_ARB_depth_clamp");
 #endif
         }
 
