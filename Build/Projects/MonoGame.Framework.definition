@@ -804,6 +804,16 @@
     <Compile Include="Input\GamePadThumbSticks.cs" />
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Input\GamePadType.cs" />
+    <Compile Include="Input\Joystick.cs" />
+    <Compile Include="Input\JoystickCapabilities.cs" />
+    <Compile Include="Input\JoystickHat.cs" />
+    <Compile Include="Input\JoystickState.cs" />
+    <Compile Include="Input\Joystick.Default.cs">
+      <Platforms>Android,Ouya,PSMobile,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,Web</Platforms>
+    </Compile>
+    <Compile Include="Input\Joystick.OpenTK.cs">
+      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>PSMobile,Android,Ouya</ExcludePlatforms>
     </Compile>
