@@ -12,7 +12,7 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Window, IView
     {
-        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.";
+		public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.()";
 
         public static bool CheckString(string s, string allowedCharacters)
         {
@@ -577,7 +577,15 @@ namespace MonoGame.Tools.Pipeline
                 _controller.IncludeFolder (_controller.GetFullPath (""));
             UpdateMenus();
             expand = false;
-        }
+		}
+
+		public void OnRenameActionActivated (object sender, EventArgs e)
+		{
+			expand = true;
+			projectview1.Rename ();
+			UpdateMenus();
+			expand = false;
+		}
 
         public void OnDeleteActionActivated (object sender, EventArgs e)
         {
@@ -637,6 +645,8 @@ namespace MonoGame.Tools.Pipeline
             ExitAction.Sensitive = notBuilding;
 
             AddAction.Sensitive = projectOpen;
+
+			RenameAction.Sensitive = paths.Length == 1;
 
             DeleteAction.Sensitive = projectOpen && somethingSelected;
 

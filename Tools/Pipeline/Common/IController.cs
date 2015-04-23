@@ -110,6 +110,8 @@ namespace MonoGame.Tools.Pipeline
 
         void NewFolder(string name, string location);
 
+		void Move (string path, string newpath, FileType type);
+
         void AddAction(IProjectAction action);
 
         IProjectItem GetItem(string originalPath);

@@ -11,7 +11,7 @@ namespace MonoGame.Tools.Pipeline
         public Menu menu, addmenu;
         public string openedProject;
 
-        public string ID_BASE = "0", ID_FOLDER = "1", ID_FILE = "2", ID_REFBASE = "3", ID_REF = "4";
+        public string ID_BASE = "0", ID_FOLDER = "1", ID_FILE = "2";
 
         public Gdk.Pixbuf ICON_BASE = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.settings.png");
         public Gdk.Pixbuf[] ICON_FOLDER = {
@@ -28,7 +28,7 @@ namespace MonoGame.Tools.Pipeline
         MainWindow window;
         PropertiesView propertiesView;
 
-        MenuItem treeadd, treeaddseperator, treenewitem, treeadditem, treenewfolder, treeaddfolder, treeopenfile, treedelete, treeopenfilelocation;
+		MenuItem treeadd, treeaddseperator, treenewitem, treeadditem, treenewfolder, treeaddfolder, treeopenfile, treerename, treerenameseparator, treedelete, treeopenfilelocation;
 
         public ProjectView ()
         {
@@ -95,7 +95,12 @@ namespace MonoGame.Tools.Pipeline
             treeadditem.ButtonPressEvent += window.OnAddItemActionActivated;
 
             treeaddfolder = new MenuItem ("Existing Folder...");
-            treeaddfolder.ButtonPressEvent += window.OnAddFolderActionActivated;
+			treeaddfolder.ButtonPressEvent += window.OnAddFolderActionActivated;
+
+			treerename = new MenuItem ("Rename");
+			treerename.Activated += window.OnRenameActionActivated;
+
+			treerenameseparator = new SeparatorMenuItem();
 
             treedelete = new MenuItem ("Delete");
             treedelete.Activated += window.OnDeleteActionActivated;
@@ -144,7 +149,9 @@ namespace MonoGame.Tools.Pipeline
             menu.Add (treeaddseperator);
             menu.Add (treeopenfilelocation);
             menu.Add (treerebuild);
-            menu.Add (new SeparatorMenuItem ());
+			menu.Add (new SeparatorMenuItem ());
+			menu.Add (treerename);
+			menu.Add (treerenameseparator);
             menu.Add (treedelete);
         }
 
@@ -368,6 +375,32 @@ namespace MonoGame.Tools.Pipeline
             return paths;
         }
 
+		public void Rename()
+		{
+			List<TreeIter> iter;
+			List<string> ids;
+			string[] path = GetSelectedTreePath (out iter, out ids);
+
+			if (path.Length != 1)
+				return;
+
+			FileType type = FileType.Base;
+
+			if (ids [0] == ID_FILE) 
+				type = FileType.File;
+			else if (ids [0] == ID_FOLDER) 
+				type = FileType.Folder;
+
+			TextEditorDialog dialog = new TextEditorDialog ("Rename", "New Name:", treeview1.Model.GetValue (iter [0], 1).ToString(), true);
+			dialog.TransientFor = window;
+
+			if (dialog.Run() == (int)ResponseType.Ok)
+			{
+				string newpath = System.IO.Path.GetDirectoryName(path[0]) + System.IO.Path.DirectorySeparatorChar + dialog.text;
+				window._controller.Move(path[0], newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath, type);
+			}
+		}
+
         public void Remove()
         {
             List<TreeIter> iter;
@@ -438,7 +471,9 @@ namespace MonoGame.Tools.Pipeline
             if (args.Event.Button == 1) 
                 ReloadPropertyGrid ();
             else if (args.Event.Button == 3) 
-                ShowMenu ();
+				ShowMenu ();
+
+			window.UpdateMenus();
         }
 
         [GLib.ConnectBefore]
@@ -480,13 +515,12 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            args.RetVal = false;
+			args.RetVal = false;
         }
 
         protected void OnTreeview1CursorChanged (object o, EventArgs args)
         {
             ReloadPropertyGrid ();
-            window.UpdateMenus();
         }
 
         string CombineVariables(string vara, string varb)
@@ -571,7 +605,9 @@ namespace MonoGame.Tools.Pipeline
                     } else {
                         treeadd.Visible = false;
                         treeopenfile.Visible = true;
-                    }
+					}
+					treerename.Visible = true;
+					treerenameseparator.Visible = true;
                     treeaddseperator.Visible = treeadd.Visible || treeopenfile.Visible;
 
                     menu.Popup ();
@@ -585,6 +621,8 @@ namespace MonoGame.Tools.Pipeline
                 treeaddseperator.Visible = false;
                 treeopenfile.Visible = false;
                 treeopenfilelocation.Visible = false;
+				treerename.Visible = false;
+				treerenameseparator.Visible = false;
 
                 menu.Popup ();
             }
