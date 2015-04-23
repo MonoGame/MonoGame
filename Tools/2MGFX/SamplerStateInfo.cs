@@ -24,6 +24,21 @@ namespace TwoMGFX
         private int _maxMipLevel;
         private float _mipMapLevelOfDetailBias;
 
+        public SamplerStateInfo()
+        {
+            // NOTE: These match the defaults of SamplerState.
+            _minFilter = TextureFilterType.Linear;
+            _magFilter = TextureFilterType.Linear;
+            _mipFilter = TextureFilterType.Linear;
+            _addressU = TextureAddressMode.Wrap;
+            _addressV = TextureAddressMode.Wrap;
+            _addressW = TextureAddressMode.Wrap;
+            _borderColor = Color.White;
+            _maxAnisotropy = 4;
+            _maxMipLevel = 0;
+            _mipMapLevelOfDetailBias = 0.0f;
+        }
+
         public string Name { get; set; }
 
         public string TextureName { get; set; }
