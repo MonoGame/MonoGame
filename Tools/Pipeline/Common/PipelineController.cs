@@ -316,33 +316,33 @@ namespace MonoGame.Tools.Pipeline
             UpdateTree();
         }
 
-		public bool MoveProject(string newname)
-		{
-			string opath = _project.OriginalPath;
-			string ext = Path.GetExtension(opath);
+        public bool MoveProject(string newname)
+        {
+            string opath = _project.OriginalPath;
+            string ext = Path.GetExtension(opath);
 
-			try
-			{
-				File.Delete(_project.OriginalPath);
-			}
-			catch {
-				View.ShowError("Error", "Could not delete old project file.");
-				return false;
-			}
+            try
+            {
+                File.Delete(_project.OriginalPath);
+            }
+            catch {
+                View.ShowError("Error", "Could not delete old project file.");
+                return false;
+            }
 
-			_project.OriginalPath = Path.GetDirectoryName(opath) + Path.DirectorySeparatorChar + newname + ext;
-			if (!SaveProject(false))
-			{
-				_project.OriginalPath = opath;
-				SaveProject(false);
-				View.ShowError("Error", "Could not save the new project file.");
-				return false;
-			}
-			View.SetTreeRoot(_project);
+            _project.OriginalPath = Path.GetDirectoryName(opath) + Path.DirectorySeparatorChar + newname + ext;
+            if (!SaveProject(false))
+            {
+                _project.OriginalPath = opath;
+                SaveProject(false);
+                View.ShowError("Error", "Could not save the new project file.");
+                return false;
+            }
+            View.SetTreeRoot(_project);
 
-			return true;
-		}
-
+            return true;
+        }
+        
         public bool SaveProject(bool saveAs)
         {
             // Do we need file name?
@@ -735,13 +735,13 @@ namespace MonoGame.Tools.Pipeline
             _actionStack.Add(action2);
         }
 
-		public void Move (string path, string newname, FileType type)
-		{
-			var action = new MoveAction(this, path, newname, type);
-			action.Do();
-			_actionStack.Add(action);
-		}
-
+        public void Move (string path, string newname, FileType type)
+        {
+            var action = new MoveAction(this, path, newname, type);
+            action.Do();
+            _actionStack.Add(action);
+        }
+        
         private List<string> GetFiles(string folder)
         {
             List<string> ret = new List<string>();

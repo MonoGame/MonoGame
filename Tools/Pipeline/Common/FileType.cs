@@ -4,11 +4,11 @@
 
 namespace MonoGame.Tools.Pipeline
 {
-	public enum FileType
-	{
-		Base,
-		File,
-		Folder
-	}
+    public enum FileType
+    {
+        Base,
+        File,
+        Folder
+    }
 }
 
