@@ -422,11 +422,11 @@ namespace MonoGame.Tools.Pipeline
                     List<string> paths = GetAllPaths (iter [i]);
                     foreach (string pth in paths) {
                         var item = window._controller.GetItem (pth) as ContentItem;
-                        if(!items.Contains(item))
+                        if (item == null && !directories.Contains(pth))
+                            directories.Add(pth);
+                        else if(!items.Contains(item))
                             items.Add (item);
                     }
-
-                    TreeIter itr = iter [i];
                 }
             }
 
