@@ -631,8 +631,8 @@ namespace MonoGame.Tools.Pipeline
                     File.Copy(sc[i], dc[i]);
 
                 var action = new IncludeAction(this, files);
-                action.Do();
-                _actionStack.Add(action);  
+                if(action.Do())
+                    _actionStack.Add(action);  
             }
             catch
             {
@@ -731,15 +731,15 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var action2 = new IncludeAction(this, files, directories);
-            action2.Do();
-            _actionStack.Add(action2);
+            if(action2.Do())
+                _actionStack.Add(action2);
         }
 
         public void Move (string path, string newname, FileType type)
         {
             var action = new MoveAction(this, path, newname, type);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
         
         private List<string> GetFiles(string folder)
@@ -772,15 +772,15 @@ namespace MonoGame.Tools.Pipeline
         public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders)
         {
             var action = new ExcludeAction(this, items, folders);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
             var action = new NewAction(this, name, location, template);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void NewFolder(string name, string location)
@@ -801,8 +801,8 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var action = new IncludeAction(this, null, new List<string> { folder });
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void AddAction(IProjectAction action)
