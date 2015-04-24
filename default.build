@@ -108,9 +108,6 @@
       <exec program="mono" commandline="Protobuild.exe -generate MacOS" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.MacOS.sln" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.MacOS.sln" />
-      <delete dir="${project::get-base-directory()}\Tools\Pipeline\bin\MacOS\AnyCPU\Release\*.pkg" />
-      <exec program="pkgbuild" workingdir="Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version 1 --install-location /Applications Pipeline.MacOS.pkg" />
-      <exec program="productbuild" workingdir="Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --distribution distribution.xml --resources ./Resources --package-path Pipeline.MacOS.pkg Pipeline.Installer.pkg" />
     </if>
   </target>
 
@@ -203,12 +200,11 @@
 
   <target name="build_installer" description="Build the installers." depends="build_code,build_docs,run_tests">
 
-    <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2015/default.build" target="build" />
-
+    <nant buildfile="IDE/MonoDevelop/default.build" target="build" />
     <nant buildfile="Installers/default.build" target="build" />
 
   </target>
