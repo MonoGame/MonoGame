@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Draw the model meshes.
+        /// Draws the model meshes.
         /// </summary>
         /// <param name="world">The world transform.</param>
         /// <param name="view">The view transform.</param>
