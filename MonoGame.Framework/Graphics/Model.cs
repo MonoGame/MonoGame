@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Represents a 3D-Model.
+    /// A basic 3D model with per mesh parent bones.
     /// </summary>
 	public sealed class Model
 	{
@@ -41,34 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         /// </summary>
         public object Tag { get; set; }
-
-        /// <summary>
-        /// Sets custom effect for all meshes in this model.
-        /// </summary>
-        /// <param name="effect">Specified <see cref="Effect"/>.</param>
-        /// <remarks>
-        /// This call is equivalent to
-        /// <code>
-        /// foreach (var mesh in model.Meshes)
-        /// {
-        ///    foreach (var part in mesh.MeshParts)
-        ///    {
-        ///       part.Effect = effect;
-        ///    }
-        /// }
-        /// </code>
-        /// </remarks>
-        public void SetCustomEffect(Effect effect)
-	    {
-            foreach (var mesh in this.Meshes)
-            {
-                foreach (var part in mesh.MeshParts)
-                {
-                    part.Effect = effect;
-                }
-            }
-        }
-
+        
 		internal Model()
 		{
 
@@ -113,11 +86,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Draws a model after applying the matrix transformations.
+        /// Draw the model meshes.
         /// </summary>
-        /// <param name="world">A matrix of world transformation.</param>
-        /// <param name="view">A matrix of view transformation.</param>
-        /// <param name="projection">A matrix of projection transformation.</param>
+        /// <param name="world">The world transform.</param>
+        /// <param name="view">The view transform.</param>
+        /// <param name="projection">The projection transform.</param>
         public void Draw(Matrix world, Matrix view, Matrix projection) 
 		{       
             int boneCount = this.Bones.Count;
@@ -152,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Copies bone transforms relative to all parent bones of the each bone from this model to a given array.
         /// </summary>
-        /// <param name="destinationBoneTransforms">The array to receive transform of bones.</param>
+        /// <param name="destinationBoneTransforms">The array receiving the transformed bones.</param>
         public void CopyAbsoluteBoneTransformsTo(Matrix[] destinationBoneTransforms)
 		{
 			if (destinationBoneTransforms == null)
@@ -196,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Copies bone transforms relative to <see cref="Model.Root"/> bone from this model to a given array.
         /// </summary>
-        /// <param name="destinationBoneTransforms">The array to receive transform of bones.</param>
+        /// <param name="destinationBoneTransforms">The array receiving the transformed bones.</param>
         public void CopyBoneTransformsTo(Matrix[] destinationBoneTransforms)
         {
             if (destinationBoneTransforms == null)
