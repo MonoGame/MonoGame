@@ -47,8 +47,12 @@
     </if>
     <if test="${os == 'MacOS'}">
       <!-- Build Pipeline.Installer.pkg -->
-      <delete dir="${project::get-base-directory()}\..\Tools\Pipeline\bin\MacOS\AnyCPU\Release\*.pkg" />
-      <delete dir="${project::get-base-directory()}\*.pkg" />
+      <delete failonerror="false">
+         <fileset>
+            <include name="${project::get-base-directory()}\*.pkg"/>
+            <include name="${project::get-base-directory()}\..\Tools\Pipeline\bin\MacOS\AnyCPU\Release\*.pkg" />
+         </fileset>
+      </delete>
       <mkdir dir="root/tmp" />
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_${buildNumber}.mpack" overwrite="true"/>
       <exec program="pkgbuild" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Pipeline --install-location /Applications ${project::get-base-directory()}/Pipeline.MacOS.pkg" />
@@ -60,6 +64,6 @@
       <delete dir="./root"/>
       <delete file="./distribution.xml"/>
       <delete file="./MacOS/Resources/LICENSE.html"/>
-   </if>
+    </if>
   </target>
 </project>
