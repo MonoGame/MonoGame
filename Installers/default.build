@@ -50,7 +50,7 @@
       <delete dir="${project::get-base-directory()}\..\Tools\Pipeline\bin\MacOS\AnyCPU\Release\*.pkg" />
       <delete dir="${project::get-base-directory()}\*.pkg" />
       <mkdir dir="root/tmp" />
-      <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_3.3.0.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_3.3.0.mpack" overwrite="true"/>
+      <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_${buildNumber}.mpack" overwrite="true"/>
       <exec program="pkgbuild" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Pipeline --install-location /Applications ${project::get-base-directory()}/Pipeline.MacOS.pkg" />
       <exec program="pkgbuild" workingdir="." commandline=" --root ./root --identifier com.monogame.xsaddin --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Addin ${project::get-base-directory()}/MonoGame.XamarinStudio.Addin.pkg" />
       <copy tofile="./distribution.xml" file="./MacOS/distribution.xml" />

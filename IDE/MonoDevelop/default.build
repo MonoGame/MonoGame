@@ -4,7 +4,7 @@
 	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
 
-  <property name="buildNumber" value="3.4.0.0"/>
+  <property name="buildNumber" value="0.0.0.0"/>
   <if test="${environment::variable-exists('BUILD_NUMBER')}">
     <property name="buildNumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
   </if>
