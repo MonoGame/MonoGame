@@ -1,28 +1,9 @@
 #!/bin/bash
-DIR="Installer/Data"
-MDIR="Installer/Makeself"
-PDIR="Installer/Data/Pipeline"
-DDIR="$DIR/Dependencies"
+mkdir Installer
 
-#create temp directories for generating the installer
-mkdir "Installer"
-mkdir "$DIR"
-mkdir "$MDIR"
-mkdir "$PDIR"
-mkdir "$DDIR"
-
-#copy pipeline data
-cp ../../Tools/Pipeline/bin/Linux/AnyCPU/Release/. $PDIR/ -R
-cp ../monogame.ico $PDIR
-cp uninstall.sh $PDIR
-
-#copy the scripts thats gonna be doing the actual install
-cp generate.sh "Installer"
-cp postinstall.sh $DIR
-cp Dependencies/. $DDIR/ -R
-
-#copy mimetype stuff
-cp mgcb.xml $DIR
-
-cp ../../ThirdParty/Dependencies/makeself/. $MDIR -R
-cp ../../ThirdParty/Dependencies/assimp/libstdc++.so.6 $DIR
+cp Data/. Installer/Data/ -R
+cp ../../Tools/Pipeline/bin/Linux/AnyCPU/Release/. Installer/Data/Pipeline/ -R
+cp generate.sh Installer/
+cp generate_deb.sh Installer/
+cp ../../ThirdParty/Dependencies/makeself/. Installer/Makeself/ -R
+cp ../../ThirdParty/Dependencies/assimp/libstdc++.so.6 Installer/Data/Main/
