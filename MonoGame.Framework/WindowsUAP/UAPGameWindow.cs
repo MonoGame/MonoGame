@@ -108,6 +108,8 @@ namespace Microsoft.Xna.Framework
 
             _coreWindow.Activated += Window_FocusChanged;
 
+			_coreWindow.CharacterReceived += Window_CharacterReceived;
+
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
 
@@ -182,6 +184,11 @@ namespace Microsoft.Xna.Framework
             // the client size changed event.
             OnClientSizeChanged();
         }
+
+		private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
+		{
+			OnTextInput(sender, new TextInputEventArgs((char)args.KeyCode));
+		}
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
         {

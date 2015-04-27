@@ -166,6 +166,16 @@ namespace TwoMGFX
             }
         }
 
+        public CompareFunction DepthBufferFunction
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.DepthBufferFunction = value;
+            }
+        }
+
         public bool MultiSampleAntiAlias
         {
             set
@@ -173,6 +183,96 @@ namespace TwoMGFX
                 if (rasterizerState == null)
                     rasterizerState = new RasterizerState();
                 rasterizerState.MultiSampleAntiAlias = value;
+            }
+        }
+
+        public bool ScissorTestEnable
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.ScissorTestEnable = value;
+            }
+        }
+
+        public bool StencilEnable
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.StencilEnable = value;
+            }
+        }
+
+        public StencilOperation StencilFail
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.StencilFail = value;
+            }
+        }
+
+        public CompareFunction StencilFunc
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.StencilFunction = value;
+            }
+        }
+
+        public int StencilMask
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.StencilMask = value;
+            }
+        }
+
+        public StencilOperation StencilPass
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.StencilPass = value;
+            }
+        }
+
+        public int StencilRef
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.ReferenceStencil = value;
+            }
+        }
+
+        public int StencilWriteMask
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.StencilWriteMask = value;
+            }
+        }
+
+        public StencilOperation StencilZFail
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.StencilDepthBufferFail = value;
             }
         }
 
