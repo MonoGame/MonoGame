@@ -296,13 +296,20 @@ namespace Microsoft.Xna.Framework
 	}
 
         /// <summary>
-        /// Class for generating random numbers consistantly when using Mono or
+        /// Class for generating random numbers consistantly when using Mono or Microsoft compilers
         /// </summary>
         public class Random
         {
-            #region Private Fields 
+            #region Private Fields
 
-            private int seed;
+            private ulong seed;
+            private ulong lastValue;
+
+            #endregion
+
+            #region Properties
+
+            public ulong Seed { get { return this.seed; } }
 
             #endregion
 
@@ -311,13 +318,39 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Initializes a new instance of the random number generator using a time dependant default seed value
             /// </summary>
-            public Random() 
+            public Random()
             {
-                this.seed = System.DateTime.Now.Month ^ System.DateTime.Now.Day ^ System.DateTime.Now.Hour
-                    ^ System.DateTime.Now.Minute ^ System.DateTime.Now.Second ^ System.DateTime.Now.Millisecond;
-            }
-            public Random(int seed) { }
+                // Seed implementation using bitwise XOR
+                this.seed = (ulong)System.DateTime.Now.Millisecond ^ (ulong)System.DateTime.Now.Second ^ (ulong)System.DateTime.Now.Minute
+                    ^ (ulong)System.DateTime.Now.Hour ^ (ulong)System.DateTime.Now.Day ^ (ulong)System.DateTime.Now.Month ^ (ulong)System.DateTime.Now.Year;
 
+                // Seed implementation using bitwise OR
+                //this.seed = System.DateTime.Now.Millisecond | System.DateTime.Now.Second | System.DateTime.Now.Minute
+                //| System.DateTime.Now.Hour | System.DateTime.Now.Day | System.DateTime.Now.Month | System.DateTime.Now.Year;
+
+                // Seed implementation using bitwise AND
+                // Note: Not reliable for a non-zero value
+                //this.seed = System.DateTime.Now.Millisecond & System.DateTime.Now.Second & System.DateTime.Now.Minute
+                //& System.DateTime.Now.Hour & System.DateTime.Now.Day & System.DateTime.Now.Month & System.DateTime.Now.Year;
+                this.lastValue = this.seed;
+            }
+            public Random(ulong seed)
+            {
+                this.seed = seed;
+                this.lastValue = seed;
+            }
+
+            #endregion
+
+            #region Private methods
+
+            ulong XORShift64Star()
+            {
+                lastValue ^= lastValue >> 12;
+                lastValue ^= lastValue << 25;
+                lastValue ^= lastValue >> 27;
+                return lastValue * ulong.MaxValue;
+            }
             #endregion
         }
     }
