@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
-        internal RenderTargetView _renderTargetView;
+        internal RenderTargetView[] _renderTargetViews;
         internal DepthStencilView _depthStencilView;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
@@ -19,11 +19,38 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void GenerateIfRequired()
         {
-            if (_renderTargetView != null)
+            if (_renderTargetViews != null)
                 return;
 
             // Create a view interface on the rendertarget to use on bind.
-            _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture());
+            if (ArraySize > 1)
+            {
+                _renderTargetViews = new RenderTargetView[ArraySize];
+                for (var i = 0; i < ArraySize; i++)
+                {
+                    var renderTargetViewDescription = new RenderTargetViewDescription();
+                    if (MultiSampleCount > 1)
+                    {
+                        renderTargetViewDescription.Dimension = RenderTargetViewDimension.Texture2DMultisampledArray;
+                        renderTargetViewDescription.Texture2DMSArray.ArraySize = 1;
+                        renderTargetViewDescription.Texture2DMSArray.FirstArraySlice = i;
+                    }
+                    else
+                    {
+                        renderTargetViewDescription.Dimension = RenderTargetViewDimension.Texture2DArray;
+                        renderTargetViewDescription.Texture2DArray.ArraySize = 1;
+                        renderTargetViewDescription.Texture2DArray.FirstArraySlice = i;
+                        renderTargetViewDescription.Texture2DArray.MipSlice = 0;
+                    }
+                    _renderTargetViews[i] = new RenderTargetView(
+                        GraphicsDevice._d3dDevice, GetTexture(),
+                        renderTargetViewDescription);
+                }
+            }
+            else
+            {
+                _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture()) };
+            }
 
             // If we don't need a depth buffer then we're done.
             if (DepthStencilFormat == DepthFormat.None)
@@ -63,7 +90,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGraphicsDeviceResetting()
         {
-            SharpDX.Utilities.Dispose(ref _renderTargetView);
+            if (_renderTargetViews != null)
+            {
+                for (var i = 0; i < _renderTargetViews.Length; i++)
+                    _renderTargetViews[i].Dispose();
+                _renderTargetViews = null;
+            }
             SharpDX.Utilities.Dispose(ref _depthStencilView);
         }
 
@@ -71,7 +103,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
-                SharpDX.Utilities.Dispose(ref _renderTargetView);
+                if (_renderTargetViews != null)
+                {
+                    for (var i = 0; i < _renderTargetViews.Length; i++)
+                        _renderTargetViews[i].Dispose();
+                    _renderTargetViews = null;
+                }
                 SharpDX.Utilities.Dispose(ref _depthStencilView);
             }
 
@@ -81,7 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
         RenderTargetView IRenderTarget.GetRenderTargetView(int arraySlice)
         {
             GenerateIfRequired();
-            return _renderTargetView;
+            return _renderTargetViews[arraySlice];
         }
 
         DepthStencilView IRenderTarget.GetDepthStencilView()

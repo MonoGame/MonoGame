@@ -20,10 +20,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_state == null)
             {
-                // We're now bound to a device... no one should
-                // be changing the state of this object now!
-                GraphicsDevice = device;
-
                 // Build the description.
                 var desc = new SharpDX.Direct3D11.RasterizerStateDescription();
 
@@ -52,6 +48,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 else
                     desc.FillMode = SharpDX.Direct3D11.FillMode.Solid;
 
+                desc.IsDepthClipEnabled = DepthClipEnable;
+
                 // These are new DX11 features we should consider exposing
                 // as part of the extended MonoGame API.
                 desc.IsFrontCounterClockwise = false;
@@ -60,7 +58,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 // To support feature level 9.1 these must 
                 // be set to these exact values.
                 desc.DepthBiasClamp = 0.0f;
-                desc.IsDepthClipEnabled = true;
 
                 // Create the state.
                 _state = new SharpDX.Direct3D11.RasterizerState(GraphicsDevice._d3dDevice, desc);

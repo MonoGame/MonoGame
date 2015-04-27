@@ -154,11 +154,6 @@ namespace Microsoft.Xna.Framework.Audio
             _format = format;
             _dataStream = dataStream;
 
-            // Convert the loop points from bytes to samples.
-            var bytesPerSample = 2 * _format.Channels;
-            loopStart /= bytesPerSample;
-            loopLength /= bytesPerSample;
-
             _buffer = new AudioBuffer
             {
                 Stream = _dataStream,

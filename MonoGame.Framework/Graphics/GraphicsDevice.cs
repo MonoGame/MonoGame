@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 
@@ -15,17 +16,34 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
-        private BlendState _blendState = BlendState.Opaque;
-        private DepthStencilState _depthStencilState = DepthStencilState.Default;
-		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
-
+        private BlendState _blendState;
+        private BlendState _actualBlendState;
         private bool _blendStateDirty;
+
+        private BlendState _blendStateAdditive;
+        private BlendState _blendStateAlphaBlend;
+        private BlendState _blendStateNonPremultiplied;
+        private BlendState _blendStateOpaque;
+
+        private DepthStencilState _depthStencilState;
+        private DepthStencilState _actualDepthStencilState;
         private bool _depthStencilStateDirty;
+
+        private DepthStencilState _depthStencilStateDefault;
+        private DepthStencilState _depthStencilStateDepthRead;
+        private DepthStencilState _depthStencilStateNone;
+
+        private RasterizerState _rasterizerState;
+        private RasterizerState _actualRasterizerState;
         private bool _rasterizerStateDirty;
+
+        private RasterizerState _rasterizerStateCullClockwise;
+        private RasterizerState _rasterizerStateCullCounterClockwise;
+        private RasterizerState _rasterizerStateCullNone;
 
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
-  
+
         private VertexBuffer _vertexBuffer;
         private bool _vertexBufferDirty;
 
@@ -36,6 +54,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _currentRenderTargetCount;
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+
+        public TextureCollection VertexTextures { get; private set; }
+
+        public SamplerStateCollection VertexSamplerStates { get; private set; }
 
         public TextureCollection Textures { get; private set; }
 
@@ -56,7 +78,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private Shader _vertexShader;
         private bool _vertexShaderDirty;
-        private bool VertexShaderDirty 
+        private bool VertexShaderDirty
         {
             get { return _vertexShaderDirty; }
         }
@@ -66,13 +88,26 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
-        private bool PixelShaderDirty 
+        private bool PixelShaderDirty
         {
             get { return _pixelShaderDirty; }
         }
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
+
+        /// <summary>
+        /// The cache of effects from unique byte streams.
+        /// </summary>
+        internal Dictionary<int, Effect> EffectCache;
+
+        // Resources may be added to and removed from the list from many threads.
+        private readonly object _resourcesLock = new object();
+
+        // Use WeakReference for the global resources list as we do not know when a resource
+        // may be disposed and collected. We do not want to prevent a resource from being
+        // collected by holding a strong reference to it in this list.
+        private readonly List<WeakReference> _resources = new List<WeakReference>();
 
 		// TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
@@ -92,6 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         internal int MaxTextureSlots;
+        internal int MaxVertexTextureSlots;
 
         public bool IsDisposed
         {
@@ -100,8 +136,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _isDisposed;
             }
         }
-		
-		public bool IsContentLost { 
+
+		public bool IsContentLost {
 			get {
 				// We will just return IsDisposed for now
 				// as that is the only case I can see for now
@@ -164,7 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Initialize();
         }
 
-        private void Setup() 
+        private void Setup()
         {
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
@@ -173,9 +209,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            Textures = new TextureCollection (MaxTextureSlots);
-			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
+            VertexTextures = new TextureCollection(MaxVertexTextureSlots, true);
+            VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);
 
+            Textures = new TextureCollection(MaxTextureSlots, false);
+            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
+
+            _blendStateAdditive = BlendState.Additive.Clone();
+            _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
+            _blendStateNonPremultiplied = BlendState.NonPremultiplied.Clone();
+            _blendStateOpaque = BlendState.Opaque.Clone();
+
+            BlendState = BlendState.Opaque;
+
+            _depthStencilStateDefault = DepthStencilState.Default.Clone();
+            _depthStencilStateDepthRead = DepthStencilState.DepthRead.Clone();
+            _depthStencilStateNone = DepthStencilState.None.Clone();
+
+            DepthStencilState = DepthStencilState.Default;
+
+            _rasterizerStateCullClockwise = RasterizerState.CullClockwise.Clone();
+            _rasterizerStateCullCounterClockwise = RasterizerState.CullCounterClockwise.Clone();
+            _rasterizerStateCullNone = RasterizerState.CullNone.Clone();
+
+            RasterizerState = RasterizerState.CullCounterClockwise;
+
+            EffectCache = new Dictionary<int, Effect>();
         }
 
         ~GraphicsDevice()
@@ -195,6 +254,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the texture and sampler collections forcing
             // the state to be reapplied.
+            VertexTextures.Clear();
+            VertexSamplerStates.Clear();
             Textures.Clear();
             SamplerStates.Clear();
 
@@ -225,25 +286,68 @@ namespace Microsoft.Xna.Framework.Graphics
 
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_rasterizerState == value)
                     return;
 
+                if (!value.DepthClipEnable && !GraphicsCapabilities.SupportsDepthClamp)
+                    throw new InvalidOperationException("Cannot set RasterizerState.DepthClipEnable to false on this graphics device");
+
                 _rasterizerState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newRasterizerState = _rasterizerState;
+                if (ReferenceEquals(_rasterizerState, RasterizerState.CullClockwise))
+                    newRasterizerState = _rasterizerStateCullClockwise;
+                else if (ReferenceEquals(_rasterizerState, RasterizerState.CullCounterClockwise))
+                    newRasterizerState = _rasterizerStateCullCounterClockwise;
+                else if (ReferenceEquals(_rasterizerState, RasterizerState.CullNone))
+                    newRasterizerState = _rasterizerStateCullNone;
+
+                newRasterizerState.BindToGraphicsDevice(this);
+
+                _actualRasterizerState = newRasterizerState;
+
                 _rasterizerStateDirty = true;
             }
         }
 
-        public BlendState BlendState 
+        public BlendState BlendState
         {
 			get { return _blendState; }
-			set 
+			set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_blendState == value)
                     return;
 
 				_blendState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newBlendState = _blendState;
+                if (ReferenceEquals(_blendState, BlendState.Additive))
+                    newBlendState = _blendStateAdditive;
+                else if (ReferenceEquals(_blendState, BlendState.AlphaBlend))
+                    newBlendState = _blendStateAlphaBlend;
+                else if (ReferenceEquals(_blendState, BlendState.NonPremultiplied))
+                    newBlendState = _blendStateNonPremultiplied;
+                else if (ReferenceEquals(_blendState, BlendState.Opaque))
+                    newBlendState = _blendStateOpaque;
+
+                // Blend state is now bound to a device... no one should
+                // be changing the state of the blend state object now!
+                newBlendState.BindToGraphicsDevice(this);
+
+                _actualBlendState = newBlendState;
+
                 _blendStateDirty = true;
             }
 		}
@@ -253,13 +357,56 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _depthStencilState; }
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_depthStencilState == value)
                     return;
 
                 _depthStencilState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newDepthStencilState = _depthStencilState;
+                if (ReferenceEquals(_depthStencilState, DepthStencilState.Default))
+                    newDepthStencilState = _depthStencilStateDefault;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.DepthRead))
+                    newDepthStencilState = _depthStencilStateDepthRead;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.None))
+                    newDepthStencilState = _depthStencilStateNone;
+
+                newDepthStencilState.BindToGraphicsDevice(this);
+
+                _actualDepthStencilState = newDepthStencilState;
+
                 _depthStencilStateDirty = true;
             }
+        }
+
+        internal void ApplyState(bool applyShaders)
+        {
+            PlatformBeginApplyState();
+
+            if (_blendStateDirty)
+            {
+                _actualBlendState.PlatformApplyState(this);
+                _blendStateDirty = false;
+            }
+
+            if (_depthStencilStateDirty)
+            {
+                _actualDepthStencilState.PlatformApplyState(this);
+                _depthStencilStateDirty = false;
+            }
+
+            if (_rasterizerStateDirty)
+            {
+                _actualRasterizerState.PlatformApplyState(this);
+                _rasterizerStateDirty = false;
+            }
+
+            PlatformApplyState(applyShaders);
         }
 
         public void Clear(Color color)
@@ -293,12 +440,40 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (disposing)
                 {
                     // Dispose of all remaining graphics resources before disposing of the graphics device
-                    GraphicsResource.DisposeAll();
+                    lock (_resourcesLock)
+                    {
+                        foreach (var resource in _resources.ToArray())
+                        {
+                            var target = resource.Target as IDisposable;
+                            if (target != null)
+                                target.Dispose();
+                        }
+                        _resources.Clear();
+                    }
+
+                    // Clear the effect cache.
+                    EffectCache.Clear();
 
                     PlatformDispose();
                 }
 
                 _isDisposed = true;
+            }
+        }
+
+        internal void AddResourceReference(WeakReference resourceReference)
+        {
+            lock (_resourcesLock)
+            {
+                _resources.Add(resourceReference);
+            }
+        }
+
+        internal void RemoveResourceReference(WeakReference resourceReference)
+        {
+            lock (_resourcesLock)
+            {
+                _resources.Remove(resourceReference);
             }
         }
 
@@ -327,7 +502,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Update the back buffer.
             CreateSizeDependentResources();
-            ApplyRenderTargets(null);        
+            ApplyRenderTargets(null);
         }
 #endif
 
@@ -347,7 +522,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
 
-            GraphicsResource.DoGraphicsDeviceResetting();
+            lock (_resourcesLock)
+            {
+                foreach (var resource in _resources)
+                {
+                    var target = resource.Target as GraphicsResource;
+                    if (target != null)
+                        target.GraphicsDeviceResetting();
+                }
+
+                // Remove references to resources that have been garbage collected.
+                _resources.RemoveAll(wr => !wr.IsAlive);
+            }
         }
 
         /// <summary>
@@ -397,15 +583,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public GraphicsProfile GraphicsProfile
-        { 
-            get 
+        {
+            get
             {
                 return _graphicsProfile;
             }
             internal set
             {
                 //Check if Profile is supported.
-                //TODO: [DirectX] Recreate the Device using the new 
+                //TODO: [DirectX] Recreate the Device using the new
                 //      feature level each time the Profile changes.
                 if(value > GetHighestSupportedGraphicsProfile(this))
                     throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
@@ -446,7 +632,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			else
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
 		}
-		
+
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
         {
             if (renderTarget == null)
@@ -455,7 +641,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
         }
 
-		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
+		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
 		{
             // Avoid having to check for null and zero length.
             var renderTargetCount = 0;
@@ -563,7 +749,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_indexBuffer == indexBuffer)
                 return;
-            
+
             _indexBuffer = indexBuffer;
             _indexBufferDirty = true;
         }
@@ -620,8 +806,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
-            Debug.Assert(_indexBuffer != null, "The index buffer is null!");
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawIndexedPrimitives.");
+
+            if (_vertexBuffer == null)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawIndexedPrimitives.");
+
+            if (_indexBuffer == null)
+                throw new InvalidOperationException("Index buffer must be set before calling DrawIndexedPrimitives.");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
             // NOTE: minVertexIndex and numVertices are only hints of the
             // range of vertex data which will be indexed.
@@ -638,17 +833,40 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
-        {            
-            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
+        {
+            if (vertexData == null)
+                throw new ArgumentNullException("vertexData");
+
+            if (vertexData.Length == 0)
+                throw new ArgumentOutOfRangeException("vertexData");
+
+            if (vertexOffset < 0 || vertexOffset >= vertexData.Length)
+                throw new ArgumentOutOfRangeException("vertexOffset");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
+
+            if (vertexOffset + vertexCount > vertexData.Length)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (vertexDeclaration == null)
+                throw new ArgumentNullException("vertexDeclaration");
 
             PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawPrimitives.");
+
+            if (_vertexBuffer == null)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawPrimitives.");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
@@ -662,8 +880,35 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
-            Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
+            // These parameter checks are a duplicate of the checks in the int[] overload of DrawUserIndexedPrimitives.
+            // Inlined here for efficiency.
+
+            if (vertexData == null || vertexData.Length == 0)
+                throw new ArgumentNullException("vertexData");
+
+            if (vertexOffset < 0 || vertexOffset >= vertexData.Length)
+                throw new ArgumentOutOfRangeException("vertexOffset");
+
+            if (numVertices <= 0 || numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (vertexOffset + numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (indexData == null || indexData.Length == 0)
+                throw new ArgumentNullException("indexData");
+
+            if (indexOffset < 0 || indexOffset >= indexData.Length)
+                throw new ArgumentOutOfRangeException("indexOffset");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (vertexDeclaration == null)
+                throw new ArgumentNullException("vertexDeclaration");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
         }
@@ -673,17 +918,43 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
-            Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
+            // These parameter checks are a duplicate of the checks in the short[] overload of DrawUserIndexedPrimitives.
+            // Inlined here for efficiency.
+
+            if (vertexData == null || vertexData.Length == 0)
+                throw new ArgumentNullException("vertexData");
+
+            if (vertexOffset < 0 || vertexOffset >= vertexData.Length)
+                throw new ArgumentOutOfRangeException("vertexOffset");
+
+            if (numVertices <= 0 || numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (vertexOffset + numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (indexData == null || indexData.Length == 0)
+                throw new ArgumentNullException("indexData");
+
+            if (indexOffset < 0 || indexOffset >= indexData.Length)
+                throw new ArgumentOutOfRangeException("indexOffset");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (vertexDeclaration == null)
+                throw new ArgumentNullException("vertexDeclaration");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
         }
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
-            //TODO: Overview the calculation
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
@@ -693,7 +964,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case PrimitiveType.TriangleList:
                     return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
-                    return 3 + (primitiveCount - 1); // ???
+                    return primitiveCount + 2;
             }
 
             throw new NotSupportedException();

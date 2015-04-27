@@ -34,6 +34,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         private static string[] ReadElements(IntermediateReader input)
         {
+            if (input.Xml.IsEmptyElement)
+                return new string[0];
+
             string str = string.Empty;
             while (input.Xml.NodeType != XmlNodeType.EndElement)
             {

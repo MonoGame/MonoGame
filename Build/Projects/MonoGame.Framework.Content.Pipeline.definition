@@ -168,10 +168,6 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\CommandLineParser.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\CompilerInclude.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\CompilerInclude.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\ConstantBufferData.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ConstantBufferData.cs</Link>
@@ -203,6 +199,10 @@
     <Compile Include="..\Tools\2MGFX\EffectObject.writer.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\EffectObject.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\IEffectCompilerOutput.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\IEffectCompilerOutput.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\MarshalHelper.cs">
       <Platforms>Windows</Platforms>
@@ -255,6 +255,10 @@
     <Compile Include="..\Tools\2MGFX\PassInfo.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\PassInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Preprocessor.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\Preprocessor.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\SamplerStateInfo.cs">
       <Platforms>Windows</Platforms>
@@ -369,6 +373,7 @@
     <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
     <Compile Include="Serialization\Intermediate\NamedValueDictionarySerializer.cs" />    
     <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
+    <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
 	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />

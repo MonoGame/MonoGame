@@ -2,8 +2,8 @@
 [Tt]humbs.db
 *.DS_Store
 
-#Linux installer file
-*.run
+#Output Linux Installer
+Installers/Linux/Installer/
 
 #Visual Studio files
 *.pidb
@@ -69,3 +69,13 @@ Test/*.csproj
 *.speccache
 *.ncrunchproject
 *.ncrunchsolution
+
+#Mac Package Files
+*.pkg
+*.mpack
+
+#Nuget Packages
+**/*.nupkg
+
+#Zip files
+*.zip

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Xml;
 using Microsoft.Xna.Framework;
@@ -161,6 +162,9 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.AreEqual("world", renaming.hello);
                 Assert.AreEqual(23, renaming.elf);
+                Assert.AreEqual(80.2f, renaming.speed);
+                Assert.AreEqual(true, renaming.isOrganic);
+                Assert.AreEqual(new Vector2(32, 32), renaming.Dimensions);
             });
         }
 
@@ -263,6 +267,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.AreEqual(new Point(1, 2), mathTypes.Point);
                 Assert.AreEqual(new Rectangle(1, 2, 3, 4), mathTypes.Rectangle);
+                Assert.AreEqual(new Vector2(1, 2), mathTypes.Vector2);
                 Assert.AreEqual(new Vector3(1, 2, 3.1f), mathTypes.Vector3);
                 Assert.AreEqual(new Vector4(1, 2, 3, 4), mathTypes.Vector4);
                 Assert.AreEqual(new Quaternion(1, 2, 3, 4), mathTypes.Quaternion);
@@ -277,6 +282,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Vector2(1, 7), mathTypes.Vector2List[0]);
                 Assert.AreEqual(new Vector2(1, 9), mathTypes.Vector2List[1]);
                 Assert.AreEqual(new Vector2(1, 10), mathTypes.Vector2List[2]);
+                Assert.AreEqual(0, mathTypes.Vector2ListEmpty.Count);
             });
         }
 
@@ -305,6 +311,19 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(true, ((PolymorphicB)polymorphicTypes.UntypedArray.GetValue(1)).Value);
                 Assert.IsAssignableFrom<PolymorphicC>(polymorphicTypes.UntypedArray.GetValue(2));
                 Assert.AreEqual(true, ((PolymorphicC)polymorphicTypes.UntypedArray.GetValue(2)).Value);
+
+                Assert.NotNull(polymorphicTypes.IntCollection);
+                Assert.IsInstanceOf<List<int>>(polymorphicTypes.IntCollection);
+                Assert.AreEqual(3, polymorphicTypes.IntCollection.Count);
+                Assert.AreEqual(1, polymorphicTypes.IntCollection.ElementAt(0));
+                Assert.AreEqual(4, polymorphicTypes.IntCollection.ElementAt(1));
+                Assert.AreEqual(6, polymorphicTypes.IntCollection.ElementAt(2));
+
+                Assert.NotNull(polymorphicTypes.UntypedDictionary);
+                Assert.IsInstanceOf<Dictionary<int, PolymorphicA>>(polymorphicTypes.UntypedDictionary);
+                Assert.AreEqual(2, ((Dictionary<int, PolymorphicA>) polymorphicTypes.UntypedDictionary).Count);
+                Assert.AreEqual(true, ((Dictionary<int, PolymorphicA>) polymorphicTypes.UntypedDictionary)[1].Value);
+                Assert.AreEqual(false, ((Dictionary<int, PolymorphicA>) polymorphicTypes.UntypedDictionary)[5].Value);
             });
         }
 
@@ -359,6 +378,14 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.NotNull(sharedResources.Head.Next.Next);
                 Assert.AreEqual(3, sharedResources.Head.Next.Next.Value);
                 Assert.AreSame(sharedResources.Head, sharedResources.Head.Next.Next.Next);
+
+                Assert.NotNull(sharedResources.LinkedArray);
+                Assert.AreEqual(2, sharedResources.LinkedArray.Length);
+                Assert.IsNotNull(sharedResources.LinkedArray[0].Next);
+                Assert.AreEqual(2, sharedResources.LinkedArray[0].Next.Length);
+                Assert.IsNotNull(sharedResources.LinkedArray[1].Next);
+                Assert.AreEqual(1, sharedResources.LinkedArray[1].Next.Length);
+                Assert.AreSame(sharedResources.LinkedArray[0].Next, sharedResources.LinkedArray[1].Next[0].Next);
             });
         }
 
@@ -457,13 +484,58 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void CustomFormatting()
         {
-            DeserializeCompileAndLoad<CustomFormatting>("21_CustomFormatting.xml", customFormatting =>
+            DeserializeCompileAndLoad<CustomFormatting<byte, Rectangle>>("21_CustomFormatting.xml", customFormatting =>
             {
                 Assert.AreEqual(1, customFormatting.A);
                 Assert.AreEqual(3, customFormatting.Vector2ListSpaced.Count);
                 Assert.AreEqual(new Vector2(0, 4), customFormatting.Vector2ListSpaced[0]);
                 Assert.AreEqual(new Vector2(0, 6), customFormatting.Vector2ListSpaced[1]);
                 Assert.AreEqual(new Vector2(0, 7), customFormatting.Vector2ListSpaced[2]);
+                Assert.AreEqual(string.Empty, customFormatting.EmptyString);
+                Assert.AreEqual(new Rectangle(0, 0, 100, 100), customFormatting.Rectangle);
+            });
+        }
+
+        [Test]
+        public void GetterOnlyProperties()
+        {
+            DeserializeCompileAndLoad<GetterOnlyProperties>("22_GetterOnlyProperties.xml", getterOnlyProps =>
+            {
+                Assert.AreEqual(3, getterOnlyProps.IntList.Count);
+                Assert.AreEqual(1, getterOnlyProps.IntList[0]);
+                Assert.AreEqual(2, getterOnlyProps.IntList[1]);
+                Assert.AreEqual(3, getterOnlyProps.IntList[2]);
+                Assert.AreEqual(0, getterOnlyProps.IntStringDictionaryWithPrivateSetter.Count);
+                Assert.AreEqual(2, getterOnlyProps.IntStringDictionary.Count);
+                Assert.AreEqual("Foo", getterOnlyProps.IntStringDictionary[1]);
+                Assert.AreEqual("Bar", getterOnlyProps.IntStringDictionary[5]);
+                Assert.AreEqual(42, getterOnlyProps.CustomClass.A);
+            });
+        }
+
+        [Test]
+        public void GetterOnlyPolymorphicArrayProperties()
+        {
+            var filePath = Paths.Xml("23_GetterOnlyPolymorphicArrayProperties.xml");
+            using (var reader = XmlReader.Create(filePath))
+            {
+                // This should throw an InvalidContentException as the
+                // xml tries to deserialize into an IList property
+                // but the property value is actually an Array.
+                Assert.Throws<InvalidOperationException>(() =>
+                    IntermediateSerializer.Deserialize<GetterOnlyPolymorphicArrayProperties>(reader, filePath));
+            }
+        }
+
+        [Test]
+        public void GenericTypes()
+        {
+            DeserializeCompileAndLoad<GenericTypes>("24_GenericTypes.xml", genericTypes =>
+            {
+                Assert.IsNotNull(genericTypes.A);
+                Assert.AreEqual(3, genericTypes.A.Value);
+                Assert.IsNotNull(genericTypes.B);
+                Assert.AreEqual(4.2f, genericTypes.B.Value);
             });
         }
     }

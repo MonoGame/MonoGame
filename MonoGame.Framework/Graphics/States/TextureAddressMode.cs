@@ -14,12 +14,16 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		Wrap,
         /// <summary>
-        /// Texels outside range will be setted to color of 0.0 or 1.0 texel.
+        /// Texels outside range will be set to color of 0.0 or 1.0 texel.
         /// </summary>
 		Clamp,
         /// <summary>
         /// Same as <see cref="TextureAddressMode.Wrap"/> but tiles will also flipped at every integer junction.
         /// </summary>
-		Mirror
+        Mirror,
+        /// <summary>
+        /// Texels outside range will be set to the border color.
+        /// </summary>
+        Border
 	}
 }

@@ -60,6 +60,15 @@ namespace Microsoft.Xna.Framework.Graphics
         internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 
+        // Keeps track of last applied state to avoid redundant OpenGL calls
+        internal bool _lastBlendEnable = false;
+        internal BlendState _lastBlendState = new BlendState();
+        internal DepthStencilState _lastDepthStencilState = new DepthStencilState();
+        internal RasterizerState _lastRasterizerState = new RasterizerState();
+        private Vector4 _lastClearColor = Vector4.Zero;
+        private float _lastClearDepth = 1.0f;
+        private int _lastClearStencil = 0;
+
         internal void SetVertexAttributeArray(bool[] attrs)
         {
             for(int x = 0; x < attrs.Length; x++)
@@ -227,6 +236,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
                     "Try updating your graphics drivers.");
             }
+
+            // Force reseting states
+            this.BlendState.PlatformApplyState(this, true);
+            this.DepthStencilState.PlatformApplyState(this, true);
+            this.RasterizerState.PlatformApplyState(this, true);            
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -256,30 +270,42 @@ namespace Microsoft.Xna.Framework.Graphics
             // some drivers won't clear with stencil test disabled
             DepthStencilState = this.clearDepthStencilState;
 		    BlendState = BlendState.Opaque;
-            PlatformApplyState(false);
+            ApplyState(false);
 
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
             {
-                GL.ClearColor(color.X, color.Y, color.Z, color.W);
-                GraphicsExtensions.CheckGLError();
+                if (color != _lastClearColor)
+                {
+                    GL.ClearColor(color.X, color.Y, color.Z, color.W);
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearColor = color;
+                }
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
 			if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
-				GL.ClearStencil(stencil);
-                GraphicsExtensions.CheckGLError();
+                if (stencil != _lastClearStencil)
+                {
+				    GL.ClearStencil(stencil);
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearStencil = stencil;
+                }
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
 			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
-#if GLES
-                GL.ClearDepth (depth);
-#else
-                GL.ClearDepth((double)depth);
-#endif
-                GraphicsExtensions.CheckGLError();
+                if (depth != _lastClearDepth)
+                {
+ #if GLES
+                    GL.ClearDepth (depth);
+ #else
+                    GL.ClearDepth((double)depth);
+ #endif
+                    GraphicsExtensions.CheckGLError();
+                    _lastClearDepth = depth;
+                }
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
@@ -758,10 +784,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
         }
 
-        internal void PlatformApplyState(bool applyShaders)
+        internal void PlatformBeginApplyState()
         {
             Threading.EnsureUIThread();
+        }
 
+        internal void PlatformApplyState(bool applyShaders)
+        {
             if ( _scissorRectangleDirty )
 	        {
                 var scissorRect = _scissorRectangle;
@@ -771,22 +800,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
 	            _scissorRectangleDirty = false;
 	        }
-
-            if (_blendStateDirty)
-            {
-                _blendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
-	        if ( _depthStencilStateDirty )
-            {
-	            _depthStencilState.PlatformApplyState(this);
-                _depthStencilStateDirty = false;
-            }
-	        if ( _rasterizerStateDirty )
-            {
-	            _rasterizerState.PlatformApplyState(this);
-	            _rasterizerStateDirty = false;
-            }
 
             // If we're not applying shaders then early out now.
             if (!applyShaders)
@@ -831,7 +844,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
 
@@ -853,7 +866,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -881,7 +894,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
 
@@ -893,7 +906,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -924,9 +937,9 @@ namespace Microsoft.Xna.Framework.Graphics
             vbHandle.Free();
         }
 
-        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            PlatformApplyState(true);
+            ApplyState(true);
 
             // Unbind current VBOs.
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);

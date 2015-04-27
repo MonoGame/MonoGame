@@ -50,9 +50,9 @@ namespace MonoGame.Tools.Pipeline
     }
 
     [System.ComponentModel.ToolboxItem (true)]
-    public partial class PropertyGridTable : Bin
+    public partial class PropertyGridTable : VBox
     {
-        Window window;
+        MainWindow window;
 
         TreeIter nulliter;
         TreeStore listStore;
@@ -65,7 +65,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void Initalize(Window window)
         {
-            this.window = window;
+            this.window = (MainWindow)window;
         }
 
         public PropertyGridTable ()
@@ -105,7 +105,11 @@ namespace MonoGame.Tools.Pipeline
             var editTextCell = new CellRendererText ();
 
             editTextCell.Edited += delegate(object o, EditedArgs args) {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
@@ -133,12 +137,16 @@ namespace MonoGame.Tools.Pipeline
             var editTextCell2 = new CellRendererText ();
             editTextCell2.Editable = true;
             editTextCell2.EditingStarted += delegate {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new CollectionEditorDialog(model.GetValue(iter, 14).ToString());
+                    var dialog = new CollectionEditorDialog(model.GetValue(iter, 14).ToString(), window);
                     dialog.TransientFor = window;
                     if(dialog.Run() == (int)ResponseType.Ok)
                     {
@@ -165,7 +173,11 @@ namespace MonoGame.Tools.Pipeline
             var editTextCell4 = new CellRendererText ();
             editTextCell4.Editable = true;
             editTextCell4.EditingStarted += delegate {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
@@ -204,7 +216,11 @@ namespace MonoGame.Tools.Pipeline
             comboCell.Editable = true;
             comboCell.HasEntry = false;
             comboCell.Edited += delegate(object o, EditedArgs args) {
+                #if GTK2
                 TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
@@ -229,6 +245,60 @@ namespace MonoGame.Tools.Pipeline
 
             column2.PackStart (comboCell , false);
 
+            var editFilePathCell = new CellRendererText();
+            editFilePathCell.Editable = true;
+            editFilePathCell.EditingStarted += delegate(object o, EditingStartedArgs args) {
+                #if GTK2
+                TreeModel model;
+                #elif GTK3
+                ITreeModel model;
+                #endif
+                TreeIter iter;
+
+                if (treeview1.Selection.GetSelected (out model, out iter)) {
+
+                    var dialog = new FileChooserDialog("Add Content Folder",
+                        window,
+                        FileChooserAction.SelectFolder,
+                        "Cancel", ResponseType.Cancel,
+                        "Open", ResponseType.Accept);
+                    dialog.SetCurrentFolder (window._controller.GetFullPath(model.GetValue(iter, 17).ToString()));
+
+                    int responseid = dialog.Run();
+                    string fileName = dialog.Filename;
+                    dialog.Destroy();
+
+                    if(responseid == (int)ResponseType.Accept)
+                    {
+                        int id = Convert.ToInt32(model.GetValue(iter, 11));
+
+                        for(int i = 0;i < eitems.Count;i++)
+                        {
+                            if(eitems[i].id == id)
+                            {
+                                if(eitems[i].eventHandler != null)
+                                {
+                                    string pl = ((PipelineController)window._controller).ProjectLocation;
+                                    if (!pl.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
+                                        pl += System.IO.Path.DirectorySeparatorChar;
+
+                                    Uri folderUri = new Uri(pl);
+                                    Uri pathUri = new Uri(fileName);
+
+                                    string newpath = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
+
+                                    var fwidget = new FalseWidget(newpath);
+                                    eitems[i].eventHandler(fwidget, EventArgs.Empty);
+                                    model.SetValue(iter, 17, newpath);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            column2.PackStart (editFilePathCell, false);
+
             treeview1.AppendColumn (column2);
 
             column1.AddAttribute (textCell1, "text", 0);
@@ -248,35 +318,37 @@ namespace MonoGame.Tools.Pipeline
             column2.AddAttribute (editTextCell3, "text", 14);
             column2.AddAttribute (editTextCell4, "text", 15);
             column2.AddAttribute (editTextCell4, "visible", 16);
+            column2.AddAttribute (editFilePathCell, "text", 17);
+            column2.AddAttribute (editFilePathCell, "visible", 18);
 
-            listStore = new TreeStore (typeof (string), typeof(bool), typeof (string), typeof(bool), typeof (string), typeof(bool), typeof(bool), typeof(TreeStore), typeof(string), typeof(bool), typeof(bool), typeof(string), typeof(string), typeof(bool), typeof(string), typeof(string), typeof(bool));
+            listStore = new TreeStore (typeof (string), typeof(bool), typeof (string), typeof(bool), typeof (string), typeof(bool), typeof(bool), typeof(TreeStore), typeof(string), typeof(bool), typeof(bool), typeof(string), typeof(string), typeof(bool), typeof(string), typeof(string), typeof(bool), typeof(string), typeof(bool));
             treeview1.Model = listStore;
         }
 
         TreeIter AddGroup(string name)
         {
-            return listStore.AppendValues (name, true, "", false, "", false, false, null, "", false, false, "", "", false, "", "", false);
+            return listStore.AppendValues (name, true, "", false, "", false, false, null, "", false, false, "", "", false, "", "", false, "", false);
         }
 
         TreeIter AddPropertyTextBox(TreeIter iter, string id, string name, string text, bool editable)
         {
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, text, true, editable, null, "", false, false, id, "", false, "", "", false) : 
-                listStore.AppendValues("", false, name, true, text, true, editable, null, "", false, false, id, "", false, "", "", false);
+                listStore.AppendValues(iter, "", false, name, true, text, true, editable, null, "", false, false, id, "", false, "", "", false, "", false): 
+                listStore.AppendValues("", false, name, true, text, true, editable, null, "", false, false, id, "", false, "", "", false, "", false);
         }
 
         TreeIter AddPropertyCollectionBox(TreeIter iter, string id, string name, string data)
         {
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false) : 
-                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false);
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false) : 
+                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false);
         }
 
         TreeIter AddPropertyColorBox(TreeIter iter, string id, string name, string color)
         {
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "", false, "", color, true) : 
-                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "", false, "", color, true);
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "", false, "", color, true, "", false): 
+                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "", false, "", color, true, "", false);
         }
 
         TreeIter AddPropertyComboBox(TreeIter iter, string id, string name, string[] values, string text)
@@ -287,15 +359,22 @@ namespace MonoGame.Tools.Pipeline
                 store.AppendValues(value);
 
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false) : 
-                listStore.AppendValues("", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false);
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false, "", false): 
+                listStore.AppendValues("", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false, "", false);
         }
 
         TreeIter AddPropertyComboBox(TreeIter iter, string id, string name, object store, string text)
         {
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false) : 
-                listStore.AppendValues("", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false);
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false, "", false): 
+                listStore.AppendValues("", false, name, true, "", false, false, store, text, true, true, id, "", false, "", "", false, "", false);
+        }
+
+        TreeIter AddPropertyFilePathBox(TreeIter iter, string id, string name, string text)
+        {
+            return !iter.Equals(nulliter) ? 
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "", false, "", "", false, text, true): 
+                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "", false, "", "", false, text, true);
         }
 
         public enum EntryType {
@@ -307,6 +386,7 @@ namespace MonoGame.Tools.Pipeline
             Check,
             Integer,
             List,
+            FilePath,
             Unkown
         }
 
@@ -377,8 +457,8 @@ namespace MonoGame.Tools.Pipeline
 
 
             treeview1.ExpandAll();
-            treeview1.Columns[0].FixedWidth = Allocation.Width / 2;
-            treeview1.Columns[1].FixedWidth = Allocation.Width / 2;
+            treeview1.Columns[0].FixedWidth = Allocation.Width / 2 - 1;
+            treeview1.Columns[1].FixedWidth = Allocation.Width / 2 - 1;
         }
 
         public TreeIter AddTreeItem(TreeItem item, TreeIter iter)
@@ -386,47 +466,68 @@ namespace MonoGame.Tools.Pipeline
             var eitem = new EventItem (eitems.Count, item.eventHandler);
             eitems.Add (eitem);
 
-            if (item.type == EntryType.Readonly || item.type == EntryType.Text || item.type == EntryType.LongText || item.type == EntryType.Integer) {
+            if (item.type == EntryType.Readonly || item.type == EntryType.Text || item.type == EntryType.LongText || item.type == EntryType.Integer)
+            {
                 string text;
                 bool editable = true;
 
                 text = item.value as string ?? "";
                 if (item.value is char)
-                    text = item.value.ToString () ?? "";
+                    text = item.value.ToString() ?? "";
 
                 editable &= item.type != EntryType.Readonly;
 
-                return AddPropertyTextBox (iter, eitem.id.ToString (), item.label, text, editable);
-            } else if (item.type == EntryType.Color) {
+                return AddPropertyTextBox(iter, eitem.id.ToString(), item.label, text, editable);
+            }
+            else if (item.type == EntryType.Color)
+            {
                 var c = (Microsoft.Xna.Framework.Color)item.value;
 
-                return AddPropertyColorBox (iter, eitem.id.ToString (), item.label, c.ToString ());
-            } else if (item.type == EntryType.Combo) {
+                return AddPropertyColorBox(iter, eitem.id.ToString(), item.label, c.ToString());
+            }
+            else if (item.type == EntryType.Combo)
+            {
                 TreeStore model = null;
 
-                foreach (var v in item.comboItems) {
+                foreach (var v in item.comboItems)
+                {
                     if (model == null)
-                        model = new TreeStore (v.Key.GetType (), v.Value.GetType ());
-                    model.AppendValues (v.Key, v.Value);
+                        model = new TreeStore(v.Key.GetType(), v.Value.GetType());
+                    model.AppendValues(v.Key, v.Value);
                 }
 
-                return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, model, item.value.ToString ());
-            } else if (item.type == EntryType.Check) {
-                return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, new [] { "True", "False" }, item.value.ToString ());
-            } else if (item.type == EntryType.List) {
+                return AddPropertyComboBox(iter, eitem.id.ToString(), item.label, model, item.value.ToString());
+            }
+            else if (item.type == EntryType.Check)
+            {
+                return AddPropertyComboBox(iter, eitem.id.ToString(), item.label, new [] { "True", "False" }, item.value.ToString());
+            }
+            else if (item.type == EntryType.List)
+            {
                 var values = (List<string>)item.value;
                 string text = "";
 
-                if (values.Count > 0) {
-                    text = values [0];
-                    for (int i = 1; i < values.Count; i++) 
-                        text += "\r\n" + values [i];
+                if (values.Count > 0)
+                {
+                    text = values[0];
+                    for (int i = 1; i < values.Count; i++)
+                        text += "\r\n" + values[i];
                 }
 
-                return AddPropertyCollectionBox (iter, eitem.id.ToString (), item.label, text);
+                return AddPropertyCollectionBox(iter, eitem.id.ToString(), item.label, text);
+            }
+            else if (item.type == EntryType.FilePath)
+            {
+                string text;
+
+                text = item.value as string ?? "";
+                if (item.value is char)
+                    text = item.value.ToString() ?? "";
+
+                return AddPropertyFilePathBox (iter, eitem.id.ToString(), item.label, text);
             }
             else 
-                return AddPropertyTextBox (iter, eitem.id.ToString (), item.label, "", false);
+                return AddPropertyTextBox (iter, eitem.id.ToString (), item.label, "EntryType not Implemented", false);
         }
 
         public void Clear() {
