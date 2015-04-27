@@ -43,8 +43,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-        internal Model(GraphicsDevice graphicsDevice, List<ModelBone> bones, List<ModelMesh> meshes)
+        /// <summary>
+        /// Constructs a model. 
+        /// </summary>
+        /// <param name="graphicsDevice">A valid reference to <see cref="GraphicsDevice"/>.</param>
+        /// <param name="bones">The collection of bones.</param>
+        /// <param name="meshes">The collection of meshes.</param>
+        public Model(GraphicsDevice graphicsDevice, List<ModelBone> bones, List<ModelMesh> meshes)
 		{
+            if(graphicsDevice == null)throw new ArgumentNullException("graphicsDevice");
+
 			// TODO: Complete member initialization
 			this.graphicsDevice = graphicsDevice;
 
