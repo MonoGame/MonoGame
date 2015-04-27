@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
             private set;
         }
 
-        internal Metrics _metrics = new Metrics();
+        internal Metrics _metrics;
 
         /// <summary>
         /// The rendering data for debugging and profiling. 
