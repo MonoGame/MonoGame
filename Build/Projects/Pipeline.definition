@@ -17,6 +17,7 @@
 
   <Properties>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
