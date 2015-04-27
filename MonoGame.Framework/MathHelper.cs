@@ -214,7 +214,31 @@ namespace Microsoft.Xna.Framework
         {
             return value1 < value2 ? value1 : value2;
         }
-        
+
+        /// <summary>
+        /// Generates the pseudo-random <c>float</c> number within a range.
+        /// </summary>
+        /// <param name="random">Random number generator.</param>
+        /// <param name="min">Minimum value.</param>
+        /// <param name="max">Maximum value.</param>
+        /// <returns>Pseudo-random <c>float</c> number.</returns>
+        public static float GenFloat(Random random, float min, float max)
+        {
+            return (float)(min + random.NextDouble() * (max - min));
+        }
+
+        /// <summary>
+        /// Generates the pseudo-random <c>double</c> number within a range.
+        /// </summary>
+        /// <param name="random">Random number generator.</param>
+        /// <param name="min">Minimum value.</param>
+        /// <param name="max">Maximum value.</param>
+        /// <returns>Pseudo-random <c>double</c> number.</returns>
+        public static double GenDouble(Random random, double min, double max)
+        {
+            return (min + random.NextDouble() * (max - min));
+        }
+
         /// <summary>
         /// Interpolates between two values using a cubic equation.
         /// </summary>
