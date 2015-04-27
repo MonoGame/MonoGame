@@ -4,6 +4,11 @@
 	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
 
+  <property name="buildNumber" value="0.0.0.0"/>
+  <if test="${environment::variable-exists('BUILD_NUMBER')}">
+    <property name="buildNumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
+  </if>
+
   <target name="checkos" description="check the operating system">
     <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
     <if test="${os == 'Unix'}">
@@ -44,6 +49,13 @@
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Framework.Content.Pipeline.Portable/3.2.99.1-Beta" dest="MonoDevelop.MonoGame/packages/MonoGame.Framework.Content.Pipeline.Portable.3.2.99.1-Beta.nupkg" />
      <get src="https://www.nuget.org/api/v2/package/Ouya.Console.Api/1.0.13.1" dest="MonoDevelop.MonoGame/packages/Ouya.Console.Api.1.0.13.1.nupkg"/>
      <if test="${os == 'MacOS'}">
+       <delete failonerror="false">
+          <fileset>
+            <include name="MonoDevelop.MonoGame_*.mpack" />
+          </fileset>
+       </delete>
+       <!-- Fix up xml to ${buildNumber} -->
+       <xmlpoke file="MonoDevelop.MonoGame/MonoDevelop.MonoGame.addin.xml" xpath="/Addin/@version" value="${buildNumber}" />
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Clean -c:Release  MonoDevelop.MonoGame.Addin.sln" />
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Build -c:Release  MonoDevelop.MonoGame.Addin.sln" />
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="setup pack bin/Release/MonoDevelop.MonoGame.dll"/>
