@@ -294,5 +294,31 @@ namespace Microsoft.Xna.Framework
 	{
 	     return (value > 0) && ((value & (value - 1)) == 0);
 	}
+
+        /// <summary>
+        /// Class for generating random numbers consistantly when using Mono or
+        /// </summary>
+        public class Random
+        {
+            #region Private Fields 
+
+            private int seed;
+
+            #endregion
+
+            #region Constructors
+
+            /// <summary>
+            /// Initializes a new instance of the random number generator using a time dependant default seed value
+            /// </summary>
+            public Random() 
+            {
+                this.seed = System.DateTime.Now.Month ^ System.DateTime.Now.Day ^ System.DateTime.Now.Hour
+                    ^ System.DateTime.Now.Minute ^ System.DateTime.Now.Second ^ System.DateTime.Now.Millisecond;
+            }
+            public Random(int seed) { }
+
+            #endregion
+        }
     }
 }
