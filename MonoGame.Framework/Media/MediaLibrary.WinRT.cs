@@ -26,7 +26,20 @@ namespace Microsoft.Xna.Framework.Media
             Task.Run(async () =>
             {
                 if (musicFolder == null)
-                    musicFolder = KnownFolders.MusicLibrary;
+                {
+                    try
+                    {
+                        musicFolder = KnownFolders.MusicLibrary;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine("Failed to access Music Library: " + e.Message);
+                        albumCollection = new AlbumCollection(new List<Album>());
+                        songCollection = new SongCollection(new List<Song>());
+                        return;
+                    }
+                }
+                    
             
                 var files = new List<StorageFile>();
                 await this.GetAllFiles(musicFolder, files);
