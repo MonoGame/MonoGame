@@ -836,7 +836,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitivesCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
 
             PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
@@ -872,7 +872,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitivesCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
 
             PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
@@ -895,7 +895,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitivesCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
 
             PlatformDrawPrimitives(primitiveType, vertexStart, vertexCount);
@@ -942,7 +942,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitivesCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
@@ -989,7 +989,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitivesCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);

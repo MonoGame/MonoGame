@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal ulong _spriteCount;
         internal ulong _drawCount;
-        internal ulong _primitivesCount;
+        internal ulong _primitiveCount;
 
         /// <summary>
         /// The count of sprites and text characters rendered via <see cref="SpriteBatch"/>.
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The count of rendered primitives.
         /// </summary>
-        public ulong PrimitivesCount { get { return _primitivesCount; } }
+        public ulong PrimitiveCount { get { return _primitiveCount; } }
 
         /// <summary>
         /// Returns the difference between two sets of metrics.
@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _spriteCount = value1._spriteCount - value2._spriteCount,
                 _drawCount = value1._drawCount - value2._drawCount,
-                _primitivesCount = value1._primitivesCount - value2._primitivesCount
+                _primitiveCount = value1._primitiveCount - value2._primitiveCount
             };
         }
 
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _spriteCount = value1._spriteCount + value2._spriteCount,
                 _drawCount = value1._drawCount + value2._drawCount,
-                _primitivesCount = value1._primitivesCount + value2._primitivesCount
+                _primitiveCount = value1._primitiveCount + value2._primitiveCount
             };
         }
     }
