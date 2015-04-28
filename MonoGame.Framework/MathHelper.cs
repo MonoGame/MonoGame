@@ -300,6 +300,16 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public class Random
         {
+            #region Static methods
+
+            public static long GenerateSeed() 
+            {
+                byte[] guid = new Guid().ToByteArray();
+                return (long)(BitConverter.ToUInt64(guid, 0) ^ BitConverter.ToUInt64(guid, 7));
+            }
+
+            #endregion
+
             #region Private Fields
 
             private ulong seed;
@@ -309,21 +319,33 @@ namespace Microsoft.Xna.Framework
 
             #region Properties
 
-            public ulong Seed { get { return this.seed; } }
+            public long Seed 
+            { 
+                get 
+                { 
+                    return (long)this.seed; 
+                }
+                set 
+                {
+                    this.seed = (ulong)value;
+                }
+            }
 
             #endregion
 
             #region Constructors
 
             /// <summary>
-            /// Initializes a new instance of the random number generator using a time dependant default seed value
+            /// Initializes a new instance of the random number generator using a new GUID as a default seed value
             /// </summary>
-            public Random()
+            public Random() : this((ulong)GenerateSeed())
             {
-                // Seed implementation using a new GUID
-                this.seed = BitConverter.ToUInt64(new Guid().ToByteArray(), 0);
-                this.lastValue = this.seed;
             }
+
+            /// <summary>
+            /// Initializes a new instance of the random number generator using the specified seed
+            /// </summary>
+            /// <param name="seed">Seed to be used when computing new random numbers</param>
             public Random(ulong seed)
             {
                 this.seed = seed;
@@ -332,15 +354,63 @@ namespace Microsoft.Xna.Framework
 
             #endregion
 
+            #region Public methods
+
+            int Next() 
+            {
+                throw new NotImplementedException();
+            }
+
+            #endregion
+
             #region Private methods
 
-            ulong XORShift64Star()
+            private ulong XORShift64Star()
             {
                 lastValue ^= lastValue >> 12;
                 lastValue ^= lastValue << 25;
                 lastValue ^= lastValue >> 27;
                 return lastValue * ulong.MaxValue;
             }
+
+            #region Integer values
+
+            private byte UInt64ToInt8(ulong uint64) 
+            {
+                throw new NotImplementedException();
+            }
+
+            private short UInt64ToInt64(ulong uint64) 
+            {
+                throw new NotImplementedException();
+            }
+
+            private int UInt64ToInt32(ulong uint64) 
+            {
+                throw new NotImplementedException();
+            }
+
+            private long UInt64ToInt64() 
+            {
+                throw new NotImplementedException();
+            }
+
+            #endregion
+
+            #region Floating point values
+
+            private float UInt64ToFloat(ulong uint64)
+            {
+                return (float)UInt64ToDouble(uint64);
+            }
+
+            private double UInt64ToDouble(ulong uint64) 
+            {
+                throw new NotImplementedException();
+            }
+
+            #endregion
+
             #endregion
         }
     }
