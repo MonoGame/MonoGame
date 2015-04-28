@@ -230,7 +230,11 @@ namespace Microsoft.Xna.Framework
 			_graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
-#elif	WINDOWS && DIRECTX
+#if WINDOWS_UAP
+            ((UAPGameWindow)_game.Window).SetClientSize(_preferredBackBufferWidth, _preferredBackBufferHeight);
+#endif
+
+#elif WINDOWS && DIRECTX
 
             _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
