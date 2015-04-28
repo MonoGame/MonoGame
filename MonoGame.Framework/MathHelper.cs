@@ -320,18 +320,8 @@ namespace Microsoft.Xna.Framework
             /// </summary>
             public Random()
             {
-                // Seed implementation using bitwise XOR
-                this.seed = (ulong)System.DateTime.Now.Millisecond ^ (ulong)System.DateTime.Now.Second ^ (ulong)System.DateTime.Now.Minute
-                    ^ (ulong)System.DateTime.Now.Hour ^ (ulong)System.DateTime.Now.Day ^ (ulong)System.DateTime.Now.Month ^ (ulong)System.DateTime.Now.Year;
-
-                // Seed implementation using bitwise OR
-                //this.seed = System.DateTime.Now.Millisecond | System.DateTime.Now.Second | System.DateTime.Now.Minute
-                //| System.DateTime.Now.Hour | System.DateTime.Now.Day | System.DateTime.Now.Month | System.DateTime.Now.Year;
-
-                // Seed implementation using bitwise AND
-                // Note: Not reliable for a non-zero value
-                //this.seed = System.DateTime.Now.Millisecond & System.DateTime.Now.Second & System.DateTime.Now.Minute
-                //& System.DateTime.Now.Hour & System.DateTime.Now.Day & System.DateTime.Now.Month & System.DateTime.Now.Year;
+                // Seed implementation using a new GUID
+                this.seed = BitConverter.ToUInt64(new Guid().ToByteArray(), 0);
                 this.lastValue = this.seed;
             }
             public Random(ulong seed)
