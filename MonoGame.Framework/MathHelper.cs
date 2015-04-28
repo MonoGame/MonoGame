@@ -370,7 +370,7 @@ namespace Microsoft.Xna.Framework
                 lastValue ^= lastValue >> 12;
                 lastValue ^= lastValue << 25;
                 lastValue ^= lastValue >> 27;
-                return lastValue * ulong.MaxValue;
+                return unchecked(lastValue * ulong.MaxValue);
             }
 
             private ulong Remap(ulong value, ulong oldMin, ulong oldMax, ulong newMin, ulong newMax) 
@@ -413,9 +413,10 @@ namespace Microsoft.Xna.Framework
 
             private long UInt64ToInt64(ulong uint64) 
             {
-                // Map the uint64 onto a range from 0 to long.MaxValue * 2, then remap it to long.MinValue-long.MaxValue
-                    // because the Remap function returns an unsigned long integer
-                return (long)(Remap(uint64, 0UL, ulong.MaxValue, 0UL, (((ulong)(long.MaxValue)) * 2))) + (long)long.MinValue;
+                unsafe 
+                {
+                    return (*(long*)&uint64) + long.MinValue; 
+                }
             }
 
             #endregion
