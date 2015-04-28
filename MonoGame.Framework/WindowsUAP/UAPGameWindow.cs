@@ -200,6 +200,9 @@ namespace Microsoft.Xna.Framework
 
         internal void SetClientSize(int width, int height)
         {
+            if (_appView.IsFullScreenMode)
+                return;
+
             if (_viewBounds.Width == width &&
                 _viewBounds.Height == height)
                 return;
