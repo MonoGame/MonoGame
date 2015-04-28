@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
     {
         #region Private Fields
 
-        private static Rectangle emptyRectangle = new Rectangle();
+        private static readonly Rectangle emptyRectangle = new Rectangle();
 
         #endregion
 
@@ -172,8 +172,7 @@ namespace Microsoft.Xna.Framework
         #region Constructors
 
         /// <summary>
-        /// Creates a new instance of <see cref="Rectangle"/> struct, with the specified
-        /// position, width, and height.
+        /// Constructs a rectangle.
         /// </summary>
         /// <param name="x">The x coordinate of the top-left corner of the created <see cref="Rectangle"/>.</param>
         /// <param name="y">The y coordinate of the top-left corner of the created <see cref="Rectangle"/>.</param>
@@ -188,8 +187,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Rectangle"/> struct, with the specified
-        /// location and size.
+        /// Constructs a rectangle.
         /// </summary>
         /// <param name="location">The x and y coordinates of the top-left corner of the created <see cref="Rectangle"/>.</param>
         /// <param name="size">The width and height of the created <see cref="Rectangle"/>.</param>

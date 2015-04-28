@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
         /// <summary>
-        /// Gets or sets the <see cref="Matrix"/> of the frustum.
+        /// The transformation <see cref="Matrix"/> of this frustum.
         /// </summary>
         public Matrix Matrix
         {
@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework
         #region Constructors
 
         /// <summary>
-        /// Creates a new instance of <see cref="BoundingFrustum"/> class.
+        /// Constructs a bounding frustum.
         /// </summary>
         /// <param name="value">Combined matrix which usually is (View * Projection).</param>
         public BoundingFrustum(Matrix value)
