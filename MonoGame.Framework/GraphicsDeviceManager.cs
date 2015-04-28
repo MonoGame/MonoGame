@@ -403,7 +403,7 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
 
-#if WINDOWS && DIRECTX
+#if (WINDOWS || WINDOWS_UAP) && DIRECTX
             ApplyChanges();
 #endif
         }
