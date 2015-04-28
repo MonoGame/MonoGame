@@ -162,7 +162,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal GraphicsMetrics _graphicsMetrics;
 
         /// <summary>
-        /// The rendering data for debugging and profiling. 
+        /// The rendering information for debugging and profiling. 
         /// </summary>
         public GraphicsMetrics GraphicsMetrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
