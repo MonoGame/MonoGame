@@ -607,10 +607,17 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnAboutActionActivated (object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/about/");
             var adialog = new AboutDialog ();
             adialog.TransientFor = this;
+            adialog.Logo = new Gdk.Pixbuf(null, "MonoGame.Tools.Pipeline.App.ico");
+            adialog.ProgramName = AssemblyAttributes.AssemblyProduct;
+            adialog.Version = AssemblyAttributes.AssemblyVersion;
+            adialog.Comments = AssemblyAttributes.AssemblyDescription;
+            adialog.Copyright = AssemblyAttributes.AssemblyCopyright;
+            adialog.Website = "http://www.monogame.net/";
+            adialog.WebsiteLabel = "MonoGame Website";
             adialog.Run ();
+            adialog.Destroy ();
         }
 
         public void UpdateMenus()
