@@ -393,23 +393,29 @@ namespace Microsoft.Xna.Framework
 
             private byte UInt64ToInt8(ulong uint64) 
             {
-                throw new NotImplementedException();
+                // Map the uint64 onto a range from 0 (same as byte.MinValue) to byte.MaxValue
+                return (byte)Remap(uint64, 0UL, ulong.MaxValue, 0UL, (ulong)(byte.MaxValue));
             }
 
             private short UInt64ToInt16(ulong uint64) 
             {
-                throw new NotImplementedException();
+                // Map the uint64 onto a range from 0 to short.MaxValue * 2, then remap it to short.MinValue-short.MaxValue
+                    // because the Remap function returns an unsigned long integer
+                return (short)((long)(Remap(uint64, 0UL, ulong.MaxValue, 0UL, (((ulong)(short.MaxValue)) * 2))) + (long)short.MinValue);
             }
 
             private int UInt64ToInt32(ulong uint64) 
             {
-                return Remap(uint64, 0, ulong.MaxValue, )
-                throw new NotImplementedException();
+                // Map the uint64 onto a range from 0 to int.MaxValue * 2, then remap it to int.MinValue-int.MaxValue
+                    // because the Remap function returns an unsigned long integer
+                return (int)((long)(Remap(uint64, 0UL, ulong.MaxValue, 0UL, (((ulong)(int.MaxValue)) * 2))) + (long)int.MinValue);
             }
 
             private long UInt64ToInt64(ulong uint64) 
             {
-                return (long)uint64;
+                // Map the uint64 onto a range from 0 to long.MaxValue * 2, then remap it to long.MinValue-long.MaxValue
+                    // because the Remap function returns an unsigned long integer
+                return (long)(Remap(uint64, 0UL, ulong.MaxValue, 0UL, (((ulong)(long.MaxValue)) * 2))) + (long)long.MinValue;
             }
 
             #endregion
@@ -423,7 +429,7 @@ namespace Microsoft.Xna.Framework
 
             private double UInt64ToDouble(ulong uint64) 
             {
-                throw new NotImplementedException();
+                return Convert.ToDouble(UInt64ToInt64(uint64));
             }
 
             #endregion
