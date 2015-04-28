@@ -110,8 +110,8 @@
     <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs">
       <Link>MonoGame.Framework\VertexElementUsage.cs</Link>
     </Compile>
-	<Compile Include="..\..\MonoGame.Framework\Graphics\Metrics.cs">
-      <Link>MonoGame.Framework\Metrics.cs</Link>
+	<Compile Include="..\..\MonoGame.Framework\Graphics\GraphicsMetrics.cs">
+      <Link>MonoGame.Framework\GraphicsMetrics.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\MathHelper.cs">
       <Link>MonoGame.Framework\MathHelper.cs</Link>

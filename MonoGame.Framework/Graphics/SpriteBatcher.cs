@@ -226,12 +226,10 @@ namespace Microsoft.Xna.Framework.Graphics
             int batchIndex = 0;
             int batchCount = _batchItemList.Count;
 
-            if (_device._enableMetrics)
+            
+            unchecked
             {
-                unchecked
-                {
-                    _device._metrics._batchCount += (ulong)batchCount;
-                }
+                _device._graphicsMetrics._spriteCount += (ulong)batchCount;
             }
 
             // Iterate through the batches, doing short.MaxValue sets of vertices only.
