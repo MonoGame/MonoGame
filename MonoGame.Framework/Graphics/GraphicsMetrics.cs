@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal ulong _primitivesCount;
 
         /// <summary>
-        /// The count of batches sended to <see cref="SpriteBatch"/>.
+        /// The count of sprites and text characters rendered via <see cref="SpriteBatch"/>.
         /// </summary>
         public ulong SpriteCount { get { return _spriteCount; } }
 
