@@ -373,6 +373,22 @@ namespace Microsoft.Xna.Framework
                 return lastValue * ulong.MaxValue;
             }
 
+            private ulong Remap(ulong value, ulong oldMin, ulong oldMax, ulong newMin, ulong newMax) 
+            {
+                // Check for zero range
+                if (oldMin == oldMax || newMin == newMax)
+                    throw new ArithmeticException("Zero range used in MathHelper.Random.Remap()");
+
+                // Check for reversed input
+                if (Min(oldMin, oldMax) != oldMin)
+                    throw new ArgumentException("Output range maximum is reversed with minimum", "oldMax");
+                else if (Min(newMin, newMax) != newMin)
+                    throw new ArgumentException("Output range maximum is reversed with minimum", "newMax");
+
+                // Compute the new value and return it
+                return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+            }
+
             #region Integer values
 
             private byte UInt64ToInt8(ulong uint64) 
@@ -380,19 +396,20 @@ namespace Microsoft.Xna.Framework
                 throw new NotImplementedException();
             }
 
-            private short UInt64ToInt64(ulong uint64) 
+            private short UInt64ToInt16(ulong uint64) 
             {
                 throw new NotImplementedException();
             }
 
             private int UInt64ToInt32(ulong uint64) 
             {
+                return Remap(uint64, 0, ulong.MaxValue, )
                 throw new NotImplementedException();
             }
 
-            private long UInt64ToInt64() 
+            private long UInt64ToInt64(ulong uint64) 
             {
-                throw new NotImplementedException();
+                return (long)uint64;
             }
 
             #endregion
