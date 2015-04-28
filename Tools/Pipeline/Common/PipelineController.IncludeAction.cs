@@ -42,7 +42,7 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            public void Do()
+            public bool Do()
             {
                 var parser = new PipelineProjectParser(_con, _con._project);
                 _con.View.BeginTreeUpdate();
@@ -71,9 +71,11 @@ namespace MonoGame.Tools.Pipeline
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
 
-            public void Undo()
+            public bool Undo()
             {
                 _con.View.BeginTreeUpdate();
 
@@ -98,6 +100,8 @@ namespace MonoGame.Tools.Pipeline
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
         }
     }

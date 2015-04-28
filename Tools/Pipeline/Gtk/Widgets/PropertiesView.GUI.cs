@@ -12,13 +12,7 @@ namespace MonoGame.Tools.Pipeline
 		
 		private global::Gtk.Button button2;
 		
-		private global::Gtk.VPaned vpaned1;
-		
 		private global::MonoGame.Tools.Pipeline.PropertyGridTable propertygridtable1;
-		
-		private global::Gtk.ScrolledWindow GtkScrolledWindow;
-		
-		private global::Gtk.TextView textview1;
 
 		protected virtual void Build ()
 		{
@@ -63,38 +57,17 @@ namespace MonoGame.Tools.Pipeline
 			w3.Position = 0;
 			w3.Expand = false;
 			w3.Fill = false;
-			// Container child vbox2.Gtk.Box+BoxChild
-			this.vpaned1 = new global::Gtk.VPaned ();
-			this.vpaned1.CanFocus = true;
-			this.vpaned1.Name = "vpaned1";
-			this.vpaned1.Position = 247;
 			// Container child vpaned1.Gtk.Paned+PanedChild
 			this.propertygridtable1 = new global::MonoGame.Tools.Pipeline.PropertyGridTable ();
 			this.propertygridtable1.Events = ((global::Gdk.EventMask)(256));
 			this.propertygridtable1.Name = "propertygridtable1";
-			this.vpaned1.Add (this.propertygridtable1);
-			global::Gtk.Paned.PanedChild w4 = ((global::Gtk.Paned.PanedChild)(this.vpaned1 [this.propertygridtable1]));
-			w4.Resize = false;
-			// Container child vpaned1.Gtk.Paned+PanedChild
-			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
-			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
-			this.GtkScrolledWindow.VscrollbarPolicy = ((global::Gtk.PolicyType)(2));
-			this.GtkScrolledWindow.HscrollbarPolicy = ((global::Gtk.PolicyType)(2));
-			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
-			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
-			this.textview1 = new global::Gtk.TextView ();
-			this.textview1.CanFocus = true;
-			this.textview1.Name = "textview1";
-			this.GtkScrolledWindow.Add (this.textview1);
-			this.vpaned1.Add (this.GtkScrolledWindow);
-			this.vbox2.Add (this.vpaned1);
-			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.vpaned1]));
+			this.vbox2.Add (this.propertygridtable1);
+			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.propertygridtable1]));
 			w7.Position = 1;
 			this.Add (this.vbox2);
 			this.Hide ();
 			this.button15.Clicked += new global::System.EventHandler (this.OnButton15Clicked);
 			this.button2.Clicked += new global::System.EventHandler (this.OnButton2Clicked);
-			this.textview1.SizeAllocated += new global::Gtk.SizeAllocatedHandler (this.OnTextview1SizeAllocated);
 		}
 	}
 }

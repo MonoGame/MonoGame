@@ -316,6 +316,33 @@ namespace MonoGame.Tools.Pipeline
             UpdateTree();
         }
 
+        public bool MoveProject(string newname)
+        {
+            string opath = _project.OriginalPath;
+            string ext = Path.GetExtension(opath);
+
+            try
+            {
+                File.Delete(_project.OriginalPath);
+            }
+            catch {
+                View.ShowError("Error", "Could not delete old project file.");
+                return false;
+            }
+
+            _project.OriginalPath = Path.GetDirectoryName(opath) + Path.DirectorySeparatorChar + newname + ext;
+            if (!SaveProject(false))
+            {
+                _project.OriginalPath = opath;
+                SaveProject(false);
+                View.ShowError("Error", "Could not save the new project file.");
+                return false;
+            }
+            View.SetTreeRoot(_project);
+
+            return true;
+        }
+        
         public bool SaveProject(bool saveAs)
         {
             // Do we need file name?
@@ -326,6 +353,7 @@ namespace MonoGame.Tools.Pipeline
                     return false;
 
                 _project.OriginalPath = newFilePath;
+				View.SetTreeRoot(_project);
             }
 
             // Do the save.
@@ -603,8 +631,8 @@ namespace MonoGame.Tools.Pipeline
                     File.Copy(sc[i], dc[i]);
 
                 var action = new IncludeAction(this, files);
-                action.Do();
-                _actionStack.Add(action);  
+                if(action.Do())
+                    _actionStack.Add(action);  
             }
             catch
             {
@@ -703,10 +731,17 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var action2 = new IncludeAction(this, files, directories);
-            action2.Do();
-            _actionStack.Add(action2);
+            if(action2.Do())
+                _actionStack.Add(action2);
         }
 
+        public void Move (string path, string newname, FileType type)
+        {
+            var action = new MoveAction(this, path, newname, type);
+            if(action.Do())
+                _actionStack.Add(action);
+        }
+        
         private List<string> GetFiles(string folder)
         {
             List<string> ret = new List<string>();
@@ -737,15 +772,15 @@ namespace MonoGame.Tools.Pipeline
         public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders)
         {
             var action = new ExcludeAction(this, items, folders);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
             var action = new NewAction(this, name, location, template);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void NewFolder(string name, string location)
@@ -766,8 +801,8 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var action = new IncludeAction(this, null, new List<string> { folder });
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void AddAction(IProjectAction action)
