@@ -302,10 +302,10 @@ namespace Microsoft.Xna.Framework
         {
             #region Static methods
 
-            public static long GenerateSeed() 
+            public static ulong GenerateSeed() 
             {
                 byte[] guid = new Guid().ToByteArray();
-                return (long)(BitConverter.ToUInt64(guid, 0) ^ BitConverter.ToUInt64(guid, 7));
+                return (BitConverter.ToUInt64(guid, 0) ^ BitConverter.ToUInt64(guid, 7));
             }
 
             #endregion
@@ -319,15 +319,15 @@ namespace Microsoft.Xna.Framework
 
             #region Properties
 
-            public long Seed 
+            public ulong Seed 
             { 
                 get 
                 { 
-                    return (long)this.seed; 
+                    return this.seed; 
                 }
                 set 
                 {
-                    this.seed = (ulong)value;
+                    this.seed = value;
                 }
             }
 
@@ -373,20 +373,10 @@ namespace Microsoft.Xna.Framework
                 return unchecked(lastValue * ulong.MaxValue);
             }
 
-            private ulong Remap(ulong value, ulong oldMin, ulong oldMax, ulong newMin, ulong newMax) 
+            private ulong Remap(ulong value, ulong newMax) 
             {
-                // Check for zero range
-                if (oldMin == oldMax || newMin == newMax)
-                    throw new ArithmeticException("Zero range used in MathHelper.Random.Remap()");
-
-                // Check for reversed input
-                if (Min(oldMin, oldMax) != oldMin)
-                    throw new ArgumentException("Output range maximum is reversed with minimum", "oldMax");
-                else if (Min(newMin, newMax) != newMin)
-                    throw new ArgumentException("Output range maximum is reversed with minimum", "newMax");
-
-                // Compute the new value and return it
-                return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+                //return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+                return ((value * newMax) / ulong.MaxValue);
             }
 
             #region Integer values
@@ -394,21 +384,21 @@ namespace Microsoft.Xna.Framework
             private byte UInt64ToInt8(ulong uint64) 
             {
                 // Map the uint64 onto a range from 0 (same as byte.MinValue) to byte.MaxValue
-                return (byte)Remap(uint64, 0UL, ulong.MaxValue, 0UL, (ulong)(byte.MaxValue));
+                return (byte)Remap(uint64, (ulong)(byte.MaxValue));
             }
 
             private short UInt64ToInt16(ulong uint64) 
             {
                 // Map the uint64 onto a range from 0 to short.MaxValue * 2, then remap it to short.MinValue-short.MaxValue
                     // because the Remap function returns an unsigned long integer
-                return (short)((long)(Remap(uint64, 0UL, ulong.MaxValue, 0UL, (((ulong)(short.MaxValue)) * 2))) + (long)short.MinValue);
+                return (short)((long)(Remap(uint64, (((ulong)(short.MaxValue)) * 2))) + (long)short.MinValue);
             }
 
             private int UInt64ToInt32(ulong uint64) 
             {
                 // Map the uint64 onto a range from 0 to int.MaxValue * 2, then remap it to int.MinValue-int.MaxValue
                     // because the Remap function returns an unsigned long integer
-                return (int)((long)(Remap(uint64, 0UL, ulong.MaxValue, 0UL, (((ulong)(int.MaxValue)) * 2))) + (long)int.MinValue);
+                return (int)((long)(Remap(uint64, (((ulong)(int.MaxValue)) * 2))) + (long)int.MinValue);
             }
 
             private long UInt64ToInt64(ulong uint64) 
