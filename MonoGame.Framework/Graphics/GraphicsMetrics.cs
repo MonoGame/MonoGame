@@ -31,11 +31,11 @@ namespace Microsoft.Xna.Framework.Graphics
         public ulong PrimitivesCount { get { return _primitivesCount; } }
 
         /// <summary>
-        /// Subtracts a <see cref="GraphicsMetrics"/> from a <see cref="GraphicsMetrics"/>.
+        /// Returns the difference between two sets of metrics.
         /// </summary>
         /// <param name="value1">Source <see cref="GraphicsMetrics"/> on the left of the sub sign.</param>
         /// <param name="value2">Source <see cref="GraphicsMetrics"/> on the right of the sub sign.</param>
-        /// <returns>Result of the metrics subtraction.</returns>
+        /// <returns>Difference between two sets of metrics.</returns>
         public static GraphicsMetrics operator -(GraphicsMetrics value1, GraphicsMetrics value2)
         {
             return new GraphicsMetrics()
@@ -47,11 +47,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Adds two metrics.
+        /// Returns the combination of two sets of metrics.
         /// </summary>
         /// <param name="value1">Source <see cref="GraphicsMetrics"/> on the left of the add sign.</param>
         /// <param name="value2">Source <see cref="GraphicsMetrics"/> on the right of the add sign.</param>
-        /// <returns>Sum of the metrics.</returns>
+        /// <returns>Combination of two sets of metrics.</returns>
         public static GraphicsMetrics operator +(GraphicsMetrics value1, GraphicsMetrics value2)
         {
             return new GraphicsMetrics()
