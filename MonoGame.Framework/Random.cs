@@ -69,9 +69,9 @@ namespace Microsoft.Xna.Framework
 
             #region Public methods
 
-            int Next()
+            public int Next()
             {
-                throw new NotImplementedException();
+                return UInt64ToInt32(XORShift64Star());
             }
 
             #endregion
