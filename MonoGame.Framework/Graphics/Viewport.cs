@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// Constructs a viewport.
         /// </summary>
         /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
         /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>
@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// Constructs a viewport.
         /// </summary>
         /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
         /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>
