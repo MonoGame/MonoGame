@@ -95,10 +95,44 @@ namespace Microsoft.Xna.Framework
             /// </summary>
             /// <param name="min">Minimum possible value</param>
             /// <param name="max">Maximum possible value</param>
-            /// <returns></returns>
+            /// <returns>Random integer of type Int32</returns>
             public int Next(int min, int max)
             {
                 return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, min, max);
+            }
+
+            #endregion
+
+            #region Int64 Next methods
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int64.
+            /// </summary>
+            /// <returns>Random integer of type Int64</returns>
+            public long Next()
+            {
+                return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, 0, long.MaxValue);
+            }
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int64 that is less than the specified maximum.
+            /// </summary>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random integer of type Int64</returns>
+            public long Next(long max)
+            {
+                return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, 0, max);
+            }
+
+            /// <summary>
+            /// Returns a random integer of type Int64 that is within a specified range.
+            /// </summary>
+            /// <param name="min">Minimum possible value</param>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random integer of type Int64</returns>
+            public long Next(long min, long max)
+            {
+                return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, min, max);
             }
 
             #endregion
