@@ -384,22 +384,26 @@ namespace Microsoft.Xna.Framework
 
             private byte UInt64ToInt8(ulong uint64) 
             {
-                // Map the uint64 onto a range from 0 (same as byte.MinValue) to byte.MaxValue
-                return (byte)Remap(uint64, (ulong)(byte.MaxValue));
+                // Map the ulong onto a long, then remap that to a byte range by multiplying by the factor of 
+                    // the maximum value of a byte divided by the maximum value of a long. However, if the long 
+                    // is negative, return the same multiplied by -1.
+                if(UInt64ToInt64(uint64) < 0)
+                    return (byte)(-UInt64ToInt64(uint64) * ((double)byte.MaxValue / long.MaxValue));
+                return (byte)(UInt64ToInt64(uint64) * ((double)byte.MaxValue / long.MaxValue));
             }
 
             private short UInt64ToInt16(ulong uint64) 
             {
-                // Map the uint64 onto a range from 0 to short.MaxValue * 2, then remap it to short.MinValue-short.MaxValue
-                    // because the Remap function returns an unsigned long integer
-                return (short)((long)(Remap(uint64, (((ulong)(short.MaxValue)) * 2))) + (long)short.MinValue);
+                // Map the ulong onto a long, then remap that to a short range by multiplying by the factor of 
+                    // the maximum value of a short divided by the maximum value of a long
+                return (short)(UInt64ToInt64(uint64) * ((double)short.MaxValue / long.MaxValue));
             }
 
             private int UInt64ToInt32(ulong uint64) 
             {
-                // Map the uint64 onto a range from 0 to int.MaxValue * 2, then remap it to int.MinValue-int.MaxValue
-                    // because the Remap function returns an unsigned long integer
-                return (int)((long)(Remap(uint64, (((ulong)(int.MaxValue)) * 2))) + (long)int.MinValue);
+                // Map the ulong onto a long, then remap that to an integer range by multiplying by the factor of 
+                    // the maximum value of an integer divided by the maximum value of a long
+                return (int)(UInt64ToInt64(uint64) * ((double)int.MaxValue/long.MaxValue));
             }
 
             private long UInt64ToInt64(ulong uint64) 
