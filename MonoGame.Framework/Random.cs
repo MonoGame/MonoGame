@@ -106,30 +106,30 @@ namespace Microsoft.Xna.Framework
             #region Int16 Next methods
 
             /// <summary>
-            /// Returns a non-negative random integer of type Int16.
+            /// Returns a non-negative random integer of type Int16 (short).
             /// </summary>
-            /// <returns>Random integer of type Int16</returns>
+            /// <returns>Random integer of type Int16 (short)</returns>
             public short Next()
             {
                 return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, 0, short.MaxValue);
             }
 
             /// <summary>
-            /// Returns a non-negative random integer of type Int16 that is less than the specified maximum.
+            /// Returns a non-negative random integer of type Int16 (short) that is less than the specified maximum.
             /// </summary>
             /// <param name="max">Maximum possible value</param>
-            /// <returns>Random integer of type Int16</returns>
+            /// <returns>Random integer of type Int16 (short)</returns>
             public short Next(short max)
             {
                 return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, 0, max);
             }
 
             /// <summary>
-            /// Returns a random integer of type Int16 that is within a specified range.
+            /// Returns a random integer of type Int16 (short) that is within a specified range.
             /// </summary>
             /// <param name="min">Minimum possible value</param>
             /// <param name="max">Maximum possible value</param>
-            /// <returns>Random integer of type Int16</returns>
+            /// <returns>Random integer of type Int16 (short)</returns>
             public short Next(short min, short max)
             {
                 return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, min, max);
@@ -140,30 +140,30 @@ namespace Microsoft.Xna.Framework
             #region Int32 Next methods
 
             /// <summary>
-            /// Returns a non-negative random integer of type Int32.
+            /// Returns a non-negative random integer of type Int32 (int).
             /// </summary>
-            /// <returns>Random integer of type Int32</returns>
+            /// <returns>Random integer of type Int32 (int)</returns>
             public int Next()
             {
                 return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, int.MaxValue);
             }
 
             /// <summary>
-            /// Returns a non-negative random integer of type Int32 that is less than the specified maximum.
+            /// Returns a non-negative random integer of type Int32 (int) that is less than the specified maximum.
             /// </summary>
             /// <param name="max">Maximum possible value</param>
-            /// <returns>Random integer of type Int32</returns>
+            /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int max)
             {
                 return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, max);
             }
 
             /// <summary>
-            /// Returns a random integer of type Int32 that is within a specified range.
+            /// Returns a random integer of type Int32 (int) that is within a specified range.
             /// </summary>
             /// <param name="min">Minimum possible value</param>
             /// <param name="max">Maximum possible value</param>
-            /// <returns>Random integer of type Int32</returns>
+            /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int min, int max)
             {
                 return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, min, max);
