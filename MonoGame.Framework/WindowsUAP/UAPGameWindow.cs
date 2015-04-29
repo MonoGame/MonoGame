@@ -119,7 +119,9 @@ namespace Microsoft.Xna.Framework
             _coreWindow.Closed += Window_Closed;
             _coreWindow.Activated += Window_FocusChanged;
 			_coreWindow.CharacterReceived += Window_CharacterReceived;
-                        
+
+            SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
+
             SetCursor(false);
         }
 
@@ -137,6 +139,13 @@ namespace Microsoft.Xna.Framework
             Game.Platform.Exit();
         }
 
+        private void SetViewBounds(double width, double height)
+        {
+            var pixelWidth = Math.Max(1, (int)Math.Round(width * _dinfo.RawPixelsPerViewPixel));
+            var pixelHeight = Math.Max(1, (int)Math.Round(height * _dinfo.RawPixelsPerViewPixel));
+            _viewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
+        }
+
         private void SwapChain_SizeChanged(object sender, SizeChangedEventArgs args)
         {
             lock (_eventLocker)
@@ -144,16 +153,14 @@ namespace Microsoft.Xna.Framework
                 var manager = Game.graphicsDeviceManager;
 
                 // Set the new client bounds.
-                var pixelWidth = Math.Max(1, (int)Math.Round(args.NewSize.Width * _dinfo.RawPixelsPerViewPixel));
-                var pixelHeight = Math.Max(1, (int)Math.Round(args.NewSize.Height * _dinfo.RawPixelsPerViewPixel));
-                _viewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
+                SetViewBounds(args.NewSize.Width, args.NewSize.Height);
 
                 // Set the default new back buffer size and viewport, but this
                 // can be overloaded by the two events below.
 
                 manager.IsFullScreen = _appView.IsFullScreenMode;
-                manager.PreferredBackBufferWidth = pixelWidth;
-                manager.PreferredBackBufferHeight = pixelHeight;
+                manager.PreferredBackBufferWidth = _viewBounds.Width;
+                manager.PreferredBackBufferHeight = _viewBounds.Height;
                 manager.ApplyChanges();
 
                 // Set the new view state which will trigger the 
