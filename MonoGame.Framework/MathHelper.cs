@@ -371,7 +371,7 @@ namespace Microsoft.Xna.Framework
                 _lastValue ^= _lastValue >> 12;
                 _lastValue ^= _lastValue << 25;
                 _lastValue ^= _lastValue >> 27;
-                return unchecked(_lastValue * ulong.MaxValue);
+                return unchecked(_lastValue * 2685821657736338717UL);
             }
 
             private ulong Remap(ulong value, ulong newMax) 
