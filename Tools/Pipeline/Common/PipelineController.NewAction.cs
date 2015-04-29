@@ -25,7 +25,7 @@ namespace MonoGame.Tools.Pipeline
                 _template = template;                
             }
 
-            public void Do()
+            public bool Do()
             {
                 var ext = Path.GetExtension(_template.TemplateFile);
                 var filename = Path.ChangeExtension(_name, ext);
@@ -34,7 +34,7 @@ namespace MonoGame.Tools.Pipeline
                 if (File.Exists(fullpath))
                 {
                     _con.View.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
-                    return;
+                    return false;
                 }
 
                 File.Copy(_template.TemplateFile, fullpath);
@@ -58,9 +58,11 @@ namespace MonoGame.Tools.Pipeline
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
 
-            public void Undo()
+            public bool Undo()
             {
                 var ext = Path.GetExtension(_template.TemplateFile);
                 var filename = Path.ChangeExtension(_name, ext);
@@ -69,7 +71,7 @@ namespace MonoGame.Tools.Pipeline
                 if (!File.Exists(fullpath))
                 {
                     _con.View.ShowError("Error", string.Format("File does not exist: '{0}'.", fullpath));
-                    return;
+                    return false;
                 }
 
                 File.Delete(fullpath);
@@ -91,6 +93,8 @@ namespace MonoGame.Tools.Pipeline
                     
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
         }
     }

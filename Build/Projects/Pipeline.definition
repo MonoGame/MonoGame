@@ -17,6 +17,7 @@
 
   <Properties>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
@@ -44,8 +45,10 @@
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\Selection.cs" />
+    <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
