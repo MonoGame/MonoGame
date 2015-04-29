@@ -17,13 +17,14 @@
 
   <Properties>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;GTK</Platform>
-      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -44,8 +45,10 @@
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\Selection.cs" />
+    <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
@@ -65,6 +68,9 @@
     <Compile Include="Windows\UpdateAction.cs" />
 
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\ContentIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\EditorIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -111,6 +117,39 @@
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
+	<Compile Include="Windows\AddFileDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AddFileDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFileDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\AddFileDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFileDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	<Compile Include="Windows\AddFolderDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AddFolderDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFolderDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\AddFolderDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFolderDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	<Compile Include="Windows\TextEditDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\TextEditDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>TextEditDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\TextEditDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>TextEditDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -166,7 +205,13 @@
     <Compile Include="Gtk\Dialogs\AddFileDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\AddFolderDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\TextEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
@@ -178,45 +223,48 @@
     <Compile Include="Gtk\Dialogs\ColorPickerDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\generated.cs">
+    <Compile Include="Gtk\Stetic.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.MainWindow.cs">  
+    <Compile Include="Gtk\MainWindow.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.NewTemplateDialog.cs">  
+    <Compile Include="Gtk\Dialogs\NewTemplateDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ProjectView.cs">  
+    <Compile Include="Gtk\Widgets\ProjectView.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertiesView.cs">
+    <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.YesNoCancelDialog.cs">  
+    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.CollectionEditorDialog.cs">  
+    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ColorPickerDialog.cs">  
+    <Compile Include="Gtk\Dialogs\ColorPickerDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertyGridTable.cs">  
+    <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AboutDialog.cs">  
+    <Compile Include="Gtk\Dialogs\AboutDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AddFileDialog.cs">  
+    <Compile Include="Gtk\Dialogs\AddFileDialog.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\AddFolderDialog.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="IgeMacIntegration.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <EmbeddedResource Include="gtk-gui\gui.stetic">
-      <Platforms>MacOS,Linux</Platforms>
-    </EmbeddedResource>
 
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="App.ico" />
@@ -224,36 +272,68 @@
     <EmbeddedResource Include="Icons\missing.png" />
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />
+    <EmbeddedResource Include="Icons\folder_missing.png" />
     <EmbeddedResource Include="Icons\settings.png" />
 
     <!-- Copy config files to output directory -->
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\atk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>atk-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gdk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>gdk-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gio-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>gio-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\glib-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>glib-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gtk-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>gtk-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\ThirdParty\Dependencies\Gtk3\pango-sharp.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>pango-sharp.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
     <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>atk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>gdk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>glade-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>glib-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>gtk-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>pango-sharp.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

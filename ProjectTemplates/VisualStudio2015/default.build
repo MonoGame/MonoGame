@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<project name="Aurora Ion Build Script" default="build" basedir=".">
+	<description>Default Ion Automated Build script</description>
+	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
+
+	<target name="build" description="Build Visual Studio Templates">
+		<delete><fileset><include name="*.zip" /></fileset></delete>
+		<!-- Find any applications that have valid build scripts, configure their references and then build them -->
+		<foreach item="Folder" property="folder" in="./">
+			
+			<zip zipfile="${folder}.zip">
+			  <fileset basedir="${folder}">			    
+			     <include name="**/*" />
+			  </fileset>
+			</zip>
+		</foreach>
+	</target>
+	
+</project>

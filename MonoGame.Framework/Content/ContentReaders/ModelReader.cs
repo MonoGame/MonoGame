@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Content
 				var boundingSphere = reader.ReadBoundingSphere();
 
                 // Tag
-                reader.ReadObject<object>();
+                var meshTag = reader.ReadObject<object>();
 
                 // Read the mesh part data.
                 int partCount = reader.ReadInt32();
@@ -197,6 +197,10 @@ namespace Microsoft.Xna.Framework.Content
                     continue;
 
 				ModelMesh mesh = new ModelMesh(reader.GraphicsDevice, parts);
+
+                // Tag reassignment
+                mesh.Tag = meshTag;
+
 				mesh.Name = name;
 				mesh.ParentBone = bones[parentBoneIndex];
 				mesh.ParentBone.AddMesh(mesh);

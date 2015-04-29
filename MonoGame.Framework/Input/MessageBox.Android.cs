@@ -5,7 +5,7 @@ using Android.Content;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class MessageBox
+    public static partial class MessageBox
     {
         private static TaskCompletionSource<int?> tcs;
         private static AlertDialog alert;

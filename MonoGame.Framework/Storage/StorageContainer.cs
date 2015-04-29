@@ -45,7 +45,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.IO;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.Storage;
 using System.Linq;
 using Windows.Storage.Search;
@@ -116,8 +116,8 @@ namespace Microsoft.Xna.Framework.Storage
 			_name = name;
 
 			// From the examples the root is based on MyDocuments folder
-#if WINDOWS_STOREAPP
-            var saved = "";
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var saved = "";
 #elif LINUX || MONOMAC
             // We already have a SaveData folder on Mac/Linux.
             var saved = StorageDevice.StorageRoot;
@@ -189,9 +189,9 @@ namespace Microsoft.Xna.Framework.Storage
 
         private void CreateDirectoryAbsolute(string path)
         {
-            // Now let's try to create it
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+			// Now let's try to create it
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             var task = folder.CreateFolderAsync(path, CreationCollisionOption.OpenIfExists);
             task.AsTask().Wait();
 #else
@@ -215,8 +215,8 @@ namespace Microsoft.Xna.Framework.Storage
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
 
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             var awaiter = folder.OpenStreamForWriteAsync(filePath, CreationCollisionOption.ReplaceExisting).GetAwaiter();
             return awaiter.GetResult();
 #else
@@ -237,9 +237,9 @@ namespace Microsoft.Xna.Framework.Storage
 			// relative so combine with our path
 			var dirPath = Path.Combine(_storagePath, directory);
 
-            // Now let's try to delete itd
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+			// Now let's try to delete itd
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             var deleteFolder = folder.GetFolderAsync(dirPath).AsTask().GetAwaiter().GetResult();
             deleteFolder.DeleteAsync().AsTask().Wait();
 #else
@@ -259,8 +259,8 @@ namespace Microsoft.Xna.Framework.Storage
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
 
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             var deleteFile = folder.GetFileAsync(filePath).AsTask().GetAwaiter().GetResult();
             deleteFile.DeleteAsync().AsTask().Wait();
 #else
@@ -283,8 +283,8 @@ namespace Microsoft.Xna.Framework.Storage
 			// relative so combine with our path
 			var dirPath = Path.Combine(_storagePath, directory);
 
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
 
             try
             {
@@ -323,8 +323,8 @@ namespace Microsoft.Xna.Framework.Storage
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
 
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             // GetFile returns an exception if the file doesn't exist, so we catch it here and return the boolean.
             try
             {
@@ -347,8 +347,8 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns>List of directory names.</returns>
 		public string[] GetDirectoryNames ()
         {
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             var results = folder.GetFoldersAsync().AsTask().GetAwaiter().GetResult();
             return results.Select<StorageFolder, string>(e => e.Name).ToArray();
 #else
@@ -374,8 +374,8 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns>List of file names.</returns>
 		public string[] GetFileNames ()
         {
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             var results = folder.GetFilesAsync().AsTask().GetAwaiter().GetResult();
             return results.Select<StorageFile, string>(e => e.Name).ToArray();
 #else
@@ -393,14 +393,14 @@ namespace Microsoft.Xna.Framework.Storage
 			if (string.IsNullOrEmpty(searchPattern))
 				throw new ArgumentNullException("Parameter searchPattern must contain a value.");
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
             var folder = ApplicationData.Current.LocalFolder;
             var options = new QueryOptions( CommonFileQuery.DefaultQuery, new [] { searchPattern } );
             var query = folder.CreateFileQueryWithOptions(options);
             var files = query.GetFilesAsync().AsTask().GetAwaiter().GetResult();
             return files.Select<StorageFile, string>(e => e.Name).ToArray();
 #else
-            return Directory.GetFiles(_storagePath, searchPattern);
+			return Directory.GetFiles(_storagePath, searchPattern);
 #endif
         }				
 
@@ -444,8 +444,8 @@ namespace Microsoft.Xna.Framework.Storage
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
 
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+			var folder = ApplicationData.Current.LocalFolder;
             if (fileMode == FileMode.Create || fileMode == FileMode.CreateNew)
             {
                 return folder.OpenStreamForWriteAsync(filePath, CreationCollisionOption.ReplaceExisting).GetAwaiter().GetResult();

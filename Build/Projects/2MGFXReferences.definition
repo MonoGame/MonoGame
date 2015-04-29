@@ -8,6 +8,9 @@
     <Binary
       Name="SharpDX.D3DCompiler"
       Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.D3DCompiler.dll" />
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
   </Platform>
 
 </ExternalProject>

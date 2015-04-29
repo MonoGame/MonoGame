@@ -21,6 +21,7 @@
 [IgnoreCase] Register -> @"register";
 [IgnoreCase] Boolean -> @"true|false|0|1";
 Number -> @"[+-]? ?[0-9]?\.?[0-9]+[fF]?";
+[IgnoreCase] HexColor -> @"0x[0-9a-f]{6}([0-9a-f][0-9a-f])?";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
 CloseBracket -> @"}";
@@ -49,6 +50,7 @@ EndOfFile -> @"^$";
 [IgnoreCase] AddressU -> @"AddressU";
 [IgnoreCase] AddressV -> @"AddressV";
 [IgnoreCase] AddressW -> @"AddressW";
+[IgnoreCase] BorderColor -> @"BorderColor";
 [IgnoreCase] MaxAnisotropy -> @"MaxAnisotropy";
 [IgnoreCase] MaxMipLevel -> @"MaxMipLevel|MaxLod";
 [IgnoreCase] MipLodBias -> @"MipLodBias";
@@ -57,6 +59,7 @@ EndOfFile -> @"^$";
 [IgnoreCase] Clamp -> @"Clamp";
 [IgnoreCase] Wrap -> @"Wrap";
 [IgnoreCase] Mirror -> @"Mirror";
+[IgnoreCase] Border -> @"Border";
 
 // Texture Filters
 [IgnoreCase] None -> @"None";
@@ -72,11 +75,42 @@ EndOfFile -> @"^$";
 [IgnoreCase] ColorWriteEnable -> @"ColorWriteEnable";
 [IgnoreCase] ZEnable -> @"ZEnable";
 [IgnoreCase] ZWriteEnable -> @"ZWriteEnable";
+[IgnoreCase] ZFunc-> @"ZFunc";
 [IgnoreCase] DepthBias -> @"DepthBias";
 [IgnoreCase] CullMode -> @"CullMode";
 [IgnoreCase] FillMode -> @"FillMode";
 [IgnoreCase] MultiSampleAntiAlias -> @"MultiSampleAntiAlias";
+[IgnoreCase] ScissorTestEnable -> @"ScissorTestEnable";
 [IgnoreCase] SlopeScaleDepthBias -> @"SlopeScaleDepthBias";
+[IgnoreCase] StencilEnable -> @"StencilEnable";
+[IgnoreCase] StencilFail -> @"StencilFail";
+[IgnoreCase] StencilFunc -> @"StencilFunc";
+[IgnoreCase] StencilMask -> @"StencilMask";
+[IgnoreCase] StencilPass -> @"StencilPass";
+[IgnoreCase] StencilRef -> @"StencilRef";
+[IgnoreCase] StencilWriteMask -> @"StencilWriteMask";
+[IgnoreCase] StencilZFail -> @"StencilZFail";
+ 
+
+// Compare function
+[IgnoreCase] Never -> @"Never";
+[IgnoreCase] Less -> @"Less";
+[IgnoreCase] Equal -> @"Equal";
+[IgnoreCase] LessEqual -> @"LessEqual";
+[IgnoreCase] Greater -> @"Greater";
+[IgnoreCase] NotEqual -> @"NotEqual";
+[IgnoreCase] GreaterEqual -> @"GreaterEqual";
+[IgnoreCase] Always -> @"Always";
+
+// Stencil operation
+[IgnoreCase] Keep -> @"Keep";
+[IgnoreCase] Zero -> @"Zero";
+[IgnoreCase] Replace -> @"Replace";
+[IgnoreCase] IncrSat -> @"IncrSat";
+[IgnoreCase] DecrSat -> @"DecrSat";
+[IgnoreCase] Invert -> @"Invert";
+[IgnoreCase] Incr -> @"Incr";
+[IgnoreCase] Decr -> @"Decr";
 
 // Colors
 [IgnoreCase] Red -> @"Red";
@@ -213,6 +247,32 @@ BlendOps -> (BlendOp_Add|BlendOp_Subtract|BlendOp_RevSubtract|BlendOp_Min|BlendO
 	return	$BlendOp_Add ?? $BlendOp_Subtract ?? $BlendOp_RevSubtract ?? $BlendOp_Min ?? $BlendOp_Max;
 };
 
+CmpFunc_Never -> Never { return CompareFunction.Never; };
+CmpFunc_Less -> Less { return CompareFunction.Less; };
+CmpFunc_Equal -> Equal { return CompareFunction.Equal; };
+CmpFunc_LessEqual -> LessEqual { return CompareFunction.LessEqual; };
+CmpFunc_Greater -> Greater { return CompareFunction.Greater; };
+CmpFunc_NotEqual -> NotEqual { return CompareFunction.NotEqual; };
+CmpFunc_GreaterEqual -> GreaterEqual { return CompareFunction.GreaterEqual; };
+CmpFunc_Always -> Always { return CompareFunction.Always; };
+CmpFunc -> (CmpFunc_Never|CmpFunc_Less|CmpFunc_Equal|CmpFunc_LessEqual|CmpFunc_Greater|CmpFunc_NotEqual|CmpFunc_GreaterEqual|CmpFunc_Always)
+{
+	return	$CmpFunc_Never ?? $CmpFunc_Less ?? $CmpFunc_Equal ?? $CmpFunc_LessEqual ?? $CmpFunc_Greater ?? $CmpFunc_NotEqual ?? $CmpFunc_GreaterEqual ?? $CmpFunc_Always;
+};
+
+StencilOp_Keep -> Keep { return StencilOperation.Keep; };
+StencilOp_Zero -> Zero { return StencilOperation.Zero; };
+StencilOp_Replace -> Replace { return StencilOperation.Replace; };
+StencilOp_IncrSat -> IncrSat { return StencilOperation.IncrementSaturation; };
+StencilOp_DecrSat -> DecrSat { return StencilOperation.DecrementSaturation; };
+StencilOp_Invert -> Invert { return StencilOperation.Invert; };
+StencilOp_Incr -> Incr { return StencilOperation.Increment; };
+StencilOp_Decr -> Decr { return StencilOperation.Decrement; };
+StencilOp -> (StencilOp_Keep|StencilOp_Zero|StencilOp_Replace|StencilOp_IncrSat|StencilOp_DecrSat|StencilOp_Invert|StencilOp_Incr|StencilOp_Decr)
+{
+	return	$StencilOp_Keep ?? $StencilOp_Zero ?? $StencilOp_Replace ?? $StencilOp_IncrSat ?? $StencilOp_DecrSat ?? $StencilOp_Invert ?? $StencilOp_Incr ?? $StencilOp_Decr;
+};
+
 // Render states
 Render_State_CullMode -> CullMode Equals CullModes Semicolon { (paramlist[0] as PassInfo).CullMode = (CullMode)$CullModes; return null; };
 Render_State_FillMode -> FillMode Equals FillModes Semicolon { (paramlist[0] as PassInfo).FillMode = (FillMode)$FillModes; return null; };
@@ -225,7 +285,17 @@ Render_State_DepthBias -> DepthBias Equals Number Semicolon { (paramlist[0] as P
 Render_State_SlopeScaleDepthBias -> SlopeScaleDepthBias Equals Number Semicolon { (paramlist[0] as PassInfo).SlopeScaleDepthBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
 Render_State_ZEnable -> ZEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ZEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
 Render_State_ZWriteEnable -> ZWriteEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ZWriteEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_ZFunc -> ZFunc Equals CmpFunc Semicolon { (paramlist[0] as PassInfo).DepthBufferFunction = (CompareFunction)$CmpFunc; return null; };
 Render_State_MultiSampleAntiAlias -> MultiSampleAntiAlias Equals Boolean Semicolon { (paramlist[0] as PassInfo).MultiSampleAntiAlias = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_ScissorTestEnable -> ScissorTestEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ScissorTestEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_StencilEnable -> StencilEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).StencilEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_StencilFail -> StencilFail Equals StencilOp Semicolon { (paramlist[0] as PassInfo).StencilFail = (StencilOperation)$StencilOp; return null; };
+Render_State_StencilFunc -> StencilFunc Equals CmpFunc Semicolon { (paramlist[0] as PassInfo).StencilFunc = (CompareFunction)$CmpFunc; return null; };
+Render_State_StencilMask -> StencilMask Equals Number Semicolon { (paramlist[0] as PassInfo).StencilMask = ParseTreeTools.ParseInt((string)$Number); return null; };
+Render_State_StencilPass -> StencilPass Equals StencilOp Semicolon { (paramlist[0] as PassInfo).StencilPass = (StencilOperation)$StencilOp; return null; };
+Render_State_StencilRef -> StencilRef Equals Number Semicolon { (paramlist[0] as PassInfo).StencilRef = ParseTreeTools.ParseInt((string)$Number); return null; };
+Render_State_StencilWriteMask -> StencilWriteMask Equals Number Semicolon { (paramlist[0] as PassInfo).StencilWriteMask = ParseTreeTools.ParseInt((string)$Number); return null; };
+Render_State_StencilZFail -> StencilZFail Equals StencilOp Semicolon { (paramlist[0] as PassInfo).StencilZFail = (StencilOperation)$StencilOp; return null; };
 
 
 Render_State_Expression ->	
@@ -240,8 +310,17 @@ Render_State_Expression ->
 				Render_State_SlopeScaleDepthBias |
 				Render_State_ZEnable |
 				Render_State_ZWriteEnable |
-				Render_State_MultiSampleAntiAlias;
-
+				Render_State_ZFunc |
+				Render_State_MultiSampleAntiAlias |
+				Render_State_ScissorTestEnable |
+				Render_State_StencilEnable |
+				Render_State_StencilFail |
+				Render_State_StencilFunc |
+				Render_State_StencilMask |
+				Render_State_StencilPass |
+				Render_State_StencilRef |
+				Render_State_StencilWriteMask |
+				Render_State_StencilZFail;
 
 Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | Render_State_Expression)* CloseBracket 
 { 
@@ -280,9 +359,10 @@ PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier
 AddressMode_Clamp -> Clamp { return TextureAddressMode.Clamp; };
 AddressMode_Wrap -> Wrap { return TextureAddressMode.Wrap; };
 AddressMode_Mirror -> Mirror { return TextureAddressMode.Mirror; };
-AddressMode -> (AddressMode_Clamp|AddressMode_Wrap|AddressMode_Mirror)
+AddressMode_Border -> Border { return TextureAddressMode.Border; };
+AddressMode -> (AddressMode_Clamp|AddressMode_Wrap|AddressMode_Mirror|AddressMode_Border)
 {
-	return $AddressMode_Clamp ?? $AddressMode_Wrap ?? $AddressMode_Mirror;
+	return $AddressMode_Clamp ?? $AddressMode_Wrap ?? $AddressMode_Mirror ?? $AddressMode_Border;
 };
 
 TextureFilter_None -> None { return TextureFilterType.None; };
@@ -303,6 +383,7 @@ Sampler_State_Filter -> Filter Equals TextureFilter Semicolon { (paramlist[0] as
 Sampler_State_AddressU -> AddressU Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressU = (TextureAddressMode)$AddressMode; return null; };
 Sampler_State_AddressV -> AddressV Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressV = (TextureAddressMode)$AddressMode; return null; };
 Sampler_State_AddressW -> AddressW Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressW = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_BorderColor -> BorderColor Equals HexColor Semicolon { (paramlist[0] as SamplerStateInfo).BorderColor = ParseTreeTools.ParseColor((string)$HexColor); return null; };
 Sampler_State_MaxMipLevel -> MaxMipLevel Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxMipLevel = ParseTreeTools.ParseInt((string)$Number); return null; };
 Sampler_State_MaxAnisotropy -> MaxAnisotropy Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxAnisotropy = ParseTreeTools.ParseInt((string)$Number); return null; };
 Sampler_State_MipLodBias -> MipLodBias Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MipMapLevelOfDetailBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
@@ -317,6 +398,7 @@ Sampler_State_Expression ->
 				Sampler_State_AddressU |
 				Sampler_State_AddressV |
 				Sampler_State_AddressW |
+                Sampler_State_BorderColor |
 				Sampler_State_MaxMipLevel |
 				Sampler_State_MaxAnisotropy |
 				Sampler_State_MipLodBias;

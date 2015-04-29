@@ -22,16 +22,10 @@ namespace MonoGame.Tools.Pipeline
         public string OpenProjectPath;
 
         private IController _controller;
-        private ImageList _treeIcons;
+        private ContentIcons _treeIcons;
 
         private bool _treeUpdating;
         private bool _treeSort;
-
-        private const int ContentItemIcon = 0;
-        private const int ContentMissingIcon = 1;
-        private const int FolderOpenIcon = 2;
-        private const int FolderClosedIcon = 3;
-        private const int ProjectIcon = 4;        
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -56,15 +50,9 @@ namespace MonoGame.Tools.Pipeline
 
             _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;            
 
-            _treeIcons = new ImageList();
-            var asm = Assembly.GetExecutingAssembly();
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.missing.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
-            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
+            _treeIcons = new ContentIcons();
             
-            _treeView.ImageList = _treeIcons;
+            _treeView.ImageList = _treeIcons.Icons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
             _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
             _treeView.NodeMouseClick += TreeViewOnNodeMouseClick;
@@ -212,13 +200,11 @@ namespace MonoGame.Tools.Pipeline
 
             if (node.Tag is ContentItem)
             {
-                _treeAddItemMenuItem.Visible = false;
-                _treeNewItemMenuItem.Visible = false;
+                _treeAddMenu.Visible = false;
             }
             else
             {
-                _treeAddItemMenuItem.Visible = true;
-                _treeNewItemMenuItem.Visible = true;
+                _treeAddMenu.Visible = true;
             }
 
             if (node.Tag is FolderItem)
@@ -361,8 +347,8 @@ namespace MonoGame.Tools.Pipeline
 
             var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
             root.Tag = new PipelineProjectProxy(project);
-            root.SelectedImageIndex = ProjectIcon;
-            root.ImageIndex = ProjectIcon;
+            root.SelectedImageIndex = ContentIcons.ProjectIcon;
+            root.ImageIndex = ContentIcons.ProjectIcon;
 
             _propertyGrid.SelectedObject = root.Tag;
         }
@@ -383,8 +369,8 @@ namespace MonoGame.Tools.Pipeline
                 if (found.Length == 0)
                 {
                     var folderNode = parent.Add(folder, folder, -1);
-                    folderNode.ImageIndex = FolderClosedIcon;
-                    folderNode.SelectedImageIndex = FolderClosedIcon;
+                    folderNode.ImageIndex = ContentIcons.FolderClosedIcon;
+                    folderNode.SelectedImageIndex = ContentIcons.FolderClosedIcon;
 
                     var idx = path.IndexOf(folder);
                     var curPath = path.Substring(0, idx + folder.Length);
@@ -396,10 +382,13 @@ namespace MonoGame.Tools.Pipeline
                     parent = found[0].Nodes;
             }
 
+            string fullPath = ((PipelineController)_controller).GetFullPath(item.OriginalPath);
+            int iconIdx = _treeIcons.GetIcon(item.Exists, fullPath);
+
             var node = parent.Add(string.Empty, item.Name, -1);
             node.Tag = item;
-            node.ImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
-            node.SelectedImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
+            node.ImageIndex = iconIdx;
+            node.SelectedImageIndex = iconIdx;
 
             _treeView.SelectedNode = node;
 
@@ -688,19 +677,19 @@ namespace MonoGame.Tools.Pipeline
 
         private void TreeViewOnBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.ImageIndex == FolderOpenIcon)
+            if (e.Node.ImageIndex == ContentIcons.FolderOpenIcon)
             {
-                e.Node.ImageIndex = FolderClosedIcon;
-                e.Node.SelectedImageIndex = FolderClosedIcon;
+                e.Node.ImageIndex = ContentIcons.FolderClosedIcon;
+                e.Node.SelectedImageIndex = ContentIcons.FolderClosedIcon;
             }
         }
 
         private void TreeViewOnBeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.ImageIndex == FolderClosedIcon)
+            if (e.Node.ImageIndex == ContentIcons.FolderClosedIcon)
             {
-                e.Node.ImageIndex = FolderOpenIcon;
-                e.Node.SelectedImageIndex = FolderOpenIcon;
+                e.Node.ImageIndex = ContentIcons.FolderOpenIcon;
+                e.Node.SelectedImageIndex = ContentIcons.FolderOpenIcon;
             }
         }
 
@@ -739,8 +728,7 @@ namespace MonoGame.Tools.Pipeline
 
             _exitMenuItem.Enabled = notBuilding;
 
-            _newItemMenuItem.Enabled = projectOpen;
-            _addItemMenuItem.Enabled = projectOpen;
+            _addMenuItem.Enabled = projectOpen;
             _deleteMenuItem.Enabled = projectOpen;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
@@ -767,15 +755,18 @@ namespace MonoGame.Tools.Pipeline
         {
             var items = new List<ContentItem>();
             var nodes = _treeView.SelectedNodesRecursive;
+            List<string> dirs = new List<string>();
 
             foreach (var node in nodes)
             {
                 var item = node.Tag as ContentItem;
                 if (item != null && !items.Contains(item))
-                    items.Add(item);                    
+                    items.Add(item);
+                else
+                    dirs.Add(node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1));
             }
 
-            _controller.Exclude(items);      
+            _controller.Exclude(items, dirs);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -807,6 +798,42 @@ namespace MonoGame.Tools.Pipeline
                 // Ensure name is unique among files at this location?
                 _controller.NewItem(dlg.NameGiven, location, template);
             }
+        }
+
+        private void OnAddFolderClick(object sender, EventArgs e)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            string location = "";
+
+            if (node != null)
+            {
+                var item = node.Tag as IProjectItem;
+                if (item != null)
+                    location = item.Location;
+                else
+                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
+            }
+
+            _controller.IncludeFolder(location);
+        }
+
+        private void OnNewFolderClick(object sender, EventArgs e)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            string location = "";
+
+            if (node != null)
+            {
+                var item = node.Tag as IProjectItem;
+                if (item != null)
+                    location = item.Location;
+                else
+                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
+            }
+
+            var dialog = new TextEditDialog("New Folder", "Folder Name:", "");
+            if (dialog.ShowDialog() == DialogResult.OK)
+                _controller.NewFolder(dialog.text, location);
         }
 
         private void OnRedoClick(object sender, EventArgs e)
@@ -890,23 +917,149 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (parent[i].Text == item.Name)
                 {
-                    if (parent[i].ImageIndex == ContentItemIcon || parent[i].ImageIndex == ContentMissingIcon)
+                    if (parent[i].ImageIndex >= ContentIcons.MaxDefinedIconIndex || parent[i].ImageIndex == ContentIcons.ContentMissingIcon)
                     {
                         this.Invoke(new MethodInvoker(delegate()
                         {
-                            parent[i].ImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
-                            parent[i].SelectedImageIndex = item.Exists ? ContentItemIcon : ContentMissingIcon;
+                            string fullPath = ((PipelineController)_controller).GetFullPath(item.OriginalPath);
+                            int iconIdx = _treeIcons.GetIcon(item.Exists, fullPath);
+
+                            parent[i].ImageIndex = iconIdx;
+                            parent[i].SelectedImageIndex = iconIdx;
                         }));
                     }
                 }
             }
         }
 
-        public bool CopyOrLink(string file, bool exists, out CopyAction action, out bool applyforall)
+        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            action = CopyAction.Link;
-            applyforall = true;
-            return true;
+            AddFileDialog afd = new AddFileDialog(file, exists);
+            if (afd.ShowDialog() == DialogResult.OK)
+            {
+                action = afd.responce;
+                applyforall = afd.applyforall;
+                return true;
+            }
+
+            action = CopyAction.Skip;
+            applyforall = false;
+            return false;
         }
+
+        public void AddTreeFolder(string afolder)
+        {
+            Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
+            _treeSort = true;
+
+            var path = afolder;
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes[0];
+            var parent = root.Nodes;
+            foreach (var folder in folders)
+            {
+                var found = parent.Find(folder, false);
+                if (found.Length == 0)
+                {
+                    var folderNode = parent.Add(folder, folder, -1);
+                    folderNode.ImageIndex = ContentIcons.FolderClosedIcon;
+                    folderNode.SelectedImageIndex = ContentIcons.FolderClosedIcon;
+
+                    var idx = path.IndexOf(folder);
+                    var curPath = path.Substring(0, idx + folder.Length);
+                    folderNode.Tag = new FolderItem(curPath);
+
+                    parent = folderNode.Nodes;
+                }
+                else
+                    parent = found[0].Nodes;
+            }
+
+            root.Expand();
+        }
+
+        public void RemoveTreeFolder(string folder)
+        {
+            Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
+            _treeSort = true;
+
+            var path = folder;
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes[0];
+            var parent = root.Nodes;
+
+            for (int i = 0; i < folders.Length;i++)
+            {
+                var found = parent.Find(folders[i], false);
+
+                if (found.Length == 0)
+                    return;
+                else if (i != folders.Length - 1)
+                    parent = found[0].Nodes;
+                else
+                    parent.Remove(found[0]);
+            }
+        }
+
+        public bool ChooseContentFolder(string initialDirectory, out string folder)
+        {
+            var dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = initialDirectory;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                folder = dialog.SelectedPath;
+                return true;
+            }
+
+            folder = "";
+            return false;
+        }
+
+        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        {
+            var dialog = new AddFolderDialog(folder);
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                action = dialog.responce;
+                return true;
+            }
+
+            action = CopyAction.Link;
+            return false;
+        }
+
+        #region drag & drop
+        private void MainView_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.None;
+            string filename = GetDropFile(e.Data, ".mgcb");
+            if (filename != null) 
+                e.Effect = DragDropEffects.Copy;
+        }
+
+        private void MainView_DragDrop(object sender, DragEventArgs e)
+        {
+            string filename = GetDropFile(e.Data, ".mgcb");
+            if (filename != null)
+                _controller.OpenProject(filename);
+        }
+
+        private string GetDropFile(IDataObject dataObject, string extension)
+        {
+            if (dataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])dataObject.GetData(DataFormats.FileDrop);
+                foreach (var filename in files)
+                {
+                    if (Path.GetExtension(filename).Equals(extension, StringComparison.OrdinalIgnoreCase))
+                        return filename;
+                }
+            }
+            return null;
+        }
+      
+        #endregion
     }
 }

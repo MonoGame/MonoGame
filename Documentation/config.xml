@@ -22,6 +22,7 @@
         <topic id="System_Requirements" name="System Requirements" filename="system_requirements.md"/>
         <topic id="Setting_Up_MonoGame" name="Setting Up MonoGame" filename="setting_up_monogame.md">
             <topic id="Setting_Up_MonoGame_Linux" name="Linux" filename="setting_up_monogame_linux.md"/>
+            <topic id="Setting_Up_MonoGame_Source" name="From Source" filename="setting_up_monogame_source.md"/>
         </topic>
         <topic id="MonoGame_FAQ" name="MonoGame FAQ" filename="monogame_faq.md"/>
         <topic id="Help_and_Support" name="Help and Support" filename="help_and_support.md"/>
@@ -45,8 +46,6 @@
     </topic>
     
     <topic id="External_Links" name="External Links" filename="links.md"/>
-
-    <topic id="New_Features" name="New Features" filename="improvements.md"/>
 
     <!-- Special topic X:ClassLibrary to include generated class library references. No filename to setup as it is generated -->
     <topic id="X:ClassLibraryReference" page-id="api" name="Class Library Reference" index="100" on-url="true"/>
