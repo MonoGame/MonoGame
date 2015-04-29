@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework
         #region Constructors
 
         /// <summary>
-        /// Creates a new instance of <see cref="Vector2"/> struct, with the specified position.
+        /// Constructs a 2d vector from the X and Y coordinates.
         /// </summary>
         /// <param name="x">The x coordinate in 2d-space.</param>
         /// <param name="y">The y coordinate in 2d-space.</param>
@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Vector2"/> struct, with the specified position.
+        /// Constructs a 2d vector from a scalar.
         /// </summary>
         /// <param name="value">The x and y coordinates in 2d-space.</param>
         public Vector2(float value)
