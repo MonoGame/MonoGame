@@ -312,8 +312,8 @@ namespace Microsoft.Xna.Framework
 
             #region Private Fields
 
-            private ulong seed;
-            private ulong lastValue;
+            private ulong _seed;
+            private ulong _lastValue;
 
             #endregion
 
@@ -323,11 +323,12 @@ namespace Microsoft.Xna.Framework
             { 
                 get 
                 { 
-                    return this.seed; 
+                    return this._seed; 
                 }
                 set 
                 {
-                    this.seed = value;
+                    this._seed = value;
+                    this._lastValue = value;
                 }
             }
 
@@ -338,7 +339,7 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Initializes a new instance of the random number generator using a new GUID as a default seed value
             /// </summary>
-            public Random() : this((ulong)GenerateSeed())
+            public Random() : this(GenerateSeed())
             {
             }
 
@@ -348,8 +349,8 @@ namespace Microsoft.Xna.Framework
             /// <param name="seed">Seed to be used when computing new random numbers</param>
             public Random(ulong seed)
             {
-                this.seed = seed;
-                this.lastValue = seed;
+                this._seed = seed;
+                this._lastValue = seed;
             }
 
             #endregion
@@ -367,10 +368,10 @@ namespace Microsoft.Xna.Framework
 
             private ulong XORShift64Star()
             {
-                lastValue ^= lastValue >> 12;
-                lastValue ^= lastValue << 25;
-                lastValue ^= lastValue >> 27;
-                return unchecked(lastValue * ulong.MaxValue);
+                _lastValue ^= _lastValue >> 12;
+                _lastValue ^= _lastValue << 25;
+                _lastValue ^= _lastValue >> 27;
+                return unchecked(_lastValue * ulong.MaxValue);
             }
 
             private ulong Remap(ulong value, ulong newMax) 
