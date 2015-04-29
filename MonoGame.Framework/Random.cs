@@ -69,10 +69,39 @@ namespace Microsoft.Xna.Framework
 
             #region Public methods
 
+            #region Int32 Next methods
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int32.
+            /// </summary>
+            /// <returns>Random integer of type Int32</returns>
             public int Next()
             {
-                return UInt64ToInt32(XORShift64Star());
+                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, int.MaxValue);
             }
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int32 that is less than the specified maximum.
+            /// </summary>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random integer of type Int32</returns>
+            public int Next(int max)
+            {
+                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, max);
+            }
+
+            /// <summary>
+            /// Returns a random integer of type Int32 that is within a specified range.
+            /// </summary>
+            /// <param name="min">Minimum possible value</param>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns></returns>
+            public int Next(int min, int max)
+            {
+                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, min, max);
+            }
+
+            #endregion
 
             #endregion
 
@@ -86,10 +115,9 @@ namespace Microsoft.Xna.Framework
                 return unchecked(_lastValue * 2685821657736338717UL);
             }
 
-            private ulong Remap(ulong value, ulong newMax)
+            private long Remap(long value, long oldMin, long oldMax, long newMin, long newMax)
             {
-                //return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
-                return ((value * newMax) / ulong.MaxValue);
+                return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
             }
 
             #region Integer values
