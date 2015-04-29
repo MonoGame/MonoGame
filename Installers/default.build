@@ -77,7 +77,7 @@
       <copy todir="Linux/InstallerData/Data/Pipeline/">
       <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
       </copy>
-      <copy tofile="Linux/InstallerData/generate.sh" file="Linux/Generate/generate_run.sh" />
+      <copy tofile="Linux/InstallerData/generate_run.sh" file="Linux/Generate/generate_run.sh" />
       <copy tofile="Linux/InstallerData/generate_deb.sh" file="Linux/Generate/generate_deb.sh" />
       <mkdir dir="Linux/InstallerData/Makeself"/>
       <copy todir="Linux/InstallerData/Makeself">
@@ -87,7 +87,7 @@
     
       <choose>
         <when test="${os == 'Unix'}">
-          <exec program="Linux/InstallerData/generate.sh" workingdir="Linux/InstallerData/"/>
+          <exec program="Linux/InstallerData/generate_run.sh" workingdir="Linux/InstallerData/"/>
           <exec program="Linux/InstallerData/generate_deb.sh" workingdir="Linux/InstallerData/"/>
           <copy tofile="Linux/monogame-linux.run" file="Linux/InstallerData/monogame-linux.run" />
           <copy tofile="Linux/monogame-pipeline.deb" file="Linux/InstallerData/monogame-pipeline.deb" />
