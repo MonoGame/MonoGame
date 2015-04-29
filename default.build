@@ -5,6 +5,7 @@
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
   <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
   <property name="msbuild12dir" value="C:\Program Files (x86)\MSBuild\12.0\Bin" />
+  <property name="msbuild14dir" value="C:\Program Files (x86)\MSBuild\14.0\Bin" />
 
   <!-- Temporary work around so that we don't need to change the targets on the build server -->
   <target name="build" depends="build_code,run_tests,build_docs,build_installer" />
@@ -33,14 +34,13 @@
     <call target="build_windows8" />
     <call target="build_windowsphone" />
     <call target="build_windowsphone81" />
+    <call target="build_windows10" />
     <call target="build_psm" />
     <call target="build_web" />
     <call target="build_linux"/>
     <call target="build_android" />
     <call target="build_mac" />
     <call target="build_ios" />
-
-    <call target="build_contentprocessor"/>
 
   </target>
 
@@ -108,9 +108,6 @@
       <exec program="mono" commandline="Protobuild.exe -generate MacOS" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.MacOS.sln" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.MacOS.sln" />
-      <delete dir="${project::get-base-directory()}\Tools\Pipeline\bin\MacOS\AnyCPU\Release\*.pkg" />
-      <exec program="pkgbuild" workingdir="Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version 1 --install-location /Applications Pipeline.MacOS.pkg" />
-      <exec program="productbuild" workingdir="Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --distribution distribution.xml --resources ./Resources --package-path Pipeline.MacOS.pkg Pipeline.Installer.pkg" />
     </if>
   </target>
 
@@ -177,10 +174,13 @@
     </if>
   </target>
 
-  <target name="build_contentprocessor" description="Build the old content processors" depends="clean">
+  <target name="build_windows10" description="Build Windows 10 UAP" depends="clean">
     <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Build /p:Configuration=Release" />
+      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
+        <exec program="Protobuild" commandline="-generate WindowsUAP" />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+      </if>
     </if>
   </target>
 
@@ -200,12 +200,11 @@
 
   <target name="build_installer" description="Build the installers." depends="build_code,build_docs,run_tests">
 
-    <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
-    <nant buildfile="IDE/MonoDevelop/default.build" target="build"/>
-
+    <nant buildfile="ProjectTemplates/VisualStudio2015/default.build" target="build" />
+    <nant buildfile="IDE/MonoDevelop/default.build" target="build" />
     <nant buildfile="Installers/default.build" target="build" />
 
   </target>

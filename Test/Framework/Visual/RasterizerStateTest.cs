@@ -64,6 +64,9 @@ namespace MonoGame.Tests.Visual
             assertMethod(() => rasterizerState.MultiSampleAntiAlias = true);
             assertMethod(() => rasterizerState.ScissorTestEnable = true);
             assertMethod(() => rasterizerState.SlopeScaleDepthBias = 0.2f);
+#if !XNA
+            assertMethod(() => rasterizerState.DepthClipEnable = false);
+#endif
         }
 
         [TestCase(CullMode.CullClockwiseFace)]
@@ -121,5 +124,27 @@ namespace MonoGame.Tests.Visual
 
             RunSingleFrameTest();
         }
+
+#if !XNA
+        [TestCase(false)]
+        [TestCase(true)]
+        public void VisualTestDepthClipEnable(bool depthClipEnable)
+        {
+            Game.Components.Add(new Colored3DCubeComponent(Game)
+            {
+                CubePosition = new Vector3(0, 0, 3)
+            });
+
+            Game.PreDrawWith += (sender, e) =>
+            {
+                Game.GraphicsDevice.RasterizerState = new RasterizerState
+                {
+                    DepthClipEnable = depthClipEnable
+                };
+            };
+
+            RunSingleFrameTest();
+        }
+#endif
     }
 }

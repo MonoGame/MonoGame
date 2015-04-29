@@ -8,7 +8,7 @@ using Windows.UI.Popups;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class MessageBox
+    public static partial class MessageBox
     {
         private static readonly CoreDispatcher dispatcher;
         private static TaskCompletionSource<int?> tcs;

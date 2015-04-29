@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 6;
+            public const int MGFXVersion = 7;
 
             public int Signature;
             public int Version;

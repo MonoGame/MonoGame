@@ -6,4 +6,4 @@ This section will cover the following topics:
  - [System Requirements](system_requirements.md)
  - [Setting Up MonoGame](setting_up_monogame.md)
  - [MonoGame FAQ](monogame_faq.md)
- - [Help & Support](help_and_support.md)
+ - [Help and Support](help_and_support.md)

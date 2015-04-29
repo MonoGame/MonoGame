@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework
@@ -8,6 +9,157 @@ namespace MonoGame.Tests.Framework
     /// </summary>
     class EnumConformingTest
     {
+        #region MonoGame.Framework
+
+        [Test]
+        public void ContainmentTypeEnum()
+        {
+            Assert.AreEqual(0, (int)ContainmentType.Disjoint);
+            Assert.AreEqual(1, (int)ContainmentType.Contains);
+            Assert.AreEqual(2, (int)ContainmentType.Intersects);
+        }
+
+        [Test]
+        public void CurveContinuityEnum()
+        {
+            Assert.AreEqual(0, (int)CurveContinuity.Smooth);
+            Assert.AreEqual(1, (int)CurveContinuity.Step);
+        }
+
+        [Test]
+        public void CurveLoopTypeEnum()
+        {
+            Assert.AreEqual(0, (int)CurveLoopType.Constant);
+            Assert.AreEqual(1, (int)CurveLoopType.Cycle);
+            Assert.AreEqual(2, (int)CurveLoopType.CycleOffset);
+            Assert.AreEqual(3, (int)CurveLoopType.Oscillate);
+            Assert.AreEqual(4, (int)CurveLoopType.Linear);
+        }
+
+        [Test]
+        public void CurveTangentEnum()
+        {
+            Assert.AreEqual(0, (int)CurveTangent.Flat);
+            Assert.AreEqual(1, (int)CurveTangent.Linear);
+            Assert.AreEqual(2, (int)CurveTangent.Smooth);
+        }
+
+        [Test]
+        public void DisplayOrientationEnum()
+        {
+            Assert.AreEqual(0, (int)DisplayOrientation.Default);
+            Assert.AreEqual(1, (int)DisplayOrientation.LandscapeLeft);
+            Assert.AreEqual(2, (int)DisplayOrientation.LandscapeRight);
+            Assert.AreEqual(4, (int)DisplayOrientation.Portrait);
+        }
+
+        [Test]
+        public void PlaneIntersectionTypeEnum()
+        {
+            Assert.AreEqual(0, (int)PlaneIntersectionType.Front);
+            Assert.AreEqual(1, (int)PlaneIntersectionType.Back);
+            Assert.AreEqual(2, (int)PlaneIntersectionType.Intersecting);
+        }
+
+        [Test]
+        public void PlayerIndexEnum()
+        {
+            Assert.AreEqual(0, (int)PlayerIndex.One);
+            Assert.AreEqual(1, (int)PlayerIndex.Two);
+            Assert.AreEqual(2, (int)PlayerIndex.Three);
+            Assert.AreEqual(3, (int)PlayerIndex.Four);
+        }
+
+        #endregion
+
+        #region MonoGame.Framework.Graphics
+
+        [Test]
+        public void BlendEnum()
+        {
+            Assert.AreEqual(0, (int)Blend.One);
+            Assert.AreEqual(1, (int)Blend.Zero);
+            Assert.AreEqual(2, (int)Blend.SourceColor);
+            Assert.AreEqual(3, (int)Blend.InverseSourceColor);
+            Assert.AreEqual(4, (int)Blend.SourceAlpha);
+            Assert.AreEqual(5, (int)Blend.InverseSourceAlpha);
+            Assert.AreEqual(6, (int)Blend.DestinationColor);
+            Assert.AreEqual(7, (int)Blend.InverseDestinationColor);
+            Assert.AreEqual(8, (int)Blend.DestinationAlpha);
+            Assert.AreEqual(9, (int)Blend.InverseDestinationAlpha);
+            Assert.AreEqual(10, (int)Blend.BlendFactor);
+            Assert.AreEqual(11, (int)Blend.InverseBlendFactor);
+            Assert.AreEqual(12, (int)Blend.SourceAlphaSaturation);
+        }
+
+        [Test]
+        public void BlendFunctionEnum()
+        {
+            Assert.AreEqual(0, (int)BlendFunction.Add);
+            Assert.AreEqual(1, (int)BlendFunction.Subtract);
+            Assert.AreEqual(2, (int)BlendFunction.ReverseSubtract);
+            Assert.AreEqual(3, (int)BlendFunction.Min);
+            Assert.AreEqual(4, (int)BlendFunction.Max);
+        }
+
+        [Test]
+        public void BufferUsageEnum()
+        {
+            Assert.AreEqual(0, (int)BufferUsage.None);
+            Assert.AreEqual(1, (int)BufferUsage.WriteOnly);
+        }
+
+        [Test]
+        public void ClearOptionsEnum()
+        {
+            Assert.AreEqual(1, (int)ClearOptions.Target);
+            Assert.AreEqual(2, (int)ClearOptions.DepthBuffer);
+            Assert.AreEqual(4, (int)ClearOptions.Stencil);
+        }
+
+        [Test]
+        public void ColorWriteChannelsEnum()
+        {
+            Assert.AreEqual(0, (int)ColorWriteChannels.None);
+            Assert.AreEqual(1, (int)ColorWriteChannels.Red);
+            Assert.AreEqual(2, (int)ColorWriteChannels.Green);
+            Assert.AreEqual(4, (int)ColorWriteChannels.Blue);
+            Assert.AreEqual(8, (int)ColorWriteChannels.Alpha);
+            Assert.AreEqual(15, (int)ColorWriteChannels.All);
+        }
+
+        [Test]
+        public void CompareFunctionEnum()
+        {
+            Assert.AreEqual(0, (int)CompareFunction.Always);
+            Assert.AreEqual(1, (int)CompareFunction.Never);
+            Assert.AreEqual(2, (int)CompareFunction.Less);
+            Assert.AreEqual(3, (int)CompareFunction.LessEqual);
+            Assert.AreEqual(4, (int)CompareFunction.Equal);
+            Assert.AreEqual(5, (int)CompareFunction.GreaterEqual);
+            Assert.AreEqual(6, (int)CompareFunction.Greater);
+            Assert.AreEqual(7, (int)CompareFunction.NotEqual);
+        }
+
+        [Test]
+        public void CubeMapFaceEnum()
+        {
+            Assert.AreEqual(0, (int)CubeMapFace.PositiveX);
+            Assert.AreEqual(1, (int)CubeMapFace.NegativeX);
+            Assert.AreEqual(2, (int)CubeMapFace.PositiveY);
+            Assert.AreEqual(3, (int)CubeMapFace.NegativeY);
+            Assert.AreEqual(4, (int)CubeMapFace.PositiveZ);
+            Assert.AreEqual(5, (int)CubeMapFace.NegativeZ);
+        }
+
+        [Test]
+        public void CullModeEnum()
+        {
+            Assert.AreEqual(0, (int)CullMode.None);
+            Assert.AreEqual(1, (int)CullMode.CullClockwiseFace);
+            Assert.AreEqual(2, (int)CullMode.CullCounterClockwiseFace);
+        }
+
         [Test]
         public void DepthFormatEnum()
         {
@@ -211,5 +363,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(11, (int)VertexElementUsage.Sample);
             Assert.AreEqual(12, (int)VertexElementUsage.TessellateFactor);
         }
+
+        #endregion
     }
 }

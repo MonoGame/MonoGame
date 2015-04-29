@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using MonoGame.Utilities.Png;
 
 #if MONOMAC
 using MonoMac.AppKit;
@@ -59,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 GenerateGLTextureIfRequired();
 
-                format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+                format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
                 if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                 {
@@ -77,8 +78,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         case SurfaceFormat.RgbEtc1:
                         case SurfaceFormat.Dxt1:
                         case SurfaceFormat.Dxt1a:
+                        case SurfaceFormat.Dxt1SRgb:
                         case SurfaceFormat.Dxt3:
+                        case SurfaceFormat.Dxt3SRgb:
                         case SurfaceFormat.Dxt5:
+                        case SurfaceFormat.Dxt5SRgb:
                             imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * GraphicsExtensions.GetSize(format);
                             break;
                         default:
@@ -104,7 +108,7 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             Threading.BlockOnUIThread(() =>
             {
@@ -210,7 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
 #if GLES
             // TODO: check for data size and for non renderable formats (formats that can't be attached to FBO)
@@ -489,8 +493,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS
-            SaveAsImage(stream, width, height, ImageFormat.Png);
+#if MONOMAC || WINDOWS || IOS
+            var pngWriter = new PngWriter();
+            pngWriter.Write(this, stream);
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else

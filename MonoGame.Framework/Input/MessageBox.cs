@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class MessageBox
+    public static partial class MessageBox
     {
         public static bool IsVisible { get; private set; }
 

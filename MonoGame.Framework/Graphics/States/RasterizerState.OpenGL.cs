@@ -93,6 +93,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 device._lastRasterizerState.SlopeScaleDepthBias = this.SlopeScaleDepthBias;
             }
 
+            if (device.GraphicsCapabilities.SupportsDepthClamp &&
+                (force || this.DepthClipEnable != device._lastRasterizerState.DepthClipEnable))
+            {
+                if (!DepthClipEnable)
+                    GL.Enable((EnableCap) 0x864F); // should be EnableCap.DepthClamp, but not available in OpenTK.Graphics.ES20.EnableCap
+                else
+                    GL.Disable((EnableCap) 0x864F);
+                GraphicsExtensions.CheckGLError();
+                device._lastRasterizerState.DepthClipEnable = this.DepthClipEnable;
+            }
+
             // TODO: Implement MultiSampleAntiAlias
         }
     }
