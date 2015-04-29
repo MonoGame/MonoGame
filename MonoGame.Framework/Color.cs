@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from the XYZ unit length components of a vector.
+        /// Constructs an RGBA color from the XYZ unit length components of a vector. Alpha value will be opaque.
         /// </summary>
         /// <param name="color">A <see cref="Vector3"/> representing color.</param>
         public Color(Vector3 color)
@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0.0-1.0) representing red,green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars(0.0-1.0) representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
         /// <param name="r">Red component value.</param>
         /// <param name="g">Green component value.</param>
@@ -249,7 +249,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0-255) representing red,green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars(0-255) representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
         /// <param name="r">Red component value.</param>
         /// <param name="g">Green component value.</param>
@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0-255) representing red,green,blue and alpha values.
+        /// Constructs an RGBA color from scalars(0-255) representing red, green, blue and alpha values.
         /// </summary>
         /// <param name="r">Red component value.</param>
         /// <param name="g">Green component value.</param>
@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0.0-1.0) representing red,green,blue and alpha values.
+        /// Constructs an RGBA color from scalars(0.0-1.0) representing red, green, blue and alpha values.
         /// </summary>
         /// <param name="r">Red component value.</param>
         /// <param name="g">Green component value.</param>
