@@ -69,6 +69,40 @@ namespace Microsoft.Xna.Framework
 
             #region Public methods
 
+            #region Int8 Next methods
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int8 (byte).
+            /// </summary>
+            /// <returns>Random integer of type Int8 (byte)</returns>
+            public byte Next()
+            {
+                return UInt64ToInt8(XORShift64Star());
+            }
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int8 (byte) that is less than the specified maximum.
+            /// </summary>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random integer of type Int8 (byte)</returns>
+            public byte Next(byte max)
+            {
+                return (byte)Remap(UInt64ToInt8(XORShift64Star()), 0, byte.MaxValue, 0, max);
+            }
+
+            /// <summary>
+            /// Returns a random integer of type Int8 (byte) that is within a specified range.
+            /// </summary>
+            /// <param name="min">Minimum possible value</param>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random integer of type Int8 (byte)</returns>
+            public byte Next(byte min, byte max)
+            {
+                return (byte)Remap(UInt64ToInt16(XORShift64Star()), 0, byte.MaxValue, min, max);
+            }
+
+            #endregion
+
             #region Int16 Next methods
 
             /// <summary>
