@@ -62,8 +62,7 @@ namespace Microsoft.Xna.Framework
             /// <param name="seed">Seed to be used when computing new random numbers</param>
             public Random(ulong seed)
             {
-                this._seed = seed;
-                this._lastValue = seed;
+                this.Seed = seed;
             }
 
             #endregion
