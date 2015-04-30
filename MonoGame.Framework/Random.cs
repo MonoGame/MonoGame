@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework
         {
             #region Static methods
 
+            [ClsCompliant(false)]
             public static ulong GenerateSeed()
             {
                 byte[] guid = new Guid().ToByteArray();
@@ -31,6 +32,7 @@ namespace Microsoft.Xna.Framework
 
             #region Properties
 
+            [ClsCompliant(false)]
             public ulong Seed
             {
                 get
@@ -60,6 +62,7 @@ namespace Microsoft.Xna.Framework
             /// Initializes a new instance of the random number generator using the specified seed
             /// </summary>
             /// <param name="seed">Seed to be used when computing new random numbers</param>
+            [ClsCompliant(false)]
             public Random(ulong seed)
             {
                 this.Seed = seed;
