@@ -120,7 +120,7 @@ namespace MonoGame.Tools.Pipeline
                     start = window._controller.GetFullPath(GetPathFromIter(iters[0]));
 
                 #if LINUX
-                Process.Start("mimeopen", "-n " + start);
+                Process.Start("xdg-open", start);
                 #else
                 Process.Start(start);
                 #endif
@@ -488,16 +488,25 @@ namespace MonoGame.Tools.Pipeline
                 if (ids.Count != 1)
                     return;
 
-                string start = openedProject;
+                if(ids[0] == ID_FILE)
+                {
+                    string start = window._controller.GetFullPath(GetPathFromIter(iters[0]));
 
-                if(ids[0] != ID_BASE)
-                    start = window._controller.GetFullPath(GetPathFromIter(iters[0]));
+                    #if LINUX
+                    Process.Start("xdg-open", start);
+                    #else
+                    Process.Start(start);
+                    #endif
+                }
+                else 
+                {
+                    bool expanded = treeview1.GetRowExpanded(treeview1.Model.GetPath(iters[0]));
 
-                #if LINUX
-                Process.Start("mimeopen", "-n " + start);
-                #else
-                Process.Start(start);
-                #endif
+                    if(!expanded)
+                        treeview1.ExpandRow(treeview1.Model.GetPath(iters[0]), false);
+                    else
+                        treeview1.CollapseRow(treeview1.Model.GetPath(iters[0]));
+                }
             }
 
             if (args.Event.Button == 3) {
@@ -615,8 +624,7 @@ namespace MonoGame.Tools.Pipeline
             } else {
                 menu.ShowAll ();
 
-                treenewitem.Visible = false;
-                treeadditem.Visible = false;
+                treeadd.Visible = false;
                 treeopenfile.Visible = false;
                 treeaddseperator.Visible = false;
                 treeopenfile.Visible = false;

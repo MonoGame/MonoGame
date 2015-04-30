@@ -47,6 +47,9 @@ namespace MonoGame.Tools.Pipeline
 
         object CompareVariables(object a, object b)
         {
+            if (a == null)
+                return a;
+
             if (a.ToString () == "???" || a.Equals(b))
                 return b;
 
