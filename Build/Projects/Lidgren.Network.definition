@@ -28,6 +28,7 @@
   </References>
 
   <Properties>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <CustomDefinitions>
     <!-- 
     Regardless of the crappy name of the define... Lidgren uses UNITY_4_5 to signify 

@@ -14,6 +14,7 @@
   <Properties>
     
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
     <RootNamespace>TwoMGFX</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>

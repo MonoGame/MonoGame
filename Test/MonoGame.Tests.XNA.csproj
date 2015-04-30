@@ -355,6 +355,9 @@
     <Content Include="Assets\ReferenceImages\Shader\Shader__RainbowH__.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\DrawWithLayerDepth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_normal.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
