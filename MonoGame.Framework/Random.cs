@@ -26,7 +26,6 @@ namespace Microsoft.Xna.Framework
             #region Private Fields
 
             private ulong _seed;
-            private ulong _lastValue;
 
             #endregion
 
@@ -42,7 +41,6 @@ namespace Microsoft.Xna.Framework
                 set
                 {
                     this._seed = value;
-                    this._lastValue = value;
                 }
             }
 
@@ -65,12 +63,14 @@ namespace Microsoft.Xna.Framework
             [ClsCompliant(false)]
             public Random(ulong seed)
             {
-                this.Seed = seed;
+                this._seed = seed;
             }
 
             #endregion
 
             #region Public methods
+
+            #region Integer Next methods
 
             #region Int8 Next methods
 
@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework
             /// Returns a non-negative random integer of type Int8 (byte).
             /// </summary>
             /// <returns>Random integer of type Int8 (byte)</returns>
-            public byte Next()
+            public byte NextByte()
             {
                 return UInt64ToInt8(XORShift64Star());
             }
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework
             /// </summary>
             /// <param name="max">Maximum possible value</param>
             /// <returns>Random integer of type Int8 (byte)</returns>
-            public byte Next(byte max)
+            public byte NextByte(byte max)
             {
                 return (byte)Remap(UInt64ToInt8(XORShift64Star()), 0, byte.MaxValue, 0, max);
             }
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework
             /// <param name="min">Minimum possible value</param>
             /// <param name="max">Maximum possible value</param>
             /// <returns>Random integer of type Int8 (byte)</returns>
-            public byte Next(byte min, byte max)
+            public byte NextByte(byte min, byte max)
             {
                 return (byte)Remap(UInt64ToInt16(XORShift64Star()), 0, byte.MaxValue, min, max);
             }
@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework
             /// Returns a non-negative random integer of type Int16 (short).
             /// </summary>
             /// <returns>Random integer of type Int16 (short)</returns>
-            public short Next()
+            public short NextShort()
             {
                 return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, 0, short.MaxValue);
             }
@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework
             /// </summary>
             /// <param name="max">Maximum possible value</param>
             /// <returns>Random integer of type Int16 (short)</returns>
-            public short Next(short max)
+            public short NextShort(short max)
             {
                 return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, 0, max);
             }
@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework
             /// <param name="min">Minimum possible value</param>
             /// <param name="max">Maximum possible value</param>
             /// <returns>Random integer of type Int16 (short)</returns>
-            public short Next(short min, short max)
+            public short NextShort(short min, short max)
             {
                 return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, min, max);
             }
@@ -146,12 +146,44 @@ namespace Microsoft.Xna.Framework
             /// Returns a non-negative random integer of type Int32 (int).
             /// </summary>
             /// <returns>Random integer of type Int32 (int)</returns>
+            public int NextInt()
+            {
+                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, int.MaxValue);
+            }
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int32 (int) that is less than the specified maximum.
+            /// </summary>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random integer of type Int32 (int)</returns>
+            public int NextInt(int max)
+            {
+                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, max);
+            }
+
+            /// <summary>
+            /// Returns a random integer of type Int32 (int) that is within a specified range.
+            /// </summary>
+            /// <param name="min">Minimum possible value</param>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random integer of type Int32 (int)</returns>
+            public int NextInt(int min, int max)
+            {
+                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, min, max);
+            }
+
+            /// <summary>
+            /// Alias for NextInt().
+            /// Returns a non-negative random integer of type Int32 (int).
+            /// </summary>
+            /// <returns>Random integer of type Int32 (int)</returns>
             public int Next()
             {
                 return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, int.MaxValue);
             }
 
             /// <summary>
+            /// Alias for NextInt(int max).
             /// Returns a non-negative random integer of type Int32 (int) that is less than the specified maximum.
             /// </summary>
             /// <param name="max">Maximum possible value</param>
@@ -162,6 +194,7 @@ namespace Microsoft.Xna.Framework
             }
 
             /// <summary>
+            /// Alias for NextInt(int min, int max).
             /// Returns a random integer of type Int32 (int) that is within a specified range.
             /// </summary>
             /// <param name="min">Minimum possible value</param>
@@ -180,7 +213,7 @@ namespace Microsoft.Xna.Framework
             /// Returns a non-negative random integer of type Int64.
             /// </summary>
             /// <returns>Random integer of type Int64</returns>
-            public long Next()
+            public long NextLong()
             {
                 return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, 0, long.MaxValue);
             }
@@ -190,7 +223,7 @@ namespace Microsoft.Xna.Framework
             /// </summary>
             /// <param name="max">Maximum possible value</param>
             /// <returns>Random integer of type Int64</returns>
-            public long Next(long max)
+            public long NextLong(long max)
             {
                 return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, 0, max);
             }
@@ -201,10 +234,84 @@ namespace Microsoft.Xna.Framework
             /// <param name="min">Minimum possible value</param>
             /// <param name="max">Maximum possible value</param>
             /// <returns>Random integer of type Int64</returns>
-            public long Next(long min, long max)
+            public long NextLong(long min, long max)
             {
                 return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, min, max);
             }
+
+            #endregion
+
+            #endregion
+
+            #region Floating Point Next methods
+
+            #region Double Next methods
+
+            /// <summary>
+            /// Returns a non-negative random double-precision floating point number.
+            /// </summary>
+            /// <returns>Random double-precision floating point number</returns>
+            public double NextDouble()
+            {
+                return Remap(UInt64ToDouble(XORShift64Star()), double.MinValue, double.MaxValue, 0, double.MaxValue);
+            }
+
+            /// <summary>
+            /// Returns a non-negative random double-precision floating point number that is less than the specified maximum.
+            /// </summary>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random double-precision floating point number</returns>
+            public double NextDouble(double max)
+            {
+                return Remap(UInt64ToDouble(XORShift64Star()), double.MinValue, double.MaxValue, 0, max);
+            }
+
+            /// <summary>
+            /// Returns a random double-precision floating point number that is within a specified range.
+            /// </summary>
+            /// <param name="min">Minimum possible value</param>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random double-precision floating point number</returns>
+            public double NextDouble(double min, double max)
+            {
+                return Remap(UInt64ToDouble(XORShift64Star()), double.MinValue, double.MaxValue, min, max);
+            }
+
+            #endregion
+
+            #region Float Next methods
+
+            /// <summary>
+            /// Returns a non-negative random single-precision floating point number.
+            /// </summary>
+            /// <returns>Random single-precision floating point number</returns>
+            public float NextFloat()
+            {
+                return (float)NextDouble();
+            }
+
+            /// <summary>
+            /// Returns a non-negative random single-precision floating point number that is less than the specified maximum.
+            /// </summary>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random single-precision floating point number</returns>
+            public float NextFloat(float max)
+            {
+                return (float)NextDouble((double)max);
+            }
+
+            /// <summary>
+            /// Returns a random single-precision floating point number that is within a specified range.
+            /// </summary>
+            /// <param name="min">Minimum possible value</param>
+            /// <param name="max">Maximum possible value</param>
+            /// <returns>Random single-precision floating point number</returns>
+            public float NextFloat(float min, float max)
+            {
+                return (float)NextDouble((double)min, (double)max);
+            }
+
+            #endregion
 
             #endregion
 
@@ -214,13 +321,18 @@ namespace Microsoft.Xna.Framework
 
             private ulong XORShift64Star()
             {
-                _lastValue ^= _lastValue >> 12;
-                _lastValue ^= _lastValue << 25;
-                _lastValue ^= _lastValue >> 27;
-                return unchecked(_lastValue * 2685821657736338717UL);
+                _seed ^= _seed >> 12;
+                _seed ^= _seed << 25;
+                _seed ^= _seed >> 27;
+                return unchecked(_seed * 2685821657736338717UL);
             }
 
             private long Remap(long value, long oldMin, long oldMax, long newMin, long newMax)
+            {
+                return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+            }
+
+            private double Remap(double value, double oldMin, double oldMax, double newMin, double newMax) 
             {
                 return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
             }
