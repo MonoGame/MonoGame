@@ -5,9 +5,8 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// The rendering information from <see cref="GraphicsDevice"/>. 
-    /// Useful for debugging and profiling purposes. 
-    /// Resetted every frame after draw at <see cref="GraphicsDevice.Present"/>.
+    /// A snapshot of rendering statistics from <see cref="GraphicsDevice.GraphicsMetrics"/> to be used for runtime debugging and profiling.
+    /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>. 
     /// </summary>
     public struct GraphicsMetrics
     {
