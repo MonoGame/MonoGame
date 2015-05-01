@@ -75,6 +75,15 @@ namespace Microsoft.Xna.Framework
             #region Int8 Next methods
 
             /// <summary>
+            /// Returns a non-negative random integer of type Int8 (byte).
+            /// </summary>
+            /// <returns>Random integer of type Int8 (byte)</returns>
+            public byte Next()
+            {
+                return UInt64ToInt8(XORShift64Star());
+            }
+
+            /// <summary>
             /// Returns a non-negative random integer of type Int8 (byte) that is less than the specified maximum.
             /// </summary>
             /// <param name="max">Maximum possible value</param>
@@ -98,6 +107,15 @@ namespace Microsoft.Xna.Framework
             #endregion
 
             #region Int16 Next methods
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int16 (short).
+            /// </summary>
+            /// <returns>Random integer of type Int16 (short)</returns>
+            public short Next()
+            {
+                return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, 0, short.MaxValue);
+            }
 
             /// <summary>
             /// Returns a non-negative random integer of type Int16 (short) that is less than the specified maximum.
@@ -157,6 +175,15 @@ namespace Microsoft.Xna.Framework
             #endregion
 
             #region Int64 Next methods
+
+            /// <summary>
+            /// Returns a non-negative random integer of type Int64.
+            /// </summary>
+            /// <returns>Random integer of type Int64</returns>
+            public long Next()
+            {
+                return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, 0, long.MaxValue);
+            }
 
             /// <summary>
             /// Returns a non-negative random integer of type Int64 that is less than the specified maximum.
