@@ -18,7 +18,7 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="iOS\MonoGame.Framework.dll" target="lib\XamariniOS\MonoGame.Framework.dll" />
+        <file src="iOS\iPhoneSimulator\Release\MonoGame.Framework.dll" target="lib\XamariniOS\MonoGame.Framework.dll" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
 </package>
