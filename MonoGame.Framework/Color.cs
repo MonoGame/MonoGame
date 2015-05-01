@@ -203,10 +203,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from color and alpha value(0-255).
+        /// Constructs an RGBA color from a <see cref="Color"/> and an alpha value.
         /// </summary>
         /// <param name="color">A <see cref="Color"/> for RGB values of new <see cref="Color"/> instance.</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="alpha">The alpha component value from 0 to 255.</param>
         public Color(Color color, int alpha)
         {
             _packedValue = 0;
@@ -218,10 +218,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from color and alpha value(0.0-1.0).
+        /// Constructs an RGBA color from color and alpha value.
         /// </summary>
         /// <param name="color">A <see cref="Color"/> for RGB values of new <see cref="Color"/> instance.</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="alpha">Alpha component value from 0.0f to 1.0f.</param>
         public Color(Color color, float alpha)
         {
             _packedValue = 0;
@@ -233,11 +233,11 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0.0-1.0) representing red, green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
         public Color(float r, float g, float b)
         {
             _packedValue = 0;
@@ -249,11 +249,11 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0-255) representing red, green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
         public Color(int r, int g, int b)
         {
             _packedValue = 0;
@@ -264,12 +264,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0-255) representing red, green, blue and alpha values.
+        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        /// <param name="alpha">Alpha component value from 0 to 255.</param>
         public Color(int r, int g, int b, int alpha)
         {
             _packedValue = 0;
@@ -280,12 +280,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars(0.0-1.0) representing red, green, blue and alpha values.
+        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="alpha">Alpha component value from 0.0f to 1.0f.</param>
         public Color(float r, float g, float b, float alpha)
         {
             _packedValue = 0;

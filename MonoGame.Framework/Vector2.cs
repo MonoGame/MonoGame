@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework
         #region Constructors
 
         /// <summary>
-        /// Constructs a 2d vector from the X and Y coordinates.
+        /// Constructs a 2d vector with X and Y from two values.
         /// </summary>
         /// <param name="x">The x coordinate in 2d-space.</param>
         /// <param name="y">The y coordinate in 2d-space.</param>
@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs a 2d vector from a scalar.
+        /// Constructs a 2d vector with X and Y set to the same value.
         /// </summary>
         /// <param name="value">The x and y coordinates in 2d-space.</param>
         public Vector2(float value)
