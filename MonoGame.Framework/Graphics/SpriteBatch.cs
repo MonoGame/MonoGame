@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null) {
-				throw new ArgumentException ("graphicsDevice");
+				throw new ArgumentNullException ("graphicsDevice", "The GraphicsDevice must not be null when creating new resources.");
 			}	
 
 			this.GraphicsDevice = graphicsDevice;
