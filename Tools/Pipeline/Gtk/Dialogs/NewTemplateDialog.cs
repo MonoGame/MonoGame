@@ -22,6 +22,7 @@ namespace MonoGame.Tools.Pipeline
             var iconCell = new CellRendererPixbuf ();
             var textCell = new CellRendererText ();
             var textCell2 = new CellRendererText ();
+            textCell2.Visible = false;
 
             column.PackStart (iconCell, false);
             column.PackStart (textCell, false);
@@ -31,7 +32,7 @@ namespace MonoGame.Tools.Pipeline
 
             column.AddAttribute (iconCell,  "pixbuf", 0);
             column.AddAttribute (textCell, "text", 1);
-            column.AddAttribute (textCell, "text", 2);
+            column.AddAttribute (textCell2, "text", 2);
 
             listStore = new TreeStore (typeof (Gdk.Pixbuf), typeof (string), typeof (string));
             treeview1.Model = listStore;
