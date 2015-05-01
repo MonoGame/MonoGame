@@ -476,6 +476,7 @@
       <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
     </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
+	<Compile Include="Graphics\GraphicsMetrics.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\Model.cs" />
