@@ -77,26 +77,34 @@ namespace Microsoft.Xna.Framework.Graphics
                 stagingDesc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read | SharpDX.Direct3D11.CpuAccessFlags.Write;
                 stagingDesc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
                 stagingDesc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
-                var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc);
-
-                lock (GraphicsDevice._d3dContext)
-                    deviceContext.CopyResource(_buffer, stagingBuffer);
-
-                int TsizeInBytes = SharpDX.Utilities.SizeOf<T>();
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var startBytes = startIndex * TsizeInBytes;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, elementCount * TsizeInBytes);
-
-                lock (GraphicsDevice._d3dContext)
+                using (var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc))
                 {
-                    // Map the staging resource to a CPU accessible memory
-                    var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+                    lock (GraphicsDevice._d3dContext)
+                        deviceContext.CopyResource(_buffer, stagingBuffer);
 
-                    SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer + offsetInBytes, elementCount * TsizeInBytes);
+                    int TsizeInBytes = SharpDX.Utilities.SizeOf<T>();
+                    var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                    try
+                    {
+                        var startBytes = startIndex * TsizeInBytes;
+                        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                        SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, elementCount * TsizeInBytes);
 
-                    // Make sure that we unmap the resource in case of an exception
-                    deviceContext.UnmapSubresource(stagingBuffer, 0);
+                        lock (GraphicsDevice._d3dContext)
+                        {
+                            // Map the staging resource to a CPU accessible memory
+                            var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+
+                            SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer + offsetInBytes, elementCount * TsizeInBytes);
+
+                            // Make sure that we unmap the resource in case of an exception
+                            deviceContext.UnmapSubresource(stagingBuffer, 0);
+                        }
+                    }
+                    finally
+                    {
+                        dataHandle.Free();
+                    }
                 }
             }
         }
@@ -125,25 +133,30 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var elementSizeInBytes = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var startBytes = startIndex * elementSizeInBytes;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                try
+                {
+                    var startBytes = startIndex * elementSizeInBytes;
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-                var box = new SharpDX.DataBox(dataPtr, 1, 0);
+                    var box = new SharpDX.DataBox(dataPtr, 1, 0);
 
-                var region = new SharpDX.Direct3D11.ResourceRegion();
-                region.Top = 0;
-                region.Front = 0;
-                region.Back = 1;
-                region.Bottom = 1;
-                region.Left = offsetInBytes;
-                region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
+                    var region = new SharpDX.Direct3D11.ResourceRegion();
+                    region.Top = 0;
+                    region.Front = 0;
+                    region.Back = 1;
+                    region.Bottom = 1;
+                    region.Left = offsetInBytes;
+                    region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
 
-                // TODO: We need to deal with threaded contexts here!
-                var d3dContext = GraphicsDevice._d3dContext;
-                lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, _buffer, 0, region);
-
-                dataHandle.Free();
+                    // TODO: We need to deal with threaded contexts here!
+                    var d3dContext = GraphicsDevice._d3dContext;
+                    lock (d3dContext)
+                        d3dContext.UpdateSubresource(box, _buffer, 0, region);
+                }
+                finally
+                {
+                    dataHandle.Free();
+                }
             }
         }
 
