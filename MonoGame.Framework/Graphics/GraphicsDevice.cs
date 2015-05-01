@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The rendering information for debugging and profiling. 
         /// </summary>
-        public GraphicsMetrics GraphicsMetrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
+        public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
         {
