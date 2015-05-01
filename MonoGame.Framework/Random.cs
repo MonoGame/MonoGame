@@ -26,6 +26,7 @@ namespace Microsoft.Xna.Framework
             #region Private Fields
 
             private ulong _seed;
+            private ulong _state;
 
             #endregion
 
@@ -41,6 +42,16 @@ namespace Microsoft.Xna.Framework
                 set
                 {
                     this._seed = value;
+                    this._state = value;
+                }
+            }
+
+            [ClsCompliant(false)]
+            public ulong State
+            {
+                get
+                {
+                    return this._state;
                 }
             }
 
@@ -63,7 +74,7 @@ namespace Microsoft.Xna.Framework
             [ClsCompliant(false)]
             public Random(ulong seed)
             {
-                this._seed = seed;
+                this.Seed = seed;
             }
 
             #endregion
@@ -321,10 +332,10 @@ namespace Microsoft.Xna.Framework
 
             private ulong XORShift64Star()
             {
-                _seed ^= _seed >> 12;
-                _seed ^= _seed << 25;
-                _seed ^= _seed >> 27;
-                return unchecked(_seed * 2685821657736338717UL);
+                _state ^= _state >> 12;
+                _state ^= _state << 25;
+                _state ^= _state >> 27;
+                return unchecked(_state * 2685821657736338717UL);
             }
 
             private long Remap(long value, long oldMin, long oldMax, long newMin, long newMax)
