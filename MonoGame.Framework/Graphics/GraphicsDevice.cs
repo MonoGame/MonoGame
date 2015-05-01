@@ -162,7 +162,8 @@ namespace Microsoft.Xna.Framework.Graphics
         internal GraphicsMetrics _graphicsMetrics;
 
         /// <summary>
-        /// The rendering information for debugging and profiling. 
+        /// The rendering information for debugging and profiling.
+        /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>. 
         /// </summary>
         public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 

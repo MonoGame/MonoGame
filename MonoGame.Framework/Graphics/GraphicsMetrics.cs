@@ -6,7 +6,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
     /// A snapshot of rendering statistics from <see cref="GraphicsDevice.Metrics"/> to be used for runtime debugging and profiling.
-    /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>. 
     /// </summary>
     public struct GraphicsMetrics
     {
