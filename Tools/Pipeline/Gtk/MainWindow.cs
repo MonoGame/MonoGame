@@ -151,8 +151,13 @@ namespace MonoGame.Tools.Pipeline
 
         public AskResult AskSaveOrCancel ()
         {
-            var dialog = new YesNoCancelDialog ("Question", "Do you want to save the project first?");
-            dialog.TransientFor = this;
+            var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
+            dialog.Title = "Save or Cancel";
+
+            dialog.AddButton("Close without Saving", (int)ResponseType.No);
+            dialog.AddButton("Cancel", (int)ResponseType.Cancel);
+            dialog.AddButton("Save", (int)ResponseType.Yes);
+
             var result = dialog.Run ();
             dialog.Destroy ();
 
@@ -375,8 +380,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFileDialog(file, exists);
-            afd.TransientFor = this;
+            var afd = new AddFileDialog(this, file, exists);
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -392,8 +396,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFolder(string folder, out CopyAction action)
         {
-            var afd = new AddFolderDialog(folder);
-            afd.TransientFor = this;
+            var afd = new AddFolderDialog(this, folder);
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -482,8 +485,7 @@ namespace MonoGame.Tools.Pipeline
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            var dialog = new NewTemplateDialog(_controller.Templates.GetEnumerator ());
-            dialog.TransientFor = this;
+            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
 
             if (dialog.Run () == (int)ResponseType.Ok) {
 
@@ -533,8 +535,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var ted = new TextEditorDialog("New Folder", "Folder Name:", "", true);
-            ted.TransientFor = this;
+            var ted = new TextEditorDialog(this, "New Folder", "Folder Name:", "", true);
             if (ted.Run() != (int)ResponseType.Ok)
                 return;
             var foldername = ted.text;

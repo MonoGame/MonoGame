@@ -391,8 +391,7 @@ namespace MonoGame.Tools.Pipeline
             else if (ids [0] == ID_FOLDER) 
                 type = FileType.Folder;
 
-            TextEditorDialog dialog = new TextEditorDialog ("Rename", "New Name:", treeview1.Model.GetValue (iter [0], 1).ToString(), true);
-            dialog.TransientFor = window;
+            TextEditorDialog dialog = new TextEditorDialog (window, "Rename", "New Name:", treeview1.Model.GetValue (iter [0], 1).ToString(), true);
 
             if (dialog.Run() == (int)ResponseType.Ok)
             {

@@ -211,13 +211,7 @@
     <Compile Include="Gtk\Dialogs\TextEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\ColorPickerDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Stetic.cs">
@@ -235,13 +229,7 @@
     <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\ColorPickerDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
@@ -256,8 +244,14 @@
     <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="IgeMacIntegration.cs">
+    <Compile Include="Gtk\Global.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\IgeMacIntegration.cs">
       <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Gtk3Integration.cs">
+      <Platforms>Linux</Platforms>
     </Compile>
 
     <!-- The resources for icons and buttons -->
