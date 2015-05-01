@@ -20,10 +20,10 @@ namespace Microsoft.Xna.Framework
     {
         #region Private Fields
 
-        private static Vector2 zeroVector = new Vector2(0f, 0f);
-        private static Vector2 unitVector = new Vector2(1f, 1f);
-        private static Vector2 unitXVector = new Vector2(1f, 0f);
-        private static Vector2 unitYVector = new Vector2(0f, 1f);
+        private static readonly Vector2 zeroVector = new Vector2(0f, 0f);
+        private static readonly Vector2 unitVector = new Vector2(1f, 1f);
+        private static readonly Vector2 unitXVector = new Vector2(1f, 0f);
+        private static readonly Vector2 unitYVector = new Vector2(0f, 1f);
 
         #endregion
 
@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework
         #region Constructors
 
         /// <summary>
-        /// Creates a new instance of <see cref="Vector2"/> struct, with the specified position.
+        /// Constructs a 2d vector with X and Y from two values.
         /// </summary>
         /// <param name="x">The x coordinate in 2d-space.</param>
         /// <param name="y">The y coordinate in 2d-space.</param>
@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="Vector2"/> struct, with the specified position.
+        /// Constructs a 2d vector with X and Y set to the same value.
         /// </summary>
         /// <param name="value">The x and y coordinates in 2d-space.</param>
         public Vector2(float value)
