@@ -19,6 +19,7 @@
     </metadata>
     <files>
         <file src="WindowsPhone\ARM\Release\MonoGame.Framework.dll" target="build\wp8\ARM\MonoGame.Framework.dll" />
+        <file src="WindowsPhone\ARM\Release\MonoGame.Framework.xml" target="build\wp8\ARM\MonoGame.Framework.xml" />
         <file src="WindowsPhone\ARM\Release\SharpDX.Direct3D11.dll" target="build\wp8\ARM\SharpDX.Direct3D11.dll" />
         <file src="WindowsPhone\ARM\Release\SharpDX.dll" target="build\wp8\ARM\SharpDX.dll" />
         <file src="WindowsPhone\ARM\Release\SharpDX.DXGI.dll" target="build\wp8\ARM\SharpDX.DXGI.dll" />
@@ -28,6 +29,7 @@
         <file src="WindowsPhone\ARM\Release\SharpDX.XAudio2.dll" target="build\wp8\ARM\SharpDX.XAudio2.dll" />
         <file src="WindowsPhone\ARM\Release\SharpDX.xml" target="build\wp8\ARM\SharpDX.xml" />
         <file src="WindowsPhone\x86\Release\MonoGame.Framework.dll" target="build\wp8\x86\MonoGame.Framework.dll" />
+        <file src="WindowsPhone\x86\Release\MonoGame.Framework.xml" target="build\wp8\x86\MonoGame.Framework.xml" />
         <file src="WindowsPhone\x86\Release\SharpDX.Direct3D11.dll" target="build\wp8\x86\SharpDX.Direct3D11.dll" />
         <file src="WindowsPhone\x86\Release\SharpDX.dll" target="build\wp8\x86\SharpDX.dll" />
         <file src="WindowsPhone\x86\Release\SharpDX.DXGI.dll" target="build\wp8\x86\SharpDX.DXGI.dll" />
