@@ -1,6 +1,4 @@
-﻿#define DIRECTX // comment this line for compiling to OpenGL platforms
-
-Texture2D SpriteTexture;
+﻿Texture2D SpriteTexture;
 
 sampler2D SpriteTextureSampler = sampler_state
 {
@@ -9,7 +7,7 @@ sampler2D SpriteTextureSampler = sampler_state
 
 struct VertexShaderOutput
 {
-#ifdef DIRECTX
+#ifndef OPENGL
 	float4 Position : SV_POSITION;
 #else
 	float4 Position : POSITION;
@@ -27,7 +25,7 @@ technique SpriteDrawing
 {
 	pass P0
 	{
-#ifdef DIRECTX
+#ifndef OPENGL
 		PixelShader = compile ps_4_0 MainPS();
 #else
 		PixelShader = compile ps_3_0 MainPS();

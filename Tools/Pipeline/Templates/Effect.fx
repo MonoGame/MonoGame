@@ -1,11 +1,8 @@
-﻿
-#define DIRECTX // comment this line for compiling to OpenGL platforms
-
-matrix WorldViewProjection;
+﻿matrix WorldViewProjection;
 
 struct VertexShaderInput
 {
-#ifdef DIRECTX
+#ifndef OPENGL
 	float4 Position : SV_POSITION;
 #else
 	float4 Position : POSITION;
@@ -15,7 +12,7 @@ struct VertexShaderInput
 
 struct VertexShaderOutput
 {
-#ifdef DIRECTX
+#ifndef OPENGL
 	float4 Position : SV_POSITION;
 #else
 	float4 Position : POSITION;
@@ -42,7 +39,7 @@ technique BasicColorDrawing
 {
 	pass P0
 	{
-#ifdef DIRECTX
+#ifndef OPENGL
 		VertexShader = compile vs_4_0 MainVS();
 		PixelShader = compile ps_4_0 MainPS();
 #else
