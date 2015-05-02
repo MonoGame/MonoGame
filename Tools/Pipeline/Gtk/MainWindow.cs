@@ -152,7 +152,7 @@ namespace MonoGame.Tools.Pipeline
         public AskResult AskSaveOrCancel ()
         {
             var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
-            dialog.Title = "Save or Cancel";
+            dialog.Title = "Save";
 
             dialog.AddButton("Close without Saving", (int)ResponseType.No);
             dialog.AddButton("Cancel", (int)ResponseType.Cancel);
