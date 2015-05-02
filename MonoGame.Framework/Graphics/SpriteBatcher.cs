@@ -225,6 +225,13 @@ namespace Microsoft.Xna.Framework.Graphics
             // Determine how many iterations through the drawing code we need to make
             int batchIndex = 0;
             int batchCount = _batchItemList.Count;
+
+            
+            unchecked
+            {
+                _device._graphicsMetrics._spriteCount += (ulong)batchCount;
+            }
+
             // Iterate through the batches, doing short.MaxValue sets of vertices only.
             while(batchCount > 0)
             {
