@@ -97,10 +97,6 @@
       <Platforms>Windows</Platforms>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Windows\AssemblyReferenceEditing.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Windows\PipelineProjectProxy.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -116,6 +112,13 @@
 	<Compile Include="Windows\AboutDialog.Designer.cs">
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Windows\ReferenceDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\ReferenceDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </Compile>
 	<Compile Include="Windows\AddFileDialog.cs">
       <Platforms>Windows</Platforms>
@@ -163,6 +166,10 @@
 	 <EmbeddedResource Include="Windows\AboutDialog.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="Windows\ReferenceDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
