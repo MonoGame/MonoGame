@@ -1,5 +1,5 @@
-﻿DirectX Effect
+﻿Sprite Effect
 Effect.png
 EffectImporter
 EffectProcessor
-DXEffect.fx
+SpriteEffect.fx

@@ -336,16 +336,16 @@
 	<None Include="Templates\Effect.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-	<None Include="Templates\DXEffect.fx">
+	<None Include="Templates\Effect.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-	<None Include="Templates\GLEffect.fx">
+	<None Include="Templates\Effect.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Templates\DXEffect.template">
+	<None Include="Templates\SpriteEffect.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-	<None Include="Templates\GLEffect.template">
+	<None Include="Templates\SpriteEffect.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Templates\Xml.png">
