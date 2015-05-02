@@ -333,6 +333,21 @@
     </None>
 
     <!-- Copy the template resources to the output -->
+	<None Include="Templates\Effect.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Templates\Xml.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
