@@ -20,6 +20,7 @@
     </metadata>
     <files>
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
         <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\net40\Tao.Sdl.dll" />
         <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />

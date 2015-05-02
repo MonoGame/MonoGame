@@ -19,6 +19,7 @@
     </metadata>
     <files>
         <file src="Linux\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="Linux\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
         <file src="Linux\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
         <file src="Linux\AnyCPU\Release\OpenTK.dll.config" target="content\net40\OpenTK.dll.config" />
         <file src="Linux\AnyCPU\Release\Tao.Sdl.dll" target="lib\net40\Tao.Sdl.dll" />
