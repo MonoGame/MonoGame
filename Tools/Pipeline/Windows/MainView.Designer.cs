@@ -90,6 +90,8 @@ namespace MonoGame.Tools.Pipeline
             this._treeRebuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this._treeDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -297,6 +299,7 @@ namespace MonoGame.Tools.Pipeline
             this.toolStripSeparator2,
             this._addMenuItem,
             this.toolStripSeparator1,
+            this.renameToolStripMenuItem,
             this._deleteMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
@@ -481,9 +484,10 @@ namespace MonoGame.Tools.Pipeline
             this._treeOpenFileLocationMenuItem,
             this._treeRebuildMenuItem,
             this.toolStripSeparator4,
+            this.renameToolStripMenuItem1,
             this._treeDeleteMenuItem});
             this._treeContextMenu.Name = "itemContextMenu";
-            this._treeContextMenu.Size = new System.Drawing.Size(174, 126);
+            this._treeContextMenu.Size = new System.Drawing.Size(174, 170);
             this._treeContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.MainMenuMenuActivate);
             // 
             // _treeOpenFileMenuItem
@@ -570,6 +574,20 @@ namespace MonoGame.Tools.Pipeline
             this._treeDeleteMenuItem.Text = "&Delete";
             this._treeDeleteMenuItem.Click += new System.EventHandler(this.OnDeleteItemClick);
             // 
+            // renameToolStripMenuItem
+            // 
+            this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
+            this.renameToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.renameToolStripMenuItem.Text = "Rename";
+            this.renameToolStripMenuItem.Click += new System.EventHandler(this.OnRenameItemClick);
+            // 
+            // renameToolStripMenuItem1
+            // 
+            this.renameToolStripMenuItem1.Name = "renameToolStripMenuItem1";
+            this.renameToolStripMenuItem1.Size = new System.Drawing.Size(173, 22);
+            this.renameToolStripMenuItem1.Text = "Rename";
+            this.renameToolStripMenuItem1.Click += new System.EventHandler(this.OnRenameItemClick);
+            // 
             // MainView
             // 
             this.AllowDrop = true;
@@ -655,6 +673,8 @@ namespace MonoGame.Tools.Pipeline
         private ToolStripSeparator toolStripSeparator7;
         private ToolStripMenuItem toolStripMenuItem5;
         private ToolStripMenuItem toolStripMenuItem6;
+        private ToolStripMenuItem renameToolStripMenuItem;
+        private ToolStripMenuItem renameToolStripMenuItem1;
     }
 }
 
