@@ -1,22 +1,23 @@
 ﻿matrix WorldViewProjection;
 
+#if OPENGL
+#define SV_POSITION POSITION
+#define VS_SHADERMODEL vs_3_0
+#define PS_SHADERMODEL ps_3_0
+#else
+#define VS_SHADERMODEL vs_4_0_level_9_1
+#define PS_SHADERMODEL ps_4_0_level_9_1
+#endif
+
 struct VertexShaderInput
 {
-#ifndef OPENGL
 	float4 Position : SV_POSITION;
-#else
-	float4 Position : POSITION;
-#endif
 	float4 Color : COLOR0;
 };
 
 struct VertexShaderOutput
 {
-#ifndef OPENGL
 	float4 Position : SV_POSITION;
-#else
-	float4 Position : POSITION;
-#endif
 	float4 Color : COLOR0;
 };
 
@@ -39,12 +40,7 @@ technique BasicColorDrawing
 {
 	pass P0
 	{
-#ifndef OPENGL
-		VertexShader = compile vs_4_0 MainVS();
-		PixelShader = compile ps_4_0 MainPS();
-#else
-		VertexShader = compile vs_3_0 MainVS();
-		PixelShader = compile ps_3_0 MainPS();
-#endif
+		VertexShader = compile VS_SHADERMODEL MainVS();
+		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
 };

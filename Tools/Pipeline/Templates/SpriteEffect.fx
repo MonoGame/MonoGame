@@ -1,5 +1,14 @@
 ﻿Texture2D SpriteTexture;
 
+#if OPENGL
+	#define SV_POSITION POSITION
+	#define VS_SHADERMODEL vs_3_0
+	#define PS_SHADERMODEL ps_3_0
+#else
+	#define VS_SHADERMODEL vs_4_0_level_9_1
+	#define PS_SHADERMODEL ps_4_0_level_9_1
+#endif
+
 sampler2D SpriteTextureSampler = sampler_state
 {
 	Texture = <SpriteTexture>;
@@ -7,11 +16,7 @@ sampler2D SpriteTextureSampler = sampler_state
 
 struct VertexShaderOutput
 {
-#ifndef OPENGL
 	float4 Position : SV_POSITION;
-#else
-	float4 Position : POSITION;
-#endif
 	float4 Color : COLOR0;
 	float2 TextureCoordinates : TEXCOORD0;
 };
@@ -25,10 +30,6 @@ technique SpriteDrawing
 {
 	pass P0
 	{
-#ifndef OPENGL
-		PixelShader = compile ps_4_0 MainPS();
-#else
-		PixelShader = compile ps_3_0 MainPS();
-#endif
+		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
 };
