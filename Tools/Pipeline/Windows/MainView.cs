@@ -21,7 +21,7 @@ namespace MonoGame.Tools.Pipeline
         // Is used when PipelineTool is launched to open a project, provided by the command line.
         public string OpenProjectPath;
 
-        private IController _controller;
+        public static IController _controller;
         private ContentIcons _treeIcons;
 
         private bool _treeUpdating;
