@@ -338,17 +338,29 @@ namespace MonoGame.Tools.Pipeline
         {
             Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
 
-            _treeView.Nodes.Clear();
             _propertyGrid.SelectedObject = null;
+
+            if(item == null)
+            {
+                _treeView.Nodes.Clear();
+                return;
+            }
 
             var project = item as PipelineProject;
             if (project == null)
                 return;
 
-            var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
+            TreeNode root;
+
+            if (_treeView.Nodes.Count == 0)
+                root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
+            else
+                root = _treeView.Nodes[0];
+
             root.Tag = new PipelineProjectProxy(project);
             root.SelectedImageIndex = ContentIcons.ProjectIcon;
             root.ImageIndex = ContentIcons.ProjectIcon;
+            root.Text = item.Name;
 
             _propertyGrid.SelectedObject = root.Tag;
         }
@@ -844,6 +856,29 @@ namespace MonoGame.Tools.Pipeline
         private void OnUndoClick(object sender, EventArgs e)
         {
             _controller.Undo();
+        }
+
+        private void OnRenameItemClick(object sender, EventArgs e)
+        {
+            FileType type = FileType.Base;
+
+            var item = (_treeView.SelectedNode.Tag as IProjectItem);
+            string path = item.OriginalPath;
+
+            if (_treeView.SelectedNode.Tag is ContentItem)
+                type = FileType.File;
+            else if (_treeView.SelectedNode.Tag is FolderItem)
+                type = FileType.Folder;
+            else
+                path = item.Name;
+
+            TextEditDialog dialog = new TextEditDialog("Rename", "New Name:", _treeView.SelectedNode.Text);
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.text;
+                _controller.Move(path, newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath, type);
+            }
         }
 
         private void ContextMenu_OpenFile_Click(object sender, EventArgs e)
