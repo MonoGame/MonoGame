@@ -12,11 +12,10 @@ namespace MonoGame.Tools.Pipeline
         List<ContentItemTemplate> items;
         TreeStore listStore;
 
-        public NewTemplateDialog (IEnumerator<ContentItemTemplate> enums)
+        public NewTemplateDialog (Window parrent, IEnumerator<ContentItemTemplate> enums) : base("New Item", parrent, DialogFlags.Modal)
         {
             Build();
 
-            Title = "New Item";
             var column = new TreeViewColumn ();
 
             var iconCell = new CellRendererPixbuf ();

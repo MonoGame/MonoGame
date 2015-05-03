@@ -11,7 +11,7 @@ namespace MonoGame.Tools.Pipeline
 
         public string text = "";
 
-        public CollectionEditorDialog (string text, Window window)
+        public CollectionEditorDialog (Window window, string text) : base(Mono.Unix.Catalog.GetString ("Reference Editor"), window, DialogFlags.Modal)
         {
             Build();
 
