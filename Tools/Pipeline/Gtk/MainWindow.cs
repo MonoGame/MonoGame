@@ -268,12 +268,12 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddTreeItem (IProjectItem item)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand);
+            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand, _controller.GetFullPath(item.OriginalPath));
         }
 
         public void AddTreeFolder (string folder)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand);
+            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand, _controller.GetFullPath(folder));
         }
 
         public void RemoveTreeItem (ContentItem contentItem)
@@ -415,7 +415,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ItemExistanceChanged(IProjectItem item)
         {
-            projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
+            projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists, _controller.GetFullPath(item.OriginalPath));
         }
 
         public Process CreateProcess(string exe, string commands)
