@@ -4,10 +4,10 @@
 
 using System;
 using System.IO;
-using MonoTouch.Foundation;
-using MonoTouch.AVFoundation;
-using MonoTouch.MediaPlayer;
-using MonoTouch.CoreMedia;
+using Foundation;
+using AVFoundation;
+using MediaPlayer;
+using CoreMedia;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -23,6 +23,12 @@ namespace Microsoft.Xna.Framework.Media
         private AVPlayer _player;
         private NSUrl assetUrl;
         private NSObject playToEndObserver;
+
+        [CLSCompliant(false)]
+        public NSUrl AssetUrl
+        {
+            get { return this.assetUrl; }
+        }
 
         internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, MPMediaItem mediaItem, NSUrl assetUrl)
         {
@@ -45,12 +51,6 @@ namespace Microsoft.Xna.Framework.Media
             _sound = AVPlayerItem.FromUrl(url);
             _player = AVPlayer.FromPlayerItem(_sound);
             playToEndObserver = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(OnFinishedPlaying);
-        }
-
-        [CLSCompliant(false)]
-        public Song(NSUrl url)
-        {
-            PlatformInitialize(url);
         }
 
         private void PlatformDispose(bool disposing)
@@ -187,10 +187,6 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (this.mediaItem != null)
                 return this.duration;
-
-            if (_sound != null)
-                return TimeSpan.FromSeconds(_sound.Asset.Duration.Seconds);
-
 
             return _duration;
         }

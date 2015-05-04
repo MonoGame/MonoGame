@@ -13,5 +13,8 @@
 
         [Utilities.CommandLineParser.Name("DEBUG")]
         public bool Debug;
+
+        [Utilities.CommandLineParser.Name("Defines", "\t - Semicolon-delimited define assignments")]
+        public string Defines;
     }
 }

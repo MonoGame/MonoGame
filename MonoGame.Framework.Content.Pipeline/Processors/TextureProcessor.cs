@@ -13,6 +13,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     {
         public TextureProcessor()
         {
+            ColorKeyColor = new Color(255, 0, 255, 255);
+            ColorKeyEnabled = true;
             PremultiplyAlpha = true;
         }
 
@@ -93,6 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
+			
 			try 
 			{
 			    if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
@@ -113,7 +116,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				TextureFormat = TextureProcessorOutputFormat.Color;
 			}
 
-            if (GenerateMipmaps)
+            // Generate mipmaps for the non-compressed textures.
+            if (GenerateMipmaps && TextureFormat == TextureProcessorOutputFormat.Color)
             {
                 context.Logger.LogMessage("Generating mipmaps.");
                 input.GenerateMipmaps(false);

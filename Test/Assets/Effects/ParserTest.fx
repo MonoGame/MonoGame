@@ -9,6 +9,19 @@ uniform float2 TestFloat2;
 uniform float3 TestFloat3;
 uniform float4 TestFloat4;
 
+sampler2D TestSampler2D = sampler_state
+{
+    MipFilter = Linear;
+    MagFilter = Linear;
+    MipFilter = None;
+    BorderColor = 0xFF00FF;
+};
+
+sampler2D TestSampler2D_2 = sampler_state
+{
+    BorderColor = 0xFF00FFFF;
+};
+
 float4 VS_Main(float4 position : POSITION0) : SV_Position0
 {
 	return float4(1, 2, 3, 4);

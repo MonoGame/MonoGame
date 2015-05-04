@@ -1,53 +1,14 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Lz4;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Path = System.IO.Path;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using Microsoft.Xna.Framework.Utilities;
+using Microsoft.Xna.Framework.Graphics;
 
 #if !WINRT
 using Microsoft.Xna.Framework.Audio;
@@ -100,7 +61,7 @@ namespace Microsoft.Xna.Framework.Content
                 for (int i = ContentManagers.Count - 1; i >= 0; --i)
                 {
                     var contentRef = ContentManagers[i];
-                    if (Object.ReferenceEquals(contentRef.Target, contentManager))
+                    if (ReferenceEquals(contentRef.Target, contentManager))
                         contains = true;
                     if (!contentRef.IsAlive)
                         ContentManagers.RemoveAt(i);
@@ -119,7 +80,7 @@ namespace Microsoft.Xna.Framework.Content
                 for (int i = ContentManagers.Count - 1; i >= 0; --i)
                 {
                     var contentRef = ContentManagers[i];
-                    if (!contentRef.IsAlive || Object.ReferenceEquals(contentRef.Target, contentManager))
+                    if (!contentRef.IsAlive || ReferenceEquals(contentRef.Target, contentManager))
                         ContentManagers.RemoveAt(i);
                 }
             }
@@ -253,9 +214,17 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
-                stream = TitleContainer.OpenStream(assetPath);
+                var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
 
+                // This is primarily for editor support. 
+                // Setting the RootDirectory to an absolute path is useful in editor
+                // situations, but TitleContainer can ONLY be passed relative paths.                
+#if LINUX || MONOMAC || WINDOWS
+                if (Path.IsPathRooted(assetPath))                
+                    stream = File.OpenRead(assetPath);                
+                else
+#endif                
+                stream = TitleContainer.OpenStream(assetPath);
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
                 // in load times on Android due to slow Android asset streams.
@@ -577,7 +546,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (asset.Key == null)
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
                 var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
 #else
                 var methodInfo = typeof(ContentManager).GetMethod("ReloadAsset", BindingFlags.NonPublic | BindingFlags.Instance);

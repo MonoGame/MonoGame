@@ -12,7 +12,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.ES20;
 #elif OPENGL
 using OpenTK.Graphics.OpenGL;
-#elif WINDOWS_STOREAPP
+#elif WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -35,8 +35,13 @@ namespace Microsoft.Xna.Framework
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
         bool disposed;
+        private bool _hardwareModeSwitch = true;
 
-#if !WINRT
+#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+        private bool _firstLaunch = true;
+#endif
+
+#if !WINRT || WINDOWS_UAP
         private bool _wantFullScreen = false;
 #endif
         public static readonly int DefaultBackBufferHeight = 480;
@@ -186,7 +191,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
             // Display orientation is always portrait on WP8
             _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
-#elif WINDOWS_STOREAPP
+#elif WINDOWS_STOREAPP || WINDOWS_UAP
 
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -195,12 +200,18 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
             
             // TODO: We probably should be resetting the whole device
             // if this changes as we are targeting a different 
             // hardware feature level.
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
+
+#if WINDOWS_UAP
+			_graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
+			_graphicsDevice.PresentationParameters.SwapChainPanel = this.SwapChainPanel;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
+#else
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
 
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
@@ -214,10 +225,14 @@ namespace Microsoft.Xna.Framework
                 _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
                 _graphicsDevice.PresentationParameters.SwapChainBackgroundPanel = null;
             }
-
-            // Update the back buffer.
-            _graphicsDevice.CreateSizeDependentResources();
+#endif
+			// Update the back buffer.
+			_graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
+
+#if WINDOWS_UAP
+            ((UAPGameWindow)_game.Window).SetClientSize(_preferredBackBufferWidth, _preferredBackBufferHeight);
+#endif
 
 #elif WINDOWS && DIRECTX
 
@@ -226,7 +241,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -286,6 +301,22 @@ namespace Microsoft.Xna.Framework
             //
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+
+#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+
+            if (!_firstLaunch)
+            {
+                if (IsFullScreen)
+                {
+                    _game.Platform.EnterFullScreen();
+                }
+                else
+                {
+                   _game.Platform.ExitFullScreen();
+                }
+            }
+            _firstLaunch = false;
+#endif
         }
 
         private void Initialize()
@@ -300,11 +331,14 @@ namespace Microsoft.Xna.Framework
             presentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-
             presentationParameters.IsFullScreen = false;
-#if WINDOWS_PHONE
 
-#elif WINRT
+#if WINDOWS_PHONE
+			// Nothing to do!
+#elif WINDOWS_UAP
+			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
+			presentationParameters.SwapChainPanel = this.SwapChainPanel;
+#elif WINDOWS_STORE
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
             if (this.SwapChainBackgroundPanel != null)
@@ -326,7 +360,7 @@ namespace Microsoft.Xna.Framework
 #if MONOMAC
             presentationParameters.IsFullScreen = _wantFullScreen;
 #elif LINUX
-            presentationParameters.IsFullScreen = false;
+            presentationParameters.IsFullScreen = _wantFullScreen;
 #else
             // Set "full screen"  as default
             presentationParameters.IsFullScreen = true;
@@ -368,6 +402,10 @@ namespace Microsoft.Xna.Framework
         public void ToggleFullScreen()
         {
             IsFullScreen = !IsFullScreen;
+
+#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+            ApplyChanges();
+#endif
         }
 
 #if WINDOWS_STOREAPP
@@ -375,7 +413,12 @@ namespace Microsoft.Xna.Framework
         public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif
 
-        public GraphicsProfile GraphicsProfile { get; set; }
+#if WINDOWS_UAP
+        [CLSCompliant(false)]
+        public SwapChainPanel SwapChainPanel { get; set; }
+#endif
+
+		public GraphicsProfile GraphicsProfile { get; set; }
 
         public GraphicsDevice GraphicsDevice
         {
@@ -389,19 +432,24 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if WINRT
+#if WINDOWS_UAP
+                return _wantFullScreen;
+#elif WINRT
                 return true;
 #else
                 if (_graphicsDevice != null)
                     return _graphicsDevice.PresentationParameters.IsFullScreen;
-                else
-                    return _wantFullScreen;
+                return _wantFullScreen;
 #endif
             }
             set
             {
-#if WINRT
+#if WINDOWS_UAP
+                _wantFullScreen = value;
+#elif WINRT
                 // Just ignore this as it is not relevant on Windows 8
+#elif WINDOWS && DIRECTX
+                _wantFullScreen = value;
 #else
                 _wantFullScreen = value;
                 if (_graphicsDevice != null)
@@ -412,8 +460,8 @@ namespace Microsoft.Xna.Framework
 #endif
                 }
 #endif
+                }
             }
-        }
 
 #if ANDROID
         internal void ForceSetFullScreen()
@@ -427,6 +475,21 @@ namespace Microsoft.Xna.Framework
                 Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
         }
 #endif
+
+        /// <summary>
+        /// Gets or sets the boolean which defines how window switches from windowed to fullscreen state.
+        /// "Hard" mode(true) is slow to switch, but more effecient for performance, while "soft" mode(false) is vice versa.
+        /// The default value is <c>true</c>. Can only be changed before graphics device is created (in game's constructor).
+        /// </summary>
+        public bool HardwareModeSwitch
+        {
+            get { return _hardwareModeSwitch;}
+            set
+            {
+                if (_graphicsDevice == null) _hardwareModeSwitch = value;
+                else throw new InvalidOperationException("This property can only be changed before graphics device is created(in game constructor).");
+            }
+        }
 
         public bool PreferMultiSampling
         {

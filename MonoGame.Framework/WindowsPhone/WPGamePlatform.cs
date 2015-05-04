@@ -65,6 +65,7 @@ non-infringement.
 */
 
 extern alias MicrosoftXnaFramework;
+using Microsoft.Xna.Framework.Input.Touch;
 using MsXna_FrameworkDispatcher = MicrosoftXnaFramework::Microsoft.Xna.Framework.FrameworkDispatcher; 
 
 using System;
@@ -78,6 +79,8 @@ namespace MonoGame.Framework.WindowsPhone
     class WindowsPhoneGamePlatform : GamePlatform
     {
         internal static string LaunchParameters;
+
+        internal static readonly TouchQueue TouchQueue = new TouchQueue();
 
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
@@ -174,7 +177,8 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-            MsXna_FrameworkDispatcher.Update(); 
+            MsXna_FrameworkDispatcher.Update();
+            TouchQueue.ProcessQueued();
             return true;
         }
 

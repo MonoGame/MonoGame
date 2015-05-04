@@ -204,7 +204,7 @@ namespace MonoGame.Tests {
 
 		[TestFixture]
 		public class Behaviors : FixtureBase {
-			[Test, RequiresSTA]
+			[Test, RequiresSTA, Ignore]
 			public void Nongraphical_run_succeeds ()
 			{
 				Game.Run ();
@@ -307,6 +307,14 @@ namespace MonoGame.Tests {
 				UpdateCount = 0;
 				DrawCount = 0;
 			}
+
+            protected override void EndRun()
+            {
+                base.EndRun();
+#if XNA
+                AbsorbQuitMessage();
+#endif
+            }
 
 			protected override void Update (GameTime gameTime)
 			{

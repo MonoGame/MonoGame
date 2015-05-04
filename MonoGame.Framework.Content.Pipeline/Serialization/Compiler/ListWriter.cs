@@ -26,6 +26,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             elementWriter = compiler.GetTypeWriter(typeof(T));
         }
 
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return true; }
+        }
+
         /// <summary>
         /// Writes the value to the output.
         /// </summary>

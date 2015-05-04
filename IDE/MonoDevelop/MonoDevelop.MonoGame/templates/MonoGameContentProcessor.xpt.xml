@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Content Processor</_Name>
+		<Icon>monogame-project</Icon>
+		<_Category>MonoGame</_Category>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a basic MonoGame Content Processor which can be used to extend the Pipeline tool.</_Description>
+	</TemplateConfiguration>
+
+	<TemplateFiles>
+		<File name="${Name}.cs" src="Common/Processor1.cs" />
+	</TemplateFiles>
+</Template>
+

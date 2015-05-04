@@ -95,29 +95,16 @@ namespace Microsoft.Xna.Framework.Graphics
             return renderTarget;
         }
 
-        internal void PlatformApplyState(bool applyShaders)
+        internal void PlatformBeginApplyState()
         {
             // TODO: This was on both the OpenGL and PSM path previously - is it necessary?
             Threading.EnsureUIThread();
+        }
 
+        internal void PlatformApplyState(bool applyShaders)
+        {
             if ( _scissorRectangleDirty )
 	            _scissorRectangleDirty = false;
-
-            if (_blendStateDirty)
-            {
-                _blendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
-	        if ( _depthStencilStateDirty )
-            {
-                _depthStencilState.PlatformApplyState(this);
-                _depthStencilStateDirty = false;
-            }
-	        if ( _rasterizerStateDirty )
-            {
-                _rasterizerState.PlatformApplyState(this);
-	            _rasterizerStateDirty = false;
-            }
 
             // If we're not applying shaders then early out now.
             if (!applyShaders)
@@ -138,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
             BindVertexBuffer(true);
-            PlatformApplyState(true);
+            ApplyState(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
         }
 
@@ -158,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException("Not implemented");
         }
 
-        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
             throw new NotImplementedException("Not implemented");
         }

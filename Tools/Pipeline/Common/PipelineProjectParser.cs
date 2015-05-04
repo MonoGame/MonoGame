@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -147,7 +148,8 @@ namespace MonoGame.Tools.Pipeline
         public bool AddContent(string sourceFile, string assetName, bool skipDuplicates)
         {
             // Make sure the source file is relative to the project.
-            var projectDir = ProjectDirectory + "\\";
+            var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
+
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Do we have a duplicate?
@@ -173,7 +175,8 @@ namespace MonoGame.Tools.Pipeline
                 OriginalPath = sourceFile,
                 ImporterName = Importer,
                 ProcessorName = Processor,
-                ProcessorParams = new OpaqueDataDictionary()
+                ProcessorParams = new OpaqueDataDictionary(),
+                Exists = File.Exists(projectDir + sourceFile)
             };
             _project.ContentItems.Add(item);
 
@@ -206,7 +209,8 @@ namespace MonoGame.Tools.Pipeline
         public void AddCopy(string sourceFile, string assetName)
         {
             // Make sure the source file is relative to the project.
-            var projectDir = ProjectDirectory + "\\";
+            var projectDir = ProjectDirectory + Path.DirectorySeparatorChar;
+
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Remove duplicates... keep this new one.
@@ -223,7 +227,8 @@ namespace MonoGame.Tools.Pipeline
                 AssetName = assetName,
                 BuildAction = BuildAction.Copy,
                 OriginalPath = sourceFile,
-                ProcessorParams = new OpaqueDataDictionary()
+                ProcessorParams = new OpaqueDataDictionary(),
+                Exists = File.Exists(projectDir + sourceFile)
             };
             _project.ContentItems.Add(item);
 
@@ -369,7 +374,7 @@ namespace MonoGame.Tools.Pipeline
                                 if (value != null)
                                 {
                                     var converter = PipelineTypes.FindConverter(value.GetType());
-                                    var valueStr = converter.ConvertTo(value, typeof(string));
+                                    var valueStr = converter.ConvertTo(null, CultureInfo.InvariantCulture, value, typeof(string));
                                     line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Name, valueStr));
                                     io.WriteLine(line);
                                 }

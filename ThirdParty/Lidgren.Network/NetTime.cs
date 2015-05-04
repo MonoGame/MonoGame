@@ -40,10 +40,12 @@ namespace Lidgren.Network
 		/// </summary>
 		public static double Now { get { return (double)(Stopwatch.GetTimestamp() - s_timeInitialized) * s_dInvFreq; } }
 #else
+		private static readonly uint s_timeInitialized = (uint)Environment.TickCount;
+
 		/// <summary>
 		/// Get number of seconds since the application started
 		/// </summary>
-		public static double Now { get { return (double)Environment.TickCount / 1000.0; } }
+		public static double Now { get { return (double)((uint)Environment.TickCount - s_timeInitialized) / 1000.0; } }
 #endif
 
 		/// <summary>

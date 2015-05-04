@@ -1,9 +1,12 @@
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using System.IO;
+#if DIRECTX
+using System.Collections.Generic;
+using TwoMGFX;
+#endif
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -32,87 +35,58 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
 
-        class ProcessorContext : ContentProcessorContext
+#if DIRECTX
+        [TestCase("Assets/Effects/PreprocessorTest.fx")]
+        public void TestPreprocessor(string effectFile)
         {
-            private TargetPlatform _targetPlatform;
-            private string _outputFilename;
+            var effectCode = File.ReadAllText(effectFile);
+            var fullPath = Path.GetFullPath(effectFile);
 
-            public ProcessorContext(    TargetPlatform targetPlatform,
-                                        string outputFilename)
+            // Preprocess.
+            var mgDependencies = new List<string>();
+            var mgPreprocessed = Preprocessor.Preprocess(effectCode, fullPath, new Dictionary<string, string>
             {
-                _targetPlatform = targetPlatform;
-                _outputFilename = outputFilename;
+                { "TEST2", "1" }
+            }, mgDependencies, new TestEffectCompilerOutput());
+
+            Assert.That(mgDependencies, Has.Count.EqualTo(1));
+            Assert.That(Path.GetFileName(mgDependencies[0]), Is.EqualTo("include.fxh"));
+
+            Assert.That(mgPreprocessed, Is.Not.StringContaining("Foo"));
+            Assert.That(mgPreprocessed, Is.StringContaining("Bar"));
+            Assert.That(mgPreprocessed, Is.Not.StringContaining("Baz"));
+
+            Assert.That(mgPreprocessed, Is.StringContaining("FOO"));
+            Assert.That(mgPreprocessed, Is.Not.StringContaining("BAR"));
+        }
+
+        private class TestEffectCompilerOutput : IEffectCompilerOutput
+        {
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Warning: {0}({1},{2}): {3}", file, line, column, message);
             }
 
-            public override string BuildConfiguration
+            public void WriteError(string file, int line, int column, string message)
             {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override string IntermediateDirectory
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override ContentBuildLogger Logger
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override string OutputDirectory
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override string OutputFilename
-            {
-                get { return _outputFilename; }
-            }
-
-            public override OpaqueDataDictionary Parameters
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override TargetPlatform TargetPlatform 
-            {
-                get { return _targetPlatform; }
-            }
-
-            public override GraphicsProfile TargetProfile
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override void AddDependency(string filename)
-            {
-            }
-
-            public override void AddOutputFile(string filename)
-            {
-            }
-
-            public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override TOutput Convert<TInput, TOutput>(TInput input, string processorName, OpaqueDataDictionary processorParameters)
-            {
-                throw new NotImplementedException();
+                Console.WriteLine("Error: {0}({1},{2}): {3}", file, line, column, message);
             }
         }
+#endif
 
         [Test]
         [TestCase("Assets/Effects/ParserTest.fx")]
         public void TestParser(string effectFile)
         {
             BuildEffect(effectFile, TargetPlatform.Windows);
+        }
+
+        [Test]
+        public void TestDefines()
+        {
+            Assert.DoesNotThrow(() => BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows));
+            Assert.Throws<InvalidContentException>(() =>
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "INVALID_SYNTAX;ANOTHER_MACRO"));
         }
 
         [Test]
@@ -127,7 +101,7 @@ namespace MonoGame.Tests.ContentPipeline
             BuildEffect(effectFile, TargetPlatform.Windows);
         }
 
-        private void BuildEffect(string effectFile, TargetPlatform targetPlatform)
+        private void BuildEffect(string effectFile, TargetPlatform targetPlatform, string defines = null)
         {
             var importerContext = new ImporterContext();
             var importer = new EffectImporter();
@@ -135,8 +109,8 @@ namespace MonoGame.Tests.ContentPipeline
 
             Assert.NotNull(input);
 
-            var processorContext = new ProcessorContext(targetPlatform, Path.ChangeExtension(effectFile, ".xnb"));
-            var processor = new EffectProcessor();
+            var processorContext = new TestProcessorContext(targetPlatform, Path.ChangeExtension(effectFile, ".xnb"));
+            var processor = new EffectProcessor { Defines = defines };
             var output = processor.Process(input, processorContext);
 
             Assert.NotNull(output);

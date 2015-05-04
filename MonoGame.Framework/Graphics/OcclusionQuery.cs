@@ -63,11 +63,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed)
             {
 #if OPENGL
-                GraphicsDevice.AddDisposeAction(() =>
-                    {
-                        GL.DeleteQueries(1, ref glQueryId);
-                        GraphicsExtensions.CheckGLError();
-                    });
+                Threading.BlockOnUIThread(() =>
+                {
+                    GL.DeleteQueries(1, ref glQueryId);
+                    GraphicsExtensions.CheckGLError();
+                });
 #elif DIRECTX
 #endif
             }

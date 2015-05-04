@@ -70,9 +70,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-using MonoTouch.Foundation;
-using MonoTouch.ObjCRuntime;
-using MonoTouch.UIKit;
+using Foundation;
+using ObjCRuntime;
+using UIKit;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework {
 
 				//Get position touch
 				var location = touch.LocationInView (touch.View);
-				var position = GetOffsetPosition (new Vector2 (location.X, location.Y), true);
+				var position = GetOffsetPosition (new Vector2 ((float)location.X, (float)location.Y), true);
 				var id = touch.Handle.ToInt32 ();
 
 				switch (touch.Phase) 
@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework {
 		public Vector2 GetOffsetPosition (Vector2 position, bool useScale)
 		{
 			if (useScale)
-				return position * Layer.ContentsScale;
+				return position * (float)Layer.ContentsScale;
 			return position;
 		}
 

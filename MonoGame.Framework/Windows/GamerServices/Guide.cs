@@ -62,7 +62,7 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.System;
 #if WINDOWS_STOREAPP
-using Microsoft.Xna.Framework.Windows8.GamerServices;
+using Microsoft.Xna.Framework.Input;
 #endif
 #else
 using System.Runtime.Remoting.Messaging;
@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         static Guide()
         {
 #if WINDOWS_STOREAPP
-            _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
+            _dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
 
 
             var licenseInformation = CurrentApp.LicenseInformation;

@@ -57,8 +57,13 @@ namespace Microsoft.Xna.Framework
 
         public bool SynchronizeWithVerticalRetrace { get; set; }
 
-        [CLSCompliant(false)]
+#if WINDOWS_UAP
+		[CLSCompliant(false)]
+		public SwapChainPanel SwapChainPanel { get; set; }
+#else
+		[CLSCompliant(false)]
         public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
+#endif
 
         public event EventHandler<EventArgs> DeviceCreated;
 
@@ -82,7 +87,11 @@ namespace Microsoft.Xna.Framework
             presentationParameters.MultiSampleCount = MultiSampleCount;
             presentationParameters.PresentationInterval = PresentationInterval;
             presentationParameters.IsFullScreen = false;
-            presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
+#if WINDOWS_UAP
+			presentationParameters.SwapChainPanel = this.SwapChainPanel;
+#else
+			presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
+#endif
 
             if (createDevice)
             {

@@ -32,8 +32,11 @@ namespace Microsoft.Xna.Framework.Content
 
             if (!string.IsNullOrEmpty(path))
             {
-                path = FileHelpers.ResolveRelativePath(input.AssetName, path);
-                path = Path.Combine(input.ContentManager.RootDirectoryFullPath, path);
+                // Add the ContentManager's RootDirectory
+                var dirPath = Path.Combine(input.ContentManager.RootDirectoryFullPath, input.AssetName);
+
+                // Resolve the relative path
+                path = FileHelpers.ResolveRelativePath(dirPath, path);
             }
 
             var durationMS = input.ReadObject<int>();

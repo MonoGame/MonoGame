@@ -2,8 +2,8 @@ using System;
 
 using Microsoft.Xna.Framework;
 
-using MonoTouch.CoreMotion;
-using MonoTouch.Foundation;
+using CoreMotion;
+using Foundation;
 
 namespace Microsoft.Devices.Sensors
 {

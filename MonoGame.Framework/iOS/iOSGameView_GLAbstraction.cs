@@ -66,8 +66,8 @@ non-infringement.
 */
 #endregion License
 
+using OpenTK.Graphics.ES20;
 using System;
-
 using All = OpenTK.Graphics.ES20.All;
 using All11 = OpenTK.Graphics.ES11.All;
 using GLES11 = OpenTK.Graphics.ES11.GL;
@@ -124,17 +124,17 @@ namespace Microsoft.Xna.Framework {
 
 			public void GenFramebuffers (int n, ref int framebuffers)
 			{
-				GLES11.Oes.GenFramebuffers (n, ref framebuffers);
+				GLES11.Oes.GenFramebuffers (n, out framebuffers);
 			}
 
 			public void GenRenderbuffers (int n, ref int renderbuffers)
 			{
-				GLES11.Oes.GenRenderbuffers (n, ref renderbuffers);
+				GLES11.Oes.GenRenderbuffers (n, out renderbuffers);
 			}
 
 			public void GetInteger (All name, ref int value)
 			{
-				GLES11.GetInteger ((All11) name, ref value);
+				GLES11.GetInteger ((All11) name, out value);
 			}
 
 			public void Scissor (int x, int y, int width, int height)
@@ -151,17 +151,17 @@ namespace Microsoft.Xna.Framework {
 		private class Gles20Api : IOpenGLApi {
 			public All CheckFramebufferStatus (All target)
 			{
-				return GLES20.CheckFramebufferStatus (target);
+				return (All)GLES20.CheckFramebufferStatus ((FramebufferTarget)target);
 			}
 
 			public void BindFramebuffer (All target, int framebuffer)
 			{
-				GLES20.BindFramebuffer (target, framebuffer);
+                GLES20.BindFramebuffer((FramebufferTarget)target, framebuffer);
 			}
 
 			public void BindRenderbuffer (All target, int renderbuffer)
 			{
-				GLES20.BindRenderbuffer (target, renderbuffer);
+				GLES20.BindRenderbuffer ((RenderbufferTarget)target, renderbuffer);
 			}
 
 			public void DeleteFramebuffers (int n, ref int framebuffers)
@@ -177,22 +177,22 @@ namespace Microsoft.Xna.Framework {
 			public void FramebufferRenderbuffer (
 				All target, All attachment, All renderbuffertarget, int renderbuffer)
 			{
-				GLES20.FramebufferRenderbuffer (target, attachment, renderbuffertarget, renderbuffer);
+				GLES20.FramebufferRenderbuffer ((FramebufferTarget)target, (FramebufferSlot)attachment, (RenderbufferTarget)renderbuffertarget, renderbuffer);
 			}
 
 			public void GenFramebuffers (int n, ref int framebuffers)
 			{
-				GLES20.GenFramebuffers (n, ref framebuffers);
+				GLES20.GenFramebuffers (n, out framebuffers);
 			}
 
 			public void GenRenderbuffers (int n, ref int renderbuffers)
 			{
-				GLES20.GenRenderbuffers (n, ref renderbuffers);
+				GLES20.GenRenderbuffers (n, out renderbuffers);
 			}
 
 			public void GetInteger (All name, ref int value)
 			{
-				GLES20.GetInteger (name, ref value);
+				GLES20.GetInteger ((GetPName)name, out value);
 			}
 
 			public void Scissor (int x, int y, int width, int height)

@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         private readonly Dictionary<string, Action<object>> _resourceFixups;
 
-        private readonly Dictionary<string, Action<Type, string>> _externalReferences;
+        private readonly Dictionary<string, List<Action<Type, string>>> _externalReferences;
 
         public XmlReader Xml { get; private set; }
 
@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Xml = xmlReader;
             _filePath = filePath;
             _resourceFixups = new Dictionary<string, Action<object>>();
-            _externalReferences = new Dictionary<string, Action<Type, string>>();
+            _externalReferences = new Dictionary<string, List<Action<Type, string>>>();
         }
 
         public bool MoveToElement(string elementName)
@@ -114,6 +114,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             var result = typeSerializer.Deserialize(this, format, existingInstance);
 
+            if (isEmpty)
+                Xml.Skip();
+
             if (!isEmpty)
                 Xml.ReadEndElement();
 
@@ -138,6 +141,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 str = Xml.ReadElementContentAsString();
             }
+
+            if (string.IsNullOrEmpty(str))
+                return;
             
             // Do we already have one for this?
             Action<object> prevFixup;
@@ -174,8 +180,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             // Execute the fixups.
             foreach (var fixup in _resourceFixups)
             {
-                var resouce = resources[fixup.Key];
-                fixup.Value(resouce);
+                object resource;
+                if (!resources.TryGetValue(fixup.Key, out resource))
+                    throw new InvalidContentException("Missing shared resource \"" + fixup.Key + "\".");
+                fixup.Value(resource);
             }
         }
 
@@ -193,7 +201,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 existingInstance.Filename = filename;
             };
-            _externalReferences.Add(str, fixup);
+
+            List<Action<Type, string>> fixups;
+            if (!_externalReferences.TryGetValue(str, out fixups))
+                _externalReferences.Add(str, fixups = new List<Action<Type, string>>());
+            fixups.Add(fixup);
         }
 
         internal void ReadExternalReferences()
@@ -207,9 +219,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Xml.ReadStartElement();
             while (MoveToElement("ExternalReference"))
             {
-                Action<Type, string> fixup;
+                List<Action<Type, string>> fixups;
                 var id = Xml.GetAttribute("ID");
-                if (!_externalReferences.TryGetValue(id, out fixup))
+                if (!_externalReferences.TryGetValue(id, out fixups))
                     throw NewInvalidContentException(null, "Unknown external reference id '{0}'!", id);
 
                 Xml.MoveToAttribute("TargetType");
@@ -222,7 +234,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 filename = Path.Combine(currentDir, filename);
 
                 // Apply the fixups.
-                fixup(targetType, filename);
+                foreach (var fixup in fixups)
+                    fixup(targetType, filename);
             }
             Xml.ReadEndElement();
         }

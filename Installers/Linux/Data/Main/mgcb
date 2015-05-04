@@ -1,0 +1,2 @@
+#!/bin/bash
+mono /opt/monogame-pipeline/MGCB.exe "$@"

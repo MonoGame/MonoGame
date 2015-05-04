@@ -67,13 +67,9 @@ non-infringement
 #endregion License
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml.Xsl;
-
-using NDesk.Options;
-
 using NUnit.Core;
 using NUnit.Util;
 
@@ -81,13 +77,13 @@ namespace MonoGame.Tests
 {
 	class CommandLineInterface
 	{
-		public static void RunMain (string [] args)
+		public static int RunMain (string [] args)
 		{
 			var runOptions = RunOptions.Parse (args);
 
 			if (runOptions.ShouldShowHelp) {
 				runOptions.ShowHelp ();
-				return;
+				return 0;
 			}
 
 			CoreExtensions.Host.InitializeService ();
@@ -99,12 +95,13 @@ namespace MonoGame.Tests
 			package.Assemblies.Add (assembly.Location);
 			if (!runner.Load (package)) {
 				Console.WriteLine ("Could not find the tests.");
-				return;
+				return -1;
 			}
 
 			var listener = new CommandLineTestEventListener(runOptions);
 			var filter = new AggregateTestFilter (runOptions.Filters);
-			runner.Run (listener, filter, false, LoggingThreshold.Off);
+			var results = runner.Run (listener, filter, false, LoggingThreshold.Off);
+		    return results.IsFailure ? 1 : 0;
 		}
 
 		private class CommandLineTestEventListener : TestEventListenerBase {

@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="bitmap">Bitmap used for the mipmap chain.</param>
         /// <returns>Resultant mipmap chain.</returns>
-        public static MipmapChain op_Implicit(BitmapContent bitmap)
+        public static implicit operator MipmapChain(BitmapContent bitmap)
         {
             return new MipmapChain(bitmap);
         }
