@@ -198,22 +198,29 @@ namespace MonoGame.Tools.Pipeline
                 _treeView.SelectedNode = node;
             }
 
-            if (node.Tag is ContentItem)
+            if (_treeView.SelectedNodes.Count() == 1)
+            {
+                _treeSeparator1.Visible = true;
+                _treeOpenFileLocationMenuItem.Visible = true;
+                _treeRenameMenuItem.Visible = true;
+
+                if (node.Tag is ContentItem)
+                    _treeAddMenu.Visible = false;
+                else
+                    _treeAddMenu.Visible = true;
+
+                if (node.Tag is FolderItem)
+                    _treeOpenFileMenuItem.Visible = false;
+                else
+                    _treeOpenFileMenuItem.Visible = true;
+            }
+            else
             {
                 _treeAddMenu.Visible = false;
-            }
-            else
-            {
-                _treeAddMenu.Visible = true;
-            }
-
-            if (node.Tag is FolderItem)
-            {
                 _treeOpenFileMenuItem.Visible = false;
-            }
-            else
-            {
-                _treeOpenFileMenuItem.Visible = true;
+                _treeOpenFileLocationMenuItem.Visible = false;
+                _treeRenameMenuItem.Visible = false;
+                _treeSeparator1.Visible = false;
             }
 
             _treeContextMenu.Show(_treeView, contextMenuLocation);
@@ -727,6 +734,7 @@ namespace MonoGame.Tools.Pipeline
             var notBuilding = !_controller.ProjectBuilding;
             var projectOpen = _controller.ProjectOpen;
             var projectOpenAndNotBuilding = projectOpen && notBuilding;
+            var count = _treeView.SelectedNodes.Count();
 
             // Update the state of all menu items.
 
@@ -740,8 +748,9 @@ namespace MonoGame.Tools.Pipeline
 
             _exitMenuItem.Enabled = notBuilding;
 
-            _addMenuItem.Enabled = projectOpen;
-            _deleteMenuItem.Enabled = projectOpen;
+            _addMenuItem.Enabled = projectOpen & count <= 1;
+            _deleteMenuItem.Enabled = projectOpen & count > 0;
+            _renameMenuItem.Enabled = projectOpen & count == 1;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
 
