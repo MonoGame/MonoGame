@@ -123,6 +123,8 @@ namespace MonoGame.Tools.Pipeline
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
             }
+
+            projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -442,6 +444,7 @@ namespace MonoGame.Tools.Pipeline
         protected void OnOpenActionActivated (object sender, EventArgs e)
         {
             _controller.OpenProject();
+            projectview1.ExpandBase();
         }
 
         protected void OnCloseActionActivated (object sender, EventArgs e)
@@ -687,7 +690,11 @@ namespace MonoGame.Tools.Pipeline
 
                 // We need a local to make the delegate work correctly.
                 var localProject = project;
-                recentItem.Activated += (sender, args) => _controller.OpenProject(localProject);
+                recentItem.Activated += delegate
+                {
+                    _controller.OpenProject(localProject);
+                    projectview1.ExpandBase();
+                };
 
                 m.Insert (recentItem, 0);
             }
