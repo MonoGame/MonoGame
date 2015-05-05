@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework
         #region Constructors
 
         /// <summary>
-        /// Creates a new instance of <see cref="BoundingFrustum"/> class.
+        /// Constructs the frustum by extracting the view planes from a matrix.
         /// </summary>
         /// <param name="value">Combined matrix which usually is (View * Projection).</param>
         public BoundingFrustum(Matrix value)

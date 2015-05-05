@@ -21,7 +21,7 @@ namespace MonoGame.Tools.Pipeline
         // Is used when PipelineTool is launched to open a project, provided by the command line.
         public string OpenProjectPath;
 
-        private IController _controller;
+        public static IController _controller;
         private ContentIcons _treeIcons;
 
         private bool _treeUpdating;
@@ -198,22 +198,29 @@ namespace MonoGame.Tools.Pipeline
                 _treeView.SelectedNode = node;
             }
 
-            if (node.Tag is ContentItem)
+            if (_treeView.SelectedNodes.Count() == 1)
+            {
+                _treeSeparator1.Visible = true;
+                _treeOpenFileLocationMenuItem.Visible = true;
+                _treeRenameMenuItem.Visible = true;
+
+                if (node.Tag is ContentItem)
+                    _treeAddMenu.Visible = false;
+                else
+                    _treeAddMenu.Visible = true;
+
+                if (node.Tag is FolderItem)
+                    _treeOpenFileMenuItem.Visible = false;
+                else
+                    _treeOpenFileMenuItem.Visible = true;
+            }
+            else
             {
                 _treeAddMenu.Visible = false;
-            }
-            else
-            {
-                _treeAddMenu.Visible = true;
-            }
-
-            if (node.Tag is FolderItem)
-            {
                 _treeOpenFileMenuItem.Visible = false;
-            }
-            else
-            {
-                _treeOpenFileMenuItem.Visible = true;
+                _treeOpenFileLocationMenuItem.Visible = false;
+                _treeRenameMenuItem.Visible = false;
+                _treeSeparator1.Visible = false;
             }
 
             _treeContextMenu.Show(_treeView, contextMenuLocation);
@@ -338,17 +345,29 @@ namespace MonoGame.Tools.Pipeline
         {
             Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
 
-            _treeView.Nodes.Clear();
             _propertyGrid.SelectedObject = null;
+
+            if(item == null)
+            {
+                _treeView.Nodes.Clear();
+                return;
+            }
 
             var project = item as PipelineProject;
             if (project == null)
                 return;
 
-            var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
+            TreeNode root;
+
+            if (_treeView.Nodes.Count == 0)
+                root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
+            else
+                root = _treeView.Nodes[0];
+
             root.Tag = new PipelineProjectProxy(project);
             root.SelectedImageIndex = ContentIcons.ProjectIcon;
             root.ImageIndex = ContentIcons.ProjectIcon;
+            root.Text = item.Name;
 
             _propertyGrid.SelectedObject = root.Tag;
         }
@@ -715,6 +734,7 @@ namespace MonoGame.Tools.Pipeline
             var notBuilding = !_controller.ProjectBuilding;
             var projectOpen = _controller.ProjectOpen;
             var projectOpenAndNotBuilding = projectOpen && notBuilding;
+            var count = _treeView.SelectedNodes.Count();
 
             // Update the state of all menu items.
 
@@ -728,8 +748,9 @@ namespace MonoGame.Tools.Pipeline
 
             _exitMenuItem.Enabled = notBuilding;
 
-            _addMenuItem.Enabled = projectOpen;
-            _deleteMenuItem.Enabled = projectOpen;
+            _addMenuItem.Enabled = projectOpen & count <= 1;
+            _deleteMenuItem.Enabled = projectOpen & count > 0;
+            _renameMenuItem.Enabled = projectOpen & count == 1;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
 
@@ -844,6 +865,29 @@ namespace MonoGame.Tools.Pipeline
         private void OnUndoClick(object sender, EventArgs e)
         {
             _controller.Undo();
+        }
+
+        private void OnRenameItemClick(object sender, EventArgs e)
+        {
+            FileType type = FileType.Base;
+
+            var item = (_treeView.SelectedNode.Tag as IProjectItem);
+            string path = item.OriginalPath;
+
+            if (_treeView.SelectedNode.Tag is ContentItem)
+                type = FileType.File;
+            else if (_treeView.SelectedNode.Tag is FolderItem)
+                type = FileType.Folder;
+            else
+                path = item.Name;
+
+            TextEditDialog dialog = new TextEditDialog("Rename", "New Name:", _treeView.SelectedNode.Text);
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.text;
+                _controller.Move(path, newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath, type);
+            }
         }
 
         private void ContextMenu_OpenFile_Click(object sender, EventArgs e)

@@ -146,14 +146,13 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-			// UAP has no concept of fullscreen vs windowed!
-            //StatusBar.GetForCurrentView().HideAsync();
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
 		}
 
 		public override void ExitFullScreen()
         {
-			// UAP has no concept of fullscreen vs windowed!
-		}
+            ApplicationView.GetForCurrentView().ExitFullScreenMode();
+        }
 
 		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {

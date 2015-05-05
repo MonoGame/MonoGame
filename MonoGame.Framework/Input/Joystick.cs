@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>The state of the joystick.</returns>
         public static JoystickState GetState(int index)
         {
-            return GetState(index);
+            return PlatformGetState(index);
         }
     }
 }

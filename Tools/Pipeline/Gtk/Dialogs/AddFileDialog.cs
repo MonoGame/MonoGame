@@ -8,7 +8,7 @@ namespace MonoGame.Tools.Pipeline
         public bool applyforall;
         public CopyAction responce;
 
-        public AddFileDialog(string fileloc, bool exists)
+        public AddFileDialog(Window parrent, string fileloc, bool exists) : base(Mono.Unix.Catalog.GetString ("Add File Action"), parrent, DialogFlags.Modal)
         {
             Build();
 

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+chmod +x Data/Main/mgcb
+chmod +x Data/Main/monogame-pipeline
+chmod +x Data/DEBIAN/postinst
+
 mkdir tmp
 
 cp Data/DEBIAN/. tmp/DEBIAN/ -R
