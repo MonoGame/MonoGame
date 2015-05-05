@@ -15,7 +15,7 @@ namespace MonoGame.Tools.Pipeline
 
         public Gdk.Pixbuf ICON_BASE = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.settings.png");
         public Gdk.Pixbuf[] ICON_FOLDER = {
-            new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_closed.png"),
+            IconCache.GetFolderIcon(),
             new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_missing.png")
         };
         public Gdk.Pixbuf[] ICON_FILE = { 
@@ -33,6 +33,7 @@ namespace MonoGame.Tools.Pipeline
         public ProjectView ()
         {
             Build();
+
             basename = "base";
 
             var column = new TreeViewColumn ();
@@ -175,7 +176,7 @@ namespace MonoGame.Tools.Pipeline
             listStore.Clear ();
         }
 
-        public void AddItem(TreeIter iter, string path, bool exists, bool folder, bool expand)
+        public void AddItem(TreeIter iter, string path, bool exists, bool folder, bool expand, string fullpath)
         {
             string id = ID_FILE;
             Gdk.Pixbuf icon = ICON_FILE[Convert.ToInt32(!exists)];
@@ -184,6 +185,8 @@ namespace MonoGame.Tools.Pipeline
                 icon = ICON_FOLDER [Convert.ToInt32 (!exists)];
                 id = ID_FOLDER;
             }
+            else if(exists)
+                icon = IconCache.GetIcon(window._controller.GetFullPath(fullpath));
 
             string[] split = path.Split ('/');
             TreeIter itr;
@@ -201,7 +204,7 @@ namespace MonoGame.Tools.Pipeline
                 for(int i = 2;i < split.Length;i++)
                     newpath += "/" + split[i];
 
-                AddItem (itr, newpath, exists, folder,  expand);
+                AddItem (itr, newpath, exists, folder, expand, fullpath);
             }
         }
 
@@ -253,7 +256,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void RefreshItem(TreeIter iter, string path, bool exists)
+        public void RefreshItem(TreeIter iter, string path, bool exists, string fullpath)
         {
             string[] split = path.Split ('/');
             TreeIter itr;
@@ -267,9 +270,13 @@ namespace MonoGame.Tools.Pipeline
                 for (int i = 2; i < split.Length; i++)
                     newpath += "/" + split [i];
 
-                RefreshItem (itr, newpath, exists);
+                RefreshItem (itr, newpath, exists, fullpath);
             } else {
                 Gdk.Pixbuf icon = ICON_FILE [Convert.ToInt32 (!exists)];
+
+                if (exists)
+                    icon = IconCache.GetIcon(window._controller.GetFullPath(fullpath));
+
                 treeview1.Model.SetValue (itr, 0, icon);
 
                 if (exists) 

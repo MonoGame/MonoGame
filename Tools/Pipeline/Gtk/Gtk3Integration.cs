@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System;
+using GLib;
 using Gtk;
 
 namespace MonoGame.Tools.Pipeline
@@ -7,6 +8,7 @@ namespace MonoGame.Tools.Pipeline
     public class Gtk3Wrapper
     {
         public const string gtklibpath = "libgtk-3.so.0";
+        public const string giolibpath = "libgio-2.0.so.0";
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr gtk_color_chooser_dialog_new (string title, IntPtr parent);
@@ -22,6 +24,12 @@ namespace MonoGame.Tools.Pipeline
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int gtk_get_minor_version ();
+
+        [DllImport (giolibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr g_file_new_for_path (string path);
+
+        [DllImport (giolibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr g_file_query_info (IntPtr gfile, string attributes, int flag, IntPtr cancelable, IntPtr error);
     }
 
     public class ColorChooserDialog : Dialog
