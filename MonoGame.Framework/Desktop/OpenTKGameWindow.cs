@@ -267,6 +267,8 @@ namespace Microsoft.Xna.Framework
             HandleInput();
 
 #if LINUX
+			Threading.Run();
+
             if (_init) {
                 if (pwidth != window.Width || pheight != window.Height || pstate != window.WindowState) {
                     if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
