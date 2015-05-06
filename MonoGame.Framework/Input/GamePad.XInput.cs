@@ -286,10 +286,7 @@ namespace Microsoft.Xna.Framework.Input
 
             // Check for the hardware back button.
             if (Back)
-            {
                 ret |= Buttons.Back;
-                Back = false;
-            }
 
             return new GamePadButtons(ret);
         }
