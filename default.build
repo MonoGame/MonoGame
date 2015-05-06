@@ -57,8 +57,8 @@
   <target name="build_windows" description="Build Windows" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release;Debug" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release;Debug" />
       <exec program="Protobuild" commandline="-generate WindowsGL" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
@@ -186,8 +186,8 @@
 
   <target name="run_tests" description="Run all the tests" depends="build_code">
     <nunit2 if="${os == 'Win32NT'}">
-      <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
-      <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
+      <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Debug" />
+      <test assemblyname="Test\bin\Windows\AnyCPU\Debug\MonoGameTests.exe" />
     </nunit2>
   </target>
 
