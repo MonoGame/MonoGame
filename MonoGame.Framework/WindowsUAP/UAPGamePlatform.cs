@@ -15,6 +15,8 @@ using Windows.ApplicationModel.Activation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml;
+using Windows.UI.Core;
+using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
@@ -93,12 +95,20 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
+            SystemNavigationManager.GetForCurrentView().BackRequested += BackRequested;
+
             Game.PreviousExecutionState = PreviousExecutionState;
         }
 
         public override GameRunBehavior DefaultRunBehavior
         {
             get { return GameRunBehavior.Synchronous; }
+        }
+
+        private static void BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            GamePad.Back = true;
+            e.Handled = true;
         }
 
         public override void RunLoop()
@@ -111,6 +121,7 @@ namespace Microsoft.Xna.Framework
             CompositionTarget.Rendering += (o, a) =>
             {
 				UAPGameWindow.Instance.Tick();
+                GamePad.Back = false;
             };
         }
         
