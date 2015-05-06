@@ -89,6 +89,7 @@ namespace MonoGame.Tools.Pipeline
                     if (svc.ShowDialog(form) == DialogResult.OK)
                     {
                         lines = form.Lines;
+                        MainView._controller.OnProjectModified();
                     }
                 }
             }
