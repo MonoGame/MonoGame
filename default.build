@@ -57,8 +57,10 @@
   <target name="build_windows" description="Build Windows" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release+Debug" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release+Debug" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Debug" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Debug" />
       <exec program="Protobuild" commandline="-generate WindowsGL" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
