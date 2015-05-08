@@ -70,6 +70,7 @@ namespace Microsoft.Xna.Framework
 		//private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle;
         private INativeWindow window;
+        private IEmbedContext _embedContext;
 
         protected Game game;
         private List<Microsoft.Xna.Framework.Input.Keys> keys;
@@ -98,13 +99,26 @@ namespace Microsoft.Xna.Framework
 
         internal INativeWindow Window { get { return window; } }
 
+        internal IEmbedContext EmbedContext { get { return _embedContext; } }
+
         #endregion
 
         #region Public Properties
 
         public override IntPtr Handle { get { return _windowHandle; } }
 
-        public override string ScreenDeviceName { get { return window.Title; } }
+        public override string ScreenDeviceName
+        {
+            get
+            {
+                if (window != null)
+                {
+                    return window.Title; 
+                }
+
+                return string.Empty;
+            }
+        }
 
         public override Rectangle ClientBounds { get { return clientBounds; } }
 
@@ -120,6 +134,11 @@ namespace Microsoft.Xna.Framework
                     return;
                 if (_isBorderless)
                     return;
+                if (window == null)
+                {
+                    return;
+                }
+
                 window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
             }
         }
@@ -149,6 +168,11 @@ namespace Microsoft.Xna.Framework
                     _isBorderless = value;
                 else
                     return;
+                if (window == null)
+                {
+                    return;
+                }
+
                 if (_isBorderless)
                 {
                     window.WindowBorder = WindowBorder.Hidden;
@@ -160,9 +184,9 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        public OpenTKGameWindow(Game game)
+        public OpenTKGameWindow(Game game, IEmbedContext embedContext)
         {
-            Initialize(game);
+            Initialize(game, embedContext);
         }
 
         ~OpenTKGameWindow()
@@ -189,7 +213,7 @@ namespace Microsoft.Xna.Framework
         
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            if (_allowAltF4 && e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
+            if (_allowAltF4 && e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt) && window != null)
             {
                 window.Close();
                 return;
@@ -206,9 +230,23 @@ namespace Microsoft.Xna.Framework
             if (Game == null)
                 return;
 
-            var winWidth = window.ClientRectangle.Width;
-            var winHeight = window.ClientRectangle.Height;
-            var winRect = new Rectangle(0, 0, winWidth, winHeight);
+            int winWidth, winHeight;
+            Rectangle winRect;
+
+            if (window == null)
+            {
+                var rect = _embedContext.GetClientBounds();
+                winWidth = rect.Width;
+                winHeight = rect.Height;
+                updateClientBounds = false;
+            }
+            else
+            {
+                winWidth = window.ClientRectangle.Width;
+                winHeight = window.ClientRectangle.Height;
+            }
+
+            winRect = new Rectangle(0, 0, winWidth, winHeight);
 
             // If window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
@@ -244,7 +282,11 @@ namespace Microsoft.Xna.Framework
 
         internal void ProcessEvents()
         {
-            Window.ProcessEvents();
+            if (Window != null)
+            {
+                Window.ProcessEvents();
+            }
+
             UpdateWindowState();
             HandleInput();
 
@@ -273,6 +315,18 @@ namespace Microsoft.Xna.Framework
 #endif
 
                 updateClientBounds = false;
+
+                if (window == null)
+                {
+                    var context2 = GraphicsContext.CurrentContext;
+                    if (context2 != null)
+                    {
+                        context2.Update(_embedContext.WindowInfo);
+                    }
+
+                    return;
+                }
+
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
                 
@@ -339,42 +393,56 @@ namespace Microsoft.Xna.Framework
         
         #endregion
 
-        private void Initialize(Game game)
+        private void Initialize(Game game, IEmbedContext embedContext)
         {
             Game = game;
 #if LINUX
             _init = false;
 #endif
+            _embedContext = embedContext;
 
             GraphicsContext.ShareContexts = true;
 
-            window = new NativeWindow();
-            window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
-            window.Resize += OnResize;
-            window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+            if (_embedContext == null)
+            {
+                window = new NativeWindow();
+                window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
+                window.Resize += OnResize;
+                window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+                window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
 #if LINUX
-            window.WindowBorder = WindowBorder.Resizable;
+                window.WindowBorder = WindowBorder.Resizable;
 #endif
 #if WINDOWS
-            window.MouseEnter += OnMouseEnter;
-            window.MouseLeave += OnMouseLeave;
+                window.MouseEnter += OnMouseEnter;
+                window.MouseLeave += OnMouseLeave;
 #endif
 
-            window.KeyPress += OnKeyPress;
+                window.KeyPress += OnKeyPress;
+            }
 
             // Set the window icon.
             var assembly = Assembly.GetEntryAssembly();
-            if(assembly != null)
+            if(assembly != null && window != null)
                 window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
             Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             updateClientBounds = false;
-            clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
-                                         window.ClientRectangle.Width, window.ClientRectangle.Height);
-            windowState = window.WindowState;            
+            if (window != null)
+            {
+                clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
+                                             window.ClientRectangle.Width, window.ClientRectangle.Height);
+                windowState = window.WindowState;            
 
-            _windowHandle = window.WindowInfo.Handle;
+                _windowHandle = window.WindowInfo.Handle;
+            }
+            else
+            {
+                _embedContext.OnResize += OnResize;
+
+                clientBounds = _embedContext.GetClientBounds();
+                _windowHandle = _embedContext.WindowInfo.Handle;
+            }
 
             keys = new List<Keys>();
 
@@ -395,7 +463,10 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            window.Title = title;            
+            if (window != null)
+            {
+                window.Title = title;
+            }
         }
 
         internal void ToggleFullScreen()
@@ -455,6 +526,11 @@ namespace Microsoft.Xna.Framework
 
         public void SetMouseVisible(bool visible)
         {
+            if (window == null)
+            {
+                return;
+            }
+
             window.Cursor = visible ? MouseCursor.Default : MouseCursor.Empty;
         }
 
