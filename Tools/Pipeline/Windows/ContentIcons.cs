@@ -54,14 +54,11 @@ namespace MonoGame.Tools.Pipeline
                 try
                 {
                     icon = Util.ExtractAssociatedIcon(fullPath);
-                    Icons.Images.Add(ext, icon);
-                    idx = Icons.Images.IndexOfKey(ext);
-                }
-                catch (ArgumentException aex) 
-                {
-                    //The filePath does not indicate a valid file. 
-                    //-or-
-                    //The filePath indicates a Universal Naming Convention (UNC) path
+                    if (icon != null)
+                    {
+                        Icons.Images.Add(ext, icon);
+                        idx = Icons.Images.IndexOfKey(ext);
+                    }
                 }
                 catch(FileNotFoundException fnfex) 
                 { 

@@ -48,8 +48,12 @@ namespace MonoGame.Tools.Pipeline
             {
                 return Icon.ExtractAssociatedIcon(filePath);
             }
-            catch (ArgumentException ae) // Network URIs throw an ArgumentException. Retry by calling shell32.
+            catch (ArgumentException aex)
             {
+                //The filePath does not indicate a valid file. 
+                //-or-
+                //The filePath indicates a Universal Naming Convention (UNC) path
+
                 HandleRef hInst = new HandleRef(null, IntPtr.Zero);
                 var iconPath = new StringBuilder(filePath);
                 int iIcon = 0;
