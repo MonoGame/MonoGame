@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     break;
 
                 case TargetPlatform.Linux:
+                case TargetPlatform.WindowsGL:
                     targetFormat = ConversionFormat.Vorbis;
                     break;
             }
