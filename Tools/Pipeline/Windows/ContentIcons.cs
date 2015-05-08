@@ -53,7 +53,7 @@ namespace MonoGame.Tools.Pipeline
                 Icon icon =null;
                 try
                 {
-                    icon = Icon.ExtractAssociatedIcon(fullPath);
+                    icon = Util.ExtractAssociatedIcon(fullPath);
                     Icons.Images.Add(ext, icon);
                     idx = Icons.Images.IndexOfKey(ext);
                 }
