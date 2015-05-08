@@ -37,7 +37,7 @@ namespace MonoGame.Tools.Pipeline
             InitializeComponent();
 
             // Set the application icon this form.
-            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Icon = Util.ExtractAssociatedIcon(Application.ExecutablePath);
 
             // Find an appropriate font for console like output.
             var faces = new [] { "Consolas", "Lucida Console", "Courier New" };

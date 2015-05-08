@@ -1,5 +1,10 @@
 ﻿using System;
 using System.IO;
+#if WINDOWS
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Text;
+#endif
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -31,5 +36,35 @@ namespace MonoGame.Tools.Pipeline
 
             return result;
         }
+
+        #if WINDOWS
+
+        [DllImport("shell32.dll", EntryPoint = "ExtractAssociatedIcon", CharSet = CharSet.Auto)]
+        internal static extern IntPtr ExtractAssociatedIcon(HandleRef hInst, StringBuilder lpIconPath, ref int lpiIcon);
+
+        internal static Icon ExtractAssociatedIcon(string filePath)
+        {
+            try 
+            {
+                return Icon.ExtractAssociatedIcon(filePath);
+            }
+            catch (ArgumentException aex)
+            {
+                //The filePath does not indicate a valid file. 
+                //-or-
+                //The filePath indicates a Universal Naming Convention (UNC) path
+
+                HandleRef hInst = new HandleRef(null, IntPtr.Zero);
+                var iconPath = new StringBuilder(filePath);
+                int iIcon = 0;
+                var handle = Util.ExtractAssociatedIcon(hInst, iconPath, ref iIcon);
+                if (handle != IntPtr.Zero)
+                    return Icon.FromHandle(handle);
+            }
+
+            return null;
+        }
+        #endif
+        
     }
 }
