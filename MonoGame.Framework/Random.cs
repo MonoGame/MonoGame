@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework
             #region Double Next methods
 
             /// <summary>
-            /// Returns a non-negative random double-precision floating point number.
+            /// Returns a non-negative random double-precision floating point number in the range of 0 to long.MaxValue.
             /// </summary>
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble()
@@ -293,7 +293,7 @@ namespace Microsoft.Xna.Framework
             #region Float Next methods
 
             /// <summary>
-            /// Returns a non-negative random single-precision floating point number.
+            /// Returns a non-negative random single-precision floating point number in the range of 0 to long.MaxValue.
             /// </summary>
             /// <returns>Random single-precision floating point number</returns>
             public float NextFloat()
