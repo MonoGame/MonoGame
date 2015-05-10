@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
             [ClsCompliant(false)]
             public static ulong GenerateSeed()
             {
-                byte[] guid = new Guid().ToByteArray();
+                byte[] guid = Guid.NewGuid().ToByteArray();
                 return (BitConverter.ToUInt64(guid, 0) ^ BitConverter.ToUInt64(guid, 7));
             }
 
