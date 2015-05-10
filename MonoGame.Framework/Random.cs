@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble()
             {
-                return Remap(UInt64ToDouble(XORShift64Star()), double.MinValue, double.MaxValue, 0, double.MaxValue);
+                return Remap(UInt64ToDouble(XORShift64Star()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, Int64ToDouble(long.MaxValue));
             }
 
             /// <summary>
@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double max)
             {
-                return Remap(UInt64ToDouble(XORShift64Star()), double.MinValue, double.MaxValue, 0, max);
+                return Remap(UInt64ToDouble(XORShift64Star()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, max);
             }
 
             /// <summary>
@@ -285,7 +285,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double min, double max)
             {
-                return Remap(UInt64ToDouble(XORShift64Star()), double.MinValue, double.MaxValue, min, max);
+                return Remap(UInt64ToDouble(XORShift64Star()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), min, max);
             }
 
             #endregion
@@ -393,7 +393,12 @@ namespace Microsoft.Xna.Framework
 
             private double UInt64ToDouble(ulong uint64)
             {
-                return Convert.ToDouble(UInt64ToInt64(uint64));
+                return Int64ToDouble(UInt64ToInt64(uint64));
+            }
+
+            private double Int64ToDouble(long int64)
+            {
+                return Convert.ToDouble(int64);
             }
 
             #endregion
