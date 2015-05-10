@@ -386,11 +386,6 @@ namespace Microsoft.Xna.Framework
 
             #region Floating point values
 
-            private float UInt64ToFloat(ulong uint64)
-            {
-                return (float)UInt64ToDouble(uint64);
-            }
-
             private double UInt64ToDouble(ulong uint64)
             {
                 return Int64ToDouble(UInt64ToInt64(uint64));
