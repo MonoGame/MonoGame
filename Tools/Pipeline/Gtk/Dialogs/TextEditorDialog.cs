@@ -9,14 +9,13 @@ namespace MonoGame.Tools.Pipeline
 
         public string text;
 
-        public TextEditorDialog(string title, string label, string text, bool strictmode)
+        public TextEditorDialog(Window parrent, string title, string label, string text, bool strictmode) : base(title, parrent, DialogFlags.Modal)
         {
             Build();
 
             this.strictmode = strictmode;
             buttonOk.Sensitive = !strictmode;
 
-            Title = title;
             label2.Text = label;
             entry1.Text = text;
         }
