@@ -11,20 +11,13 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        private AudioContext acontext;
-        private OggStreamer oggstreamer;
-
         private OggStream stream;
         private float _volume = 1f;
 
         private void PlatformInitialize(string fileName)
         {
-            acontext = new AudioContext();
-            oggstreamer = new OggStreamer();
-            
-            stream = new OggStream(fileName);
+            stream = new OggStream(fileName, OnFinishedPlaying);
             stream.Prepare();
-            stream.AddOnFinishedAction(OnFinishedPlaying);
 
             _duration = stream.GetLength();
         }

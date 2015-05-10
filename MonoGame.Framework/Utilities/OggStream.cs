@@ -7,6 +7,8 @@ using System.Threading;
 using NVorbis;
 using OpenTK.Audio.OpenAL;
 
+using Microsoft.Xna.Framework.Audio;
+
 namespace MonoGame.Utilities
 {
     internal static class ALHelper
@@ -44,11 +46,13 @@ namespace MonoGame.Utilities
         internal bool Ready { get; private set; }
         internal bool Preparing { get; private set; }
 
+        public Action FinishedAction { get; private set; }
         public int BufferCount { get; private set; }
 
-        public OggStream(string filename, int bufferCount = DefaultBufferCount) : this(File.OpenRead(filename), bufferCount) { }
-        public OggStream(Stream stream, int bufferCount = DefaultBufferCount)
+        public OggStream(string filename, Action finishedAction = null, int bufferCount = DefaultBufferCount) : this(File.OpenRead(filename), finishedAction, bufferCount) { }
+        public OggStream(Stream stream, Action finishedAction = null, int bufferCount = DefaultBufferCount)
         {
+            FinishedAction = finishedAction;
             BufferCount = bufferCount;
 
             alBufferIds = AL.GenBuffers(bufferCount);
@@ -204,11 +208,6 @@ namespace MonoGame.Utilities
 
         public bool IsLooped { get; set; }
 
-        public void AddOnFinishedAction(Action finishedAction)
-        {
-            OggStreamer.Instance.AddOnFinishAction(finishedAction);
-        }
-
         public void Dispose()
         {
             var state = AL.GetSourceState(alSourceId);
@@ -307,8 +306,6 @@ namespace MonoGame.Utilities
 
     public class OggStreamer : IDisposable
     {
-        Action finishedPlaying = null;
-
         const float DefaultUpdateRate = 10;
         const int DefaultBufferSize = 44100;
 
@@ -321,6 +318,7 @@ namespace MonoGame.Utilities
         readonly short[] castBuffer;
 
         readonly HashSet<OggStream> streams = new HashSet<OggStream>();
+        readonly HashSet<Action> streamactions = new HashSet<Action>();
         readonly List<OggStream> threadLocalStreams = new List<OggStream>(); 
 
         readonly Thread underlyingThread;
@@ -363,11 +361,6 @@ namespace MonoGame.Utilities
             castBuffer = new short[bufferSize];
         }
 
-        public void AddOnFinishAction(Action finishedPlaying)
-        {
-            this.finishedPlaying = finishedPlaying;
-        }
-
         public void Dispose()
         {
             lock (singletonMutex)
@@ -387,9 +380,10 @@ namespace MonoGame.Utilities
             lock (iterationMutex)
                 return streams.Add(stream);
         }
+
         internal bool RemoveStream(OggStream stream)
         {
-            lock (iterationMutex) 
+            lock (iterationMutex)
                 return streams.Remove(stream);
         }
 
@@ -459,6 +453,8 @@ namespace MonoGame.Utilities
 
                             if (finished)
                             {
+                                Action a = stream.FinishedAction;
+
                                 if (stream.IsLooped)
                                 {
                                     stream.Close();
@@ -470,15 +466,17 @@ namespace MonoGame.Utilities
                                     i = tempBuffers.Length;
                                 }
 
-                                if (finishedPlaying != null)
-                                    finishedPlaying.Invoke();
+                                if (stream.FinishedAction != null)
+                                    stream.FinishedAction.Invoke();
                             }
                         }
 
-                        AL.SourceQueueBuffers(stream.alSourceId, tempBuffers.Length, tempBuffers);
-                        ALHelper.Check();
-
-                        if (finished && !stream.IsLooped)
+                        if (!finished)
+                        {
+                            AL.SourceQueueBuffers(stream.alSourceId, tempBuffers.Length, tempBuffers);
+                            ALHelper.Check();
+                        }
+                        else if (!stream.IsLooped)
                             continue;
                     }
 
