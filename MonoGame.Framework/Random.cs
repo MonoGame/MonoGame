@@ -8,12 +8,15 @@ namespace Microsoft.Xna.Framework
     public static partial class MathHelper
     {
         /// <summary>
-        /// Class for generating random numbers consistantly when using Mono or Microsoft compilers
+        /// Class for generating random numbers consistantly when using Mono or Microsoft compilers.
         /// </summary>
         public class Random
         {
             #region Static methods
 
+            /// <summary>
+            /// Utility method for generating a seed for the random number generator.
+            /// </summary>
             [ClsCompliant(false)]
             public static ulong GenerateSeed()
             {
@@ -32,6 +35,10 @@ namespace Microsoft.Xna.Framework
 
             #region Properties
 
+            /// <summary>
+            /// Original seed for the random number generator. Assigning to this will 
+            /// reset the RNG to this state as well as assigning the seed.
+            /// </summary>
             [ClsCompliant(false)]
             public ulong Seed
             {
@@ -45,7 +52,12 @@ namespace Microsoft.Xna.Framework
                     this._state = value;
                 }
             }
-
+            
+            /// <summary>
+            /// Read-only variable containing the current state of the random number generator internally.
+            /// This variable can be assigned as the seed of another random number generator to make them
+            /// produce the same output, or can be used to save the state of the RNG.
+            /// </summary>
             [ClsCompliant(false)]
             public ulong State
             {
@@ -60,7 +72,8 @@ namespace Microsoft.Xna.Framework
             #region Constructors
 
             /// <summary>
-            /// Initializes a new instance of the random number generator using a new GUID as a default seed value
+            /// Initializes a new instance of the random number generator using the value of 
+            /// Random.GenerateSeed() as a default seed value.
             /// </summary>
             public Random()
                 : this(GenerateSeed())
