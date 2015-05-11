@@ -172,6 +172,9 @@ namespace MonoGame.Utilities
 
         public TimeSpan GetPosition()
         {
+            if (Reader == null || Reader.DecodedTime == null)
+                return TimeSpan.Zero;
+
             return Reader.DecodedTime;
         }
 
@@ -318,7 +321,6 @@ namespace MonoGame.Utilities
         readonly short[] castBuffer;
 
         readonly HashSet<OggStream> streams = new HashSet<OggStream>();
-        readonly HashSet<Action> streamactions = new HashSet<Action>();
         readonly List<OggStream> threadLocalStreams = new List<OggStream>(); 
 
         readonly Thread underlyingThread;
@@ -453,8 +455,6 @@ namespace MonoGame.Utilities
 
                             if (finished)
                             {
-                                Action a = stream.FinishedAction;
-
                                 if (stream.IsLooped)
                                 {
                                     stream.Close();
