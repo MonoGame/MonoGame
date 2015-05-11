@@ -12,7 +12,8 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
 	public class SpriteBatch : GraphicsResource
 	{
-	    readonly SpriteBatcher _batcher;
+        #region Private Fields
+        readonly SpriteBatcher _batcher;
 
 		SpriteSortMode _sortMode;
 		BlendState _blendState;
@@ -30,13 +31,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
+        #endregion
 
         /// <summary>
-        /// Constructs a <see cref="SpriteBatch"/> instance.
+        /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-		public SpriteBatch (GraphicsDevice graphicsDevice)
+        public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
             {
