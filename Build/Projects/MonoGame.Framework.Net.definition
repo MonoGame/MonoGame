@@ -115,10 +115,10 @@
       <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
-      <Platforms>Android,MacOS,Ouya,Windows,WindowsGL</Platforms>
+      <Platforms>Android,MacOS,Ouya,Windows,WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesDispatcher.cs">
-      <Platforms>MacOS,Windows,WindowsGL</Platforms>
+      <Platforms>MacOS,Windows,WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesComponent.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
@@ -255,15 +255,15 @@
       <Platforms>iOS</Platforms>
     </Compile>
     
-    <!-- Linux Platform -->
-    <Compile Include="Linux\GamerServices\Guide.cs">
-      <Platforms>Linux</Platforms>
+    <!-- DesktopGL Platform -->
+    <Compile Include="DesktopGL\GamerServices\Guide.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="Linux\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>Linux</Platforms>
+    <Compile Include="DesktopGL\GamerServices\MonoGameGamerServicesHelper.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="Linux\GamerServices\SignedInGamer.cs">
-      <Platforms>Linux</Platforms>
+    <Compile Include="DesktopGL\GamerServices\SignedInGamer.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
 
 
@@ -304,13 +304,13 @@
 
     <!-- Windows Desktop Platform -->
     <Compile Include="Windows\GamerServices\Guide.cs">
-      <Platforms>Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>Windows8,Windows,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>Windows,WindowsGL</Platforms>
+      <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Windows\GamerServices\SignedInGamer.cs">
-      <Platforms>Windows,WindowsGL</Platforms>
+      <Platforms>Windows</Platforms>
     </Compile>
 
  

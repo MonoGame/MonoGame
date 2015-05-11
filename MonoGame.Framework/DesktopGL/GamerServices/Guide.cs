@@ -75,25 +75,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          string defaultText,
 		 bool usePasswordMode)
 		{
-			string result = defaultText; 
-
-            //TextFieldAlertView myAlertView = new TextFieldAlertView(usePasswordMode, title, defaultText);
-
-
-            //myAlertView.Title = title;
-            //myAlertView.Message = description;
-
-            //myAlertView.Clicked += delegate(object sender, UIButtonEventArgs e)
-            //        {
-            //            if (e.ButtonIndex == 1)
-            //            {
-            //                    result = ((UIAlertView) sender).Subviews.OfType<UITextField>().Single().Text;
-            //            }
-            //        };
-            //myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
-            //myAlertView.Show();
-
-			return result;
+            throw new NotImplementedException();
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
@@ -116,25 +98,14 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state,
          bool usePasswordMode)
 		{
-			isVisible = true;
-
-			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
-
-			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+            return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
-		{
-			try 
-			{
-				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
+        {
+            ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
-				return ski.EndInvoke(result);
-			} 
-			finally 
-			{
-				isVisible = false;
-			}			
+            return ski.EndInvoke(result);			
 		}
 
 		delegate Nullable<int> ShowMessageBoxDelegate( string title,
@@ -148,12 +119,12 @@ namespace Microsoft.Xna.Framework.GamerServices
          IEnumerable<string> buttons,
          int focusButton,
          MessageBoxIcon icon)
-		{
-			Nullable<int> result = null;
+        {
+            int? result = null;
+            IsVisible = true;
 
-			
-
-			return result;
+            IsVisible = false;
+            return result;
 		}
 
 		public static IAsyncResult BeginShowMessageBox(
@@ -167,11 +138,21 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state
 		)
 		{	
-			isVisible = true;
+            if (IsVisible)
+                throw new Exception("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
 
-			ShowMessageBoxDelegate smb = ShowMessageBox; 
+            if (player != PlayerIndex.One)
+                throw new ArgumentOutOfRangeException("player", "Specified argument was out of the range of valid values.");
+            if (title == null)
+                throw new ArgumentNullException("title", "This string cannot be null or empty, and must be less than 256 characters long.");
+            if (text == null)
+                throw new ArgumentNullException("text", "This string cannot be null or empty, and must be less than 256 characters long.");
+            if (buttons == null)
+                throw new ArgumentNullException("buttons", "Value can not be null.");
 
-			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
+            ShowMessageBoxDelegate smb = ShowMessageBox;
+
+            return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);		
 		}
 
 		public static IAsyncResult BeginShowMessageBox (
@@ -188,17 +169,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 		public static Nullable<int> EndShowMessageBox (IAsyncResult result)
-		{
-			try
-			{
-				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
-
-				return smbd.EndInvoke(result);
-			} 
-			finally 
-			{
-				isVisible = false;
-			}
+        {
+            return ((ShowMessageBoxDelegate)result.AsyncState).EndInvoke(result);
 		}
 
 
@@ -326,11 +298,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{ 
 			get
 			{
-				return isTrialMode;
-			}
-			set
-			{
-				isTrialMode = value;
+                return simulateTrialMode || isTrialMode;
 			}
 		}
 
