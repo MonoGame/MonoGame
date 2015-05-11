@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Text;
 
@@ -28,14 +32,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		Vector2 _texCoordBR = new Vector2 (0,0);
 
         /// <summary>
-        /// Creates a new instance of <see cref="SpriteBatch"/> class.
+        /// Constructs a <see cref="SpriteBatch"/> instance.
         /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
 		public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
-			if (graphicsDevice == null) {
-				throw new ArgumentNullException ("graphicsDevice", "The GraphicsDevice must not be null when creating new resources.");
+			if (graphicsDevice == null)
+            {
+				throw new ArgumentNullException ("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
 			}	
 
 			this.GraphicsDevice = graphicsDevice;
