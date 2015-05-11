@@ -60,13 +60,6 @@ namespace Microsoft.Xna.Framework
         private bool _isBorderless;
         private bool _isMouseInBounds;
 
-#if LINUX
-        private bool _init;
-        WindowState pstate;
-        int pwidth = 0;
-        int pheight = 0;
-#endif
-
 		//private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle;
         private INativeWindow window;
@@ -80,6 +73,7 @@ namespace Microsoft.Xna.Framework
         private Rectangle clientBounds;
         private Rectangle targetBounds;
         private bool updateClientBounds;
+        private int updateborder = 0;
         bool disposed;
 
         #region Internal Properties
@@ -227,51 +221,41 @@ namespace Microsoft.Xna.Framework
             clientBounds = winRect;
 
             OnClientSizeChanged();
-
-#if LINUX
-            if(!_init)
-            {
-                if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
-                    window.WindowBorder = WindowBorder.Fixed;
-
-                pwidth = window.Width;
-                pheight = window.Height;
-                pstate = window.WindowState;
-                _init = true;
-            }
-#endif
         }
 
         internal void ProcessEvents()
         {
+            UpdateBorder();
             Window.ProcessEvents();
             UpdateWindowState();
             HandleInput();
+        }
 
-#if LINUX
-            if (_init) {
-                if (pwidth != window.Width || pheight != window.Height || pstate != window.WindowState) {
-                    if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
-                        window.WindowBorder = WindowBorder.Fixed;
-
-                    pwidth = window.Width;
-                    pheight = window.Height;
-                    pstate = window.WindowState;
-                }
+        private void UpdateBorder()
+        {
+            if (updateborder == 1)
+            {
+                WindowBorder desired;
+                if (_isBorderless)
+                    desired = WindowBorder.Hidden;
+                else
+                    desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+            
+                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                    window.WindowBorder = desired;
             }
-#endif
+
+            if(updateborder > 0)
+                updateborder--;
         }
 
         private void UpdateWindowState()
         {
             // we should wait until window's not fullscreen to resize
+
             if (updateClientBounds)
             {
-#if LINUX
-                if(window.WindowBorder == WindowBorder.Fixed)
-                    window.WindowBorder = WindowBorder.Resizable;
-#endif
-
+                window.WindowBorder = WindowBorder.Resizable;
                 updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
@@ -285,25 +269,14 @@ namespace Microsoft.Xna.Framework
                     windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
-                
-                // fixes issue on linux (and windows?) that AllowUserResizing is not set any more when exiting fullscreen mode
-                WindowBorder desired;
-                if (_isBorderless)
-                    desired = WindowBorder.Hidden;
-                else
-#if LINUX
-                    desired = WindowBorder.Resizable;
-#else
-                    desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
-#endif
-                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
-                    window.WindowBorder = desired;
+
+                // we need to create a small delay between resizing the window
+                // and changing the border to avoid OpenTK Linux bug
+                updateborder = 2;
 
                 var context = GraphicsContext.CurrentContext;
                 if (context != null)
-                {
                     context.Update(window.WindowInfo);
-                }
             }
         }
 
@@ -342,20 +315,15 @@ namespace Microsoft.Xna.Framework
         private void Initialize(Game game)
         {
             Game = game;
-#if LINUX
-            _init = false;
-#endif
 
             GraphicsContext.ShareContexts = true;
 
             window = new NativeWindow();
+            window.WindowBorder = WindowBorder.Resizable;
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
             window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-#if LINUX
-            window.WindowBorder = WindowBorder.Resizable;
-#endif
 #if WINDOWS
             window.MouseEnter += OnMouseEnter;
             window.MouseLeave += OnMouseLeave;
@@ -404,9 +372,6 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
-#if LINUX
-            updateClientBounds = true;
-#endif
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)
