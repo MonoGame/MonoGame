@@ -29,7 +29,7 @@ namespace MonoGame.Utilities
         }
     }
 
-    public class OggStream : IDisposable
+    internal class OggStream : IDisposable
     {
         const int DefaultBufferCount = 3;
 
@@ -307,7 +307,7 @@ namespace MonoGame.Utilities
         }
     }
 
-    public class OggStreamer : IDisposable
+    internal class OggStreamer : IDisposable
     {
         const float DefaultUpdateRate = 10;
         const int DefaultBufferSize = 44100;
