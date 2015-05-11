@@ -204,6 +204,7 @@
     <Compile Include="GameComponent.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
     <Compile Include="GameTimer.cs">
