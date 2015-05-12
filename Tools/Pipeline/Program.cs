@@ -40,6 +40,7 @@ namespace MonoGame.Tools.Pipeline
 #if LINUX || MONOMAC
 
 			Gtk.Application.Init ();
+            Global.Initalize ();
 			MainWindow win = new MainWindow ();
 			win.Show (); 
 			new PipelineController(win);

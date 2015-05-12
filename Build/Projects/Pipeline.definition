@@ -17,6 +17,7 @@
 
   <Properties>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
@@ -44,8 +45,10 @@
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\Selection.cs" />
+    <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
@@ -94,10 +97,6 @@
       <Platforms>Windows</Platforms>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Windows\AssemblyReferenceEditing.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Windows\PipelineProjectProxy.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -113,6 +112,13 @@
 	<Compile Include="Windows\AboutDialog.Designer.cs">
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Windows\ReferenceDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\ReferenceDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </Compile>
 	<Compile Include="Windows\AddFileDialog.cs">
       <Platforms>Windows</Platforms>
@@ -161,6 +167,10 @@
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
+	 <EmbeddedResource Include="Windows\ReferenceDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
       <AutoGen>True</AutoGen>
@@ -196,9 +206,6 @@
     <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\AboutDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\AddFileDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -211,13 +218,7 @@
     <Compile Include="Gtk\Dialogs\TextEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\ColorPickerDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Stetic.cs">
@@ -235,19 +236,10 @@
     <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\ColorPickerDialog.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\AboutDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\AddFileDialog.GUI.cs">  
@@ -259,8 +251,14 @@
     <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="IgeMacIntegration.cs">
+    <Compile Include="Gtk\Global.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\IgeMacIntegration.cs">
       <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Gtk3Integration.cs">
+      <Platforms>Linux</Platforms>
     </Compile>
 
     <!-- The resources for icons and buttons -->
@@ -336,6 +334,21 @@
     </None>
 
     <!-- Copy the template resources to the output -->
+	<None Include="Templates\Effect.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Templates\Xml.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

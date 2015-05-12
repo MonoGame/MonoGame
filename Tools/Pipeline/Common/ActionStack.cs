@@ -5,8 +5,8 @@ namespace MonoGame.Tools.Pipeline
 {
     internal interface IProjectAction
     {
-        void Do();
-        void Undo();
+        bool Do();
+        bool Undo();
     }
 
     internal delegate void CanUndoRedoChanged(bool canUndo, bool canRedo);
@@ -48,10 +48,11 @@ namespace MonoGame.Tools.Pipeline
                     return;
 
                 var action = _undoStack.Last();
-                _undoStack.Remove(action);
-
-                action.Undo();
-                _redoStack.Add(action);
+                if (action.Undo())
+                {
+                    _undoStack.Remove(action);
+                    _redoStack.Add(action);
+                }
 
                 Update();
             }
@@ -62,10 +63,11 @@ namespace MonoGame.Tools.Pipeline
                     return;
 
                 var action = _redoStack.Last();
-                _redoStack.Remove(action);
-
-                action.Do();
-                _undoStack.Add(action);
+                if (action.Do())
+                {
+                    _redoStack.Remove(action);
+                    _undoStack.Add(action);
+                }
 
                 Update();
             }

@@ -33,11 +33,6 @@ namespace MonoGame.Tools.Pipeline
             propertygridtable1.Initalize (window);
         }
 
-        protected void OnTextview1SizeAllocated (object o, SizeAllocatedArgs args)
-        {
-            vpaned1.Position = vpaned1.Allocation.Height; //add -50 for correct size of description box
-        }
-
         public void Load(List<object> cobjects, string name, string location)
         {
             this.name = name;
@@ -52,6 +47,9 @@ namespace MonoGame.Tools.Pipeline
 
         object CompareVariables(object a, object b)
         {
+            if (a == null)
+                return a;
+
             if (a.ToString () == "???" || a.Equals(b))
                 return b;
 
