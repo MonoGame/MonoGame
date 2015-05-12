@@ -7,7 +7,7 @@ namespace MonoGame.Tools.Pipeline
     {
         public CopyAction responce;
 
-        public AddFolderDialog(string folderloc)
+        public AddFolderDialog(Window parrent, string folderloc) : base(Mono.Unix.Catalog.GetString ("Add Folder Action"), parrent, DialogFlags.Modal)
         {
             Build();
 

@@ -410,6 +410,7 @@
     <Compile Include="InvalidContentException.cs" />
     <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
+    <Compile Include="OggImporter.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
     <Compile Include="OpenAssetImporter.cs" />
     <Compile Include="PipelineComponentScanner.cs" />

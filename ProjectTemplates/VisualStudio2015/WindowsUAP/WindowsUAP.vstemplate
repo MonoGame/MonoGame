@@ -19,7 +19,7 @@
     <RequiredPlatformVersion>6.1.0</RequiredPlatformVersion>
     <CreateInPlace>true</CreateInPlace>
   </TemplateData>
-  <TemplateContent>
+  <TemplateContent PreferedSolutionConfiguration="Debug|x86">
     <Project File="Application.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml">App.xaml</ProjectItem>
       <ProjectItem ReplaceParameters="true" OpenInEditor="!blend" TargetFileName="App.xaml.cs">App.xaml.cs</ProjectItem>
@@ -46,10 +46,15 @@
   </WizardExtension>
   <WizardExtension>
     <Assembly>Microsoft.VisualStudio.WinRT.TemplateWizards, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
-    <FullClassName>Microsoft.VisualStudio.WinRT.TemplateWizards.PlatformVersion.Wizard</FullClassName>
-  </WizardExtension>
-  <WizardExtension>
-    <Assembly>Microsoft.VisualStudio.WinRT.TemplateWizards, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
     <FullClassName>Microsoft.VisualStudio.WinRT.TemplateWizards.ApplicationInsights.Wizard</FullClassName>
   </WizardExtension>
+  <WizardExtension>
+    <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
+  </WizardExtension>
+  <WizardData>
+    <packages repository="registry" keyName="UAPFrameworkDependenciesLocationVS14" isPreunzipped="true">
+      <package id="System.Numerics.Vectors" version="4.0.0" skipAssemblyReferences="false" />
+    </packages>
+  </WizardData>
 </VSTemplate>

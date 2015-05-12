@@ -22,6 +22,7 @@
 	</metadata>
     <files>
         <file src="Windows\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
         <file src="Windows\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\net40\SharpDX.Direct2D1.dll" />
         <file src="Windows\AnyCPU\Release\SharpDX.Direct3D11.dll" target="lib\net40\SharpDX.Direct3D11.dll" />
         <file src="Windows\AnyCPU\Release\SharpDX.Direct3D9.dll" target="lib\net40\SharpDX.Direct3D9.dll" />

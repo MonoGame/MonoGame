@@ -3,7 +3,9 @@
 *.DS_Store
 
 #Output Linux Installer
-Installers/Linux/Installer/
+Installers/Linux/InstallerData/
+*.run
+*.deb
 
 #Visual Studio files
 *.pidb
