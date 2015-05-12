@@ -148,11 +148,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (input is BasicMaterialContent && DefaultEffect != MaterialProcessorDefaultEffect.BasicEffect)
             {
                 var newMaterial = CreateDefaultMaterial(DefaultEffect);
+                
                 // Preserve material properties.
+                newMaterial.Name = input.Name;
+                newMaterial.Identity = input.Identity;
                 foreach (var item in input.OpaqueData)
                     newMaterial.OpaqueData.Add(item.Key, item.Value);
                 foreach (var item in input.Textures)
                     newMaterial.Textures.Add(item.Key, item.Value);
+                
                 input = newMaterial;
             }
 
