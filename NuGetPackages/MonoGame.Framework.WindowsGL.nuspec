@@ -20,6 +20,7 @@
     <files>
         <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
         <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
+        <file src="WindowsGL\AnyCPU\Release\NVorbis.dll" target="lib\net40\NVorbis.dll" />
         <file src="WindowsGL\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>

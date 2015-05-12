@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Utilities;
 
 #if MONOMAC
 using MonoMac.OpenAL;
 #else
 using OpenTK.Audio.OpenAL;
+using OpenTK.Audio;
 using OpenTK;
 #endif
 
@@ -25,7 +27,7 @@ using AudioToolbox;
 namespace Microsoft.Xna.Framework.Audio
 {
 	internal sealed class OpenALSoundController : IDisposable
-	{
+    {
         private static OpenALSoundController _instance = null;
         private IntPtr _device;
         private ContextHandle _context;
@@ -36,11 +38,13 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MAX_NUMBER_OF_SOURCES = 32;
 #if MONOMAC || IOS
         private const double PREFERRED_MIX_RATE = 44100;
-#endif
-#if ANDROID
+#elif ANDROID
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
+#elif (WINDOWS && OPENGL) || LINUX
+        private static AudioContext _acontext;
+        private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
         private List<OALSoundBuffer> inUseSourcesCollection;
@@ -54,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Sets up the hardware resources used by the controller.
         /// </summary>
 		private OpenALSoundController()
-		{
+        {
             if (!OpenSoundController())
             {
                 return;
@@ -88,6 +92,7 @@ namespace Microsoft.Xna.Framework.Audio
 #if MONOMAC || IOS
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 #endif
+
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
@@ -194,7 +199,14 @@ namespace Microsoft.Xna.Framework.Audio
 #else
                 int[] attribute = new int[0];
 #endif
+#if (WINDOWS && OPENGL) || LINUX
+                _acontext = new AudioContext();
+                _context = Alc.GetCurrentContext();
+                _oggstreamer = new OggStreamer();
+#else
                 _context = Alc.CreateContext(_device, attribute);
+#endif
+
                 if (CheckALError("Could not create AL context"))
                 {
                     CleanUpOpenAL();
@@ -293,6 +305,10 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     if (_bSoundAvailable)
                         CleanUpOpenAL();
+
+#if (WINDOWS && OPENGL) || LINUX
+                    _oggstreamer.Dispose();
+#endif
                 }
                 _isDisposed = true;
             }
