@@ -15,7 +15,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.ES20;
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #endif
 
