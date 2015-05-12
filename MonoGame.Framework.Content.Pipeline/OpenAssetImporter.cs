@@ -165,6 +165,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // --> Leave default settings, handle transformation pivots explicitly.
                 //importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(false));
 
+                // Set flag to remove degenerate faces (points and lines).
+                // This flag is very important when PostProcessSteps.FindDegenerates is used
+                // because FindDegenerates converts degenerate triangles to points and lines!
+                importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
+
                 // Note about Assimp post-processing:
                 // Keep post-processing to a minimum. The ModelImporter should import
                 // the model as is. We don't want to lose any information, i.e. empty
