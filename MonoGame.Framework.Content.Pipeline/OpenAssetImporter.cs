@@ -143,6 +143,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
+            _context = context;
 #if LINUX
 			var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
 
@@ -422,7 +423,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (aiMesh.HasBones)
             {
                 var xnaWeights = new List<BoneWeightCollection>();
-                for (var i = 0; i < geom.Indices.Count; i++)
+                var vertexCount = geom.Vertices.VertexCount;
+                bool missingBoneWeights = false;
+                for (var i = 0; i < vertexCount; i++)
                 {
                     var list = new BoneWeightCollection();
                     for (var boneIndex = 0; boneIndex < aiMesh.BoneCount; boneIndex++)
@@ -436,8 +439,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                             list.Add(new BoneWeight(bone.Name, weight.Weight));
                         }
                     }
-                    if (list.Count > 0)
+
+                    if (list.Count == 0)
+                    {
+                        // No bone weights found for vertex. Use bone 0 as fallback.
+                        missingBoneWeights = true;
+                        list.Add(new BoneWeight(aiMesh.Bones[0].Name, 1));
+                    }
+
                         xnaWeights.Add(list);
+                }
+
+                if (missingBoneWeights)
+                {
+                    _context.Logger.LogWarning(
+                        string.Empty, 
+                        _identity, 
+                        "No bone weights found for one or more vertices of skinned mesh '{0}'.",
+                        aiMesh.Name);
                 }
 
                 geom.Vertices.Channels.Add(VertexChannelNames.Weights(0), xnaWeights);
