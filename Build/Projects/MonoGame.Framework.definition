@@ -199,6 +199,7 @@
     <Compile Include="FrameworkDispatcher.cs">
       <Platforms>_FrameworkDispatcherProvided</Platforms>
     </Compile>
+	<Compile Include="FrameworkResources.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
     <Compile Include="GameComponent.cs" />
