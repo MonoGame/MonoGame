@@ -56,7 +56,8 @@ using System.Resources;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("81119db2-82a6-45fb-a366-63a08437b485")]
-
+
+
 // This was needed in WinRT releases to inform the system that we
 // don't need to load any language specific resources.
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
