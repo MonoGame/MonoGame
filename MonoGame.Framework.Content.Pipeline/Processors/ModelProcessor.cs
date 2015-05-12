@@ -196,7 +196,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
             parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
             parameters.Add("TextureFormat", TextureFormat);
-            parameters.Add("DefaultEffect", DefaultEffect);
 
             return context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", parameters);
         }
