@@ -45,11 +45,11 @@
     <CustomDefinitions>
       <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;OPENAL</Platform>
       <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL</Platform>
+      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;DESKTOPGL</Platform>
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL</Platform>
       <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA;OPENAL</Platform>
       <Platform Name="PSMobile">PSM</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
