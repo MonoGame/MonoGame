@@ -214,6 +214,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.WindowsStoreApp:
                 case TargetPlatform.Ouya:
                 case TargetPlatform.Android:
+                case TargetPlatform.DesktopGL:
                 case TargetPlatform.Linux: 
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.NativeClient:

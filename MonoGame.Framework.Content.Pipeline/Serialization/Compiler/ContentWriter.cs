@@ -56,6 +56,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'r', // RaspberryPi
             'P', // PlayStation4
             'g', // Windows (OpenGL)
+            'd', // DesktopGL
         };
 
         /// <summary>

@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.iOS:
                 case TargetPlatform.Android:
                 case TargetPlatform.Linux:
+                case TargetPlatform.DesktopGL:
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.Ouya:
                 case TargetPlatform.RaspberryPi:
