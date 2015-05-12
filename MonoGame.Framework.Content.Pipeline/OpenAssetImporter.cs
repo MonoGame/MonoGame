@@ -118,6 +118,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             public Matrix? GeometricTranslation;
             public Matrix? GeometricRotation;
             public Matrix? GeometricScaling;
+
+            public Matrix GetTransform(Vector3? scale, Quaternion? rotation, Vector3? translation)
+            {
+                var transform = Matrix.Identity;
+
+                if (GeometricScaling.HasValue)
+                    transform *= GeometricScaling.Value;
+                if (GeometricRotation.HasValue)
+                    transform *= GeometricRotation.Value;
+                if (GeometricTranslation.HasValue)
+                    transform *= GeometricTranslation.Value;
+                if (ScalingPivotInverse.HasValue)
+                    transform *= ScalingPivotInverse.Value;
+                if (scale.HasValue)
+                    transform *= Matrix.CreateScale(scale.Value);
+                else if (Scaling.HasValue)
+                    transform *= Scaling.Value;
+                if (ScalingPivot.HasValue)
+                    transform *= ScalingPivot.Value;
+                if (ScalingOffset.HasValue)
+                    transform *= ScalingOffset.Value;
+                if (RotationPivotInverse.HasValue)
+                    transform *= RotationPivotInverse.Value;
+                if (PostRotation.HasValue)
+                    transform *= PostRotation.Value;
+                if (rotation.HasValue)
+                    transform *= Matrix.CreateFromQuaternion(rotation.Value);
+                else if (Rotation.HasValue)
+                    transform *= Rotation.Value;
+                if (PreRotation.HasValue)
+                    transform *= PreRotation.Value;
+                if (RotationPivot.HasValue)
+                    transform *= RotationPivot.Value;
+                if (RotationOffset.HasValue)
+                    transform *= RotationOffset.Value;
+                if (translation.HasValue)
+                    transform *= Matrix.CreateTranslation(translation.Value);
+                else if (Translation.HasValue)
+                    transform *= Translation.Value;
+
+                return transform;
+            }
         }
         #endregion
 
@@ -643,12 +685,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     {
                         node.Transform = Matrix.Invert(offsetMatrix) * parentOffsetMatrix;
                     }
-                    else if (isOffsetMatrixValid && (aiNode == _rootBone || aiParent == _rootBone))
+                    else if (isOffsetMatrixValid && aiNode == _rootBone)
                     {
-                        // The current bone is the first or second bone in the chain.
+                        // The current bone is the first in the chain.
                         // The parent offset matrix is missing. :(
-                        // Let's assume that parent's transform is Identity.
+                        FbxPivot pivot;
+                        if (_pivots.TryGetValue(node.Name, out pivot))
+                        {
+                            // --> Use transformation pivot.
+                            node.Transform = pivot.GetTransform(null, null, null);
+                        }
+                        else
+                        {
+                            // --> Let's assume that parent's transform is Identity.
                         node.Transform = Matrix.Invert(offsetMatrix);
+                    }
+                    }
+                    else if (isOffsetMatrixValid && aiParent == _rootBone)
+                    {
+                        // The current bone is the second bone in the chain.
+                        // The parent offset matrix is missing. :(
+                        // --> Derive matrix from parent bone, which is the root bone.
+                        parentOffsetMatrix = Matrix.Invert(parent.Transform);
+                        node.Transform = Matrix.Invert(offsetMatrix) * parentOffsetMatrix;
                     }
                     else
                     {
@@ -859,42 +918,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     }
 
                     // Apply transformation pivot.
-                    var transform = Matrix.Identity;
-
-                    if (pivot.GeometricScaling.HasValue)
-                        transform *= pivot.GeometricScaling.Value;
-                    if (pivot.GeometricRotation.HasValue)
-                        transform *= pivot.GeometricRotation.Value;
-                    if (pivot.GeometricTranslation.HasValue)
-                        transform *= pivot.GeometricTranslation.Value;
-                    if (pivot.ScalingPivotInverse.HasValue)
-                        transform *= pivot.ScalingPivotInverse.Value;
-                    if (scale.HasValue)
-                        transform *= Matrix.CreateScale(scale.Value);
-                    else if (pivot.Scaling.HasValue)
-                        transform *= pivot.Scaling.Value;
-                    if (pivot.ScalingPivot.HasValue)
-                        transform *= pivot.ScalingPivot.Value;
-                    if (pivot.ScalingOffset.HasValue)
-                        transform *= pivot.ScalingOffset.Value;
-                    if (pivot.RotationPivotInverse.HasValue)
-                        transform *= pivot.RotationPivotInverse.Value;
-                    if (pivot.PostRotation.HasValue)
-                        transform *= pivot.PostRotation.Value;
-                    if (rotation.HasValue)
-                        transform *= Matrix.CreateFromQuaternion(rotation.Value);
-                    else if (pivot.Rotation.HasValue)
-                        transform *= pivot.Rotation.Value;
-                    if (pivot.PreRotation.HasValue)
-                        transform *= pivot.PreRotation.Value;
-                    if (pivot.RotationPivot.HasValue)
-                        transform *= pivot.RotationPivot.Value;
-                    if (pivot.RotationOffset.HasValue)
-                        transform *= pivot.RotationOffset.Value;
-                    if (translation.HasValue)
-                        transform *= Matrix.CreateTranslation(translation.Value);
-                    else if (pivot.Translation.HasValue)
-                        transform *= pivot.Translation.Value;
+                    var transform = pivot.GetTransform(scale, rotation, translation);
 
                     channel.Add(new AnimationKeyframe(TimeSpan.FromSeconds(time / aiAnimation.TicksPerSecond), transform));
                 }
