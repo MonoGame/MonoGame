@@ -40,11 +40,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Android,
 
         /// <summary>
-        /// Linux-based PCs
+        /// All desktop versions using OpenGL.
         /// (MonoGame)
         /// </summary>
-        [Obsolete("This platform is obsolete, use DesktopGL instead")]
-        Linux,
+        DesktopGL,
 
         /// <summary>
         /// Apple Mac OSX-based devices (iMac, MacBook, MacBook Air, etc)
@@ -98,12 +97,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// (MonoGame)
         /// </summary>
         [Obsolete("This platform is obsolete, use DesktopGL instead")]
-        WindowsGL,
+        WindowsGL = DesktopGL,
 
         /// <summary>
-        /// All desktop versions using OpenGL.
+        /// Linux-based PCs
         /// (MonoGame)
         /// </summary>
-        DesktopGL
+        [Obsolete("This platform is obsolete, use DesktopGL instead")]
+        Linux = DesktopGL
     }
 }

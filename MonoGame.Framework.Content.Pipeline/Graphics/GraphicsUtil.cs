@@ -208,14 +208,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (context.TargetPlatform)
             {
                 case TargetPlatform.Windows:
-                case TargetPlatform.WindowsGL:
                 case TargetPlatform.WindowsPhone:
                 case TargetPlatform.WindowsPhone8:
                 case TargetPlatform.WindowsStoreApp:
                 case TargetPlatform.Ouya:
                 case TargetPlatform.Android:
                 case TargetPlatform.DesktopGL:
-                case TargetPlatform.Linux: 
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
