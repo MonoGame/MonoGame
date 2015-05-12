@@ -199,7 +199,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case MaterialProcessorDefaultEffect.BasicEffect:
                     return new BasicMaterialContent();
                 case MaterialProcessorDefaultEffect.SkinnedEffect:
-                    return new SkinnedMaterialContent() { WeightsPerVertex = 4 };
+                    return new SkinnedMaterialContent();
                 case MaterialProcessorDefaultEffect.EnvironmentMapEffect:
                     return new EnvironmentMapMaterialContent();
                 case MaterialProcessorDefaultEffect.DualTextureEffect:
