@@ -126,8 +126,10 @@ namespace Microsoft.Xna.Framework.Storage
             string saved = "";
             if(CurrentPlatform.OS == OS.Linux)
                 saved = StorageDevice.StorageRoot;
-            else
+            else if(CurrentPlatform.OS == OS.Windows)
                 saved = Path.Combine(StorageDevice.StorageRoot, "SavedGames");
+            else
+                throw new Exception("Unexpected platform!");
 #else
 			var root = StorageDevice.StorageRoot;
 			var saved = Path.Combine(root,"SavedGames");
