@@ -125,11 +125,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			var vp = gd.Viewport;
 
 		    Matrix projection;
-#if PSM || DIRECTX
             Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0, out projection);
-#else
+#if !PSM && !DIRECTX
             // GL requires a half pixel offset to match DX.
-            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1, out projection);
             projection.M41 += -0.5f * projection.M11;
             projection.M42 += -0.5f * projection.M22;
 #endif

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Content Importer</_Name>
+		<Icon>monogame-project</Icon>
+		<_Category>MonoGame</_Category>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a basic MonoGame Content Importer which can be used to extend the Pipeline tool.</_Description>
+	</TemplateConfiguration>
+
+	<TemplateFiles>
+		<File name="${Name}.cs" src="Common/Importer1.cs" />
+	</TemplateFiles>
+</Template>
+
+

@@ -5,18 +5,18 @@ using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class VideoPlayer : IDisposable
     {
         private static MediaSession _session;
-        private static SimpleAudioVolume _volumeController;
+        private static AudioStreamVolume _volumeController;
         private static PresentationClock _clock;
 
         // HACK: Need SharpDX to fix this.
-        private static readonly Guid MRPolicyVolumeService = Guid.Parse("1abaa2ac-9d3b-47c6-ab48-c59506de784d");
-        private static readonly Guid SimpleAudioVolumeGuid = Guid.Parse("089EDF13-CF71-4338-8D13-9E569DBDC319");
+        private static Guid AudioStreamVolumeGuid;
 
         private static Callback _callback;
 
@@ -42,6 +42,9 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformInitialize()
         {
+            // The GUID is specified in a GuidAttribute attached to the class
+            AudioStreamVolumeGuid = Guid.Parse(((GuidAttribute)typeof(AudioStreamVolume).GetCustomAttributes(typeof(GuidAttribute), false)[0]).Value);
+
             MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
         }
@@ -104,9 +107,8 @@ namespace Microsoft.Xna.Framework.Media
             // Set the new song.
             _session.SetTopology(0, _currentVideo.Topology);
 
-            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(GetVolumeObj(_session));
-            _volumeController.Mute = IsMuted;
-            _volumeController.MasterVolume = _volume;
+            _volumeController = CppObject.FromPointer<AudioStreamVolume>(MediaPlayer.GetVolumeObj(_session));
+            SetChannelVolumes();
 
             // Get the clock.
             _clock = _session.Clock.QueryInterface<PresentationClock>();
@@ -123,38 +125,6 @@ namespace Microsoft.Xna.Framework.Media
             _session.Start(null, varStart);
         }
 
-        internal static IntPtr GetVolumeObj(MediaSession session)
-        {
-            // Get the volume interface - shared between MediaPlayer and VideoPlayer
-            const int retries = 10;
-            const int sleepTimeFactor = 50;
-
-            var volumeObj = (IntPtr)0;
-
-            //See https://github.com/mono/MonoGame/issues/2620
-            //MediaFactory.GetService throws a SharpDX exception for unknown reasons. it appears retrying will solve the problem but there
-            //is no specific number of times, nor pause that works. So we will retry N times with an increasing Sleep between each one
-            //before finally throwing the error we saw in the first place.
-            for (int i = 0; i < retries; i++)
-            {
-                try
-                {
-                    MediaFactory.GetService(session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
-                    break;
-                }
-                catch (SharpDXException)
-                {
-                    if (i == retries - 1)
-                    {
-                        throw;
-                    }
-                    Debug.WriteLine("MediaFactory.GetService failed({0}) sleeping for {1} ms", i + 1, i*sleepTimeFactor);
-                    Thread.Sleep(i*sleepTimeFactor); //Sleep for longer and longer times
-                }
-            }
-            return volumeObj;
-        }
-
         private void PlatformResume()
         {
             _session.Start(null, null);
@@ -162,7 +132,23 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformStop()
         {
+            _session.ClearTopologies();
             _session.Stop();
+            _session.Close();
+            _volumeController.Dispose();
+            _volumeController = null;
+            _clock.Dispose();
+            _clock = null;
+        }
+
+        private void SetChannelVolumes()
+        {
+            if (_volumeController != null)
+            {
+                float volume = !_isMuted ? _volume : 0.0f;
+                for (int i = 0; i < _volumeController.ChannelCount; i++)
+                    _volumeController.SetChannelVolume(i, volume);
+            }
         }
 
         private void PlatformSetVolume()
@@ -170,7 +156,7 @@ namespace Microsoft.Xna.Framework.Media
             if (_volumeController == null)
                 return;
 
-            _volumeController.MasterVolume = _volume;
+            SetChannelVolumes();
         }
 
         private void PlatformSetIsLooped()
@@ -183,7 +169,7 @@ namespace Microsoft.Xna.Framework.Media
             if (_volumeController == null)
                 return;
 
-            _volumeController.Mute = _isMuted;
+            SetChannelVolumes();
         }
 
         private TimeSpan PlatformGetPlayPosition()

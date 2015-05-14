@@ -126,7 +126,9 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        static public SharpDX.Vector2 ToVector2(this Vector2 vec)
+#if !WINDOWS_UAP
+
+		static public SharpDX.Vector2 ToVector2(this Vector2 vec)
         {
             return new SharpDX.Vector2(vec.X, vec.Y);
         }
@@ -146,7 +148,9 @@ namespace Microsoft.Xna.Framework
             return new SharpDX.Color4(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
         }
 
-        static public SharpDX.X3DAudio.Emitter ToEmitter(this Audio.AudioEmitter emitter)
+#endif // !WINDOWS_UAP
+
+		static public SharpDX.X3DAudio.Emitter ToEmitter(this Audio.AudioEmitter emitter)
         {           
             // Pulling out Vector properties for efficiency.
             var pos = emitter.Position;
@@ -175,12 +179,19 @@ namespace Microsoft.Xna.Framework
 
             return new SharpDX.X3DAudio.Emitter()
             {
-                Position = new SharpDX.Vector3( pos.X, pos.Y, pos.Z ),
+#if WINDOWS_UAP
+				Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z },
+				Velocity = new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z },
+				OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z },
+				OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z },
+#else
+				Position = new SharpDX.Vector3( pos.X, pos.Y, pos.Z ),
                 Velocity = new SharpDX.Vector3( vel.X, vel.Y, vel.Z ),
                 OrientFront = new SharpDX.Vector3( forward.X, forward.Y, forward.Z ),
                 OrientTop = new SharpDX.Vector3( up.X, up.Y, up.Z ),
                 DopplerScaler = emitter.DopplerScale,                   
-            };
+#endif
+			};
         }
 
         static public SharpDX.X3DAudio.Listener ToListener(this Audio.AudioListener listener)
@@ -212,11 +223,18 @@ namespace Microsoft.Xna.Framework
 
             return new SharpDX.X3DAudio.Listener()
             {
-                Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z),
+#if WINDOWS_UAP
+				Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z },
+				Velocity = new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z },
+				OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z },
+				OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z },
+#else
+				Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z),
                 Velocity = new SharpDX.Vector3(vel.X, vel.Y, vel.Z),
                 OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z),
                 OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z),                
-            };
+#endif
+			};
         }
 
         static public SharpDX.Direct3D11.Comparison ToComparison(this CompareFunction compare)

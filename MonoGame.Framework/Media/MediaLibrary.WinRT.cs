@@ -22,10 +22,24 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformLoad(Action<int> progressCallback)
         {
+#if !WINDOWS_UAP
             Task.Run(async () =>
             {
                 if (musicFolder == null)
-                    musicFolder = KnownFolders.MusicLibrary;
+                {
+                    try
+                    {
+                        musicFolder = KnownFolders.MusicLibrary;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine("Failed to access Music Library: " + e.Message);
+                        albumCollection = new AlbumCollection(new List<Album>());
+                        songCollection = new SongCollection(new List<Song>());
+                        return;
+                    }
+                }
+                    
             
                 var files = new List<StorageFile>();
                 await this.GetAllFiles(musicFolder, files);
@@ -126,6 +140,7 @@ namespace Microsoft.Xna.Framework.Media
                 albumCollection = new AlbumCollection(albumList);
                 songCollection = new SongCollection(songList);
             }).Wait();
+#endif
         }
 
         private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)

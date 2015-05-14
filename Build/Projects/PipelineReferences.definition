@@ -4,25 +4,25 @@
   <Platform Type="Linux">
     <Binary
       Name="gtk-sharp"
-      Path="ThirdParty\Dependencies\Gtk\gtk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gtk-sharp.dll" />
     <Binary
       Name="atk-sharp"
-      Path="ThirdParty\Dependencies\Gtk\atk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\atk-sharp.dll" />
     <Binary
       Name="gdk-sharp"
-      Path="ThirdParty\Dependencies\Gtk\gdk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gdk-sharp.dll" />
     <Binary
       Name="glade-sharp"
-      Path="ThirdParty\Dependencies\Gtk\glade-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gio-sharp.dll" />
     <Binary
       Name="glib-sharp"
-      Path="ThirdParty\Dependencies\Gtk\glib-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\glib-sharp.dll" />
     <Binary
       Name="gtk-dotnet"
-      Path="ThirdParty\Dependencies\Gtk\gtk-dotnet.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gtk-dotnet.dll" />
     <Binary
       Name="pango-sharp"
-      Path="ThirdParty\Dependencies\Gtk\pango-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\pango-sharp.dll" />
     <Binary
       Name="Mono.Posix"
       Path="ThirdParty\Dependencies\Gtk\Mono.Posix.dll" />

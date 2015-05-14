@@ -12,7 +12,7 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Window, IView
     {
-        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.";
+        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.()";
 
         public static bool CheckString(string s, string allowedCharacters)
         {
@@ -182,7 +182,7 @@ namespace MonoGame.Tools.Pipeline
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter)
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
@@ -579,6 +579,14 @@ namespace MonoGame.Tools.Pipeline
             expand = false;
         }
 
+        public void OnRenameActionActivated (object sender, EventArgs e)
+        {
+            expand = true;
+            projectview1.Rename ();
+            UpdateMenus();
+            expand = false;
+        }
+        
         public void OnDeleteActionActivated (object sender, EventArgs e)
         {
             projectview1.Remove ();
@@ -637,7 +645,9 @@ namespace MonoGame.Tools.Pipeline
             ExitAction.Sensitive = notBuilding;
 
             AddAction.Sensitive = projectOpen;
-
+            
+            RenameAction.Sensitive = paths.Length == 1;
+            
             DeleteAction.Sensitive = projectOpen && somethingSelected;
 
             BuildAction.Sensitive = projectOpen;
