@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Audio
         { 
             get
             {
-                if (_all.Count == 0)
+                if (All.Count == 0)
                     return (null);
 
                 string defaultDevice = OpenTK.Audio.AudioCapture.DefaultDevice;
