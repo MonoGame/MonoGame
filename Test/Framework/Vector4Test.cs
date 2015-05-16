@@ -127,7 +127,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ToStringTest()
         {
-            StringAssert.IsMatch("{X:10 Y:20 Z:3,5 W:-100}", new Vector4(10, 20, 3.5f, -100).ToString());
+            StringAssert.IsMatch("{X:10 Y:20 Z:3.5 W:-100}", new Vector4(10, 20, 3.5f, -100).ToString());
         }
     }
 }
