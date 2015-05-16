@@ -33,6 +33,18 @@ namespace MonoGame.Tools.Pipeline
             propertygridtable1.Initalize (window);
         }
 
+        public static string ObsoleteText(Enum value)
+        {
+            var fi = value.GetType().GetField(value.ToString());
+            var attributes = (ObsoleteAttribute[])
+                fi.GetCustomAttributes(typeof(ObsoleteAttribute), false);
+
+            if (attributes != null && attributes.Length > 0)
+                return attributes[0].Message;
+
+            return "";
+        }
+
         public void Load(List<object> cobjects, string name, string location)
         {
             this.name = name;
@@ -132,7 +144,17 @@ namespace MonoGame.Tools.Pipeline
 
                     Dictionary<string, object> data = Enum.GetValues (typeof(TP.TargetPlatform))
                         .Cast<TP.TargetPlatform> ()
-                        .ToDictionary (t => t.ToString(), t => (object)t);
+                        .ToDictionary (t => ObsoleteText(t) != "" ? "[!] " + t.ToString() : t.ToString(), t => (object)t);
+
+                    try
+                    {
+                        if (ObsoleteText((TP.TargetPlatform)Enum.Parse(typeof(TP.TargetPlatform), value.ToString())) != "")
+                        {
+                            value = "[!] " + value;
+                        }
+                    }
+                    catch { }
+
                     propertygridtable1.AddEntry (p.Name, value, 
                         PropertyGridTable.EntryType.Combo,(s,e) => { 
                             foreach (object o in currentObjects) 

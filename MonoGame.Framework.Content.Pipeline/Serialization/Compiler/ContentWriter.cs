@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'm', // WindowsPhone
             'i', // iOS
             'a', // Android
-            'l', // Linux
+            'd', // DesktopGL
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
@@ -55,7 +55,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
-            'g', // Windows (OpenGL)
+            'd', // Windows (OpenGL)
+            'd', // Linux
         };
 
         /// <summary>
