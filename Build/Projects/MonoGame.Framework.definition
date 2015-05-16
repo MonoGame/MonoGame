@@ -1028,6 +1028,9 @@
     <Compile Include="Utilities\AssemblyHelper.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
     </Compile>
+    <Compile Include="Utilities\CurrentPlatform.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\OggStream.cs">
       <Platforms>WindowsGL,Linux</Platforms>
