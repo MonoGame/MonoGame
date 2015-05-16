@@ -217,10 +217,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            VertexTextures = new TextureCollection(MaxVertexTextureSlots, true);
+            VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, true);
             VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);
 
-            Textures = new TextureCollection(MaxTextureSlots, false);
+            Textures = new TextureCollection(this, MaxTextureSlots, false);
             SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
 
             _blendStateAdditive = BlendState.Additive.Clone();
