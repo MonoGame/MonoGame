@@ -348,9 +348,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>The squared distance between two vectors.</returns>
         public static float DistanceSquared(Vector4 value1, Vector4 value2)
         {
-            float result;
-            DistanceSquared(ref value1, ref value2, out result);
-            return result;
+              return (value1.W - value2.W) * (value1.W - value2.W) +
+                     (value1.X - value2.X) * (value1.X - value2.X) +
+                     (value1.Y - value2.Y) * (value1.Y - value2.Y) +
+                     (value1.Z - value2.Z) * (value1.Z - value2.Z);
         }
 
         /// <summary>
@@ -720,8 +721,10 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector4 Normalize(Vector4 value)
         {
-            Normalize(ref value, out value);
-            return value;
+            float factor = DistanceSquared(value, zero);
+            factor = 1f / (float)Math.Sqrt(factor);
+
+            return new Vector4(value.X*factor,value.Y*factor,value.Z*factor,value.W*factor);
         }
 
         /// <summary>

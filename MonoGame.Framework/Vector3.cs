@@ -392,9 +392,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>The squared distance between two vectors.</returns>
         public static float DistanceSquared(Vector3 value1, Vector3 value2)
         {
-            float result;
-            DistanceSquared(ref value1, ref value2, out result);
-            return result;
+            return  (value1.X - value2.X) * (value1.X - value2.X) +
+                    (value1.Y - value2.Y) * (value1.Y - value2.Y) +
+                    (value1.Z - value2.Z) * (value1.Z - value2.Z);
         }
 
         /// <summary>
@@ -751,8 +751,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector3 Normalize(Vector3 value)
         {
-            Normalize(ref value, out value);
-            return value;
+            float factor = Distance(value, zero);
+            factor = 1f / factor;
+            return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
         }
 
         /// <summary>
