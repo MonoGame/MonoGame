@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Content
             'm', // WindowsPhone
             'i', // iOS
             'a', // Android
-            'l', // Linux
+            'd', // DesktopGL
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
@@ -48,7 +48,10 @@ namespace Microsoft.Xna.Framework.Content
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
-            'g', // Windows (OpenGL)
+
+            // Old WindowsGL and Linux platform chars
+            'w',
+            'l',
         };
 
         private static void AddContentManager(ContentManager contentManager)
