@@ -5,6 +5,7 @@ chmod +x Data/Main/monogame-pipeline
 chmod +x Data/RUN/postinstall.sh
 chmod +x Data/RUN/uninstall.sh
 chmod +x Data/RUN/Dependencies/dependencies*
+chmod +x Makeself/makeself.sh
 
 mkdir tmp
 
