@@ -68,27 +68,59 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
+            /// <summary>
+            /// Nonnegative number identifying the sequence of random numbers produced by the generator.
+            /// </summary>
+            /// <devdoc>The sequence number determines the increment of the internal LCG. Only uneven,
+            /// unsigned values are valid. Allowing any positive long value is more intuitive.</devdoc>
+            public long Sequence
+            {
+                get
+                {
+                    return (long)(_seq >> 1);
+                }
+                set
+                {
+                    if (value < 0)
+                        throw new ArgumentOutOfRangeException();
+                    this._seq = ((ulong)value << 1) | 1;
+                }
+            }
+
             #endregion
 
             #region Constructors
 
             /// <summary>
             /// Initializes a new instance of the random number generator using the value of 
-            /// Random.GenerateSeed() as a default seed value.
+            /// Random.GenerateSeed() as a default seed value and the default sequence.
             /// </summary>
+            /// <devdoc>The default sequence is derived from Knuth's LCG for MMIX. When fed into the
+            /// Sequence property, it produces an increment of 1442695040888963407.</devdoc>
             public Random()
-                : this(GenerateSeed())
+                : this(GenerateSeed(), 721347520444481703)
             {
             }
 
             /// <summary>
-            /// Initializes a new instance of the random number generator using the specified seed
+            /// Initializes a new instance of the random number generator using the value of
+            /// Random.GenerateSeed() as a default seed value and the specified sequence.
+            /// </summary>
+            /// <param name="sequence"></param>
+            public Random(long sequence)
+                : this(GenerateSeed(), sequence)
+            {
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the random number generator using the specified seed and sequence.
             /// </summary>
             /// <param name="seed">Seed to be used when computing new random numbers</param>
             [ClsCompliant(false)]
-            public Random(ulong seed)
+            public Random(ulong seed, long sequence)
             {
                 this.Seed = seed;
+                this.Sequence = sequence;
             }
 
             #endregion
