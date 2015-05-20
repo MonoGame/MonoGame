@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework
 
             private ulong _seed;
             private ulong _state;
+            private ulong _seq;
 
             #endregion
 
@@ -104,7 +105,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte()
             {
-                return UInt64ToInt8(XORShift64Star());
+                return UInt64ToInt8(PcgXshRS());
             }
 
             /// <summary>
@@ -114,7 +115,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte(byte max)
             {
-                return (byte)Remap(UInt64ToInt8(XORShift64Star()), 0, byte.MaxValue, 0, max);
+                return (byte)Remap(UInt64ToInt8(PcgXshRS()), 0, byte.MaxValue, 0, max);
             }
 
             /// <summary>
@@ -125,7 +126,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte(byte min, byte max)
             {
-                return (byte)Remap(UInt64ToInt16(XORShift64Star()), 0, byte.MaxValue, min, max);
+                return (byte)Remap(UInt64ToInt16(PcgXshRS()), 0, byte.MaxValue, min, max);
             }
 
             #endregion
@@ -138,7 +139,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort()
             {
-                return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, 0, short.MaxValue);
+                return (short)Remap(UInt64ToInt16(PcgXshRS()), short.MinValue, short.MaxValue, 0, short.MaxValue);
             }
 
             /// <summary>
@@ -148,7 +149,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort(short max)
             {
-                return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, 0, max);
+                return (short)Remap(UInt64ToInt16(PcgXshRS()), short.MinValue, short.MaxValue, 0, max);
             }
 
             /// <summary>
@@ -159,7 +160,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort(short min, short max)
             {
-                return (short)Remap(UInt64ToInt16(XORShift64Star()), short.MinValue, short.MaxValue, min, max);
+                return (short)Remap(UInt64ToInt16(PcgXshRS()), short.MinValue, short.MaxValue, min, max);
             }
 
             #endregion
@@ -172,7 +173,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int NextInt()
             {
-                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, int.MaxValue);
+                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, int.MaxValue);
             }
 
             /// <summary>
@@ -182,7 +183,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int NextInt(int max)
             {
-                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, max);
+                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, max);
             }
 
             /// <summary>
@@ -193,7 +194,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int NextInt(int min, int max)
             {
-                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, min, max);
+                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, min, max);
             }
 
             /// <summary>
@@ -203,7 +204,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next()
             {
-                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, int.MaxValue);
+                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, int.MaxValue);
             }
 
             /// <summary>
@@ -214,7 +215,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int max)
             {
-                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, 0, max);
+                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, max);
             }
 
             /// <summary>
@@ -226,7 +227,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int min, int max)
             {
-                return (int)Remap(UInt64ToInt32(XORShift64Star()), int.MinValue, int.MaxValue, min, max);
+                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, min, max);
             }
 
             #endregion
@@ -239,7 +240,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int64</returns>
             public long NextLong()
             {
-                return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, 0, long.MaxValue);
+                return Remap(UInt64ToInt64(PcgXshRS()), long.MinValue, long.MaxValue, 0, long.MaxValue);
             }
 
             /// <summary>
@@ -249,7 +250,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int64</returns>
             public long NextLong(long max)
             {
-                return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, 0, max);
+                return Remap(UInt64ToInt64(PcgXshRS()), long.MinValue, long.MaxValue, 0, max);
             }
 
             /// <summary>
@@ -260,7 +261,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int64</returns>
             public long NextLong(long min, long max)
             {
-                return Remap(UInt64ToInt64(XORShift64Star()), long.MinValue, long.MaxValue, min, max);
+                return Remap(UInt64ToInt64(PcgXshRS()), long.MinValue, long.MaxValue, min, max);
             }
 
             #endregion
@@ -277,7 +278,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble()
             {
-                return Remap(UInt64ToDouble(XORShift64Star()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, Int64ToDouble(long.MaxValue));
+                return Remap(UInt64ToDouble(PcgXshRS()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, Int64ToDouble(long.MaxValue));
             }
 
             /// <summary>
@@ -287,7 +288,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double max)
             {
-                return Remap(UInt64ToDouble(XORShift64Star()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, max);
+                return Remap(UInt64ToDouble(PcgXshRS()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, max);
             }
 
             /// <summary>
@@ -298,7 +299,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double min, double max)
             {
-                return Remap(UInt64ToDouble(XORShift64Star()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), min, max);
+                return Remap(UInt64ToDouble(PcgXshRS()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), min, max);
             }
 
             #endregion
@@ -343,12 +344,11 @@ namespace Microsoft.Xna.Framework
 
             #region Private methods
 
-            private ulong XORShift64Star()
+            private uint PcgXshRS()
             {
-                _state ^= _state >> 12;
-                _state ^= _state << 25;
-                _state ^= _state >> 27;
-                return unchecked(_state * 2685821657736338717UL);
+                _state = unchecked(_state * 6364136223846793005UL + _seq);
+
+                return (uint)(_state ^ (_state >> 22)) >> (22 + (int)(_state >> 61));
             }
 
             private long Remap(long value, long oldMin, long oldMax, long newMin, long newMax)
