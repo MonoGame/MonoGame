@@ -113,6 +113,10 @@ namespace Microsoft.Xna.Framework.Utilities
             if (getMethod == null || !getMethod.IsPublic)
                 return false;
 
+            var setMethod = GetPropertySetMethod(property);
+            if (setMethod == null || !setMethod.IsPublic)
+                return false;
+
             return true;
         }
 
