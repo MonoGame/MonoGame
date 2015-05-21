@@ -137,7 +137,8 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte()
             {
-                return UInt64ToInt8(PcgXshRS());
+                // Shift to upper 8 bits, then cast (equivalent to multiplication + division)
+                return (byte)(PcgXshRS() >> 24);
             }
 
             /// <summary>
@@ -171,7 +172,8 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort()
             {
-                return (short)Remap(UInt64ToInt16(PcgXshRS()), short.MinValue, short.MaxValue, 0, short.MaxValue);
+                // Shift to upper 15 bits for positive values only, then cast
+                return (short)(PcgXshRS() >> 17);
             }
 
             /// <summary>
@@ -236,7 +238,8 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next()
             {
-                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, int.MaxValue);
+                // Shift to remove sign bit, then cast
+                return (int)(PcgXshRS() >> 1);
             }
 
             /// <summary>
@@ -272,7 +275,11 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int64</returns>
             public long NextLong()
             {
-                return Remap(UInt64ToInt64(PcgXshRS()), long.MinValue, long.MaxValue, 0, long.MaxValue);
+                long lo = (long)PcgXshRS();
+                // Remove 1 bit, only 63 needed for positive values
+                long hi = (long)(PcgXshRS() >> 1);
+
+                return lo | (hi << 32);
             }
 
             /// <summary>
