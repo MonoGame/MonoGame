@@ -32,6 +32,9 @@ namespace Microsoft.Xna.Framework
             private ulong _state;
             private ulong _seq;
 
+            private const float UINT32_TO_FLOAT = 1.0f / ((uint.MaxValue >> 8) + 1);
+            private const double UINT64_TO_DOUBLE = 1.0 / ((ulong.MaxValue >> 11) + 1);
+
             #endregion
 
             #region Properties
@@ -335,7 +338,8 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble()
             {
-                return Remap(UInt64ToDouble(PcgXshRS()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, Int64ToDouble(long.MaxValue));
+                ulong value = (ulong)PcgXshRS() | ((ulong)PcgXshRS() << 32);
+                return (value >> 11) * UINT64_TO_DOUBLE;
             }
 
             /// <summary>
@@ -345,7 +349,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double max)
             {
-                return Remap(UInt64ToDouble(PcgXshRS()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), 0, max);
+                return NextDouble() * max;
             }
 
             /// <summary>
@@ -356,7 +360,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double min, double max)
             {
-                return Remap(UInt64ToDouble(PcgXshRS()), Int64ToDouble(long.MinValue), Int64ToDouble(long.MaxValue), min, max);
+                return NextDouble() * (max - min) + min;
             }
 
             #endregion
@@ -369,7 +373,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random single-precision floating point number</returns>
             public float NextFloat()
             {
-                return (float)NextDouble();
+                return (PcgXshRS() >> 8) * UINT32_TO_FLOAT;
             }
 
             /// <summary>
@@ -379,7 +383,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random single-precision floating point number</returns>
             public float NextFloat(float max)
             {
-                return (float)NextDouble((double)max);
+                return NextFloat() * max;
             }
 
             /// <summary>
@@ -390,7 +394,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random single-precision floating point number</returns>
             public float NextFloat(float min, float max)
             {
-                return (float)NextDouble((double)min, (double)max);
+                return NextFloat() * (max - min) + min;
             }
 
             #endregion
@@ -407,66 +411,6 @@ namespace Microsoft.Xna.Framework
 
                 return (uint)(_state ^ (_state >> 22)) >> (22 + (int)(_state >> 61));
             }
-
-            private long Remap(long value, long oldMin, long oldMax, long newMin, long newMax)
-            {
-                return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
-            }
-
-            private double Remap(double value, double oldMin, double oldMax, double newMin, double newMax) 
-            {
-                return (((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
-            }
-
-            #region Integer values
-
-            private byte UInt64ToInt8(ulong uint64)
-            {
-                // Map the ulong onto a long, then remap that to a byte range by multiplying by the factor of 
-                // the maximum value of a byte divided by the maximum value of a long. However, if the long 
-                // is negative, return the same multiplied by -1.
-                if (UInt64ToInt64(uint64) < 0)
-                    return (byte)(-UInt64ToInt64(uint64) * ((double)byte.MaxValue / long.MaxValue));
-                return (byte)(UInt64ToInt64(uint64) * ((double)byte.MaxValue / long.MaxValue));
-            }
-
-            private short UInt64ToInt16(ulong uint64)
-            {
-                // Map the ulong onto a long, then remap that to a short range by multiplying by the factor of 
-                // the maximum value of a short divided by the maximum value of a long
-                return (short)(UInt64ToInt64(uint64) * ((double)short.MaxValue / long.MaxValue));
-            }
-
-            private int UInt64ToInt32(ulong uint64)
-            {
-                // Map the ulong onto a long, then remap that to an integer range by multiplying by the factor of 
-                // the maximum value of an integer divided by the maximum value of a long
-                return (int)(UInt64ToInt64(uint64) * ((double)int.MaxValue / long.MaxValue));
-            }
-
-            private long UInt64ToInt64(ulong uint64)
-            {
-                unsafe
-                {
-                    return (*(long*)&uint64) + long.MinValue;
-                }
-            }
-
-            #endregion
-
-            #region Floating point values
-
-            private double UInt64ToDouble(ulong uint64)
-            {
-                return Int64ToDouble(UInt64ToInt64(uint64));
-            }
-
-            private double Int64ToDouble(long int64)
-            {
-                return Convert.ToDouble(int64);
-            }
-
-            #endregion
 
             #endregion
         }
