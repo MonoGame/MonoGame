@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework
     public static partial class MathHelper
     {
         /// <summary>
-        /// Class for generating random numbers consistantly when using Mono or Microsoft compilers.
+        /// Class for generating random numbers consistently when using Mono or Microsoft compilers.
         /// </summary>
         public class Random
         {
@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework
             }
 
             /// <summary>
-            /// Nonnegative number identifying the sequence of random numbers produced by the generator.
+            /// Non-negative number identifying the sequence of random numbers produced by the generator.
             /// </summary>
             /// <devdoc>The sequence number determines the increment of the internal LCG. Only uneven,
             /// unsigned values are valid. Allowing any positive long value is more intuitive.</devdoc>
@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework
             /// Initializes a new instance of the random number generator using the value of
             /// Random.GenerateSeed() as a default seed value and the specified sequence.
             /// </summary>
-            /// <param name="sequence"></param>
+            /// <param name="sequence">Non-negative number identifying the sequence of random numbers.</param>
             public Random(long sequence)
                 : this(GenerateSeed(), sequence)
             {
@@ -119,6 +119,7 @@ namespace Microsoft.Xna.Framework
             /// Initializes a new instance of the random number generator using the specified seed and sequence.
             /// </summary>
             /// <param name="seed">Seed to be used when computing new random numbers</param>
+            /// <param name="sequence">Non-negative number identifying the sequence of random numbers.</param>
             [ClsCompliant(false)]
             public Random(ulong seed, long sequence)
             {
@@ -147,7 +148,7 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a non-negative random integer of type Int8 (byte) that is less than the specified maximum.
             /// </summary>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="max">Exclusive maximum value.</param>
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte(byte max)
             {
@@ -157,8 +158,8 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a random integer of type Int8 (byte) that is within a specified range.
             /// </summary>
-            /// <param name="min">Minimum possible value</param>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="min">Inclusive minimum value.</param>
+            /// <param name="max">Exclusive maximum value.</param>
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte(byte min, byte max)
             {
@@ -183,7 +184,7 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a non-negative random integer of type Int16 (short) that is less than the specified maximum.
             /// </summary>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="max">Exclusive maximum value.</param>
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort(short max)
             {
@@ -193,8 +194,8 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a random integer of type Int16 (short) that is within a specified range.
             /// </summary>
-            /// <param name="min">Minimum possible value</param>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="min">Inclusive minimum value.</param>
+            /// <param name="max">Exclusive maximum value.</param>
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort(short min, short max)
             {
@@ -239,7 +240,6 @@ namespace Microsoft.Xna.Framework
             }
 
             /// <summary>
-            /// Alias for NextInt().
             /// Returns a non-negative random integer of type Int32 (int).
             /// </summary>
             /// <returns>Random integer of type Int32 (int)</returns>
@@ -250,10 +250,9 @@ namespace Microsoft.Xna.Framework
             }
 
             /// <summary>
-            /// Alias for NextInt(int max).
             /// Returns a non-negative random integer of type Int32 (int) that is less than the specified maximum.
             /// </summary>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="max">Exclusice maximum value.</param>
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int max)
             {
@@ -261,11 +260,10 @@ namespace Microsoft.Xna.Framework
             }
 
             /// <summary>
-            /// Alias for NextInt(int min, int max).
             /// Returns a random integer of type Int32 (int) that is within a specified range.
             /// </summary>
-            /// <param name="min">Minimum possible value</param>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="min">Inclusive minimum value.</param>
+            /// <param name="max">Exclusive maximum value.</param>
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int min, int max)
             {
@@ -298,7 +296,7 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a non-negative random integer of type Int64 that is less than the specified maximum.
             /// </summary>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="max">Exclusive maximum possible value.</param>
             /// <returns>Random integer of type Int64</returns>
             public long NextLong(long max)
             {
@@ -308,8 +306,8 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a random integer of type Int64 that is within a specified range.
             /// </summary>
-            /// <param name="min">Minimum possible value</param>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="min">Inclusive minimum value.</param>
+            /// <param name="max">Exclusive maximum value.</param>
             /// <returns>Random integer of type Int64</returns>
             public long NextLong(long min, long max)
             {
@@ -333,7 +331,7 @@ namespace Microsoft.Xna.Framework
             #region Double Next methods
 
             /// <summary>
-            /// Returns a non-negative random double-precision floating point number in the range of 0 to long.MaxValue.
+            /// Returns a non-negative random double-precision floating point number in the range of 0 to 1.0.
             /// </summary>
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble()
@@ -345,7 +343,7 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a non-negative random double-precision floating point number that is less than the specified maximum.
             /// </summary>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="max">Maximum possible value.</param>
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double max)
             {
@@ -355,8 +353,8 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a random double-precision floating point number that is within a specified range.
             /// </summary>
-            /// <param name="min">Minimum possible value</param>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="min">Minimum possible value.</param>
+            /// <param name="max">Maximum possible value.</param>
             /// <returns>Random double-precision floating point number</returns>
             public double NextDouble(double min, double max)
             {
@@ -368,7 +366,7 @@ namespace Microsoft.Xna.Framework
             #region Float Next methods
 
             /// <summary>
-            /// Returns a non-negative random single-precision floating point number in the range of 0 to long.MaxValue.
+            /// Returns a non-negative random single-precision floating point number in the range of 0 to 1.0.
             /// </summary>
             /// <returns>Random single-precision floating point number</returns>
             public float NextFloat()
@@ -379,7 +377,7 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a non-negative random single-precision floating point number that is less than the specified maximum.
             /// </summary>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="max">Maximum possible value.</param>
             /// <returns>Random single-precision floating point number</returns>
             public float NextFloat(float max)
             {
@@ -389,8 +387,8 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Returns a random single-precision floating point number that is within a specified range.
             /// </summary>
-            /// <param name="min">Minimum possible value</param>
-            /// <param name="max">Maximum possible value</param>
+            /// <param name="min">Minimum possible value.</param>
+            /// <param name="max">Maximum possible value.</param>
             /// <returns>Random single-precision floating point number</returns>
             public float NextFloat(float min, float max)
             {
