@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte(byte max)
             {
-                return (byte)Remap(UInt64ToInt8(PcgXshRS()), 0, byte.MaxValue, 0, max);
+                return NextByte(0, max);
             }
 
             /// <summary>
@@ -159,7 +159,8 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int8 (byte)</returns>
             public byte NextByte(byte min, byte max)
             {
-                return (byte)Remap(UInt64ToInt16(PcgXshRS()), 0, byte.MaxValue, min, max);
+                uint range = (uint)(max - min);
+                return (byte)((PcgXshRS() % range) + min);
             }
 
             #endregion
@@ -183,7 +184,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort(short max)
             {
-                return (short)Remap(UInt64ToInt16(PcgXshRS()), short.MinValue, short.MaxValue, 0, max);
+                return NextShort(0, max);
             }
 
             /// <summary>
@@ -194,7 +195,10 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int16 (short)</returns>
             public short NextShort(short min, short max)
             {
-                return (short)Remap(UInt64ToInt16(PcgXshRS()), short.MinValue, short.MaxValue, min, max);
+                // Cast to int, in case the total range is bigger than short.MaxValue
+                int range = (int)max - (int)min;
+
+                return (short)((PcgXshRS() % range) + min);
             }
 
             #endregion
@@ -250,7 +254,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int max)
             {
-                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, max);
+                return Next(0, max);
             }
 
             /// <summary>
@@ -262,7 +266,13 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int32 (int)</returns>
             public int Next(int min, int max)
             {
-                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, min, max);
+                // Cast to uint in case the total range is greater than int.MaxValue
+                // Force overflow on negative numbers, so they remain less than positive ones
+                uint _min = (uint)min + 0x80000000;
+                uint _max = (uint)max + 0x80000000;
+                uint range = _max - _min;
+
+                return (int)(PcgXshRS() % range) + min;
             }
 
             #endregion
@@ -289,7 +299,7 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int64</returns>
             public long NextLong(long max)
             {
-                return Remap(UInt64ToInt64(PcgXshRS()), long.MinValue, long.MaxValue, 0, max);
+                return NextLong(0, max);
             }
 
             /// <summary>
@@ -300,7 +310,15 @@ namespace Microsoft.Xna.Framework
             /// <returns>Random integer of type Int64</returns>
             public long NextLong(long min, long max)
             {
-                return Remap(UInt64ToInt64(PcgXshRS()), long.MinValue, long.MaxValue, min, max);
+                // Cast to ulong in case the total range is greater than long.MaxValue
+                // Force overflow on negative numbers, so they remain less than positive ones
+                ulong _min = (ulong)min + 0x8000000000000000;
+                ulong _max = (ulong)max + 0x8000000000000000;
+                ulong range = _max - _min;
+
+                ulong value = (ulong)PcgXshRS() | ((ulong)PcgXshRS() << 32);
+
+                return (long)(value % range) + min;
             }
 
             #endregion
