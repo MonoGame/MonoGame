@@ -213,36 +213,6 @@ namespace Microsoft.Xna.Framework
             /// Returns a non-negative random integer of type Int32 (int).
             /// </summary>
             /// <returns>Random integer of type Int32 (int)</returns>
-            public int NextInt()
-            {
-                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, int.MaxValue);
-            }
-
-            /// <summary>
-            /// Returns a non-negative random integer of type Int32 (int) that is less than the specified maximum.
-            /// </summary>
-            /// <param name="max">Maximum possible value</param>
-            /// <returns>Random integer of type Int32 (int)</returns>
-            public int NextInt(int max)
-            {
-                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, 0, max);
-            }
-
-            /// <summary>
-            /// Returns a random integer of type Int32 (int) that is within a specified range.
-            /// </summary>
-            /// <param name="min">Minimum possible value</param>
-            /// <param name="max">Maximum possible value</param>
-            /// <returns>Random integer of type Int32 (int)</returns>
-            public int NextInt(int min, int max)
-            {
-                return (int)Remap(UInt64ToInt32(PcgXshRS()), int.MinValue, int.MaxValue, min, max);
-            }
-
-            /// <summary>
-            /// Returns a non-negative random integer of type Int32 (int).
-            /// </summary>
-            /// <returns>Random integer of type Int32 (int)</returns>
             public int Next()
             {
                 // Shift to remove sign bit, then cast
