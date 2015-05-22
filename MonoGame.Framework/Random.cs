@@ -377,7 +377,7 @@ namespace Microsoft.Xna.Framework
             {
                 _state = unchecked(_state * 6364136223846793005UL + _seq);
 
-                return (uint)(_state ^ (_state >> 22)) >> (22 + (int)(_state >> 61));
+                return (uint)((_state ^ (_state >> 22)) >> (22 + (int)(_state >> 61)));
             }
 
             #endregion
