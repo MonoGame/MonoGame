@@ -67,6 +67,7 @@ purpose and non-infringement.
 #region Assembly Microsoft.Xna.Framework.Storage.dll, v4.0.30319
 // C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Storage.dll
 #endregion
+using MonoGame.Utilities;
 using Microsoft.Xna.Framework;
 using System;
 using System.IO;
@@ -473,18 +474,25 @@ namespace Microsoft.Xna.Framework.Storage
 			get {
 #if WINRT
                 return ApplicationData.Current.LocalFolder.Path; 
-#elif LINUX
-                string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-                if (String.IsNullOrEmpty(osConfigDir))
+#elif DESKTOPGL
+                if(CurrentPlatform.OS == OS.Linux)
                 {
-                    osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                    string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
                     if (String.IsNullOrEmpty(osConfigDir))
                     {
-                        return "."; // Oh well.
+                        osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                        if (String.IsNullOrEmpty(osConfigDir))
+                        {
+                            return "."; // Oh well.
+                        }
+                        osConfigDir += "/.local/share";
                     }
-                    osConfigDir += "/.local/share";
+                    return osConfigDir;
                 }
-                return osConfigDir;
+                else if(CurrentPlatform.OS == OS.Windows)
+                    return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                else
+                    throw new Exception("Unexpected platform!");
 #elif MONOMAC
                 string osConfigDir = Environment.GetEnvironmentVariable("HOME");
                 if (String.IsNullOrEmpty(osConfigDir))
