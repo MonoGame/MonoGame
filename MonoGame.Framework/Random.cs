@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
             /// <summary>
             /// Utility method for generating a seed for the random number generator.
             /// </summary>
-            [ClsCompliant(false)]
+            [CLSCompliant(false)]
             public static ulong GenerateSeed()
             {
                 byte[] guid = Guid.NewGuid().ToByteArray();
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework
             /// Original seed for the random number generator. Assigning to this will 
             /// reset the RNG to this state as well as assigning the seed.
             /// </summary>
-            [ClsCompliant(false)]
+            [CLSCompliant(false)]
             public ulong Seed
             {
                 get
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework
             /// This variable can be assigned as the seed of another random number generator to make them
             /// produce the same output, or can be used to save the state of the RNG.
             /// </summary>
-            [ClsCompliant(false)]
+            [CLSCompliant(false)]
             public ulong State
             {
                 get
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework
             /// </summary>
             /// <param name="seed">Seed to be used when computing new random numbers</param>
             /// <param name="sequence">Non-negative number identifying the sequence of random numbers.</param>
-            [ClsCompliant(false)]
+            [CLSCompliant(false)]
             public Random(ulong seed, long sequence)
             {
                 this.Seed = seed;
@@ -377,7 +377,7 @@ namespace Microsoft.Xna.Framework
             {
                 _state = unchecked(_state * 6364136223846793005UL + _seq);
 
-                return (uint)(_state ^ (_state >> 22)) >> (22 + (int)(_state >> 61));
+                return (uint)((_state ^ (_state >> 22)) >> (22 + (int)(_state >> 61)));
             }
 
             #endregion
