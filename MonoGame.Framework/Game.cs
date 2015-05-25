@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework
 
         private bool _suppressDraw;
         private bool _isDisposed;
+        private bool _initialized;
 
         /// <summary>
         /// Initializes a new instance of this class, which provides basic graphics device initialization, game logic,
@@ -317,8 +318,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets if the game is initialized.
         /// </summary>
-        private bool Initialized { get; set; }
-
+        internal bool Initialized
+        {
+            get { return _initialized; }
+        }
         [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 
