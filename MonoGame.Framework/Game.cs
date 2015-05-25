@@ -13,7 +13,6 @@ using Microsoft.Xna.Framework.Input.Touch;
 #if WINRT
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
-
 #endif
 
 namespace Microsoft.Xna.Framework
