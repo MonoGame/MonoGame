@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework
             if (orientations == DisplayOrientation.Default)
             {
                 // Make the decision based on the preferred backbuffer dimensions.
-                var manager = Game.graphicsDeviceManager;
+                var manager = Game.GraphicsDeviceManager;
                 if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
                     supported = FromOrientation(DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight);
                 else
@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework
         {
             lock (_eventLocker)
             {
-                var manager = Game.graphicsDeviceManager;
+                var manager = Game.GraphicsDeviceManager;
 
                 // Set the new client bounds.
                 SetViewBounds(args.NewSize.Width, args.NewSize.Height);
@@ -235,7 +235,7 @@ namespace Microsoft.Xna.Framework
 
                 // If we have a valid client bounds then update the graphics device.
                 if (_viewBounds.Width > 0 && _viewBounds.Height > 0)
-                    Game.graphicsDeviceManager.ApplyChanges();
+                    Game.GraphicsDeviceManager.ApplyChanges();
             }
         }
 

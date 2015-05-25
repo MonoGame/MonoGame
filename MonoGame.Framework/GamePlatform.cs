@@ -344,11 +344,11 @@ namespace Microsoft.Xna.Framework
 		/// <summary>
 		/// Log the specified Message.
 		/// </summary>
-		/// <param name='Message'>
+		/// <param name='message'>
 		/// 
 		/// </param>
 		[System.Diagnostics.Conditional("DEBUG")]
-		public virtual void Log(string Message) {}		
+		public virtual void Log(string message) {}		
 			
 
         #endregion
