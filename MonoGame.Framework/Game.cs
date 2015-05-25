@@ -635,11 +635,19 @@ namespace Microsoft.Xna.Framework
                 LoadContent();
         }
 
+        /// <summary>
+        /// Called when the game determines it is time to draw a frame.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected virtual void Draw(GameTime gameTime)
         {
             _drawables.ForEachFilteredItem(DrawAction, gameTime);
         }
 
+        /// <summary>
+        /// Called when the game has determined that game logic needs to be processed.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected virtual void Update(GameTime gameTime)
         {
             _updateables.ForEachFilteredItem(UpdateAction, gameTime);
