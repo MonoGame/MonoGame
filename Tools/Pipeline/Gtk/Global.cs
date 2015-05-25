@@ -5,7 +5,7 @@ using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public class Global
+    public static class Global
     {
         //by default this should be set to whatever Gtk libs we provide with Mac
         public static double GtkMajorVersion = 2;
@@ -13,6 +13,8 @@ namespace MonoGame.Tools.Pipeline
 
         //indicates which desktop enviorment is currenlly in use
         public static string DesktopEnvironment = "OSX";
+
+        public static bool UseHeaderBar;
 
         public static void Initalize()
         {
@@ -32,10 +34,22 @@ namespace MonoGame.Tools.Pipeline
                 DesktopEnvironment = line;
             }
             #endif
+
+            UseHeaderBar = Global.GtkMajorVersion >= 3 && Global.GtkMinorVersion >= 12 && Global.DesktopEnvironment == "GNOME";
+        }
+
+        public static IntPtr GetNewDialog(IntPtr parrent)
+        {
+            #if GTK3
+            if(UseHeaderBar)
+                return Gtk3Wrapper.gtk_dialog_new_with_buttons("", parrent, 4 + (int)DialogFlags.Modal);
+            #endif
+
+            return (new Dialog("", new Gtk.Window(parrent), DialogFlags.Modal)).Handle;
         }
     }
 
-    public class IconCache
+    public static class IconCache
     {
         static IconTheme theme = IconTheme.Default;
 
