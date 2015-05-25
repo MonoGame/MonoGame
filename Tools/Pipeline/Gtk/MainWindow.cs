@@ -124,7 +124,8 @@ namespace MonoGame.Tools.Pipeline
                 OpenProjectPath = null;
             }
 
-            projectview1.ExpandBase();
+            if(_controller.ProjectOpen)
+                projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
