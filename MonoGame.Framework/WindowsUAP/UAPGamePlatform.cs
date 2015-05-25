@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework
         protected override void Dispose(bool disposing)
         {
             // Make sure we dispose the graphics system.
-            var graphicsDeviceManager = Game.graphicsDeviceManager;
+            var graphicsDeviceManager = Game.GraphicsDeviceManager;
             if (graphicsDeviceManager != null)
                 graphicsDeviceManager.Dispose();
 

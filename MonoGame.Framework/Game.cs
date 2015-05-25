@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework
     public class Game : IDisposable
     {
         private ContentManager _content;
-        private GamePlatform _platform;
+        internal GamePlatform Platform;
         private TimeSpan _accumulatedElapsedTime;
         private GameTime _gameTime;
         private Stopwatch _gameTimer;
@@ -70,10 +70,10 @@ namespace Microsoft.Xna.Framework
             Components = new GameComponentCollection();
             _content = new ContentManager(Services);
 
-            _platform = GamePlatform.Create(this);
-            _platform.Activated += OnActivated;
-            _platform.Deactivated += OnDeactivated;
-            Services.AddService(typeof (GamePlatform), _platform);
+            Platform = GamePlatform.Create(this);
+            Platform.Activated += OnActivated;
+            Platform.Deactivated += OnDeactivated;
+            Services.AddService(typeof (GamePlatform), Platform);
 
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
@@ -92,8 +92,8 @@ namespace Microsoft.Xna.Framework
         [Conditional("DEBUG")]
         public void Log(string message)
         {
-            if (_platform != null)
-                _platform.Log(message);
+            if (Platform != null)
+                Platform.Log(message);
         }
 
         public void Dispose()
@@ -130,16 +130,16 @@ namespace Microsoft.Xna.Framework
                         _graphicsDeviceManager = null;
                     }
 
-                    if (_platform != null)
+                    if (Platform != null)
                     {
-                        _platform.Activated -= OnActivated;
-                        _platform.Deactivated -= OnDeactivated;
+                        Platform.Activated -= OnActivated;
+                        Platform.Deactivated -= OnDeactivated;
                         Services.RemoveService(typeof (GamePlatform));
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
                         Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
 #endif
-                        _platform.Dispose();
-                        _platform = null;
+                        Platform.Dispose();
+                        Platform = null;
                     }
 
                     ContentTypeReaderManager.ClearTypeCreators();
@@ -226,7 +226,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public bool IsActive
         {
-            get { return _platform.IsActive; }
+            get { return Platform.IsActive; }
         }
 
         /// <summary>
@@ -234,8 +234,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public bool IsMouseVisible
         {
-            get { return _platform.IsMouseVisible; }
-            set { _platform.IsMouseVisible = value; }
+            get { return Platform.IsMouseVisible; }
+            set { Platform.IsMouseVisible = value; }
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace Microsoft.Xna.Framework
             {
                 // Give GamePlatform implementations an opportunity to override
                 // the new value.
-                value = _platform.TargetElapsedTimeChanging(value);
+                value = Platform.TargetElapsedTimeChanging(value);
 
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException("The time must be positive and non-zero.", default(Exception));
@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework
                 if (value != _targetElapsedTime)
                 {
                     _targetElapsedTime = value;
-                    _platform.TargetElapsedTimeChanged();
+                    Platform.TargetElapsedTimeChanged();
                 }
             }
         }
@@ -311,7 +311,7 @@ namespace Microsoft.Xna.Framework
         [CLSCompliant(false)]
         public GameWindow Window
         {
-            get { return _platform.Window; }
+            get { return Platform.Window; }
         }
 
         /// <summary>
@@ -374,7 +374,7 @@ namespace Microsoft.Xna.Framework
 #endif
         public void Exit()
         {
-            _platform.Exit();
+            Platform.Exit();
             _suppressDraw = true;
         }
 
@@ -383,7 +383,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void ResetElapsedTime()
         {
-            _platform.ResetElapsedTime();
+            Platform.ResetElapsedTime();
             _gameTimer.Reset();
             _gameTimer.Start();
             _accumulatedElapsedTime = TimeSpan.Zero;
@@ -405,10 +405,10 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void RunOneFrame()
         {
-            if (_platform == null)
+            if (Platform == null)
                 return;
 
-            if (!_platform.BeforeRun())
+            if (!Platform.BeforeRun())
                 return;
 
             if (!Initialized)
@@ -428,7 +428,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Run()
         {
-            Run(_platform.DefaultRunBehavior);
+            Run(Platform.DefaultRunBehavior);
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace Microsoft.Xna.Framework
         public void Run(GameRunBehavior runBehavior)
         {
             AssertNotDisposed();
-            if (!_platform.BeforeRun())
+            if (!Platform.BeforeRun())
             {
                 BeginRun();
                 _gameTimer = Stopwatch.StartNew();
@@ -455,12 +455,12 @@ namespace Microsoft.Xna.Framework
             switch (runBehavior)
             {
                 case GameRunBehavior.Asynchronous:
-                    _platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
-                    _platform.StartRunLoop();
+                    Platform.AsyncRunLoopEnded += Platform_AsyncRunLoopEnded;
+                    Platform.StartRunLoop();
                     break;
 
                 case GameRunBehavior.Synchronous:
-                    _platform.RunLoop();
+                    Platform.RunLoop();
                     EndRun();
                     DoExiting();
                     break;
@@ -579,7 +579,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         protected virtual void EndDraw()
         {
-            _platform.Present();
+            Platform.Present();
         }
 
         /// <summary>
@@ -720,26 +720,26 @@ namespace Microsoft.Xna.Framework
 
         internal void ApplyChanges(GraphicsDeviceManager manager)
         {
-            _platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+            Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
 
 #if !(WINDOWS && DIRECTX)
 
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
-                _platform.EnterFullScreen();
+                Platform.EnterFullScreen();
             else
-                _platform.ExitFullScreen();
+                Platform.ExitFullScreen();
 #endif
             var viewport = new Viewport(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth,
                 GraphicsDevice.PresentationParameters.BackBufferHeight);
 
             GraphicsDevice.Viewport = viewport;
-            _platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
+            Platform.EndScreenDeviceChange(string.Empty, viewport.Width, viewport.Height);
         }
 
         internal void DoUpdate(GameTime gameTime)
         {
             AssertNotDisposed();
-            if (_platform.BeforeUpdate(gameTime))
+            if (Platform.BeforeUpdate(gameTime))
             {
                 // Once per frame, we need to check currently
                 // playing sounds to see if they've stopped,
@@ -759,7 +759,7 @@ namespace Microsoft.Xna.Framework
             // Draw and EndDraw should not be called if BeginDraw returns false.
             // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
-            if (_platform.BeforeDraw(gameTime) && BeginDraw())
+            if (Platform.BeforeDraw(gameTime) && BeginDraw())
             {
                 Draw(gameTime);
                 EndDraw();
@@ -769,7 +769,7 @@ namespace Microsoft.Xna.Framework
         internal void DoInitialize()
         {
             AssertNotDisposed();
-            _platform.BeforeInitialize();
+            Platform.BeforeInitialize();
             Initialize();
             OrganizeComponents();
             Components.ComponentAdded += OnComponentAdded;
