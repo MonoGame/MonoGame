@@ -8,9 +8,14 @@ namespace MonoGame.Tools.Pipeline
         public bool applyforall;
         public CopyAction responce;
 
-        public AddFileDialog(Window parrent, string fileloc, bool exists) : base(Mono.Unix.Catalog.GetString ("Add File Action"), parrent, DialogFlags.Modal)
+        public AddFileDialog(Window parrent, string fileloc, bool exists) : base(Global.GetNewDialog(parrent.Handle))
         {
             Build();
+
+            this.Title = Mono.Unix.Catalog.GetString ("Add File Action");
+
+            this.AddButton("Ok", ResponseType.Ok);
+            this.AddButton("Cancel", ResponseType.Cancel);
 
             label1.Text = label1.Text.Replace("%file", fileloc);
             label1.Markup = label1.Text;
@@ -24,11 +29,6 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnResponse(object sender, EventArgs e)
         {
-            Destroy ();
-        }
-
-        protected void OnButtonOkClicked(object sender, EventArgs e)
-        {
             if (radiobuttonCopy.Active)
                 responce = CopyAction.Copy;
             else if (radiobuttonLink.Active)
@@ -37,7 +37,8 @@ namespace MonoGame.Tools.Pipeline
                 responce = CopyAction.Skip;
 
             applyforall = checkbutton1.Active;
-            Respond(ResponseType.Ok);
+
+            Destroy ();
         }
     }
 }

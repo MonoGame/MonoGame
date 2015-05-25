@@ -15,10 +15,6 @@ namespace MonoGame.Tools.Pipeline
 		private global::Gtk.CheckButton checkbutton1;
 		
 		private global::Gtk.Alignment alignment1;
-		
-		private global::Gtk.Button buttonCancel;
-		
-		private global::Gtk.Button buttonOk;
 
 		protected virtual void Build ()
 		{
@@ -104,41 +100,6 @@ namespace MonoGame.Tools.Pipeline
 			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(w1 [this.alignment1]));
 			w7.PackType = ((global::Gtk.PackType)(1));
 			w7.Position = 6;
-			// Internal child MonoGame.Tools.Pipeline.AddFileDialog.ActionArea
-            #if GTK2
-			global::Gtk.HButtonBox w8 = this.ActionArea;
-            #elif GTK3
-            global::Gtk.ButtonBox w8 = this.ActionArea;
-            #endif
-			w8.Name = "dialog1_ActionArea";
-			w8.Spacing = 10;
-			w8.BorderWidth = ((uint)(5));
-			w8.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonCancel = new global::Gtk.Button ();
-			this.buttonCancel.CanDefault = true;
-			this.buttonCancel.CanFocus = true;
-			this.buttonCancel.Name = "buttonCancel";
-			this.buttonCancel.UseStock = true;
-			this.buttonCancel.UseUnderline = true;
-			this.buttonCancel.Label = "gtk-cancel";
-			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w9 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w8 [this.buttonCancel]));
-			w9.Expand = false;
-			w9.Fill = false;
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonOk = new global::Gtk.Button ();
-			this.buttonOk.CanDefault = true;
-			this.buttonOk.CanFocus = true;
-			this.buttonOk.Name = "buttonOk";
-			this.buttonOk.UseStock = true;
-			this.buttonOk.UseUnderline = true;
-			this.buttonOk.Label = "gtk-ok";
-			w8.Add (this.buttonOk);
-			global::Gtk.ButtonBox.ButtonBoxChild w10 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w8 [this.buttonOk]));
-			w10.Position = 1;
-			w10.Expand = false;
-			w10.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
@@ -146,7 +107,6 @@ namespace MonoGame.Tools.Pipeline
 			this.DefaultHeight = 261;
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
-			this.buttonOk.Clicked += new global::System.EventHandler (this.OnButtonOkClicked);
 		}
 	}
 }
