@@ -190,7 +190,7 @@ namespace MonoGame.Tools.Pipeline
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter && !filePath.EndsWith(".mgcb"))
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
