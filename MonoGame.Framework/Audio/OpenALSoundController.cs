@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
-#elif (WINDOWS && OPENGL) || LINUX
+#elif DESKTOPGL
         private static AudioContext _acontext;
         private static OggStreamer _oggstreamer;
 #endif
@@ -199,7 +199,7 @@ namespace Microsoft.Xna.Framework.Audio
 #else
                 int[] attribute = new int[0];
 #endif
-#if (WINDOWS && OPENGL) || LINUX
+#if DESKTOPGL
                 _acontext = new AudioContext();
                 _context = Alc.GetCurrentContext();
                 _oggstreamer = new OggStreamer();
@@ -306,7 +306,7 @@ namespace Microsoft.Xna.Framework.Audio
                     if (_bSoundAvailable)
                         CleanUpOpenAL();
 
-#if (WINDOWS && OPENGL) || LINUX
+#if DESKTOPGL
                     _oggstreamer.Dispose();
 #endif
                 }
