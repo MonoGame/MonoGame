@@ -153,11 +153,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// ATC/ATITC compression (Android)
         /// </summary>
-        RgbaATCExplicitAlpha =  80,
+        RgbaAtcExplicitAlpha =  80,
         /// <summary>
         /// ATC/ATITC compression (Android)
         /// </summary>
-        RgbaATCInterpolatedAlpha = 81,
+        RgbaAtcInterpolatedAlpha = 81,
 
         #endregion
     }

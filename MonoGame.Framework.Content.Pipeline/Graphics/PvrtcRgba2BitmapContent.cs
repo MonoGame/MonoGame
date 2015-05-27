@@ -6,21 +6,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class AtcExplicitBitmapContent : AtcBitmapContent
+    public class PvrtcRgba2BitmapContent : PvrtcBitmapContent
     {
         /// <summary>
-        /// Creates an instance of AtcExplicitBitmapContent.
-        /// </summary>
-        public AtcExplicitBitmapContent()
-        {
-        }
-
-        /// <summary>
-        /// Creates an instance of AtcExplicitBitmapContent with the specified width and height.
+        /// Creates an instance of PvrtcRgba2BitBitmapContent with the specified width and height.
         /// </summary>
         /// <param name="width">The width in pixels of the bitmap.</param>
         /// <param name="height">The height in pixels of the bitmap.</param>
-        public AtcExplicitBitmapContent(int width, int height)
+        public PvrtcRgba2BitmapContent(int width, int height)
             : base(width, height)
         {
         }
@@ -32,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The GPU texture format of the bitmap type.</returns>
         public override bool TryGetFormat(out SurfaceFormat format)
         {
-            format = SurfaceFormat.RgbaAtcExplicitAlpha;
+            format = SurfaceFormat.RgbaPvrtc2Bpp;
             return true;
         }
 
@@ -42,7 +35,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Description of the bitmap.</returns>
         public override string ToString()
         {
-            return "ATITC Explicit Alpha " + Width + "x" + Height;
+            return "PVRTC RGBA 2bpp " + Width + "x" + Height;
         }
     }
 }

@@ -120,6 +120,10 @@
     <Compile Include="Graphics\PixelBitmapContent.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgb2BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgb4BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgba2BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgba4BitmapContent.cs" />
     <Compile Include="Graphics\Font\SharpFontImporter.cs" />
     <Compile Include="Graphics\SkinnedMaterialContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
@@ -430,6 +434,7 @@
     <Compile Include="XmlImporter.cs" />
 
 	<!-- Utility Classes -->
+    <Compile Include="Utilities\Vector4Converter.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />

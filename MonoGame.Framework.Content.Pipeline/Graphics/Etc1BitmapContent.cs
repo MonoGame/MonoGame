@@ -2,12 +2,15 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework.Graphics;
 using PVRTexLibNET;
-using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Supports the processing of a texture compressed using ETC1.
+    /// </summary>
     public class Etc1BitmapContent : BitmapContent
     {
         byte[] _data;
@@ -49,25 +52,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
-            // Region copy is not supported.
-            if (destinationRegion.Top != 0 ||
-                destinationRegion.Left != 0 ||
-                destinationRegion.Width != Width ||
-                destinationRegion.Height != Height)
-                return false;
-            if (sourceRegion.Top != 0 ||
-                sourceRegion.Left != 0 ||
-                sourceRegion.Width != sourceBitmap.Width ||
-                sourceRegion.Height != sourceBitmap.Height)
+            SurfaceFormat sourceFormat;
+            if (!sourceBitmap.TryGetFormat(out sourceFormat))
                 return false;
 
-            // If needed, convert to floating point format
-            if (!(sourceBitmap is PixelBitmapContent<Color>))
+            // A shortcut for copying the entire bitmap to another bitmap of the same type and format
+            if (SurfaceFormat.RgbEtc1 == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
-                var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
-                BitmapContent.Copy(sourceBitmap, colorBitmap);
-                sourceBitmap = colorBitmap;
+                SetPixelData(sourceBitmap.GetPixelData());
+                return true;
             }
+
+            // Destination region copy is not yet supported
+            if (destinationRegion != new Rectangle(0, 0, Width, Height))
+                return false;
+
+            // If the source is not Vector4 or requires resizing, send it through BitmapContent.Copy
+            if (!(sourceBitmap is PixelBitmapContent<Vector4>) || sourceRegion.Width != destinationRegion.Width || sourceRegion.Height != destinationRegion.Height)
+            {
+                try
+                {
+                    BitmapContent.Copy(sourceBitmap, sourceRegion, this, destinationRegion);
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    return false;
+                }
+            }
+
+            // Convert to full colour 32-bit format. Floating point would be preferred for processing, but it appears to have some issues.
+            var colorBitmap = new PixelBitmapContent<Color>(sourceRegion.Width, sourceRegion.Height);
+            BitmapContent.Copy(sourceBitmap, sourceRegion, colorBitmap, new Rectangle(0, 0, colorBitmap.Width, colorBitmap.Height));
+            sourceBitmap = colorBitmap;
 
             try
             {
@@ -79,10 +96,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
                     PVRTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
                 PVRTexture.Transcode(PixelFormat.ETC1, VariableType.UnsignedByte, ColourSpace.lRGB /*, CompressorQuality.ETCMediumPerceptual, true*/);
-                var etc1DataSize = PVRTexture.GetTextureDataSize(0);
-                var etc1Data = new byte[etc1DataSize];
-                PVRTexture.GetTextureData(etc1Data, etc1DataSize);
-                SetPixelData(etc1Data);
+                var texDataSize = PVRTexture.GetTextureDataSize(0);
+                var texData = new byte[texDataSize];
+                PVRTexture.GetTextureData(texData, texDataSize);
+                SetPixelData(texData);
             }
             finally
             {
@@ -93,7 +110,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
-            // No support for copying from a ETC1 texture yet
+            SurfaceFormat destinationFormat;
+            if (!destinationBitmap.TryGetFormat(out destinationFormat))
+                return false;
+
+            // A shortcut for copying the entire bitmap to another bitmap of the same type and format
+            if (SurfaceFormat.RgbEtc1 == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            {
+                destinationBitmap.SetPixelData(GetPixelData());
+                return true;
+            }
+
+            // No other support for copying from a ETC1 texture yet
             return false;
         }
 
@@ -106,6 +134,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             format = SurfaceFormat.RgbEtc1;
             return true;
+        }
+
+        /// <summary>
+        /// Returns a string description of the bitmap.
+        /// </summary>
+        /// <returns>Description of the bitmap.</returns>
+        public override string ToString()
+        {
+            return "ETC1 " + Width + "x" + Height;
         }
     }
 }
