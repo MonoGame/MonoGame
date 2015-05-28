@@ -163,6 +163,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     for (int x = 0; x < sourceRegion.Width; ++x)
                     {
                         p.PackFromVector4(row[sourceRegion.Left + x]);
+                        pixel = (T)p;
                         SetPixel(destinationRegion.Left + x, destinationRegion.Top + y, pixel);
                     }
                 });

@@ -243,6 +243,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     return profile == GraphicsProfile.Reach;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.Etc1Compressed:
                     return true;
             }
 
@@ -263,7 +264,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (format)
             {
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    return platform == TargetPlatform.iOS;
+                    return true;
             }
 
             return false;
@@ -402,10 +403,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var height = content.Faces[0][0].Width;
 
 			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height))
-				throw new PipelineException("PVRTC Compressed textures width and height must be powers of two.");
+				throw new PipelineException("PVR compression requires width and height must be powers of two.");
 
 			if (width != height)
-				throw new PipelineException("PVRTC Compressed textures must be square. i.e width == height.");
+				throw new PipelineException("PVR compression requires square textures.");
 
             var face = content.Faces[0][0];
 
@@ -425,7 +426,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (profile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
-                    throw new PipelineException("DXT Compressed textures width and height must be powers of two in GraphicsProfile.Reach.");                
+                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
             }
 
             var pixelData = texData.GetPixelData();
@@ -504,7 +505,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (alphaRange != AlphaRange.Opaque)
                 Compress(typeof(PixelBitmapContent<Bgra4444>), content, generateMipMaps);
             else
+            {
+                // PVR SGX does not handle non-POT ETC1 textures.
+                // https://code.google.com/p/libgdx/issues/detail?id=1310
+                // Since we already enforce POT for PVR and DXT in Reach, we will also enforce POT for ETC1
+                if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
+                    throw new PipelineException("ETC1 compression require width and height must be powers of two.");
                 Compress(typeof(Etc1BitmapContent), content, generateMipMaps);
+            }
         }
 
         static void CompressColor16Bit(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
