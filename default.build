@@ -41,6 +41,7 @@
     <call target="build_android" />
     <call target="build_mac" />
     <call target="build_ios" />
+    <call target="build_desktopgl" />
 
   </target>
 
@@ -83,6 +84,19 @@
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
+    </if>
+  </target>
+
+  <target name="build_desktopgl" description="Build DesktopGL" depends="clean">
+    <if test="${os == 'Win32NT'}">
+      <exec program="Protobuild" commandline="-generate DesktopGL" />
+      <exec program="msbuild " commandline="MonoGame.Framework.DesktopGL.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.DesktopGL.sln /t:Build /p:Configuration=Release" />
+    </if>
+    <if test="${os == 'Unix'}">
+      <exec program="mono" commandline="Protobuild.exe -generate DesktopGL" />
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.DesktopGL.sln" />
+      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.DesktopGL.sln" />
     </if>
   </target>
 

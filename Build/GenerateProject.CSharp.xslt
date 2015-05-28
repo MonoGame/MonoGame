@@ -431,6 +431,9 @@
               <xsl:when test="/Input/Generation/Platform = 'Linux'">
                 <xsl:text>PLATFORM_LINUX</xsl:text>
               </xsl:when>
+              <xsl:when test="/Input/Generation/Platform = 'DesktopGL'">
+                <xsl:text>PLATFORM_DESKTOPGL</xsl:text>
+              </xsl:when>
               <xsl:when test="/Input/Generation/Platform = 'MacOS'">
                 <xsl:text>PLATFORM_MACOS</xsl:text>
               </xsl:when>
@@ -647,7 +650,8 @@
         </xsl:when>
         <xsl:when test="/Input/Generation/Platform = 'Windows' or 
           /Input/Generation/Platform = 'MacOS' or 
-          /Input/Generation/Platform = 'Linux'">
+          /Input/Generation/Platform = 'Linux' or 
+          /Input/Generation/Platform = 'DesktopGL'">
           <!--
             We have to choose the ToolsVersion based on the framework, since .NET 4.5
             and later use a ToolsVersion that aligns with Visual Studio's version.

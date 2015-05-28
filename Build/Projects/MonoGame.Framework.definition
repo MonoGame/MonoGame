@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,Web">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,Web,DesktopGL">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -22,6 +22,7 @@
   	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
     <Platform Name="WindowsPhone81">6522B7E9-25A5-4250-B164-42CC2C4ECCAD</Platform>
     <Platform Name="WindowsUAP">09C41A48-7BF3-4A46-9EB8-CE95B4C27CA9</Platform>
+  	<Platform Name="DesktopGL">35253CE1-C864-4CD3-8249-4D1319748E82</Platform>
   </ProjectGuids>
 
   <!-- Common assembly references -->
@@ -56,6 +57,7 @@
       <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
       <Platform Name="WindowsUAP">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
       <Platform Name="Web">TRACE;WEB</Platform>
+      <Platform Name="DesktopGL">TRACE;OPENGL;OPENAL;DESKTOPGL</Platform>
     </CustomDefinitions>
 
   </Properties>
@@ -77,7 +79,7 @@
       <Platforms>Web</Platforms>
     </Uses>
     <Uses Name="_XNADesignProvided">
-      <Platforms>Windows,WindowsGL,Linux,MacOS</Platforms>
+      <Platforms>Windows,WindowsGL,Linux,MacOS,DesktopGL</Platforms>
     </Uses>
     <Uses Name="_FrameworkDispatcherProvided">
       <Platforms>Windows,WindowsGL,MacOS</Platforms>
@@ -86,7 +88,7 @@
       <Platforms>Windows</Platforms>
     </Recommends>
     <Recommends Name="OpenGLGraphics">
-      <Platforms>Linux,MacOS</Platforms>
+      <Platforms>Linux,MacOS,DesktopGL</Platforms>
     </Recommends>
   </Dependencies>
 
@@ -103,7 +105,7 @@
     <Service Name="OpenGLGraphics">
       <RemoveDefine>DIRECTX;WINDOWS_MEDIA_SESSION</RemoveDefine>
       <AddDefine>OPENGL;OPENAL</AddDefine>
-      <Platforms>iOS,MacOS,Linux,Windows,WindowsGL,Ouya,Android</Platforms>
+      <Platforms>iOS,MacOS,Linux,Windows,WindowsGL,Ouya,Android,DesktopGL</Platforms>
       <Conflicts>ANGLEGraphics,DirectXGraphics,PSMGraphics,WebGraphics</Conflicts>
       <Requires>OpenALAudio,_GLCompatible</Requires>
     </Service>
@@ -125,7 +127,7 @@
 
     <!-- Audio APIs -->
     <Service Name="OpenALAudio">
-      <Platforms>Angle,iOS,Linux,Windows,WindowsGL,MacOS,Android,Ouya</Platforms>
+      <Platforms>Angle,iOS,Linux,Windows,WindowsGL,MacOS,Android,Ouya,DesktopGL</Platforms>
       <Conflicts>XAudioAudio,PSMAudio,WebAudio</Conflicts>
     </Service>
     <Service Name="XAudioAudio">
@@ -164,7 +166,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>Linux,MacOS</Platforms>
+      <Platforms>Linux,MacOS,DesktopGL</Platforms>
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -243,10 +245,10 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="TextInputEventArgs.cs">
-      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUAP</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUAP,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Threading.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,WindowsPhone,DesktopGL</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Vector2.cs" />
@@ -259,14 +261,14 @@
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioLoader.cs">
-      <Platforms>Linux,WindowsGL,Angle,Android,Ouya</Platforms>
+      <Platforms>Linux,WindowsGL,Angle,Android,Ouya,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Audio\AudioUtil.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
@@ -378,13 +380,13 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Content\ContentReaders\Texture3DReader.cs">
-      <Platforms>Angle,Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+      <Platforms>Angle,Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureCubeReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
@@ -396,7 +398,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs"/>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web,DesktopGL</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerCollectionItemNameAttribute.cs" />
@@ -407,7 +409,7 @@
     <Compile Include="Content\ContentTypeReaderManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="Content\ResourceContentManager.cs">
-      <Platforms>Angle,Android,iOS,Linux,Ouya,Windows,WindowsGL</Platforms>
+      <Platforms>Angle,Android,iOS,Linux,Ouya,Windows,WindowsGL,DesktopGL</Platforms>
     </Compile>
 
 
@@ -476,7 +478,7 @@
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\ImageEx.cs">
-      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
@@ -578,7 +580,7 @@
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
@@ -792,7 +794,7 @@
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,MacOS,WindowsGL,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.Web.cs">
       <Platforms>Web</Platforms>
@@ -816,7 +818,7 @@
       <Platforms>Android,Ouya,PSMobile,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,Web</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,MacOS,WindowsGL,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>PSMobile,Android,Ouya</ExcludePlatforms>
@@ -910,7 +912,7 @@
       <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.Default.cs">
-      <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,Web</Platforms>
+      <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,Web,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSource.cs" />
@@ -940,7 +942,7 @@
         <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Media\Song.NVorbis.cs">
-        <Platforms>WindowsGL,Linux</Platforms>
+        <Platforms>WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Media\Song.WMS.cs">
         <Platforms>Windows</Platforms>
@@ -953,7 +955,7 @@
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web,DesktopGL</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -968,7 +970,7 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web,DesktopGL</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -1020,20 +1022,20 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUAP,Linux</Platforms>
+      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUAP,Linux,DesktopGL</Platforms>
     </Compile>
 
 
     <!-- Utility Classes -->
     <Compile Include="Utilities\AssemblyHelper.cs">
-      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Utilities\CurrentPlatform.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Platforms>WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\OggStream.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Platforms>WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
@@ -1088,13 +1090,13 @@
 
     <!-- Common Desktop Platform -->
     <Compile Include="Desktop\OpenTKGamePlatform.cs">
-      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,WindowsGL,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Desktop\OpenTKGameWindow.cs">
-      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,WindowsGL,DesktopGL</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardUtil.OpenTK.cs">
-      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,WindowsGL,DesktopGL</Platforms>
     </Compile>
 
 

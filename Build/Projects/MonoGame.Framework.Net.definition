@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,DesktopGL">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -19,7 +19,8 @@
 	<Platform Name="Windows8">A65B8326-1DDD-4E5D-8130-E74F70919E81</Platform>
 	<Platform Name="WindowsGL">6D6009F4-0AFB-4806-89D7-7945F20270F5</Platform>
 	<Platform Name="WindowsPhone">C6DA906E-9E4A-428B-8870-07A39B172F83</Platform>
-    <Platform Name="WindowsPhone81">423e2b58-4fbb-4a5d-8a86-1188f2889523</Platform>
+	<Platform Name="WindowsPhone81">423e2b58-4fbb-4a5d-8a86-1188f2889523</Platform>
+	<Platform Name="DesktopGL">1B738549-0449-4504-B978-7BFC347E3F32</Platform>
   </ProjectGuids>
 
   <!-- Common assembly references -->
@@ -56,6 +57,7 @@
       <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX;NET</Platform>
       <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
+      <Platform Name="DesktopGL">TRACE;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
     </CustomDefinitions>
 
   </Properties>
@@ -115,13 +117,13 @@
       <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
-      <Platforms>Android,MacOS,Ouya,Windows,WindowsGL,Linux</Platforms>
+      <Platforms>Android,MacOS,Ouya,Windows,WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesDispatcher.cs">
-      <Platforms>MacOS,Windows,WindowsGL,Linux</Platforms>
+      <Platforms>MacOS,Windows,WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesComponent.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL,DesktopGL</Platforms>
     </Compile>
  
 
@@ -257,13 +259,13 @@
     
     <!-- DesktopGL Platform -->
     <Compile Include="DesktopGL\GamerServices\Guide.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Platforms>WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="DesktopGL\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Platforms>WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="DesktopGL\GamerServices\SignedInGamer.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
+      <Platforms>WindowsGL,Linux,DesktopGL</Platforms>
     </Compile>
 
 

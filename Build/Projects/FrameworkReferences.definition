@@ -7,6 +7,18 @@
     <Reference Include="OpenTK-1.0" />
   </Platform>
 
+  <Platform Type="DesktopGL">
+    <Service Name="MonoGame.Framework/OpenGLGraphics">
+      <Reference Include="System.Drawing" />
+      <Binary
+        Name="NVorbis"
+        Path="ThirdParty/Dependencies/NVorbis/NVorbis.dll" />
+      <Binary
+        Name="OpenTK"
+        Path="ThirdParty/Dependencies/OpenTK.dll" />
+    </Service>
+  </Platform>
+
   <Platform Type="Linux">
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Drawing" />

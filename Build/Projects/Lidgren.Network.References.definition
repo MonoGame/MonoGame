@@ -15,6 +15,11 @@
     <Reference Include="Xamarin.iOS" />
   </Platform>
 
+  <Platform Type="DesktopGL">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
   <Platform Type="Linux">
     <Reference Include="System" />
     <Reference Include="System.Xml" />

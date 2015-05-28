@@ -7,6 +7,10 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
+  <Platform Type="DesktopGL">
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
   <Platform Type="Linux">
     <Reference Include="Lidgren.Network" />
   </Platform>

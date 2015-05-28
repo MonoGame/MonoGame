@@ -3,7 +3,7 @@
   Name="Lidgren.Network"
   Path="ThirdParty/Lidgren.Network"
   Type="Library"
-  Platforms="Android,Linux,MacOS,Ouya,Windows,WindowsGL,iOS">
+  Platforms="Android,Linux,MacOS,Ouya,Windows,WindowsGL,iOS,DesktopGL">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -42,6 +42,7 @@
       <Platform Name="PSMobile">PSM;UNITY_4_5</Platform>
       <Platform Name="Windows">TRACE;UNITY_4_5</Platform>
       <Platform Name="WindowsGL">TRACE;UNITY_4_5</Platform>
+      <Platform Name="DesktopGL">TRACE;UNITY_4_5</Platform>
     </CustomDefinitions>
   </Properties>
 
