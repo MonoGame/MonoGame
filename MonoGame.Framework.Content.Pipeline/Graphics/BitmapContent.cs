@@ -106,11 +106,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (!destinationBitmap.TryGetFormat(out destinationFormat))
                 throw new InvalidOperationException("Could not retrieve surface format of destination bitmap");
 
-            // If the formats are the same and the regions are the same size, do a simpler copy
-            if (sourceFormat == destinationFormat && sourceRegion.Width == destinationRegion.Width && sourceRegion.Height == destinationRegion.Height)
+            // If the formats are the same and the regions are the full bounds of the bitmaps and they are the same size, do a simpler copy
+            if (sourceFormat == destinationFormat && sourceRegion == destinationRegion
+                && sourceRegion == new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height)
+                && destinationRegion == new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height))
             {
-                if (destinationBitmap.TryCopyFrom(sourceBitmap, sourceRegion, destinationRegion))
-                    return;
+                destinationBitmap.SetPixelData(sourceBitmap.GetPixelData());
+                return;
             }
 
             // The basic process is
