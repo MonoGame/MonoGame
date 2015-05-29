@@ -155,7 +155,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Context.MakeCurrent(wnd);
             (Context as IGraphicsContextInternal).LoadAll();
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
-
+#endif
+#if WINDOWS || ANGLE
             // Provide the graphics context for background loading
             // Note: this context should use the same GraphicsMode,
             // major, minor version and flags parameters as the main
@@ -351,7 +352,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL || ANGLE
                 Context.Dispose();
                 Context = null;
-
+#endif
+#if WINDOWS || ANGLE
                 if (Threading.BackgroundContext != null)
                 {
                     Threading.BackgroundContext.Dispose();

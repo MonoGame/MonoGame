@@ -71,12 +71,12 @@ namespace Microsoft.Xna.Framework
         static int mainThreadId;
 #endif
 
-#if ANDROID
+#if ANDROID || LINUX
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
 #elif IOS
         public static EAGLContext BackgroundContext;
-#elif WINDOWS || DESKTOPGL || ANGLE
+#elif WINDOWS || ANGLE
         public static IGraphicsContext BackgroundContext;
         public static IWindowInfo WindowInfo;
 #endif
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif WINDOWS || DESKTOPGL || ANGLE
+#elif WINDOWS || ANGLE
             lock (BackgroundContext)
             {
                 // Make the context current on this thread
@@ -226,7 +226,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID
+#if ANDROID || LINUX
         static void Add(Action action)
         {
             lock (actions)

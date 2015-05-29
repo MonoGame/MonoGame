@@ -247,6 +247,10 @@ namespace Microsoft.Xna.Framework
             Window.ProcessEvents();
             UpdateWindowState();
             HandleInput();
+
+#if LINUX
+			Threading.Run();
+#endif
         }
 
         private void UpdateBorder()
