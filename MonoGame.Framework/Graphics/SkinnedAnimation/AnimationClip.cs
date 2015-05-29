@@ -27,27 +27,15 @@ namespace Microsoft.Xna.Framework.Graphics.SkinnedAnimation
             Keyframes = keyframes;
         }
 
-
-        /// <summary>
-        /// Private constructor for use by the XNB deserializer.
-        /// </summary>
-        private AnimationClip()
-        {
-        }
-
-
         /// <summary>
         /// Gets the total length of the animation.
         /// </summary>
-        [ContentSerializer]
-        public TimeSpan Duration { get; private set; }
-
+        public TimeSpan Duration { get; internal set; }
 
         /// <summary>
         /// Gets a combined list containing all the keyframes for all bones,
         /// sorted by time.
         /// </summary>
-        [ContentSerializer]
         public List<Keyframe> Keyframes { get; private set; }
     }
 }

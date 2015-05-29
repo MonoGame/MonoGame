@@ -322,6 +322,7 @@
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReader.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\AnimationClipReader.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
     <Compile Include="Content\ContentReaders\BooleanReader.cs" />
