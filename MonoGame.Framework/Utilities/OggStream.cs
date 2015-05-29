@@ -16,11 +16,6 @@ namespace MonoGame.Utilities
         public static readonly XRamExtension XRam = new XRamExtension();
         public static readonly EffectsExtension Efx = new EffectsExtension();
 
-        static ALHelper()
-        {
-            
-        }
-
         public static void Check()
         {
             ALError error;

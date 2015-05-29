@@ -17,10 +17,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic)
 		{
-			if (graphicsDevice == null)
-                throw new ArgumentNullException("graphicsDevice");
-
-            this.GraphicsDevice = graphicsDevice;
+		    if (graphicsDevice == null)
+		    {
+		        throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+		    }
+		    this.GraphicsDevice = graphicsDevice;
             this.VertexDeclaration = vertexDeclaration;
             this.VertexCount = vertexCount;
             this.BufferUsage = bufferUsage;

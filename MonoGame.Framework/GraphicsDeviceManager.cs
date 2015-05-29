@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework
 
             _supportedOrientations = DisplayOrientation.Default;
 
-#if WINDOWS || MONOMAC || LINUX
+#if WINDOWS || MONOMAC || DESKTOPGL
             _preferredBackBufferHeight = DefaultBackBufferHeight;
             _preferredBackBufferWidth = DefaultBackBufferWidth;
 #else
@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework
 
             ((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
 
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
             ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
 
             //Set the swap interval based on if vsync is desired or not.
@@ -359,7 +359,7 @@ namespace Microsoft.Xna.Framework
 
 #if MONOMAC
             presentationParameters.IsFullScreen = _wantFullScreen;
-#elif LINUX
+#elif DESKTOPGL
             presentationParameters.IsFullScreen = _wantFullScreen;
 #else
             // Set "full screen"  as default

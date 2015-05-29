@@ -124,7 +124,8 @@ namespace MonoGame.Tools.Pipeline
                 OpenProjectPath = null;
             }
 
-            projectview1.ExpandBase();
+            if(_controller.ProjectOpen)
+                projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -156,7 +157,7 @@ namespace MonoGame.Tools.Pipeline
             var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
             dialog.Title = "Save";
 
-            dialog.AddButton("Close without Saving", (int)ResponseType.No);
+            dialog.AddButton("No", (int)ResponseType.No);
             dialog.AddButton("Cancel", (int)ResponseType.Cancel);
             dialog.AddButton("Save", (int)ResponseType.Yes);
 
@@ -189,7 +190,7 @@ namespace MonoGame.Tools.Pipeline
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter && !filePath.EndsWith(".mgcb"))
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
