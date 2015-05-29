@@ -43,9 +43,9 @@ namespace MonoGame.Tests.Framework
             Vector3 v2 = new Vector3(-10.5f, 0.2f, 1000.0f);
             v1.Normalize();
             var expectedResult = new Vector3(-0.0104994215f, 0.000199988979f, 0.999944866f);
-            Assert.AreEqual(expectedResult, v1);
+            Assert.That(expectedResult, Is.EqualTo(v1).Using(Vector3Comparer.Epsilon));
             v2 = Vector3.Normalize(v2);
-            Assert.AreEqual(expectedResult,v2);
+            Assert.That(expectedResult, Is.EqualTo(v2).Using(Vector3Comparer.Epsilon));
         }
 
         [Test]
