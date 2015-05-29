@@ -27,6 +27,28 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void DistanceSquared()
+        {
+            var v1 = new Vector3(0.1f, 100.0f, -5.5f);
+            var v2 = new Vector3(1.1f, -2.0f, 5.5f);
+            var d = Vector3.DistanceSquared(v1, v2);
+            var expectedResult = 10526f;
+            Assert.AreEqual(expectedResult, d);
+        }
+
+        [Test]
+        public void Normalize()
+        {
+            Vector3 v1 = new Vector3(-10.5f, 0.2f, 1000.0f);
+            Vector3 v2 = new Vector3(-10.5f, 0.2f, 1000.0f);
+            v1.Normalize();
+            var expectedResult = new Vector3(-0.0104994215f, 0.000199988979f, 0.999944866f);
+            Assert.That(expectedResult, Is.EqualTo(v1).Using(Vector3Comparer.Epsilon));
+            v2 = Vector3.Normalize(v2);
+            Assert.That(expectedResult, Is.EqualTo(v2).Using(Vector3Comparer.Epsilon));
+        }
+
+        [Test]
         public void Transform()
         {
             // STANDART OVERLOADS TEST
