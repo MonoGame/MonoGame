@@ -13,7 +13,11 @@ namespace MonoGame.Tests.Framework
             // Constructor
 
             Assert.AreEqual(new Rectangle(){X = 10, Y = 20, Width = 64, Height = 64}, rectangle);
+#if !XNA
+            // Constructor 2
 
+            Assert.AreEqual(new Rectangle() { X = 1, Y = 2, Width = 4, Height = 45 }, new Rectangle(new Point(1, 2), new Point(4, 45)));
+#endif
             // Left property
 
             Assert.AreEqual(10, rectangle.Left);
@@ -249,7 +253,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ToStringTest()
         {
-            Assert.AreEqual("{X:-10 Y:10 Width:100 Height:1000}",new Rectangle(-10,10,100,1000).ToString());
+            StringAssert.IsMatch("{X:-10 Y:10 Width:100 Height:1000}",new Rectangle(-10,10,100,1000).ToString());
         }
     }
 }

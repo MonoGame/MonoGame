@@ -484,7 +484,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void CustomFormatting()
         {
-            DeserializeCompileAndLoad<CustomFormatting>("21_CustomFormatting.xml", customFormatting =>
+            DeserializeCompileAndLoad<CustomFormatting<byte, Rectangle>>("21_CustomFormatting.xml", customFormatting =>
             {
                 Assert.AreEqual(1, customFormatting.A);
                 Assert.AreEqual(3, customFormatting.Vector2ListSpaced.Count);
@@ -492,6 +492,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Vector2(0, 6), customFormatting.Vector2ListSpaced[1]);
                 Assert.AreEqual(new Vector2(0, 7), customFormatting.Vector2ListSpaced[2]);
                 Assert.AreEqual(string.Empty, customFormatting.EmptyString);
+                Assert.AreEqual(new Rectangle(0, 0, 100, 100), customFormatting.Rectangle);
             });
         }
 

@@ -10,7 +10,18 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        internal void ClearTargets(RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)
+        internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
+        {
+            if (_applyToVertexStage && !device.GraphicsCapabilities.SupportsVertexTextures)
+                return;
+
+            if (_applyToVertexStage)
+                ClearTargets(targets, device._d3dContext.VertexShader);
+            else
+                ClearTargets(targets, device._d3dContext.PixelShader);
+        }
+
+        private void ClearTargets(RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)
         {
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
@@ -24,6 +35,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Make one pass across all the texture slots.
             for (var i = 0; i < _textures.Length; i++)
             {
+                if (_textures[i] == null)
+                    continue;
+
                 if (_textures[i] != target0 &&
                     _textures[i] != target1 &&
                     _textures[i] != target2 &&

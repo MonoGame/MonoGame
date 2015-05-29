@@ -1041,10 +1041,4 @@ namespace Microsoft.Xna.Framework
             }
         }
     }
-
-    public enum GameRunBehavior
-    {
-        Asynchronous,
-        Synchronous
-    }
 }

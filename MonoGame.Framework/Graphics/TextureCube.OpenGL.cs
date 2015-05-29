@@ -6,7 +6,7 @@ using System;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					GraphicsExtensions.CheckGLError();
 					_lastTextureWrapT = (int)TextureWrapMode.ClampToEdge;
 
-            format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+            format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
             for (int i = 0; i < 6; i++)
             {

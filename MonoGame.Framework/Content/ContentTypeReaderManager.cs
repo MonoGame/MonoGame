@@ -74,8 +74,8 @@ namespace Microsoft.Xna.Framework.Content
             // Trick to prevent the linker removing the code, but not actually execute the code
             if (falseflag)
             {
-                // Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
-                // This forces the classes not to be optimized out when deploying to iDevices
+                // Dummy variables required for it to work on iDevices or Android ** DO NOT DELETE ** 
+                // This forces the classes not to be optimized out when deploying to iDevices or Android
                 var hByteReader = new ByteReader();
                 var hSByteReader = new SByteReader();
                 var hDateTimeReader = new DateTimeReader();
@@ -115,6 +115,12 @@ namespace Microsoft.Xna.Framework.Content
 				var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
+                var hInt32Reader = new Int32Reader();
+                var hSingleReader = new SingleReader();
+                var hEffectReader = new EffectReader();
+                var hModelReader = new ModelReader();
+                var hVertexDeclarationReader = new VertexDeclarationReader();
+                var hTextureCubeReader = new TextureCubeReader();
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
@@ -168,7 +174,7 @@ namespace Microsoft.Xna.Framework.Content
                                 {
                                     typeReader = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
                                 }
-                                catch (TargetInvocationException ex)
+                                catch (Exception ex)
                                 {
                                     // If you are getting here, the Mono runtime is most likely not able to JIT the type.
                                     // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 

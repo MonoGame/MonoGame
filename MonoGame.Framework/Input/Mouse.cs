@@ -46,7 +46,7 @@ using System.Drawing;
 #endif
 
 #if OPENGL
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using MouseInfo = OpenTK.Input.Mouse;
 #elif MONOMAC
 using MonoMac.Foundation;
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly MouseState _defaultState = new MouseState();
 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
 
         static OpenTK.INativeWindow Window;
 
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Input
         { 
             get
             { 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
                 return Window.WindowInfo.Handle;
 #elif WINRT
                 return IntPtr.Zero; // WinRT platform does not create traditionally window, so returns IntPtr.Zero.
@@ -131,10 +131,10 @@ namespace Microsoft.Xna.Framework.Input
             //We need to maintain precision...
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 
-#elif (WINDOWS && OPENGL) || LINUX || ANGLE
+#elif DESKTOPGL || ANGLE
 
             var state = OpenTK.Input.Mouse.GetCursorState();
-            var pc = Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
+            var pc = ((OpenTKGameWindow)window).Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
             window.MouseState.X = pc.X;
             window.MouseState.Y = pc.Y;
 
@@ -188,7 +188,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             UpdateStatePosition(x, y);
 
-#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX || ANGLE
+#if (WINDOWS && DIRECTX) || DESKTOPGL || ANGLE
             // correcting the coordinate system
             // Only way to set the mouse position !!!
             var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
@@ -196,7 +196,7 @@ namespace Microsoft.Xna.Framework.Input
             var pt = new System.Drawing.Point(0, 0);
 #endif
 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             OpenTK.Input.Mouse.SetPosition(pt.X, pt.Y);
 #elif WINDOWS
             SetCursorPos(pt.X, pt.Y);

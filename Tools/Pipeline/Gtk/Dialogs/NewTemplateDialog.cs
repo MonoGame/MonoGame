@@ -12,16 +12,25 @@ namespace MonoGame.Tools.Pipeline
         List<ContentItemTemplate> items;
         TreeStore listStore;
 
-        public NewTemplateDialog (IEnumerator<ContentItemTemplate> enums)
+        Button buttonOk;
+
+        public NewTemplateDialog (Window parrent, IEnumerator<ContentItemTemplate> enums) : base(Global.GetNewDialog(parrent.Handle))
         {
             Build();
 
-            Title = "New Item";
+            this.Title = "New Item";
+
+            buttonOk = (Button)this.AddButton("Ok", ResponseType.Ok);
+            buttonOk.Sensitive = false;
+
+            this.AddButton("Cancel", ResponseType.Cancel);
+
             var column = new TreeViewColumn ();
 
             var iconCell = new CellRendererPixbuf ();
             var textCell = new CellRendererText ();
             var textCell2 = new CellRendererText ();
+            textCell2.Visible = false;
 
             column.PackStart (iconCell, false);
             column.PackStart (textCell, false);
@@ -31,7 +40,7 @@ namespace MonoGame.Tools.Pipeline
 
             column.AddAttribute (iconCell,  "pixbuf", 0);
             column.AddAttribute (textCell, "text", 1);
-            column.AddAttribute (textCell, "text", 2);
+            column.AddAttribute (textCell2, "text", 2);
 
             listStore = new TreeStore (typeof (Gdk.Pixbuf), typeof (string), typeof (string));
             treeview1.Model = listStore;
@@ -92,12 +101,6 @@ namespace MonoGame.Tools.Pipeline
         protected void OnEntry1Changed (object sender, EventArgs e)
         {
             ButtonOkEnabled ();
-        }
-
-        protected void OnButtonOkClicked (object sender, EventArgs e)
-        {
-            if (buttonOk.Sensitive) 
-                Respond(ResponseType.Ok);
         }
     }
 }

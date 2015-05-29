@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Text;
 
@@ -8,7 +12,8 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
 	public class SpriteBatch : GraphicsResource
 	{
-	    readonly SpriteBatcher _batcher;
+        #region Private Fields
+        readonly SpriteBatcher _batcher;
 
 		SpriteSortMode _sortMode;
 		BlendState _blendState;
@@ -26,16 +31,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
+        #endregion
 
         /// <summary>
-        /// Creates a new instance of <see cref="SpriteBatch"/> class.
+        /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-		public SpriteBatch (GraphicsDevice graphicsDevice)
+        public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
-			if (graphicsDevice == null) {
-				throw new ArgumentException ("graphicsDevice");
+			if (graphicsDevice == null)
+            {
+				throw new ArgumentNullException ("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
 			}	
 
 			this.GraphicsDevice = graphicsDevice;
@@ -125,11 +132,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			var vp = gd.Viewport;
 
 		    Matrix projection;
-#if PSM || DIRECTX
             Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0, out projection);
-#else
+#if !PSM && !DIRECTX
             // GL requires a half pixel offset to match DX.
-            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1, out projection);
             projection.M41 += -0.5f * projection.M11;
             projection.M42 += -0.5f * projection.M22;
 #endif

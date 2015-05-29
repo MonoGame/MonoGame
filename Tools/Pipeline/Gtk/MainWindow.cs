@@ -12,7 +12,7 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Window, IView
     {
-        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.";
+        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.()";
 
         public static bool CheckString(string s, string allowedCharacters)
         {
@@ -66,6 +66,11 @@ namespace MonoGame.Tools.Pipeline
             treerebuild.Activated += delegate {
                 projectview1.Rebuild ();
             };
+
+            //This is always returning false, and solves a bug
+            if (projectview1 == null || propertiesview1 == null)
+                return;
+
             projectview1.Initalize (this, treerebuild, propertiesview1);
 
             if (Assembly.GetEntryAssembly ().FullName.Contains ("Pipeline"))
@@ -118,6 +123,9 @@ namespace MonoGame.Tools.Pipeline
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
             }
+
+            if(_controller.ProjectOpen)
+                projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -146,8 +154,13 @@ namespace MonoGame.Tools.Pipeline
 
         public AskResult AskSaveOrCancel ()
         {
-            var dialog = new YesNoCancelDialog ("Question", "Do you want to save the project first?");
-            dialog.TransientFor = this;
+            var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
+            dialog.Title = "Save";
+
+            dialog.AddButton("No", (int)ResponseType.No);
+            dialog.AddButton("Cancel", (int)ResponseType.Cancel);
+            dialog.AddButton("Save", (int)ResponseType.Yes);
+
             var result = dialog.Run ();
             dialog.Destroy ();
 
@@ -162,7 +175,7 @@ namespace MonoGame.Tools.Pipeline
         public bool AskSaveName (ref string filePath, string title)
         {
             var filechooser =
-                new FileChooserDialog(title,
+                new FileChooserDialog("Save MGCB Project As",
                     this,
                     FileChooserAction.Save,
                     "Cancel", ResponseType.Cancel,
@@ -171,10 +184,13 @@ namespace MonoGame.Tools.Pipeline
             filechooser.AddFilter (MonoGameContentProjectFileFilter);
             filechooser.AddFilter (AllFilesFilter);
 
+            if (title != null)
+                filechooser.Title = title;
+
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter)
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
@@ -255,12 +271,12 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddTreeItem (IProjectItem item)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand);
+            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand, _controller.GetFullPath(item.OriginalPath));
         }
 
         public void AddTreeFolder (string folder)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand);
+            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand, _controller.GetFullPath(folder));
         }
 
         public void RemoveTreeItem (ContentItem contentItem)
@@ -367,8 +383,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFileDialog(file, exists);
-            afd.TransientFor = this;
+            var afd = new AddFileDialog(this, file, exists);
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -384,8 +399,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFolder(string folder, out CopyAction action)
         {
-            var afd = new AddFolderDialog(folder);
-            afd.TransientFor = this;
+            var afd = new AddFolderDialog(this, folder);
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -404,7 +418,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ItemExistanceChanged(IProjectItem item)
         {
-            projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
+            projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists, _controller.GetFullPath(item.OriginalPath));
         }
 
         public Process CreateProcess(string exe, string commands)
@@ -431,6 +445,7 @@ namespace MonoGame.Tools.Pipeline
         protected void OnOpenActionActivated (object sender, EventArgs e)
         {
             _controller.OpenProject();
+            projectview1.ExpandBase();
         }
 
         protected void OnCloseActionActivated (object sender, EventArgs e)
@@ -474,21 +489,20 @@ namespace MonoGame.Tools.Pipeline
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            var dialog = new NewTemplateDialog(_controller.Templates.GetEnumerator ());
-            dialog.TransientFor = this;
+            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
 
             if (dialog.Run () == (int)ResponseType.Ok) {
 
                 List<TreeIter> iters;
-                List<Gdk.Pixbuf> icons;
-                string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+                List<string> ids;
+                string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
                 string location;
 
                 if (paths.Length == 1) {
-                    if (icons [0] == projectview1.ICON_FOLDER)
+                    if (ids [0] == projectview1.ID_FOLDER)
                         location = paths [0];
-                    else if (icons[0] == projectview1.ICON_BASE)
+                    else if (ids[0] == projectview1.ID_BASE)
                         location = _controller.GetFullPath ("");
                     else
                         location = System.IO.Path.GetDirectoryName (paths [0]);
@@ -506,13 +520,13 @@ namespace MonoGame.Tools.Pipeline
         {
             expand = true;
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-                if (icons [0] == projectview1.ICON_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.Include (paths [0]);
-                else if (icons[0] == projectview1.ICON_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.Include (_controller.GetFullPath (""));
                 else
                     _controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
@@ -525,21 +539,20 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var ted = new TextEditorDialog("New Folder", "Folder Name:", "", true);
-            ted.TransientFor = this;
+            var ted = new TextEditorDialog(this, "New Folder", "Folder Name:", "", true);
             if (ted.Run() != (int)ResponseType.Ok)
                 return;
             var foldername = ted.text;
 
             expand = true;
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-                if (icons [0] == projectview1.ICON_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.NewFolder (foldername, paths [0]);
-                else if (icons[0] == projectview1.ICON_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.NewFolder (foldername, _controller.GetFullPath (""));
                 else
                     _controller.NewFolder (foldername, System.IO.Path.GetDirectoryName (paths [0]));
@@ -554,13 +567,13 @@ namespace MonoGame.Tools.Pipeline
         {
             expand = true;
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             if (paths.Length == 1) {
-                if (icons [0] == projectview1.ICON_FOLDER)
+                if (ids [0] == projectview1.ID_FOLDER)
                     _controller.IncludeFolder (paths [0]);
-                else if (icons[0] == projectview1.ICON_BASE)
+                else if (ids[0] == projectview1.ID_BASE)
                     _controller.IncludeFolder (_controller.GetFullPath (""));
                 else
                     _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));
@@ -571,6 +584,14 @@ namespace MonoGame.Tools.Pipeline
             expand = false;
         }
 
+        public void OnRenameActionActivated (object sender, EventArgs e)
+        {
+            expand = true;
+            projectview1.Rename ();
+            UpdateMenus();
+            expand = false;
+        }
+        
         public void OnDeleteActionActivated (object sender, EventArgs e)
         {
             projectview1.Remove ();
@@ -599,17 +620,24 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnAboutActionActivated (object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/about/");
             var adialog = new AboutDialog ();
             adialog.TransientFor = this;
+            adialog.Logo = new Gdk.Pixbuf(null, "MonoGame.Tools.Pipeline.App.ico");
+            adialog.ProgramName = AssemblyAttributes.AssemblyProduct;
+            adialog.Version = AssemblyAttributes.AssemblyVersion;
+            adialog.Comments = AssemblyAttributes.AssemblyDescription;
+            adialog.Copyright = AssemblyAttributes.AssemblyCopyright;
+            adialog.Website = "http://www.monogame.net/";
+            adialog.WebsiteLabel = "MonoGame Website";
             adialog.Run ();
+            adialog.Destroy ();
         }
 
         public void UpdateMenus()
         {
             List<TreeIter> iters;
-            List<Gdk.Pixbuf> icons;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
 
             var notBuilding = !_controller.ProjectBuilding;
             var projectOpen = _controller.ProjectOpen;
@@ -629,7 +657,9 @@ namespace MonoGame.Tools.Pipeline
             ExitAction.Sensitive = notBuilding;
 
             AddAction.Sensitive = projectOpen;
-
+            
+            RenameAction.Sensitive = paths.Length == 1;
+            
             DeleteAction.Sensitive = projectOpen && somethingSelected;
 
             BuildAction.Sensitive = projectOpen;
@@ -661,7 +691,11 @@ namespace MonoGame.Tools.Pipeline
 
                 // We need a local to make the delegate work correctly.
                 var localProject = project;
-                recentItem.Activated += (sender, args) => _controller.OpenProject(localProject);
+                recentItem.Activated += delegate
+                {
+                    _controller.OpenProject(localProject);
+                    projectview1.ExpandBase();
+                };
 
                 m.Insert (recentItem, 0);
             }

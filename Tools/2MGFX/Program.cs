@@ -30,7 +30,7 @@ namespace TwoMGFX
             ShaderInfo shaderInfo;
             try
             {
-                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options, new ConsoleEffectCompilerOutput());
             }
             catch (Exception ex)
             {
@@ -92,6 +92,19 @@ namespace TwoMGFX
             // We finished succesfully.
             Console.WriteLine("Compiled '{0}' to '{1}'.", options.SourceFile, options.OutputFile);
             return 0;
+        }
+
+        private class ConsoleEffectCompilerOutput : IEffectCompilerOutput
+        {
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Warning: {0}({1},{2}): {3}" , file, line, column, message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                throw new Exception(string.Format("Error: {0}({1},{2}): {3}", file, line, column, message));
+            }
         }
     }
 }

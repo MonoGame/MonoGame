@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 #if MONOMAC
 using MonoMac.OpenGL;
 #endif
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #endif
 #if GLES

@@ -12,7 +12,7 @@ using MonoMac.OpenGL;
 using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
 #endif
 
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
         internal IGraphicsContext Context { get; private set; }
 #endif
 
@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
             var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
 
@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsDevice.AddDisposeAction(() =>
                                             {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
                 Context.Dispose();
                 Context = null;
 
@@ -386,7 +386,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformPresent()
         {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             Context.SwapBuffers();
 #endif
             GraphicsExtensions.CheckGLError();

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #endif
 
@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindTexture(glTarget, glTexture);
             GraphicsExtensions.CheckGLError();
 
-            format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+            format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
             GL.TexImage3D(glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
             GraphicsExtensions.CheckGLError();

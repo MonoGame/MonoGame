@@ -46,6 +46,13 @@ namespace MonoGame.Tools.Pipeline
 
         public bool LaunchDebugger { get; set; }
 
+        public string ProjectLocation {
+            get
+            {
+                return _project.Location;
+            }
+        }
+
         public bool ProjectOpen { get; private set; }
 
         public bool ProjectDirty { get; set; }
@@ -68,14 +75,13 @@ namespace MonoGame.Tools.Pipeline
 
         public event Action OnBuildFinished;
 
-        public PipelineController(IView view, PipelineProject project)
+        public PipelineController(IView view)
         {
             _actionStack = new ActionStack();
             Selection = new Selection();
 
             View = view;
             View.Attach(this);
-            _project = project;
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
@@ -86,6 +92,7 @@ namespace MonoGame.Tools.Pipeline
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
             ProjectDirty = true;
+            View.UpdateProperties(_project);
         }
 
         public void OnReferencesModified()
@@ -93,6 +100,7 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
             ProjectDirty = true;
             ResolveTypes();
+            View.UpdateProperties(_project);
         }
 
         public void OnItemModified(ContentItem contentItem)
@@ -310,6 +318,33 @@ namespace MonoGame.Tools.Pipeline
             UpdateTree();
         }
 
+        public bool MoveProject(string newname)
+        {
+            string opath = _project.OriginalPath;
+            string ext = Path.GetExtension(opath);
+
+            try
+            {
+                File.Delete(_project.OriginalPath);
+            }
+            catch {
+                View.ShowError("Error", "Could not delete old project file.");
+                return false;
+            }
+
+            _project.OriginalPath = Path.GetDirectoryName(opath) + Path.DirectorySeparatorChar + newname + ext;
+            if (!SaveProject(false))
+            {
+                _project.OriginalPath = opath;
+                SaveProject(false);
+                View.ShowError("Error", "Could not save the new project file.");
+                return false;
+            }
+            View.SetTreeRoot(_project);
+
+            return true;
+        }
+        
         public bool SaveProject(bool saveAs)
         {
             // Do we need file name?
@@ -320,6 +355,7 @@ namespace MonoGame.Tools.Pipeline
                     return false;
 
                 _project.OriginalPath = newFilePath;
+				View.SetTreeRoot(_project);
             }
 
             // Do the save.
@@ -597,8 +633,8 @@ namespace MonoGame.Tools.Pipeline
                     File.Copy(sc[i], dc[i]);
 
                 var action = new IncludeAction(this, files);
-                action.Do();
-                _actionStack.Add(action);  
+                if(action.Do())
+                    _actionStack.Add(action);  
             }
             catch
             {
@@ -641,7 +677,7 @@ namespace MonoGame.Tools.Pipeline
                         try
                         {
                             DirectoryInfo dinfo = new DirectoryInfo(folder);
-                            string newdir = directories[i].Replace(folder, initialDirectory + dinfo.Name + Path.DirectorySeparatorChar);
+                            string newdir = directories[i].Replace(folder, initialDirectory + Path.DirectorySeparatorChar + dinfo.Name + Path.DirectorySeparatorChar);
 
                             if (!Directory.Exists(newdir))
                                 Directory.CreateDirectory(newdir);
@@ -660,7 +696,7 @@ namespace MonoGame.Tools.Pipeline
                         try
                         {
                             DirectoryInfo dinfo = new DirectoryInfo(folder);
-                            string newfile = files[i].Replace(folder, initialDirectory + dinfo.Name + Path.DirectorySeparatorChar);
+                            string newfile = files[i].Replace(folder, initialDirectory + Path.DirectorySeparatorChar + dinfo.Name + Path.DirectorySeparatorChar);
 
                             if (!File.Exists(newfile))
                                 File.Copy(files[i], newfile);
@@ -697,10 +733,17 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var action2 = new IncludeAction(this, files, directories);
-            action2.Do();
-            _actionStack.Add(action2);
+            if(action2.Do())
+                _actionStack.Add(action2);
         }
 
+        public void Move (string path, string newname, FileType type)
+        {
+            var action = new MoveAction(this, path, newname, type);
+            if(action.Do())
+                _actionStack.Add(action);
+        }
+        
         private List<string> GetFiles(string folder)
         {
             List<string> ret = new List<string>();
@@ -731,15 +774,15 @@ namespace MonoGame.Tools.Pipeline
         public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders)
         {
             var action = new ExcludeAction(this, items, folders);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
             var action = new NewAction(this, name, location, template);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void NewFolder(string name, string location)
@@ -760,8 +803,8 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var action = new IncludeAction(this, null, new List<string> { folder });
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void AddAction(IProjectAction action)

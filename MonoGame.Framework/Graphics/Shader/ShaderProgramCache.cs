@@ -6,7 +6,7 @@ using System.Collections.Generic;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 

@@ -75,11 +75,42 @@ EndOfFile -> @"^$";
 [IgnoreCase] ColorWriteEnable -> @"ColorWriteEnable";
 [IgnoreCase] ZEnable -> @"ZEnable";
 [IgnoreCase] ZWriteEnable -> @"ZWriteEnable";
+[IgnoreCase] ZFunc-> @"ZFunc";
 [IgnoreCase] DepthBias -> @"DepthBias";
 [IgnoreCase] CullMode -> @"CullMode";
 [IgnoreCase] FillMode -> @"FillMode";
 [IgnoreCase] MultiSampleAntiAlias -> @"MultiSampleAntiAlias";
+[IgnoreCase] ScissorTestEnable -> @"ScissorTestEnable";
 [IgnoreCase] SlopeScaleDepthBias -> @"SlopeScaleDepthBias";
+[IgnoreCase] StencilEnable -> @"StencilEnable";
+[IgnoreCase] StencilFail -> @"StencilFail";
+[IgnoreCase] StencilFunc -> @"StencilFunc";
+[IgnoreCase] StencilMask -> @"StencilMask";
+[IgnoreCase] StencilPass -> @"StencilPass";
+[IgnoreCase] StencilRef -> @"StencilRef";
+[IgnoreCase] StencilWriteMask -> @"StencilWriteMask";
+[IgnoreCase] StencilZFail -> @"StencilZFail";
+ 
+
+// Compare function
+[IgnoreCase] Never -> @"Never";
+[IgnoreCase] Less -> @"Less";
+[IgnoreCase] Equal -> @"Equal";
+[IgnoreCase] LessEqual -> @"LessEqual";
+[IgnoreCase] Greater -> @"Greater";
+[IgnoreCase] NotEqual -> @"NotEqual";
+[IgnoreCase] GreaterEqual -> @"GreaterEqual";
+[IgnoreCase] Always -> @"Always";
+
+// Stencil operation
+[IgnoreCase] Keep -> @"Keep";
+[IgnoreCase] Zero -> @"Zero";
+[IgnoreCase] Replace -> @"Replace";
+[IgnoreCase] IncrSat -> @"IncrSat";
+[IgnoreCase] DecrSat -> @"DecrSat";
+[IgnoreCase] Invert -> @"Invert";
+[IgnoreCase] Incr -> @"Incr";
+[IgnoreCase] Decr -> @"Decr";
 
 // Colors
 [IgnoreCase] Red -> @"Red";
@@ -216,6 +247,32 @@ BlendOps -> (BlendOp_Add|BlendOp_Subtract|BlendOp_RevSubtract|BlendOp_Min|BlendO
 	return	$BlendOp_Add ?? $BlendOp_Subtract ?? $BlendOp_RevSubtract ?? $BlendOp_Min ?? $BlendOp_Max;
 };
 
+CmpFunc_Never -> Never { return CompareFunction.Never; };
+CmpFunc_Less -> Less { return CompareFunction.Less; };
+CmpFunc_Equal -> Equal { return CompareFunction.Equal; };
+CmpFunc_LessEqual -> LessEqual { return CompareFunction.LessEqual; };
+CmpFunc_Greater -> Greater { return CompareFunction.Greater; };
+CmpFunc_NotEqual -> NotEqual { return CompareFunction.NotEqual; };
+CmpFunc_GreaterEqual -> GreaterEqual { return CompareFunction.GreaterEqual; };
+CmpFunc_Always -> Always { return CompareFunction.Always; };
+CmpFunc -> (CmpFunc_Never|CmpFunc_Less|CmpFunc_Equal|CmpFunc_LessEqual|CmpFunc_Greater|CmpFunc_NotEqual|CmpFunc_GreaterEqual|CmpFunc_Always)
+{
+	return	$CmpFunc_Never ?? $CmpFunc_Less ?? $CmpFunc_Equal ?? $CmpFunc_LessEqual ?? $CmpFunc_Greater ?? $CmpFunc_NotEqual ?? $CmpFunc_GreaterEqual ?? $CmpFunc_Always;
+};
+
+StencilOp_Keep -> Keep { return StencilOperation.Keep; };
+StencilOp_Zero -> Zero { return StencilOperation.Zero; };
+StencilOp_Replace -> Replace { return StencilOperation.Replace; };
+StencilOp_IncrSat -> IncrSat { return StencilOperation.IncrementSaturation; };
+StencilOp_DecrSat -> DecrSat { return StencilOperation.DecrementSaturation; };
+StencilOp_Invert -> Invert { return StencilOperation.Invert; };
+StencilOp_Incr -> Incr { return StencilOperation.Increment; };
+StencilOp_Decr -> Decr { return StencilOperation.Decrement; };
+StencilOp -> (StencilOp_Keep|StencilOp_Zero|StencilOp_Replace|StencilOp_IncrSat|StencilOp_DecrSat|StencilOp_Invert|StencilOp_Incr|StencilOp_Decr)
+{
+	return	$StencilOp_Keep ?? $StencilOp_Zero ?? $StencilOp_Replace ?? $StencilOp_IncrSat ?? $StencilOp_DecrSat ?? $StencilOp_Invert ?? $StencilOp_Incr ?? $StencilOp_Decr;
+};
+
 // Render states
 Render_State_CullMode -> CullMode Equals CullModes Semicolon { (paramlist[0] as PassInfo).CullMode = (CullMode)$CullModes; return null; };
 Render_State_FillMode -> FillMode Equals FillModes Semicolon { (paramlist[0] as PassInfo).FillMode = (FillMode)$FillModes; return null; };
@@ -228,7 +285,17 @@ Render_State_DepthBias -> DepthBias Equals Number Semicolon { (paramlist[0] as P
 Render_State_SlopeScaleDepthBias -> SlopeScaleDepthBias Equals Number Semicolon { (paramlist[0] as PassInfo).SlopeScaleDepthBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
 Render_State_ZEnable -> ZEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ZEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
 Render_State_ZWriteEnable -> ZWriteEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ZWriteEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_ZFunc -> ZFunc Equals CmpFunc Semicolon { (paramlist[0] as PassInfo).DepthBufferFunction = (CompareFunction)$CmpFunc; return null; };
 Render_State_MultiSampleAntiAlias -> MultiSampleAntiAlias Equals Boolean Semicolon { (paramlist[0] as PassInfo).MultiSampleAntiAlias = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_ScissorTestEnable -> ScissorTestEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ScissorTestEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_StencilEnable -> StencilEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).StencilEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_StencilFail -> StencilFail Equals StencilOp Semicolon { (paramlist[0] as PassInfo).StencilFail = (StencilOperation)$StencilOp; return null; };
+Render_State_StencilFunc -> StencilFunc Equals CmpFunc Semicolon { (paramlist[0] as PassInfo).StencilFunc = (CompareFunction)$CmpFunc; return null; };
+Render_State_StencilMask -> StencilMask Equals Number Semicolon { (paramlist[0] as PassInfo).StencilMask = ParseTreeTools.ParseInt((string)$Number); return null; };
+Render_State_StencilPass -> StencilPass Equals StencilOp Semicolon { (paramlist[0] as PassInfo).StencilPass = (StencilOperation)$StencilOp; return null; };
+Render_State_StencilRef -> StencilRef Equals Number Semicolon { (paramlist[0] as PassInfo).StencilRef = ParseTreeTools.ParseInt((string)$Number); return null; };
+Render_State_StencilWriteMask -> StencilWriteMask Equals Number Semicolon { (paramlist[0] as PassInfo).StencilWriteMask = ParseTreeTools.ParseInt((string)$Number); return null; };
+Render_State_StencilZFail -> StencilZFail Equals StencilOp Semicolon { (paramlist[0] as PassInfo).StencilZFail = (StencilOperation)$StencilOp; return null; };
 
 
 Render_State_Expression ->	
@@ -243,8 +310,17 @@ Render_State_Expression ->
 				Render_State_SlopeScaleDepthBias |
 				Render_State_ZEnable |
 				Render_State_ZWriteEnable |
-				Render_State_MultiSampleAntiAlias;
-
+				Render_State_ZFunc |
+				Render_State_MultiSampleAntiAlias |
+				Render_State_ScissorTestEnable |
+				Render_State_StencilEnable |
+				Render_State_StencilFail |
+				Render_State_StencilFunc |
+				Render_State_StencilMask |
+				Render_State_StencilPass |
+				Render_State_StencilRef |
+				Render_State_StencilWriteMask |
+				Render_State_StencilZFail;
 
 Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | Render_State_Expression)* CloseBracket 
 { 

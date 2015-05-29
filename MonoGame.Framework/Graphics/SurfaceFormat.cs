@@ -100,6 +100,32 @@ namespace Microsoft.Xna.Framework.Graphics
         /// For compatibility with WPF D3DImage.
         /// </summary>
         Bgra32 = 21,    // B8G8R8A8    
+
+        /// <summary>
+        /// Unsigned 32-bit RGBA sRGB pixel format that supports 8 bits per channel.
+        /// </summary>
+        ColorSRgb = 30,
+        /// <summary>
+        /// Unsigned 32-bit sRGB pixel format that supports 8 bits per channel. 8 bits are unused.
+        /// </summary>
+        Bgr32SRgb = 31,
+        /// <summary>
+        /// Unsigned 32-bit sRGB pixel format that supports 8 bits per channel.
+        /// </summary>
+        Bgra32SRgb = 32,
+        /// <summary>
+        /// DXT1. sRGB texture format with compression. Surface dimensions must be a multiple of 4.
+        /// </summary>
+        Dxt1SRgb = 33,
+        /// <summary>
+        /// DXT3. sRGB texture format with compression. Surface dimensions must be a multiple of 4.
+        /// </summary>
+        Dxt3SRgb = 34,
+        /// <summary>
+        /// DXT5. sRGB texture format with compression. Surface dimensions must be a multiple of 4.
+        /// </summary>
+        Dxt5SRgb = 35,
+
 		/// <summary>
         /// PowerVR texture compression format (iOS and Android).
 		/// </summary>
