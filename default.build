@@ -37,11 +37,11 @@
     <call target="build_windows10" />
     <call target="build_psm" />
     <call target="build_web" />
+    <call target="build_desktopgl" />
     <call target="build_linux"/>
     <call target="build_android" />
     <call target="build_mac" />
     <call target="build_ios" />
-    <call target="build_desktopgl" />
 
   </target>
 
@@ -60,18 +60,12 @@
       <exec program="Protobuild" commandline="-generate Windows" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />
-      <exec program="Protobuild" commandline="-generate WindowsGL" />
-      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Windows" />
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Windows.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Windows.sln" />
-      <exec program="mono" commandline="Protobuild.exe -generate WindowsGL" />
-      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.WindowsGL.sln" />
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.WindowsGL.sln" />
-    </if>
+     </if>
   </target>
 
   <target name="build_linux" description="Build Linux" depends="clean">

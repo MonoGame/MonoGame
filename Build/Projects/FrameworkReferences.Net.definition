@@ -11,10 +11,6 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="Linux">
-    <Reference Include="Lidgren.Network" />
-  </Platform>
-
   <Platform Type="MacOS">
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -52,11 +48,6 @@
 
   <Platform Type="Windows8">
     <Reference Include="MonoGame.Framework.Windows8" />
-  </Platform>
-
-  <Platform Type="WindowsGL">
-    <Reference Include="System.Core" />
-    <Reference Include="Lidgren.Network" />
   </Platform>
 
   <Platform Type="WindowsPhone">

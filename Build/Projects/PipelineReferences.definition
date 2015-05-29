@@ -3,6 +3,9 @@
 
   <Platform Type="Linux">
     <Binary
+      Name="MonoGame.Framework"
+      Path="MonoGame.Framework\bin\DesktopGL\AnyCPU\Release\MonoGame.Framework.dll" />
+    <Binary
       Name="gtk-sharp"
       Path="ThirdParty\Dependencies\Gtk3\gtk-sharp.dll" />
     <Binary

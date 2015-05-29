@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="MGCB.References">
+
+  <Platform Type="Linux">
+    <Binary
+      Name="MonoGame.Framework"
+      Path="MonoGame.Framework\bin\DesktopGL\AnyCPU\Release\MonoGame.Framework.dll" />
+  </Platform>
+
+</ExternalProject>

@@ -20,11 +20,6 @@
     <Reference Include="System.Xml" />
   </Platform>
 
-  <Platform Type="Linux">
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
-  </Platform>
-
   <Platform Type="MacOS">
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,11 +46,6 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </Platform>
-
-  <Platform Type="WindowsGL">
-    <Reference Include="System" />
     <Reference Include="System.Xml" />
   </Platform>
 
