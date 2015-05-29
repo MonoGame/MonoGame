@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework
         {
             get { return DisplayOrientation.LandscapeLeft; }
         }
-#if (WINDOWS && OPENGL) || LINUX
+#if DESKTOPGL
         public override Microsoft.Xna.Framework.Point Position
         {
             get { return new Microsoft.Xna.Framework.Point(window.Location.X,window.Location.Y); }
@@ -288,7 +288,7 @@ namespace Microsoft.Xna.Framework
             Keyboard.SetKeys(keys);
         }
 
-#if WINDOWS
+#if DESKTOPGL
         private void OnMouseEnter(object sender, EventArgs e)
         {
             _isMouseInBounds = true;
@@ -324,7 +324,7 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-#if WINDOWS
+#if DESKTOPGL
             window.MouseEnter += OnMouseEnter;
             window.MouseLeave += OnMouseLeave;
 #endif
@@ -348,7 +348,7 @@ namespace Microsoft.Xna.Framework
 
             // mouse
             // TODO review this when opentk 1.1 is released
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             Mouse.setWindows(this);
 #else
             Mouse.UpdateMouseInfo(window.Mouse);

@@ -26,7 +26,7 @@ using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 #endif
 
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #endif
@@ -41,7 +41,7 @@ using Android.Graphics;
 #endif
 #endif // OPENGL
 
-#if WINDOWS || LINUX || MONOMAC || ANGLE
+#if DESKTOPGL || MONOMAC || ANGLE
 using System.Drawing.Imaging;
 #endif
 
@@ -312,7 +312,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return PlatformFromStream(graphicsDevice, image);
             }
 #endif
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             Bitmap image = (Bitmap)Bitmap.FromStream(stream);
             try
             {

@@ -25,6 +25,9 @@ namespace MonoGame.Tools.Pipeline
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int gtk_get_minor_version ();
 
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr gtk_dialog_new_with_buttons (string title, IntPtr parent, int flags);
+
         [DllImport (giolibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr g_file_new_for_path (string path);
 

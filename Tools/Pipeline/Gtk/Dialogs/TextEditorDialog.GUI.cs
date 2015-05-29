@@ -9,10 +9,6 @@ namespace MonoGame.Tools.Pipeline
 		private global::Gtk.Entry entry1;
 		
 		private global::Gtk.Label label3;
-		
-		private global::Gtk.Button buttonCancel;
-		
-		private global::Gtk.Button buttonOk;
 
 		protected virtual void Build ()
 		{
@@ -60,42 +56,6 @@ namespace MonoGame.Tools.Pipeline
 			w4.Position = 2;
 			w4.Expand = false;
 			w4.Fill = false;
-			// Internal child MonoGame.Tools.Pipeline.TextEditorDialog.ActionArea
-            #if GTK2
-			global::Gtk.HButtonBox w5 = this.ActionArea;
-            #elif GTK3
-            global::Gtk.ButtonBox w5 = this.ActionArea;
-            #endif
-			w5.Name = "dialog1_ActionArea";
-			w5.Spacing = 10;
-			w5.BorderWidth = ((uint)(5));
-			w5.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonCancel = new global::Gtk.Button ();
-			this.buttonCancel.CanDefault = true;
-			this.buttonCancel.CanFocus = true;
-			this.buttonCancel.Name = "buttonCancel";
-			this.buttonCancel.UseStock = true;
-			this.buttonCancel.UseUnderline = true;
-			this.buttonCancel.Label = "gtk-cancel";
-			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w6 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w5 [this.buttonCancel]));
-			w6.Expand = false;
-			w6.Fill = false;
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonOk = new global::Gtk.Button ();
-			this.buttonOk.Sensitive = false;
-			this.buttonOk.CanDefault = true;
-			this.buttonOk.CanFocus = true;
-			this.buttonOk.Name = "buttonOk";
-			this.buttonOk.UseStock = true;
-			this.buttonOk.UseUnderline = true;
-			this.buttonOk.Label = "gtk-ok";
-			w5.Add (this.buttonOk);
-			global::Gtk.ButtonBox.ButtonBoxChild w7 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w5 [this.buttonOk]));
-			w7.Position = 1;
-			w7.Expand = false;
-			w7.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
@@ -105,7 +65,6 @@ namespace MonoGame.Tools.Pipeline
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 			this.entry1.Changed += new global::System.EventHandler (this.OnEntry1Changed);
-			this.buttonOk.Clicked += new global::System.EventHandler (this.OnButtonOkClicked);
 		}
 	}
 }
