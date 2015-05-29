@@ -24,6 +24,7 @@ namespace MonoGame.Tools.Pipeline
             buttonOk.Sensitive = false;
 
             this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
 
             var column = new TreeViewColumn ();
 

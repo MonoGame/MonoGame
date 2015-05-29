@@ -20,6 +20,7 @@ namespace MonoGame.Tools.Pipeline
             buttonOk.Sensitive = false;
 
             this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
 
             this.strictmode = strictmode;
             buttonOk.Sensitive = !strictmode;
