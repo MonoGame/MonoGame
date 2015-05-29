@@ -25,34 +25,20 @@ namespace Microsoft.Xna.Framework.Graphics.SkinnedAnimation
             Time = time;
             Transform = transform;
         }
-
-
-        /// <summary>
-        /// Private constructor for use by the XNB deserializer.
-        /// </summary>
-        private Keyframe()
-        {
-        }
-
-
+        
         /// <summary>
         /// Gets the index of the target bone that is animated by this keyframe.
         /// </summary>
-        [ContentSerializer]
         public int Bone { get; private set; }
-
 
         /// <summary>
         /// Gets the time offset from the start of the animation to this keyframe.
         /// </summary>
-        [ContentSerializer]
         public TimeSpan Time { get; private set; }
-
 
         /// <summary>
         /// Gets the bone transform for this keyframe.
         /// </summary>
-        [ContentSerializer]
         public Matrix Transform { get; private set; }
     }
 }

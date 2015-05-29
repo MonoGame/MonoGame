@@ -285,6 +285,7 @@
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler -->
     <Compile Include="Serialization\Compiler\AlphaTestEffectWriter.cs" />
+    <Compile Include="Serialization\Compiler\AnimationClipWriter.cs" />
     <Compile Include="Serialization\Compiler\ArrayWriter.cs" />
     <Compile Include="Serialization\Compiler\BasicEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\BooleanWriter.cs" />
