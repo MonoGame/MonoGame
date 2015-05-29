@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux">
+<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux,DesktopGL">
 
   <References>
     <Reference Include="System" />
@@ -27,6 +27,7 @@
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="iOS">IOS;</Platform>
+      <Platform Name="DesktopGL">TRACE;DESKTOPGL</Platform>
     </CustomDefinitions>
 
   </Properties>
@@ -60,8 +61,12 @@
         <Platforms>Windows,WindowsGL</Platforms>
     </Compile>
 
+    <Compile Include="Runner\DesktopGL\Program.cs">
+        <Platforms>DesktopGL</Platforms>
+    </Compile>
+
     <Compile Include="Runner\Desktop\FramePixelData.cs">
-        <Platforms>Windows,WindowsGL,MacOS,Linux</Platforms>
+        <Platforms>Windows,WindowsGL,MacOS,Linux,DesktopGL</Platforms>
     </Compile>
 
     <Compile Include="Runner\iOS\Main.cs">
