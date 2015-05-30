@@ -15,6 +15,7 @@ namespace MonoGame.Tools.Pipeline
 
             this.AddButton("Ok", ResponseType.Ok);
             this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
 
             label1.Text = label1.Text.Replace("%folder", folderloc);
             label1.Markup = label1.Text;
