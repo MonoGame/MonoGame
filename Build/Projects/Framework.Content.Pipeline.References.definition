@@ -13,7 +13,7 @@
       Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
     <Binary
       Name="PVRTexLibNET"
-      Path="ThirdParty\Dependencies\PVRTexLibNet\PVRTexLibNET.dll" />
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
@@ -36,7 +36,7 @@
       Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
     <Binary
       Name="PVRTexLibNET"
-      Path="ThirdParty\Dependencies\PVRTexLibNet\PVRTexLibNET.dll" />
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
@@ -67,7 +67,7 @@
       Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
     <Binary
       Name="PVRTexLibNET"
-      Path="ThirdParty\Dependencies\PVRTexLibNet\PVRTexLibNET.dll" />
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
