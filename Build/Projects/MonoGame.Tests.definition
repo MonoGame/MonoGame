@@ -29,6 +29,14 @@
     </CustomDefinitions>
 
   </Properties>
+  
+  <Services>
+    <Service Name="DesktopGL">
+      <RemoveDefine>WINDOWS;DIRECTX</RemoveDefine>
+      <AddDefine>DESKTOPGL</AddDefine>
+      <InfersReference>False</InfersReference>
+    </Service>
+  </Services>
 
   <Files>
 
@@ -54,10 +62,11 @@
     </Compile>
     <Compile Include="Runner\Windows\Program.cs">
         <Platforms>Windows</Platforms>
+        <ExcludeServices>DesktopGL</ExcludeServices>
     </Compile>
 
     <Compile Include="Runner\DesktopGL\Program.cs">
-        <Services>MonoGame.Framework/DesktopGL</Services>
+        <Services>DesktopGL</Services>
     </Compile>
 
     <Compile Include="Runner\Desktop\FramePixelData.cs">
@@ -151,6 +160,7 @@
     <Compile Include="ContentPipeline\AssetTestUtility.cs" />
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
+        <ExcludeServices>MonoGame.Framework/DesktopGL</ExcludeServices>
     </Compile>
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">
         <Services>MonoGame.Framework/_Desktop</Services>
