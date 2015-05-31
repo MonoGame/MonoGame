@@ -1,6 +1,7 @@
 ﻿// MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -39,10 +40,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Android,
 
         /// <summary>
-        /// Linux-based PCs
+        /// All desktop versions using OpenGL.
         /// (MonoGame)
         /// </summary>
-        Linux,
+        DesktopGL,
 
         /// <summary>
         /// Apple Mac OSX-based devices (iMac, MacBook, MacBook Air, etc)
@@ -89,6 +90,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// All desktop versions of Windows using OpenGL.
         /// (MonoGame)
         /// </summary>
-        WindowsGL,
+        [Obsolete("This platform is obsolete, use DesktopGL instead")]
+        WindowsGL = DesktopGL,
+
+        /// <summary>
+        /// Linux-based PCs
+        /// (MonoGame)
+        /// </summary>
+        [Obsolete("This platform is obsolete, use DesktopGL instead")]
+        Linux = DesktopGL
     }
 }

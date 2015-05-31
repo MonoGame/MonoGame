@@ -11,8 +11,8 @@
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Drawing" />
       <Binary
-        Name="Tao.Sdl"
-        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
+        Name="NVorbis"
+        Path="ThirdParty/Dependencies/NVorbis/NVorbis.dll" />
       <Binary
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />
@@ -134,6 +134,9 @@
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
+      <Binary
+        Name="NVorbis"
+        Path="ThirdParty/Dependencies/NVorbis/NVorbis.dll" />
       <Binary
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />

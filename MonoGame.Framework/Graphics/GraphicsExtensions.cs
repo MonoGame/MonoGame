@@ -4,7 +4,7 @@ using System.Diagnostics;
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return VertexAttribPointerType.Short;
                 
-#if MONOMAC || WINDOWS || LINUX
+#if MONOMAC || WINDOWS || DESKTOPGL
                case VertexElementFormat.HalfVector2:
                     return VertexAttribPointerType.HalfFloat;
 
@@ -344,7 +344,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				return (BlendEquationMode)All.MaxExt;
 			case BlendFunction.Min:
 				return (BlendEquationMode)All.MinExt;
-#elif MONOMAC || WINDOWS || LINUX
+#elif MONOMAC || WINDOWS || DESKTOPGL
 			case BlendFunction.Max:
 				return BlendEquationMode.Max;
 			case BlendFunction.Min:
@@ -374,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorSrc.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS || LINUX
+#if MONOMAC || WINDOWS || DESKTOPGL
 				return (BlendingFactorSrc)All.OneMinusSrcColor;
 #else
 				return BlendingFactorSrc.OneMinusSrcColor;
@@ -386,7 +386,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceAlphaSaturation:
 				return BlendingFactorSrc.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS || LINUX
+#if MONOMAC || WINDOWS || DESKTOPGL
 				return (BlendingFactorSrc)All.SrcColor;
 #else
 				return BlendingFactorSrc.SrcColor;
@@ -462,7 +462,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || DESKTOPGL || ANGLE
         /// <summary>
         /// Convert a <see cref="SurfaceFormat"/> to an OpenTK.Graphics.ColorFormat.
         /// This is used for setting up the backbuffer format of the OpenGL context.

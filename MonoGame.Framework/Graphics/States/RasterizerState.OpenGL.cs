@@ -6,7 +6,7 @@ using System;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-#if MONOMAC || WINDOWS || LINUX
+#if MONOMAC || WINDOWS || DESKTOPGL
 			if (FillMode == FillMode.Solid) 
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             else

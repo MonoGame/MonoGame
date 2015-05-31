@@ -12,9 +12,19 @@ namespace MonoGame.Tools.Pipeline
         List<ContentItemTemplate> items;
         TreeStore listStore;
 
-        public NewTemplateDialog (Window parrent, IEnumerator<ContentItemTemplate> enums) : base("New Item", parrent, DialogFlags.Modal)
+        Button buttonOk;
+
+        public NewTemplateDialog (Window parrent, IEnumerator<ContentItemTemplate> enums) : base(Global.GetNewDialog(parrent.Handle))
         {
             Build();
+
+            this.Title = "New Item";
+
+            buttonOk = (Button)this.AddButton("Ok", ResponseType.Ok);
+            buttonOk.Sensitive = false;
+
+            this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
 
             var column = new TreeViewColumn ();
 
@@ -92,12 +102,6 @@ namespace MonoGame.Tools.Pipeline
         protected void OnEntry1Changed (object sender, EventArgs e)
         {
             ButtonOkEnabled ();
-        }
-
-        protected void OnButtonOkClicked (object sender, EventArgs e)
-        {
-            if (buttonOk.Sensitive) 
-                Respond(ResponseType.Ok);
         }
     }
 }

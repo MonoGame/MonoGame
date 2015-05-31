@@ -5,7 +5,7 @@
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
 #elif GLES

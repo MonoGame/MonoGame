@@ -12,12 +12,6 @@ mkdir tmp/opt
 cp Data/Pipeline/. tmp/opt/monogame-pipeline/ -R
 cp Data/Main/mgcb.xml tmp/opt/monogame-pipeline/
 
-mkdir tmp/lib
-cp Data/Pipeline/libnvcore.so tmp/lib/
-cp Data/Pipeline/libnvimage.so tmp/lib/
-cp Data/Pipeline/libnvmath.so tmp/lib/
-cp Data/Pipeline/libnvtt.so tmp/lib/
-
 mkdir tmp/bin
 cp Data/Main/mgcb tmp/bin/
 cp Data/Main/monogame-pipeline tmp/bin/

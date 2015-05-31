@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Content
             'm', // WindowsPhone
             'i', // iOS
             'a', // Android
-            'l', // Linux
+            'd', // DesktopGL
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
@@ -48,7 +48,10 @@ namespace Microsoft.Xna.Framework.Content
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
-            'g', // Windows (OpenGL)
+
+            // Old WindowsGL and Linux platform chars
+            'w',
+            'l',
         };
 
         private static void AddContentManager(ContentManager contentManager)
@@ -219,7 +222,7 @@ namespace Microsoft.Xna.Framework.Content
                 // This is primarily for editor support. 
                 // Setting the RootDirectory to an absolute path is useful in editor
                 // situations, but TitleContainer can ONLY be passed relative paths.                
-#if LINUX || MONOMAC || WINDOWS
+#if DESKTOPGL || MONOMAC || WINDOWS
                 if (Path.IsPathRooted(assetPath))                
                     stream = File.OpenRead(assetPath);                
                 else

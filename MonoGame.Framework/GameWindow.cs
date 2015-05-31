@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework {
         /// </summary>
         public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } }
 
-#if (WINDOWS && !WINRT) || LINUX
+#if (WINDOWS && !WINRT) || DESKTOPGL
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || WINDOWS_UAP  || LINUX || ANGLE
+#if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
 
         /// <summary>
 		/// Use this event to retrieve text for objects like textbox's.
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework {
 				ScreenDeviceNameChanged (this, EventArgs.Empty);
 		}
 
-#if WINDOWS || WINDOWS_UAP || LINUX || ANGLE
+#if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
 			if (TextInput != null)

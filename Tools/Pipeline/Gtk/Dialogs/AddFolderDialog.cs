@@ -7,9 +7,15 @@ namespace MonoGame.Tools.Pipeline
     {
         public CopyAction responce;
 
-        public AddFolderDialog(Window parrent, string folderloc) : base(Mono.Unix.Catalog.GetString ("Add Folder Action"), parrent, DialogFlags.Modal)
+        public AddFolderDialog(Window parrent, string folderloc) : base(Global.GetNewDialog(parrent.Handle))
         {
             Build();
+
+            this.Title = Mono.Unix.Catalog.GetString ("Add Folder Action");
+
+            this.AddButton("Ok", ResponseType.Ok);
+            this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
 
             label1.Text = label1.Text.Replace("%folder", folderloc);
             label1.Markup = label1.Text;
@@ -17,13 +23,8 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnResponse(object sender, EventArgs e)
         {
-            Destroy ();
-        }
-
-        protected void OnButtonOkClicked(object sender, EventArgs e)
-        {
             responce = (radiobutton1.Active) ? CopyAction.Copy : CopyAction.Link;
-            Respond(ResponseType.Ok);
+            Destroy ();
         }
     }
 }

@@ -123,6 +123,9 @@ namespace MonoGame.Tools.Pipeline
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
             }
+
+            if(_controller.ProjectOpen)
+                projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -154,7 +157,7 @@ namespace MonoGame.Tools.Pipeline
             var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
             dialog.Title = "Save";
 
-            dialog.AddButton("Close without Saving", (int)ResponseType.No);
+            dialog.AddButton("No", (int)ResponseType.No);
             dialog.AddButton("Cancel", (int)ResponseType.Cancel);
             dialog.AddButton("Save", (int)ResponseType.Yes);
 
@@ -187,7 +190,7 @@ namespace MonoGame.Tools.Pipeline
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter && !filePath.EndsWith(".mgcb"))
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
@@ -442,6 +445,7 @@ namespace MonoGame.Tools.Pipeline
         protected void OnOpenActionActivated (object sender, EventArgs e)
         {
             _controller.OpenProject();
+            projectview1.ExpandBase();
         }
 
         protected void OnCloseActionActivated (object sender, EventArgs e)
@@ -687,7 +691,11 @@ namespace MonoGame.Tools.Pipeline
 
                 // We need a local to make the delegate work correctly.
                 var localProject = project;
-                recentItem.Activated += (sender, args) => _controller.OpenProject(localProject);
+                recentItem.Activated += delegate
+                {
+                    _controller.OpenProject(localProject);
+                    projectview1.ExpandBase();
+                };
 
                 m.Insert (recentItem, 0);
             }

@@ -33,6 +33,18 @@ namespace MonoGame.Tools.Pipeline
             propertygridtable1.Initalize (window);
         }
 
+        public static Dictionary<string, object> GetDictionary(Type type)
+        {
+            Dictionary<string, object> ret = new Dictionary<string, object>();
+            string[] names = Enum.GetNames(type);
+            Array objects = Enum.GetValues(type);
+
+            for (int i = 0; i < names.Length; i++)
+                ret.Add(names[i], objects.GetValue(i));
+
+            return ret;
+        }
+
         public void Load(List<object> cobjects, string name, string location)
         {
             this.name = name;
@@ -83,9 +95,7 @@ namespace MonoGame.Tools.Pipeline
                     if (value == null)
                         value = "";
 
-                    Dictionary<string, object> data = Enum.GetValues (typeof(BuildAction))
-                        .Cast<BuildAction> ()
-                        .ToDictionary (t => t.ToString(), t => (object)t);
+                    Dictionary<string, object> data = GetDictionary(typeof(BuildAction));
                     propertygridtable1.AddEntry (p.Name, value, 
                         PropertyGridTable.EntryType.Combo,(s,e) => { 
                             foreach (object o in currentObjects) 
@@ -115,9 +125,7 @@ namespace MonoGame.Tools.Pipeline
                     if (value == null)
                         value = "";
 
-                    Dictionary<string, object> data = Enum.GetValues (typeof(GraphicsProfile))
-                        .Cast<GraphicsProfile> ()
-                        .ToDictionary (t => t.ToString(), t => (object)t);
+                    Dictionary<string, object> data = GetDictionary(typeof(GraphicsProfile));
                     propertygridtable1.AddEntry (p.Name, value, 
                         PropertyGridTable.EntryType.Combo,(s,e) => { 
                             foreach (object o in currentObjects) 
@@ -130,9 +138,7 @@ namespace MonoGame.Tools.Pipeline
                     if (value == null)
                         value = "";
 
-                    Dictionary<string, object> data = Enum.GetValues (typeof(TP.TargetPlatform))
-                        .Cast<TP.TargetPlatform> ()
-                        .ToDictionary (t => t.ToString(), t => (object)t);
+                    Dictionary<string, object> data = GetDictionary(typeof(TP.TargetPlatform));
                     propertygridtable1.AddEntry (p.Name, value, 
                         PropertyGridTable.EntryType.Combo,(s,e) => { 
                             foreach (object o in currentObjects) 
@@ -327,9 +333,8 @@ namespace MonoGame.Tools.Pipeline
                 if (p1.Type == typeof(MaterialProcessorDefaultEffect)) {
                     if (value == null)
                         value = "";
-                    Dictionary<string, object> data = Enum.GetValues (typeof(MaterialProcessorDefaultEffect))
-                        .Cast<MaterialProcessorDefaultEffect> ()
-                        .ToDictionary (t => t.ToString(), t => (object)t);
+
+                    Dictionary<string, object> data = GetDictionary(typeof(MaterialProcessorDefaultEffect));
                     var defaultValue = (MaterialProcessorDefaultEffect)p1.DefaultValue;
                     propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue,
                         PropertyGridTable.EntryType.Combo,(s,e) => { 
@@ -344,9 +349,8 @@ namespace MonoGame.Tools.Pipeline
                 if (p1.Type == typeof(TextureProcessorOutputFormat)) {
                     if (value == null)
                         value = "";
-                    Dictionary<string, object> data = Enum.GetValues (typeof(TextureProcessorOutputFormat))
-                        .Cast<TextureProcessorOutputFormat> ()
-                        .ToDictionary (t => t.ToString(), t => (object)t);
+                    
+                    Dictionary<string, object> data = GetDictionary(typeof(TextureProcessorOutputFormat));
                     var defaultValue = (TextureProcessorOutputFormat)p1.DefaultValue;
                     propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue,
                         PropertyGridTable.EntryType.Combo,(s,e) => { 

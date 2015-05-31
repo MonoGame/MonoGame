@@ -20,10 +20,9 @@
     <files>
         <file src="Linux\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
         <file src="Linux\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
+        <file src="Linux\AnyCPU\Release\NVorbis.dll" target="lib\net40\NVorbis.dll" />
         <file src="Linux\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
         <file src="Linux\AnyCPU\Release\OpenTK.dll.config" target="content\net40\OpenTK.dll.config" />
-        <file src="Linux\AnyCPU\Release\Tao.Sdl.dll" target="lib\net40\Tao.Sdl.dll" />
-        <file src="Linux\AnyCPU\Release\Tao.Sdl.dll.config" target="content\net40\Tao.Sdl.dll.config" />
         <file src="..\..\NuGetPackages\tools\MonoGame.Framework\Linux\install.ps1" target="tools\install.ps1" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #endif
 

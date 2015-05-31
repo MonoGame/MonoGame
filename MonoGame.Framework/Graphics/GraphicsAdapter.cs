@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif ANDROID
                 View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
                 return new DisplayMode(view.Width, view.Height, 60, SurfaceFormat.Color);
-#elif (WINDOWS && OPENGL) || LINUX
+#elif DESKTOPGL
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
 #elif WINDOWS
@@ -263,7 +263,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var modes = new List<DisplayMode>(new[] { CurrentDisplayMode, });
 
-#if (WINDOWS && OPENGL) || LINUX
+#if DESKTOPGL
                     
 					//IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
 					var displays = new List<OpenTK.DisplayDevice>();

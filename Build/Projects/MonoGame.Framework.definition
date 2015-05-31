@@ -45,11 +45,11 @@
     <CustomDefinitions>
       <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;OPENAL</Platform>
       <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
-      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL</Platform>
+      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;DESKTOPGL</Platform>
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL</Platform>
       <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA;OPENAL</Platform>
       <Platform Name="PSMobile">PSM</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
@@ -159,7 +159,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
 
     <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
-      <Platforms>Linux,MacOS</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -199,11 +199,13 @@
     <Compile Include="FrameworkDispatcher.cs">
       <Platforms>_FrameworkDispatcherProvided</Platforms>
     </Compile>
+	<Compile Include="FrameworkResources.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
     <Compile Include="GameTimer.cs">
@@ -926,7 +928,7 @@
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\Song.Default.cs">
-        <Platforms>Angle,WindowsGL,MacOS,Web</Platforms>
+        <Platforms>Angle,MacOS,Web</Platforms>
     </Compile>
     <Compile Include="Media\Song.Android.cs">
         <Platforms>Android,Ouya</Platforms>
@@ -937,8 +939,8 @@
     <Compile Include="Media\Song.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="Media\Song.Tao.SDL.cs">
-        <Platforms>Linux</Platforms>
+    <Compile Include="Media\Song.NVorbis.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Media\Song.WMS.cs">
         <Platforms>Windows</Platforms>
@@ -1026,7 +1028,13 @@
     <Compile Include="Utilities\AssemblyHelper.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
     </Compile>
+    <Compile Include="Utilities\CurrentPlatform.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Utilities\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />

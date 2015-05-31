@@ -92,6 +92,7 @@ namespace MonoGame.Tools.Pipeline
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
             ProjectDirty = true;
+            View.UpdateProperties(_project);
         }
 
         public void OnReferencesModified()
@@ -99,6 +100,7 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
             ProjectDirty = true;
             ResolveTypes();
+            View.UpdateProperties(_project);
         }
 
         public void OnItemModified(ContentItem contentItem)

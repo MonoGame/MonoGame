@@ -1,5 +1,15 @@
 #!/bin/bash
 #mgcb terminal command
+if [ ! -d /usr/local/bin ]
+then
+	if [ ! -d /usr/local ]
+	then
+		mkdir /usr/local
+	fi
+        chgrp -R admin /usr/local
+	chmod -R 755 /usr/local
+	mkdir /usr/local/bin
+fi
 if [ -f /usr/local/bin/mgcb ]
 then
 	rm /usr/local//bin/mgcb
