@@ -14,6 +14,7 @@
   <Properties>
     
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
     <AssemblyName>MonoGameTests</AssemblyName>
     <RootNamespace>MonoGame.Tests</RootNamespace>
@@ -89,12 +90,14 @@
 	<Compile Include="Framework\CurveKeyCollectionTest.cs" />
 	<Compile Include="Framework\CurveKeyTest.cs" />
 	<Compile Include="Framework\CurveTest.cs" />
+	<Compile Include="Framework\EnumConformingTest.cs" />
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\GameTest.cs" />	
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Framework\GestureRecognizerTest.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />
+	<Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\MockWindow.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
@@ -114,6 +117,7 @@
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
     <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
+    <Compile Include="Framework\Components\Simple3DCubeComponent.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
     <Compile Include="Framework\Components\UpdateGuard.cs" />
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
@@ -121,9 +125,16 @@
     <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
     <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
     
+    <Compile Include="Framework\Visual\BlendStateTest.cs" />
+    <Compile Include="Framework\Visual\DepthStencilStateTest.cs" />
+    <Compile Include="Framework\Visual\EffectTest.cs" />
+    <Compile Include="Framework\Visual\GraphicsDeviceTest.cs" />
+    <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
+    <Compile Include="Framework\Visual\SamplerStateTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Visual\Texture2DTest.cs" />
     <Compile Include="Framework\Visual\Texture3DTest.cs" />
+    <Compile Include="Framework\Visual\TextureCubeTest.cs" />
     <Compile Include="Framework\Visual\IndexBufferTest.cs" />
     <Compile Include="Framework\Visual\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
@@ -137,6 +148,7 @@
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\AssetTestUtility.cs" />
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
     </Compile>
@@ -213,16 +225,46 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
+    <Content Include="Assets\Effects\CustomSpriteBatchEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\CustomSpriteBatchEffectComparisonSampler.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Effects\DefinesTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Effects\ParserTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Effects\PreprocessorTest.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Effects\Include.fxh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Effects\TextureArrayEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\VertexTextureEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
+    <Content Include="Assets\ReferenceImages\BlendState\VisualTests.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\DepthStencilState\VisualTestDepthBufferEnable_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\DepthStencilState\VisualTestStencilBuffer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\VertexTextureVisualTest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -296,6 +338,39 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullClockwiseFace_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullCounterClockwiseFace_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestCullMode_None_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestDepthClipEnable_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestDepthClipEnable_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestFillMode_Solid_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestFillMode_WireFrame_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SamplerState\VisualTestAddressModes.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SamplerState\VisualTestComparisonFunction.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_without_render_target_change.png">
@@ -415,6 +490,24 @@
     <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipVertically_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_BackToFront_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Deferred_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_FrontToBack_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Immediate_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Texture_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\ReferenceImages\SpriteBatch\DrawWithLayerDepth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -449,6 +542,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Scaled.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_Color_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\DrawWithSRgbFormats_ColorSRgb_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Texture2D\TextureArrayAsRenderTargetAndShaderResource.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Viewport\Affects_draw_origin.png">
@@ -542,6 +650,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	<Content Include="Assets\Xml\21_CustomFormatting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\22_GetterOnlyProperties.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\23_GetterOnlyPolymorphicArrayProperties.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\24_GenericTypes.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

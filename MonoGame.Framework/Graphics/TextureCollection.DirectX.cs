@@ -12,9 +12,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
         {
+            if (_applyToVertexStage)
+            {
+                ClearTargets(targets, device._d3dContext.VertexShader);
+            }
+            else
+            {
+                ClearTargets(targets, device._d3dContext.PixelShader);
+            }
+        }
+
+        private void ClearTargets(RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)
+        {
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-            var pixelShaderStage = device._d3dContext.PixelShader;
 
             // We assume 4 targets to avoid a loop within a loop below.
             var target0 = targets[0].RenderTarget;
@@ -25,6 +36,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Make one pass across all the texture slots.
             for (var i = 0; i < _textures.Length; i++)
             {
+                if (_textures[i] == null)
+                    continue;
+
                 if (_textures[i] != target0 &&
                     _textures[i] != target1 &&
                     _textures[i] != target2 &&
@@ -34,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Immediately clear the texture from the device.
                 _dirty &= ~(1 << i);
                 _textures[i] = null;
-                pixelShaderStage.SetShaderResource(i, null);
+                shaderStage.SetShaderResource(i, null);
             }
         }
 
@@ -50,7 +64,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-            var pixelShaderStage = device._d3dContext.PixelShader;
+            SharpDX.Direct3D11.CommonShaderStage shaderStage;
+            if (_applyToVertexStage)
+                shaderStage = device._d3dContext.VertexShader;
+            else
+                shaderStage = device._d3dContext.PixelShader;
 
             for (var i = 0; i < _textures.Length; i++)
             {
@@ -61,9 +79,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 var tex = _textures[i];
 
                 if (_textures[i] == null || _textures[i].IsDisposed)
-                    pixelShaderStage.SetShaderResource(i, null);
+                    shaderStage.SetShaderResource(i, null);
                 else
-                    pixelShaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+                    shaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
 
                 _dirty &= ~mask;
                 if (_dirty == 0)

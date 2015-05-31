@@ -23,5 +23,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             format = SurfaceFormat.Dxt5;
             return true;
         }
+
+        /// <summary>
+        /// Returns a string description of the bitmap.
+        /// </summary>
+        /// <returns>Description of the bitmap.</returns>
+        public override string ToString()
+        {
+            return "DXT5 " + Width + "x" + Height;
+        }
     }
 }

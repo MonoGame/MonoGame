@@ -12,6 +12,8 @@ using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Nvidia.TextureTools;
 using PVRTexLibNET;
 using WrapMode = System.Drawing.Drawing2D.WrapMode;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -241,6 +243,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     return profile == GraphicsProfile.Reach;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.Etc1Compressed:
                     return true;
             }
 
@@ -261,7 +264,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (format)
             {
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    return platform == TargetPlatform.iOS;
+                    return true;
             }
 
             return false;
@@ -323,7 +326,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         break;
 
                     case TargetPlatform.Android:
-                    case TargetPlatform.Ouya:
                         format = TextureProcessorOutputFormat.Etc1Compressed;
                         break;
 
@@ -390,7 +392,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
         
-        private static void CompressPvrtc(TextureContent content, bool generateMipmaps, bool premultipliedAlpha)
+        private static void CompressPvrtc(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
         {
             // TODO: Once uncompressed mipmap generation is supported, first use NVTT to generate mipmaps,
             // then compress them withthe PVRTC tool, so we have the same implementation of mipmap generation
@@ -401,68 +403,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var height = content.Faces[0][0].Width;
 
 			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height))
-				throw new PipelineException("PVRTC Compressed textures width and height must be powers of two.");
+				throw new PipelineException("PVR compression requires width and height must be powers of two.");
 
 			if (width != height)
-				throw new PipelineException("PVRTC Compressed textures must be square. i.e width == height.");
+				throw new PipelineException("PVR compression requires square textures.");
 
-            var numberOfMipLevels = 1;
-            if (generateMipmaps)
-            {
-                while (height != 1 || width != 1)
-                {
-                    height = Math.Max(height / 2, 1);
-                    width = Math.Max(width / 2, 1);
-                    numberOfMipLevels++;
-                }
-            }
+            var face = content.Faces[0][0];
 
-            IntPtr dataSizesPtr = IntPtr.Zero;
-            var texDataPtr = ManagedPVRTC.ManagedPVRTC.CompressTexture(content.Faces[0][0].GetPixelData(),
-                                            content.Faces[0][0].Height,
-                                            content.Faces[0][0].Width,
-                                            numberOfMipLevels,
-                                            premultipliedAlpha,
-                                            true,
-                                            ref dataSizesPtr);
+            var pixelData = face.GetPixelData();
+            var alphaRange = CalculateAlphaRange(pixelData);
 
-            // Store the size of each mip level
-            var dataSizesArray = new int[numberOfMipLevels];
-            Marshal.Copy(dataSizesPtr, dataSizesArray, 0, dataSizesArray.Length);
-
-            var levelSize = 0;
-            byte[] levelData;
-            var sourceWidth = content.Faces[0][0].Width;
-            var sourceHeight = content.Faces[0][0].Height;
-
-            content.Faces[0].Clear();
-
-            for (int x = 0; x < numberOfMipLevels; x++)
-            {
-                levelSize = dataSizesArray[x];
-                levelData = new byte[levelSize];
-
-                Marshal.Copy(texDataPtr, levelData, 0, levelSize);
-
-                var levelWidth = Math.Max(sourceWidth >> x, 1);
-                var levelHeight = Math.Max(sourceHeight >> x, 1);
-
-                var bmpContent = new PvrtcBitmapContent(4, sourceWidth, sourceHeight);
-                bmpContent.SetPixelData(levelData);
-                content.Faces[0].Add(bmpContent);
-
-                texDataPtr = IntPtr.Add(texDataPtr, levelSize);
-            }
+            if (alphaRange == AlphaRange.Opaque)
+                Compress(typeof(PvrtcRgb4BitmapContent), content, generateMipMaps);
+            else
+                Compress(typeof(PvrtcRgba4BitmapContent), content, generateMipMaps);
         }
 
-        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipmaps, bool premultipliedAlpha, bool sharpAlpha)
+        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool premultipliedAlpha, bool sharpAlpha)
         {
             var texData = content.Faces[0][0];
 
             if (profile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
-                    throw new PipelineException("DXT Compressed textures width and height must be powers of two in GraphicsProfile.Reach.");                
+                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
             }
 
             var pixelData = texData.GetPixelData();
@@ -470,6 +434,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Test the alpha channel to figure out if we have alpha.
             var alphaRange = CalculateAlphaRange(pixelData);
 
+            if (alphaRange == AlphaRange.Opaque)
+                Compress(typeof(Dxt1BitmapContent), content, generateMipMaps);
+            else if (alphaRange == AlphaRange.Cutout || sharpAlpha)
+                Compress(typeof(Dxt3BitmapContent), content, generateMipMaps);
+            else
+                Compress(typeof(Dxt5BitmapContent), content, generateMipMaps);
+            /*
             var _dxtCompressor = new Compressor();
             var inputOptions = new InputOptions();
             if (alphaRange != AlphaRange.Opaque)           
@@ -508,61 +479,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             _dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
 
             dataHandle.Free();
+            */
         }
   
         static void CompressAti(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
         {
 			var face = content.Faces[0][0];
-			var pixelData = face.GetPixelData ();
-			var alphaRange = CalculateAlphaRange (pixelData);
+			var pixelData = face.GetPixelData();
+			var alphaRange = CalculateAlphaRange(pixelData);
 
-			AtcBitmapContent atc;
-			if (generateMipMaps) {
-				for (int i = 0; i < content.Faces.Count; ++i)
-				{
-					var src = content.Faces[i][0];
-					var w = src.Width;
-					var h = src.Height;
-
-					content.Faces[i].Clear();
-
-					if (alphaRange == AlphaRange.Full)
-						atc = new AtcExplicitBitmapContent (w, h);
-					else
-						atc = new AtcInterpolatedBitmapContent (w, h);
-					BitmapContent.Copy(src, atc);
-					content.Faces[i].Add(atc);
-					while (w > 1 && h > 1)
-					{
-						if (w > 1)
-							w = w >> 1;
-						if (h > 1)
-							h = h >> 1;
-						if (alphaRange == AlphaRange.Full)
-							atc = new AtcExplicitBitmapContent (w, h);
-						else
-							atc = new AtcInterpolatedBitmapContent (w, h);
-						BitmapContent.Copy(src.Resize(w, h), atc);
-						content.Faces[i].Add(atc);
-					}
-				}
-			}
-			else
-			{
-				for (int i = 0; i < content.Faces.Count; ++i)
-				{
-					for (int j = 0; j < content.Faces[i].Count; ++j)
-					{
-						var src = content.Faces[i][j];
-						if (alphaRange == AlphaRange.Full)
-							atc = new AtcExplicitBitmapContent (src.Width, src.Height);
-						else
-							atc = new AtcInterpolatedBitmapContent (src.Width, src.Height);
-						BitmapContent.Copy(src, atc);
-						content.Faces[i][j] = atc;
-					}
-				}
-			}
+            if (alphaRange == AlphaRange.Full)
+                Compress(typeof(AtcExplicitBitmapContent), content, generateMipMaps);
+            else
+                Compress(typeof(AtcInterpolatedBitmapContent), content, generateMipMaps);
         }
 
         static void CompressEtc1(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
@@ -574,48 +503,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Use BGRA4444 for textures with non-opaque alpha values
             if (alphaRange != AlphaRange.Opaque)
-            {
-                CompressBGRA4444(content, generateMipMaps);
-                return;
-            }
-
-            if (generateMipMaps)
-            {
-                for (int i = 0; i < content.Faces.Count; ++i)
-                {
-                    var src = content.Faces[i][0];
-                    var w = src.Width;
-                    var h = src.Height;
-
-                    content.Faces[i].Clear();
-                    var etc1 = new Etc1BitmapContent(w, h);
-                    BitmapContent.Copy(src, etc1);
-                    content.Faces[i].Add(etc1);
-                    while (w > 1 && h > 1)
-                    {
-                        if (w > 1)
-                            w = w >> 1;
-                        if (h > 1)
-                            h = h >> 1;
-                        etc1 = new Etc1BitmapContent(w, h);
-                        BitmapContent.Copy(src.Resize(w, h), etc1);
-                        content.Faces[i].Add(etc1);
-                    }
-                }
-            }
+                Compress(typeof(PixelBitmapContent<Bgra4444>), content, generateMipMaps);
             else
             {
-                for (int i = 0; i < content.Faces.Count; ++i)
-                {
-                    for (int j = 0; j < content.Faces[i].Count; ++j)
-                    {
-                        // Copy the existing face to the ETC1 compressed format and replace the face
-                        var src = content.Faces[i][j];
-                        var etc1 = new Etc1BitmapContent(src.Width, src.Height);
-                        BitmapContent.Copy(src, etc1);
-                        content.Faces[i][j] = etc1;
-                    }
-                }
+                // PVR SGX does not handle non-POT ETC1 textures.
+                // https://code.google.com/p/libgdx/issues/detail?id=1310
+                // Since we already enforce POT for PVR and DXT in Reach, we will also enforce POT for ETC1
+                if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
+                    throw new PipelineException("ETC1 compression require width and height must be powers of two.");
+                Compress(typeof(Etc1BitmapContent), content, generateMipMaps);
             }
         }
 
@@ -627,19 +523,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var alphaRange = CalculateAlphaRange(pixelData);
 
             if (alphaRange == AlphaRange.Opaque)
-                CompressBGR565(content, generateMipMaps);
+                Compress(typeof(PixelBitmapContent<Bgr565>), content, generateMipMaps);
+            else if (alphaRange == AlphaRange.Cutout)
+                Compress(typeof(PixelBitmapContent<Bgra5551>), content, generateMipMaps);
             else
-                CompressBGRA4444(content, generateMipMaps);
+                Compress(typeof(PixelBitmapContent<Bgra4444>), content, generateMipMaps);
         }
 
-        static void CompressBGR565(TextureContent content, bool generateMipMaps)
+        static void Compress(Type targetType, TextureContent content, bool generateMipMaps)
         {
+            var wh = new object[2];
+            if (generateMipMaps)
+            {
+                for (int i = 0; i < content.Faces.Count; ++i)
+                {
+                    var src = content.Faces[i][0];
+                    var w = src.Width;
+                    var h = src.Height;
 
-        }
-
-        static void CompressBGRA4444(TextureContent content, bool generateMipMaps)
-        {
-
+                    content.Faces[i].Clear();
+                    wh[0] = w;
+                    wh[1] = h;
+                    var dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
+                    BitmapContent.Copy(src, dest);
+                    content.Faces[i].Add(dest);
+                    while (w > 1 && h > 1)
+                    {
+                        if (w > 1)
+                            w = w >> 1;
+                        if (h > 1)
+                            h = h >> 1;
+                        wh[0] = w;
+                        wh[1] = h;
+                        dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
+                        BitmapContent.Copy(src, dest);
+                        content.Faces[i].Add(dest);
+                    }
+                }
+            }
+            else
+            {
+                content.ConvertBitmapType(targetType);
+            }
         }
     }
 }

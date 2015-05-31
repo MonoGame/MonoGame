@@ -5,6 +5,7 @@
 using System;
 using System.Linq;
 using Microsoft.Xna.Framework.Media;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -80,24 +81,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 switch (key)
                 {
                     case "duration":
-                        _duration = TimeSpan.FromSeconds(double.Parse(value));
+                        _duration = TimeSpan.FromSeconds(double.Parse(value, CultureInfo.InvariantCulture));
                         break;
 
                     case "bit_rate":
-                        _bitsPerSecond = int.Parse(value);
+                        _bitsPerSecond = int.Parse(value, CultureInfo.InvariantCulture);
                         break;
 
                     case "width":
-                        _width = int.Parse(value);
+                        _width = int.Parse(value, CultureInfo.InvariantCulture);
                         break;
 
                     case "height":
-                        _height = int.Parse(value);
+                        _height = int.Parse(value, CultureInfo.InvariantCulture);
                         break;
 
                     case "r_frame_rate":
                         var frac = value.Split('/');
-                        _framesPerSecond = float.Parse(frac[0]) / float.Parse(frac[1]);
+                        _framesPerSecond = float.Parse(frac[0], CultureInfo.InvariantCulture) / float.Parse(frac[1], CultureInfo.InvariantCulture);
                         break;
                 }
             }

@@ -237,12 +237,10 @@ namespace Microsoft.Xna.Framework
             box.Intersects (ref this, out result);
         }
 
-        /*
         public PlaneIntersectionType Intersects(BoundingFrustum frustum)
         {
             return frustum.Intersects(this);
         }
-        */
 
         public PlaneIntersectionType Intersects(BoundingSphere sphere)
         {
@@ -252,6 +250,20 @@ namespace Microsoft.Xna.Framework
         public void Intersects(ref BoundingSphere sphere, out PlaneIntersectionType result)
         {
             sphere.Intersects(ref this, out result);
+        }
+
+        internal PlaneIntersectionType Intersects(ref Vector3 point)
+        {
+            float distance;
+            DotCoordinate(ref point, out distance);
+
+            if (distance > 0)
+                return PlaneIntersectionType.Front;
+
+            if (distance < 0)
+                return PlaneIntersectionType.Back;
+
+            return PlaneIntersectionType.Intersecting;
         }
 
         internal string DebugDisplayString

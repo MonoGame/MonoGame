@@ -293,6 +293,60 @@ namespace TwoMGFX
                 case TokenType.BlendOps:
                     Value = EvalBlendOps(tree, paramlist);
                     break;
+                case TokenType.CmpFunc_Never:
+                    Value = EvalCmpFunc_Never(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc_Less:
+                    Value = EvalCmpFunc_Less(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc_Equal:
+                    Value = EvalCmpFunc_Equal(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc_LessEqual:
+                    Value = EvalCmpFunc_LessEqual(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc_Greater:
+                    Value = EvalCmpFunc_Greater(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc_NotEqual:
+                    Value = EvalCmpFunc_NotEqual(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc_GreaterEqual:
+                    Value = EvalCmpFunc_GreaterEqual(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc_Always:
+                    Value = EvalCmpFunc_Always(tree, paramlist);
+                    break;
+                case TokenType.CmpFunc:
+                    Value = EvalCmpFunc(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_Keep:
+                    Value = EvalStencilOp_Keep(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_Zero:
+                    Value = EvalStencilOp_Zero(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_Replace:
+                    Value = EvalStencilOp_Replace(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_IncrSat:
+                    Value = EvalStencilOp_IncrSat(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_DecrSat:
+                    Value = EvalStencilOp_DecrSat(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_Invert:
+                    Value = EvalStencilOp_Invert(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_Incr:
+                    Value = EvalStencilOp_Incr(tree, paramlist);
+                    break;
+                case TokenType.StencilOp_Decr:
+                    Value = EvalStencilOp_Decr(tree, paramlist);
+                    break;
+                case TokenType.StencilOp:
+                    Value = EvalStencilOp(tree, paramlist);
+                    break;
                 case TokenType.Render_State_CullMode:
                     Value = EvalRender_State_CullMode(tree, paramlist);
                     break;
@@ -326,8 +380,38 @@ namespace TwoMGFX
                 case TokenType.Render_State_ZWriteEnable:
                     Value = EvalRender_State_ZWriteEnable(tree, paramlist);
                     break;
+                case TokenType.Render_State_ZFunc:
+                    Value = EvalRender_State_ZFunc(tree, paramlist);
+                    break;
                 case TokenType.Render_State_MultiSampleAntiAlias:
                     Value = EvalRender_State_MultiSampleAntiAlias(tree, paramlist);
+                    break;
+                case TokenType.Render_State_ScissorTestEnable:
+                    Value = EvalRender_State_ScissorTestEnable(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilEnable:
+                    Value = EvalRender_State_StencilEnable(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilFail:
+                    Value = EvalRender_State_StencilFail(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilFunc:
+                    Value = EvalRender_State_StencilFunc(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilMask:
+                    Value = EvalRender_State_StencilMask(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilPass:
+                    Value = EvalRender_State_StencilPass(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilRef:
+                    Value = EvalRender_State_StencilRef(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilWriteMask:
+                    Value = EvalRender_State_StencilWriteMask(tree, paramlist);
+                    break;
+                case TokenType.Render_State_StencilZFail:
+                    Value = EvalRender_State_StencilZFail(tree, paramlist);
                     break;
                 case TokenType.Render_State_Expression:
                     Value = EvalRender_State_Expression(tree, paramlist);
@@ -349,6 +433,9 @@ namespace TwoMGFX
                     break;
                 case TokenType.AddressMode_Mirror:
                     Value = EvalAddressMode_Mirror(tree, paramlist);
+                    break;
+                case TokenType.AddressMode_Border:
+                    Value = EvalAddressMode_Border(tree, paramlist);
                     break;
                 case TokenType.AddressMode:
                     Value = EvalAddressMode(tree, paramlist);
@@ -391,6 +478,9 @@ namespace TwoMGFX
                     break;
                 case TokenType.Sampler_State_AddressW:
                     Value = EvalSampler_State_AddressW(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_BorderColor:
+                    Value = EvalSampler_State_BorderColor(tree, paramlist);
                     break;
                 case TokenType.Sampler_State_MaxMipLevel:
                     Value = EvalSampler_State_MaxMipLevel(tree, paramlist);
@@ -633,6 +723,96 @@ namespace TwoMGFX
             return	this.GetValue(tree, TokenType.BlendOp_Add, 0) ?? this.GetValue(tree, TokenType.BlendOp_Subtract, 0) ?? this.GetValue(tree, TokenType.BlendOp_RevSubtract, 0) ?? this.GetValue(tree, TokenType.BlendOp_Min, 0) ?? this.GetValue(tree, TokenType.BlendOp_Max, 0);
         }
 
+        protected virtual object EvalCmpFunc_Never(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.Never;
+        }
+
+        protected virtual object EvalCmpFunc_Less(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.Less;
+        }
+
+        protected virtual object EvalCmpFunc_Equal(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.Equal;
+        }
+
+        protected virtual object EvalCmpFunc_LessEqual(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.LessEqual;
+        }
+
+        protected virtual object EvalCmpFunc_Greater(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.Greater;
+        }
+
+        protected virtual object EvalCmpFunc_NotEqual(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.NotEqual;
+        }
+
+        protected virtual object EvalCmpFunc_GreaterEqual(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.GreaterEqual;
+        }
+
+        protected virtual object EvalCmpFunc_Always(ParseTree tree, params object[] paramlist)
+        {
+            return CompareFunction.Always;
+        }
+
+        protected virtual object EvalCmpFunc(ParseTree tree, params object[] paramlist)
+        {
+            return	this.GetValue(tree, TokenType.CmpFunc_Never, 0) ?? this.GetValue(tree, TokenType.CmpFunc_Less, 0) ?? this.GetValue(tree, TokenType.CmpFunc_Equal, 0) ?? this.GetValue(tree, TokenType.CmpFunc_LessEqual, 0) ?? this.GetValue(tree, TokenType.CmpFunc_Greater, 0) ?? this.GetValue(tree, TokenType.CmpFunc_NotEqual, 0) ?? this.GetValue(tree, TokenType.CmpFunc_GreaterEqual, 0) ?? this.GetValue(tree, TokenType.CmpFunc_Always, 0);
+        }
+
+        protected virtual object EvalStencilOp_Keep(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.Keep;
+        }
+
+        protected virtual object EvalStencilOp_Zero(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.Zero;
+        }
+
+        protected virtual object EvalStencilOp_Replace(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.Replace;
+        }
+
+        protected virtual object EvalStencilOp_IncrSat(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.IncrementSaturation;
+        }
+
+        protected virtual object EvalStencilOp_DecrSat(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.DecrementSaturation;
+        }
+
+        protected virtual object EvalStencilOp_Invert(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.Invert;
+        }
+
+        protected virtual object EvalStencilOp_Incr(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.Increment;
+        }
+
+        protected virtual object EvalStencilOp_Decr(ParseTree tree, params object[] paramlist)
+        {
+            return StencilOperation.Decrement;
+        }
+
+        protected virtual object EvalStencilOp(ParseTree tree, params object[] paramlist)
+        {
+            return	this.GetValue(tree, TokenType.StencilOp_Keep, 0) ?? this.GetValue(tree, TokenType.StencilOp_Zero, 0) ?? this.GetValue(tree, TokenType.StencilOp_Replace, 0) ?? this.GetValue(tree, TokenType.StencilOp_IncrSat, 0) ?? this.GetValue(tree, TokenType.StencilOp_DecrSat, 0) ?? this.GetValue(tree, TokenType.StencilOp_Invert, 0) ?? this.GetValue(tree, TokenType.StencilOp_Incr, 0) ?? this.GetValue(tree, TokenType.StencilOp_Decr, 0);
+        }
+
         protected virtual object EvalRender_State_CullMode(ParseTree tree, params object[] paramlist)
         {
             (paramlist[0] as PassInfo).CullMode = (CullMode)this.GetValue(tree, TokenType.CullModes, 0); return null;
@@ -688,9 +868,59 @@ namespace TwoMGFX
             (paramlist[0] as PassInfo).ZWriteEnable = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
         }
 
+        protected virtual object EvalRender_State_ZFunc(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).DepthBufferFunction = (CompareFunction)this.GetValue(tree, TokenType.CmpFunc, 0); return null;
+        }
+
         protected virtual object EvalRender_State_MultiSampleAntiAlias(ParseTree tree, params object[] paramlist)
         {
             (paramlist[0] as PassInfo).MultiSampleAntiAlias = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_ScissorTestEnable(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).ScissorTestEnable = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilEnable(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilEnable = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilFail(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilFail = (StencilOperation)this.GetValue(tree, TokenType.StencilOp, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilFunc(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilFunc = (CompareFunction)this.GetValue(tree, TokenType.CmpFunc, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilMask(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilMask = ParseTreeTools.ParseInt((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilPass(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilPass = (StencilOperation)this.GetValue(tree, TokenType.StencilOp, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilRef(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilRef = ParseTreeTools.ParseInt((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilWriteMask(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilWriteMask = ParseTreeTools.ParseInt((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_StencilZFail(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).StencilZFail = (StencilOperation)this.GetValue(tree, TokenType.StencilOp, 0); return null;
         }
 
         protected virtual object EvalRender_State_Expression(ParseTree tree, params object[] paramlist)
@@ -749,9 +979,14 @@ namespace TwoMGFX
             return TextureAddressMode.Mirror;
         }
 
+        protected virtual object EvalAddressMode_Border(ParseTree tree, params object[] paramlist)
+        {
+            return TextureAddressMode.Border;
+        }
+
         protected virtual object EvalAddressMode(ParseTree tree, params object[] paramlist)
         {
-            return this.GetValue(tree, TokenType.AddressMode_Clamp, 0) ?? this.GetValue(tree, TokenType.AddressMode_Wrap, 0) ?? this.GetValue(tree, TokenType.AddressMode_Mirror, 0);
+            return this.GetValue(tree, TokenType.AddressMode_Clamp, 0) ?? this.GetValue(tree, TokenType.AddressMode_Wrap, 0) ?? this.GetValue(tree, TokenType.AddressMode_Mirror, 0) ?? this.GetValue(tree, TokenType.AddressMode_Border, 0);
         }
 
         protected virtual object EvalTextureFilter_None(ParseTree tree, params object[] paramlist)
@@ -817,6 +1052,11 @@ namespace TwoMGFX
         protected virtual object EvalSampler_State_AddressW(ParseTree tree, params object[] paramlist)
         {
             (paramlist[0] as SamplerStateInfo).AddressW = (TextureAddressMode)this.GetValue(tree, TokenType.AddressMode, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_BorderColor(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).BorderColor = ParseTreeTools.ParseColor((string)this.GetValue(tree, TokenType.HexColor, 0)); return null;
         }
 
         protected virtual object EvalSampler_State_MaxMipLevel(ParseTree tree, params object[] paramlist)

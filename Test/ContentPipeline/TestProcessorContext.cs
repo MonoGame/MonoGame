@@ -21,7 +21,7 @@ namespace MonoGame.Tests.ContentPipeline
 
         public override string BuildConfiguration
         {
-            get { throw new NotImplementedException(); }
+            get { return "Debug"; }
         }
 
         public override string IntermediateDirectory
@@ -56,7 +56,7 @@ namespace MonoGame.Tests.ContentPipeline
 
         public override GraphicsProfile TargetProfile
         {
-            get { throw new NotImplementedException(); }
+            get { return GraphicsProfile.HiDef; }
         }
 
         public override void AddDependency(string filename)

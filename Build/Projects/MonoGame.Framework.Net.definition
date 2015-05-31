@@ -38,6 +38,7 @@
   <Properties>
     
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
 	<RemoveXnaAssembliesOnWP8>False</RemoveXnaAssembliesOnWP8>
@@ -300,18 +301,6 @@
     <Compile Include="Windows8\GamerServices\SignedInGamer.cs">
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
-    <Compile Include="Windows8\GamerServices\EventAsync.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
-    <Compile Include="Windows8\GamerServices\InputDialog.cs">
-      <Platforms>Windows8,WindowsPhone81</Platforms>
-    </Compile>
-    <Page Include="Themes\generic.xaml">
-        <Platforms>Windows8,WindowsPhone81</Platforms>
-        <Generator>MSBuild:Compile</Generator>
-        <SubType>Designer</SubType>
-    </Page>
-
 
     <!-- Windows Desktop Platform -->
     <Compile Include="Windows\GamerServices\Guide.cs">

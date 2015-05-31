@@ -63,12 +63,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         NativeClient,
 
         /// <summary>
-        /// Ouya video game console, a variation of Android
-        /// (MonoGame)
-        /// </summary>
-        Ouya,
-
-        /// <summary>
         /// Sony PlayStation Mobile (PS Vita)
         /// (MonoGame)
         /// </summary>

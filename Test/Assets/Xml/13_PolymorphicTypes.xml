@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<XnaContent>
+<XnaContent xmlns:Generic="System.Collections.Generic">
   <Asset Type="PolymorphicTypes">
     <Hello Type="string">World</Hello>
     <Elf Type="int">23</Elf>
@@ -25,5 +25,20 @@
         <Value>true</Value>
       </Item>
     </UntypedArray>
+    <IntCollection Type="Generic:List[int]">1 4 6</IntCollection>
+    <UntypedDictionary Type="Generic:Dictionary[int,PolymorphicA]">
+      <Item>
+        <Key>1</Key>
+        <Value>
+          <Value>true</Value>
+        </Value>
+      </Item>
+      <Item>
+        <Key>5</Key>
+        <Value>
+          <Value>false</Value>
+        </Value>
+      </Item>
+    </UntypedDictionary>
   </Asset>
 </XnaContent>
