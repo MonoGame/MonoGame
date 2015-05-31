@@ -7,9 +7,9 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="DesktopGL">
+  <Service Name="DesktopGL">
     <Reference Include="Lidgren.Network" />
-  </Platform>
+  </Service>
 
   <Platform Type="MacOS">
     <Reference Include="System.Core" />

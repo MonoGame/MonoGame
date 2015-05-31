@@ -15,10 +15,10 @@
     <Reference Include="Xamarin.iOS" />
   </Platform>
 
-  <Platform Type="DesktopGL">
+  <Service Name="MonoGame.Framework/DesktopGL">
     <Reference Include="System" />
     <Reference Include="System.Xml" />
-  </Platform>
+  </Service>
 
   <Platform Type="MacOS">
     <Reference Include="System" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ExternalProject Name="MonoGame.Tests.References">
 
-  <Platform Type="Windows">
+  <Service Name="MonoGame.Framework/_Desktop">
     <Reference Include="System.Drawing" />
 
     <Binary
@@ -19,47 +19,7 @@
     <Binary
       Name="nunit.util"
       Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
-  </Platform>
-
-  <Platform Type="DesktopGL">
-    <Reference Include="System.Drawing" />
-
-    <Binary
-      Name="NDesk.Options"
-      Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />
-    <Binary
-      Name="nunit.core"
-      Path="ThirdParty/Dependencies/Tests/nunit.core.dll" />
-    <Binary
-      Name="nunit.core.interfaces"
-      Path="ThirdParty/Dependencies/Tests/nunit.core.interfaces.dll" />
-    <Binary
-      Name="nunit.framework"
-      Path="ThirdParty/Dependencies/Tests/nunit.framework.dll" />
-    <Binary
-      Name="nunit.util"
-      Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
-  </Platform>
-
-  <Platform Type="MacOS">
-    <Reference Include="System.Drawing" />
-
-    <Binary
-      Name="NDesk.Options"
-      Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />
-    <Binary
-      Name="nunit.core"
-      Path="ThirdParty/Dependencies/Tests/nunit.core.dll" />
-    <Binary
-      Name="nunit.core.interfaces"
-      Path="ThirdParty/Dependencies/Tests/nunit.core.interfaces.dll" />
-    <Binary
-      Name="nunit.framework"
-      Path="ThirdParty/Dependencies/Tests/nunit.framework.dll" />
-    <Binary
-      Name="nunit.util"
-      Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
-  </Platform>
+  </Service>
 
   <Platform Type="iOS">
     <Reference Include="monotouch" />

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MGCB" Path="Tools/MGCB" Type="Console" Platforms="Windows,MacOS,Linux">
+<Project Name="MGCB" Path="Tools/MGCB" Type="Console" Platforms="Windows,MacOS,Linux,DesktopGL">
 
   <!-- Common assembly references -->
   <References>
@@ -10,8 +10,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
-
-    <Reference Include="MGCB.References" />
   </References>
 
   <Properties>
@@ -26,6 +24,7 @@
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
       <Platform Name="MacOS">TRACE;MONOMAC</Platform>
       <Platform Name="Linux">TRACE;LINUX</Platform>
+      <Platform Name="DesktopGL">TRACE;LINUX</Platform>
     </CustomDefinitions>
 
     <ForceArchitecture>x64</ForceArchitecture>

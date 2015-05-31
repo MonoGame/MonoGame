@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,MacOS,Ouya,Windows,Windows8,WindowsPhone,WindowsPhone81,DesktopGL">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsPhone,WindowsPhone81,DesktopGL">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -18,7 +18,6 @@
 	<Platform Name="Windows8">A65B8326-1DDD-4E5D-8130-E74F70919E81</Platform>
 	<Platform Name="WindowsPhone">C6DA906E-9E4A-428B-8870-07A39B172F83</Platform>
 	<Platform Name="WindowsPhone81">423e2b58-4fbb-4a5d-8a86-1188f2889523</Platform>
-	<Platform Name="DesktopGL">1B738549-0449-4504-B978-7BFC347E3F32</Platform>
   </ProjectGuids>
 
   <!-- Common assembly references -->
@@ -53,10 +52,15 @@
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE;NET</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX;NET</Platform>
       <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
-      <Platform Name="DesktopGL">TRACE;OPENGL;OPENAL;NET;DESKTOPGL</Platform>
     </CustomDefinitions>
 
   </Properties>
+
+  <Services>
+    <Service Name="DesktopGL">
+      <AddDefine>TRACE;OPENGL;OPENAL;NET;DESKTOPGL</AddDefine>
+    </Service>
+  </Services>
 
   <Files>
 
@@ -112,14 +116,15 @@
     <Compile Include="GamerServices\SignedInGamerCollection.cs">
       <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
     </Compile>
+    <!-- TODO: I don't understand why these three files have such different platforms? -->
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
-      <Platforms>Android,MacOS,Ouya,Windows,DesktopGL</Platforms>
+      <Platforms>Android,MacOS,Ouya,Windows,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesDispatcher.cs">
-      <Platforms>MacOS,Windows,DesktopGL</Platforms>
+      <Platforms>MacOS,Windows,Linux,DesktopGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesComponent.cs">
-      <Platforms>Android,iOS,MacOS,Ouya,PSMobile,Windows,DesktopGL</Platforms>
+      <Platforms>Android,iOS,MacOS,Ouya,PSMobile,Windows,Linux,DesktopGL</Platforms>
     </Compile>
  
 
@@ -255,13 +260,13 @@
     
     <!-- DesktopGL Platform -->
     <Compile Include="DesktopGL\GamerServices\Guide.cs">
-      <Platforms>DesktopGL</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="DesktopGL\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>DesktopGL</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
     <Compile Include="DesktopGL\GamerServices\SignedInGamer.cs">
-      <Platforms>DesktopGL</Platforms>
+      <Services>DesktopGL</Services>
     </Compile>
 
 

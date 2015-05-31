@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,MacOS,DesktopGL">
+<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,MacOS,Linux,DesktopGL">
 
   <References>
     <Reference Include="System" />
@@ -25,6 +25,7 @@
       <Platform Name="MacOS">MONOMAC</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX</Platform>
       <Platform Name="iOS">IOS;</Platform>
+      <Platform Name="Linux">TRACE;DESKTOPGL</Platform>
       <Platform Name="DesktopGL">TRACE;DESKTOPGL</Platform>
     </CustomDefinitions>
 
@@ -57,11 +58,11 @@
     </Compile>
 
     <Compile Include="Runner\DesktopGL\Program.cs">
-        <Platforms>DesktopGL</Platforms>
+        <Services>MonoGame.Framework/DesktopGL</Services>
     </Compile>
 
     <Compile Include="Runner\Desktop\FramePixelData.cs">
-        <Platforms>Windows,MacOS,DesktopGL</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
 
     <Compile Include="Runner\iOS\Main.cs">
@@ -146,38 +147,38 @@
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\AssetTestUtility.cs" />
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\FontTextureProcessorTests.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TestProcessorContext.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TextureContentTests.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TextureProcessorTests.cs">
-        <Platforms>Windows,MacOS</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
 
     <Content Include="Assets\tests.xsl">
