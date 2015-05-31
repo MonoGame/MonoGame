@@ -1218,6 +1218,7 @@
     </Compile>
     <Compile Include="Desktop\OpenTKGameWindow.cs">
       <Services>_OpenTKDesktop</Services>
+      <ExcludePlatforms>MacOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\KeyboardUtil.OpenTK.cs">
       <Services>_OpenTKDesktop</Services>
