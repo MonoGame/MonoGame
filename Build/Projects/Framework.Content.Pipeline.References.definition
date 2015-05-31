@@ -12,11 +12,8 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
     <Binary
-      Name="ManagedPVRTC"
-      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
-    <Binary
       Name="PVRTexLibNET"
-      Path="ThirdParty\Dependencies\PVRTexLibNet\x86\PVRTexLibNET.dll" />
+      Path="ThirdParty\Dependencies\PVRTexLibNet\PVRTexLibNET.dll" />
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
@@ -35,14 +32,11 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
-      Name="ManagedPVRTC"
-      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
-    <Binary
       Name="FreeImageNET"
       Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
     <Binary
       Name="PVRTexLibNET"
-      Path="ThirdParty\Dependencies\PVRTexLibNet\x86\PVRTexLibNET.dll" />
+      Path="ThirdParty\Dependencies\PVRTexLibNet\PVRTexLibNET.dll" />
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
@@ -66,14 +60,11 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
-      Name="ManagedPVRTC"
-      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
-    <Binary
       Name="FreeImageNET"
       Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
     <Binary
       Name="PVRTexLibNET"
-      Path="ThirdParty\Dependencies\PVRTexLibNet\x64\PVRTexLibNET.dll" />
+      Path="ThirdParty\Dependencies\PVRTexLibNet\PVRTexLibNET.dll" />
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
