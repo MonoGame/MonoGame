@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MGCB" Path="Tools/MGCB" Type="Console" Platforms="Windows,MacOS,Linux,DesktopGL">
+<Project Name="MGCB" Path="Tools/MGCB" Type="Console" Platforms="Windows,MacOS,Linux">
 
   <!-- Common assembly references -->
   <References>
@@ -24,7 +24,6 @@
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
       <Platform Name="MacOS">TRACE;MONOMAC</Platform>
       <Platform Name="Linux">TRACE;LINUX</Platform>
-      <Platform Name="DesktopGL">TRACE;LINUX</Platform>
     </CustomDefinitions>
 
     <ForceArchitecture>x64</ForceArchitecture>
