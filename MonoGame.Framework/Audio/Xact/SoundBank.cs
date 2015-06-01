@@ -181,10 +181,9 @@ namespace Microsoft.Xna.Framework.Audio
                                         case 3:
                                             {
                                                 uint soundOffset = reader.ReadUInt32();
-                                                var weightMin = reader.ReadSingle();
-                                                var weightMax = reader.ReadSingle();
-                                                var varFlags = reader.ReadUInt32();
-                                                var linger = (varFlags & 0x01) == 0x01;
+                                                reader.ReadSingle(); // weightMin
+                                                reader.ReadSingle(); // weightMax
+                                                reader.ReadUInt32(); // flags
 
                                                 var oldPosition = stream.Position;
                                                 stream.Seek(soundOffset, SeekOrigin.Begin);
@@ -210,10 +209,10 @@ namespace Microsoft.Xna.Framework.Audio
                             }
 
                             // Instance limiting
-                            var instanceLimit = reader.ReadByte();
-                            var fadeInSec = reader.ReadUInt16() / 1000.0f;
-                            var fadeOutSec = reader.ReadUInt16() / 1000.0f;
-                            var instanceFlags = reader.ReadByte();
+                            reader.ReadByte(); //instanceLimit
+                            reader.ReadUInt16(); //fadeInSec, divide by 1000.0f
+                            reader.ReadUInt16(); //fadeOutSec, divide by 1000.0f
+                            reader.ReadByte(); //instanceFlags
 
                             _cues.Add(cue.Name, cue);
                         }
