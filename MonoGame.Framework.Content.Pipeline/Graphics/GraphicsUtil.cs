@@ -346,11 +346,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         break;
 
                     case TargetPlatform.Windows:
-                    case TargetPlatform.WindowsGL:
                     case TargetPlatform.WindowsPhone8:
                     case TargetPlatform.WindowsStoreApp:
                     case TargetPlatform.DesktopGL:
-                    case TargetPlatform.Linux:
                     case TargetPlatform.MacOSX:
                     case TargetPlatform.NativeClient:
                         if (format != TextureProcessorOutputFormat.DxtCompressed)
