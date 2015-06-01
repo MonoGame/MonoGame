@@ -3,8 +3,20 @@
 
   <Platform Type="Linux">
     <Binary
-      Name="MonoGame.Framework"
-      Path="MonoGame.Framework\bin\DesktopGL\AnyCPU\Release\MonoGame.Framework.dll" />
+      Name="AssimpNet"
+      Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
+    <Binary
+      Name="Nvidia.TextureTools"
+      Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
+    <Binary
+      Name="SharpFont"
+      Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
+    <Binary
+      Name="ManagedPVRTC"
+      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
+  </Platform>
+  
+  <Platform Type="DesktopGL">
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
@@ -18,7 +30,6 @@
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
   </Platform>
-
 
   <Platform Type="MacOS">
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
@@ -38,7 +49,6 @@
       Name="FreeImageNET"
       Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
   </Platform>
-
 
   <Platform Type="Windows">
     <Binary
@@ -62,9 +72,9 @@
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
-  <Binary
+    <Binary
       Name="FreeImageNET"
-       Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
+      Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
   </Platform>
 	
 </ExternalProject>
