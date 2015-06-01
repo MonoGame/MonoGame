@@ -541,14 +541,19 @@
       <Link>ffprobe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x86\libPVRTexLibWrapper.so">
       <Platforms>Linux</Platforms>
-      <Link>libPVRTexLibWrapper.so</Link>
+      <Link>libPVRTexLibWrapper.x86.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibWrapper.dll.config">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so">
       <Platforms>Linux</Platforms>
-      <Link>PVRTexLibWrapper.dll.config</Link>
+      <Link>libPVRTexLibWrapper.x64.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibNET.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">
@@ -638,9 +643,9 @@
       <Link>libPVRTexLibWrapper.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibWrapper.dll.config">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config">
       <Platforms>MacOS</Platforms>
-      <Link>PVRTexLibWrapper.dll.config</Link>
+      <Link>PVRTexLibNET.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">
