@@ -90,20 +90,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Sony PlayStation4
         /// </summary>
-        PlayStation4,
-
-        /// <summary>
-        /// All desktop versions of Windows using OpenGL.
-        /// (MonoGame)
-        /// </summary>
-        [Obsolete("This platform is obsolete, use DesktopGL instead")]
-        WindowsGL = DesktopGL,
-
-        /// <summary>
-        /// Linux-based PCs
-        /// (MonoGame)
-        /// </summary>
-        [Obsolete("This platform is obsolete, use DesktopGL instead")]
-        Linux = DesktopGL
+        PlayStation4
     }
 }
