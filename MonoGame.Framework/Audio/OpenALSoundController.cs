@@ -304,11 +304,13 @@ namespace Microsoft.Xna.Framework.Audio
                 if (disposing)
                 {
                     if (_bSoundAvailable)
+                    {
                         CleanUpOpenAL();
-
 #if DESKTOPGL
-                    _oggstreamer.Dispose();
+                        if(_oggstreamer != null)
+                            _oggstreamer.Dispose();
 #endif
+                    }
                 }
                 _isDisposed = true;
             }
