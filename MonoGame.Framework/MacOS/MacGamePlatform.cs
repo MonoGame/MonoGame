@@ -385,7 +385,7 @@ namespace Microsoft.Xna.Framework
         {
             var device = Game.GraphicsDevice;
             if (device != null)
-                device.Present();
+                device._graphicsMetrics = new GraphicsMetrics();
         }
 
         #endregion
