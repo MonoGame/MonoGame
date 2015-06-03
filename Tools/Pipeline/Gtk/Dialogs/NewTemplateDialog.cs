@@ -74,7 +74,7 @@ namespace MonoGame.Tools.Pipeline
             TreeIter iter;
 
             if (entry1.Text != "") {
-                if (MainWindow.CheckString (entry1.Text, MainWindow.AllowedCharacters)) {
+                if (MainWindow.CheckString (entry1.Text, MainWindow.NotAllowedCharacters)) {
                     if (treeview1.Selection.GetSelected (out iter)) {
                         buttonOk.Sensitive = true;
                         label2.Visible = false;
@@ -89,6 +89,17 @@ namespace MonoGame.Tools.Pipeline
             } else {
                 buttonOk.Sensitive = false;
                 label2.Visible = false;
+            }
+
+            if(label2.Visible)
+            {
+                var chars = MainWindow.NotAllowedCharacters.ToCharArray();
+                string notallowedchars = chars[0].ToString();
+
+                for (int i = 1; i < chars.Length; i++)
+                    notallowedchars += ", " + chars[i];
+
+                this.label2.LabelProp = "Your name contains one of not allowed letters: " + notallowedchars;
             }
         }
 
