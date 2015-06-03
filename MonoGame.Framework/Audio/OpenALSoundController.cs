@@ -307,7 +307,10 @@ namespace Microsoft.Xna.Framework.Audio
                         CleanUpOpenAL();
 
 #if (WINDOWS && OPENGL) || LINUX
-                    _oggstreamer.Dispose();
+                    // Work around for MonoGame Issue https://github.com/mono/MonoGame/issues/3897
+                    // **Note** this will cause conflicts when updating MonoGame the next time.
+                    if (_oggstreamer != null)
+                        _oggstreamer.Dispose();
 #endif
                 }
                 _isDisposed = true;
