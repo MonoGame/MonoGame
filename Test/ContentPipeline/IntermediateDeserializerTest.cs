@@ -538,5 +538,17 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(4.2f, genericTypes.B.Value);
             });
         }
+
+        [Test]
+        public void StructArrayNoElements()
+        {
+            // Note that this does not contain a matching SerializeAndAssert test as Vector2ArrayNoElements
+            // will serialize to an empty Xml element which defeats the purpose of this test.
+            DeserializeCompileAndLoad<StructArrayNoElements>("25_StructArrayNoElements.xml", structArrayNoElems =>
+            {
+                Assert.IsNotNull(structArrayNoElems.Vector2ArrayNoElements);
+                Assert.AreEqual(0, structArrayNoElems.Vector2ArrayNoElements.Length);
+            });
+        }
     }
 }
