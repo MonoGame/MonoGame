@@ -69,7 +69,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         channel.Name.StartsWith("Tangent"))
                     {
                         for (int i = 0; i < vector3Channel.Count; i++)
-                            vector3Channel[i] = Vector3.TransformNormal(vector3Channel[i], inverseTranspose);
+                        {
+                            Vector3 normal = vector3Channel[i];
+                            Vector3.TransformNormal(ref normal, ref inverseTranspose, out normal);
+                            Vector3.Normalize(ref normal, out normal);
+                            vector3Channel[i] = normal;
+                        }
                     }
                 }
             }

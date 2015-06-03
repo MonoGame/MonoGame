@@ -22,10 +22,10 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
-      <Platform Name="Linux">TRACE;LINUX</Platform>
+      <Platform Name="Linux">TRACE;LINUX;DESKTOPGL</Platform>
       <Platform Name="MacOS">MONOMAC</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="iOS">IOS;</Platform>
     </CustomDefinitions>
 

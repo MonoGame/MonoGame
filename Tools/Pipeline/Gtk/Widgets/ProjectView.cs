@@ -166,9 +166,13 @@ namespace MonoGame.Tools.Pipeline
         
             if(!treeview1.Model.GetIterFromString (out iter, "0"))
                 iter = listStore.AppendValues (ICON_BASE, basename, ID_BASE);
-            treeview1.ExpandRow(treeview1.Model.GetPath(iter), false);
 
             return iter;
+        }
+
+        public void ExpandBase()
+        {
+            treeview1.ExpandRow(treeview1.Model.GetPath(GetBaseIter()), false);
         }
 
         public void Close()

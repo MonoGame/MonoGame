@@ -378,7 +378,7 @@
     <Compile Include="Serialization\Intermediate\NamedValueDictionarySerializer.cs" />    
     <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
     <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
-	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
@@ -418,6 +418,7 @@
     <Compile Include="InvalidContentException.cs" />
     <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
+    <Compile Include="OggImporter.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
     <Compile Include="OpenAssetImporter.cs" />
     <Compile Include="PipelineComponentScanner.cs" />
@@ -540,14 +541,19 @@
       <Link>ffprobe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x86\PVRTexLibWrapper.dll">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x86\libPVRTexLibWrapper.so">
       <Platforms>Linux</Platforms>
-      <Link>PVRTexLibWrapper.so</Link>
+      <Link>libPVRTexLibWrapper.x86.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibWrapper.dll.config">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so">
       <Platforms>Linux</Platforms>
-      <Link>PVRTexLibWrapper.dll.config</Link>
+      <Link>libPVRTexLibWrapper.x64.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibNET.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">
@@ -580,16 +586,6 @@
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
       <Platforms>MacOS</Platforms>
       <Link>Nvidia.TextureTools.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\MacOS\libpvrtc.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libpvrtc.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>ManagedPVRTC.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib">
@@ -642,14 +638,14 @@
       <Link>libfreeimageplus.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\MacOS\x86\PVRTexLibWrapper.dylib">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\MacOS\x86\libPVRTexLibWrapper.dylib">
       <Platforms>MacOS</Platforms>
-      <Link>PVRTexLibWrapper.dylib</Link>
+      <Link>libPVRTexLibWrapper.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibWrapper.dll.config">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config">
       <Platforms>MacOS</Platforms>
-      <Link>PVRTexLibWrapper.dll.config</Link>
+      <Link>PVRTexLibNET.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">

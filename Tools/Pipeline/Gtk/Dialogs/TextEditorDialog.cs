@@ -5,13 +5,22 @@ namespace MonoGame.Tools.Pipeline
 {
     public partial class TextEditorDialog : Dialog
     {
-        bool strictmode;
+        Button buttonOk;
 
+        bool strictmode;
         public string text;
 
-        public TextEditorDialog(Window parrent, string title, string label, string text, bool strictmode) : base(title, parrent, DialogFlags.Modal)
+        public TextEditorDialog(Window parrent, string title, string label, string text, bool strictmode) : base(Global.GetNewDialog(parrent.Handle))
         {
             Build();
+
+            this.Title = title;
+
+            buttonOk = (Button)this.AddButton("Ok", ResponseType.Ok);
+            buttonOk.Sensitive = false;
+
+            this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
 
             this.strictmode = strictmode;
             buttonOk.Sensitive = !strictmode;
@@ -22,6 +31,7 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnResponse(object sender, EventArgs e)
         {
+            text = entry1.Text;
             Destroy ();
         }
 
@@ -47,12 +57,6 @@ namespace MonoGame.Tools.Pipeline
         protected void OnEntry1Changed(object sender, EventArgs e)
         {
             ButtonOkEnabled();
-        }
-
-        protected void OnButtonOkClicked(object sender, EventArgs e)
-        {
-            text = entry1.Text;
-            Respond(ResponseType.Ok);
         }
     }
 }

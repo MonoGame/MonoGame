@@ -45,11 +45,11 @@
     <Reference Include="OpenTK">
        <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="NVorbis">
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\NVorbis.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework">
        <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Tao.Sdl">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\Tao.Sdl.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
