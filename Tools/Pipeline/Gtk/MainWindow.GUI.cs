@@ -4,6 +4,10 @@ namespace MonoGame.Tools.Pipeline
 {
 	internal partial class MainWindow
 	{
+        #if GTK3
+        HeaderBar hbar;
+        #endif
+
 		private global::Gtk.UIManager UIManager;
 		
 		private global::Gtk.Action FileAction;
@@ -172,7 +176,6 @@ namespace MonoGame.Tools.Pipeline
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "MonoGame.Tools.Pipeline.MainWindow";
-			this.Title = global::Mono.Unix.Catalog.GetString ("MonoGame Pipeline");
 			this.Icon = global::Gdk.Pixbuf.LoadFromResource ("MonoGame.Tools.Pipeline.App.ico");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Container child MonoGame.Tools.Pipeline.MainWindow.Gtk.Container+ContainerChild
@@ -229,6 +232,19 @@ namespace MonoGame.Tools.Pipeline
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.hpaned1]));
 			w8.Position = 1;
 			this.Add (this.vbox2);
+
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                hbar = new HeaderBar();
+                hbar.AttachToWindow(this);
+                hbar.ShowCloseButton = true;
+                hbar.Show();
+            }
+            #endif
+
+            this.Title = basetitle;
+
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
