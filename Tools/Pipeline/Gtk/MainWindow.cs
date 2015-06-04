@@ -13,12 +13,24 @@ namespace MonoGame.Tools.Pipeline
     partial class MainWindow : Window, IView
     {
         const string basetitle = "MonoGame Pipeline";
-        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.()";
+        public static string LinuxNotAllowedCharacters = "/"; 
+        public static string MacNotAllowedCharacters = ":";
 
-        public static bool CheckString(string s, string allowedCharacters)
+        public static string NotAllowedCharacters
         {
-            for (int i = 0; i < s.Length; i++) 
-                if (!allowedCharacters.Contains (s.Substring (i, 1)))
+            get
+            {
+                if (Global.DesktopEnvironment == "OSX")
+                    return MacNotAllowedCharacters;
+                else
+                    return LinuxNotAllowedCharacters;
+            }
+        }
+
+        public static bool CheckString(string s, string notallowedCharacters)
+        {
+            for (int i = 0; i < notallowedCharacters.Length; i++) 
+                if (s.Contains (notallowedCharacters.Substring (i, 1)))
                     return false;
 
             return true;

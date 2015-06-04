@@ -46,6 +46,9 @@ namespace MonoGame.Tools.Pipeline
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr gtk_dialog_new_with_buttons (string title, IntPtr parent, int flags);
 
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr gtk_widget_set_opacity (IntPtr widget, double opacity);
+
         [DllImport (giolibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr g_file_new_for_path (string path);
 

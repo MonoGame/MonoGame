@@ -12,17 +12,17 @@ namespace MonoGame.Tools.Pipeline
         {
             private readonly PipelineController _con;
 
-            private readonly string path;
-            private readonly string newpath;
-            private readonly FileType type;
+            private readonly string[] paths;
+            private readonly string[] newpaths;
+            private readonly FileType[] types;
 
-            public MoveAction(PipelineController controller, string path, string newpath, FileType type)
+            public MoveAction(PipelineController controller, string[] paths, string[] newpaths, FileType[] types)
             {
                 _con = controller;
 
-                this.path = path;
-                this.newpath = newpath;
-                this.type = type;
+                this.paths = paths;
+                this.newpaths = newpaths;
+                this.types = types;
             }
 
             private bool Move(string path, string newpath, FileType type)
@@ -111,12 +111,22 @@ namespace MonoGame.Tools.Pipeline
 
             public bool Do()
             {
-                return Move(path, newpath, type);
+                bool ret = true;
+
+                for (int i = 0; i < paths.Length; i++)
+                    ret = ret && Move(paths[i], newpaths[i], types[i]);
+
+                return ret;
             }
 
             public bool Undo()
             {
-                return Move(newpath, path, type);
+                bool ret = true;
+
+                for (int i = 0; i < paths.Length; i++)
+                    ret = ret && Move(newpaths[i], paths[i], types[i]);
+
+                return ret;
             }
         }
     }

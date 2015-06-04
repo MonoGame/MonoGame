@@ -737,9 +737,9 @@ namespace MonoGame.Tools.Pipeline
                 _actionStack.Add(action2);
         }
 
-        public void Move (string path, string newname, FileType type)
+        public void Move (string[] paths, string[] newnames, FileType[] types)
         {
-            var action = new MoveAction(this, path, newname, type);
+            var action = new MoveAction(this, paths, newnames, types);
             if(action.Do())
                 _actionStack.Add(action);
         }
