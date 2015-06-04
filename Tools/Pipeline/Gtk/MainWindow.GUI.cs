@@ -233,7 +233,15 @@ namespace MonoGame.Tools.Pipeline
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 751;
-			this.DefaultHeight = 557;
+            this.DefaultHeight = 557;
+
+            #if GTK3
+            Gdk.Geometry geom = new Gdk.Geometry();
+            geom.MinWidth = 400;
+            geom.MinHeight = 300;
+            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize);
+            #endif
+
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.NewAction.Activated += new global::System.EventHandler (this.OnNewActionActivated);
