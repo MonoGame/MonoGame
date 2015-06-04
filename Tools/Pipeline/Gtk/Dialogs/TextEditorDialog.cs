@@ -17,7 +17,7 @@ namespace MonoGame.Tools.Pipeline
             this.Title = title;
 
             buttonOk = (Button)this.AddButton("Ok", ResponseType.Ok);
-            buttonOk.Sensitive = false;
+            buttonOk.Sensitive = !strictmode;
 
             this.AddButton("Cancel", ResponseType.Cancel);
             this.DefaultResponse = ResponseType.Ok;
@@ -41,7 +41,7 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             if (entry1.Text != "") {
-                if (MainWindow.CheckString (entry1.Text, MainWindow.AllowedCharacters)) {
+                if (MainWindow.CheckString (entry1.Text, MainWindow.NotAllowedCharacters)) {
                     buttonOk.Sensitive = true;
                     label3.Visible = false;
                 } else {
@@ -51,6 +51,17 @@ namespace MonoGame.Tools.Pipeline
             } else {
                 buttonOk.Sensitive = false;
                 label3.Visible = false;
+            }
+
+            if(label3.Visible)
+            {
+                var chars = MainWindow.NotAllowedCharacters.ToCharArray();
+                string notallowedchars = chars[0].ToString();
+
+                for (int i = 1; i < chars.Length; i++)
+                    notallowedchars += ", " + chars[i];
+
+                this.label3.LabelProp = "Your name contains one of not allowed letters: " + notallowedchars;
             }
         }
 
