@@ -1061,9 +1061,11 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
             var dialog = new AddFolderDialog(folder);
+            applyforall = false;
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 action = dialog.responce;
