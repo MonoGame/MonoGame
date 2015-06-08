@@ -723,6 +723,15 @@ namespace MonoGame.Tools.Pipeline
 
         void ReloadPropertyGrid()
         {
+            string name = "????";
+            string location = "????";
+
+            if (!window._controller.ProjectOpen)
+            {
+                propertiesView.Load(null, name, location);
+                return;
+            }
+
             window._controller.Selection.Clear (window);
             List<TreeIter> iters;
             List<string> ids;
@@ -733,8 +742,6 @@ namespace MonoGame.Tools.Pipeline
 
             var citems = new List<ContentItem> ();
             var dirpaths = new List<string> ();
-            string name = "????";
-            string location = "????";
 
             for(int i = 0;i < paths.Length;i++)
             {
