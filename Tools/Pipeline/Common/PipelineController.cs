@@ -573,15 +573,37 @@ namespace MonoGame.Tools.Pipeline
             return AskSaveProject();
         }
 
-        public void Include(string initialDirectory)
-        {       
+        public void DragDrop(string initialDirectory, string[] folders, string[] files)
+        {
             // Root the path to the project.
             if (!Path.IsPathRooted(initialDirectory))
                 initialDirectory = Path.Combine(_project.Location, initialDirectory);
+            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                initialDirectory += Path.DirectorySeparatorChar.ToString();
+
+            IncludeFolder(initialDirectory, folders);
+            Include(initialDirectory, files);
+        }
+
+        public void Include(string initialDirectory)
+        {
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                initialDirectory += Path.DirectorySeparatorChar.ToString();
 
             List<string> files;
             if (!View.ChooseContentFile(initialDirectory, out files))
                 return;
+
+            Include(initialDirectory, files.ToArray());
+        }
+
+        private void Include(string initialDirectory, string[] f)
+        {
+            List<string> files = new List<string>();
+            files.AddRange(f);
 
             List<string> sc = new List<string>(), dc = new List<string>();
             int def = 0;
@@ -647,94 +669,122 @@ namespace MonoGame.Tools.Pipeline
             // Root the path to the project.
             if (!Path.IsPathRooted(initialDirectory))
                 initialDirectory = Path.Combine(_project.Location, initialDirectory);
+            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                initialDirectory += Path.DirectorySeparatorChar.ToString();
 
             string folder;
             if (!View.ChooseContentFolder(initialDirectory, out folder))
                 return;
 
-            if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                folder += Path.DirectorySeparatorChar;
+            IncludeFolder(initialDirectory, new []{ folder });
+        }
 
-            List<string> files = new List<string>();
-            List<string> directories = new List<string>();
+        public void IncludeFolder(string initialDirectory, string[] dirs)
+        {
+            CopyAction caction = CopyAction.Copy;
+            bool applyforall = false;
 
-            files.AddRange(GetFiles(folder));
-            directories.Add(folder);
-            directories.AddRange(GetDirectories(folder));
+            List<string> ffiles = new List<string>();
+            List<string> ddirectories = new List<string>();
 
-            if (!folder.StartsWith(initialDirectory))
+            List<string> sc = new List<string>(), dc = new List<string>();
+
+            foreach (string fol in dirs)
             {
-                CopyAction caction;
+                List<string> files = new List<string>();
+                List<string> directories = new List<string>();
 
-                if (!View.CopyOrLinkFolder(folder, out caction))
-                    return;
+                string folder = fol;
 
-                if (caction == CopyAction.Copy)
+                if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    folder += Path.DirectorySeparatorChar;
+
+                files.AddRange(GetFiles(folder));
+                directories.Add(folder);
+                directories.AddRange(GetDirectories(folder));
+
+                if (!folder.StartsWith(initialDirectory))
                 {
+                    string nd = folder.Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar);
 
-                    for (int i = 0; i < directories.Count; i++)
+                    if (!applyforall)
+                    if (!View.CopyOrLinkFolder(folder, Directory.Exists(nd), out caction, out applyforall))
+                        return;
+
+                    if (caction == CopyAction.Copy)
                     {
-                        try
-                        {
-                            DirectoryInfo dinfo = new DirectoryInfo(folder);
-                            string newdir = directories[i].Replace(folder, initialDirectory + Path.DirectorySeparatorChar + dinfo.Name + Path.DirectorySeparatorChar);
+                        for (int i = 0; i < directories.Count; i++)
+                            ddirectories.Add(directories[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
 
-                            if (!Directory.Exists(newdir))
-                                Directory.CreateDirectory(newdir);
+                        for (int i = 0; i < files.Count; i++)
+                            ffiles.Add(files[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
 
-                            directories[i] = newdir;
-                        }
-                        catch
-                        {
-                            View.ShowError("Error While Creating Directories", "An error occurred while the directories were beeing created, aborting.");
-                            return;
-                        }
+                        sc.Add(folder);
+                        dc.Add(nd);
                     }
-
-                    for (int i = 0; i < files.Count; i++)
+                    else if (caction == CopyAction.Link)
                     {
-                        try
+                        string pl = _project.Location;
+                        if (!pl.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                            pl += Path.DirectorySeparatorChar;
+
+                        Uri folderUri = new Uri(pl);
+
+                        for (int i = 0; i < directories.Count; i++)
                         {
-                            DirectoryInfo dinfo = new DirectoryInfo(folder);
-                            string newfile = files[i].Replace(folder, initialDirectory + Path.DirectorySeparatorChar + dinfo.Name + Path.DirectorySeparatorChar);
-
-                            if (!File.Exists(newfile))
-                                File.Copy(files[i], newfile);
-                            else
-                            {
-                                View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, the file:\"" +
-                                    newfile + "\" already exists, aborting.");
-                                return;
-                            }
-
-                            files[i] = newfile;
+                            Uri pathUri = new Uri(directories[i]);
+                            ddirectories.Add(Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar)));
                         }
-                        catch
+
+                        for (int i = 0; i < files.Count; i++)
                         {
-                            View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, aborting.");
-                            return;
+                            Uri pathUri = new Uri(files[i]);
+                            ffiles.Add(Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar)));
                         }
                     }
                 }
                 else
                 {
-                    string pl = _project.Location;
-                    if (!pl.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                        pl += Path.DirectorySeparatorChar;
-
-                    Uri folderUri = new Uri(pl);
-
-                    for (int i = 0; i < directories.Count; i++)
-                    {
-                        Uri pathUri = new Uri(directories[i]);
-                        directories[i] = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
-                    }
+                    ddirectories.AddRange(directories);
+                    ffiles.AddRange(files);
                 }
             }
 
-            var action2 = new IncludeAction(this, files, directories);
-            if(action2.Do())
-                _actionStack.Add(action2);
+            try
+            {
+                for (int i = 0; i < sc.Count; i++)
+                    DirectoryCopy(sc[i], dc[i]);
+
+                var action2 = new IncludeAction(this, ffiles, ddirectories);
+                if (action2.Do())
+                    _actionStack.Add(action2);
+            }
+            catch
+            {
+                View.ShowError("Error While Copying Files", "An error occurred while the directories were being copied, aborting.");
+            }
+        }
+
+        private static void DirectoryCopy(string sourceDirName, string destDirName)
+        {
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            if (!Directory.Exists(destDirName))
+                Directory.CreateDirectory(destDirName);
+
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            foreach (DirectoryInfo subdir in dirs)
+            {
+                string temppath = Path.Combine(destDirName, subdir.Name);
+                DirectoryCopy(subdir.FullName, temppath);
+            }
         }
 
         public void Move (string[] paths, string[] newnames, FileType[] types)

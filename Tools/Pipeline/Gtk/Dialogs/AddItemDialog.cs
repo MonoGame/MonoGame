@@ -3,22 +3,19 @@ using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class AddFileDialog : Dialog
+    public partial class AddItemDialog : Dialog
     {
         public bool applyforall;
         public CopyAction responce;
 
-        public AddFileDialog(Window parrent, string fileloc, bool exists) : base(Global.GetNewDialog(parrent.Handle))
+        public AddItemDialog(Window parrent, string fileloc, bool exists, FileType filetype) : base(Global.GetNewDialog(parrent.Handle))
         {
-            Build();
-
-            this.Title = Mono.Unix.Catalog.GetString ("Add File Action");
+            Build(filetype, fileloc);
 
             this.AddButton("Ok", ResponseType.Ok);
             this.AddButton("Cancel", ResponseType.Cancel);
             this.DefaultResponse = ResponseType.Ok;
 
-            label1.Text = label1.Text.Replace("%file", fileloc);
             label1.Markup = label1.Text;
 
             if (exists)

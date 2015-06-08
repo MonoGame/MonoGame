@@ -206,10 +206,7 @@
     <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\AddFileDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\AddFolderDialog.cs">
+    <Compile Include="Gtk\Dialogs\AddItemDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
@@ -242,10 +239,7 @@
     <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\AddFileDialog.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\AddFolderDialog.GUI.cs">  
+    <Compile Include="Gtk\Dialogs\AddItemDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
