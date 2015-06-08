@@ -169,6 +169,7 @@ namespace MonoGame.Tools.Pipeline
             basename = name;
             TreeIter iter = GetBaseIter ();
             treeview1.Model.SetValue (iter, 1, name);
+            window.ReloadTitle();
         }
 
         public TreeIter GetBaseIter()

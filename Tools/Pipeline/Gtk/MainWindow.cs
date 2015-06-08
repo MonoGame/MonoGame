@@ -12,6 +12,7 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Window, IView
     {
+        const string basetitle = "MonoGame Pipeline";
         public static string LinuxNotAllowedCharacters = "/"; 
         public static string MacNotAllowedCharacters = ":";
 
@@ -45,6 +46,22 @@ namespace MonoGame.Tools.Pipeline
         MenuItem treerebuild;
         MenuItem recentMenu;
         bool expand = false;
+
+        public void ReloadTitle()
+        {
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                hbar.Subtitle = projectview1.openedProject;
+                return;
+            }
+            #endif
+
+            if (projectview1.openedProject != "")
+                this.Title = basetitle + " - " + System.IO.Path.GetFileName(projectview1.openedProject);
+            else
+                this.Title = basetitle;
+        }
 
         public MainWindow () :
             base (WindowType.Toplevel)
@@ -275,6 +292,7 @@ namespace MonoGame.Tools.Pipeline
                 projectview1.SetBaseIter (System.IO.Path.GetFileNameWithoutExtension (item.OriginalPath));
             }
             else {
+                projectview1.openedProject = "";
                 projectview1.SetBaseIter ("");
                 projectview1.Close ();
                 UpdateMenus ();
