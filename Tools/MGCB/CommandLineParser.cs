@@ -281,7 +281,7 @@ namespace MGCB
                     continue;
                 }
 
-                if (arg.StartsWith("/@:"))
+                if (arg.StartsWith("/@:") || arg.StartsWith("-@:"))
                 {
                     var file = arg.Substring(3);
                     var commands = File.ReadAllLines(file);
@@ -314,7 +314,7 @@ namespace MGCB
 
         private bool ParseArgument(string arg)
         {
-            if (arg.StartsWith("/"))
+            if (arg.StartsWith("/") || arg.StartsWith("-"))
             {
                 // After the first escaped argument we can no
                 // longer read non-escaped arguments.
@@ -402,7 +402,8 @@ namespace MGCB
             {   
                 "$",
                 "/",                
-                "#",                
+                "#",
+                "-",
             };
 
         static void CheckReservedPrefixes(string str)
@@ -473,6 +474,19 @@ namespace MGCB
 
         public string Title { get; set; }
 
+        bool IsWindows(PlatformID platform)
+        {
+            switch (platform)
+            {
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.WinCE:
+                    return true;
+            }
+            return false;
+        }
+
         public void ShowError(string message, params object[] args)
         {
             if (!string.IsNullOrEmpty(message) && OnError != null)
@@ -495,6 +509,7 @@ namespace MGCB
                 Console.Error.WriteLine();
             }
 
+            var defaultParamPrefix = IsWindows(Environment.OSVersion.Platform) ? "  /" : "  -";
             Console.Error.WriteLine("Usage: {0} {1}{2}", 
                 name, 
                 string.Join(" ", _requiredUsageHelp), 
@@ -522,9 +537,9 @@ namespace MGCB
                         hasValue = true;
 
                     if (hasValue)
-                        Console.Error.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
+                        Console.Error.WriteLine(defaultParamPrefix + "{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
                     else
-                        Console.Error.WriteLine("  /{0}\n    {1}\n", param.Name, param.Description);
+                        Console.Error.WriteLine(defaultParamPrefix + "{0}\n    {1}\n", param.Name, param.Description);
                 }
             }
         }
