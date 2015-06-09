@@ -90,46 +90,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework {
 
-    public class KeyboardEntryEventArgs : EventArgs 
-    {
-        public object TextEtc;
-		public int Start;
-		public int Length;
-		public int End;
-        public KeyboardEntryEventArgs (string text)
-        {
-            TextEtc = text;
-        }
-        public KeyboardEntryEventArgs (object text)
-        {
-            TextEtc = text;
-        }
-		public KeyboardEntryEventArgs (string text, int start, int length, int end)
-		{
-			TextEtc = text;
-			Start = start;
-			Length = length;
-			End = end;
-		}
-    }
-    public enum Keypresses
-    {
-        backspaceDeleteKey,
-		enterKey,
-        whatelse
-    }
-
-	public class SelectionChangedEventArgs : EventArgs 
-	{
-		public NSRange Range;
-
-		public SelectionChangedEventArgs(NSRange range)
-		{
-			Range = range;
-		}
-	}
-
-
     [Register("iOSGameView")]
 	public partial class iOSGameView : UIView {
 		private readonly iOSGamePlatform _platform;
@@ -137,9 +97,7 @@ namespace Microsoft.Xna.Framework {
 		private int _depthbuffer;
 		private int _framebuffer;
 
-
 		#region Construction/Destruction
-
 		public iOSGameView (iOSGamePlatform platform, CGRect frame)
 			: base(frame)
 		{
@@ -166,7 +124,7 @@ namespace Microsoft.Xna.Framework {
 			_isDisposed = true;
 		}
 
-#endregion Construction/Destruction
+		#endregion Construction/Destruction
 
 		#region Properties
 
@@ -184,9 +142,8 @@ namespace Microsoft.Xna.Framework {
 			return new Class (typeof (CAEAGLLayer));
 		}
 
-        public bool EnableKeyboard = false;
-		public override bool CanBecomeFirstResponder {
-            get { return EnableKeyboard; }
+        public override bool CanBecomeFirstResponder {
+            get { return true; }
 		}
 
 		private new CAEAGLLayer Layer {
@@ -426,12 +383,5 @@ namespace Microsoft.Xna.Framework {
 				throw new InvalidOperationException (
 					"GraphicsContext must be created for this operation to succeed.");
 		}
-
-
-
-        //**********************************************
-        //**********************************************
-
-
-}
+	}
 }
