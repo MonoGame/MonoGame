@@ -115,6 +115,7 @@ namespace Microsoft.Xna.Framework.Content
 				var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
+                var hModelReader = new ModelReader();
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
