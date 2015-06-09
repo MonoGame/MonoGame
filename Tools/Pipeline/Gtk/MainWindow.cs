@@ -12,12 +12,25 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Window, IView
     {
-        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.()";
+        const string basetitle = "MonoGame Pipeline";
+        public static string LinuxNotAllowedCharacters = "/"; 
+        public static string MacNotAllowedCharacters = ":";
 
-        public static bool CheckString(string s, string allowedCharacters)
+        public static string NotAllowedCharacters
         {
-            for (int i = 0; i < s.Length; i++) 
-                if (!allowedCharacters.Contains (s.Substring (i, 1)))
+            get
+            {
+                if (Global.DesktopEnvironment == "OSX")
+                    return MacNotAllowedCharacters;
+                else
+                    return LinuxNotAllowedCharacters;
+            }
+        }
+
+        public static bool CheckString(string s, string notallowedCharacters)
+        {
+            for (int i = 0; i < notallowedCharacters.Length; i++) 
+                if (s.Contains (notallowedCharacters.Substring (i, 1)))
                     return false;
 
             return true;
@@ -33,6 +46,22 @@ namespace MonoGame.Tools.Pipeline
         MenuItem treerebuild;
         MenuItem recentMenu;
         bool expand = false;
+
+        public void ReloadTitle()
+        {
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                hbar.Subtitle = projectview1.openedProject;
+                return;
+            }
+            #endif
+
+            if (projectview1.openedProject != "")
+                this.Title = basetitle + " - " + System.IO.Path.GetFileName(projectview1.openedProject);
+            else
+                this.Title = basetitle;
+        }
 
         public MainWindow () :
             base (WindowType.Toplevel)
@@ -263,6 +292,7 @@ namespace MonoGame.Tools.Pipeline
                 projectview1.SetBaseIter (System.IO.Path.GetFileNameWithoutExtension (item.OriginalPath));
             }
             else {
+                projectview1.openedProject = "";
                 projectview1.SetBaseIter ("");
                 projectview1.Close ();
                 UpdateMenus ();
@@ -383,7 +413,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFileDialog(this, file, exists);
+            var afd = new AddItemDialog(this, file, exists, FileType.File);
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -397,9 +427,10 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFolderDialog(this, folder);
+            var afd = new AddItemDialog(this, folder, exists, FileType.Folder);
+            applyforall = false;
 
             if (afd.Run() == (int)ResponseType.Ok)
             {

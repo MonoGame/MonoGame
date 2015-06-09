@@ -20,6 +20,24 @@ namespace MonoGame.Tools.Pipeline
         public static extern void gtk_color_chooser_set_rgba (IntPtr chooser, double[] color);
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr gtk_header_bar_new ();
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void gtk_header_bar_set_subtitle (IntPtr handle, string text);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern string gtk_header_bar_get_subtitle (IntPtr handle);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void gtk_header_bar_set_show_close_button (IntPtr handle, bool show);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool gtk_header_bar_get_show_close_button (IntPtr handle);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void gtk_window_set_titlebar (IntPtr window, IntPtr widget);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int gtk_get_major_version ();
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
@@ -27,6 +45,9 @@ namespace MonoGame.Tools.Pipeline
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr gtk_dialog_new_with_buttons (string title, IntPtr parent, int flags);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr gtk_widget_set_opacity (IntPtr widget, double opacity);
 
         [DllImport (giolibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr g_file_new_for_path (string path);
@@ -62,6 +83,42 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public ColorChooser(IntPtr native) : base(native) { }
+    }
+
+    public class HeaderBar : Container
+    {
+        public string Subtitle
+        {
+            get
+            {
+                return Gtk3Wrapper.gtk_header_bar_get_subtitle(this.Handle);
+            }
+            set
+            {
+                Gtk3Wrapper.gtk_header_bar_set_subtitle(this.Handle, value);
+            }
+        }
+
+        public bool ShowCloseButton
+        {
+            get
+            {
+                return Gtk3Wrapper.gtk_header_bar_get_show_close_button(this.Handle);
+            }
+            set
+            {
+                Gtk3Wrapper.gtk_header_bar_set_show_close_button(this.Handle, value);
+            }
+        }
+
+        public HeaderBar() : base(Gtk3Wrapper.gtk_header_bar_new()) { }
+
+        public HeaderBar(IntPtr handle) : base(handle) { }
+
+        public void AttachToWindow(Window window)
+        {
+            Gtk3Wrapper.gtk_window_set_titlebar(window.Handle, this.Handle);
+        }
     }
 }
 

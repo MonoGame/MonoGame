@@ -196,9 +196,10 @@ namespace Microsoft.Xna.Framework.Audio
                 };
 
                 int[] attribute = new int[0];
-#else
+#elif !DESKTOPGL
                 int[] attribute = new int[0];
 #endif
+
 #if DESKTOPGL
                 _acontext = new AudioContext();
                 _context = Alc.GetCurrentContext();
@@ -304,11 +305,13 @@ namespace Microsoft.Xna.Framework.Audio
                 if (disposing)
                 {
                     if (_bSoundAvailable)
+                    {
                         CleanUpOpenAL();
-
 #if DESKTOPGL
-                    _oggstreamer.Dispose();
+                        if(_oggstreamer != null)
+                            _oggstreamer.Dispose();
 #endif
+                    }
                 }
                 _isDisposed = true;
             }
