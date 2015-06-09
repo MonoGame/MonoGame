@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
 
             this.AddButton("Ok", ResponseType.Ok);
             this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
 
             this.controller = ((PipelineController)((MainWindow)parrent)._controller);
 

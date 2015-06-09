@@ -34,5 +34,6 @@ sudo ./monogame_linux.run
   * libopenal-dev
   * libsdl-mixer1.2
   * referenceassemblies-pcl
+  * ttf-mscorefonts-installer (recommended, but not needed)
 * Open up MonoDevelop, go to Tools > Add-in Manager > Gallery, search for MonoGame and install the found addin. It should be found under Game Development.
 * That's it, MonoGame is installed.

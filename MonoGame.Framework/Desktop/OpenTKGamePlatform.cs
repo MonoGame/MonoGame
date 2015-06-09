@@ -283,8 +283,6 @@ namespace Microsoft.Xna.Framework
 
         public override void Present()
         {
-            base.Present();
-
             var device = Game.GraphicsDevice;
             if (device != null)
                 device.Present();
