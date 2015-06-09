@@ -64,17 +64,13 @@ change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
-using Microsoft.Xna.Framework.Input;
 
 
 #endregion License
 
 using System;
 using System.Drawing;
-using System.Text;
 
-using System.Collections.Generic;
-using System.Linq;
 using CoreAnimation;
 using Foundation;
 using ObjCRuntime;
@@ -142,8 +138,8 @@ namespace Microsoft.Xna.Framework {
 			return new Class (typeof (CAEAGLLayer));
 		}
 
-        public override bool CanBecomeFirstResponder {
-            get { return true; }
+		public override bool CanBecomeFirstResponder {
+			get { return true; }
 		}
 
 		private new CAEAGLLayer Layer {
