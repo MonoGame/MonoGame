@@ -12,14 +12,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
         {
+            if (_applyToVertexStage && !device.GraphicsCapabilities.SupportsVertexTextures)
+                return;
+
             if (_applyToVertexStage)
-            {
                 ClearTargets(targets, device._d3dContext.VertexShader);
-            }
             else
-            {
                 ClearTargets(targets, device._d3dContext.PixelShader);
-            }
         }
 
         private void ClearTargets(RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)

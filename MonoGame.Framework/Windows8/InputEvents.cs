@@ -29,6 +29,8 @@ namespace Microsoft.Xna.Framework
             window.KeyDown += CoreWindow_KeyDown;
             window.KeyUp += CoreWindow_KeyUp;
             window.VisibilityChanged += CoreWindow_VisibilityChanged;
+            window.Activated += CoreWindow_Activated;
+            window.SizeChanged += CoreWindow_SizeChanged;
 
             if (inputElement != null)
             {
@@ -241,9 +243,25 @@ namespace Microsoft.Xna.Framework
                 _keys.Add(xnaKey);
         }
 
+        private void CoreWindow_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
+        {
+            // If the window is resized then also 
+            // drop any current key states.
+            _keys.Clear();
+        }
+
+        private void CoreWindow_Activated(CoreWindow sender, WindowActivatedEventArgs args)
+        {
+            // Forget about the held keys when we lose focus as we don't
+            // receive key events for them while we are in the background
+            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
+                _keys.Clear();
+        }
+
         private void CoreWindow_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
         {
-            //Forget about the held keys when we disappear as we don't receive key events for them while we are in the background
+            // Forget about the held keys when we disappear as we don't
+            // receive key events for them while we are in the background
             if (!args.Visible)
                 _keys.Clear();
         }

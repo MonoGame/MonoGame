@@ -12,12 +12,25 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Window, IView
     {
-        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.";
+        const string basetitle = "MonoGame Pipeline";
+        public static string LinuxNotAllowedCharacters = "/"; 
+        public static string MacNotAllowedCharacters = ":";
 
-        public static bool CheckString(string s, string allowedCharacters)
+        public static string NotAllowedCharacters
         {
-            for (int i = 0; i < s.Length; i++) 
-                if (!allowedCharacters.Contains (s.Substring (i, 1)))
+            get
+            {
+                if (Global.DesktopEnvironment == "OSX")
+                    return MacNotAllowedCharacters;
+                else
+                    return LinuxNotAllowedCharacters;
+            }
+        }
+
+        public static bool CheckString(string s, string notallowedCharacters)
+        {
+            for (int i = 0; i < notallowedCharacters.Length; i++) 
+                if (s.Contains (notallowedCharacters.Substring (i, 1)))
                     return false;
 
             return true;
@@ -33,6 +46,22 @@ namespace MonoGame.Tools.Pipeline
         MenuItem treerebuild;
         MenuItem recentMenu;
         bool expand = false;
+
+        public void ReloadTitle()
+        {
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                hbar.Subtitle = projectview1.openedProject;
+                return;
+            }
+            #endif
+
+            if (projectview1.openedProject != "")
+                this.Title = basetitle + " - " + System.IO.Path.GetFileName(projectview1.openedProject);
+            else
+                this.Title = basetitle;
+        }
 
         public MainWindow () :
             base (WindowType.Toplevel)
@@ -123,6 +152,9 @@ namespace MonoGame.Tools.Pipeline
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
             }
+
+            if(_controller.ProjectOpen)
+                projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -151,8 +183,13 @@ namespace MonoGame.Tools.Pipeline
 
         public AskResult AskSaveOrCancel ()
         {
-            var dialog = new YesNoCancelDialog ("Question", "Do you want to save the project first?");
-            dialog.TransientFor = this;
+            var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
+            dialog.Title = "Save";
+
+            dialog.AddButton("No", (int)ResponseType.No);
+            dialog.AddButton("Cancel", (int)ResponseType.Cancel);
+            dialog.AddButton("Save", (int)ResponseType.Yes);
+
             var result = dialog.Run ();
             dialog.Destroy ();
 
@@ -182,7 +219,7 @@ namespace MonoGame.Tools.Pipeline
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter && !filePath.EndsWith(".mgcb"))
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
@@ -255,6 +292,7 @@ namespace MonoGame.Tools.Pipeline
                 projectview1.SetBaseIter (System.IO.Path.GetFileNameWithoutExtension (item.OriginalPath));
             }
             else {
+                projectview1.openedProject = "";
                 projectview1.SetBaseIter ("");
                 projectview1.Close ();
                 UpdateMenus ();
@@ -263,12 +301,12 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddTreeItem (IProjectItem item)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand);
+            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand, _controller.GetFullPath(item.OriginalPath));
         }
 
         public void AddTreeFolder (string folder)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand);
+            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand, _controller.GetFullPath(folder));
         }
 
         public void RemoveTreeItem (ContentItem contentItem)
@@ -375,8 +413,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFileDialog(file, exists);
-            afd.TransientFor = this;
+            var afd = new AddItemDialog(this, file, exists, FileType.File);
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -390,10 +427,10 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFolderDialog(folder);
-            afd.TransientFor = this;
+            var afd = new AddItemDialog(this, folder, exists, FileType.Folder);
+            applyforall = false;
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -412,7 +449,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ItemExistanceChanged(IProjectItem item)
         {
-            projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists);
+            projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists, _controller.GetFullPath(item.OriginalPath));
         }
 
         public Process CreateProcess(string exe, string commands)
@@ -439,6 +476,7 @@ namespace MonoGame.Tools.Pipeline
         protected void OnOpenActionActivated (object sender, EventArgs e)
         {
             _controller.OpenProject();
+            projectview1.ExpandBase();
         }
 
         protected void OnCloseActionActivated (object sender, EventArgs e)
@@ -482,8 +520,7 @@ namespace MonoGame.Tools.Pipeline
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            var dialog = new NewTemplateDialog(_controller.Templates.GetEnumerator ());
-            dialog.TransientFor = this;
+            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
 
             if (dialog.Run () == (int)ResponseType.Ok) {
 
@@ -533,8 +570,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var ted = new TextEditorDialog("New Folder", "Folder Name:", "", true);
-            ted.TransientFor = this;
+            var ted = new TextEditorDialog(this, "New Folder", "Folder Name:", "", true);
             if (ted.Run() != (int)ResponseType.Ok)
                 return;
             var foldername = ted.text;
@@ -579,6 +615,14 @@ namespace MonoGame.Tools.Pipeline
             expand = false;
         }
 
+        public void OnRenameActionActivated (object sender, EventArgs e)
+        {
+            expand = true;
+            projectview1.Rename ();
+            UpdateMenus();
+            expand = false;
+        }
+        
         public void OnDeleteActionActivated (object sender, EventArgs e)
         {
             projectview1.Remove ();
@@ -607,10 +651,17 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnAboutActionActivated (object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/about/");
             var adialog = new AboutDialog ();
             adialog.TransientFor = this;
+            adialog.Logo = new Gdk.Pixbuf(null, "MonoGame.Tools.Pipeline.App.ico");
+            adialog.ProgramName = AssemblyAttributes.AssemblyProduct;
+            adialog.Version = AssemblyAttributes.AssemblyVersion;
+            adialog.Comments = AssemblyAttributes.AssemblyDescription;
+            adialog.Copyright = AssemblyAttributes.AssemblyCopyright;
+            adialog.Website = "http://www.monogame.net/";
+            adialog.WebsiteLabel = "MonoGame Website";
             adialog.Run ();
+            adialog.Destroy ();
         }
 
         public void UpdateMenus()
@@ -637,7 +688,9 @@ namespace MonoGame.Tools.Pipeline
             ExitAction.Sensitive = notBuilding;
 
             AddAction.Sensitive = projectOpen;
-
+            
+            RenameAction.Sensitive = paths.Length == 1;
+            
             DeleteAction.Sensitive = projectOpen && somethingSelected;
 
             BuildAction.Sensitive = projectOpen;
@@ -669,7 +722,11 @@ namespace MonoGame.Tools.Pipeline
 
                 // We need a local to make the delegate work correctly.
                 var localProject = project;
-                recentItem.Activated += (sender, args) => _controller.OpenProject(localProject);
+                recentItem.Activated += delegate
+                {
+                    _controller.OpenProject(localProject);
+                    projectview1.ExpandBase();
+                };
 
                 m.Insert (recentItem, 0);
             }

@@ -100,6 +100,8 @@ namespace MonoGame.Tools.Pipeline
 
         #region ContentItem
 
+        void DragDrop(string initialDirectory, string[] folders, string[] files);
+
         void Include(string initialDirectory);
 
         void IncludeFolder(string initialDirectory);
@@ -112,6 +114,8 @@ namespace MonoGame.Tools.Pipeline
 
         void NewFolder(string name, string location);
 
+        void Move (string[] paths, string[] newpaths, FileType[] types);
+        
         void AddAction(IProjectAction action);
 
         IProjectItem GetItem(string originalPath);

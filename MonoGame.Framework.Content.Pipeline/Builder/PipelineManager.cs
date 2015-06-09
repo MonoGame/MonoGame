@@ -492,7 +492,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Logger.PushFile(pipelineEvent.SourceFile);
 
             // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
-            TrackPipelineBuildEvent(pipelineEvent);
+            bool fileAlreadyProcessed = TrackPipelineBuildEvent(pipelineEvent);
 
             var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
             if (!rebuild)
@@ -545,7 +545,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
             else
             {
-                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+                // Print message, but only if the file has not been logged before.
+                if (!fileAlreadyProcessed)
+                    Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
             }
 
             Logger.PopFile();
@@ -712,10 +714,15 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Stores the pipeline build event (in memory) if no matching event is found.
         /// </summary>
         /// <param name="pipelineEvent">The pipeline build event.</param>
-        private void TrackPipelineBuildEvent(PipelineBuildEvent pipelineEvent)
+        /// <returns>
+        /// <see langword="true"/> if the source file was already processed before; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        private bool TrackPipelineBuildEvent(PipelineBuildEvent pipelineEvent)
         {
             List<PipelineBuildEvent> pipelineBuildEvents;
-            if (!_pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents))
+            bool eventsFound = _pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents);
+            if (!eventsFound)
             {
                 pipelineBuildEvents = new List<PipelineBuildEvent>();
                 _pipelineBuildEvents.Add(pipelineEvent.SourceFile, pipelineBuildEvents);
@@ -723,6 +730,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             if (FindMatchingEvent(pipelineBuildEvents, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters) == null)
                 pipelineBuildEvents.Add(pipelineEvent);
+
+            return eventsFound;
         }
 
         /// <summary>

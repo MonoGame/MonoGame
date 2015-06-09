@@ -107,16 +107,6 @@ namespace Microsoft.Xna.Framework
             {
                 throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
             }
-            
-#if LINUX
-            // also set up SdlMixer to play background music. If one of these functions fails, we will not get any background music (but that should rarely happen)
-            Tao.Sdl.Sdl.SDL_InitSubSystem(Tao.Sdl.Sdl.SDL_INIT_AUDIO);
-            Tao.Sdl.SdlMixer.Mix_OpenAudio(44100, (short)Tao.Sdl.Sdl.AUDIO_S16SYS, 2, 1024);			
-
-            //even though this method is called whenever IsMouseVisible is changed it needs to be called during startup
-            //so that the cursor can be put in the correct inital state (hidden)
-            OnIsMouseVisibleChanged();
-#endif
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -166,9 +156,14 @@ namespace Microsoft.Xna.Framework
             //(SJ) Why is this called here when it's not in any other project
             //Net.NetworkSession.Exit();
             Interlocked.Increment(ref isExiting);
-#if LINUX
-            Tao.Sdl.SdlMixer.Mix_CloseAudio();
-#endif
+
+            // sound controller must be disposed here
+            // so that it doesn't stop the game from disposing
+            if (soundControllerInstance != null)
+            {
+                soundControllerInstance.Dispose();
+                soundControllerInstance = null;
+            }
             OpenTK.DisplayDevice.Default.RestoreResolution();
         }
 
@@ -288,8 +283,6 @@ namespace Microsoft.Xna.Framework
 
         public override void Present()
         {
-            base.Present();
-
             var device = Game.GraphicsDevice;
             if (device != null)
                 device.Present();

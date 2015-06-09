@@ -28,9 +28,4 @@
 
 
   </Application>
-
-  <!-- Enable dynamic access to types that Application Insights requires -->
-  <Library Name="*Microsoft.ApplicationInsights*">
-    <Type Name="Windows.ApplicationModel.Core.CoreApplication" Dynamic="Required Public" />
-  </Library>
 </Directives>

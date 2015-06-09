@@ -306,5 +306,26 @@ namespace MonoGame.Tests.Visual {
             };
             Game.Run();
         }
+
+        [Test]
+        public void DrawWithLayerDepth()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                _spriteBatch.Begin();
+                _spriteBatch.Draw(
+                    _texture, new Vector2(30, 30), null, Color.Red,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(40, 40), null, Color.Green,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(50, 50), null, Color.Blue,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+                _spriteBatch.End();
+            };
+
+            RunSingleFrameTest();
+        }
 	}
 }

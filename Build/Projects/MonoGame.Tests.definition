@@ -14,6 +14,7 @@
   <Properties>
     
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
     <AssemblyName>MonoGameTests</AssemblyName>
     <RootNamespace>MonoGame.Tests</RootNamespace>
@@ -21,10 +22,10 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
-      <Platform Name="Linux">TRACE;LINUX</Platform>
+      <Platform Name="Linux">TRACE;LINUX;DESKTOPGL</Platform>
       <Platform Name="MacOS">MONOMAC</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="iOS">IOS;</Platform>
     </CustomDefinitions>
 
@@ -504,6 +505,9 @@
 	<Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteSortMode_Texture_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Assets\ReferenceImages\SpriteBatch\DrawWithLayerDepth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -655,6 +659,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Xml\24_GenericTypes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\25_StructArrayNoElements.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

@@ -436,6 +436,11 @@ class GenericClass<T>
 }
 #endregion
 
+class StructArrayNoElements
+{
+    public Vector2[] Vector2ArrayNoElements = new Vector2[] {};
+}
+
 namespace MonoGame.Tests.ContentPipeline
 {
     #region Namespaces

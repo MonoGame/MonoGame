@@ -13,6 +13,7 @@ using Windows.Graphics.Display;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Windows.UI.Xaml.Controls;
 
 namespace Microsoft.Xna.Framework
 {
@@ -21,12 +22,14 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
-        private Rectangle _clientBounds;
+        private DisplayInformation _dinfo;
+        private ApplicationView _appView;
+        private SwapChainPanel _swapChainPanel;
+        private Rectangle _viewBounds;
+
+        private object _eventLocker = new object();
 
         private InputEvents _windowEvents;
-
-
-        private Vector2 _backBufferScale;
 
         #region Internal Properties
 
@@ -42,7 +45,7 @@ namespace Microsoft.Xna.Framework
 
         public override string ScreenDeviceName { get { return String.Empty; } } // window.Title
 
-        public override Rectangle ClientBounds { get { return _clientBounds; } }
+        public override Rectangle ClientBounds { get { return _viewBounds; } }
 
         public override bool AllowUserResizing
         {
@@ -99,19 +102,25 @@ namespace Microsoft.Xna.Framework
             _coreWindow = coreWindow;
             _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
-			var dinfo = DisplayInformation.GetForCurrentView();
-            _orientation = ToOrientation(dinfo.CurrentOrientation);
-			dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
+			_dinfo = DisplayInformation.GetForCurrentView();
+            _appView = ApplicationView.GetForCurrentView();
 
-            _coreWindow.SizeChanged += Window_SizeChanged;
+            // Set a min size that is reasonable knowing someone might try
+            // to use some old school resolution like 640x480.
+            var minSize = new Windows.Foundation.Size(640 / _dinfo.RawPixelsPerViewPixel, 480 / _dinfo.RawPixelsPerViewPixel);
+            _appView.SetPreferredMinSize(minSize);
+
+            _orientation = ToOrientation(_dinfo.CurrentOrientation);
+            _dinfo.OrientationChanged += DisplayProperties_OrientationChanged;
+            _swapChainPanel = inputElement as SwapChainPanel;
+
+            _swapChainPanel.SizeChanged += SwapChain_SizeChanged;
+
             _coreWindow.Closed += Window_Closed;
-
             _coreWindow.Activated += Window_FocusChanged;
-
 			_coreWindow.CharacterReceived += Window_CharacterReceived;
 
-            var bounds = _coreWindow.Bounds;
-            SetClientBounds(bounds.Width, bounds.Height);
+            SetViewBounds(_appView.VisibleBounds.Width, _appView.VisibleBounds.Height);
 
             SetCursor(false);
         }
@@ -130,59 +139,35 @@ namespace Microsoft.Xna.Framework
             Game.Platform.Exit();
         }
 
-        private void SetClientBounds(double width, double height)
+        private void SetViewBounds(double width, double height)
         {
-            var pwidth = (int)Math.Round(width);
-            var pheight = (int)Math.Round(height);
-            _clientBounds = new Rectangle(0, 0, pwidth, pheight);
+            var pixelWidth = Math.Max(1, (int)Math.Round(width * _dinfo.RawPixelsPerViewPixel));
+            var pixelHeight = Math.Max(1, (int)Math.Round(height * _dinfo.RawPixelsPerViewPixel));
+            _viewBounds = new Rectangle(0, 0, pixelWidth, pixelHeight);
         }
 
-        private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
+        private void SwapChain_SizeChanged(object sender, SizeChangedEventArgs args)
         {
-            var manager = Game.graphicsDeviceManager;
-
-            // If we haven't calculated the back buffer scale then do it now.
-            if (_backBufferScale == Vector2.Zero)
+            lock (_eventLocker)
             {
-                // Make sure the scale is calculated in terms of the same orientation as the preferred back buffer
-                float clientWidth;
-                float clientHeight;
-                if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
-                {
-                    clientWidth = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                    clientHeight = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                }
-                else
-                {
-                    clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
-                    clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
-                }
-                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
-                                                manager.PreferredBackBufferHeight / clientHeight);
-            }
+                var manager = Game.graphicsDeviceManager;
 
-            // Set the new client bounds.
-            SetClientBounds(args.Size.Width, args.Size.Height);
+                // Set the new client bounds.
+                SetViewBounds(args.NewSize.Width, args.NewSize.Height);
 
-            // Set the default new back buffer size and viewport, but this
-            // can be overloaded by the two events below.
-            
-            var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
-            var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
-            manager.PreferredBackBufferWidth = newWidth;
-            manager.PreferredBackBufferHeight = newHeight;
-            if(manager.GraphicsDevice!=null)
-            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
+                // Set the default new back buffer size and viewport, but this
+                // can be overloaded by the two events below.
 
-            // If we have a valid client bounds then 
-            // update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                manager.IsFullScreen = _appView.IsFullScreenMode;
+                manager.PreferredBackBufferWidth = _viewBounds.Width;
+                manager.PreferredBackBufferHeight = _viewBounds.Height;
                 manager.ApplyChanges();
 
-            // Set the new view state which will trigger the 
-            // Game.ApplicationViewChanged event and signal
-            // the client size changed event.
-            OnClientSizeChanged();
+                // Set the new view state which will trigger the 
+                // Game.ApplicationViewChanged event and signal
+                // the client size changed event.
+                OnClientSizeChanged();
+            }
         }
 
 		private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
@@ -220,17 +205,38 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        internal void SetClientSize(int width, int height)
+        {
+            if (_appView.IsFullScreenMode)
+                return;
+
+            if (_viewBounds.Width == width &&
+                _viewBounds.Height == height)
+                return;
+
+            var viewSize = new Windows.Foundation.Size(width / _dinfo.RawPixelsPerViewPixel, height / _dinfo.RawPixelsPerViewPixel);
+
+            //_appView.SetPreferredMinSize(viewSize);
+            if (!_appView.TryResizeView(viewSize))
+            {
+                // TODO: What now?
+            }
+        }
+
         private void DisplayProperties_OrientationChanged(DisplayInformation dinfo, object sender)
         {
-            // Set the new orientation.
-            _orientation = ToOrientation(dinfo.CurrentOrientation);
+            lock(_eventLocker)
+            {
+                // Set the new orientation.
+                _orientation = ToOrientation(dinfo.CurrentOrientation);
 
-            // Call the user callback.
-            OnOrientationChanged();
+                // Call the user callback.
+                OnOrientationChanged();
 
-            // If we have a valid client bounds then update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                Game.graphicsDeviceManager.ApplyChanges();
+                // If we have a valid client bounds then update the graphics device.
+                if (_viewBounds.Width > 0 && _viewBounds.Height > 0)
+                    Game.graphicsDeviceManager.ApplyChanges();
+            }
         }
 
         protected override void SetTitle(string title)

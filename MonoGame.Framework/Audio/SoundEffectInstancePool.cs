@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Audio
     internal static class SoundEffectInstancePool
     {
 
-#if WINDOWS || (WINRT && !WINDOWS_PHONE) || LINUX || WEB || ANGLE
+#if WINDOWS || (WINRT && !WINDOWS_PHONE) || DESKTOPGL || WEB || ANGLE
 
         // These platforms are only limited by memory.
         private const int MAX_PLAYING_INSTANCES = int.MaxValue;
