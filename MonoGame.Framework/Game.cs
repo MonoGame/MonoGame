@@ -5,10 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
-
-
 #if WINRT
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -16,6 +12,8 @@ using Windows.ApplicationModel.Activation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
+
 
 namespace Microsoft.Xna.Framework
 {
@@ -647,7 +645,6 @@ namespace Microsoft.Xna.Framework
         internal void DoUpdate(GameTime gameTime)
         {
             AssertNotDisposed();
-
             if (Platform.BeforeUpdate(gameTime))
             {
                 // Once per frame, we need to check currently 
