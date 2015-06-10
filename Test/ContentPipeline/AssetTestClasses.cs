@@ -441,11 +441,16 @@ class GenericTypes
 {
     public GenericClass<int> A;
     public GenericClass<float> B;
+    public GenericClass<GenericArg> C;
 }
 
 class GenericClass<T>
 {
     public T Value;
+}
+public class GenericArg
+{
+    public int Value;
 }
 #endregion
 

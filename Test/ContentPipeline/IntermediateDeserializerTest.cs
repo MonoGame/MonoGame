@@ -539,6 +539,9 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(3, genericTypes.A.Value);
                 Assert.IsNotNull(genericTypes.B);
                 Assert.AreEqual(4.2f, genericTypes.B.Value);
+                Assert.IsNotNull(genericTypes.C);
+                Assert.IsNotNull(genericTypes.C.Value);
+                Assert.AreEqual(5, genericTypes.C.Value.Value);
             });
         }
 

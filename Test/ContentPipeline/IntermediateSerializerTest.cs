@@ -455,7 +455,8 @@ namespace MonoGame.Tests.ContentPipeline
             SerializeAndAssert("24_GenericTypes.xml", new GenericTypes
             {
                 A = new GenericClass<int> { Value = 3 },
-                B = new GenericClass<float> { Value = 4.2f }
+                B = new GenericClass<float> { Value = 4.2f },
+                C = new GenericClass<GenericArg> { Value = new GenericArg { Value = 5 } }
             });
         }
     }
