@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics.SkinnedAnimation
         /// <summary>
         /// Constructs a new animation clip object.
         /// </summary>
-        public AnimationClip(TimeSpan duration, List<Keyframe> keyframes)
+        public AnimationClip(TimeSpan duration, Keyframe[] keyframes)
         {
             Duration = duration;
             Keyframes = keyframes;
@@ -36,6 +36,6 @@ namespace Microsoft.Xna.Framework.Graphics.SkinnedAnimation
         /// Gets a combined list containing all the keyframes for all bones,
         /// sorted by time.
         /// </summary>
-        public List<Keyframe> Keyframes { get; private set; }
+        public Keyframe[] Keyframes { get; private set; }
     }
 }

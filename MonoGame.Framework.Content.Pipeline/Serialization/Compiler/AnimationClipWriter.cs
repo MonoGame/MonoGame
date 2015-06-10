@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             WriteKeyframes(output, value.Keyframes);
         }
 
-        private void WriteKeyframes(ContentWriter output, List<Keyframe> Keyframes)
+        private void WriteKeyframes(ContentWriter output, IList<Keyframe> Keyframes)
         {
             output.Write(Keyframes.Count);
             foreach (var element in Keyframes)

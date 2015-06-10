@@ -120,14 +120,13 @@ namespace Microsoft.Xna.Framework.Graphics.SkinnedAnimation
 
             while (currentKeyframe < keyframes.Count)
             {
-                Keyframe keyframe = keyframes[currentKeyframe];
-
                 // Stop when we've read up to the current time position.
-                if (keyframe.Time > currentTimeValue)
+                if (keyframes[currentKeyframe].Time > currentTimeValue)
                     break;
 
                 // Use this keyframe.
-                boneTransforms[keyframe.Bone] = keyframe.Transform;
+                int bone = keyframes[currentKeyframe].Bone;
+                boneTransforms[bone] = keyframes[currentKeyframe].Transform;
 
                 currentKeyframe++;
             }

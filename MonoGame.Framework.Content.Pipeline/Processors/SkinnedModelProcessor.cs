@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (animation.Duration <= TimeSpan.Zero)
                 throw new InvalidContentException("Animation has a zero duration.");
 
-            return new AnimationClip(animation.Duration, keyframes);
+            return new AnimationClip(animation.Duration, keyframes.ToArray());
         }
 
 
