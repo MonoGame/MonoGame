@@ -38,25 +38,19 @@ namespace Microsoft.Xna.Framework.Content
             return new TimeSpan(input.ReadInt64());
         }
 
-        private List<Keyframe> ReadKeyframes(ContentReader input, List<Keyframe> existingInstance)
+        private Keyframe[] ReadKeyframes(ContentReader input, Keyframe[] existingInstance)
         {
             var keyframes = existingInstance;
 
             int count = input.ReadInt32();
             if (keyframes == null)
-                keyframes = new List<Keyframe>(count);
+                keyframes = new Keyframe[count];
 
             for (int i = 0; i < count; i++)
             {
-                Keyframe keyframe = new Keyframe(
-                        input.ReadInt32(),
-                        new TimeSpan(input.ReadInt64()),
-                        input.ReadMatrix()
-                    );
-                if (existingInstance == null)
-                    keyframes.Add(keyframe);
-                else
-                    keyframes[i] = keyframe;
+                keyframes[i].bone = input.ReadInt32();
+                keyframes[i].time = new TimeSpan(input.ReadInt64());
+                keyframes[i].transform = input.ReadMatrix();
             }
 
             return keyframes;

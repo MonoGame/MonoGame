@@ -14,31 +14,49 @@ namespace Microsoft.Xna.Framework.Graphics.SkinnedAnimation
     /// <summary>
     /// Describes the position of a single bone at a single point in time.
     /// </summary>
-    public class Keyframe
+    public struct Keyframe
     {
+        internal int bone;
+        internal TimeSpan time;
+        internal Matrix transform;
+
         /// <summary>
         /// Constructs a new keyframe object.
         /// </summary>
         public Keyframe(int bone, TimeSpan time, Matrix transform)
         {
-            Bone = bone;
-            Time = time;
-            Transform = transform;
+            this.bone = bone;
+            this.time = time;
+            this.transform = transform;
         }
         
         /// <summary>
         /// Gets the index of the target bone that is animated by this keyframe.
         /// </summary>
-        public int Bone { get; private set; }
+        public int Bone 
+        { 
+            get {return bone;}
+            internal set { bone = value; }
+        }
 
         /// <summary>
         /// Gets the time offset from the start of the animation to this keyframe.
         /// </summary>
-        public TimeSpan Time { get; private set; }
+        public TimeSpan Time
+        {
+            get { return time; }
+            internal set { time = value; }
+        }
 
         /// <summary>
         /// Gets the bone transform for this keyframe.
         /// </summary>
-        public Matrix Transform { get; private set; }
+        public Matrix Transform
+        {
+            get { return transform; }
+            internal set { transform = value; }
+        }
+        
+		        
     }
 }
