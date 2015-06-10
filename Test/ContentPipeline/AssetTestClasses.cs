@@ -149,12 +149,25 @@ public class AllowNull
 #endregion
 
 #region Collections
+
+public enum CustomEnum
+{
+    Val1,
+    Val2
+}
+
+public class CustomItem
+{
+    public CustomEnum EnumVal;
+}
+
 public class Collections
 {
     public string[] StringArray;
     public List<string> StringList;
     public int[] IntArray;
     public Color[] ColorArray;
+    public List<CustomItem> CustomItemList;
 
     // Indexer - should be ignored by intermediate serializer.
     public Color this[int i]

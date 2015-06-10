@@ -233,6 +233,9 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Color(0x91, 0x6B, 0x46, 0xFF), collections.ColorArray[1]);
                 Assert.AreEqual(new Color(0x91, 0x7B, 0x46, 0xFF), collections.ColorArray[2]);
                 Assert.AreEqual(new Color(0x88, 0x65, 0x43, 0xFF), collections.ColorArray[3]);
+
+                Assert.NotNull(collections.CustomItemList);
+                Assert.AreEqual(0, collections.CustomItemList.Count);
             });            
         }
 
