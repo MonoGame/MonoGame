@@ -25,7 +25,7 @@ namespace MonoGame.Tools.Pipeline
 
         private readonly List<ContentItemTemplate> _templateItems;
 
-private static readonly string [] _mgcbSearchPaths = new []       
+        private static readonly string [] _mgcbSearchPaths = new []       
         {
             "",
 #if DEBUG
