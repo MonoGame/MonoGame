@@ -20,6 +20,8 @@ namespace Microsoft.Xna.Framework.Media
 
         private static Callback _callback;
 
+        private static Texture2D retTexture;
+
         private class Callback : IAsyncCallback
         {
             public void Dispose()
@@ -60,11 +62,19 @@ namespace Microsoft.Xna.Framework.Media
 
             // TODO: This could likely be optimized if we held on to the SharpDX Surface/Texture data,
             // and set it on an XNA one rather than constructing a new one every time this is called.
-            var retTex = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
+            if (retTexture == null || retTexture.IsDisposed || retTexture.Width != _currentVideo.Width || retTexture.Height != _currentVideo.Height)
+            {
+                if (retTexture != null && !retTexture.IsDisposed)
+                {
+                    retTexture.Dispose();
+                }
+
+                retTexture = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
+            }
+
+            retTexture.SetData(texData);
             
-            retTex.SetData(texData);
-            
-            return retTex;
+            return retTexture;
         }
 
         private void PlatformGetState(ref MediaState result)
@@ -127,7 +137,8 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformResume()
         {
-            _session.Start(null, null);
+            var varStart = new Variant();
+            _session.Start(null, varStart);
         }
 
         private void PlatformStop()
@@ -179,6 +190,11 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformDispose(bool disposing)
         {
+            if (retTexture != null && !retTexture.IsDisposed)
+            {
+                retTexture.Dispose();
+                retTexture = null;
+            }
         }
     }
 }
