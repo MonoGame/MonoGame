@@ -25,15 +25,19 @@ namespace MonoGame.Tools.Pipeline
 
         private readonly List<ContentItemTemplate> _templateItems;
 
-        private static readonly string [] _mgcbSearchPaths = new []       
+private static readonly string [] _mgcbSearchPaths = new []       
         {
             "",
 #if DEBUG
             "../../../../../MGCB/bin/Windows/AnyCPU/Debug",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Debug"),
 #else
             "../../../../../MGCB/bin/Windows/AnyCPU/Release",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Release"),
 #endif
             "../MGCB",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../MGCB"),
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
         };
 
         public IEnumerable<ContentItemTemplate> Templates
@@ -451,13 +455,10 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private string FindMGCB()
-        {
-            // We locate mgcb.exe relative to pipeline.exe, regardless of the current working directory.            
-            var curDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
+        {            
             foreach (var root in _mgcbSearchPaths)
             {
-                var mgcbPath = Path.Combine(curDir, Path.Combine(root, "MGCB.exe"));
+                var mgcbPath = Path.Combine(root, "MGCB.exe");
                 if (File.Exists(mgcbPath))
                     return Path.GetFullPath(mgcbPath);
             }
