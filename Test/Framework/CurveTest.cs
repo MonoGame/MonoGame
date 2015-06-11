@@ -62,6 +62,27 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void EvaluateNoKeys()
+        {
+            var curve = new Curve();
+
+            var result = curve.Evaluate(1.25f);
+
+            Assert.AreEqual(0f, result);
+        }
+
+        [Test]
+        public void EvaluateOneKey()
+        {
+            var curve = new Curve();
+            curve.Keys.Add(new CurveKey(1, -1));
+
+            var result = curve.Evaluate(1.25f);
+
+            Assert.AreEqual(-1f, result);
+        }
+
+        [Test]
         public void ComputeTangent()
         {
             var key1 = new CurveKey(-0.5f, 1.5f); 
