@@ -163,6 +163,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return (x & (x - 1)) == 0;
         }
 
+        public static bool IsMultipleOfFour(int x)
+        {
+            return x % 4 == 0;
+        }
+
         /// <summary>
         /// Returns the next power of two. Returns same value if already is PoT.
         /// </summary>
@@ -305,6 +310,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
                     throw new PipelineException("DXT Compressed textures width and height must be powers of two in GraphicsProfile.Reach.");                
+            }
+
+            if (!IsMultipleOfFour(texData.Width) || !IsMultipleOfFour(texData.Height))
+            {                
+                throw new PipelineException(
+                    "Invalid texture. Face 0 is sized {0}x{1}, but textures using DXT compressed formats must be multiples of four.",
+                    texData.Width,
+                    texData.Height);
             }
 
             var pixelData = texData.GetPixelData();

@@ -403,7 +403,22 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             if (_shared)
                 desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
-
+            
+            if (_format == SurfaceFormat.Dxt1 ||
+                _format == SurfaceFormat.Dxt5)
+            {
+                if (width % 4 != 0 || height % 4 != 1)
+                {
+                    // Note that the sharpdx call immediately below this will in fact fail
+                    // in this case. However it fails with an extremely unhelpful message. 
+                    // The message we write here matches the one given by XNA.
+                    //
+                    // Note that XNA also throws this exception for Dxt3, however since that call
+                    // actually works with sharpdx...
+                    throw new System.ArgumentException("DXT compressed texture sizes must be multiples of four.");
+                }
+            }
+                
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
 

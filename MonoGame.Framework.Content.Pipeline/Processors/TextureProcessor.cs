@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 			catch(Exception ex)
 			{
-				context.Logger.LogImportantMessage ("Could not compress texture {0}", ex.ToString());
+				context.Logger.LogImportantMessage ("Could not compress texture : {0}", ex.ToString());
 				TextureFormat = TextureProcessorOutputFormat.Color;
 			}
 
