@@ -17,6 +17,8 @@
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
     <MonoGamePlatform>WindowsPhone8</MonoGamePlatform>
     <MonoGameContentBuilderExe></MonoGameContentBuilderExe>
+    <MonoGameInstallDirectory Condition=" '$(OS)' != 'Unix' ">$(MSBuildProgramFiles32)</MonoGameInstallDirectory>
+    <MonoGameInstallDirectory Condition=" '$(OS)' == 'Unix' ">$(MSBuildExtensionsPath)</MonoGameInstallDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -113,7 +115,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsPhone81\MonoGame.Framework.dll</HintPath>
+       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\MonoGame.Framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="..\$ext_projectname$.Shared\Shared.Application.Shared.projitems" Label="Shared" />
