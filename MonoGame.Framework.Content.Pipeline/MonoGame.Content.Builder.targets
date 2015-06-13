@@ -11,11 +11,6 @@
     <AvailableItemName Include="MonoGameContentReference" />
   </ItemGroup>
 
-  <!-- Get all Mono Game Content References and store them in a list -->
-  <ItemGroup>
-    <ContentReferences Include="@(MonoGameContentReference)"/>
-  </ItemGroup>
-
   <!-- This disables the IDE feature that skips executing msbuild in some build situations. --> 
   <PropertyGroup>
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
@@ -25,15 +20,20 @@
 
     <PropertyGroup>
 
-      <ContentRootDirectory>Content</ContentRootDirectory>
-      <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
-      <ParentIntermediateDir>$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
+      <ContentRootDirectory Condition=" '$(ContentRootDirectory)' == '' " >Content</ContentRootDirectory>
+      <ParentOutputDir Condition=" '$(ParentOutputDir)' == '' " >$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
+      <ParentIntermediateDir Condition=" '$(ParentIntermediateDir)' == '' " >$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
 
-      <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
+      <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)Tools\MGCB.exe</MonoGameContentBuilderExe>
 
       <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
-
     </PropertyGroup>
+
+    <!-- Get all Mono Game Content References and store them in a list -->
+    <!-- We do this here so we are compatible with xbuild -->
+    <ItemGroup>
+      <ContentReferences Include="@(MonoGameContentReference)"/>
+     </ItemGroup>
 
     <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, Ouya, NativeClient, PlayStation4, or PlayStationMobile."
        Condition="	'$(MonoGamePlatform)' != 'Windows' And
@@ -56,34 +56,52 @@
         Condition="!Exists('$(MonoGameContentBuilderExe)')"
       />
 
+    <Warning
+        Text="No Content References Found. Please make sure your .mgcb file has a build action of MonoGameContentReference"
+        Condition=" '%(ContentReferences.FullPath)' == ''"
+    />
+
     <MakeDir Directories="$(ParentIntermediateDir)"/>
     <MakeDir Directories="$(ParentOutputDir)"/>
 
   </Target>
 
-  <Target Name="BuildContent"
-        BeforeTargets="PreBuildEvent;Rebuild"
-        DependsOnTargets="Prepare">
+  <PropertyGroup>
+    <BuildDependsOn>
+      BuildContent;
+      $(BuildDependsOn);
+    </BuildDependsOn>
+  </PropertyGroup>
 
-    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
+  <Target Name="RunContentBuilder">
+    <Exec Condition="'$(OS)' == 'Windows_NT'" Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
+          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
+    <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mono &quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)" 
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
+    <CreateItem Include="$(ParentOutputDir)\**\*.*">
+          <Output TaskParameter="Include" ItemName="ExtraContent" />
+    </CreateItem>
+  </Target>
+
+  <Target Name="BuildContent" DependsOnTargets="Prepare;RunContentBuilder"
+        Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
     <ItemGroup>
-
-      <ExtraContent Include="$(ParentOutputDir)\**\*.*" />
-
-      <Content Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) != 'Android'">
-        <Link>$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
+      <Content Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)" 
+          Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'">
+        <Link>$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-
-      <AndroidAsset Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) == 'Android'">
-        <Link>Assets\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
+      <BundleResource Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
+          Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'" >
+        <Link>Resources\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)</Link>
+      </BundleResource>
+      <AndroidAsset Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
+          Condition="'$(MonoGamePlatform)' == 'Android'">
+        <Link>Assets\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </AndroidAsset>
-
     </ItemGroup>
-
   </Target>
 
 </Project>
