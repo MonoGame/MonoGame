@@ -203,7 +203,8 @@ namespace MonoGame.Tests.ContentPipeline
                     new Color(0x91, 0x7B, 0x46, 0xFF),
                     new Color(0x88, 0x65, 0x43, 0xFF)
                 },
-                CustomItemList = new List<CustomItem>()
+                CustomItemList = new List<CustomItem>(),
+                CustomItemInheritedList = new List<CustomItemInherited>()
             });
         }
 

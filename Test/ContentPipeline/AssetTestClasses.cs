@@ -161,6 +161,17 @@ public class CustomItem
     public CustomEnum EnumVal;
 }
 
+public class CustomItemBase
+{
+    public double DoubleVal;
+    public Nullable<float> NullableFloatVal;
+}
+
+public class CustomItemInherited : CustomItemBase
+{
+    public char[] CharArrayVal;
+}
+
 public class Collections
 {
     public string[] StringArray;
@@ -168,6 +179,7 @@ public class Collections
     public int[] IntArray;
     public Color[] ColorArray;
     public List<CustomItem> CustomItemList;
+    public List<CustomItemInherited> CustomItemInheritedList;
 
     // Indexer - should be ignored by intermediate serializer.
     public Color this[int i]
