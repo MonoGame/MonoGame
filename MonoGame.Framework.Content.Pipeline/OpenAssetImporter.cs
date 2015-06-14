@@ -805,115 +805,114 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     }
                 }
 
-                // Get all unique keyframe times. (Assuming that no two key frames
-                // have the same time, which is usually a safe assumption.)
-                var times = scaleKeys.Select(k => k.Time)
-                                     .Union(rotationKeys.Select(k => k.Time))
-                                     .Union(translationKeys.Select(k => k.Time))
-                                     .OrderBy(t => t)
-                                     .ToList();
+                int scaleIndex = 0;
+                int rotationIndex = 0;
+                int translationIndex = 0;
 
-                Debug.Assert(times.Count == times.Distinct().Count(), "Sequences combined with Union() should not have duplicates.");
-
-                int prevScaleIndex = -1;
-                int prevRotationIndex = -1;
-                int prevTranslationIndex = -1;
-                double prevScaleTime = 0.0;
-                double prevRotationTime = 0.0;
-                double prevTranslationTime = 0.0;
-                Vector3? prevScale = null;
-                Quaternion? prevRotation = null;
-                Vector3? prevTranslation = null;
-
-                foreach (var time in times)
+                // Interpolate frames  
+                var framesPerSecond = 60.0; 
+                var ticksPerFrame = aiAnimation.TicksPerSecond / framesPerSecond;
+                var frames = (int)(aiAnimation.DurationInTicks / ticksPerFrame)+1;
+                for (var frame = 0.0; frame < frames; frame++)
                 {
+                    var time = frame * ticksPerFrame;
+               
                     // Get scaling.
-                    Vector3? scale;
-                    int scaleIndex = scaleKeys.FindIndex(k => k.Time == time);
-                    if (scaleIndex != -1)
+                    Vector3? scale = null;
+                    if (scaleKeys.Count >= 1)
                     {
-                        // Scaling key found.
+                        if (time <= scaleKeys[scaleIndex].Time)
+                    {
                         scale = ToXna(scaleKeys[scaleIndex].Value);
-                        prevScaleIndex = scaleIndex;
-                        prevScaleTime = time;
-                        prevScale = scale;
                     }
                     else
                     {
-                        // No scaling key found.
-                        if (prevScaleIndex != -1 && prevScaleIndex + 1 < scaleKeys.Count)
+                            while ((scaleIndex + 1) < scaleKeys.Count &&
+                                    time > scaleKeys[(scaleIndex + 1)].Time)
                         {
-                            // Lerp between previous and next scaling key.
-                            var nextScaleKey = scaleKeys[prevScaleIndex + 1];
-                            var nextScaleTime = nextScaleKey.Time;
-                            var nextScale = ToXna(nextScaleKey.Value);
-                            var amount = (float)((time - prevScaleTime) / (nextScaleTime - prevScaleTime));
-                            scale = Vector3.Lerp(prevScale.Value, nextScale, amount);
+                                scaleIndex++;
+                            }
+
+                            if ((scaleIndex + 1) < scaleKeys.Count)
+                            {
+                                var scaleTimeA = scaleKeys[scaleIndex].Time;
+                                var scaleA = ToXna(scaleKeys[scaleIndex].Value);
+                                var scaleTimeB = scaleKeys[scaleIndex + 1].Time;
+                                var scaleB = ToXna(scaleKeys[scaleIndex + 1].Value);
+
+                                var amount = (float)((time - scaleTimeA) / (scaleTimeB - scaleTimeA));
+                                scale = Vector3.Lerp(scaleA, scaleB, amount);
                         }
                         else
                         {
-                            // Hold previous scaling value.
-                            scale = prevScale;
+                                scale = ToXna(scaleKeys[scaleIndex].Value);
+                            }
                         }
                     }
 
                     // Get rotation.
-                    Quaternion? rotation;
-                    int rotationIndex = rotationKeys.FindIndex(k => k.Time == time);
-                    if (rotationIndex != -1)
+                    Quaternion? rotation = null;
+                    if(rotationKeys.Count >= 1)
                     {
-                        // Rotation key found.
+                        if (time <= rotationKeys[rotationIndex].Time)
+                    {
                         rotation = ToXna(rotationKeys[rotationIndex].Value);
-                        prevRotationIndex = rotationIndex;
-                        prevRotationTime = time;
-                        prevRotation = rotation;
                     }
                     else
                     {
-                        // No rotation key found.
-                        if (prevRotationIndex != -1 && prevRotationIndex + 1 < rotationKeys.Count)
+                            while ( (rotationIndex + 1) < rotationKeys.Count &&
+                                    time > rotationKeys[(rotationIndex + 1)].Time)
                         {
-                            // Lerp between previous and next rotation key.
-                            var nextRotationKey = rotationKeys[prevRotationIndex + 1];
-                            var nextRotationTime = nextRotationKey.Time;
-                            var nextRotation = ToXna(nextRotationKey.Value);
-                            var amount = (float)((time - prevRotationTime) / (nextRotationTime - prevRotationTime));
-                            rotation = Quaternion.Slerp(prevRotation.Value, nextRotation, amount);
+                                rotationIndex++;
+                            }
+
+                            if ((rotationIndex + 1) < rotationKeys.Count)
+                            {
+                                var rotationTimeA = rotationKeys[rotationIndex].Time;
+                                var rotationA = ToXna(rotationKeys[rotationIndex].Value);
+                                var rotationTimeB = rotationKeys[rotationIndex + 1].Time;
+                                var rotationB = ToXna(rotationKeys[rotationIndex + 1].Value);
+
+                                var amount = (float)((time - rotationTimeA) / (rotationTimeB - rotationTimeA));
+                                rotation = Quaternion.Slerp(rotationA, rotationB, amount);
                         }
                         else
                         {
-                            // Hold previous rotation value.
-                            rotation = prevRotation;
+                                rotation = ToXna(rotationKeys[rotationIndex].Value);
+                            }
                         }
                     }
 
                     // Get translation.
-                    Vector3? translation;
-                    int translationIndex = translationKeys.FindIndex(k => k.Time == time);
-                    if (translationIndex != -1)
+                    Vector3? translation = null;
+                    if (translationKeys.Count >= 1)
                     {
-                        // Translation key found.
+                        if (time <= translationKeys[translationIndex].Time)
+                    {
                         translation = ToXna(translationKeys[translationIndex].Value);
-                        prevTranslationIndex = translationIndex;
-                        prevTranslationTime = time;
-                        prevTranslation = translation;
                     }
                     else
                     {
-                        // No translation key found.
-                        if (prevTranslationIndex != -1 && prevTranslationIndex + 1 < translationKeys.Count)
+                            while ((translationIndex + 1) < translationKeys.Count &&
+                                    time > translationKeys[(translationIndex + 1)].Time)
                         {
-                            // Lerp between previous and next translation key.
-                            var nextTranslationKey = translationKeys[prevTranslationIndex + 1];
-                            var nextTranslationTime = nextTranslationKey.Time;
-                            var nextTranslation = ToXna(nextTranslationKey.Value);
-                            var amount = (float)((time - prevTranslationTime) / (nextTranslationTime - prevTranslationTime));
-                            translation = Vector3.Lerp(prevTranslation.Value, nextTranslation, amount);
+                                translationIndex++;
+                            }
+
+                            if ((translationIndex + 1) < translationKeys.Count)
+                            {
+                                var translationTimeA = translationKeys[translationIndex].Time;
+                                var translationA = ToXna(translationKeys[translationIndex].Value);
+                                var translationTimeB = translationKeys[translationIndex + 1].Time;
+                                var translationB = ToXna(translationKeys[translationIndex + 1].Value);
+
+                                var amount = (float)((time - translationTimeA) / (translationTimeB - translationTimeA));
+                                translation = Vector3.Lerp(translationA, translationB, amount);
                         }
                         else
                         {
-                            // Hold previous translation value.
-                            translation = prevTranslation;
+                                translation = ToXna(translationKeys[translationIndex].Value);
+                            }
                         }
                     }
 
