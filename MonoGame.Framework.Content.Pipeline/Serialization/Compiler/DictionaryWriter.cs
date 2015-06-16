@@ -35,12 +35,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            if (value.Count > 0)
-            {
-                output.GetTypeWriter(typeof(K));
-                output.GetTypeWriter(typeof(V));
-            }
-
             output.Write(value.Count);
             foreach (var element in value)
             {
