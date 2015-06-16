@@ -103,7 +103,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             else if (contentSerializerAttribute.SharedResource)
             {
                 _sharedResources.Add(property);
-                return false;
             }
 
             return true;
@@ -130,7 +129,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             else if (contentSerializerAttribute.SharedResource)
             {
                 _sharedResources.Add(field);
-                return false;
             }
 
             return true;
