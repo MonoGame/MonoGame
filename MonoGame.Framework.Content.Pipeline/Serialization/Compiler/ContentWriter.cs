@@ -265,10 +265,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 			    typeWriterMap.Add(typeWriter.GetType(), index);
                 typeMap.Add(type, typeWriter);
 
-                if (type.IsArray)
-                {
-                    GetTypeWriter(type.GetElementType());
-                }
+                typeWriter.OnAddedToContentWriter(this);
             }
             return typeWriter;
         }

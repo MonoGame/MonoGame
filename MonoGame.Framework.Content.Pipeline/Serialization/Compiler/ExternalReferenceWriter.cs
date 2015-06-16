@@ -13,10 +13,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         private ContentTypeWriter _targetWriter;
 
         /// <inheritdoc/>
-        protected override void Initialize(ContentCompiler compiler)
+        internal override void OnAddedToContentWriter(ContentWriter output)
         {
-            base.Initialize(compiler);
-            _targetWriter = compiler.GetTypeWriter(typeof(T));
+            base.OnAddedToContentWriter(output);
+            _targetWriter = output.GetTypeWriter(typeof(T));
         }
 
         /// <summary>
