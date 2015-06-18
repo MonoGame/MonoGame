@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -81,7 +82,9 @@ namespace Microsoft.Xna.Framework
                 (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
         }
 
- 	/// <summary>
+        #region Clamp
+
+        /// <summary>
         /// Restricts a value to be within a specified range.
         /// </summary>
         /// <param name="value">The value to clamp.</param>
@@ -114,6 +117,8 @@ namespace Microsoft.Xna.Framework
             return value;
         }
         
+		#endregion
+		
         /// <summary>
         /// Calculates the absolute value of the difference of two values.
         /// </summary>
@@ -125,6 +130,90 @@ namespace Microsoft.Xna.Framework
             return Math.Abs(value1 - value2);
         }
         
+		#region GetPickRay
+		
+		/// <summary>
+        /// Projects a <see cref="Ray"/> from 2d to 3d space coordinates.
+        /// </summary>
+        /// <param name="x">The x coordinate in 2d space.</param>
+        /// <param name="y">The y coordinate in 2d space.</param>
+        /// <param name="viewport">The view bounds.</param>
+        /// <param name="projection">The projection <see cref="Matrix"/>.</param>
+        /// <param name="view">The view <see cref="Matrix"/>.</param>
+        /// <param name="world">The world <see cref="Matrix"/>.</param>
+        /// <returns>The projected ray.</returns>
+        public static Ray GetPickRay(int x, int y, Viewport viewport, Matrix projection, Matrix view, Matrix world)
+        {
+            var nearSrc = new Vector3(x, y, 0);
+            var farSrc = new Vector3(x, y, 1);
+            var near = viewport.Unproject(nearSrc, projection, view, world);
+            var far = viewport.Unproject(farSrc, projection, view, world);
+            var d = far - near;
+            d.Normalize();
+            return new Ray(near, d);
+        }
+
+        /// <summary>
+        /// Projects a <see cref="Ray"/> from 2d to 3d space coordinates.
+        /// </summary>
+        /// <param name="x">The x coordinate in 2d space.</param>
+        /// <param name="y">The y coordinate in 2d space.</param>
+        /// <param name="viewport">The view bounds.</param>
+        /// <param name="projection">The projection <see cref="Matrix"/>.</param>
+        /// <param name="view">The view <see cref="Matrix"/>.</param>
+        /// <returns>The projected ray.</returns>
+        public static Ray GetPickRay(int x, int y, Viewport viewport, Matrix projection, Matrix view)
+        {
+            var nearSrc = new Vector3(x, y, 0);
+            var farSrc = new Vector3(x, y, 1);
+            var near = viewport.Unproject(nearSrc, projection, view, Matrix.Identity);
+            var far = viewport.Unproject(farSrc, projection, view, Matrix.Identity);
+            var d = far - near;
+            d.Normalize();
+            return new Ray(near, d);
+        }
+
+        /// <summary>
+        /// Projects a <see cref="Ray"/> from 2d to 3d space coordinates.
+        /// </summary>
+        /// <param name="position">The x and y coordinates in 2d space.</param>
+        /// <param name="viewport">The view bounds.</param>
+        /// <param name="projection">The projection <see cref="Matrix"/>.</param>
+        /// <param name="view">The view <see cref="Matrix"/>.</param>
+        /// <param name="world">The world <see cref="Matrix"/>.</param>
+        /// <returns>The projected ray.</returns>
+        public static Ray GetPickRay(Point position, Viewport viewport, Matrix projection, Matrix view, Matrix world)
+        {
+            var nearSrc = new Vector3(position.X, position.Y, 0);
+            var farSrc = new Vector3(position.X, position.Y, 1);
+            var near = viewport.Unproject(nearSrc, projection, view, world);
+            var far = viewport.Unproject(farSrc, projection, view, world);
+            var d = far - near;
+            d.Normalize();
+            return new Ray(near, d);
+        }
+
+        /// <summary>
+        /// Projects a <see cref="Ray"/> from 2d to 3d space coordinates.
+        /// </summary>
+        /// <param name="position">The x and y coordinates in 2d space.</param>
+        /// <param name="viewport">The view bounds.</param>
+        /// <param name="projection">The projection <see cref="Matrix"/>.</param>
+        /// <param name="view">The view <see cref="Matrix"/>.</param>
+        /// <returns>The projected ray.</returns>
+        public static Ray GetPickRay(Point position, Viewport viewport, Matrix projection, Matrix view)
+        {
+            var nearSrc = new Vector3(position.X, position.Y, 0);
+            var farSrc = new Vector3(position.X, position.Y, 1);
+            var near = viewport.Unproject(nearSrc, projection, view, Matrix.Identity);
+            var far = viewport.Unproject(farSrc, projection, view, Matrix.Identity);
+            var d = far - near;
+            d.Normalize();
+            return new Ray(near, d);
+        }
+		
+		#endregion
+		
         /// <summary>
         /// Performs a Hermite spline interpolation.
         /// </summary>
@@ -171,7 +260,9 @@ namespace Microsoft.Xna.Framework
             return value1 + (value2 - value1) * amount;
         }
 
-	/// <summary>
+		#region Max
+		
+	    /// <summary>
         /// Returns the greater of two values.
         /// </summary>
         /// <param name="value1">Source value.</param>
@@ -193,6 +284,10 @@ namespace Microsoft.Xna.Framework
             return value1 > value2 ? value1 : value2;
         }
         
+		#endregion
+		
+		#region Min
+		
         /// <summary>
         /// Returns the lesser of two values.
         /// </summary>
@@ -215,6 +310,8 @@ namespace Microsoft.Xna.Framework
             return value1 < value2 ? value1 : value2;
         }
         
+		#endregion
+		
         /// <summary>
         /// Interpolates between two values using a cubic equation.
         /// </summary>
