@@ -80,19 +80,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             sourceBitmap = colorBitmap;
 
             PixelFormat targetFormat;
+            ColourSpace colourSpace;
             switch (format)
             {
                 case SurfaceFormat.Dxt1:
+                    targetFormat = PixelFormat.DXT1;
+                    colourSpace = ColourSpace.lRGB;
+                    break;
                 case SurfaceFormat.Dxt1SRgb:
                     targetFormat = PixelFormat.DXT1;
+                    colourSpace = ColourSpace.sRGB;
                     break;
                 case SurfaceFormat.Dxt3:
+                    targetFormat = PixelFormat.DXT3;
+                    colourSpace = ColourSpace.lRGB;
+                    break;
                 case SurfaceFormat.Dxt3SRgb:
                     targetFormat = PixelFormat.DXT3;
+                    colourSpace = ColourSpace.sRGB;
                     break;
                 case SurfaceFormat.Dxt5:
+                    targetFormat = PixelFormat.DXT5;
+                    colourSpace = ColourSpace.lRGB;
+                    break;
                 case SurfaceFormat.Dxt5SRgb:
                     targetFormat = PixelFormat.DXT5;
+                    colourSpace = ColourSpace.sRGB;
                     break;
                 default:
                     return false;
@@ -103,11 +116,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // Create the texture object in the PVR library
                 var sourceData = sourceBitmap.GetPixelData();
                 PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
-                    PixelFormat.RGBA8888, true, VariableType.UnsignedByte, ColourSpace.lRGB);
+                    PixelFormat.RGBA8888, true, VariableType.UnsignedByte, colourSpace);
                 // Resize the bitmap if needed
                 if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
                     PVRTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
-                PVRTexture.Transcode(targetFormat, VariableType.UnsignedByte, ColourSpace.lRGB /*, CompressorQuality.ETCMediumPerceptual, true*/);
+                PVRTexture.Transcode(targetFormat, VariableType.UnsignedByte, colourSpace);
                 var texDataSize = PVRTexture.GetTextureDataSize(0);
                 var texData = new byte[texDataSize];
                 PVRTexture.GetTextureData(texData, texDataSize);

@@ -155,7 +155,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var src = sourceBitmap as PixelBitmapContent<Vector4>;
             if (default(T) is IPackedVector)
             {
-                Parallel.For(0, Height, (y) =>
+                Parallel.For(0, sourceRegion.Height, (y) =>
                 {
                     var pixel = default(T);
                     var p = (IPackedVector)pixel;
@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 if (converter == null)
                     return false;
 
-                Parallel.For(0, Height, (y) =>
+                Parallel.For(0, sourceRegion.Height, (y) =>
                 {
                     var row = src.GetRow(sourceRegion.Top + y);
                     for (int x = 0; x < sourceRegion.Width; ++x)
@@ -219,7 +219,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var dest = destinationBitmap as PixelBitmapContent<Vector4>;
             if (default(T) is IPackedVector)
             {
-                Parallel.For(0, Height, (y) =>
+                Parallel.For(0, sourceRegion.Height, (y) =>
                 {
                     var row = GetRow(sourceRegion.Top + y);
                     for (int x = 0; x < sourceRegion.Width; ++x)
@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 if (converter == null)
                     return false;
 
-                Parallel.For(0, Height, (y) =>
+                Parallel.For(0, sourceRegion.Height, (y) =>
                 {
                     var row = GetRow(sourceRegion.Top + y);
                     for (int x = 0; x < sourceRegion.Width; ++x)

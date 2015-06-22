@@ -121,7 +121,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // Resize the bitmap if needed
                 if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
                     PVRTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
-                PVRTexture.Transcode(targetFormat, VariableType.UnsignedByte, ColourSpace.lRGB /*, CompressorQuality.ETCMediumPerceptual, true*/);
+                // On Linux, anything less than CompressorQuality.PVRTCHigh crashes in libpthread.so at the end of compression
+                PVRTexture.Transcode(targetFormat, VariableType.UnsignedByte, ColourSpace.lRGB, CompressorQuality.PVRTCHigh);
                 var texDataSize = PVRTexture.GetTextureDataSize(0);
                 var texData = new byte[texDataSize];
                 PVRTexture.GetTextureData(texData, texDataSize);
