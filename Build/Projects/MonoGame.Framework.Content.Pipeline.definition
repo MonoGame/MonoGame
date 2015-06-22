@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework.Content.Pipeline" Path="MonoGame.Framework.Content.Pipeline" Type="Library" Platforms="Linux,MacOS,Windows">
 
   <!--
@@ -638,7 +638,7 @@
       <Link>libfreeimageplus.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\MacOS\x86\libPVRTexLibWrapper.dylib">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libPVRTexLibWrapper.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
