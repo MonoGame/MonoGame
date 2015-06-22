@@ -52,7 +52,16 @@ namespace MonoGame.Tools.Pipeline
             #if GTK3
             if(Global.UseHeaderBar)
             {
-                hbar.Subtitle = projectview1.openedProject;
+                if(string.IsNullOrEmpty(projectview1.openedProject))
+                {
+                    this.Title = "MonoGame Pipeline Tool";
+                    hbar.Subtitle = "";
+                }
+                else
+                {
+                    this.Title = System.IO.Path.GetFileName(projectview1.openedProject);
+                    hbar.Subtitle = System.IO.Path.GetDirectoryName(projectview1.openedProject);
+                }
                 return;
             }
             #endif
@@ -80,7 +89,12 @@ namespace MonoGame.Tools.Pipeline
             AllFilesFilter.Name = "All Files (*.*)";
             AllFilesFilter.AddPattern ("*.*");
 
+            #if GTK3
+            Widget[] widgets = Global.UseHeaderBar ? menu2.Children : menubar1.Children;
+            #else
             Widget[] widgets = menubar1.Children;
+            #endif
+
             foreach (Widget w in widgets) {
                 if(w.Name == "FileAction")
                 {
@@ -702,6 +716,16 @@ namespace MonoGame.Tools.Pipeline
             CleanAction.Sensitive = projectOpenAndNotBuilding;
             CancelBuildAction.Sensitive = !notBuilding;
             CancelBuildAction.Visible = !notBuilding;
+
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                new_button.Sensitive = NewAction.Sensitive;
+                open_button.Sensitive = OpenAction.Sensitive;
+                save_button.Sensitive = SaveAction.Sensitive;
+                build_button.Sensitive = BuildAction1.Sensitive;
+            }
+            #endif
 
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();

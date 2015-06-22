@@ -6,6 +6,12 @@ namespace MonoGame.Tools.Pipeline
 	{
         #if GTK3
         HeaderBar hbar;
+
+        [Builder.ObjectAttribute] Button new_button;
+        [Builder.ObjectAttribute] Button open_button;
+        [Builder.ObjectAttribute] Button save_button;
+        [Builder.ObjectAttribute] Button build_button;
+        [Builder.ObjectAttribute] Menu menu2;
         #endif
 
 		private global::Gtk.UIManager UIManager;
@@ -236,10 +242,26 @@ namespace MonoGame.Tools.Pipeline
             #if GTK3
             if(Global.UseHeaderBar)
             {
-                hbar = new HeaderBar();
+                Builder builder = new Builder(null, "MonoGame.Tools.Pipeline.Gtk.MainWindow.HeaderBar.glade", null);
+                hbar = new HeaderBar(builder.GetObject("headerbar").Handle);
+                builder.Autoconnect(this);
+
                 hbar.AttachToWindow(this);
                 hbar.ShowCloseButton = true;
                 hbar.Show();
+
+                foreach(var o in menubar1.Children)
+                {
+                    menubar1.Remove(o);
+                    menu2.Insert(o, 4);
+                }
+
+                new_button.Clicked += OnNewActionActivated;
+                open_button.Clicked += OnOpenActionActivated;
+                save_button.Clicked += OnSaveActionActivated;
+                build_button.Clicked += OnBuildAction1Activated;
+
+                vbox2.Remove (menubar1);
             }
             #endif
 
