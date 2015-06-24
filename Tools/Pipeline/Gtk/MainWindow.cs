@@ -461,7 +461,19 @@ namespace MonoGame.Tools.Pipeline
 #endif
 #if MONOMAC || LINUX
             _buildProcess.StartInfo.FileName = "mono";
-            _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
+            if (_controller.LaunchDebugger) {
+                var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
+                port = !string.IsNullOrEmpty (port) ? port : "55555";
+                var monodebugger = string.Format ("--debug --debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:{0}",
+                    port);
+                _buildProcess.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monodebugger, exe, commands);
+                OutputAppend("************************************************");
+                OutputAppend("RUNNING MGCB IN DEBUG MODE!!!");
+                OutputAppend(string.Format ("Attach your Debugger to localhost:{0}", port));
+                OutputAppend("************************************************");
+            } else {
+                _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
+            }
 #endif
 
             return _buildProcess;
@@ -664,6 +676,16 @@ namespace MonoGame.Tools.Pipeline
             adialog.Destroy ();
         }
 
+        protected void OnDebugModeActionActivated (object sender, EventArgs e)
+        {
+            _controller.LaunchDebugger = this.DebugModeAction.Active;
+        }
+
+        protected void OnCancelBuildActionActivated (object sender, EventArgs e)
+        {
+            _controller.CancelBuild();
+        }
+
         public void UpdateMenus()
         {
             List<TreeIter> iters;
@@ -702,6 +724,8 @@ namespace MonoGame.Tools.Pipeline
             CleanAction.Sensitive = projectOpenAndNotBuilding;
             CancelBuildAction.Sensitive = !notBuilding;
             CancelBuildAction.Visible = !notBuilding;
+
+            DebugModeAction.Sensitive = notBuilding;
 
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();
