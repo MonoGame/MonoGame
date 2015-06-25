@@ -52,7 +52,7 @@ namespace MonoGame.Tools.Pipeline
 		
 		private global::Gtk.Action CleanAction;
 		
-		private global::Gtk.Action DebugModeAction;
+		private global::Gtk.ToggleAction DebugModeAction;
 		
 		private global::Gtk.Action HelpAction;
 		
@@ -149,7 +149,7 @@ namespace MonoGame.Tools.Pipeline
 			this.CleanAction = new global::Gtk.Action ("CleanAction", global::Mono.Unix.Catalog.GetString ("Clean"), null, null);
 			this.CleanAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Clean");
 			w1.Add (this.CleanAction, null);
-			this.DebugModeAction = new global::Gtk.Action ("DebugModeAction", global::Mono.Unix.Catalog.GetString ("Debug Mode"), null, null);
+			this.DebugModeAction = new global::Gtk.ToggleAction ("DebugModeAction", global::Mono.Unix.Catalog.GetString ("Debug Mode"), null, null);
 			this.DebugModeAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Debug Mode");
 			w1.Add (this.DebugModeAction, null);
 			this.HelpAction = new global::Gtk.Action ("HelpAction", global::Mono.Unix.Catalog.GetString ("Help"), null, null);
@@ -188,7 +188,7 @@ namespace MonoGame.Tools.Pipeline
 			this.vbox2 = new global::Gtk.VBox ();
 			this.vbox2.Name = "vbox2";
 			// Container child vbox2.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='OpenAction' action='OpenAction'/><menuitem name='OpenRecentAction' action='OpenRecentAction'/><menuitem name='CloseAction' action='CloseAction'/><separator/><menuitem name='ImportAction' action='ImportAction'/><separator/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><separator/><menuitem name='ExitAction' action='ExitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='UndoAction' action='UndoAction'/><menuitem name='RedoAction' action='RedoAction'/><separator/><menu name='AddAction' action='AddAction'><menuitem name='NewItemAction' action='NewItemAction'/><menuitem name='NewFolderAction' action='NewFolderAction'/><separator/><menuitem name='ExistingItemAction' action='ExistingItemAction'/><menuitem name='ExistingFolderAction' action='ExistingFolderAction'/></menu><separator/><menuitem name='RenameAction' action='RenameAction'/><menuitem name='DeleteAction' action='DeleteAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/><menuitem name='CancelBuildAction' action='CancelBuildAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='ViewHelpAction' action='ViewHelpAction'/><separator/><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='OpenAction' action='OpenAction'/><menuitem name='OpenRecentAction' action='OpenRecentAction'/><menuitem name='CloseAction' action='CloseAction'/><separator/><menuitem name='ImportAction' action='ImportAction'/><separator/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><separator/><menuitem name='ExitAction' action='ExitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='UndoAction' action='UndoAction'/><menuitem name='RedoAction' action='RedoAction'/><separator/><menu name='AddAction' action='AddAction'><menuitem name='NewItemAction' action='NewItemAction'/><menuitem name='NewFolderAction' action='NewFolderAction'/><separator/><menuitem name='ExistingItemAction' action='ExistingItemAction'/><menuitem name='ExistingFolderAction' action='ExistingFolderAction'/></menu><separator/><menuitem name='RenameAction' action='RenameAction'/><menuitem name='DeleteAction' action='DeleteAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/><menuitem name='CancelBuildAction' action='CancelBuildAction'/><separator name='sep1'/><menuitem name='DebugModeAction' action='DebugModeAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='ViewHelpAction' action='ViewHelpAction'/><separator/><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
 			this.menubar1 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar1")));
 			this.menubar1.Name = "menubar1";
 			this.vbox2.Add (this.menubar1);
@@ -302,6 +302,8 @@ namespace MonoGame.Tools.Pipeline
 			this.NewFolderAction.Activated += new global::System.EventHandler (this.OnNewFolderActionActivated);
 			this.ExistingItemAction.Activated += new global::System.EventHandler (this.OnAddItemActionActivated);
 			this.ExistingFolderAction.Activated += new global::System.EventHandler (this.OnAddFolderActionActivated);
+			this.DebugModeAction.Activated += new global::System.EventHandler (this.OnDebugModeActionActivated); 
+			this.CancelBuildAction.Activated += new global::System.EventHandler (this.OnCancelBuildActionActivated);
 		}
 	}
 }

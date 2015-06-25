@@ -30,10 +30,13 @@ namespace MonoGame.Tools.Pipeline
             "",
 #if DEBUG
             "../../../../../MGCB/bin/Windows/AnyCPU/Debug",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Debug"),
 #else
             "../../../../../MGCB/bin/Windows/AnyCPU/Release",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Release"),
 #endif
             "../MGCB",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../MGCB"),
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
         };
 
@@ -452,7 +455,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private string FindMGCB()
-        {
+        {            
             foreach (var root in _mgcbSearchPaths)
             {
                 var mgcbPath = Path.Combine(root, "MGCB.exe");

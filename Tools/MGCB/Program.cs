@@ -31,7 +31,13 @@ namespace MGCB
             
             // Launch debugger if requested.
             if (content.LaunchDebugger)
-                System.Diagnostics.Debugger.Launch();
+            {
+                try {
+                    System.Diagnostics.Debugger.Launch();
+                } catch (NotImplementedException) {
+                    // not implemented under Mono
+                }
+            }
 
             // Print a startup message.            
             var buildStarted = DateTime.Now;

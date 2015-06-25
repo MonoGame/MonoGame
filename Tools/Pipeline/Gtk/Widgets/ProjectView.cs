@@ -649,6 +649,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             window._controller.Move(sourcedata.ToArray(), destdata.ToArray(), types.ToArray());
+            window.UpdateMenus();
         }
 
         void Treeview1_DragDataReceived (object o, DragDataReceivedArgs args)
@@ -669,6 +670,24 @@ namespace MonoGame.Tools.Pipeline
                     if (paths[i].StartsWith("file://"))
                     {
                         string path = paths[i].Substring(7);
+
+                        try
+                        {
+                            //convert hex to ascii if any
+                            for(int ih = 0;ih < path.Length;ih++)
+                            {
+                                if (path.Substring(ih, 1) == "%")
+                                {
+                                    string hex = path.Substring(ih + 1, 2);
+                                    path = path.Replace("%" + hex, Convert.ToChar(Convert.ToUInt32(hex, 16)).ToString());
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            window.ShowError("Error", "An unknown error has occured.");
+                            return;
+                        }
 
                         if (System.IO.File.Exists(path))
                             files.Add(path);
@@ -706,6 +725,7 @@ namespace MonoGame.Tools.Pipeline
 
                 string initDir = (iter.Equals(GetBaseIter())) ? window._controller.GetFullPath ("") : GetPathFromIter(iter);
                 window._controller.DragDrop(initDir, folders.ToArray(), files.ToArray());
+                window.UpdateMenus();
             }
         }
 

@@ -457,5 +457,18 @@ namespace MonoGame.Tests.ContentPipeline
                 B = new GenericClass<float> { Value = 4.2f }
             });
         }
+
+        [Test]
+        public void ChildCollections()
+        {
+            SerializeAndAssert("26_ChildCollections.xml", new ChildCollections
+            {
+                Children =
+                {
+                    new ChildCollectionChild { Name = "Foo" },
+                    new ChildCollectionChild { Name = "Bar" }
+                }
+            });
+        }
     }
 }
