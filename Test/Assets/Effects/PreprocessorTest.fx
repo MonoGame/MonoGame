@@ -6,6 +6,12 @@
 
 #define TEST 1
 
+/*
+This is a C style comment.
+*/
+
+#define
+
 #if TEST == 0
 Foo
 #elif TEST == 1

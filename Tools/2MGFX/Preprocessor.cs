@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using CppNet;
 
@@ -17,14 +18,14 @@ namespace TwoMGFX
 
             pp.EmitExtraLineInfo = false;
             pp.addFeature(Feature.LINEMARKERS);
-            pp.setListener(new MGErrorListener(fullPath, output));
+            pp.setListener(new MGErrorListener(output));
             pp.setFileSystem(new MGFileSystem(dependencies));
             pp.setQuoteIncludePath(new List<string> { Path.GetDirectoryName(fullPath) });
 
             foreach (var define in defines)
                 pp.addMacro(define.Key, define.Value);
 
-            pp.addInput(new StringLexerSource(effectCode, true, fullPath));
+            pp.addInput(new MGStringLexerSource(effectCode, true, fullPath));
 
             var result = new StringBuilder();
 
@@ -37,14 +38,26 @@ namespace TwoMGFX
                     case CppNet.Token.EOF:
                         endOfStream = true;
                         break;
-                    case CppNet.Token.CCOMMENT:
                     case CppNet.Token.CPPCOMMENT:
                         break;
+                    case CppNet.Token.CCOMMENT:
+                    {
+                        var tokenText = token.getText();
+                        if (tokenText != null)
+                        {
+                            // Need to preserve line breaks so that line numbers are correct.
+                            var lineBreaks = string.Join("", token.getText().Where(x => x == '\n'));
+                            result.Append(lineBreaks);
+                        }
+                        break;
+                    }
                     default:
+                    {
                         var tokenText = token.getText();
                         if (tokenText != null)
                             result.Append(tokenText);
                         break;
+                    }
                 }
             }
 
@@ -111,29 +124,59 @@ namespace TwoMGFX
             {
                 if (!_dependencies.Contains(_path))
                     _dependencies.Add(_path);
-                return new FileLexerSource(_path);
+                return new MGFileLexerSource(_path);
+            }
+        }
+
+        private interface IMGLexerSource
+        {
+            string Path { get; }
+        }
+
+        private class MGFileLexerSource : FileLexerSource, IMGLexerSource
+        {
+            public string Path { get; private set; }
+
+            public MGFileLexerSource(string path)
+                : base(path)
+            {
+                Path = path;
+            }
+        }
+
+        private class MGStringLexerSource : StringLexerSource, IMGLexerSource
+        {
+            public string Path { get; private set; }
+
+            public MGStringLexerSource(string str, bool ppvalid, string fileName)
+                : base(str, ppvalid, fileName)
+            {
+                Path = fileName;
             }
         }
 
         private class MGErrorListener : PreprocessorListener
         {
-            private readonly string _fullPath;
             private readonly IEffectCompilerOutput _output;
 
-            public MGErrorListener(string fullPath, IEffectCompilerOutput output)
+            public MGErrorListener(IEffectCompilerOutput output)
             {
-                _fullPath = fullPath;
                 _output = output;
             }
 
             public void handleWarning(Source source, int line, int column, string msg)
             {
-                _output.WriteWarning(_fullPath, line, column, msg);
+                _output.WriteWarning(GetPath(source), line, column, msg);
             }
 
             public void handleError(Source source, int line, int column, string msg)
             {
-                _output.WriteError(_fullPath, line, column, msg);
+                _output.WriteError(GetPath(source), line, column, msg);
+            }
+
+            private string GetPath(Source source)
+            {
+                return ((IMGLexerSource) source).Path;
             }
 
             public void handleSourceChange(Source source, string ev)
