@@ -46,8 +46,9 @@ namespace TwoMGFX
                         if (tokenText != null)
                         {
                             // Need to preserve line breaks so that line numbers are correct.
-                            var lineBreaks = string.Join("", token.getText().Where(x => x == '\n'));
-                            result.Append(lineBreaks);
+                            foreach (var c in tokenText)
+                                if (c == '\n')
+                                    result.Append(c);
                         }
                         break;
                     }
@@ -124,32 +125,16 @@ namespace TwoMGFX
             {
                 if (!_dependencies.Contains(_path))
                     _dependencies.Add(_path);
-                return new MGFileLexerSource(_path);
+                return new MGStringLexerSource(File.ReadAllText(_path), true, _path);
             }
         }
 
-        private interface IMGLexerSource
-        {
-            string Path { get; }
-        }
-
-        private class MGFileLexerSource : FileLexerSource, IMGLexerSource
-        {
-            public string Path { get; private set; }
-
-            public MGFileLexerSource(string path)
-                : base(path)
-            {
-                Path = path;
-            }
-        }
-
-        private class MGStringLexerSource : StringLexerSource, IMGLexerSource
+        private class MGStringLexerSource : StringLexerSource
         {
             public string Path { get; private set; }
 
             public MGStringLexerSource(string str, bool ppvalid, string fileName)
-                : base(str, ppvalid, fileName)
+                : base(str.Replace("\r\n", "\n"), ppvalid, fileName)
             {
                 Path = fileName;
             }
@@ -176,7 +161,7 @@ namespace TwoMGFX
 
             private string GetPath(Source source)
             {
-                return ((IMGLexerSource) source).Path;
+                return ((MGStringLexerSource) source).Path;
             }
 
             public void handleSourceChange(Source source, string ev)
