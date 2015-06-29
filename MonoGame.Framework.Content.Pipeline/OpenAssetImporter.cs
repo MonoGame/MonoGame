@@ -805,18 +805,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     }
                 }
 
-                // Ignore identity bone
-                if (scaleKeys.Count == 1 && rotationKeys.Count == 1 && translationKeys.Count == 1)
-                {
-                    if(scaleKeys[0].Time == 0 &&
-                       rotationKeys[0].Time == 0 &&
-                       translationKeys[0].Time == 0 &&
-                       scaleKeys[0].Value == new Vector3D(1,1,1) &&
-                       rotationKeys[0].Value == new Assimp.Quaternion(1,0,0,0) &&
-                       translationKeys[0].Value == new Vector3D(0,0,0))
-                    continue;
-                }
-                
                 // Get all unique keyframe times. (Assuming that no two key frames
                 // have the same time, which is usually a safe assumption.)
                 var times = scaleKeys.Select(k => k.Time)
