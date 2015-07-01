@@ -4,13 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.ComponentModel;
 using System.Linq;
 using SharpFont;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
@@ -102,9 +100,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var requiresPOT = GraphicsUtil.RequiresPowerOfTwo(format, context.TargetPlatform, context.TargetProfile);
                 var requiresSquare = GraphicsUtil.RequiresSquare(format, context.TargetPlatform);
 
-                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, requiresPOT, requiresSquare);
-
-				//systemBitmap.Save ("fontglyphs.png");
+                var face = GlyphPacker.ArrangeGlyphs(glyphs, requiresPOT, requiresSquare);
 
 				// Adjust line and character spacing.
 				lineSpacing += input.Spacing;
@@ -127,8 +123,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
 				}
 
-                output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
-			    systemBitmap.Dispose();
+                output.Texture.Faces[0].Add(face);
 
                 if (GraphicsUtil.IsCompressedTextureFormat(format))
                 {
@@ -148,7 +143,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			IFontImporter importer;
 
 			var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
-			var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
+			//var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
 			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
 
@@ -158,15 +153,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			//			}
 			//			else
 			//			{
-			if (TrueTypeFileExtensions.Contains (fileExtension)) 
-			{
-				importer = new SharpFontImporter ();
-			}
-			else 
-			{
-				//importer = new TrueTypeImporter();
-				importer = new SharpFontImporter ();
-			}
+			if (!TrueTypeFileExtensions.Contains(fileExtension)) 
+                throw new PipelineException("Unknown file extension " + fileExtension);
+
+			importer = new SharpFontImporter();
 
 			// Import the source font data.
 			importer.Import(options, fontName);

@@ -2,20 +2,17 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Drawing;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-
-#if WINDOWS || MACOS
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using FreeImageAPI;
-#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
     /// Provides methods for reading texture files for use in the Content Pipeline.
     /// </summary>
-#if WINDOWS || MACOS
     [ContentImporter(   ".bmp", // Bitmap Image File
                         ".cut", // Dr Halo CUT
                         ".dds", // Direct Draw Surface
@@ -51,9 +48,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         ".xbm", // X BitMap
                         ".xpm", // X PixMap
                     DisplayName = "Texture Importer - MonoGame", DefaultProcessor = "TextureProcessor")]
-#else
-    [ContentImporter(".png", ".jpg", ".bmp", DisplayName = "Texture Importer - MonoGame", DefaultProcessor = "TextureProcessor")]
-#endif
     public class TextureImporter : ContentImporter<TextureContent>
     {
         /// <summary>
@@ -73,55 +67,64 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-#if WINDOWS || MACOS
-
-            // TODO: This is a pretty lame way to do this. It would be better
-            // if we could completely get rid of the System.Drawing.Bitmap
-            // class and replace it with FreeImage, but some other processors/importers
-            // such as Font rely on Bitmap. Soon, we should completely remove any references
-            // to System.Drawing.Bitmap and replace it with FreeImage. For now
-            // this is the quickest way to add support for virtually every input Texture
-            // format without breaking functionality in other places.
             var fBitmap = FreeImage.LoadEx(filename);
-            var info = FreeImage.GetInfoHeaderEx(fBitmap);
 
-            // creating a System.Drawing.Bitmap from a >= 64bpp image isn't
-            // supported.
-            if (info.biBitCount > 32)
+            BitmapContent face = null;
+            var height = (int)FreeImage.GetHeight(fBitmap);
+            var width = (int)FreeImage.GetWidth(fBitmap);
+            var bpp = FreeImage.GetBPP(fBitmap);
+            if (FreeImage.GetImageType(fBitmap) == FREE_IMAGE_TYPE.FIT_BITMAP)
             {
-                var temp = FreeImage.ConvertTo32Bits(fBitmap);
+                switch (bpp)
+                {
+                    case 16:
+                        if (FreeImage.IsRGB555(fBitmap))
+                            face = new PixelBitmapContent<Bgra5551>(width, height);
+                        else if (FreeImage.IsRGB565(fBitmap))
+                            face = new PixelBitmapContent<Bgr565>(width, height);
+                        else
+                            face = new PixelBitmapContent<Bgra4444>(width, height);
+                        break;
 
-                // The docs are unclear on what's happening here...
-                // If a new bitmap is created or if the old is just converted.
-                // UnloadEx doesn't throw any exceptions if it's called multiple
-                // times on the same bitmap, so just being cautious here.
-                FreeImage.UnloadEx(ref fBitmap);
-                fBitmap = temp;
+                    case 24:
+                        {
+                            // MonoGame has no SurfaceFormat for BGR888, so convert to BGRA8888 through FreeImage first
+                            var copy = FreeImage.ConvertTo32Bits(fBitmap);
+                            FreeImage.UnloadEx(ref fBitmap);
+                            fBitmap = copy;
+                            face = new PixelBitmapContent<Color>(width, height);
+                        }
+                        break;
+
+                    case 32:
+                        face = new PixelBitmapContent<Color>(width, height);
+                        break;
+
+                    case 64:
+                        face = new PixelBitmapContent<HalfVector4>(width, height);
+                        break;
+
+                    case 128:
+                        face = new PixelBitmapContent<Vector4>(width, height);
+                        break;
+                }
             }
 
-            var systemBitmap = FreeImage.GetBitmap(fBitmap);
+            var pitch = (int)FreeImage.GetPitch(fBitmap);
+            var redMask = FreeImage.GetRedMask(fBitmap);
+            var greenMask = FreeImage.GetGreenMask(fBitmap);
+            var blueMask = FreeImage.GetBlueMask(fBitmap);
+
+            SurfaceFormat format;
+            face.TryGetFormat(out format);
+            var bitmapSize = format.GetSize() * width * height;
+            var bytes = new byte[bitmapSize];
+            FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
             FreeImage.UnloadEx(ref fBitmap);
-            
-#else
-            var systemBitmap = new Bitmap(filename);
-#endif
 
-            var height = systemBitmap.Height;
-            var width = systemBitmap.Width;
+            face.SetPixelData(bytes);
 
-            // Force the input's pixelformat to ARGB32, so we can have a common pixel format to deal with.
-            if (systemBitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb)
-            {
-				var bitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-				using ( var graphics = System.Drawing.Graphics.FromImage(bitmap)) {
-                    graphics.DrawImage(systemBitmap, 0, 0, width, height);
-				}
-
-				systemBitmap = bitmap;
-			}
-
-            output.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
-            systemBitmap.Dispose();
+            output.Faces[0].Add(face);
 
             return output;
         }

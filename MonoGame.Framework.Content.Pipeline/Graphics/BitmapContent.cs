@@ -126,18 +126,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (sourceBitmap.TryCopyTo(intermediate, sourceRegion, intermediateRegion))
             {
                 // Resize the intermediate if required
-                if (intermediate.Width != destinationBitmap.Width || intermediate.Height != destinationBitmap.Height)
-                {
-                    // We should resize the Vector4 format, but GraphicsUtil.Resize only does Color at the moment
-                    var color = new PixelBitmapContent<Color>(intermediate.Width, intermediate.Height);
-                    // Copy from Vector4 to Color will always work
-                    color.TryCopyFrom(intermediate, intermediateRegion, intermediateRegion);
-                    color = color.Resize(destinationRegion.Width, destinationRegion.Height) as PixelBitmapContent<Color>;
-                    // Convert back to Vector4
-                    intermediate = new PixelBitmapContent<Vector4>(destinationRegion.Width, destinationRegion.Height);
-                    intermediateRegion = new Rectangle(0, 0, intermediate.Width, intermediate.Height);
-                    color.TryCopyTo(intermediate, intermediateRegion, intermediateRegion);
-                }
+                if (intermediate.Width != destinationRegion.Width || intermediate.Height != destinationRegion.Height)
+                    intermediate = intermediate.Resize(destinationRegion.Width, destinationRegion.Height) as PixelBitmapContent<Vector4>;
                 // Copy from the intermediate to the destination
                 if (destinationBitmap.TryCopyFrom(intermediate, new Rectangle(0, 0, intermediate.Width, intermediate.Height), destinationRegion))
                     return;

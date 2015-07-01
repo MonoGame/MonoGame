@@ -72,8 +72,8 @@ namespace MonoGame.Tests.ContentPipeline
 
             // Normalize line endings - git on build server seems to set
             // core.autocrlf to false.
-            expectedXml = expectedXml.Replace(Environment.NewLine, "\n");
-            actualXml = actualXml.Replace(Environment.NewLine, "\n");
+            expectedXml = expectedXml.Replace("\r\n", "\n");
+            actualXml = actualXml.Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedXml, actualXml);
         }

@@ -3,21 +3,18 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using Nvidia.TextureTools;
-using PVRTexLibNET;
-using WrapMode = System.Drawing.Drawing2D.WrapMode;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+//using Nvidia.TextureTools;
+using PVRTexLibNET;
+using FreeImageAPI;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    
+    /*
     class DxtDataHandler
     {
         private TextureContent _content;
@@ -79,26 +76,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return true;
         }
     }
-    
+    */
     public static class GraphicsUtil
     {
-        internal static Bitmap ToSystemBitmap(this BitmapContent bitmapContent)
-        {
-            var srcBmp = bitmapContent;
-            var srcData = srcBmp.GetPixelData();
-
-            var srcDataHandle = GCHandle.Alloc(srcData, GCHandleType.Pinned);
-            var srcDataPtr = (IntPtr)(srcDataHandle.AddrOfPinnedObject().ToInt64());
-
-            // stride must be aligned on a 32 bit boundary or 4 bytes
-            int stride = ((srcBmp.Width * 32 + 31) & ~31) >> 3;
-
-            var systemBitmap = new Bitmap(srcBmp.Width, srcBmp.Height, stride, System.Drawing.Imaging.PixelFormat.Format32bppArgb | System.Drawing.Imaging.PixelFormat.Alpha, srcDataPtr);
-            srcDataHandle.Free();
-
-            return systemBitmap;
-        }
-
         internal static void Resize(this TextureContent content, int newWidth, int newHeight)
         {
             content.Faces[0][0] = content.Faces[0][0].Resize(newWidth, newHeight);
@@ -106,55 +86,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         internal static BitmapContent Resize(this BitmapContent bitmap, int newWidth, int newHeight)
         {
-            // TODO: This should be refactored to use FreeImage 
-            // with a higher quality filter.
-
-            var destination = new Bitmap(newWidth, newHeight);
-
-            using (var source = bitmap.ToSystemBitmap())
-            using (var graphics = System.Drawing.Graphics.FromImage(destination))
+            BitmapContent src = bitmap;
+            SurfaceFormat format;
+            src.TryGetFormat(out format);
+            if (format != SurfaceFormat.Vector4)
             {
-                var imageAttr = new ImageAttributes();
-                imageAttr.SetWrapMode(WrapMode.TileFlipXY);
-
-                var destRect = new System.Drawing.Rectangle(0, 0, newWidth, newHeight);
-
-                graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
-                graphics.DrawImage(source, destRect, 0, 0, source.Width, source.Height, GraphicsUnit.Pixel, imageAttr);
+                var v4 = new PixelBitmapContent<Vector4>(src.Width, src.Height);
+                BitmapContent.Copy(src, v4);
+                src = v4;
             }
 
-            return destination.ToXnaBitmap(false); //we dont want to flip colors twice            
-        }
+            // Convert to FreeImage bitmap
+            var bytes = src.GetPixelData();
+            var fi = FreeImage.ConvertFromRawBits(bytes, FREE_IMAGE_TYPE.FIT_RGBAF, src.Width, src.Height, SurfaceFormat.Vector4.GetSize() * src.Width, 128, 0, 0, 0, true);
 
-        public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap, bool flipColors)
-        {
-            // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
-            // swizzle the channels later
-            System.Diagnostics.Debug.Assert(systemBitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            // Resize
+            var newfi = FreeImage.Rescale(fi, newWidth, newHeight, FREE_IMAGE_FILTER.FILTER_BICUBIC);
+            FreeImage.UnloadEx(ref fi);
 
-            var bitmapData = systemBitmap.LockBits(new System.Drawing.Rectangle(0, 0, systemBitmap.Width, systemBitmap.Height),
-                                    ImageLockMode.ReadOnly,
-                                    systemBitmap.PixelFormat);
+            // Convert back to PixelBitmapContent<Vector4>
+            src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
+            bytes = new byte[SurfaceFormat.Vector4.GetSize() * newWidth * newHeight];
+            FreeImage.ConvertToRawBits(bytes, newfi, SurfaceFormat.Vector4.GetSize() * newWidth, 128, 0, 0, 0, true);
+            src.SetPixelData(bytes);
+            FreeImage.UnloadEx(ref newfi);
+            // Convert back to source type if required
+            if (format != SurfaceFormat.Vector4)
+            {
+                var s = (BitmapContent)Activator.CreateInstance(bitmap.GetType(), new object[] { newWidth, newHeight });
+                BitmapContent.Copy(src, s);
+                src = s;
+            }
 
-            var length = bitmapData.Stride * bitmapData.Height;
-            var pixelData = new byte[length];
-
-            // Copy bitmap to byte[]
-            Marshal.Copy(bitmapData.Scan0, pixelData, 0, length);
-            systemBitmap.UnlockBits(bitmapData);
-
-            // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
-            // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
-            // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RGBA.
-            // Because of this we flip the R and B channels.
-
-            if(flipColors)
-                BGRAtoRGBA(pixelData);
-
-            var xnaBitmap = new PixelBitmapContent<Color>(systemBitmap.Width, systemBitmap.Height);
-            xnaBitmap.SetPixelData(pixelData);
-
-            return xnaBitmap;
+            return src;
         }
 
         public static void BGRAtoRGBA(byte[] data)
@@ -185,26 +149,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 nearestPower = nearestPower << 1;
 
             return nearestPower;
-        }
-
-        /// <summary>
-        /// Compares a System.Drawing.Color to a Microsoft.Xna.Framework.Color
-        /// </summary>
-        internal static bool ColorsEqual(this System.Drawing.Color a, Color b)
-        {
-            if (a.A != b.A)
-                return false;
-
-            if (a.R != b.R)
-                return false;
-
-            if (a.G != b.G)
-                return false;
-
-            if (a.B != b.B)
-                return false;
-
-            return true;
         }
 
         /// <summary>
