@@ -143,6 +143,9 @@
     <Compile Include="..\..\MonoGame.Framework\Vector4.cs">
       <Link>MonoGame.Framework\Vector4.cs</Link>
     </Compile>
+	   <Compile Include="..\..\MonoGame.Framework\Graphics\Viewport.cs">
+      <Link>MonoGame.Framework\Viewport.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Design\Vector2TypeConverter.cs">
       <Link>MonoGame.Framework\Design\Vector2TypeConverter.cs</Link>
     </Compile>
