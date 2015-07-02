@@ -664,6 +664,12 @@
     <Content Include="Assets\Xml\24_GenericTypes.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Xml\25_StructArrayNoElements.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\26_ChildCollections.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\Default.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

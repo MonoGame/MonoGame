@@ -474,7 +474,23 @@
       <xsl:value-of select="user:CalculateDefines($addDefines, $removeDefines)" />
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <xsl:choose>
+      <xsl:when test="/Input/Properties/WarningLevel">
+        <WarningLevel>
+          <xsl:value-of select="/Input/Properties/WarningLevel" />
+        </WarningLevel>
+      </xsl:when>
+      <xsl:otherwise>
+        <WarningLevel>4</WarningLevel>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="/Input/Properties/TreatWarningsAsErrors">
+        <TreatWarningsAsErrors>
+          <xsl:value-of select="/Input/Properties/TreatWarningsAsErrors" />
+        </TreatWarningsAsErrors>
+      </xsl:when>
+    </xsl:choose>
     <xsl:choose>
       <xsl:when test="/Input/Properties/ForceArchitecture">
         <PlatformTarget>

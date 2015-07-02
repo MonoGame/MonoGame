@@ -28,6 +28,7 @@
   </References>
 
   <Properties>
+    <WarningLevel>0</WarningLevel>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <CustomDefinitions>
     <!-- 

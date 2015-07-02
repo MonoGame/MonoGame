@@ -886,7 +886,7 @@ namespace MonoGame.Tools.Pipeline
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.text;
-                _controller.Move(path, newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath, type);
+                _controller.Move(new [] { path }, new [] { newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath }, new[] { type });
             }
         }
 
@@ -1061,9 +1061,11 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
             var dialog = new AddFolderDialog(folder);
+            applyforall = false;
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 action = dialog.responce;

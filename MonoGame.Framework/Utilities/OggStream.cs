@@ -167,7 +167,7 @@ namespace MonoGame.Utilities
 
         public TimeSpan GetPosition()
         {
-            if (Reader == null || Reader.DecodedTime == null)
+            if (Reader == null)
                 return TimeSpan.Zero;
 
             return Reader.DecodedTime;

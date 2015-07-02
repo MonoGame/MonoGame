@@ -50,7 +50,12 @@ namespace MonoGame.Tools.Pipeline
 			this.label3 = new global::Gtk.Label ();
 			this.label3.HeightRequest = 0;
 			this.label3.Name = "label3";
-			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Only Letters, numbers, space and \"_\" are allowed.");
+
+            #if GTK3
+            if(Global.GtkMajorVersion == 3 && Global.GtkMinorVersion >= 8)
+                Gtk3Wrapper.gtk_widget_set_opacity(label3.Handle, 0.7);
+            #endif
+
 			w1.Add (this.label3);
 			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(w1 [this.label3]));
 			w4.Position = 2;
@@ -61,7 +66,17 @@ namespace MonoGame.Tools.Pipeline
 			}
 			this.DefaultWidth = 367;
 			this.DefaultHeight = 143;
-			this.label3.Hide ();
+            this.label3.Hide ();
+
+            #if GTK3
+            Gdk.Geometry geom = new Gdk.Geometry();
+            geom.MinWidth = this.DefaultWidth;
+            geom.MinHeight = this.DefaultHeight;
+            geom.MaxWidth = 1000;
+            geom.MaxHeight = this.DefaultHeight;
+            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize | Gdk.WindowHints.MaxSize);
+            #endif
+
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 			this.entry1.Changed += new global::System.EventHandler (this.OnEntry1Changed);

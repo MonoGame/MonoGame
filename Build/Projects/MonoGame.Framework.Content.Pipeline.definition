@@ -367,6 +367,7 @@
     <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\ExternalReferenceSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\GenericCollectionHelper.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
