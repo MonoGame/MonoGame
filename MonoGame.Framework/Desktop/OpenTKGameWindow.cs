@@ -61,7 +61,6 @@ namespace Microsoft.Xna.Framework
     {
         private bool _isResizable;
         private bool _isBorderless;
-        private bool _isMouseInBounds;
 
 		//private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle;
@@ -303,23 +302,6 @@ namespace Microsoft.Xna.Framework
             Keyboard.SetKeys(keys);
         }
 
-#if DESKTOPGL
-        private void OnMouseEnter(object sender, EventArgs e)
-        {
-            _isMouseInBounds = true;
-        }
-
-        private void OnMouseLeave(object sender, EventArgs e)
-        {
-            //There is a bug in OpenTK where the MouseLeave event is raised when the mouse button
-            //is down while the cursor is still in the window bounds.
-            if (Mouse.GetState().LeftButton == ButtonState.Released)
-            {
-                _isMouseInBounds = false;
-            }
-        }
-#endif
-
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
@@ -339,10 +321,6 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-#if DESKTOPGL
-            window.MouseEnter += OnMouseEnter;
-            window.MouseLeave += OnMouseLeave;
-#endif
 
             window.KeyPress += OnKeyPress;
 

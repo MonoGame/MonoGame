@@ -22,7 +22,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         AudioFormat format;
         int loopLength;
         int loopStart;
-        bool disposed;
 
         /// <summary>
         /// Gets the raw audio data.
@@ -126,9 +125,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// </param>
         public void ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string saveToFile)
         {
-            if (disposed)
-                throw new ObjectDisposedException("AudioContent");
-
             var temporarySource = Path.GetTempFileName();
             var temporaryOutput = Path.GetTempFileName();
             try
