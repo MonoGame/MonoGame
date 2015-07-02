@@ -210,6 +210,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.Windows:
                 case TargetPlatform.WindowsPhone:
                 case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsPhone81:
                 case TargetPlatform.WindowsStoreApp:
                 case TargetPlatform.Ouya:
                 case TargetPlatform.Android:

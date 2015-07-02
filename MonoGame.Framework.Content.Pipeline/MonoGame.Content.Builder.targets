@@ -47,6 +47,7 @@
 			'$(MonoGamePlatform)' != 'Ouya' And       
 			'$(MonoGamePlatform)' != 'PlayStationMobile' And       
 			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
+			'$(MonoGamePlatform)' != 'WindowsPhone81' And
 			'$(MonoGamePlatform)' != 'RaspberryPi' And       
 			'$(MonoGamePlatform)' != 'PlayStation4' And       
 			'$(MonoGamePlatform)' != 'WindowsGL'" />

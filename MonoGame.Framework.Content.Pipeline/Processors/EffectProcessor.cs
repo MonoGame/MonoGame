@@ -58,6 +58,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 case TargetPlatform.Windows:
                 case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsPhone81:
                 case TargetPlatform.WindowsStoreApp:
                     options.Profile = ShaderProfile.DirectX_11;
                     break;
