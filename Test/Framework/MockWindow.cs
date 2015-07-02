@@ -21,6 +21,9 @@ namespace MonoGame.Tests.Framework
 #if (WINDOWS && !WINRT) || LINUX
         public override Point Position { get; set; }
 #endif
+#if DESKTOPGL
+        public override System.Drawing.Icon Icon { get; set; } 
+#endif
 
         public override DisplayOrientation CurrentOrientation
         {
