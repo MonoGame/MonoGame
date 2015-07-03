@@ -61,7 +61,11 @@ namespace MonoGame.Tools.Pipeline
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);  
 
-        bool ChooseContentFolder(string initialDirectory, out string folder);        
+        bool ChooseContentFolder(string initialDirectory, out string folder);
+
+        bool ChooseItemTemplate(out ContentItemTemplate template, out string name);
+
+        bool ChooseName(string title, string text, string oldname, bool docheck, out string newname);
 
         bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall);
 
@@ -72,5 +76,15 @@ namespace MonoGame.Tools.Pipeline
         Process CreateProcess(string exe, string commands);
 
         void ItemExistanceChanged(IProjectItem item);
+
+        void ReloadRecentList(List<string> paths);
+
+        void ExpandPath(string path);
+
+        bool GetSelection(out FileType fileType, out string path, out string location);
+
+        bool GetSelection(out FileType[] fileType, out string[] path, out string[] location);
+
+        List<ContentItem> GetChildItems(string path);
     }
 }

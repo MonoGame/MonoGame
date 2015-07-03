@@ -198,30 +198,15 @@ namespace MonoGame.Tools.Pipeline
                 _treeView.SelectedNode = node;
             }
 
-            if (_treeView.SelectedNodes.Count() == 1)
-            {
-                _treeSeparator1.Visible = true;
-                _treeOpenFileLocationMenuItem.Visible = true;
-                _treeRenameMenuItem.Visible = true;
+            var cmv = _controller.GetContextMenuVisibilityInfo();
 
-                if (node.Tag is ContentItem)
-                    _treeAddMenu.Visible = false;
-                else
-                    _treeAddMenu.Visible = true;
-
-                if (node.Tag is FolderItem)
-                    _treeOpenFileMenuItem.Visible = false;
-                else
-                    _treeOpenFileMenuItem.Visible = true;
-            }
-            else
-            {
-                _treeAddMenu.Visible = false;
-                _treeOpenFileMenuItem.Visible = false;
-                _treeOpenFileLocationMenuItem.Visible = false;
-                _treeRenameMenuItem.Visible = false;
-                _treeSeparator1.Visible = false;
-            }
+            _treeOpenFileMenuItem.Visible = cmv.Open;
+            _treeAddMenu.Visible = cmv.Add;
+            _treeSeparator1.Visible = cmv.Open || cmv.Add;
+            _treeRebuildMenuItem.Visible = cmv.Rebuild;
+            _treeOpenFileLocationMenuItem.Visible = cmv.OpenFileLocation;
+            _treeRenameMenuItem.Visible = cmv.Rename;
+            _treeDeleteMenuItem.Visible = cmv.Delete;
 
             _treeContextMenu.Show(_treeView, contextMenuLocation);
         }
@@ -235,24 +220,6 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             ContextMenu_OpenFile_Click(sender, args);            
-        }
-
-        public void UpdateRecentProjectList()
-        {
-            _openRecentMenuItem.DropDownItems.Clear();
-
-            foreach (var project in History.Default.ProjectHistory)
-            {
-                var recentItem = new ToolStripMenuItem(project);
-
-                // We need a local to make the delegate work correctly.
-                var localProject = project;
-                recentItem.Click += (sender, args) => _controller.OpenProject(localProject);
-
-                _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
-            }
-
-            _openRecentMenuItem.Enabled = (_openRecentMenuItem.DropDownItems.Count >= 1);
         }
 
         public AskResult AskSaveOrCancel()
@@ -410,8 +377,6 @@ namespace MonoGame.Tools.Pipeline
             node.SelectedImageIndex = iconIdx;
 
             _treeView.SelectedNode = node;
-
-            root.Expand();
         }
 
         public void RemoveTreeItem(ContentItem item)
@@ -425,28 +390,9 @@ namespace MonoGame.Tools.Pipeline
             var parent = node.Parent;
             node.Remove();
 
-            {
-                var obj = _propertyGrid.SelectedObject as ContentItem;
-                if (obj != null && obj.OriginalPath == item.OriginalPath)
-                    _propertyGrid.SelectedObject = null;
-            }
-
-            // Clean up the parent nodes without children
-            // and be sure not to delete the root node.
-            while (parent != null && parent.Parent != null && parent.Nodes.Count == 0)
-            {
-                var parentParent = parent.Parent;
-
-                parent.Remove();
-
-                {
-                    var obj = _propertyGrid.SelectedObject as ContentItem;
-                    if (obj != null && obj.OriginalPath == item.OriginalPath)
-                        _propertyGrid.SelectedObject = null;
-                }
-
-                parent = parentParent;
-            }            
+            var obj = _propertyGrid.SelectedObject as ContentItem;
+            if (obj != null && obj.OriginalPath == item.OriginalPath)
+                _propertyGrid.SelectedObject = null;
         }
 
         public void SelectTreeItem(IProjectItem item)
@@ -731,39 +677,24 @@ namespace MonoGame.Tools.Pipeline
 
         private void UpdateMenus()
         {
-            var notBuilding = !_controller.ProjectBuilding;
-            var projectOpen = _controller.ProjectOpen;
-            var projectOpenAndNotBuilding = projectOpen && notBuilding;
-            var count = _treeView.SelectedNodes.Count();
+            var ms = _controller.GetMenuSensitivityInfo();
 
-            // Update the state of all menu items.
-
-            _newProjectMenuItem.Enabled = notBuilding;
-            _openProjectMenuItem.Enabled = notBuilding;
-            _importProjectMenuItem.Enabled = notBuilding;
-
-            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
-            _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
-            _closeMenuItem.Enabled = projectOpenAndNotBuilding;
-
-            _exitMenuItem.Enabled = notBuilding;
-
-            _addMenuItem.Enabled = projectOpen & count <= 1;
-            _deleteMenuItem.Enabled = projectOpen & count > 0;
-            _renameMenuItem.Enabled = projectOpen & count == 1;
-
-            _buildMenuItem.Enabled = projectOpenAndNotBuilding;
-
-            _treeRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
-            _rebuildMenuItem.Enabled = _treeRebuildMenuItem.Enabled;
-
-            _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
-            _cancelBuildSeparator.Visible = !notBuilding;
-            _cancelBuildMenuItem.Enabled = !notBuilding;
-            _cancelBuildMenuItem.Visible = !notBuilding;
+            _newProjectMenuItem.Enabled = ms.New;
+            _openProjectMenuItem.Enabled = ms.Open;
+            _importProjectMenuItem.Enabled = ms.Import;
+            _saveMenuItem.Enabled = ms.Save;
+            _saveAsMenuItem.Enabled = ms.SaveAs;
+            _closeMenuItem.Enabled = ms.Close;
+            _exitMenuItem.Enabled = ms.Exit;
+            _addMenuItem.Enabled = ms.Add;
+            _deleteMenuItem.Enabled = ms.Delete;
+            _renameMenuItem.Enabled = ms.Rename;
+            _buildMenuItem.Enabled = ms.Build;
+            _rebuildMenuItem.Enabled = ms.Rebuild;
+            _cleanMenuItem.Enabled = ms.Clean;
+            _cancelBuildMenuItem.Enabled = _cancelBuildMenuItem.Visible = _cancelBuildSeparator.Visible = ms.Cancel;
       
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
-            UpdateRecentProjectList();
         }
         
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
@@ -774,20 +705,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnDeleteItemClick(object sender, EventArgs e)
         {
-            var items = new List<ContentItem>();
-            var nodes = _treeView.SelectedNodesRecursive;
-            List<string> dirs = new List<string>();
-
-            foreach (var node in nodes)
-            {
-                var item = node.Tag as ContentItem;
-                if (item != null && !items.Contains(item))
-                    items.Add(item);
-                else
-                    dirs.Add(node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1));
-            }
-
-            _controller.Exclude(items, dirs);      
+            _controller.Delete();    
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -803,58 +721,22 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnAddItemClick(object sender, EventArgs e)
         {
-            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
-            var item = node.Tag as IProjectItem;
-            _controller.Include(item.Location);
+            _controller.Include();
         }
 
         private void OnNewItemClick(object sender, System.EventArgs e)
         {
-            var dlg = new NewContentDialog(_controller.Templates, EditorIcons.Templates);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                var template = dlg.Selected;
-                var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
-
-                // Ensure name is unique among files at this location?
-                _controller.NewItem(dlg.NameGiven, location, template);
-            }
+            _controller.NewItem();
         }
 
         private void OnAddFolderClick(object sender, EventArgs e)
         {
-            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
-            string location = "";
-
-            if (node != null)
-            {
-                var item = node.Tag as IProjectItem;
-                if (item != null)
-                    location = item.Location;
-                else
-                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
-            }
-
-            _controller.IncludeFolder(location);
+            _controller.IncludeFolder();
         }
 
         private void OnNewFolderClick(object sender, EventArgs e)
         {
-            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
-            string location = "";
-
-            if (node != null)
-            {
-                var item = node.Tag as IProjectItem;
-                if (item != null)
-                    location = item.Location;
-                else
-                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
-            }
-
-            var dialog = new TextEditDialog("New Folder", "Folder Name:", "");
-            if (dialog.ShowDialog() == DialogResult.OK)
-                _controller.NewFolder(dialog.text, location);
+            _controller.NewFolder();
         }
 
         private void OnRedoClick(object sender, EventArgs e)
@@ -1019,8 +901,6 @@ namespace MonoGame.Tools.Pipeline
                 else
                     parent = found[0].Nodes;
             }
-
-            root.Expand();
         }
 
         public void RemoveTreeFolder(string folder)
@@ -1074,6 +954,150 @@ namespace MonoGame.Tools.Pipeline
 
             action = CopyAction.Link;
             return false;
+        }
+
+        public bool ChooseItemTemplate(out ContentItemTemplate template, out string name)
+        {
+            var dlg = new NewContentDialog(_controller.Templates, EditorIcons.Templates);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                template = dlg.Selected;
+                name = dlg.NameGiven;
+                return true;
+            }
+
+            template = null;
+            name = null;
+            return false;
+        }
+
+        public bool ChooseName(string title, string text, string oldname, bool docheck, out string newname)
+        {
+            var dialog = new TextEditDialog(title, text, oldname);
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                newname = dialog.text;
+                return true;
+            }
+
+            newname = "";
+            return false;
+        }
+
+        public void ReloadRecentList(List<string> paths)
+        {
+            _openRecentMenuItem.DropDownItems.Clear();
+
+            foreach (var project in paths)
+            {
+                var recentItem = new ToolStripMenuItem(project);
+
+                // We need a local to make the delegate work correctly.
+                var localProject = project;
+                recentItem.Click += (sender, args) => _controller.OpenProject(localProject);
+
+                _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
+            }
+
+            _openRecentMenuItem.Enabled = (_openRecentMenuItem.DropDownItems.Count >= 1);
+        }
+
+        public void ExpandPath(string path)
+        {
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes[0];
+            var parent = root.Nodes;
+
+            root.Expand();
+
+            foreach (var folder in folders)
+            {
+                var found = parent.Find(folder, false);
+                if (found.Length == 0)
+                    return;
+
+                parent = found[0].Nodes;
+                found[0].Expand();
+            }
+        }
+
+        public bool GetSelection(out FileType fileType, out string path, out string location)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            var item = (_treeView.SelectedNodes.Count() != 1) ? _treeView.Nodes[0].Tag : node.Tag;
+
+            if (item is ContentItem)
+                fileType = FileType.File;
+            else if (item is FolderItem)
+                fileType = FileType.Folder;
+            else
+                fileType = FileType.Base;
+
+            path = (fileType == FileType.Base) ? "" : (item as IProjectItem).OriginalPath;
+            location = (fileType == FileType.Base) ? "" : (item as IProjectItem).Location;
+
+            return _treeView.SelectedNodes.Count() == 1;
+        }
+
+        public bool GetSelection(out FileType[] fileType, out string[] path, out string[] location)
+        {
+            var types = new List<FileType>();
+            var paths = new List<string>();
+            var locations = new List<string>();
+
+            foreach (var node in _treeView.SelectedNodes)
+            {
+                var item = node.Tag;
+                FileType tmp_type = FileType.Base;
+
+                if (item is ContentItem)
+                    tmp_type = FileType.File;
+                else if (item is FolderItem)
+                    tmp_type = FileType.Folder;
+                    
+                types.Add(tmp_type);
+                paths.Add((tmp_type == FileType.Base) ? "" : (item as IProjectItem).OriginalPath);
+                locations.Add((tmp_type == FileType.Base) ? "" : (item as IProjectItem).Location);
+            }
+
+            fileType = types.ToArray();
+            path = paths.ToArray();
+            location = locations.ToArray();
+
+            return _treeView.SelectedNodes.Any();
+        }
+
+        public List<ContentItem> GetChildItems(string path)
+        {
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes[0];
+            var parent = root;
+
+            foreach (var folder in folders)
+            {
+                var found = parent.Nodes.Find(folder, false);
+                if (found.Length == 0)
+                    return new List<ContentItem>();
+
+                parent = found[0];
+            }
+
+            return GetItems(parent);
+        }
+
+        private List<ContentItem> GetItems(TreeNode node)
+        {
+            var items = new List<ContentItem>();
+            
+            foreach (TreeNode n in node.Nodes)
+                items.AddRange(GetItems(n));
+
+            if (node.Tag is ContentItem)
+                items.Add(node.Tag as ContentItem);
+
+            return items;
         }
 
         #region drag & drop
