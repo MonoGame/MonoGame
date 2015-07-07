@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics.PackedVector;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
 {
@@ -12,6 +10,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         T FromVector4(Vector4 value);
     }
 
+    /// <summary>
+    /// Helper class used by PixelBitmapContent.TryCopyFrom and TryCopyTo to convert between non-PackedValue types and Vector4.
+    /// </summary>
     class Vector4Converter :
         IVector4Converter<byte>,
         IVector4Converter<short>,
@@ -21,17 +22,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
     {
         Vector4 IVector4Converter<byte>.ToVector4(byte value)
         {
-            return new Vector4(value, value, value, value);
+            var f = (float)value / (float)byte.MaxValue;
+            return new Vector4(f, f, f, f);
         }
 
         Vector4 IVector4Converter<short>.ToVector4(short value)
         {
-            return new Vector4(value, value, value, value);
+            var f = (float)value / (float)short.MaxValue;
+            return new Vector4(f, f, f, f);
         }
 
         Vector4 IVector4Converter<int>.ToVector4(int value)
         {
-            return new Vector4(value, value, value, value);
+            var f = (float)value / (float)int.MaxValue;
+            return new Vector4(f, f, f, f);
         }
 
         Vector4 IVector4Converter<float>.ToVector4(float value)
@@ -46,17 +50,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
 
         byte IVector4Converter<byte>.FromVector4(Vector4 value)
         {
-            return (byte)value.X;
+            return (byte)(value.X * (float)byte.MaxValue);
         }
 
         short IVector4Converter<short>.FromVector4(Vector4 value)
         {
-            return (short)value.X;
+            return (short)(value.X * (float)short.MaxValue);
         }
 
         int IVector4Converter<int>.FromVector4(Vector4 value)
         {
-            return (int)value.X;
+            return (int)(value.X * (float)int.MaxValue);
         }
 
         float IVector4Converter<float>.FromVector4(Vector4 value)
