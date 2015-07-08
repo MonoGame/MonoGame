@@ -15,10 +15,10 @@
     <Reference Include="Xamarin.iOS" />
   </Platform>
 
-  <Platform Type="Linux">
+  <Service Name="MonoGame.Framework/DesktopGL">
     <Reference Include="System" />
     <Reference Include="System.Xml" />
-  </Platform>
+  </Service>
 
   <Platform Type="MacOS">
     <Reference Include="System" />
@@ -46,11 +46,6 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </Platform>
-
-  <Platform Type="WindowsGL">
-    <Reference Include="System" />
     <Reference Include="System.Xml" />
   </Platform>
 

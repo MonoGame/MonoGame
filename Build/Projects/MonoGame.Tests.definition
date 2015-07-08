@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux">
+<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,MacOS,Linux">
 
   <References>
     <Reference Include="System" />
@@ -22,14 +22,21 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
-      <Platform Name="Linux">TRACE;LINUX;DESKTOPGL</Platform>
       <Platform Name="MacOS">MONOMAC</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="iOS">IOS;</Platform>
+      <Platform Name="Linux">TRACE;DESKTOPGL</Platform>
     </CustomDefinitions>
 
   </Properties>
+  
+  <Services>
+    <Service Name="DesktopGL">
+      <RemoveDefine>WINDOWS;DIRECTX</RemoveDefine>
+      <AddDefine>DESKTOPGL</AddDefine>
+      <InfersReference>False</InfersReference>
+    </Service>
+  </Services>
 
   <Files>
 
@@ -50,18 +57,20 @@
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Utility.cs" />
 
-    <Compile Include="Runner\Linux\Program.cs">
-        <Platforms>Linux</Platforms>
-    </Compile>
     <Compile Include="Runner\MacOS\Program.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="Runner\Windows\Program.cs">
-        <Platforms>Windows,WindowsGL</Platforms>
+        <Platforms>Windows</Platforms>
+        <ExcludeServices>DesktopGL</ExcludeServices>
+    </Compile>
+
+    <Compile Include="Runner\DesktopGL\Program.cs">
+        <Services>DesktopGL</Services>
     </Compile>
 
     <Compile Include="Runner\Desktop\FramePixelData.cs">
-        <Platforms>Windows,WindowsGL,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
 
     <Compile Include="Runner\iOS\Main.cs">
@@ -146,38 +155,39 @@
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\AssetTestUtility.cs" />
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
+        <ExcludeServices>MonoGame.Framework/DesktopGL</ExcludeServices>
     </Compile>
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\FontTextureProcessorTests.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TestProcessorContext.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TextureContentTests.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
     <Compile Include="ContentPipeline\TextureProcessorTests.cs">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Services>MonoGame.Framework/_Desktop</Services>
     </Compile>
 
     <Content Include="Assets\tests.xsl">

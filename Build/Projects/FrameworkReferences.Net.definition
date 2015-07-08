@@ -7,9 +7,9 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="Linux">
+  <Service Name="DesktopGL">
     <Reference Include="Lidgren.Network" />
-  </Platform>
+  </Service>
 
   <Platform Type="MacOS">
     <Reference Include="System.Core" />
@@ -48,11 +48,6 @@
 
   <Platform Type="Windows8">
     <Reference Include="MonoGame.Framework.Windows8" />
-  </Platform>
-
-  <Platform Type="WindowsGL">
-    <Reference Include="System.Core" />
-    <Reference Include="Lidgren.Network" />
   </Platform>
 
   <Platform Type="WindowsPhone">
