@@ -74,11 +74,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            // Convert to full colour 32-bit format. Floating point would be preferred for processing, but it appears the ATICompressor does not support this
-            var colorBitmap = new PixelBitmapContent<Color>(sourceRegion.Width, sourceRegion.Height);
-            BitmapContent.Copy(sourceBitmap, sourceRegion, colorBitmap, new Rectangle(0, 0, colorBitmap.Width, colorBitmap.Height));
-            sourceBitmap = colorBitmap;
-
             PixelFormat targetFormat;
             ColourSpace colourSpace;
             switch (format)
@@ -115,12 +110,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 // Create the texture object in the PVR library
                 var sourceData = sourceBitmap.GetPixelData();
+                var rgba32F = (PixelFormat)0x2020202061626772; // static const PixelType PVRStandard32PixelType = PixelType('r', 'g', 'b', 'a', 32, 32, 32, 32);
                 PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
-                    PixelFormat.RGBA8888, true, VariableType.UnsignedByte, colourSpace);
+                    rgba32F, true, VariableType.Float, colourSpace);
                 // Resize the bitmap if needed
                 if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
                     PVRTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
-                PVRTexture.Transcode(targetFormat, VariableType.UnsignedByte, colourSpace);
+                if (!PVRTexture.Transcode(targetFormat, VariableType.UnsignedByteNorm, colourSpace))
+                    return false;
                 var texDataSize = PVRTexture.GetTextureDataSize(0);
                 var texData = new byte[texDataSize];
                 PVRTexture.GetTextureData(texData, texDataSize);

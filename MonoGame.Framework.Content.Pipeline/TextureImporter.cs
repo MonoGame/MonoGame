@@ -73,59 +73,178 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var height = (int)FreeImage.GetHeight(fBitmap);
             var width = (int)FreeImage.GetWidth(fBitmap);
             var bpp = FreeImage.GetBPP(fBitmap);
-            if (FreeImage.GetImageType(fBitmap) == FREE_IMAGE_TYPE.FIT_BITMAP)
+            var imageType = FreeImage.GetImageType(fBitmap);
+
+            // Swizzle channels and expand to include an alpha channel
+            switch (imageType)
             {
-                switch (bpp)
-                {
-                    case 16:
-                        if (FreeImage.IsRGB555(fBitmap))
-                            face = new PixelBitmapContent<Bgra5551>(width, height);
-                        else if (FreeImage.IsRGB565(fBitmap))
-                            face = new PixelBitmapContent<Bgr565>(width, height);
-                        else
-                            face = new PixelBitmapContent<Bgra4444>(width, height);
-                        break;
+                case FREE_IMAGE_TYPE.FIT_BITMAP:
+                    switch (bpp)
+                    {
+                        case 16:
+                            // Channel swizzling for 16-bit formats is done after we get the bytes from the bitmap
+                            break;
 
-                    case 24:
-                        {
-                            // MonoGame has no SurfaceFormat for BGR888, so convert to BGRA8888 through FreeImage first
-                            var copy = FreeImage.ConvertTo32Bits(fBitmap);
-                            FreeImage.UnloadEx(ref fBitmap);
-                            fBitmap = copy;
-                            face = new PixelBitmapContent<Color>(width, height);
-                        }
-                        break;
+                        case 24:
+                            {
+                                // Swap R and B channels to make it BGR, then add an alpha channel
+                                var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                                var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                                FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                                FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                                FreeImage.UnloadEx(ref r);
+                                FreeImage.UnloadEx(ref b);
+                                var bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                                FreeImage.UnloadEx(ref fBitmap);
+                                fBitmap = bgra;
 
-                    case 32:
-                        face = new PixelBitmapContent<Color>(width, height);
-                        break;
+                                // FreeImage.ConvertTo32Bits() doesn't appear to do anything at all, so let's do it ourselves
+                                /*
+                                var rgba = new byte[width * height * 4];
+                                var i = 0;
+                                var j = 0;
+                                while (j < rgba.Length)
+                                {
+                                    // Swap RGB to BGRA
+                                    rgba[j] = bytes[i + 2];
+                                    rgba[j + 1] = bytes[i + 1];
+                                    rgba[j + 2] = bytes[i];
+                                    rgba[j + 3] = 255;
+                                    j += 4;
+                                    i += 3;
+                                }
+                                bytes = rgba;
+                                */
+                            }
+                            break;
 
-                    case 64:
-                        face = new PixelBitmapContent<HalfVector4>(width, height);
-                        break;
+                        case 32:
+                            {
+                                // Swap R and B channels to make it BGRA
+                                var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                                var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                                FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                                FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                                FreeImage.UnloadEx(ref r);
+                                FreeImage.UnloadEx(ref b);
+                                /*
+                                var i = 0;
+                                while (i < bytes.Length)
+                                {
+                                    // Swap RGBA to BGRA
+                                    var r = bytes[i];
+                                    bytes[i] = bytes[i + 2];
+                                    bytes[i + 2] = r;
+                                    i += 4;
+                                }
+                                */
+                            }
+                            break;
+                    }
+                    break;
 
-                    case 128:
-                        face = new PixelBitmapContent<Vector4>(width, height);
-                        break;
-                }
+                case FREE_IMAGE_TYPE.FIT_RGBF:
+                    {
+                        // Swap R and B channels to make it BGR, then add an alpha channel
+                        var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                        var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                        FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                        FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                        FreeImage.UnloadEx(ref r);
+                        FreeImage.UnloadEx(ref b);
+                        var bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
+                        FreeImage.UnloadEx(ref fBitmap);
+                        fBitmap = bgra;
+                    }
+                    break;
+
+                case FREE_IMAGE_TYPE.FIT_RGBAF:
+                    {
+                        // Swap R and B channels to make it BGRA
+                        var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                        var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                        FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                        FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                        FreeImage.UnloadEx(ref r);
+                        FreeImage.UnloadEx(ref b);
+                    }
+                    break;
             }
 
+            // The bits per pixel and image type may have changed
+            bpp = FreeImage.GetBPP(fBitmap);
+            imageType = FreeImage.GetImageType(fBitmap);
             var pitch = (int)FreeImage.GetPitch(fBitmap);
             var redMask = FreeImage.GetRedMask(fBitmap);
             var greenMask = FreeImage.GetGreenMask(fBitmap);
             var blueMask = FreeImage.GetBlueMask(fBitmap);
 
-            SurfaceFormat format;
-            face.TryGetFormat(out format);
-            var bitmapSize = format.GetSize() * width * height;
-            var bytes = new byte[bitmapSize];
+            // Get the bytes from the FreeImage bitmap
+            var bytes = new byte[width * height * (bpp / 8)];
             FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
+
+            // Massage into the ordering and formats we want that wasn't possible earlier
+            switch (imageType)
+            {
+                case FREE_IMAGE_TYPE.FIT_BITMAP:
+                    switch (bpp)
+                    {
+                        case 16:
+                            // Swap R and B channels to make it BGR(A)
+                            if (FreeImage.IsRGB555(fBitmap))
+                            {
+                                var alphaMask = (uint)1;
+                                for (var i = 0; i < bytes.Length; i += 2)
+                                {
+                                    ushort rgb = (ushort)(bytes[i] | (bytes[i] << 8));
+                                    ushort bgr = (ushort)(((rgb & blueMask) << 10) | (rgb & greenMask) | ((rgb & redMask) >> 10) | (rgb & alphaMask));
+                                    bytes[i] = (byte)bgr;
+                                    bytes[i + 1] = (byte)(bgr >> 8);
+                                }
+
+                                face = new PixelBitmapContent<Bgra5551>(width, height);
+                            }
+                            else if (FreeImage.IsRGB565(fBitmap))
+                            {
+                                for (var i = 0; i < bytes.Length; i += 2)
+                                {
+                                    ushort rgb = (ushort)(bytes[i] | (bytes[i] << 8));
+                                    ushort bgr = (ushort)(((rgb & blueMask) << 11) | (rgb & greenMask) | ((rgb & redMask) >> 11));
+                                    bytes[i] = (byte)bgr;
+                                    bytes[i + 1] = (byte)(bgr >> 8);
+                                }
+
+                                face = new PixelBitmapContent<Bgr565>(width, height);
+                            }
+                            else
+                            {
+                                var alphaMask = (uint)0x000F;
+                                for (var i = 0; i < bytes.Length; i += 2)
+                                {
+                                    ushort rgba = (ushort)(bytes[i] | (bytes[i] << 8));
+                                    ushort bgra = (ushort)(((rgba & blueMask) << 8) | (rgba & greenMask) | ((rgba & redMask) >> 8) | (rgba & alphaMask));
+                                    bytes[i] = (byte)bgra;
+                                    bytes[i + 1] = (byte)(bgra >> 8);
+                                }
+
+                                face = new PixelBitmapContent<Bgra4444>(width, height);
+                            }
+                            break;
+
+                        case 32:
+                            face = new PixelBitmapContent<Color>(width, height);
+                            break;
+                    }
+                    break;
+
+                case FREE_IMAGE_TYPE.FIT_RGBAF:
+                    face = new PixelBitmapContent<Vector4>(width, height);
+                    break;
+            }
             FreeImage.UnloadEx(ref fBitmap);
 
             face.SetPixelData(bytes);
-
             output.Faces[0].Add(face);
-
             return output;
         }
     }
