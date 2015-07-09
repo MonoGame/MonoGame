@@ -239,9 +239,9 @@ namespace Microsoft.Xna.Framework.Storage
 		}
 		
 		private IAsyncResult OpenContainer (string displayName, AsyncCallback callback, object state)
-		{
+        {
 
-#if WINDOWS || MONOMAC
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
             try
             {
                 OpenContainerAsynchronous AsynchronousOpen = new OpenContainerAsynchronous(Open);
@@ -342,7 +342,7 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
-#if WINDOWS || MONOMAC
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
             var del = new ShowSelectorAsynchronousShowNoPlayer (Show);
 
 #if WINRT
@@ -398,7 +398,7 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (PlayerIndex player, int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
-#if WINDOWS || MONOMAC
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
             var del = new ShowSelectorAsynchronousShow (Show);
 #if WINRT
             showDelegate = del;
@@ -458,7 +458,7 @@ namespace Microsoft.Xna.Framework.Storage
         public StorageContainer EndOpenContainer (IAsyncResult result)
 		{
 
-#if WINDOWS || MONOMAC
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
             StorageContainer returnValue = null;
             try
             {
@@ -521,7 +521,7 @@ namespace Microsoft.Xna.Framework.Storage
 		public static StorageDevice EndShowSelector (IAsyncResult result) 
 		{
 
-#if WINDOWS || MONOMAC
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
             if (!result.IsCompleted)
             {
                 // Wait for the WaitHandle to become signaled.
