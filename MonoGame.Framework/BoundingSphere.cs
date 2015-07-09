@@ -560,32 +560,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        #region Operators
-
-        /// <summary>
-        /// Compares whether two <see cref="BoundingSphere"/> instances are equal.
-        /// </summary>
-        /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the equal sign.</param>
-        /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the equal sign.</param>
-        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
-        public static bool operator == (BoundingSphere a, BoundingSphere b)
-        {
-            return a.Equals(b);
-        }
-
-        /// <summary>
-        /// Compares whether two <see cref="BoundingSphere"/> instances are not equal.
-        /// </summary>
-        /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the not equal sign.</param>
-        /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
-        public static bool operator != (BoundingSphere a, BoundingSphere b)
-        {
-            return !a.Equals(b);
-        }
-
-        #endregion
-
         /// <summary>
         /// Returns a <see cref="String"/> representation of this <see cref="BoundingSphere"/> in the format:
         /// {Center:[<see cref="Center"/>] Radius:[<see cref="Radius"/>]}
@@ -623,6 +597,32 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Compares whether two <see cref="BoundingSphere"/> instances are equal.
+        /// </summary>
+        /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the equal sign.</param>
+        /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the equal sign.</param>
+        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        public static bool operator == (BoundingSphere a, BoundingSphere b)
+        {
+            return a.Equals(b);
+        }
+
+        /// <summary>
+        /// Compares whether two <see cref="BoundingSphere"/> instances are not equal.
+        /// </summary>
+        /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the not equal sign.</param>
+        /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the not equal sign.</param>
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
+        public static bool operator != (BoundingSphere a, BoundingSphere b)
+        {
+            return !a.Equals(b);
+        }
 
         #endregion
     }
