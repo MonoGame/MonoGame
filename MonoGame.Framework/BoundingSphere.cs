@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    "Pos( ", this.Center.DebugDisplayString, " )  \r\n",
+                    "Center( ", this.Center.DebugDisplayString, " )  \r\n",
                     "Radius( ", this.Radius.ToString(), " )"
                     );
             }
