@@ -12,6 +12,9 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
     <Binary
+      Name="FreeImageNET"
+      Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
+    <Binary
       Name="PVRTexLibNET"
       Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
     <Binary
