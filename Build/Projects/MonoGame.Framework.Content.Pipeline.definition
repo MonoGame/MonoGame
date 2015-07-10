@@ -526,12 +526,12 @@
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\FreeImage\FreeImageNET.dll.config">
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config">
       <Platforms>Linux</Platforms>
       <Link>FreeImageNET.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\FreeImage\Linux\x64\libfreeimage-3.17.0.so">
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so">
       <Platforms>Linux</Platforms>
       <Link>libfreeimage-3.17.0.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
