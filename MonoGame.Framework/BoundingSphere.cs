@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Describes a virtual sphere in 3D-space for bounding operations.
+    /// Describes a sphere in 3D-space for bounding operations.
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
         #region Contains
 
         /// <summary>
-        /// Gets how the specified <see cref="BoundingBox"/> lie within the bounds of this sphere.
+        /// Test if a bounding box is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="box">The box for testing.</param>
         /// <returns>The containment type.</returns>
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets how the specified <see cref="BoundingBox"/> lie within the bounds of this sphere.
+        /// Test if a bounding box is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="box">The box for testing.</param>
         /// <param name="result">The containment type as an output parameter.</param>
@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets how the specified <see cref="BoundingFrustum"/> lie within the bounds of this sphere.
+        /// Test if a frustum is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="frustum">The frustum for testing.</param>
         /// <returns>The containment type.</returns>
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets how the specified <see cref="BoundingFrustum"/> lie within the bounds of this sphere.
+        /// Test if a frustum is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="frustum">The frustum for testing.</param>
         /// <param name="result">The containment type as an output parameter.</param>
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets how the other sphere lie within the bounds of this sphere.
+        /// Test if a sphere is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="sphere">The other sphere for testing.</param>
         /// <returns>The containment type.</returns>
@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets how the other sphere lie within the bounds of this sphere.
+        /// Test if a sphere is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="sphere">The other sphere for testing.</param>
         /// <param name="result">The containment type as an output parameter.</param>
@@ -201,7 +201,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets how the specified <see cref="Vector3"/> within the bounds of this sphere.
+        /// Test if a point is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="point">The vector in 3D-space for testing.</param>
         /// <returns>The containment type.</returns>
@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets how the specified <see cref="Vector3"/> within the bounds of this sphere.
+        /// Test if a point is fully inside, outside, or just intersecting the sphere.
         /// </summary>
         /// <param name="point">The vector in 3D-space for testing.</param>
         /// <param name="result">The containment type as an output parameter.</param>
@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework
         #region CreateFromBoundingBox
 
         /// <summary>
-        /// Creates the smallest <see cref="BoundingSphere"/> that can surround a specified <see cref="BoundingBox"/>.
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain a specified <see cref="BoundingBox"/>.
         /// </summary>
         /// <param name="box">The box to create the sphere from.</param>
         /// <returns>The new <see cref="BoundingSphere"/>.</returns>
@@ -250,7 +250,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates the smallest <see cref="BoundingSphere"/> that can surround a specified <see cref="BoundingBox"/>.
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain a specified <see cref="BoundingBox"/>.
         /// </summary>
         /// <param name="box">The box to create the sphere from.</param>
         /// <param name="result">The new <see cref="BoundingSphere"/> as an output parameter.</param>
@@ -270,7 +270,7 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         /// <summary>
-        /// Creates the smallest <see cref="BoundingSphere"/> that can surround a specified <see cref="BoundingFrustum"/>.
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain a specified <see cref="BoundingFrustum"/>.
         /// </summary>
         /// <param name="frustum">The frustum to create the sphere from.</param>
         /// <returns>The new <see cref="BoundingSphere"/>.</returns>
@@ -366,7 +366,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates the smallest <see cref="BoundingSphere"/> that contains two spheres.
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain two spheres.
         /// </summary>
         /// <param name="original">First sphere.</param>
         /// <param name="additional">Second sphere.</param>
@@ -379,7 +379,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates the smallest <see cref="BoundingSphere"/> that contains two spheres.
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain two spheres.
         /// </summary>
         /// <param name="original">First sphere.</param>
         /// <param name="additional">Second sphere.</param>
