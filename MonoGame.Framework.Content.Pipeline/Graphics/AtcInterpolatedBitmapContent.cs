@@ -6,10 +6,22 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class Dxt1BitmapContent : DxtBitmapContent
+    public class AtcInterpolatedBitmapContent : AtcBitmapContent
     {
-        public Dxt1BitmapContent(int width, int height)
-            : base(8, width, height)
+        /// <summary>
+        /// Creates an instance of AtcInterpolatedBitmapContent.
+        /// </summary>
+        public AtcInterpolatedBitmapContent()
+        {
+        }
+
+        /// <summary>
+        /// Creates an instance of AtcInterpolatedBitmapContent with the specified width and height.
+        /// </summary>
+        /// <param name="width">The width in pixels of the bitmap.</param>
+        /// <param name="height">The height in pixels of the bitmap.</param>
+        public AtcInterpolatedBitmapContent(int width, int height)
+            : base(width, height)
         {
         }
 
@@ -20,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The GPU texture format of the bitmap type.</returns>
         public override bool TryGetFormat(out SurfaceFormat format)
         {
-            format = SurfaceFormat.Dxt1;
+            format = SurfaceFormat.RgbaAtcInterpolatedAlpha;
             return true;
         }
 
@@ -30,7 +42,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Description of the bitmap.</returns>
         public override string ToString()
         {
-            return "DXT1 " + Width + "x" + Height;
+            return "ATITC Interpolated Alpha " + Width + "x" + Height;
         }
     }
 }

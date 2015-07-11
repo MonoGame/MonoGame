@@ -8,36 +8,46 @@ using PVRTexLibNET;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public abstract class DxtBitmapContent : BitmapContent
+    /// <summary>
+    /// Supports the processing of a texture compressed using ETC1.
+    /// </summary>
+    public class Etc1BitmapContent : BitmapContent
     {
-        internal byte[] _bitmapData;
-        internal int _blockSize;
+        byte[] _data;
 
-        internal SurfaceFormat _format;
-
-        public DxtBitmapContent(int blockSize)
+        /// <summary>
+        /// Initializes a new instance of Etc1BitmapContent.
+        /// </summary>
+        protected Etc1BitmapContent()
+            : base()
         {
-            if (!((blockSize == 8) || (blockSize == 16)))
-                throw new ArgumentException("Invalid block size");
-            _blockSize = blockSize;
-            TryGetFormat(out _format);
         }
 
-        public DxtBitmapContent(int blockSize, int width, int height)
-            : this(blockSize)
+        /// <summary>
+        /// Initializes a new instance of Etc1BitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public Etc1BitmapContent(int width, int height)
+            : base(width, height)
         {
-            Width = width;
-            Height = height;
         }
 
         public override byte[] GetPixelData()
         {
-            return _bitmapData;
+            return _data;
         }
 
         public override void SetPixelData(byte[] sourceData)
         {
-            _bitmapData = sourceData;
+            int bytesRequired = ((Width + 3) >> 2) * ((Height + 3) >> 2) * SurfaceFormat.RgbEtc1.GetSize();
+            if (bytesRequired != sourceData.Length)
+                throw new ArgumentException("ETC1 bitmap with width " + Width + " and height " + Height + " needs "
+                    + bytesRequired + " bytes. Received " + sourceData.Length + " bytes");
+
+            if (_data == null || _data.Length != bytesRequired)
+                _data = new byte[bytesRequired];
+            Buffer.BlockCopy(sourceData, 0, _data, 0, bytesRequired);
         }
 
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
@@ -46,11 +56,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (!sourceBitmap.TryGetFormat(out sourceFormat))
                 return false;
 
-            SurfaceFormat format;
-            TryGetFormat(out format);
-
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            if (format == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            if (SurfaceFormat.RgbEtc1 == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
                 SetPixelData(sourceBitmap.GetPixelData());
                 return true;
@@ -74,50 +81,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            PixelFormat targetFormat;
-            ColourSpace colourSpace;
-            switch (format)
-            {
-                case SurfaceFormat.Dxt1:
-                    targetFormat = PixelFormat.DXT1;
-                    colourSpace = ColourSpace.lRGB;
-                    break;
-                case SurfaceFormat.Dxt1SRgb:
-                    targetFormat = PixelFormat.DXT1;
-                    colourSpace = ColourSpace.sRGB;
-                    break;
-                case SurfaceFormat.Dxt3:
-                    targetFormat = PixelFormat.DXT3;
-                    colourSpace = ColourSpace.lRGB;
-                    break;
-                case SurfaceFormat.Dxt3SRgb:
-                    targetFormat = PixelFormat.DXT3;
-                    colourSpace = ColourSpace.sRGB;
-                    break;
-                case SurfaceFormat.Dxt5:
-                    targetFormat = PixelFormat.DXT5;
-                    colourSpace = ColourSpace.lRGB;
-                    break;
-                case SurfaceFormat.Dxt5SRgb:
-                    targetFormat = PixelFormat.DXT5;
-                    colourSpace = ColourSpace.sRGB;
-                    break;
-                default:
-                    return false;
-            }
-
             try
             {
                 // Create the texture object in the PVR library
                 var sourceData = sourceBitmap.GetPixelData();
                 var rgba32F = (PixelFormat)0x2020202061626772; // static const PixelType PVRStandard32PixelType = PixelType('r', 'g', 'b', 'a', 32, 32, 32, 32);
                 PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
-                    rgba32F, true, VariableType.Float, colourSpace);
+                    rgba32F, true, VariableType.Float, ColourSpace.lRGB);
                 // Resize the bitmap if needed
                 if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
                     PVRTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
-                if (!PVRTexture.Transcode(targetFormat, VariableType.UnsignedByteNorm, colourSpace))
-                    return false;
+                PVRTexture.Transcode(PixelFormat.ETC1, VariableType.UnsignedByte, ColourSpace.lRGB /*, CompressorQuality.ETCMediumPerceptual, true*/);
                 var texDataSize = PVRTexture.GetTextureDataSize(0);
                 var texData = new byte[texDataSize];
                 PVRTexture.GetTextureData(texData, texDataSize);
@@ -136,18 +110,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (!destinationBitmap.TryGetFormat(out destinationFormat))
                 return false;
 
-            SurfaceFormat format;
-            TryGetFormat(out format);
-
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            if (format == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            if (SurfaceFormat.RgbEtc1 == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
                 destinationBitmap.SetPixelData(GetPixelData());
                 return true;
             }
 
-            // No other support for copying from a DXT texture yet
+            // No other support for copying from a ETC1 texture yet
             return false;
+        }
+
+        /// <summary>
+        /// Gets the corresponding GPU texture format for the specified bitmap type.
+        /// </summary>
+        /// <param name="format">Format being retrieved.</param>
+        /// <returns>The GPU texture format of the bitmap type.</returns>
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = SurfaceFormat.RgbEtc1;
+            return true;
+        }
+
+        /// <summary>
+        /// Returns a string description of the bitmap.
+        /// </summary>
+        /// <returns>Description of the bitmap.</returns>
+        public override string ToString()
+        {
+            return "ETC1 " + Width + "x" + Height;
         }
     }
 }
