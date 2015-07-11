@@ -778,7 +778,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnProjectLoaded()
         {
-            _projectLoading = true;
+            _projectLoading = false;
         }
         
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
