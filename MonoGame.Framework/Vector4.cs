@@ -182,6 +182,18 @@ namespace Microsoft.Xna.Framework
             this.W = value;
         }
 
+        /// <summary>
+        /// Constructs a 4d vector from <see cref="Quaternion"/>.
+        /// </summary>
+        /// <param name="quaternion">The x, y, z and w coordinates in 4d-space.</param>
+        public Vector4(Quaternion quaternion)
+        {
+            this.X = quaternion.X;
+            this.Y = quaternion.Y;
+            this.Z = quaternion.Z;
+            this.W = quaternion.W;
+        }
+
         #endregion
 
         #region Public Methods
@@ -775,7 +787,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains subtraction of on <see cref="Vector4"/> from a another.
+        /// Creates a new <see cref="Vector4"/> that contains subtraction of one <see cref="Vector4"/> from another.
         /// </summary>
         /// <param name="value1">Source <see cref="Vector4"/>.</param>
         /// <param name="value2">Source <see cref="Vector4"/>.</param>
@@ -790,7 +802,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains subtraction of on <see cref="Vector4"/> from a another.
+        /// Creates a new <see cref="Vector4"/> that contains subtraction of one <see cref="Vector4"/> from another.
         /// </summary>
         /// <param name="value1">Source <see cref="Vector4"/>.</param>
         /// <param name="value2">Source <see cref="Vector4"/>.</param>
@@ -1129,6 +1141,15 @@ namespace Microsoft.Xna.Framework
         public override string ToString()
         {
             return "{X:" + X + " Y:" + Y + " Z:" + Z + " W:" + W + "}";
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Quaternion"/> representation for this object.
+        /// </summary>
+        /// <returns>A <see cref="Quaternion"/> representation for this object.</returns>
+        public Quaternion ToQuaternion()
+        {
+            return new Quaternion(this);
         }
 
         #endregion

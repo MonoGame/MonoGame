@@ -5,8 +5,13 @@ using System.Globalization;
 
 namespace MonoGame.Tests.Framework
 {
-    class Vector2Test
+    class Vector2Test : FPointBase
     {
+        private void Compare(Vector2 expected, Vector2 source)
+        {
+            Assert.That(expected, Is.EqualTo(source).Using(Vector2Comparer.Epsilon));
+        }
+
         [Test]
         public void CatmullRom()
         {
@@ -16,8 +21,8 @@ namespace MonoGame.Tests.Framework
             Vector2 result;
             Vector2.CatmullRom(ref v1, ref v2, ref v3, ref v4, value, out result);
 
-            Assert.That(expectedResult, Is.EqualTo(Vector2.CatmullRom(v1, v2, v3, v4, value)).Using(Vector2Comparer.Epsilon));
-            Assert.That(expectedResult, Is.EqualTo(result).Using(Vector2Comparer.Epsilon));
+            Compare(expectedResult, Vector2.CatmullRom(v1, v2, v3, v4, value));
+            Compare(expectedResult, result);
         }
 
         [Test]
@@ -26,53 +31,53 @@ namespace MonoGame.Tests.Framework
             var vector = new Vector2(1, 2);
 
             // Test 0.0 scale.
-            Assert.AreEqual(Vector2.Zero, 0 * vector);
-            Assert.AreEqual(Vector2.Zero, vector * 0);
-            Assert.AreEqual(Vector2.Zero, Vector2.Multiply(vector, 0));
-            Assert.AreEqual(Vector2.Multiply(vector, 0), vector * 0.0f);
+            Compare(Vector2.Zero, 0 * vector);
+            Compare(Vector2.Zero, vector * 0);
+            Compare(Vector2.Zero, Vector2.Multiply(vector, 0));
+            Compare(Vector2.Multiply(vector, 0), vector * 0.0f);
 
             // Test 1.0 scale.
-            Assert.AreEqual(vector, 1 * vector);
-            Assert.AreEqual(vector, vector * 1);
-            Assert.AreEqual(vector, Vector2.Multiply(vector, 1));
-            Assert.AreEqual(Vector2.Multiply(vector, 1), vector * 1.0f);
+            Compare(vector, 1 * vector);
+            Compare(vector, vector * 1);
+            Compare(vector, Vector2.Multiply(vector, 1));
+            Compare(Vector2.Multiply(vector, 1), vector * 1.0f);
 
             var scaledVec = vector * 2;
 
             // Test 2.0 scale.
-            Assert.AreEqual(scaledVec, 2 * vector);
-            Assert.AreEqual(scaledVec, vector * 2);
-            Assert.AreEqual(scaledVec, Vector2.Multiply(vector, 2));
-            Assert.AreEqual(vector * 2.0f, scaledVec);
-            Assert.AreEqual(2 * vector, Vector2.Multiply(vector, 2));
+            Compare(scaledVec, 2 * vector);
+            Compare(scaledVec, vector * 2);
+            Compare(scaledVec, Vector2.Multiply(vector, 2));
+            Compare(vector * 2.0f, scaledVec);
+            Compare(2 * vector, Vector2.Multiply(vector, 2));
 
             scaledVec = vector * 0.999f;
 
             // Test 0.999 scale.
-            Assert.AreEqual(scaledVec, 0.999f * vector);
-            Assert.AreEqual(scaledVec, vector * 0.999f);
-            Assert.AreEqual(scaledVec, Vector2.Multiply(vector, 0.999f));
-            Assert.AreEqual(vector * 0.999f, scaledVec);
-            Assert.AreEqual(0.999f * vector, Vector2.Multiply(vector, 0.999f));
+            Compare(scaledVec, 0.999f * vector);
+            Compare(scaledVec, vector * 0.999f);
+            Compare(scaledVec, Vector2.Multiply(vector, 0.999f));
+            Compare(vector * 0.999f, scaledVec);
+            Compare(0.999f * vector, Vector2.Multiply(vector, 0.999f));
 
             var vector2 = new Vector2(2, 2);
 
             // Test two vectors multiplication.
-            Assert.AreEqual(new Vector2(vector.X * vector2.X, vector.Y * vector2.Y), vector * vector2);
-            Assert.AreEqual(vector2 * vector, new Vector2(vector.X * vector2.X, vector.Y * vector2.Y));
-            Assert.AreEqual(vector * vector2, Vector2.Multiply(vector, vector2));
-            Assert.AreEqual(Vector2.Multiply(vector, vector2), vector * vector2);
+            Compare(new Vector2(vector.X * vector2.X, vector.Y * vector2.Y), vector * vector2);
+            Compare(vector2 * vector, new Vector2(vector.X * vector2.X, vector.Y * vector2.Y));
+            Compare(vector * vector2, Vector2.Multiply(vector, vector2));
+            Compare(Vector2.Multiply(vector, vector2), vector * vector2);
 
             Vector2 refVec;
 
             // Overloads comparsion 
             var vector3 = Vector2.Multiply(vector, vector2);
             Vector2.Multiply(ref vector, ref vector2, out refVec);
-            Assert.AreEqual(vector3, refVec);
+            Compare(vector3, refVec);
 
             vector3 = Vector2.Multiply(vector, 2);
             Vector2.Multiply(ref vector, ref vector2, out refVec);
-            Assert.AreEqual(vector3, refVec);
+            Compare(vector3, refVec);
         }
 
         [Test]
@@ -84,8 +89,8 @@ namespace MonoGame.Tests.Framework
             var v1 = new Vector2(1, 1); var v2 = new Vector2(2, 2); var v3 = new Vector2(3, 3); var v4 = new Vector2(4, 4);
             var v5 = new Vector2(4, 3); var v6 = new Vector2(2, 1); var v7 = new Vector2(1, 2); var v8 = new Vector2(3, 4);
 
-            Assert.That(t1, Is.EqualTo(Vector2.Hermite(v1, v2, v3, v4, 0.25f)).Using(Vector2Comparer.Epsilon));
-            Assert.That(t2, Is.EqualTo(Vector2.Hermite(v5, v6, v7, v8, 0.45f)).Using(Vector2Comparer.Epsilon));
+            Compare(t1, Vector2.Hermite(v1, v2, v3, v4, 0.25f));
+            Compare(t2, Vector2.Hermite(v5, v6, v7, v8, 0.45f));
 
             Vector2 result1;
             Vector2 result2;
@@ -93,8 +98,8 @@ namespace MonoGame.Tests.Framework
             Vector2.Hermite(ref v1, ref v2, ref v3, ref v4, 0.25f, out result1);
             Vector2.Hermite(ref v5, ref v6, ref v7, ref v8, 0.45f, out result2);
 
-            Assert.That(t1, Is.EqualTo(result1).Using(Vector2Comparer.Epsilon));
-            Assert.That(t2, Is.EqualTo(result2).Using(Vector2Comparer.Epsilon));
+            Compare(t1, result1);
+            Compare(t2, result2);
         }
 
         [Test]
@@ -113,8 +118,8 @@ namespace MonoGame.Tests.Framework
 
             var q3 = new Quaternion(1, 2, 3, 4);
 
-            Assert.That(expectedResult1, Is.EqualTo(Vector2.Transform(v1, m1)).Using(Vector2Comparer.Epsilon));
-            Assert.That(expectedResult2, Is.EqualTo(Vector2.Transform(v2, q2)).Using(Vector2Comparer.Epsilon));
+            Compare(expectedResult1, Vector2.Transform(v1, m1));
+            Compare(expectedResult2, Vector2.Transform(v2, q2));
 
             // OUTPUT OVERLOADS TEST
 
@@ -124,8 +129,8 @@ namespace MonoGame.Tests.Framework
             Vector2.Transform(ref v1, ref m1, out result1);
             Vector2.Transform(ref v2, ref q2, out result2);
 
-            Assert.That(expectedResult1, Is.EqualTo(result1).Using(Vector2Comparer.Epsilon));
-            Assert.That(expectedResult2, Is.EqualTo(result2).Using(Vector2Comparer.Epsilon));
+            Compare(expectedResult1, result1);
+            Compare(expectedResult2, result2);
 
             // TRANSFORM ON LIST (MATRIX)
             {
@@ -141,7 +146,7 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 10; i++)
                 {
-                    Assert.That(desinationList1[i], Is.EqualTo(new Vector2(19 + (6 * i), 22 + (8 * i))).Using(Vector2Comparer.Epsilon));
+                    Compare(desinationList1[i], new Vector2(19 + (6 * i), 22 + (8 * i)));
                 }
             }
             // TRANSFORM ON LIST (MATRIX)(DESTINATION & SOURCE)
@@ -156,15 +161,15 @@ namespace MonoGame.Tests.Framework
 
                 Vector2.Transform(sourceList2, 2, ref m1, desinationList2, 1, 3);
 
-                Assert.That(Vector2.Zero, Is.EqualTo(desinationList2[0]).Using(Vector2Comparer.Epsilon));
+                Compare(Vector2.Zero, desinationList2[0]);
 
-                Assert.That(new Vector2(31, 38), Is.EqualTo(desinationList2[1]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(37, 46), Is.EqualTo(desinationList2[2]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(43, 54), Is.EqualTo(desinationList2[3]).Using(Vector2Comparer.Epsilon));
+                Compare(new Vector2(31, 38), desinationList2[1]);
+                Compare(new Vector2(37, 46), desinationList2[2]);
+                Compare(new Vector2(43, 54), desinationList2[3]);
 
                 for (int i = 4; i < 10; i++)
                 {
-                    Assert.That(Vector2.Zero, Is.EqualTo(desinationList2[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(Vector2.Zero, desinationList2[i]);
                 }
             }
             // TRANSFORM ON LIST (MATRIX)(SIMPLE)
@@ -181,7 +186,7 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 10; i++)
                 {
-                    Assert.That(desinationList3[i], Is.EqualTo(new Vector2(19 + (6 * i), 22 + (8 * i))).Using(Vector2Comparer.Epsilon));
+                    Compare(desinationList3[i], new Vector2(19 + (6 * i), 22 + (8 * i)));
                 }
             }
             // TRANSFORM ON LIST (QUATERNION)
@@ -198,7 +203,7 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 10; i++)
                 {
-                    Assert.That(new Vector2(-45 + (-45 * i), 9 + (9 * i)), Is.EqualTo(desinationList4[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(new Vector2(-45 + (-45 * i), 9 + (9 * i)), desinationList4[i]);
                 }
             }
             // TRANSFORM ON LIST (QUATERNION)(DESTINATION & SOURCE)
@@ -213,15 +218,15 @@ namespace MonoGame.Tests.Framework
 
                 Vector2.Transform(sourceList5, 2, ref q3, desinationList5, 1, 3);
 
-                Assert.That(Vector2.Zero, Is.EqualTo(desinationList5[0]).Using(Vector2Comparer.Epsilon));
+                Compare(Vector2.Zero, desinationList5[0]);
 
-                Assert.That(new Vector2(-135, 27), Is.EqualTo(desinationList5[1]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(-180, 36), Is.EqualTo(desinationList5[2]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(-225, 45), Is.EqualTo(desinationList5[3]).Using(Vector2Comparer.Epsilon));
+                Compare(new Vector2(-135, 27), desinationList5[1]);
+                Compare(new Vector2(-180, 36), desinationList5[2]);
+                Compare(new Vector2(-225, 45), desinationList5[3]);
 
                 for (int i = 4; i < 10; i++)
                 {
-                    Assert.That(Vector2.Zero, Is.EqualTo(desinationList5[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(Vector2.Zero, desinationList5[i]);
                 }
             }
             // TRANSFORM ON LIST (QUATERNION)(SIMPLE)
@@ -238,7 +243,7 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 10; i++)
                 {
-                    Assert.That(new Vector2(-45 + (-45 * i), 9 + (9 * i)), Is.EqualTo(desinationList6[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(new Vector2(-45 + (-45 * i), 9 + (9 * i)), desinationList6[i]);
                 }
             }
         }
@@ -252,12 +257,12 @@ namespace MonoGame.Tests.Framework
             var expectedResult1 = new Vector2(14, 18);
             var expectedResult2 = expectedResult1;
 
-            Assert.That(expectedResult1, Is.EqualTo(Vector2.TransformNormal(normal, matrix)).Using(Vector2Comparer.Epsilon));
+            Compare(expectedResult1, Vector2.TransformNormal(normal, matrix));
 
             Vector2 result;
             Vector2.TransformNormal(ref normal, ref matrix, out result);
 
-            Assert.That(expectedResult2, Is.EqualTo(result).Using(Vector2Comparer.Epsilon));
+            Compare(expectedResult2, result);
 
             // TRANSFORM ON LIST
             {
@@ -273,7 +278,7 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 10; i++)
                 {
-                    Assert.That(new Vector2(0 + (6 * i), 0 + (8 * i)), Is.EqualTo(destinationArray1[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(new Vector2(0 + (6 * i), 0 + (8 * i)), destinationArray1[i]);
                 }
             }
             // TRANSFORM ON LIST(SOURCE OFFSET)
@@ -290,12 +295,12 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 5; i++)
                 {
-                    Assert.That(new Vector2(30 + (6 * i), 40 + (8 * i)), Is.EqualTo(destinationArray2[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(new Vector2(30 + (6 * i), 40 + (8 * i)), destinationArray2[i]);
                 }
 
                 for (int i = 5; i < 10; i++)
                 {
-                    Assert.That(Vector2.Zero, Is.EqualTo(destinationArray2[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(Vector2.Zero, destinationArray2[i]);
                 }
             }
             // TRANSFORM ON LIST(DESTINATION OFFSET)
@@ -312,13 +317,13 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 6; ++i)
                 {
-                    Assert.That(Vector2.Zero, Is.EqualTo(destinationArray3[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(Vector2.Zero, destinationArray3[i]);
                 }
 
-                Assert.That(new Vector2(6, 8), Is.EqualTo(destinationArray3[6]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(12, 16), Is.EqualTo(destinationArray3[7]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(18, 24), Is.EqualTo(destinationArray3[8]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(24, 32), Is.EqualTo(destinationArray3[9]).Using(Vector2Comparer.Epsilon));
+                Compare(new Vector2(6, 8), destinationArray3[6]);
+                Compare(new Vector2(12, 16), destinationArray3[7]);
+                Compare(new Vector2(18, 24), destinationArray3[8]);
+                Compare(new Vector2(24, 32), destinationArray3[9]);
             }
             // TRANSFORM ON LIST(DESTINATION & SOURCE)
             {
@@ -334,17 +339,17 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 3; ++i)
                 {
-                    Assert.That(Vector2.Zero, Is.EqualTo(destinationArray4[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(Vector2.Zero, destinationArray4[i]);
                 }
 
-                Assert.That(new Vector2(12, 16), Is.EqualTo(destinationArray4[3]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(18, 24), Is.EqualTo(destinationArray4[4]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(24, 32), Is.EqualTo(destinationArray4[5]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(30, 40), Is.EqualTo(destinationArray4[6]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(36, 48), Is.EqualTo(destinationArray4[7]).Using(Vector2Comparer.Epsilon));
-                Assert.That(new Vector2(42, 56), Is.EqualTo(destinationArray4[8]).Using(Vector2Comparer.Epsilon));
+                Compare(new Vector2(12, 16), destinationArray4[3]);
+                Compare(new Vector2(18, 24), destinationArray4[4]);
+                Compare(new Vector2(24, 32), destinationArray4[5]);
+                Compare(new Vector2(30, 40), destinationArray4[6]);
+                Compare(new Vector2(36, 48), destinationArray4[7]);
+                Compare(new Vector2(42, 56), destinationArray4[8]);
 
-                Assert.That(Vector2.Zero, Is.EqualTo(destinationArray4[9]).Using(Vector2Comparer.Epsilon));
+                Compare(Vector2.Zero, destinationArray4[9]);
             }
             // TRANSFORM ON LIST(SIMPLE)
             {
@@ -360,7 +365,7 @@ namespace MonoGame.Tests.Framework
 
                 for (int i = 0; i < 10; ++i)
                 {
-                    Assert.That(new Vector2(0 + (6 * i), 0 + (8 * i)), Is.EqualTo(destinationArray5[i]).Using(Vector2Comparer.Epsilon));
+                    Compare(new Vector2(0 + (6 * i), 0 + (8 * i)), destinationArray5[i]);
                 }
             }
         }

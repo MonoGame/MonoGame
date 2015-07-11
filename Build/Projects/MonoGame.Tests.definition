@@ -91,6 +91,7 @@
 	<Compile Include="Framework\CurveKeyTest.cs" />
 	<Compile Include="Framework\CurveTest.cs" />
 	<Compile Include="Framework\EnumConformingTest.cs" />
+	<Compile Include="Framework\FPointBase.cs" />
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\GameTest.cs" />	
     <Compile Include="Framework\GameTest+Methods.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Framework\MockWindow.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
+	<Compile Include="Framework\QuaternionTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
 	<Compile Include="Framework\RectangleTest.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
