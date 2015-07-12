@@ -3,16 +3,19 @@ using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class AddFileDialog : Dialog
+    public partial class AddItemDialog : Dialog
     {
         public bool applyforall;
         public CopyAction responce;
 
-        public AddFileDialog(Window parrent, string fileloc, bool exists) : base(Mono.Unix.Catalog.GetString ("Add File Action"), parrent, DialogFlags.Modal)
+        public AddItemDialog(Window parrent, string fileloc, bool exists, FileType filetype) : base(Global.GetNewDialog(parrent.Handle))
         {
-            Build();
+            Build(filetype, fileloc);
 
-            label1.Text = label1.Text.Replace("%file", fileloc);
+            this.AddButton("Ok", ResponseType.Ok);
+            this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
+
             label1.Markup = label1.Text;
 
             if (exists)
@@ -24,11 +27,6 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnResponse(object sender, EventArgs e)
         {
-            Destroy ();
-        }
-
-        protected void OnButtonOkClicked(object sender, EventArgs e)
-        {
             if (radiobuttonCopy.Active)
                 responce = CopyAction.Copy;
             else if (radiobuttonLink.Active)
@@ -37,7 +35,8 @@ namespace MonoGame.Tools.Pipeline
                 responce = CopyAction.Skip;
 
             applyforall = checkbutton1.Active;
-            Respond(ResponseType.Ok);
+
+            Destroy ();
         }
     }
 }

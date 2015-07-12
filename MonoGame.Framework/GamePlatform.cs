@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework
             return new iOSGamePlatform(game);
 #elif MONOMAC
             return new MacGamePlatform(game);
-#elif (WINDOWS && OPENGL) || LINUX || ANGLE
+#elif DESKTOPGL || ANGLE
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
@@ -337,6 +337,9 @@ namespace Microsoft.Xna.Framework
         {
             if (!disposed)
             {
+                Mouse.PrimaryWindow = null;
+                TouchPanel.PrimaryWindow = null;
+
                 disposed = true;
             }
         }

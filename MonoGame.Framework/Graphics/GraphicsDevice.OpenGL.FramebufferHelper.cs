@@ -14,7 +14,7 @@ using MonoMac;
 using MonoMac.OpenGL;
 #endif
 
-#if (WINDOWS || LINUX) && !GLES
+#if (WINDOWS || DESKTOPGL) && !GLES
 using OpenTK.Graphics.OpenGL;
 
 #endif

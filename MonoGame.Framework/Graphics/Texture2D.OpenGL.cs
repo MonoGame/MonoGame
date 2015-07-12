@@ -26,7 +26,7 @@ using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 #endif
 
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #endif
@@ -41,7 +41,7 @@ using Android.Graphics;
 #endif
 #endif // OPENGL
 
-#if WINDOWS || LINUX || MONOMAC || ANGLE
+#if DESKTOPGL || MONOMAC || ANGLE
 using System.Drawing.Imaging;
 #endif
 
@@ -75,7 +75,6 @@ namespace Microsoft.Xna.Framework.Graphics
                         case SurfaceFormat.RgbaPvrtc4Bpp:
                             imageSize = (Math.Max(this.width, 8) * Math.Max(this.height, 8) * 4 + 7) / 8;
                             break;
-                        case SurfaceFormat.RgbEtc1:
                         case SurfaceFormat.Dxt1:
                         case SurfaceFormat.Dxt1a:
                         case SurfaceFormat.Dxt1SRgb:
@@ -83,6 +82,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         case SurfaceFormat.Dxt3SRgb:
                         case SurfaceFormat.Dxt5:
                         case SurfaceFormat.Dxt5SRgb:
+                        case SurfaceFormat.RgbEtc1:
+                        case SurfaceFormat.RgbaAtcExplicitAlpha:
+                        case SurfaceFormat.RgbaAtcInterpolatedAlpha:
                             imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * GraphicsExtensions.GetSize(format);
                             break;
                         default:
@@ -139,10 +141,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
                     // a 4x4 block. 
                     // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                    if (_format == SurfaceFormat.Dxt1 ||
-                        _format == SurfaceFormat.Dxt1a ||
-                        _format == SurfaceFormat.Dxt3 ||
-                        _format == SurfaceFormat.Dxt5)
+                    if (_format == SurfaceFormat.Dxt1
+                        || _format == SurfaceFormat.Dxt1a
+                        || _format == SurfaceFormat.Dxt3
+                        || _format == SurfaceFormat.Dxt5
+                        || _format == SurfaceFormat.RgbaAtcExplicitAlpha
+                        || _format == SurfaceFormat.RgbaAtcInterpolatedAlpha
+                        || _format == SurfaceFormat.RgbPvrtc2Bpp
+                        || _format == SurfaceFormat.RgbPvrtc4Bpp
+                        || _format == SurfaceFormat.RgbaPvrtc2Bpp
+                        || _format == SurfaceFormat.RgbaPvrtc4Bpp
+                        || _format == SurfaceFormat.RgbEtc1
+                        )
                     {
                             if (w > 4)
                                 w = (w + 3) & ~3;
@@ -312,7 +322,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return PlatformFromStream(graphicsDevice, image);
             }
 #endif
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             Bitmap image = (Bitmap)Bitmap.FromStream(stream);
             try
             {

@@ -42,8 +42,10 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
-#elif (WINDOWS && OPENGL) || LINUX
+#elif DESKTOPGL
+        #pragma warning disable 414
         private static AudioContext _acontext;
+        #pragma warning restore 414
         private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
@@ -196,10 +198,11 @@ namespace Microsoft.Xna.Framework.Audio
                 };
 
                 int[] attribute = new int[0];
-#else
+#elif !DESKTOPGL
                 int[] attribute = new int[0];
 #endif
-#if (WINDOWS && OPENGL) || LINUX
+
+#if DESKTOPGL
                 _acontext = new AudioContext();
                 _context = Alc.GetCurrentContext();
                 _oggstreamer = new OggStreamer();
@@ -304,14 +307,13 @@ namespace Microsoft.Xna.Framework.Audio
                 if (disposing)
                 {
                     if (_bSoundAvailable)
+                    {
                         CleanUpOpenAL();
-
-#if (WINDOWS && OPENGL) || LINUX
-                    // Work around for MonoGame Issue https://github.com/mono/MonoGame/issues/3897
-                    // **Note** this will cause conflicts when updating MonoGame the next time.
-                    if (_oggstreamer != null)
-                        _oggstreamer.Dispose();
+#if DESKTOPGL
+                        if(_oggstreamer != null)
+                            _oggstreamer.Dispose();
 #endif
+                    }
                 }
                 _isDisposed = true;
             }

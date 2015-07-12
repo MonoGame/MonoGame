@@ -31,6 +31,27 @@ echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
 #automatic dependency installer
 ./Dependencies/dependencies.sh
 
+#setup nvtt libraries
+if [ ! -f /lib/libnvcore.so ]
+then
+	ln $IDIR/libnvcore.so /lib/libnvcore.so
+fi
+
+if [ ! -f /lib/libnvimage.so ]
+then
+	ln $IDIR/libnvimage.so /lib/libnvimage.so
+fi
+
+if [ ! -f /lib/libnvmath.so ]
+then
+	ln $IDIR/libnvmath.so /lib/libnvmath.so
+fi
+
+if [ ! -f /lib/libnvtt.so ]
+then
+	ln $IDIR/libnvtt.so /lib/libnvtt.so
+fi
+
 #check GLIBCXX_3.4.20 support
 if [ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]
 then
@@ -86,7 +107,7 @@ if [ -f /usr/share/applications/Monogame\ Pipeline.desktop ]
 then
 	rm /usr/share/applications/Monogame\ Pipeline.desktop
 fi
-echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=false\nTerminal=false\nType=Application\nMimeType=text/mgcb;\nCategories=Development;" >> /usr/share/applications/Monogame\ Pipeline.desktop
+echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=Used to create platform specific .xnb files\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=true\nTerminal=false\nType=Application\nMimeType=text/mgcb;\nCategories=Development;" >> /usr/share/applications/Monogame\ Pipeline.desktop
 
 #mimetype
 echo "Adding mimetype..."

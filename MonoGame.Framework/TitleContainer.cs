@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework
     {
         static TitleContainer() 
         {
-#if WINDOWS || LINUX
+#if WINDOWS || DESKTOPGL
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;

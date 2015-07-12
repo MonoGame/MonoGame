@@ -24,5 +24,11 @@ mkdir tmp/usr/share/icons/gnome/scalable
 mkdir tmp/usr/share/icons/gnome/scalable/mimetypes
 cp Data/Main/monogame.svg tmp/usr/share/icons/gnome/scalable/mimetypes/
 
+mkdir tmp/lib
+cp Data/Pipeline/libnvcore.so tmp/lib/
+cp Data/Pipeline/libnvimage.so tmp/lib/
+cp Data/Pipeline/libnvmath.so tmp/lib/
+cp Data/Pipeline/libnvtt.so tmp/lib/
+
 dpkg-deb --build tmp monogame-pipeline.deb
 rm -rf tmp

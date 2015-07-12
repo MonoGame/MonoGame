@@ -5,7 +5,7 @@ using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public class Global
+    public static class Global
     {
         //by default this should be set to whatever Gtk libs we provide with Mac
         public static double GtkMajorVersion = 2;
@@ -13,6 +13,8 @@ namespace MonoGame.Tools.Pipeline
 
         //indicates which desktop enviorment is currenlly in use
         public static string DesktopEnvironment = "OSX";
+
+        public static bool UseHeaderBar;
 
         public static void Initalize()
         {
@@ -32,10 +34,22 @@ namespace MonoGame.Tools.Pipeline
                 DesktopEnvironment = line;
             }
             #endif
+
+            UseHeaderBar = Global.GtkMajorVersion >= 3 && Global.GtkMinorVersion >= 12 && Global.DesktopEnvironment == "GNOME";
+        }
+
+        public static IntPtr GetNewDialog(IntPtr parrent)
+        {
+            #if GTK3
+            if(UseHeaderBar)
+                return Gtk3Wrapper.gtk_dialog_new_with_buttons("", parrent, 4 + (int)DialogFlags.Modal);
+            #endif
+
+            return (new Dialog("", new Gtk.Window(parrent), DialogFlags.Modal)).Handle;
         }
     }
 
-    public class IconCache
+    public static class IconCache
     {
         static IconTheme theme = IconTheme.Default;
 
@@ -46,8 +60,6 @@ namespace MonoGame.Tools.Pipeline
 
         public static Pixbuf GetIcon(string fileName)
         {
-            Pixbuf icon = new Pixbuf(null, "MonoGame.Tools.Pipeline.Icons.blueprint.png");
-
             #if GTK3
             GLib.FileInfo info = new GLib.FileInfo(Gtk3Wrapper.g_file_query_info(Gtk3Wrapper.g_file_new_for_path(fileName), "standard::*", 0, new IntPtr(), new IntPtr()));
 
@@ -55,18 +67,22 @@ namespace MonoGame.Tools.Pipeline
             {
                 string[] sicon = info.Icon.ToString().Split(' ');
 
-                for(int i = sicon.Length - 1;i >= 0;i--)
+                for(int i = sicon.Length - 1;i >= 1;i--)
                 {
-                    icon = theme.LoadIcon(sicon[i], 16, (IconLookupFlags)0);
+                    try
+                    {
+                        var icon = theme.LoadIcon(sicon[i], 16, (IconLookupFlags)0);
 
-                    if(icon != null)
-                        i = 2;
+                        if(icon != null)
+                            return icon;
+                    }
+                    catch { }
                 }
             }
             catch { }
             #endif
 
-            return icon;
+            return theme.LoadIcon("text-x-generic", 16, (IconLookupFlags)0);
         }
     }
 }

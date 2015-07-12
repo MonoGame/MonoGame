@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Media
 
 #if ANDROID || OPENAL || PSM || WEB || IOS
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
-#if !LINUX
+#if !DESKTOPGL
         event FinishedPlayingHandler DonePlaying;
 #endif
 #endif

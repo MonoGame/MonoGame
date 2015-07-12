@@ -12,12 +12,25 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Window, IView
     {
-        public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.()";
+        const string basetitle = "MonoGame Pipeline";
+        public static string LinuxNotAllowedCharacters = "/"; 
+        public static string MacNotAllowedCharacters = ":";
 
-        public static bool CheckString(string s, string allowedCharacters)
+        public static string NotAllowedCharacters
         {
-            for (int i = 0; i < s.Length; i++) 
-                if (!allowedCharacters.Contains (s.Substring (i, 1)))
+            get
+            {
+                if (Global.DesktopEnvironment == "OSX")
+                    return MacNotAllowedCharacters;
+                else
+                    return LinuxNotAllowedCharacters;
+            }
+        }
+
+        public static bool CheckString(string s, string notallowedCharacters)
+        {
+            for (int i = 0; i < notallowedCharacters.Length; i++) 
+                if (s.Contains (notallowedCharacters.Substring (i, 1)))
                     return false;
 
             return true;
@@ -33,6 +46,31 @@ namespace MonoGame.Tools.Pipeline
         MenuItem treerebuild;
         MenuItem recentMenu;
         bool expand = false;
+
+        public void ReloadTitle()
+        {
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                if(string.IsNullOrEmpty(projectview1.openedProject))
+                {
+                    this.Title = "MonoGame Pipeline Tool";
+                    hbar.Subtitle = "";
+                }
+                else
+                {
+                    this.Title = System.IO.Path.GetFileName(projectview1.openedProject);
+                    hbar.Subtitle = System.IO.Path.GetDirectoryName(projectview1.openedProject);
+                }
+                return;
+            }
+            #endif
+
+            if (projectview1.openedProject != "")
+                this.Title = basetitle + " - " + System.IO.Path.GetFileName(projectview1.openedProject);
+            else
+                this.Title = basetitle;
+        }
 
         public MainWindow () :
             base (WindowType.Toplevel)
@@ -51,7 +89,12 @@ namespace MonoGame.Tools.Pipeline
             AllFilesFilter.Name = "All Files (*.*)";
             AllFilesFilter.AddPattern ("*.*");
 
+            #if GTK3
+            Widget[] widgets = Global.UseHeaderBar ? menu2.Children : menubar1.Children;
+            #else
             Widget[] widgets = menubar1.Children;
+            #endif
+
             foreach (Widget w in widgets) {
                 if(w.Name == "FileAction")
                 {
@@ -124,7 +167,8 @@ namespace MonoGame.Tools.Pipeline
                 OpenProjectPath = null;
             }
 
-            projectview1.ExpandBase();
+            if(_controller.ProjectOpen)
+                projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -189,7 +233,7 @@ namespace MonoGame.Tools.Pipeline
             var result = filechooser.Run() == (int)ResponseType.Accept;
             filePath = filechooser.Filename;
 
-            if (filechooser.Filter == MonoGameContentProjectFileFilter && !filePath.EndsWith(".mgcb"))
+            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
                 filePath += ".mgcb";
 
             filechooser.Destroy ();
@@ -262,6 +306,7 @@ namespace MonoGame.Tools.Pipeline
                 projectview1.SetBaseIter (System.IO.Path.GetFileNameWithoutExtension (item.OriginalPath));
             }
             else {
+                projectview1.openedProject = "";
                 projectview1.SetBaseIter ("");
                 projectview1.Close ();
                 UpdateMenus ();
@@ -382,7 +427,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFileDialog(this, file, exists);
+            var afd = new AddItemDialog(this, file, exists, FileType.File);
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -396,9 +441,10 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        public bool CopyOrLinkFolder(string folder, out CopyAction action)
+        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddFolderDialog(this, folder);
+            var afd = new AddItemDialog(this, folder, exists, FileType.Folder);
+            applyforall = false;
 
             if (afd.Run() == (int)ResponseType.Ok)
             {
@@ -429,7 +475,19 @@ namespace MonoGame.Tools.Pipeline
 #endif
 #if MONOMAC || LINUX
             _buildProcess.StartInfo.FileName = "mono";
-            _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
+            if (_controller.LaunchDebugger) {
+                var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
+                port = !string.IsNullOrEmpty (port) ? port : "55555";
+                var monodebugger = string.Format ("--debug --debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:{0}",
+                    port);
+                _buildProcess.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monodebugger, exe, commands);
+                OutputAppend("************************************************");
+                OutputAppend("RUNNING MGCB IN DEBUG MODE!!!");
+                OutputAppend(string.Format ("Attach your Debugger to localhost:{0}", port));
+                OutputAppend("************************************************");
+            } else {
+                _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
+            }
 #endif
 
             return _buildProcess;
@@ -632,6 +690,16 @@ namespace MonoGame.Tools.Pipeline
             adialog.Destroy ();
         }
 
+        protected void OnDebugModeActionActivated (object sender, EventArgs e)
+        {
+            _controller.LaunchDebugger = this.DebugModeAction.Active;
+        }
+
+        protected void OnCancelBuildActionActivated (object sender, EventArgs e)
+        {
+            _controller.CancelBuild();
+        }
+
         public void UpdateMenus()
         {
             List<TreeIter> iters;
@@ -670,6 +738,18 @@ namespace MonoGame.Tools.Pipeline
             CleanAction.Sensitive = projectOpenAndNotBuilding;
             CancelBuildAction.Sensitive = !notBuilding;
             CancelBuildAction.Visible = !notBuilding;
+
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                new_button.Sensitive = NewAction.Sensitive;
+                open_button.Sensitive = OpenAction.Sensitive;
+                save_button.Sensitive = SaveAction.Sensitive;
+                build_button.Sensitive = BuildAction1.Sensitive;
+            }
+            #endif
+
+            DebugModeAction.Sensitive = notBuilding;
 
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();
