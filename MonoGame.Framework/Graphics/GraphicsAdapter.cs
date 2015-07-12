@@ -85,11 +85,8 @@ namespace Microsoft.Xna.Framework.Graphics
                        60,
                        SurfaceFormat.Color);
 #elif ANDROID
-                var context = Android.App.Application.Context;
-                IWindowManager windowManager = context.GetSystemService(Android.Content.Context.WindowService).JavaCast<IWindowManager>();
-                var screenSize = new Android.Graphics.Point();
-                windowManager.DefaultDisplay.GetRealSize(screenSize);
-                return new DisplayMode(screenSize.X, screenSize.Y, 60, SurfaceFormat.Color);
+                View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
+                return new DisplayMode(view.Width, view.Height, 60, SurfaceFormat.Color);
 #elif DESKTOPGL
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
