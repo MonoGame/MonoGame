@@ -288,11 +288,7 @@ namespace MGCB
             {
                 try
                 {
-                    _manager.BuildContent(c.SourceFile,
-                                          null,
-                                          c.Importer,
-                                          c.Processor,
-                                          c.ProcessorParams);
+                    _manager.BuildContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
 
                     newContent.SourceFiles.Add(c.SourceFile);
 
@@ -304,8 +300,7 @@ namespace MGCB
                     if (ex.ContentIdentity != null && !string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
                     {
                         message = ex.ContentIdentity.SourceFilename;
-                        if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
-                            message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
+                        if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier)) message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
                         message += ": ";
                     }
                     message += ex.Message;
@@ -315,8 +310,13 @@ namespace MGCB
                 catch (PipelineException ex)
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
-                    if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                    if (ex.InnerException != null) Console.Error.Write(ex.InnerException.ToString());
+                    ++errorCount;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    if (ex.InnerException != null) Console.Error.Write(ex.InnerException.ToString());
                     ++errorCount;
                 }
             }
