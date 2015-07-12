@@ -13,6 +13,7 @@ using MonoMac.Foundation;
 using UIKit;
 #elif ANDROID
 using Android.Views;
+using Android.Runtime;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -84,8 +85,11 @@ namespace Microsoft.Xna.Framework.Graphics
                        60,
                        SurfaceFormat.Color);
 #elif ANDROID
-                var screenSize = Android.App.Application.Context.Resources.DisplayMetrics;
-                return new DisplayMode(screenSize.WidthPixels, screenSize.HeightPixels, 60, SurfaceFormat.Color);
+                var context = Android.App.Application.Context;
+                IWindowManager windowManager = context.GetSystemService(Android.Content.Context.WindowService).JavaCast<IWindowManager>();
+                var screenSize = new Android.Graphics.Point();
+                windowManager.DefaultDisplay.GetRealSize(screenSize);
+                return new DisplayMode(screenSize.X, screenSize.Y, 60, SurfaceFormat.Color);
 #elif DESKTOPGL
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
