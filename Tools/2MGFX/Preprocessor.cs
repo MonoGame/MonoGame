@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using CppNet;
 
@@ -125,7 +124,14 @@ namespace TwoMGFX
             {
                 if (!_dependencies.Contains(_path))
                     _dependencies.Add(_path);
-                return new MGStringLexerSource(File.ReadAllText(_path), true, _path);
+                return new MGStringLexerSource(AppendNewlineIfNonePresent(File.ReadAllText(_path)), true, _path);
+            }
+
+            private static string AppendNewlineIfNonePresent(string text)
+            {
+                if (!text.EndsWith("\n"))
+                    return text + "\n";
+                return text;
             }
         }
 

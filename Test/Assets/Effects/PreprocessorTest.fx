@@ -10,16 +10,16 @@
 This is a C style comment.
 */
 
-#if foo(TEST)
+#if foo(TEST) // TODO: This should trigger a warning at position 13:4, but it's currently reported at 9:4.
 
 #endif
 
 #if TEST == 0
-Foo
+int Foo;
 #elif TEST == 1
-Bar
+int Bar;
 #else
-Baz
+int Baz;
 #endif
 
 #if defined(TEST2)
