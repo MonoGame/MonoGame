@@ -90,77 +90,85 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
+            if (Game.Instance != null)
+            { 
 #if DESKTOPGL || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
-            var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
 
-            #if GLES
-            // Create an OpenGL ES 2.0 context
-            var flags = GraphicsContextFlags.Embedded;
-            int major = 2;
-            int minor = 0;
-            #else
-            // Create an OpenGL compatibility context
-            var flags = GraphicsContextFlags.Default;
-            int major = 1;
-            int minor = 0;
-            #endif
+                var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+                #if GLES
+                // Create an OpenGL ES 2.0 context
+                var flags = GraphicsContextFlags.Embedded;
+                int major = 2;
+                int minor = 0;
+                #else
+                // Create an OpenGL compatibility context
+                var flags = GraphicsContextFlags.Default;
+                int major = 1;
+                int minor = 0;
+                #endif
 
-            if (Context == null || Context.IsDisposed)
-            {
-                var color = PresentationParameters.BackBufferFormat.GetColorFormat();
-                var depth =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
-                    24;
-                var stencil =
-                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
-                    0;
-
-                var samples = 0;
-                if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
+                if (Context == null || Context.IsDisposed)
                 {
-                    // Use a default of 4x samples if PreferMultiSampling is enabled
-                    // without explicitly setting the desired MultiSampleCount.
-                    if (PresentationParameters.MultiSampleCount == 0)
+                    var color = PresentationParameters.BackBufferFormat.GetColorFormat();
+                    var depth =
+                        PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
+                        PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
+                        24;
+                    var stencil =
+                        PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
+                        0;
+
+                    var samples = 0;
+                    if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
                     {
-                        PresentationParameters.MultiSampleCount = 4;
+                        // Use a default of 4x samples if PreferMultiSampling is enabled
+                        // without explicitly setting the desired MultiSampleCount.
+                        if (PresentationParameters.MultiSampleCount == 0)
+                        {
+                            PresentationParameters.MultiSampleCount = 4;
+                        }
+
+                        samples = PresentationParameters.MultiSampleCount;
                     }
 
-                    samples = PresentationParameters.MultiSampleCount;
+                    mode = new GraphicsMode(color, depth, stencil, samples);
+                    try
+                    {
+                        Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                    }
+                    catch (Exception e)
+                    {
+                        Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
+                            e.ToString());
+                        major = 1;
+                        minor = 0;
+                        flags = GraphicsContextFlags.Default;
+                        Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                    }
                 }
+                Context.MakeCurrent(wnd);
+                (Context as IGraphicsContextInternal).LoadAll();
+                Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
-                mode = new GraphicsMode(color, depth, stencil, samples);
-                try
+                // Provide the graphics context for background loading
+                // Note: this context should use the same GraphicsMode,
+                // major, minor version and flags parameters as the main
+                // context. Otherwise, context sharing will very likely fail.
+                if (Threading.BackgroundContext == null)
                 {
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                    Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
+                    Threading.WindowInfo = wnd;
+                    Threading.BackgroundContext.MakeCurrent(null);
                 }
-                catch (Exception e)
-                {
-                    Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
-                        e.ToString());
-                    major = 1;
-                    minor = 0;
-                    flags = GraphicsContextFlags.Default;
-                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
-                }
-            }
-            Context.MakeCurrent(wnd);
-            (Context as IGraphicsContextInternal).LoadAll();
-            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
-
-            // Provide the graphics context for background loading
-            // Note: this context should use the same GraphicsMode,
-            // major, minor version and flags parameters as the main
-            // context. Otherwise, context sharing will very likely fail.
-            if (Threading.BackgroundContext == null)
-            {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
-                Threading.WindowInfo = wnd;
-                Threading.BackgroundContext.MakeCurrent(null);
-            }
-            Context.MakeCurrent(wnd);
+                Context.MakeCurrent(wnd);
 #endif
+            }
+            else
+            {
+                // Using an external Game implementation 
+                Context = GraphicsContext.CurrentContext;
+            }
 
             MaxTextureSlots = 16;
 
