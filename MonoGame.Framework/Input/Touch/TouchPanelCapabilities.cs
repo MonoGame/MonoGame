@@ -77,6 +77,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 #else
                 //Touch isn't implemented in OpenTK, so no linux or mac https://github.com/opentk/opentk/issues/80
                 isConnected = false;
+                maximumTouchCount = 0;
 #endif
             }
         }
