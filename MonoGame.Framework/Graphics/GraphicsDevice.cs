@@ -324,6 +324,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        //TODO Implement
+        public Color BlendFactor
+        {
+            get;
+            set;
+        }
+
         public BlendState BlendState
         {
 			get { return _blendState; }
