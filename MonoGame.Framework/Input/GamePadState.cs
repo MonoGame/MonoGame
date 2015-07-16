@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Input
     //     to offer additional data without separate state queries to GamePad.
     public partial struct GamePadState
     {
+        internal int _packetNumber;
+
         /// <summary>
         /// The default initialized gamepad state.
         /// </summary>
@@ -36,8 +38,8 @@ namespace Microsoft.Xna.Framework.Input
         //     links to related code samples.
         public int PacketNumber
         {
-            get;
-            internal set;
+            get { return _packetNumber; }
+            internal set { _packetNumber = value; }
         }
         
         //
