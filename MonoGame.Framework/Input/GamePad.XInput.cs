@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.Input
                 buttons: buttons,
                 dPad: dpadState);
 
-            state._packetNumber = packetNumber;
+            state.PacketNumber = packetNumber;
 
             return state;
         }
