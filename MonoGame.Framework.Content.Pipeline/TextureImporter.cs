@@ -67,7 +67,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-            var fBitmap = FreeImage.LoadEx(filename);
+            FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
+            var fBitmap = FreeImage.LoadEx(filename, FREE_IMAGE_LOAD_FLAGS.DEFAULT, ref format);
+            if (format == FREE_IMAGE_FORMAT.FIF_UNKNOWN)
+                throw new ContentLoadException("TextureImporter failed to load '" + filename + "'");
 
             BitmapContent face = null;
             var height = (int)FreeImage.GetHeight(fBitmap);
@@ -81,6 +84,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 case FREE_IMAGE_TYPE.FIT_BITMAP:
                     switch (bpp)
                     {
+                        case 8:
+                            {
+                                // Expand to 32-bit
+                                var bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                                FreeImage.UnloadEx(ref fBitmap);
+                                fBitmap = bgra;
+                                // Swap R and B channels to make it BGRA
+                                var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                                var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                                FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+                                FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+                                FreeImage.UnloadEx(ref r);
+                                FreeImage.UnloadEx(ref b);
+                            }
+                            break;
+
                         case 16:
                             // Channel swizzling for 16-bit formats is done after we get the bytes from the bitmap
                             break;
@@ -97,24 +116,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                                 var bgra = FreeImage.ConvertTo32Bits(fBitmap);
                                 FreeImage.UnloadEx(ref fBitmap);
                                 fBitmap = bgra;
-
-                                // FreeImage.ConvertTo32Bits() doesn't appear to do anything at all, so let's do it ourselves
-                                /*
-                                var rgba = new byte[width * height * 4];
-                                var i = 0;
-                                var j = 0;
-                                while (j < rgba.Length)
-                                {
-                                    // Swap RGB to BGRA
-                                    rgba[j] = bytes[i + 2];
-                                    rgba[j + 1] = bytes[i + 1];
-                                    rgba[j + 2] = bytes[i];
-                                    rgba[j + 3] = 255;
-                                    j += 4;
-                                    i += 3;
-                                }
-                                bytes = rgba;
-                                */
                             }
                             break;
 
@@ -127,17 +128,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                                 FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
                                 FreeImage.UnloadEx(ref r);
                                 FreeImage.UnloadEx(ref b);
-                                /*
-                                var i = 0;
-                                while (i < bytes.Length)
-                                {
-                                    // Swap RGBA to BGRA
-                                    var r = bytes[i];
-                                    bytes[i] = bytes[i + 2];
-                                    bytes[i + 2] = r;
-                                    i += 4;
-                                }
-                                */
                             }
                             break;
                     }
