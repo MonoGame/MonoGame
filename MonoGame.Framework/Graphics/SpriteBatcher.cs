@@ -229,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             unchecked
             {
-                _device._graphicsMetrics._spriteCount += (ulong)batchCount;
+                _device._graphicsMetrics._spriteCount += (long)batchCount;
             }
 
             // Iterate through the batches, doing short.MaxValue sets of vertices only.
