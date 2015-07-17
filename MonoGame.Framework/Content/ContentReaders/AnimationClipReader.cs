@@ -50,7 +50,22 @@ namespace Microsoft.Xna.Framework.Content
             {
                 keyframes[i].bone = input.ReadInt32();
                 keyframes[i].time = new TimeSpan(input.ReadInt64());
-                keyframes[i].transform = input.ReadMatrix();
+                keyframes[i].transform.M11 = input.ReadSingle();
+                keyframes[i].transform.M12 = input.ReadSingle();
+                keyframes[i].transform.M13 = input.ReadSingle();
+                keyframes[i].transform.M14 = 0;
+                keyframes[i].transform.M21 = input.ReadSingle();
+                keyframes[i].transform.M22 = input.ReadSingle();
+                keyframes[i].transform.M23 = input.ReadSingle();
+                keyframes[i].transform.M24 = 0;
+                keyframes[i].transform.M31 = input.ReadSingle();
+                keyframes[i].transform.M32 = input.ReadSingle();
+                keyframes[i].transform.M33 = input.ReadSingle();
+                keyframes[i].transform.M34 = 0;
+                keyframes[i].transform.M41 = input.ReadSingle();
+                keyframes[i].transform.M42 = input.ReadSingle();
+                keyframes[i].transform.M43 = input.ReadSingle();
+                keyframes[i].transform.M44 = 1;
             }
 
             return keyframes;

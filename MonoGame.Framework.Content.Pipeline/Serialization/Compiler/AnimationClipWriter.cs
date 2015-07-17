@@ -34,7 +34,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             {
                 output.Write(element.Bone);
                 output.Write(element.Time.Ticks);
-                output.Write(element.Transform);
+                output.Write(element.Transform.M11);
+                output.Write(element.Transform.M12);
+                output.Write(element.Transform.M13);
+                output.Write(element.Transform.M21);
+                output.Write(element.Transform.M22);
+                output.Write(element.Transform.M23);
+                output.Write(element.Transform.M31);
+                output.Write(element.Transform.M32);
+                output.Write(element.Transform.M33);
+                output.Write(element.Transform.M41);
+                output.Write(element.Transform.M42);
+                output.Write(element.Transform.M43);
             }
         }
     }
