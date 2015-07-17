@@ -43,7 +43,9 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
 #elif DESKTOPGL
+        #pragma warning disable 414
         private static AudioContext _acontext;
+        #pragma warning restore 414
         private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;

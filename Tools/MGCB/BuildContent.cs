@@ -37,6 +37,14 @@ namespace MGCB
             set { throw new InvalidOperationException(); }
         }
 
+        [CommandLineParameter(
+            Name = "workingDir",
+            ValueName = "directoryPath",
+            Description = "The working directory where all source content is located.")]
+        public void SetWorkingDir(string path)
+        {
+            Directory.SetCurrentDirectory(path);
+        }
 
         [CommandLineParameter(
             Name = "outputDir",
@@ -305,6 +313,13 @@ namespace MGCB
                     ++errorCount;
                 }
                 catch (PipelineException ex)
+                {
+                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    if (ex.InnerException != null)
+                        Console.Error.Write(ex.InnerException.ToString());
+                    ++errorCount;
+                }
+                catch (Exception ex)
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)

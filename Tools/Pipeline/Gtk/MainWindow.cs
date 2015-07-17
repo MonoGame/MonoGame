@@ -52,7 +52,16 @@ namespace MonoGame.Tools.Pipeline
             #if GTK3
             if(Global.UseHeaderBar)
             {
-                hbar.Subtitle = projectview1.openedProject;
+                if(string.IsNullOrEmpty(projectview1.openedProject))
+                {
+                    this.Title = "MonoGame Pipeline Tool";
+                    hbar.Subtitle = "";
+                }
+                else
+                {
+                    this.Title = System.IO.Path.GetFileName(projectview1.openedProject);
+                    hbar.Subtitle = System.IO.Path.GetDirectoryName(projectview1.openedProject);
+                }
                 return;
             }
             #endif
@@ -80,7 +89,12 @@ namespace MonoGame.Tools.Pipeline
             AllFilesFilter.Name = "All Files (*.*)";
             AllFilesFilter.AddPattern ("*.*");
 
+            #if GTK3
+            Widget[] widgets = Global.UseHeaderBar ? menu2.Children : menubar1.Children;
+            #else
             Widget[] widgets = menubar1.Children;
+            #endif
+
             foreach (Widget w in widgets) {
                 if(w.Name == "FileAction")
                 {
@@ -461,7 +475,19 @@ namespace MonoGame.Tools.Pipeline
 #endif
 #if MONOMAC || LINUX
             _buildProcess.StartInfo.FileName = "mono";
-            _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
+            if (_controller.LaunchDebugger) {
+                var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
+                port = !string.IsNullOrEmpty (port) ? port : "55555";
+                var monodebugger = string.Format ("--debug --debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:{0}",
+                    port);
+                _buildProcess.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monodebugger, exe, commands);
+                OutputAppend("************************************************");
+                OutputAppend("RUNNING MGCB IN DEBUG MODE!!!");
+                OutputAppend(string.Format ("Attach your Debugger to localhost:{0}", port));
+                OutputAppend("************************************************");
+            } else {
+                _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
+            }
 #endif
 
             return _buildProcess;
@@ -664,6 +690,16 @@ namespace MonoGame.Tools.Pipeline
             adialog.Destroy ();
         }
 
+        protected void OnDebugModeActionActivated (object sender, EventArgs e)
+        {
+            _controller.LaunchDebugger = this.DebugModeAction.Active;
+        }
+
+        protected void OnCancelBuildActionActivated (object sender, EventArgs e)
+        {
+            _controller.CancelBuild();
+        }
+
         public void UpdateMenus()
         {
             List<TreeIter> iters;
@@ -702,6 +738,18 @@ namespace MonoGame.Tools.Pipeline
             CleanAction.Sensitive = projectOpenAndNotBuilding;
             CancelBuildAction.Sensitive = !notBuilding;
             CancelBuildAction.Visible = !notBuilding;
+
+            #if GTK3
+            if(Global.UseHeaderBar)
+            {
+                new_button.Sensitive = NewAction.Sensitive;
+                open_button.Sensitive = OpenAction.Sensitive;
+                save_button.Sensitive = SaveAction.Sensitive;
+                build_button.Sensitive = BuildAction1.Sensitive;
+            }
+            #endif
+
+            DebugModeAction.Sensitive = notBuilding;
 
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();

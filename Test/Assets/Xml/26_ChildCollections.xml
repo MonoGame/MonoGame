@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="ChildCollections">
+    <Children>
+      <Item>
+        <Name>Foo</Name>
+      </Item>
+      <Item>
+        <Name>Bar</Name>
+      </Item>
+    </Children>
+  </Asset>
+</XnaContent>
