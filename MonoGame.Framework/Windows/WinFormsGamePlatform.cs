@@ -251,6 +251,7 @@ namespace MonoGame.Framework
                 }
                 Microsoft.Xna.Framework.Media.MediaManagerState.CheckShutdown();
             }
+            Keyboard.SetKeys(null);
 
             base.Dispose(disposing);
         }

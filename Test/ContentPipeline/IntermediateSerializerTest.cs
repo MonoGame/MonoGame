@@ -32,10 +32,13 @@ namespace MonoGame.Tests.ContentPipeline
             class FakeGraphicsService : IGraphicsDeviceService
             {
                 public GraphicsDevice GraphicsDevice { get; private set; }
+
+                #pragma warning disable 67
                 public event EventHandler<EventArgs> DeviceCreated;
                 public event EventHandler<EventArgs> DeviceDisposing;
                 public event EventHandler<EventArgs> DeviceReset;
                 public event EventHandler<EventArgs> DeviceResetting;
+                #pragma warning restore 67
             }
 
             class FakeServiceProvider : IServiceProvider
@@ -72,8 +75,8 @@ namespace MonoGame.Tests.ContentPipeline
 
             // Normalize line endings - git on build server seems to set
             // core.autocrlf to false.
-            expectedXml = expectedXml.Replace(Environment.NewLine, "\n");
-            actualXml = actualXml.Replace(Environment.NewLine, "\n");
+            expectedXml = expectedXml.Replace("\r\n", "\n");
+            actualXml = actualXml.Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedXml, actualXml);
         }
@@ -455,6 +458,19 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 A = new GenericClass<int> { Value = 3 },
                 B = new GenericClass<float> { Value = 4.2f }
+            });
+        }
+
+        [Test]
+        public void ChildCollections()
+        {
+            SerializeAndAssert("26_ChildCollections.xml", new ChildCollections
+            {
+                Children =
+                {
+                    new ChildCollectionChild { Name = "Foo" },
+                    new ChildCollectionChild { Name = "Bar" }
+                }
             });
         }
     }

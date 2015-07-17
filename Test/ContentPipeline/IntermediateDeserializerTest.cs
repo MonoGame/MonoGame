@@ -32,10 +32,13 @@ namespace MonoGame.Tests.ContentPipeline
             class FakeGraphicsService : IGraphicsDeviceService
             {
                 public GraphicsDevice GraphicsDevice { get; private set; }
+
+                #pragma warning disable 67
                 public event EventHandler<EventArgs> DeviceCreated;
                 public event EventHandler<EventArgs> DeviceDisposing;
                 public event EventHandler<EventArgs> DeviceReset;
                 public event EventHandler<EventArgs> DeviceResetting;
+                #pragma warning restore 67
             }
 
             class FakeServiceProvider : IServiceProvider
@@ -548,6 +551,22 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 Assert.IsNotNull(structArrayNoElems.Vector2ArrayNoElements);
                 Assert.AreEqual(0, structArrayNoElems.Vector2ArrayNoElements.Length);
+            });
+        }
+
+        [Test]
+        public void ChildCollections()
+        {
+            // ChildCollection is a ContentPipeline-only type, so we don't need to / shouldn't
+            // test running it through ContentCompiler.
+            Deserialize<ChildCollections>("26_ChildCollections.xml", childCollections =>
+            {
+                Assert.IsNotNull(childCollections.Children);
+                Assert.AreEqual(2, childCollections.Children.Count);
+                Assert.AreEqual(childCollections, childCollections.Children[0].Parent);
+                Assert.AreEqual("Foo", childCollections.Children[0].Name);
+                Assert.AreEqual(childCollections, childCollections.Children[1].Parent);
+                Assert.AreEqual("Bar", childCollections.Children[1].Name);
             });
         }
     }
