@@ -223,13 +223,23 @@ namespace Microsoft.Xna.Framework
             if (winWidth <= 1 || winHeight <= 1)
                 return;
 
-            //Stretch the viewport
-            var cv = Game.GraphicsDevice.Viewport;
+            if (window.WindowState == WindowState.Fullscreen)
+            {
+                //Stretch the viewport
+                var cv = Game.GraphicsDevice.Viewport;
 
-            var scalledwidth = ((float)cv.Width * (float)window.Width) / (float)Game.graphicsDeviceManager.PreferredBackBufferWidth;
-            var scalledheight = ((float)cv.Height * (float)window.Height) / (float)Game.graphicsDeviceManager.PreferredBackBufferHeight;
+                var scalledwidth = ((float)cv.Width * (float)window.Width) / (float)Game.graphicsDeviceManager.PreferredBackBufferWidth;
+                var scalledheight = ((float)cv.Height * (float)window.Height) / (float)Game.graphicsDeviceManager.PreferredBackBufferHeight;
 
-            OpenTK.Graphics.OpenGL.GL.Viewport(cv.X, cv.Y, (int)scalledwidth, (int)scalledheight);
+                OpenTK.Graphics.OpenGL.GL.Viewport(cv.X, cv.Y, (int)scalledwidth, (int)scalledheight);
+            }
+            else
+            {
+                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+
+                Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+            }
 
             //If we've already got a pending change, do nothing
             if (updateClientBounds)
