@@ -122,7 +122,6 @@ namespace Microsoft.Xna.Framework.Input
             maps[Keycode.Y] = Keys.Y;
             maps[Keycode.C] = Keys.Z;
 			maps[Keycode.Back] = Keys.Escape;
-            maps[Keycode.Back] = Keys.Back;
             maps[Keycode.Home] = Keys.Home;
             maps[Keycode.Enter] = Keys.Enter;
             maps[Keycode.Period] = Keys.OemPeriod;
