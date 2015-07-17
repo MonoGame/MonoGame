@@ -220,17 +220,20 @@ namespace Microsoft.Xna.Framework
 
             // If window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
-            if (winWidth <= 1 || winHeight <= 1) 
+            if (winWidth <= 1 || winHeight <= 1)
                 return;
+
+            //Stretch the viewport
+            var cv = Game.GraphicsDevice.Viewport;
+
+            var scalledwidth = ((float)cv.Width * (float)window.Width) / (float)Game.graphicsDeviceManager.PreferredBackBufferWidth;
+            var scalledheight = ((float)cv.Height * (float)window.Height) / (float)Game.graphicsDeviceManager.PreferredBackBufferHeight;
+
+            OpenTK.Graphics.OpenGL.GL.Viewport(cv.X, cv.Y, (int)scalledwidth, (int)scalledheight);
 
             //If we've already got a pending change, do nothing
             if (updateClientBounds)
                 return;
-            
-            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
-
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
 
             clientBounds = winRect;
 
@@ -324,17 +327,20 @@ namespace Microsoft.Xna.Framework
 
             window.KeyPress += OnKeyPress;
 
-            //make sure that the game is not running on linux
-            //on Linux people may want to use mkbundle to
-            //create native Linux binaries
-            if (CurrentPlatform.OS != OS.Linux)
+            Title = "MonoGame Application";
+
+            //load the information from assembly if it exists
+            try
             {
-                // Set the window icon.
                 var assembly = Assembly.GetEntryAssembly();
+
                 if (assembly != null)
+                {
                     window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-                Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
+                    Title = AssemblyHelper.GetDefaultWindowTitle();
+                }
             }
+            catch { }
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
@@ -371,6 +377,7 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
+            updateClientBounds = true;
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)

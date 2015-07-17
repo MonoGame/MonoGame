@@ -216,27 +216,14 @@ namespace Microsoft.Xna.Framework
 
             if (graphicsDeviceManager.IsFullScreen)
             {
-                bounds = new Rectangle(0, 0,graphicsDeviceManager.PreferredBackBufferWidth,graphicsDeviceManager.PreferredBackBufferHeight);
-
-                if (OpenTK.DisplayDevice.Default.Width != graphicsDeviceManager.PreferredBackBufferWidth ||
-                    OpenTK.DisplayDevice.Default.Height != graphicsDeviceManager.PreferredBackBufferHeight)
-                {
-                    OpenTK.DisplayDevice.Default.ChangeResolution(graphicsDeviceManager.PreferredBackBufferWidth,
-                            graphicsDeviceManager.PreferredBackBufferHeight,
-                            OpenTK.DisplayDevice.Default.BitsPerPixel,
-                            OpenTK.DisplayDevice.Default.RefreshRate);
-                }
+                bounds = new Rectangle(0, 0, graphicsDeviceManager.PreferredBackBufferWidth,graphicsDeviceManager.PreferredBackBufferHeight);
             }
             else
             {
-                
-                // switch back to the normal screen resolution
-                OpenTK.DisplayDevice.Default.RestoreResolution();
                 // now update the bounds 
                 bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
                 bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
             }
-            
 
             // Now we set our Presentation Parameters
             var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
@@ -251,7 +238,7 @@ namespace Microsoft.Xna.Framework
             }
 
             if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
-            {                
+            {
                 _view.ToggleFullScreen();
             }
 
