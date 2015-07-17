@@ -65,7 +65,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.Android:
                 case TargetPlatform.DesktopGL:
                 case TargetPlatform.MacOSX:
-                case TargetPlatform.Ouya:
                 case TargetPlatform.RaspberryPi:
                     options.Profile = ShaderProfile.OpenGL;
                     break;

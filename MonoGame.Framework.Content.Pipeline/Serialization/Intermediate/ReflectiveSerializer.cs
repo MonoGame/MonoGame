@@ -25,6 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         private readonly List<ElementInfo> _elements = new List<ElementInfo>();
 
         private ContentTypeSerializer _baseSerializer;
+        private GenericCollectionHelper _collectionHelper;
 
         private bool GetElementInfo(IntermediateSerializer serializer, MemberInfo member, out ElementInfo info)
         {
@@ -131,6 +132,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 if (GetElementInfo(serializer, field, out info))
                     _elements.Add(info);                
             }
+
+            if (GenericCollectionHelper.IsGenericCollectionType(TargetType, false))
+                _collectionHelper = serializer.GetCollectionHelper(TargetType);
         }
 
         public override bool CanDeserializeIntoExistingObject
@@ -191,6 +195,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 }
             }
 
+            if (_collectionHelper != null)
+                _collectionHelper.Deserialize(input, result, format);
+
             return result;
         }
 
@@ -198,6 +205,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             if (_baseSerializer != null)
                 return _baseSerializer.ObjectIsEmpty(value);
+            if (_collectionHelper != null)
+                return _collectionHelper.ObjectIsEmpty(value);
             return false;
         }
 
@@ -223,6 +232,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 elementSerializer.ScanChildren(serializer, callback, elementValue);
             }
+
+            if (_collectionHelper != null)
+                _collectionHelper.ScanChildren(callback, value);
         }
 
         protected internal override void Serialize(IntermediateWriter output, object value, ContentSerializerAttribute format)
@@ -241,6 +253,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 else
                     output.WriteObjectInternal(elementValue, info.Attribute, info.Serializer, info.Serializer.TargetType);
             }
+
+            if (_collectionHelper != null)
+                _collectionHelper.Serialize(output, value, format);
         }
     }
 }

@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                     Xml.WriteAttributeString("Null", "true");
                 }
-                else if (value.GetType() != declaredType && !IsNullableType(declaredType))
+                else if (value.GetType() != typeSerializer.TargetType && !IsNullableType(declaredType))
                 {
                     Xml.WriteStartAttribute("Type");
                     WriteTypeName(value.GetType());

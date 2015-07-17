@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework.Content.Pipeline" Path="MonoGame.Framework.Content.Pipeline" Type="Library" Platforms="Linux,MacOS,Windows">
 
   <!--
@@ -79,6 +79,9 @@
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\AtcBitmapContent.cs" />
+    <Compile Include="Graphics\AtcExplicitBitmapContent.cs" />
+    <Compile Include="Graphics\AtcInterpolatedBitmapContent.cs" />
     <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
     <Compile Include="Graphics\Font\BitmapUtils.cs" />
@@ -95,6 +98,7 @@
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\EffectMaterialContent.cs" />
     <Compile Include="Graphics\EnvironmentMapMaterialContent.cs" />
+    <Compile Include="Graphics\Etc1BitmapContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
@@ -116,6 +120,10 @@
     <Compile Include="Graphics\PixelBitmapContent.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgb2BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgb4BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgba2BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgba4BitmapContent.cs" />
     <Compile Include="Graphics\Font\SharpFontImporter.cs" />
     <Compile Include="Graphics\SkinnedMaterialContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
@@ -123,7 +131,6 @@
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureCubeContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
-    <Compile Include="Graphics\Font\TrueTypeImporter.cs" />
     <Compile Include="Graphics\VertexChannel.cs" />
     <Compile Include="Graphics\VertexChannelCollection.cs" />
     <Compile Include="Graphics\VertexChannelGeneric.cs" />
@@ -360,6 +367,7 @@
     <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\ExternalReferenceSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\GenericCollectionHelper.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
@@ -370,7 +378,7 @@
     <Compile Include="Serialization\Intermediate\NamedValueDictionarySerializer.cs" />    
     <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
     <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
-	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
@@ -427,6 +435,7 @@
     <Compile Include="XmlImporter.cs" />
 
 	<!-- Utility Classes -->
+    <Compile Include="Utilities\Vector4Converter.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />
@@ -438,11 +447,6 @@
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">
       <Platforms>Windows</Platforms>
       <Link>nvtt.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\x64\pvrtc.dll">
-      <Platforms>Windows</Platforms>
-      <Link>pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\assimp\Assimp64.dll">
@@ -473,6 +477,11 @@
     <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe">
       <Platforms>Windows</Platforms>
       <Link>ffprobe.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Windows\x64\PVRTexLibWrapper.dll">
+      <Platforms>Windows</Platforms>
+      <Link>PVRTexLibWrapper.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
@@ -517,6 +526,16 @@
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>FreeImageNET.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so">
+      <Platforms>Linux</Platforms>
+      <Link>libfreeimage-3.17.0.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg">
       <Platforms>Linux</Platforms>
       <Link>ffmpeg</Link>
@@ -525,6 +544,26 @@
     <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe">
       <Platforms>Linux</Platforms>
       <Link>ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x86\libPVRTexLibWrapper.so">
+      <Platforms>Linux</Platforms>
+      <Link>libPVRTexLibWrapper.x86.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so">
+      <Platforms>Linux</Platforms>
+      <Link>libPVRTexLibWrapper.x64.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>PVRTexLibNET.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>ATI.TextureConverter.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
@@ -552,16 +591,6 @@
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
       <Platforms>MacOS</Platforms>
       <Link>Nvidia.TextureTools.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\MacOS\libpvrtc.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libpvrtc.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>ManagedPVRTC.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib">
@@ -609,9 +638,19 @@
       <Link>libfreeimage.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimageplus.dylib">
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib">
       <Platforms>MacOS</Platforms>
-      <Link>libfreeimageplus.dylib</Link>
+      <Link>libPVRTexLibWrapper.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>PVRTexLibNET.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>ATI.TextureConverter.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </Files>
