@@ -436,6 +436,47 @@ class GenericClass<T>
 }
 #endregion
 
+#region ChildCollections
+public class ChildCollections
+{
+    private readonly ChildrenCollection _children;
+
+    [ContentSerializer]
+    public ChildrenCollection Children
+    {
+        get { return _children; }
+    }
+
+    public ChildCollections()
+    {
+        _children = new ChildrenCollection(this);
+    }
+}
+
+public class ChildrenCollection : ChildCollection<ChildCollections, ChildCollectionChild>
+{
+    public ChildrenCollection(ChildCollections parent) : base(parent)
+    {
+    }
+
+    protected override ChildCollections GetParent(ChildCollectionChild child)
+    {
+        return child.Parent;
+    }
+
+    protected override void SetParent(ChildCollectionChild child, ChildCollections parent)
+    {
+        child.Parent = parent;
+    }
+}
+
+public class ChildCollectionChild : ContentItem
+{
+    [ContentSerializerIgnore]
+    public ChildCollections Parent { get; set; }
+}
+#endregion
+
 class StructArrayNoElements
 {
     public Vector2[] Vector2ArrayNoElements = new Vector2[] {};

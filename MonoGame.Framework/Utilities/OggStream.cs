@@ -167,7 +167,7 @@ namespace MonoGame.Utilities
 
         public TimeSpan GetPosition()
         {
-            if (Reader == null || Reader.DecodedTime == null)
+            if (Reader == null)
                 return TimeSpan.Zero;
 
             return Reader.DecodedTime;
@@ -341,6 +341,9 @@ namespace MonoGame.Utilities
 
         public OggStreamer(int bufferSize = DefaultBufferSize, float updateRate = DefaultUpdateRate)
         {
+            UpdateRate = updateRate;
+            BufferSize = bufferSize;
+
             lock (singletonMutex)
             {
                 if (instance != null)
@@ -350,9 +353,6 @@ namespace MonoGame.Utilities
                 underlyingThread = new Thread(EnsureBuffersFilled) { Priority = ThreadPriority.Lowest };
                 underlyingThread.Start();
             }
-
-            UpdateRate = updateRate;
-            BufferSize = bufferSize;
 
             readSampleBuffer = new float[bufferSize];
             castBuffer = new short[bufferSize];
@@ -413,7 +413,7 @@ namespace MonoGame.Utilities
         {
             while (!cancelled)
             {
-                Thread.Sleep((int) (1000 / UpdateRate));
+                Thread.Sleep((int) (1000 / ((UpdateRate <= 0) ? 1 : UpdateRate)));
                 if (cancelled) break;
 
                 threadLocalStreams.Clear();

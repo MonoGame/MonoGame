@@ -29,6 +29,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public virtual bool ResizeToPowerOfTwo { get; set; }
 
+        public virtual bool MakeSquare { get; set; }
+
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
@@ -63,11 +65,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             
             if (ResizeToPowerOfTwo)
             {
-                if (!GraphicsUtil.IsPowerOfTwo(bmp.Width) || !GraphicsUtil.IsPowerOfTwo(bmp.Height))
+                if (!GraphicsUtil.IsPowerOfTwo(bmp.Width) || !GraphicsUtil.IsPowerOfTwo(bmp.Height) || (MakeSquare && bmp.Height != bmp.Width))
                 {
-                    input.Resize(GraphicsUtil.GetNextPowerOfTwo(bmp.Width), GraphicsUtil.GetNextPowerOfTwo(bmp.Height));
+                    var newWidth = GraphicsUtil.GetNextPowerOfTwo(bmp.Width);
+                    var newHeight = GraphicsUtil.GetNextPowerOfTwo(bmp.Height);
+                    if (MakeSquare)
+                        newWidth = newHeight = Math.Max(newWidth, newHeight);
+                    input.Resize(newWidth, newHeight);
                     bmp = input.Faces[0][0];
                 }
+            }
+            else if (MakeSquare && bmp.Height != bmp.Width)
+            {
+                var newSize = Math.Max(bmp.Width, bmp.Height);
+                input.Resize(newSize, newSize);
+                bmp = input.Faces[0][0];
             }
 
             if (PremultiplyAlpha)
@@ -98,9 +110,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			
 			try 
 			{
-			    if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
-                    TextureFormat == TextureProcessorOutputFormat.Compressed )
-                	GraphicsUtil.CompressTexture(context.TargetProfile, input, context, GenerateMipmaps, PremultiplyAlpha, false);
+			    if (TextureFormat != TextureProcessorOutputFormat.Color)
+                	GraphicsUtil.CompressTexture(context.TargetProfile, input, TextureFormat, context, GenerateMipmaps, PremultiplyAlpha, false);
 			}
 			catch(EntryPointNotFoundException ex) {
 				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture", ex.ToString());

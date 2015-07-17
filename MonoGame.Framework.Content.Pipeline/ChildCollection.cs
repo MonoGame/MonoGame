@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             TChild child = this[index];
             SetParent(child, default(TParent));
             SetParent(item, parent);
-            base.InsertItem(index, item);
+            base.SetItem(index, item);
         }
 
         /// <summary>

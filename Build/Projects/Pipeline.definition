@@ -263,6 +263,9 @@
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\folder_missing.png" />
     <EmbeddedResource Include="Icons\settings.png" />
+    <EmbeddedResource Include="Gtk\MainWindow.HeaderBar.glade">
+      <Platforms>Linux</Platforms>
+    </EmbeddedResource>
 
     <!-- Copy config files to output directory -->
     <None Include="..\..\ThirdParty\Dependencies\Gtk3\atk-sharp.dll.config">
