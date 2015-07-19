@@ -71,9 +71,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // http://en.wikipedia.org/wiki/Windows_Phone_8#Hardware_requirements
                 isConnected = true;
                 maximumTouchCount = 4;
-#elif PSM
-                isConnected = true;
-                maximumTouchCount = 2; //TODO: This number is made up, needs to be tested on Vita
 #else
                 //Touch isn't implemented in OpenTK, so no linux or mac https://github.com/opentk/opentk/issues/80
                 isConnected = false;

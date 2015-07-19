@@ -11,8 +11,6 @@ using Foundation;
 using UIKit;
 #elif MONOMAC
 using MonoMac.Foundation;
-#elif PSM
-using Sce.PlayStation.Core;
 #endif
 using Microsoft.Xna.Framework.Utilities;
 
@@ -28,8 +26,6 @@ namespace Microsoft.Xna.Framework
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
 #elif IOS || MONOMAC
 			Location = NSBundle.MainBundle.ResourcePath;
-#elif PSM
-			Location = "/Application";
 #else
             Location = string.Empty;
 #endif
