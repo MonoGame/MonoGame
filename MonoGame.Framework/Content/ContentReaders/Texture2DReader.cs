@@ -17,17 +17,6 @@ namespace Microsoft.Xna.Framework.Content
 			// Do nothing
 		}
 
-#if ANDROID
-        static string[] supportedExtensions = new string[] { ".jpg", ".bmp", ".jpeg", ".png", ".gif" };
-#else
-        static string[] supportedExtensions = new string[] { ".jpg", ".bmp", ".jpeg", ".png", ".gif", ".pict", ".tga" };
-#endif
-
-        internal static string Normalize(string fileName)
-        {
-            return Normalize(fileName, supportedExtensions);
-        }
-
         protected internal override Texture2D Read(ContentReader reader, Texture2D existingInstance)
 		{
 			Texture2D texture = null;
@@ -51,25 +40,6 @@ namespace Microsoft.Xna.Framework.Content
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
 			{
-				case SurfaceFormat.Dxt1:
-				case SurfaceFormat.Dxt1a:
-					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
-						convertedFormat = SurfaceFormat.Color;
-					break;
-				case SurfaceFormat.Dxt1SRgb:
-					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
-						convertedFormat = SurfaceFormat.ColorSRgb;
-					break;
-				case SurfaceFormat.Dxt3:
-				case SurfaceFormat.Dxt5:
-					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-						convertedFormat = SurfaceFormat.Color;
-					break;
-				case SurfaceFormat.Dxt3SRgb:
-				case SurfaceFormat.Dxt5SRgb:
-					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-						convertedFormat = SurfaceFormat.ColorSRgb;
-					break;
 				case SurfaceFormat.NormalizedByte4:
 					convertedFormat = SurfaceFormat.Color;
 					break;
@@ -91,24 +61,6 @@ namespace Microsoft.Xna.Framework.Content
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{
-					case SurfaceFormat.Dxt1:
-                    case SurfaceFormat.Dxt1SRgb:
-                    case SurfaceFormat.Dxt1a:
-                        if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1 && convertedFormat == SurfaceFormat.Color)
-						    levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
-						break;
-					case SurfaceFormat.Dxt3:
-					case SurfaceFormat.Dxt3SRgb:
-                        if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-                        if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc && convertedFormat == SurfaceFormat.Color)
-						    levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
-						break;
-					case SurfaceFormat.Dxt5:
-					case SurfaceFormat.Dxt5SRgb:
-                        if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-                        if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc && convertedFormat == SurfaceFormat.Color)
-    						levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
-						break;
                     case SurfaceFormat.Bgra5551:
                         {
 #if OPENGL
