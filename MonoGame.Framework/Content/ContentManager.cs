@@ -10,11 +10,6 @@ using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 
-#if !WINRT
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
-#endif
-
 namespace Microsoft.Xna.Framework.Content
 {
 	public partial class ContentManager : IDisposable
@@ -279,131 +274,31 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			Stream stream = null;
-			try
+            // Try to load as XNB file
+            try
             {
-				//try load it traditionally
-				stream = OpenStream(assetName);
-
-                // Try to load as XNB file
-                try
+                //try load it traditionally
+                stream = OpenStream(assetName);
+                using (BinaryReader xnbReader = new BinaryReader(stream))
                 {
-                    using (BinaryReader xnbReader = new BinaryReader(stream))
+                    using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, recordDisposableObject))
                     {
-                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, recordDisposableObject))
-                        {
-                            result = reader.ReadAsset<T>();
-                            if (result is GraphicsResource)
-                                ((GraphicsResource)result).Name = originalAssetName;
-                        }
-                    }
-                }
-                finally
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
+                        result = reader.ReadAsset<T>();
+                        if (result is GraphicsResource)
+                            ((GraphicsResource)result).Name = originalAssetName;
                     }
                 }
             }
-            catch (ContentLoadException ex)
+            finally
             {
-				//MonoGame try to load as a non-content file
-
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
-                assetName = Normalize<T>(assetName);
-	
-				if (string.IsNullOrEmpty(assetName))
-				{
-					throw new ContentLoadException("Could not load " + originalAssetName + " asset as a non-content file!", ex);
-				}
-
-                result = ReadRawAsset<T>(assetName, originalAssetName);
-
-                // Because Raw Assets skip the ContentReader step, they need to have their
-                // disopsables recorded here. Doing it outside of this catch will 
-                // result in disposables being logged twice.
-                if (result is IDisposable)
+                if (stream != null)
                 {
-                    if (recordDisposableObject != null)
-                        recordDisposableObject(result as IDisposable);
-                    else
-                        disposableAssets.Add(result as IDisposable);
+                    stream.Dispose();
                 }
-			}
+            }
             
-			if (result == null)
-				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-
 			return (T)result;
 		}
-
-        protected virtual string Normalize<T>(string assetName)
-        {
-            if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
-            {
-                return Texture2DReader.Normalize(assetName);
-            }
-            else if ((typeof(T) == typeof(SpriteFont)))
-            {
-                return SpriteFontReader.Normalize(assetName);
-            }
-#if !WINRT
-            else if ((typeof(T) == typeof(Song)))
-            {
-                return SongReader.Normalize(assetName);
-            }
-            else if ((typeof(T) == typeof(SoundEffect)))
-            {
-                return SoundEffectReader.Normalize(assetName);
-            }
-#endif
-            else if ((typeof(T) == typeof(Effect)))
-            {
-                return EffectReader.Normalize(assetName);
-            }
-            return null;
-        }
-
-        protected virtual object ReadRawAsset<T>(string assetName, string originalAssetName)
-        {
-            if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
-            {
-                using (Stream assetStream = TitleContainer.OpenStream(assetName))
-                {
-                    Texture2D texture = Texture2D.FromStream(
-                        graphicsDeviceService.GraphicsDevice, assetStream);
-                    texture.Name = originalAssetName;
-                    return texture;
-                }
-            }
-            else if ((typeof(T) == typeof(SpriteFont)))
-            {
-                //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
-                throw new NotImplementedException();
-            }
-#if !DIRECTX
-            else if ((typeof(T) == typeof(Song)))
-            {
-                return new Song(assetName);
-            }
-            else if ((typeof(T) == typeof(SoundEffect)))
-            {
-                using (Stream s = TitleContainer.OpenStream(assetName))
-                    return SoundEffect.FromStream(s);
-            }
-#endif
-            else if ((typeof(T) == typeof(Effect)))
-            {
-                using (Stream assetStream = TitleContainer.OpenStream(assetName))
-                {
-                    var data = new byte[assetStream.Length];
-                    assetStream.Read(data, 0, (int)assetStream.Length);
-                    return new Effect(this.graphicsDeviceService.GraphicsDevice, data);
-                }
-            }
-            return null;
-        }
 
         private ContentReader GetContentReaderFromXnb(string originalAssetName, ref Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
         {
@@ -581,56 +476,29 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			Stream stream = null;
-			try
-			{
+            // Try to load as XNB file
+            try
+            {
                 //try load it traditionally
                 stream = OpenStream(assetName);
-
-                // Try to load as XNB file
-                try
+                using (var xnbReader = new BinaryReader(stream))
                 {
-                    using (BinaryReader xnbReader = new BinaryReader(stream))
+                    using (var reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, null))
                     {
-                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, null))
-                        {
-                            reader.InitializeTypeReaders();
-                            reader.ReadObject<T>(currentAsset);
-                            reader.ReadSharedResources();
-                        }
+                        reader.InitializeTypeReaders();
+                        reader.ReadObject<T>(currentAsset);
+                        reader.ReadSharedResources();
                     }
                 }
-                finally
+            }
+            finally
+            {
+                if (stream != null)
                 {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                    }
+                    stream.Dispose();
                 }
-			}
-			catch (ContentLoadException)
-			{
-				// Try to reload as a non-xnb file.
-                // Just textures supported for now.
-
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
-                assetName = Normalize<T>(assetName);
-
-                ReloadRawAsset(currentAsset, assetName, originalAssetName);
             }
 		}
-
-        protected virtual void ReloadRawAsset<T>(T asset, string assetName, string originalAssetName)
-        {
-            if (asset is Texture2D)
-            {
-                using (Stream assetStream = TitleContainer.OpenStream(assetName))
-                {
-                    var textureAsset = asset as Texture2D;
-                    textureAsset.Reload(assetStream);
-                }
-            }
-        }
 
 		public virtual void Unload()
 		{
