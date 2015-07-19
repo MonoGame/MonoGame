@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework
 
             return stream;
 #elif ANDROID
-            return Game.Activity.Assets.Open(safeName);
+            return Android.App.Application.Context.Assets.Open(safeName);
 #elif IOS
             var absolutePath = Path.Combine(Location, safeName);
             if (SupportRetina)

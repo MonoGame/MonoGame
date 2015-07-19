@@ -75,27 +75,25 @@ namespace Microsoft.Xna.Framework.Content
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
 			{
-#if !IOS && !ANDROID
 				case SurfaceFormat.Dxt1:
-                case SurfaceFormat.Dxt1a:
-                    if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
-                        convertedFormat = SurfaceFormat.Color;
-                    break;
-                case SurfaceFormat.Dxt1SRgb:
-                    if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
-                        convertedFormat = SurfaceFormat.ColorSRgb;
-                    break;
-                case SurfaceFormat.Dxt3:
+				case SurfaceFormat.Dxt1a:
+					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
+						convertedFormat = SurfaceFormat.Color;
+					break;
+				case SurfaceFormat.Dxt1SRgb:
+					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsDxt1)
+						convertedFormat = SurfaceFormat.ColorSRgb;
+					break;
+				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
-                    if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-					    convertedFormat = SurfaceFormat.Color;
+					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
+						convertedFormat = SurfaceFormat.Color;
 					break;
-                case SurfaceFormat.Dxt3SRgb:
-                case SurfaceFormat.Dxt5SRgb:
-                    if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
-					    convertedFormat = SurfaceFormat.ColorSRgb;
+				case SurfaceFormat.Dxt3SRgb:
+				case SurfaceFormat.Dxt5SRgb:
+					if (!reader.GraphicsDevice.GraphicsCapabilities.SupportsS3tc)
+						convertedFormat = SurfaceFormat.ColorSRgb;
 					break;
-#endif
 				case SurfaceFormat.NormalizedByte4:
 					convertedFormat = SurfaceFormat.Color;
 					break;
