@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework
         /// Creates a new <see cref="Quaternion"/> from the specified axis and angle.
         /// </summary>
         /// <param name="axis">The axis of rotation.</param>
-        /// <param name="angle">The angle to rotate around the axis.</param>
+        /// <param name="angle">The angle in radians.</param>
         /// <returns>The new quaternion builded from axis and angle.</returns>
         public static Quaternion CreateFromAxisAngle(Vector3 axis, float angle)
         {
@@ -276,7 +276,7 @@ namespace Microsoft.Xna.Framework
         /// Creates a new <see cref="Quaternion"/> from the specified axis and angle.
         /// </summary>
         /// <param name="axis">The axis of rotation.</param>
-        /// <param name="angle">The angle to rotate around the axis.</param>
+        /// <param name="angle">The angle in radians.</param>
         /// <param name="result">The new quaternion builded from axis and angle as an output parameter.</param>
         public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Quaternion result)
         {
@@ -296,8 +296,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new <see cref="Quaternion"/> from the specified <see cref="Matrix"/>.
         /// </summary>
-        /// <param name="matrix">The matrix which contains rotation information.</param>
-        /// <returns>The new quaternion builded from matrix.</returns>
+        /// <param name="matrix">The rotation matrix.</param>
+        /// <returns>A quaternion composed from the rotation part of the matrix.</returns>
         public static Quaternion CreateFromRotationMatrix(Matrix matrix)
         {
             Quaternion quaternion;
@@ -355,8 +355,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new <see cref="Quaternion"/> from the specified <see cref="Matrix"/>.
         /// </summary>
-        /// <param name="matrix">The matrix which contains rotation information.</param>
-        /// <param name="result">The new quaternion builded from matrix as an output parameter.</param>
+        /// <param name="matrix">The rotation matrix.</param>
+        /// <param name="result">A quaternion composed from the rotation part of the matrix as an output parameter.</param>
         public static void CreateFromRotationMatrix(ref Matrix matrix, out Quaternion result)
         {
             float sqrt;
