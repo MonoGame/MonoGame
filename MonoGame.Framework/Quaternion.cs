@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
     {
         #region Private Fields
 
-        private static readonly Quaternion identity = new Quaternion(0, 0, 0, 1);
+        private static readonly Quaternion _identity = new Quaternion(0, 0, 0, 1);
 
         #endregion
 
@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public static Quaternion Identity
         {
-            get{ return identity; }
+            get{ return _identity; }
         }
 
         #endregion
@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (this == Quaternion.identity)
+                if (this == Quaternion._identity)
                 {
                     return "Identity";
                 }
@@ -411,12 +411,12 @@ namespace Microsoft.Xna.Framework
         #region CreateFromYawPitchRoll
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> from the specified yaw, pitch and roll scalars.
+        /// Creates a new <see cref="Quaternion"/> from the specified yaw, pitch and roll angles.
         /// </summary>
-        /// <param name="yaw"></param>
-        /// <param name="pitch"></param>
-        /// <param name="roll"></param>
-        /// <returns>The new quaternion builded from the specified yaw, pitch and roll scalars.</returns>
+        /// <param name="yaw">Yaw around the y axis in radians.</param>
+        /// <param name="pitch">Pitch around the x axis in radians.</param>
+        /// <param name="roll">Roll around the z axis in radians.</param>
+        /// <returns>A new quaternion from the concatenated yaw, pitch, and roll angles.</returns>
         public static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 		{
             float halfRoll = roll * 0.5f;
@@ -437,12 +437,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> from the specified yaw, pitch and roll scalars.
+        /// Creates a new <see cref="Quaternion"/> from the specified yaw, pitch and roll angles.
         /// </summary>
-        /// <param name="yaw"></param>
-        /// <param name="pitch"></param>
-        /// <param name="roll"></param>
-        /// <param name="result">The new quaternion builded from the specified yaw, pitch and roll scalars as an output parameter.</param>
+        /// <param name="yaw">Yaw around the y axis in radians.</param>
+        /// <param name="pitch">Pitch around the x axis in radians.</param>
+        /// <param name="roll">Roll around the z axis in radians.</param>
+        /// <param name="result">A new quaternion from the concatenated yaw, pitch, and roll angles.</param>
  		public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Quaternion result)
 		{
             float halfRoll = roll * 0.5f;
@@ -561,7 +561,9 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is Quaternion) ? this == (Quaternion)obj : false;
+            if (obj is Quaternion)
+                return Equals((Quaternion)obj);
+            return false;
         }
 
         /// <summary>
@@ -571,7 +573,10 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(Quaternion other)
         {
-			return ((((this.X == other.X) && (this.Y == other.Y)) && (this.Z == other.Z)) && (this.W == other.W));
+			return X == other.X &&
+                   Y == other.Y &&
+                   Z == other.Z &&
+                   W == other.W;
         }
 
         #endregion
@@ -627,8 +632,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Quaternion"/>.</returns>
         public float Length()
         {
-            float num = (X * X) + (Y * Y) + (Z * Z) + (W * W);
-    		return (float) Math.Sqrt(num);
+    		return (float) Math.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
         }
 
         /// <summary>
