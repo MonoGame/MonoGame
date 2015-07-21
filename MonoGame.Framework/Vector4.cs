@@ -182,18 +182,6 @@ namespace Microsoft.Xna.Framework
             this.W = value;
         }
 
-        /// <summary>
-        /// Constructs a 4d vector from <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="quaternion">The x, y, z and w coordinates in 4d-space.</param>
-        public Vector4(Quaternion quaternion)
-        {
-            this.X = quaternion.X;
-            this.Y = quaternion.Y;
-            this.Z = quaternion.Z;
-            this.W = quaternion.W;
-        }
-
         #endregion
 
         #region Public Methods

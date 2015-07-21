@@ -442,7 +442,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="yaw">Yaw around the y axis in radians.</param>
         /// <param name="pitch">Pitch around the x axis in radians.</param>
         /// <param name="roll">Roll around the z axis in radians.</param>
-        /// <param name="result">A new quaternion from the concatenated yaw, pitch, and roll angles.</param>
+        /// <param name="result">A new quaternion from the concatenated yaw, pitch, and roll angles as an output parameter.</param>
  		public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Quaternion result)
 		{
             float halfRoll = roll * 0.5f;
@@ -593,10 +593,10 @@ namespace Microsoft.Xna.Framework
         #region Inverse
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains an inversion of specified quaternion.
+        /// Returns the inverse quaternion which represents the opposite rotation.
         /// </summary>
         /// <param name="quaternion">Source <see cref="Quaternion"/>.</param>
-        /// <returns>The inversion quaternion.</returns>
+        /// <returns>The inverse quaternion.</returns>
         public static Quaternion Inverse(Quaternion quaternion)
         {
             Quaternion quaternion2;
@@ -610,10 +610,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains an inversion of specified quaternion.
+        /// Returns the inverse quaternion which represents the opposite rotation.
         /// </summary>
         /// <param name="quaternion">Source <see cref="Quaternion"/>.</param>
-        /// <param name="result">The inversion quaternion as an output parameter.</param>
+        /// <param name="result">The inverse quaternion as an output parameter.</param>
         public static void Inverse(ref Quaternion quaternion, out Quaternion result)
         {
             float num2 = (((quaternion.X * quaternion.X) + (quaternion.Y * quaternion.Y)) + (quaternion.Z * quaternion.Z)) + (quaternion.W * quaternion.W);
@@ -627,18 +627,18 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         /// <summary>
-        /// Returns the length of this <see cref="Quaternion"/>.
+        /// Returns the magnitude of the quaternion components.
         /// </summary>
-        /// <returns>The length of this <see cref="Quaternion"/>.</returns>
+        /// <returns>The magnitude of the quaternion components.</returns>
         public float Length()
         {
     		return (float) Math.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
         }
 
         /// <summary>
-        /// Returns the squared length of this <see cref="Quaternion"/>.
+        /// Returns the squared magnitude of the quaternion components.
         /// </summary>
-        /// <returns>The squared length of this <see cref="Quaternion"/>.</returns>
+        /// <returns>The squared magnitude of the quaternion components.</returns>
         public float LengthSquared()
         {
             return (X * X) + (Y * Y) + (Z * Z) + (W * W);
@@ -647,12 +647,12 @@ namespace Microsoft.Xna.Framework
         #region Lerp
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains linear interpolation of the specified quaternions.
+        /// Performs a linear blend between two quaternions.
         /// </summary>
-        /// <param name="quaternion1">Source <see cref="Vector4"/>.</param>
-        /// <param name="quaternion2">Source <see cref="Vector4"/>.</param>
-        /// <param name="amount">Weighting value.</param>
-        /// <returns>The result of linear interpolation of the specified quaternions.</returns>
+        /// <param name="quaternion1">Source <see cref="Quaternion"/>.</param>
+        /// <param name="quaternion2">Source <see cref="Quaternion"/>.</param>
+        /// <param name="amount">The blend amount where 0 returns <paramref name="quaternion1"/> and 1 <paramref name="quaternion2"/>.</param>
+        /// <returns>The result of linear blending between two quaternions.</returns>
         public static Quaternion Lerp(Quaternion quaternion1, Quaternion quaternion2, float amount)
         {
             float num = amount;
@@ -683,12 +683,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains linear interpolation of the specified quaternions.
+        /// Performs a linear blend between two quaternions.
         /// </summary>
-        /// <param name="quaternion1">Source <see cref="Vector4"/>.</param>
-        /// <param name="quaternion2">Source <see cref="Vector4"/>.</param>
-        /// <param name="amount">Weighting value.</param>
-        /// <param name="result">The result of linear interpolation of the specified quaternions as an output parameter.</param>
+        /// <param name="quaternion1">Source <see cref="Quaternion"/>.</param>
+        /// <param name="quaternion2">Source <see cref="Quaternion"/>.</param>
+        /// <param name="amount">The blend amount where 0 returns <paramref name="quaternion1"/> and 1 <paramref name="quaternion2"/>.</param>
+        /// <param name="result">The result of linear blending between two quaternions as an output parameter.</param>
         public static void Lerp(ref Quaternion quaternion1, ref Quaternion quaternion2, float amount, out Quaternion result)
         {
             float num = amount;
@@ -722,12 +722,12 @@ namespace Microsoft.Xna.Framework
         #region Slerp
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains spherical linear interpolation of the specified quaternions.
+        /// Performs a spherical linear blend between two quaternions.
         /// </summary>
-        /// <param name="quaternion1">Source <see cref="Vector4"/>.</param>
-        /// <param name="quaternion2">Source <see cref="Vector4"/>.</param>
-        /// <param name="amount">Weighting value.</param>
-        /// <returns>The result of spherical linear interpolation of the specified quaternions.</returns>
+        /// <param name="quaternion1">Source <see cref="Quaternion"/>.</param>
+        /// <param name="quaternion2">Source <see cref="Quaternion"/>.</param>
+        /// <param name="amount">The blend amount where 0 returns <paramref name="quaternion1"/> and 1 <paramref name="quaternion2"/>.</param>
+        /// <returns>The result of spherical linear blending between two quaternions.</returns>
         public static Quaternion Slerp(Quaternion quaternion1, Quaternion quaternion2, float amount)
         {
             float num2;
@@ -761,12 +761,12 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains spherical linear interpolation of the specified quaternions.
+        /// Performs a spherical linear blend between two quaternions.
         /// </summary>
-        /// <param name="quaternion1">Source <see cref="Vector4"/>.</param>
-        /// <param name="quaternion2">Source <see cref="Vector4"/>.</param>
-        /// <param name="amount">Weighting value.</param>
-        /// <param name="result">The result of spherical linear interpolation of the specified quaternions as an output parameter.</param>
+        /// <param name="quaternion1">Source <see cref="Quaternion"/>.</param>
+        /// <param name="quaternion2">Source <see cref="Quaternion"/>.</param>
+        /// <param name="amount">The blend amount where 0 returns <paramref name="quaternion1"/> and 1 <paramref name="quaternion2"/>.</param>
+        /// <param name="result">The result of spherical linear blending between two quaternions as an output parameter.</param>
         public static void Slerp(ref Quaternion quaternion1, ref Quaternion quaternion2, float amount, out Quaternion result)
         {
             float num2;
@@ -924,20 +924,20 @@ namespace Microsoft.Xna.Framework
         #region Negate
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains the specified quaternion inversion.
+        /// Flips the sign of the all the quaternion components.
         /// </summary>
         /// <param name="quaternion">Source <see cref="Quaternion"/>.</param>
-        /// <returns>The result of the quaternion inversion.</returns>
+        /// <returns>The result of quaternion negation.</returns>
         public static Quaternion Negate(Quaternion quaternion)
         {
 		    return new Quaternion(-quaternion.X, -quaternion.Y, -quaternion.Z, -quaternion.W);
         }
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains the specified quaternion inversion.
+        /// Flips the sign of the all the quaternion components.
         /// </summary>
         /// <param name="quaternion">Source <see cref="Quaternion"/>.</param>
-        /// <param name="result">The result of the quaternion inversion as an output parameter.</param>
+        /// <param name="result">The result of quaternion negation as an output parameter.</param>
         public static void Negate(ref Quaternion quaternion, out Quaternion result)
         {
             result.X = -quaternion.X;
@@ -951,7 +951,7 @@ namespace Microsoft.Xna.Framework
         #region Normalize
 
         /// <summary>
-        /// Turns this <see cref="Quaternion"/> to a unit quaternion with the same direction.
+        /// Scales the quaternion magnitude to unit length.
         /// </summary>
         public void Normalize()
         {
@@ -963,10 +963,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains a normalized values from another quaternion.
+        /// Scales the quaternion magnitude to unit length.
         /// </summary>
         /// <param name="quaternion">Source <see cref="Quaternion"/>.</param>
-        /// <returns>Unit quaternion.</returns>
+        /// <returns>The unit length quaternion.</returns>
         public static Quaternion Normalize(Quaternion quaternion)
         {
             Quaternion result;
@@ -979,10 +979,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Quaternion"/> that contains a normalized values from another quaternion.
+        /// Scales the quaternion magnitude to unit length.
         /// </summary>
         /// <param name="quaternion">Source <see cref="Quaternion"/>.</param>
-        /// <param name="result">Unit quaternion as an output parameter.</param>
+        /// <param name="result">The unit length quaternion an output parameter.</param>
         public static void Normalize(ref Quaternion quaternion, out Quaternion result)
         {
 		    float num = 1f / ((float) Math.Sqrt((quaternion.X * quaternion.X) + (quaternion.Y * quaternion.Y) + (quaternion.Z * quaternion.Z) + (quaternion.W * quaternion.W)));
@@ -1151,10 +1151,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Inverts values in the specified <see cref="Quaternion"/>.
+        /// Flips the sign of the all the quaternion components.
         /// </summary>
         /// <param name="quaternion">Source <see cref="Quaternion"/> on the right of the sub sign.</param>
-        /// <returns>Result of the inversion.</returns>
+        /// <returns>The result of quaternion negation.</returns>
         public static Quaternion operator -(Quaternion quaternion)
         {
             Quaternion quaternion2;
