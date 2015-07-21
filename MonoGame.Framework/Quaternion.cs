@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Describes a 4D-vector which designed for rotation operations.
+    /// An efficient mathematical representation for three dimensional rotations.
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
