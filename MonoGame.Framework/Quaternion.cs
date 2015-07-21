@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework
         #region Public Properties
 
         /// <summary>
-        /// Returns a <see cref="Quaternion"/> with components 0, 0, 0, 1(without the rotation).
+        /// Returns a quaternion representing no rotation.
         /// </summary>
         public static Quaternion Identity
         {
