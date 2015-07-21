@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework
 {
-    internal class QuaternionTest
+    class QuaternionTest
     {
         private void Compare(Quaternion expected, Quaternion source)
         {
