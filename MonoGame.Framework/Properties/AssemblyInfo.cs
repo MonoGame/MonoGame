@@ -18,8 +18,6 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for all OpenGL Desktop Platforms")]
 #elif WINDOWS
 [assembly: AssemblyDescription("MonoGame for Windows Desktop (DirectX)")]
-#elif PSM
-[assembly: AssemblyDescription("MonoGame for PlayStation Mobile")]
 #elif MAC
 [assembly: AssemblyDescription("MonoGame for Mac OS X")]
 #elif IOS

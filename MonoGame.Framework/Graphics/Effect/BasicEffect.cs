@@ -71,8 +71,6 @@ namespace Microsoft.Xna.Framework.Graphics
         static readonly byte[] Bytecode = LoadEffectResource(
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.dx11.mgfxo"
-#elif PSM 
-            "Microsoft.Xna.Framework.PSSuite.Graphics.Resources.BasicEffect.cgx" //FIXME: This shader is totally incomplete
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.ogl.mgfxo"
 #endif
@@ -416,11 +414,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         void CacheEffectParameters(BasicEffect cloneSource)
         {
-            #if !PSM
-                textureParam                = Parameters["Texture"];
-            #else
-                textureParam                = Parameters["Texture0"];
-            #endif
+            textureParam                = Parameters["Texture"];
             diffuseColorParam           = Parameters["DiffuseColor"];
             emissiveColorParam          = Parameters["EmissiveColor"];
             specularColorParam          = Parameters["SpecularColor"];
@@ -506,10 +500,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
-#if PSM
-#warning Major hack as PSM Shaders don't support multiple Techinques (yet)
-                shaderIndex = 0;
-#endif
 
                 if (_shaderIndex != shaderIndex)
                 {
