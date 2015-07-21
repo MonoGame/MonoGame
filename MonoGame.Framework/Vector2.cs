@@ -809,7 +809,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector2"/> that contains subtraction of on <see cref="Vector2"/> from a another.
+        /// Creates a new <see cref="Vector2"/> that contains subtraction of one <see cref="Vector2"/> from another.
         /// </summary>
         /// <param name="value1">Source <see cref="Vector2"/>.</param>
         /// <param name="value2">Source <see cref="Vector2"/>.</param>
@@ -822,7 +822,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector2"/> that contains subtraction of on <see cref="Vector2"/> from a another.
+        /// Creates a new <see cref="Vector2"/> that contains subtraction of one <see cref="Vector2"/> from another.
         /// </summary>
         /// <param name="value1">Source <see cref="Vector2"/>.</param>
         /// <param name="value2">Source <see cref="Vector2"/>.</param>

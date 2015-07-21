@@ -5,8 +5,13 @@ using System.Globalization;
 
 namespace MonoGame.Tests.Framework
 {
-    class Vector3Test
+    class Vector3Test : FPointBase
     {
+        private void Compare(Vector3 expected, Vector3 source)
+        {
+            Assert.That(expected, Is.EqualTo(source).Using(Vector3Comparer.Epsilon));
+        }
+
         [Test]
         public void TypeConverter()
         {
@@ -33,7 +38,7 @@ namespace MonoGame.Tests.Framework
             var v2 = new Vector3(1.1f, -2.0f, 5.5f);
             var d = Vector3.DistanceSquared(v1, v2);
             var expectedResult = 10526f;
-            Assert.AreEqual(expectedResult, d);
+            Compare(expectedResult, d);
         }
 
         [Test]
@@ -43,9 +48,9 @@ namespace MonoGame.Tests.Framework
             Vector3 v2 = new Vector3(-10.5f, 0.2f, 1000.0f);
             v1.Normalize();
             var expectedResult = new Vector3(-0.0104994215f, 0.000199988979f, 0.999944866f);
-            Assert.That(expectedResult, Is.EqualTo(v1).Using(Vector3Comparer.Epsilon));
+            Compare(expectedResult, v1);
             v2 = Vector3.Normalize(v2);
-            Assert.That(expectedResult, Is.EqualTo(v2).Using(Vector3Comparer.Epsilon));
+            Compare(expectedResult, v2);
         }
 
         [Test]
@@ -65,16 +70,16 @@ namespace MonoGame.Tests.Framework
             Vector3 result1;
             Vector3 result2;
 
-            Assert.That(expectedResult1, Is.EqualTo(Vector3.Transform(v1, m1)).Using(Vector3Comparer.Epsilon));
-            Assert.That(expectedResult2, Is.EqualTo(Vector3.Transform(v2, q1)).Using(Vector3Comparer.Epsilon));
+            Compare(expectedResult1, Vector3.Transform(v1, m1));
+            Compare(expectedResult2, Vector3.Transform(v2, q1));
 
             // OUTPUT OVERLOADS TEST
 
             Vector3.Transform(ref v1, ref m1, out result1);
             Vector3.Transform(ref v2, ref q1, out result2);
 
-            Assert.That(expectedResult1, Is.EqualTo(result1).Using(Vector3Comparer.Epsilon));
-            Assert.That(expectedResult2, Is.EqualTo(result2).Using(Vector3Comparer.Epsilon));
+            Compare(expectedResult1, result1);
+            Compare(expectedResult2, result2);
         }
     }
 }
