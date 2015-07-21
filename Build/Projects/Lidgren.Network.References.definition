@@ -15,7 +15,7 @@
     <Reference Include="Xamarin.iOS" />
   </Platform>
 
-  <Platform Type="Linux">
+  <Platform Type="DesktopGL">
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </Platform>
@@ -46,11 +46,6 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </Platform>
-
-  <Platform Type="WindowsGL">
-    <Reference Include="System" />
     <Reference Include="System.Xml" />
   </Platform>
 

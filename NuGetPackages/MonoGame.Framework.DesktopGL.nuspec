@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
-        <id>MonoGame.Framework.WindowsGL</id>
+        <id>MonoGame.Framework.DesktopGL</id>
         <version>0.0.0.0</version>
-        <title>MonoGame.Framework.WindowsGL</title>
+        <title>MonoGame.Framework.DesktopGL</title>
         <authors>MonoGameTeam</authors>
         <owners>MonoGameTeam</owners>
         <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt#L2</licenseUrl>
@@ -18,10 +18,12 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
-        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
-        <file src="WindowsGL\AnyCPU\Release\NVorbis.dll" target="lib\net40\NVorbis.dll" />
-        <file src="WindowsGL\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
+        <file src="DesktopGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="DesktopGL\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
+        <file src="DesktopGL\AnyCPU\Release\NVorbis.dll" target="lib\net40\NVorbis.dll" />
+        <file src="DesktopGL\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
+        <file src="DesktopGL\AnyCPU\Release\OpenTK.dll.config" target="content\net40\OpenTK.dll.config" />
+        <file src="..\..\NuGetPackages\tools\MonoGame.Framework\DesktopGL\install.ps1" target="tools\install.ps1" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
 </package>
