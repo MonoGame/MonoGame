@@ -5,15 +5,23 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
+#if WINDOWS
+using System.ComponentModel;
+using System.Globalization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Describes a 2D-point.
     /// </summary>
+    /// 
+#if WINDOWS
+    [TypeConverter(typeof(Point.PointConverter))]
+#endif
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public struct Point : IEquatable<Point>
+    public struct Point : IEquatable<Point>, IComparable<Point>
     {
         #region Private Fields
 
@@ -27,12 +35,18 @@ namespace Microsoft.Xna.Framework
         /// The x coordinate of this <see cref="Point"/>.
         /// </summary>
         [DataMember]
+#if WINDOWS
+        [Browsable(true)]
+#endif
         public int X;
 
         /// <summary>
         /// The y coordinate of this <see cref="Point"/>.
         /// </summary>
         [DataMember]
+#if WINDOWS
+        [Browsable(true)]
+#endif
         public int Y;
 
         #endregion
@@ -208,6 +222,65 @@ namespace Microsoft.Xna.Framework
         {
             return new Vector2(X, Y);
         }
+
+        public int CompareTo(Point other)
+        {
+            if (this.X == other.X)
+            {
+                return this.Y - other.Y;
+            }
+            else
+            {
+                return this.X - other.X;
+            }
+
+            //return Math.Sign((this.X * this.X + this.Y * this.Y) - (other.X * other.X + other.Y * other.Y));
+            // -1 other greater than this
+            // 0 if same age
+            // 1 if this greater than other
+        }
+
+#if WINDOWS
+        public class PointConverter : TypeConverter
+        {
+            // Overrides the CanConvertFrom method of TypeConverter.
+            // The ITypeDescriptorContext interface provides the context for the
+            // conversion. Typically, this interface is used at design time to 
+            // provide information about the design-time container.
+            public override bool CanConvertFrom(ITypeDescriptorContext context,
+               Type sourceType)
+            {
+
+                if (sourceType == typeof(string))
+                {
+                    return true;
+                }
+                return base.CanConvertFrom(context, sourceType);
+            }
+
+            // Overrides the ConvertFrom method of TypeConverter.
+            public override object ConvertFrom(ITypeDescriptorContext context,
+               CultureInfo culture, object value)
+            {
+                if (value is string)
+                {
+                    string[] v = ((string)value).Split(new char[] { ',' });
+                    return new Point(int.Parse(v[0]), int.Parse(v[1]));
+                }
+                return base.ConvertFrom(context, culture, value);
+            }
+            // Overrides the ConvertTo method of TypeConverter.
+            public override object ConvertTo(ITypeDescriptorContext context,
+               CultureInfo culture, object value, Type destinationType)
+            {
+                if (destinationType == typeof(string))
+                {
+                    return ((Point)value).X + "," + ((Point)value).Y;
+                }
+                return base.ConvertTo(context, culture, value, destinationType);
+            }
+        }
+#endif
 
         #endregion
     }
