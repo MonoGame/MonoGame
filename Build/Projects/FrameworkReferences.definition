@@ -49,12 +49,6 @@
       Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
   </Platform>
 
-  <Platform Type="PSMobile">
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="Sce.PlayStation.Core" />
-  </Platform>
-
   <Platform Type="Windows">
     <Service Name="MonoGame.Framework/DirectXGraphics">
       <Reference Include="System.Core" />
