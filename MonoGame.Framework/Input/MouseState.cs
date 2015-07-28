@@ -251,13 +251,13 @@ namespace Microsoft.Xna.Framework.Input
             if (LeftButton == ButtonState.Pressed)
                 str = "Left";
             if (RightButton == ButtonState.Pressed)
-                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "Right";
+                str = str + (str.Length != 0 ? " " : "") + "Right";
             if (MiddleButton == ButtonState.Pressed)
-                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "Middle";
+                str = str + (str.Length != 0 ? " " : "") + "Middle";
             if (this.XButton1 == ButtonState.Pressed)
-                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "XButton1";
+                str = str + (str.Length != 0 ? " " : "") + "XButton1";
             if (this.XButton2 == ButtonState.Pressed)
-                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "XButton2";
+                str = str + (str.Length != 0 ? " " : "") + "XButton2";
             if (str.Length == 0)
                 str = "None";
             return "{X:" + X + " Y:" + Y + " Buttons:" + str + " Wheel:" + ScrollWheelValue + "}";
