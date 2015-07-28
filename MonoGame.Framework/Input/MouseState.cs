@@ -229,6 +229,24 @@ namespace Microsoft.Xna.Framework.Input
                 _xButton2 = value;
             }
 		}
-	}
+
+        public override string ToString()
+        {
+            string str = string.Empty;
+            if (LeftButton == ButtonState.Pressed)
+                str = "Left";
+            if (RightButton == ButtonState.Pressed)
+                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "Right";
+            if (MiddleButton == ButtonState.Pressed)
+                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "Middle";
+            if (this.XButton1 == ButtonState.Pressed)
+                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "XButton1";
+            if (this.XButton2 == ButtonState.Pressed)
+                str = str + (string.IsNullOrEmpty(str) ? "" : " ") + "XButton2";
+            if (str.Length == 0)
+                str = "None";
+            return "{X:" + X + " Y:" + Y + " Buttons:" + str + " Wheel:" + ScrollWheelValue + "}";
+        }
+    }
 }
 

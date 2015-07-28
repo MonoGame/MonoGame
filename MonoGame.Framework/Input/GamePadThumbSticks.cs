@@ -45,13 +45,13 @@ namespace Microsoft.Xna.Framework.Input
 {
     public struct GamePadThumbSticks
     {
-        public enum GateType
+        internal enum GateType
         {
             None,
             Round,
             Square
         };
-        public static GateType Gate = GateType.Round;
+        internal static GateType Gate = GateType.Round;
 
         Vector2 left;
         Vector2 right;
@@ -234,7 +234,8 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.</returns>
         public static bool operator !=(GamePadThumbSticks left, GamePadThumbSticks right)
         {
-            return !(left == right);
+            return (left.left != right.left)
+               || (left.right != right.right);
         }
 
         /// <summary>
@@ -244,12 +245,25 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadThumbSticks"/> and has the same value as this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadThumbSticks) && (this == (GamePadThumbSticks)obj);
+            if (obj is GamePadThumbSticks)
+                return Equals((GamePadThumbSticks)obj);
+            return false;
+        }
+
+        public bool Equals(GamePadThumbSticks other)
+        {
+            return (left == other.left)
+               && (right == other.right);
         }
 
         public override int GetHashCode ()
         {
             return this.Left.GetHashCode () + 37 * this.Right.GetHashCode ();
+        }
+
+        public override string ToString()
+        {
+            return "{Left:" + left + " Right:" + right + "}";
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// The default initialized gamepad state.
         /// </summary>
-        public static readonly GamePadState Default = new GamePadState();
+        internal static readonly GamePadState Default = new GamePadState();
 
         //
         // Summary:
@@ -204,7 +204,12 @@ namespace Microsoft.Xna.Framework.Input
         //     Object on the right of the equal sign.
         public static bool operator !=(GamePadState left, GamePadState right)
         {
-            return !left.Equals(right);
+            return left.IsConnected != right.IsConnected ||
+                left.PacketNumber != right.PacketNumber ||
+                left.ThumbSticks != right.ThumbSticks ||
+                left.Triggers != right.Triggers ||
+                left.Buttons != right.Buttons ||
+                left.DPad != right.DPad;
         }
         //
         // Summary:
@@ -218,7 +223,12 @@ namespace Microsoft.Xna.Framework.Input
         //     Object on the right of the equal sign.
         public static bool operator ==(GamePadState left, GamePadState right)
         {
-            return left.Equals(right);
+            return left.IsConnected == right.IsConnected &&
+                left.PacketNumber == right.PacketNumber &&
+                left.ThumbSticks == right.ThumbSticks &&
+                left.Triggers == right.Triggers &&
+                left.Buttons == right.Buttons &&
+                left.DPad == right.DPad;
         }
         //
         // Summary:
@@ -230,21 +240,39 @@ namespace Microsoft.Xna.Framework.Input
         //     Object with which to make the comparison.
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            if (obj is GamePadState)
+                return Equals((GamePadState)obj);
+            return false;
         }
+
+        public bool Equals(GamePadState other)
+        {
+            return IsConnected == other.IsConnected &&
+                   PacketNumber == other.PacketNumber &&
+                   ThumbSticks == other.ThumbSticks &&
+                   Triggers == other.Triggers &&
+                   Buttons == other.Buttons &&
+                   DPad == other.DPad;
+        }
+
         //
         // Summary:
         //     Gets the hash code for this instance.
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return ThumbSticks.GetHashCode()
+                ^ Triggers.GetHashCode()
+                ^ Buttons.GetHashCode()
+                ^ IsConnected.GetHashCode()
+                ^ DPad.GetHashCode()
+                ^ PacketNumber.GetHashCode();
         }
         //
         // Summary:
         //     Retrieves a string representation of this object.
         public override string ToString()
         {
-            return base.ToString();
+            return "{IsConnected:" + IsConnected + "}";
         }
     }
 }

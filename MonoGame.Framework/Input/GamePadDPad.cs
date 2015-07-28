@@ -112,7 +112,10 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.</returns>
         public static bool operator !=(GamePadDPad left, GamePadDPad right)
         {
-            return !(left == right);
+            return (left.Down != right.Down)
+               || (left.Left != right.Left)
+               || (left.Right != right.Right)
+               || (left.Up == right.Up);
         }
 
         /// <summary>
@@ -122,7 +125,17 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadDPad"/> and has the same value as this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadDPad) && (this == (GamePadDPad)obj);
+            if (obj is GamePadDPad)
+                return Equals((GamePadDPad)obj);
+            return false;
+        }
+
+        public bool Equals(GamePadDPad other)
+        {
+            return (Down == other.Down)
+                && (Left == other.Left)
+                && (Right == other.Right)
+                && (Up == other.Up);
         }
 
         public override int GetHashCode ()
@@ -133,5 +146,37 @@ namespace Microsoft.Xna.Framework.Input
                 (this.Right == ButtonState.Pressed ? 4 : 0) +
                 (this.Up    == ButtonState.Pressed ? 8 : 0);
         }
-	}
+
+        public override string ToString()
+        {
+            string str = string.Empty;
+
+            if (this.Up == ButtonState.Pressed)
+            {
+                str += "Up";
+            }
+
+            if (this.Down == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "Down";
+            }
+
+            if (this.Left == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "Left";
+            }
+
+            if (this.Right == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "Right";
+            }
+
+            if (str.Length == 0)
+            {
+                str = "None";
+            }
+
+            return "{DPad:" + str + "}";
+        }
+    }
 }
