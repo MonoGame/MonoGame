@@ -65,6 +65,11 @@ namespace Microsoft.Xna.Framework
 		//private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle;
         private INativeWindow window;
+        bool skipfirstcall;
+
+        // track previous window info
+        int old_width, old_height;
+        WindowState old_state = WindowState.Normal;
 
         protected Game game;
         private List<Microsoft.Xna.Framework.Input.Keys> keys;
@@ -223,6 +228,29 @@ namespace Microsoft.Xna.Framework
             if (winWidth <= 1 || winHeight <= 1)
                 return;
 
+            // skip resize call on window creation
+            if (!skipfirstcall)
+            {
+                skipfirstcall = true;
+                return;
+            }
+
+            if (window.WindowState == WindowState.Normal)
+            {
+                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+            }
+
+            if (old_width != Game.graphicsDeviceManager.PreferredBackBufferWidth || old_height != Game.graphicsDeviceManager.PreferredBackBufferHeight || old_state == WindowState.Fullscreen)
+            {
+                Game.GraphicsDevice.Viewport = new Viewport(0, 0, Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
+
+                old_width = Game.GraphicsDevice.PresentationParameters.BackBufferWidth;
+                old_height = Game.GraphicsDevice.PresentationParameters.BackBufferHeight;
+            }
+
+            old_state = window.WindowState;
+
             if (window.WindowState == WindowState.Fullscreen)
             {
                 //Stretch the viewport
@@ -231,14 +259,7 @@ namespace Microsoft.Xna.Framework
                 var scalledwidth = ((float)cv.Width * (float)window.Width) / (float)Game.graphicsDeviceManager.PreferredBackBufferWidth;
                 var scalledheight = ((float)cv.Height * (float)window.Height) / (float)Game.graphicsDeviceManager.PreferredBackBufferHeight;
 
-                OpenTK.Graphics.OpenGL.GL.Viewport(cv.X, cv.Y, (int)scalledwidth, (int)scalledheight);
-            }
-            else
-            {
-                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
-
-                Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+                OpenTK.Graphics.OpenGL.GL.Viewport(0, 0, (int)scalledwidth, (int)scalledheight);
             }
 
             //If we've already got a pending change, do nothing
@@ -252,10 +273,16 @@ namespace Microsoft.Xna.Framework
 
         internal void ProcessEvents()
         {
-            UpdateBorder();
-            Window.ProcessEvents();
-            UpdateWindowState();
-            HandleInput();
+            lock (window)
+            {
+                if (window == null)
+                    return;
+
+                UpdateBorder();
+                Window.ProcessEvents();
+                UpdateWindowState();
+                HandleInput();
+            }
         }
 
         private void UpdateBorder()
@@ -299,7 +326,7 @@ namespace Microsoft.Xna.Framework
 
                 // we need to create a small delay between resizing the window
                 // and changing the border to avoid OpenTK Linux bug
-                updateborder = 2;
+                updateborder = 20;
 
                 var context = GraphicsContext.CurrentContext;
                 if (context != null)
