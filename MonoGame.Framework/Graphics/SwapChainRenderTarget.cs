@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // First, retrieve the underlying DXGI Device from the D3D Device.
             // Creates the swap chain 
-            using (var dxgiDevice = d3dDevice.QueryInterface<Device1>())
+            using (var dxgiDevice = d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
             using (var dxgiAdapter = dxgiDevice.Adapter)
             using (var dxgiFactory = dxgiAdapter.GetParent<Factory1>())
             {
