@@ -275,6 +275,7 @@
             <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'Windows8'">
+            <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
             <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
