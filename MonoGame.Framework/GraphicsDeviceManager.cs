@@ -324,7 +324,7 @@ namespace Microsoft.Xna.Framework
             var presentationParameters = new PresentationParameters();
             presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
 
-#if WINDOWS || WINRT
+#if (WINDOWS || WINRT) && !DESKTOPGL
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
             presentationParameters.BackBufferFormat = _preferredBackBufferFormat;

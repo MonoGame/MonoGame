@@ -66,6 +66,7 @@ namespace Microsoft.Xna.Framework
         private IntPtr _windowHandle;
         private INativeWindow window;
         bool skipfirstcall;
+        bool restore_windows_size;
 
         // track previous window info
         int old_width, old_height;
@@ -234,8 +235,23 @@ namespace Microsoft.Xna.Framework
                 skipfirstcall = true;
                 return;
             }
+            
+            // Windows OpenTK window recives 2 resizes after exiting fullscreen
+            // first one has the correct size, while the second one has the fullscreen size
+            // therefor we are only interested in restoring the correct size
+            if (restore_windows_size)
+            {
+                window.Width = old_width;
+                window.Height = old_height;
 
-            if (window.WindowState == WindowState.Normal)
+                winWidth = old_width;
+                winHeight = old_height;
+            }
+
+            if (CurrentPlatform.OS == OS.Windows && old_state == WindowState.Fullscreen && !Game.graphicsDeviceManager.IsFullScreen)
+                restore_windows_size = true;
+
+            if (!Game.graphicsDeviceManager.IsFullScreen)
             {
                 Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
                 Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
@@ -249,9 +265,9 @@ namespace Microsoft.Xna.Framework
                 old_height = Game.GraphicsDevice.PresentationParameters.BackBufferHeight;
             }
 
-            old_state = window.WindowState;
+            old_state = (Game.graphicsDeviceManager.IsFullScreen) ? WindowState.Fullscreen : WindowState.Normal;
 
-            if (window.WindowState == WindowState.Fullscreen)
+            if (Game.graphicsDeviceManager.IsFullScreen)
             {
                 //Stretch the viewport
                 var cv = Game.GraphicsDevice.Viewport;
@@ -289,6 +305,11 @@ namespace Microsoft.Xna.Framework
         {
             if (updateborder == 1)
             {
+                restore_windows_size = false;
+
+                if (CurrentPlatform.OS != OS.Linux)
+                    return;
+                
                 WindowBorder desired;
                 if (_isBorderless)
                     desired = WindowBorder.Hidden;
@@ -309,7 +330,9 @@ namespace Microsoft.Xna.Framework
 
             if (updateClientBounds)
             {
-                window.WindowBorder = WindowBorder.Resizable;
+                if (CurrentPlatform.OS == OS.Linux)
+                    window.WindowBorder = WindowBorder.Resizable;
+
                 updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
@@ -327,6 +350,18 @@ namespace Microsoft.Xna.Framework
                 // we need to create a small delay between resizing the window
                 // and changing the border to avoid OpenTK Linux bug
                 updateborder = 20;
+
+                if (CurrentPlatform.OS != OS.Linux)
+                {
+                    WindowBorder desired;
+                    if (_isBorderless)
+                        desired = WindowBorder.Hidden;
+                    else
+                        desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+
+                    if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                        window.WindowBorder = desired;
+                }
 
                 var context = GraphicsContext.CurrentContext;
                 if (context != null)
