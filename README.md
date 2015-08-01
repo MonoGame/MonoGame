@@ -14,6 +14,7 @@ Our goal is to make it easy for XNA developers to create cross-platform games wi
 * [Windows Store Apps](http://dev.windows.com) (for Windows 8 and Windows RT)
 * [Windows Phone 8](http://dev.windowsphone.com)
 * [Windows Phone 8.1](http://dev.windows.com)
+* [Windows 10 UWP](http://dev.windows.com)
 * [OUYA](http://ouya.tv), an Android-based gaming console
 
 ## Quick Start
