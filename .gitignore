@@ -37,6 +37,9 @@ obj/
 [Dd]ebug*/
 [Rr]elease*/
 Ankh.NoLoad
+.vs/
+project.lock.json
+artifacts/
 
 #Tooling
 _ReSharper*/
