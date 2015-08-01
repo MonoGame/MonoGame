@@ -1401,5 +1401,12 @@ namespace Microsoft.Xna.Framework.Graphics
             return graphicsProfile;
         }
 
+#if WINDOWS_STOREAPP || WINDOWS_UAP
+        internal void Trim()
+        {
+            using (var dxgiDevice3 = _d3dDevice.QueryInterface<SharpDX.DXGI.Device3>())
+                dxgiDevice3.Trim();
+        }
+#endif
     }
 }
