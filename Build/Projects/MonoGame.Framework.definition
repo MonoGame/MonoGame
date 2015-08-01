@@ -1102,6 +1102,9 @@
     <Compile Include="WindowsUAP\XamlGame.cs">
       <Platforms>WindowsUAP</Platforms>
     </Compile>	  
+    <None Include="project.json">
+      <Platforms>WindowsUAP</Platforms>
+    </None>
 
 	  
     <!-- Windows Desktop Platfom -->
