@@ -65,6 +65,12 @@ namespace Microsoft.Xna.Framework
 		//private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle;
         private INativeWindow window;
+        bool skipfirstcall;
+        bool restore_windows_size;
+
+        // track previous window info
+        int old_width, old_height;
+        WindowState old_state = WindowState.Normal;
 
         protected Game game;
         private List<Microsoft.Xna.Framework.Input.Keys> keys;
@@ -220,17 +226,61 @@ namespace Microsoft.Xna.Framework
 
             // If window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
-            if (winWidth <= 1 || winHeight <= 1) 
+            if (winWidth <= 1 || winHeight <= 1)
                 return;
+
+            // skip resize call on window creation
+            if (!skipfirstcall)
+            {
+                skipfirstcall = true;
+                return;
+            }
+            
+            // Windows OpenTK window recives 2 resizes after exiting fullscreen
+            // first one has the correct size, while the second one has the fullscreen size
+            // therefor we are only interested in restoring the correct size
+            if (restore_windows_size)
+            {
+                window.Width = old_width;
+                window.Height = old_height;
+
+                winWidth = old_width;
+                winHeight = old_height;
+            }
+
+            if (CurrentPlatform.OS == OS.Windows && old_state == WindowState.Fullscreen && !Game.graphicsDeviceManager.IsFullScreen)
+                restore_windows_size = true;
+
+            if (!Game.graphicsDeviceManager.IsFullScreen)
+            {
+                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+            }
+
+            if (old_width != Game.graphicsDeviceManager.PreferredBackBufferWidth || old_height != Game.graphicsDeviceManager.PreferredBackBufferHeight || old_state == WindowState.Fullscreen)
+            {
+                Game.GraphicsDevice.Viewport = new Viewport(0, 0, Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
+
+                old_width = Game.GraphicsDevice.PresentationParameters.BackBufferWidth;
+                old_height = Game.GraphicsDevice.PresentationParameters.BackBufferHeight;
+            }
+
+            old_state = (Game.graphicsDeviceManager.IsFullScreen) ? WindowState.Fullscreen : WindowState.Normal;
+
+            if (Game.graphicsDeviceManager.IsFullScreen)
+            {
+                //Stretch the viewport
+                var cv = Game.GraphicsDevice.Viewport;
+
+                var scalledwidth = ((float)cv.Width * (float)window.Width) / (float)Game.graphicsDeviceManager.PreferredBackBufferWidth;
+                var scalledheight = ((float)cv.Height * (float)window.Height) / (float)Game.graphicsDeviceManager.PreferredBackBufferHeight;
+
+                OpenTK.Graphics.OpenGL.GL.Viewport(0, 0, (int)scalledwidth, (int)scalledheight);
+            }
 
             //If we've already got a pending change, do nothing
             if (updateClientBounds)
                 return;
-            
-            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
-
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
 
             clientBounds = winRect;
 
@@ -239,16 +289,27 @@ namespace Microsoft.Xna.Framework
 
         internal void ProcessEvents()
         {
-            UpdateBorder();
-            Window.ProcessEvents();
-            UpdateWindowState();
-            HandleInput();
+            lock (window)
+            {
+                if (window == null)
+                    return;
+
+                UpdateBorder();
+                Window.ProcessEvents();
+                UpdateWindowState();
+                HandleInput();
+            }
         }
 
         private void UpdateBorder()
         {
             if (updateborder == 1)
             {
+                restore_windows_size = false;
+
+                if (CurrentPlatform.OS != OS.Linux)
+                    return;
+                
                 WindowBorder desired;
                 if (_isBorderless)
                     desired = WindowBorder.Hidden;
@@ -269,7 +330,9 @@ namespace Microsoft.Xna.Framework
 
             if (updateClientBounds)
             {
-                window.WindowBorder = WindowBorder.Resizable;
+                if (CurrentPlatform.OS == OS.Linux)
+                    window.WindowBorder = WindowBorder.Resizable;
+
                 updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
@@ -286,7 +349,19 @@ namespace Microsoft.Xna.Framework
 
                 // we need to create a small delay between resizing the window
                 // and changing the border to avoid OpenTK Linux bug
-                updateborder = 2;
+                updateborder = 20;
+
+                if (CurrentPlatform.OS != OS.Linux)
+                {
+                    WindowBorder desired;
+                    if (_isBorderless)
+                        desired = WindowBorder.Hidden;
+                    else
+                        desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+
+                    if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                        window.WindowBorder = desired;
+                }
 
                 var context = GraphicsContext.CurrentContext;
                 if (context != null)
@@ -324,17 +399,20 @@ namespace Microsoft.Xna.Framework
 
             window.KeyPress += OnKeyPress;
 
-            //make sure that the game is not running on linux
-            //on Linux people may want to use mkbundle to
-            //create native Linux binaries
-            if (CurrentPlatform.OS != OS.Linux)
+            Title = "MonoGame Application";
+
+            //load the information from assembly if it exists
+            try
             {
-                // Set the window icon.
                 var assembly = Assembly.GetEntryAssembly();
+
                 if (assembly != null)
+                {
                     window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-                Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
+                    Title = AssemblyHelper.GetDefaultWindowTitle();
+                }
             }
+            catch { }
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
@@ -371,6 +449,7 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
+            updateClientBounds = true;
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)
