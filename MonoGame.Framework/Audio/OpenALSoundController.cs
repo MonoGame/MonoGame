@@ -308,11 +308,15 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     if (_bSoundAvailable)
                     {
-                        CleanUpOpenAL();
-#if DESKTOPGL
+                        #if DESKTOPGL
                         if(_oggstreamer != null)
                             _oggstreamer.Dispose();
-#endif
+                        #endif
+
+                        for (int i = 0; i < allSourcesArray.Length; i++)
+                            AL.DeleteSource(allSourcesArray[i]);
+                        
+                        CleanUpOpenAL();
                     }
                 }
                 _isDisposed = true;
