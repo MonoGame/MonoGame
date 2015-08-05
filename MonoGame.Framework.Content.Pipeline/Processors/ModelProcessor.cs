@@ -155,8 +155,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			if (GenerateTangentFrames)
             {
                 context.Logger.LogMessage("Generating tangent frames.");
-                MeshHelper.CalculateTangentFrames(mesh, VertexChannelNames.TextureCoordinate(0),
-                  VertexChannelNames.Tangent(0), VertexChannelNames.Binormal(0));
+                foreach (GeometryContent geom in mesh.Geometry)
+                {
+                    if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal(0)))
+                    {
+                        MeshHelper.CalculateNormals(geom, true);
+                    }
+
+                    if(!geom.Vertices.Channels.Contains(VertexChannelNames.Tangent(0)) ||
+                        !geom.Vertices.Channels.Contains(VertexChannelNames.Binormal(0)))
+                    {
+                        MeshHelper.CalculateTangentFrames(geom, VertexChannelNames.TextureCoordinate(0), VertexChannelNames.Tangent(0),
+                            VertexChannelNames.Binormal(0));
+                    }
+                }
             }
 
             var startVertex = 0;
