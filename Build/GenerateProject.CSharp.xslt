@@ -275,6 +275,7 @@
             <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'Windows8'">
+            <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
             <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
@@ -286,8 +287,8 @@
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'WindowsUAP'">
 			  <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-			  <TargetPlatformVersion>10.0.10069.0</TargetPlatformVersion>
-			  <TargetPlatformMinVersion>10.0.10069.0</TargetPlatformMinVersion>
+			  <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
+			  <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
 			  <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
 		  </xsl:when>			
           <xsl:when test="/Input/Generation/Platform = 'iOS' or /Input/Generation/Platform = 'PSMobile'">
