@@ -346,6 +346,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private void OnLayoutRootTapped(object sender, TappedRoutedEventArgs e)
         {
+            _buttons[0].Focus(FocusState.Programmatic); // Hide input panel
+
             if (e.OriginalSource == sender &&
                 IsLightDismissEnabled)
             {

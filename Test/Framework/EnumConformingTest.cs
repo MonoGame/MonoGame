@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework
 {
     /// <summary>
-    /// Tests for enum compatibility with XNA.
+    /// Tests for enum compatibility with XNA(here is only XNA enum members, extensions are not included).
     /// </summary>
     class EnumConformingTest
     {
@@ -283,8 +284,6 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void SurfaceFormateEnum()
         {
-            // note : there is only XNA formats, extensions are not included
-
             Assert.AreEqual(0, (int)SurfaceFormat.Color);
             Assert.AreEqual(1, (int)SurfaceFormat.Bgr565);
             Assert.AreEqual(2, (int)SurfaceFormat.Bgra5551);
@@ -362,6 +361,227 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(10, (int)VertexElementUsage.PointSize);
             Assert.AreEqual(11, (int)VertexElementUsage.Sample);
             Assert.AreEqual(12, (int)VertexElementUsage.TessellateFactor);
+        }
+
+        #endregion
+
+        #region MonoGame.Framework.Input
+
+        [Test]
+        public void ButtonsEnum()
+        {
+            Assert.AreEqual(1, (int)Buttons.DPadUp);
+            Assert.AreEqual(2, (int)Buttons.DPadDown);
+            Assert.AreEqual(4, (int)Buttons.DPadLeft);
+            Assert.AreEqual(8, (int)Buttons.DPadRight);
+            Assert.AreEqual(16, (int)Buttons.Start);
+            Assert.AreEqual(32, (int)Buttons.Back);
+            Assert.AreEqual(64, (int)Buttons.LeftStick);
+            Assert.AreEqual(128, (int)Buttons.RightStick);
+            Assert.AreEqual(256, (int)Buttons.LeftShoulder);
+            Assert.AreEqual(512, (int)Buttons.RightShoulder);
+            Assert.AreEqual(2048, (int)Buttons.BigButton);
+            Assert.AreEqual(4096, (int)Buttons.A);
+            Assert.AreEqual(8192, (int)Buttons.B);
+            Assert.AreEqual(16384, (int)Buttons.X);
+            Assert.AreEqual(32768, (int)Buttons.Y);
+            Assert.AreEqual(2097152, (int)Buttons.LeftThumbstickLeft);
+            Assert.AreEqual(4194304, (int)Buttons.RightTrigger);
+            Assert.AreEqual(8388608, (int)Buttons.LeftTrigger);
+            Assert.AreEqual(16777216, (int)Buttons.RightThumbstickUp);
+            Assert.AreEqual(33554432, (int)Buttons.RightThumbstickDown);
+            Assert.AreEqual(67108864, (int)Buttons.RightThumbstickRight);
+            Assert.AreEqual(134217728, (int)Buttons.RightThumbstickLeft);
+            Assert.AreEqual(268435456, (int)Buttons.LeftThumbstickUp);
+            Assert.AreEqual(536870912, (int)Buttons.LeftThumbstickDown);
+            Assert.AreEqual(1073741824, (int)Buttons.LeftThumbstickRight);
+        }
+
+        [Test]
+        public void ButtonStateEnum()
+        {
+            Assert.AreEqual(0, (int)ButtonState.Released);
+            Assert.AreEqual(1, (int)ButtonState.Pressed);
+        }
+
+        [Test]
+        public void GamePadTypeEnum()
+        {
+            Assert.AreEqual(0, (int)GamePadType.Unknown);
+            Assert.AreEqual(1, (int)GamePadType.GamePad);
+            Assert.AreEqual(2, (int)GamePadType.Wheel);
+            Assert.AreEqual(3, (int)GamePadType.ArcadeStick);
+            Assert.AreEqual(4, (int)GamePadType.FlightStick);
+            Assert.AreEqual(5, (int)GamePadType.DancePad);
+            Assert.AreEqual(6, (int)GamePadType.Guitar);
+            Assert.AreEqual(7, (int)GamePadType.AlternateGuitar);
+            Assert.AreEqual(8, (int)GamePadType.DrumKit);
+            Assert.AreEqual(768, (int)GamePadType.BigButtonPad);
+        }
+
+        [Test]
+        public void KeysEnum()
+        {
+            Assert.AreEqual(0, (int)Keys.None);
+            Assert.AreEqual(8, (int)Keys.Back);
+            Assert.AreEqual(9, (int)Keys.Tab);
+            Assert.AreEqual(13, (int)Keys.Enter);
+            Assert.AreEqual(19, (int)Keys.Pause);
+            Assert.AreEqual(20, (int)Keys.CapsLock);
+            Assert.AreEqual(21, (int)Keys.Kana);
+            Assert.AreEqual(25, (int)Keys.Kanji);
+            Assert.AreEqual(27, (int)Keys.Escape);
+            Assert.AreEqual(28, (int)Keys.ImeConvert);
+            Assert.AreEqual(29, (int)Keys.ImeNoConvert);
+            Assert.AreEqual(32, (int)Keys.Space);
+            Assert.AreEqual(33, (int)Keys.PageUp);
+            Assert.AreEqual(34, (int)Keys.PageDown);
+            Assert.AreEqual(35, (int)Keys.End);
+            Assert.AreEqual(36, (int)Keys.Home);
+            Assert.AreEqual(37, (int)Keys.Left);
+            Assert.AreEqual(38, (int)Keys.Up);
+            Assert.AreEqual(39, (int)Keys.Right);
+            Assert.AreEqual(40, (int)Keys.Down);
+            Assert.AreEqual(41, (int)Keys.Select);
+            Assert.AreEqual(42, (int)Keys.Print);
+            Assert.AreEqual(43, (int)Keys.Execute);
+            Assert.AreEqual(44, (int)Keys.PrintScreen);
+            Assert.AreEqual(45, (int)Keys.Insert);
+            Assert.AreEqual(46, (int)Keys.Delete);
+            Assert.AreEqual(47, (int)Keys.Help);
+            Assert.AreEqual(48, (int)Keys.D0);
+            Assert.AreEqual(49, (int)Keys.D1);
+            Assert.AreEqual(50, (int)Keys.D2);
+            Assert.AreEqual(51, (int)Keys.D3);
+            Assert.AreEqual(52, (int)Keys.D4);
+            Assert.AreEqual(53, (int)Keys.D5);
+            Assert.AreEqual(54, (int)Keys.D6);
+            Assert.AreEqual(55, (int)Keys.D7);
+            Assert.AreEqual(56, (int)Keys.D8);
+            Assert.AreEqual(57, (int)Keys.D9);
+            Assert.AreEqual(65, (int)Keys.A);
+            Assert.AreEqual(66, (int)Keys.B);
+            Assert.AreEqual(67, (int)Keys.C);
+            Assert.AreEqual(68, (int)Keys.D);
+            Assert.AreEqual(69, (int)Keys.E);
+            Assert.AreEqual(70, (int)Keys.F);
+            Assert.AreEqual(71, (int)Keys.G);
+            Assert.AreEqual(72, (int)Keys.H);
+            Assert.AreEqual(73, (int)Keys.I);
+            Assert.AreEqual(74, (int)Keys.J);
+            Assert.AreEqual(75, (int)Keys.K);
+            Assert.AreEqual(76, (int)Keys.L);
+            Assert.AreEqual(77, (int)Keys.M);
+            Assert.AreEqual(78, (int)Keys.N);
+            Assert.AreEqual(79, (int)Keys.O);
+            Assert.AreEqual(80, (int)Keys.P);
+            Assert.AreEqual(81, (int)Keys.Q);
+            Assert.AreEqual(82, (int)Keys.R);
+            Assert.AreEqual(83, (int)Keys.S);
+            Assert.AreEqual(84, (int)Keys.T);
+            Assert.AreEqual(85, (int)Keys.U);
+            Assert.AreEqual(86, (int)Keys.V);
+            Assert.AreEqual(87, (int)Keys.W);
+            Assert.AreEqual(88, (int)Keys.X);
+            Assert.AreEqual(89, (int)Keys.Y);
+            Assert.AreEqual(90, (int)Keys.Z);
+            Assert.AreEqual(91, (int)Keys.LeftWindows);
+            Assert.AreEqual(92, (int)Keys.RightWindows);
+            Assert.AreEqual(93, (int)Keys.Apps);
+            Assert.AreEqual(95, (int)Keys.Sleep);
+            Assert.AreEqual(96, (int)Keys.NumPad0);
+            Assert.AreEqual(97, (int)Keys.NumPad1);
+            Assert.AreEqual(98, (int)Keys.NumPad2);
+            Assert.AreEqual(99, (int)Keys.NumPad3);
+            Assert.AreEqual(100, (int)Keys.NumPad4);
+            Assert.AreEqual(101, (int)Keys.NumPad5);
+            Assert.AreEqual(102, (int)Keys.NumPad6);
+            Assert.AreEqual(103, (int)Keys.NumPad7);
+            Assert.AreEqual(104, (int)Keys.NumPad8);
+            Assert.AreEqual(105, (int)Keys.NumPad9);
+            Assert.AreEqual(106, (int)Keys.Multiply);
+            Assert.AreEqual(107, (int)Keys.Add);
+            Assert.AreEqual(108, (int)Keys.Separator);
+            Assert.AreEqual(109, (int)Keys.Subtract);
+            Assert.AreEqual(110, (int)Keys.Decimal);
+            Assert.AreEqual(111, (int)Keys.Divide);
+            Assert.AreEqual(112, (int)Keys.F1);
+            Assert.AreEqual(113, (int)Keys.F2);
+            Assert.AreEqual(114, (int)Keys.F3);
+            Assert.AreEqual(115, (int)Keys.F4);
+            Assert.AreEqual(116, (int)Keys.F5);
+            Assert.AreEqual(117, (int)Keys.F6);
+            Assert.AreEqual(118, (int)Keys.F7);
+            Assert.AreEqual(119, (int)Keys.F8);
+            Assert.AreEqual(120, (int)Keys.F9);
+            Assert.AreEqual(121, (int)Keys.F10);
+            Assert.AreEqual(122, (int)Keys.F11);
+            Assert.AreEqual(123, (int)Keys.F12);
+            Assert.AreEqual(124, (int)Keys.F13);
+            Assert.AreEqual(125, (int)Keys.F14);
+            Assert.AreEqual(126, (int)Keys.F15);
+            Assert.AreEqual(127, (int)Keys.F16);
+            Assert.AreEqual(128, (int)Keys.F17);
+            Assert.AreEqual(129, (int)Keys.F18);
+            Assert.AreEqual(130, (int)Keys.F19);
+            Assert.AreEqual(131, (int)Keys.F20);
+            Assert.AreEqual(132, (int)Keys.F21);
+            Assert.AreEqual(133, (int)Keys.F22);
+            Assert.AreEqual(134, (int)Keys.F23);
+            Assert.AreEqual(135, (int)Keys.F24);
+            Assert.AreEqual(144, (int)Keys.NumLock);
+            Assert.AreEqual(145, (int)Keys.Scroll);
+            Assert.AreEqual(160, (int)Keys.LeftShift);
+            Assert.AreEqual(161, (int)Keys.RightShift);
+            Assert.AreEqual(162, (int)Keys.LeftControl);
+            Assert.AreEqual(163, (int)Keys.RightControl);
+            Assert.AreEqual(164, (int)Keys.LeftAlt);
+            Assert.AreEqual(165, (int)Keys.RightAlt);
+            Assert.AreEqual(166, (int)Keys.BrowserBack);
+            Assert.AreEqual(167, (int)Keys.BrowserForward);
+            Assert.AreEqual(168, (int)Keys.BrowserRefresh);
+            Assert.AreEqual(169, (int)Keys.BrowserStop);
+            Assert.AreEqual(170, (int)Keys.BrowserSearch);
+            Assert.AreEqual(171, (int)Keys.BrowserFavorites);
+            Assert.AreEqual(172, (int)Keys.BrowserHome);
+            Assert.AreEqual(173, (int)Keys.VolumeMute);
+            Assert.AreEqual(174, (int)Keys.VolumeDown);
+            Assert.AreEqual(175, (int)Keys.VolumeUp);
+            Assert.AreEqual(176, (int)Keys.MediaNextTrack);
+            Assert.AreEqual(177, (int)Keys.MediaPreviousTrack);
+            Assert.AreEqual(178, (int)Keys.MediaStop);
+            Assert.AreEqual(179, (int)Keys.MediaPlayPause);
+            Assert.AreEqual(180, (int)Keys.LaunchMail);
+            Assert.AreEqual(181, (int)Keys.SelectMedia);
+            Assert.AreEqual(182, (int)Keys.LaunchApplication1);
+            Assert.AreEqual(183, (int)Keys.LaunchApplication2);
+            Assert.AreEqual(186, (int)Keys.OemSemicolon);
+            Assert.AreEqual(187, (int)Keys.OemPlus);
+            Assert.AreEqual(188, (int)Keys.OemComma);
+            Assert.AreEqual(189, (int)Keys.OemMinus);
+            Assert.AreEqual(190, (int)Keys.OemPeriod);
+            Assert.AreEqual(191, (int)Keys.OemQuestion);
+            Assert.AreEqual(192, (int)Keys.OemTilde);
+            Assert.AreEqual(202, (int)Keys.ChatPadGreen);
+            Assert.AreEqual(203, (int)Keys.ChatPadOrange);
+            Assert.AreEqual(219, (int)Keys.OemOpenBrackets);
+            Assert.AreEqual(220, (int)Keys.OemPipe);
+            Assert.AreEqual(221, (int)Keys.OemCloseBrackets);
+            Assert.AreEqual(222, (int)Keys.OemQuotes);
+            Assert.AreEqual(223, (int)Keys.Oem8);
+            Assert.AreEqual(226, (int)Keys.OemBackslash);
+            Assert.AreEqual(229, (int)Keys.ProcessKey);
+            Assert.AreEqual(242, (int)Keys.OemCopy);
+            Assert.AreEqual(243, (int)Keys.OemAuto);
+            Assert.AreEqual(244, (int)Keys.OemEnlW);
+            Assert.AreEqual(246, (int)Keys.Attn);
+            Assert.AreEqual(247, (int)Keys.Crsel);
+            Assert.AreEqual(248, (int)Keys.Exsel);
+            Assert.AreEqual(249, (int)Keys.EraseEof);
+            Assert.AreEqual(250, (int)Keys.Play);
+            Assert.AreEqual(251, (int)Keys.Zoom);
+            Assert.AreEqual(253, (int)Keys.Pa1);
+            Assert.AreEqual(254, (int)Keys.OemClear);
         }
 
         #endregion

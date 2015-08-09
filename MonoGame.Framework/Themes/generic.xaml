@@ -76,6 +76,9 @@
                     <Setter
                         Property="MinHeight"
                         Value="52" />
+                    <Setter
+                        Property="Background"
+                        Value="White" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -107,34 +110,6 @@
                     <Setter
                         Property="FontSize"
                         Value="40" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="Button">
-                                <Border Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ButtonHighlight" BorderThickness="0" BorderBrush="Black">
-                                    <Grid>
-                                        <Rectangle x:Name="innerRectangle" HorizontalAlignment="Stretch" 
-                                           VerticalAlignment="Stretch" Fill="{TemplateBinding Background}" />
-                                        <ContentPresenter x:Name="Text" Content="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal">
-                                                    <Storyboard>
-                                                        <ColorAnimation From="Transparent" To="Black" Storyboard.TargetName="Text" Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)" BeginTime="0" Duration="1"></ColorAnimation>
-                                                        <ColorAnimation From="Transparent" To="White" Storyboard.TargetName="Text" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" BeginTime="0" Duration="1"></ColorAnimation>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="PointerOver">
-                                                    <Storyboard>
-                                                        <ColorAnimation From="Transparent" To="#888888" Storyboard.TargetName="ButtonHighlight" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"  Duration="0:0:1"></ColorAnimation>
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                    </Grid>
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
                 </Style>
             </Setter.Value>
         </Setter>

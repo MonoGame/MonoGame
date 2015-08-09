@@ -36,6 +36,9 @@ or conditions. You may have additional consumer rights under your local laws whi
 permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 purpose and non-infringement.
 */
+using MonoGame.Utilities;
+
+
 #endregion License
 
 #region Using Statements
@@ -58,7 +61,6 @@ namespace Microsoft.Xna.Framework
     {
         private bool _isResizable;
         private bool _isBorderless;
-        private bool _isMouseInBounds;
 
 		//private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle;
@@ -127,6 +129,18 @@ namespace Microsoft.Xna.Framework
         {
             get { return new Microsoft.Xna.Framework.Point(window.Location.X,window.Location.Y); }
             set { window.Location = new System.Drawing.Point(value.X,value.Y); }
+        }
+
+        public override System.Drawing.Icon Icon
+        {
+            get
+            {
+                return window.Icon;
+            }
+            set
+            {
+                window.Icon = value;
+            }
         }
 #endif
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
@@ -288,23 +302,6 @@ namespace Microsoft.Xna.Framework
             Keyboard.SetKeys(keys);
         }
 
-#if DESKTOPGL
-        private void OnMouseEnter(object sender, EventArgs e)
-        {
-            _isMouseInBounds = true;
-        }
-
-        private void OnMouseLeave(object sender, EventArgs e)
-        {
-            //There is a bug in OpenTK where the MouseLeave event is raised when the mouse button
-            //is down while the cursor is still in the window bounds.
-            if (Mouse.GetState().LeftButton == ButtonState.Released)
-            {
-                _isMouseInBounds = false;
-            }
-        }
-#endif
-
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
@@ -324,18 +321,20 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
-#if DESKTOPGL
-            window.MouseEnter += OnMouseEnter;
-            window.MouseLeave += OnMouseLeave;
-#endif
 
             window.KeyPress += OnKeyPress;
 
-            // Set the window icon.
-            var assembly = Assembly.GetEntryAssembly();
-            if(assembly != null)
-                window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
+            //make sure that the game is not running on linux
+            //on Linux people may want to use mkbundle to
+            //create native Linux binaries
+            if (CurrentPlatform.OS != OS.Linux)
+            {
+                // Set the window icon.
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly != null)
+                    window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+                Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
+            }
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
@@ -372,6 +371,7 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
+            updateClientBounds = true;
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)

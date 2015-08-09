@@ -16,38 +16,29 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformLoad(Action<int> progressCallback)
         {
-            MPMediaQuery mediaQuery = new MPMediaQuery();
-            var value = NSObject.FromObject(MPMediaType.Music);
-            var type = MPMediaItem.MediaTypeProperty;
-            var predicate = MPMediaPropertyPredicate.PredicateWithValue(value, type);
-            mediaQuery.AddFilterPredicate(predicate);
-            mediaQuery.GroupingType = MPMediaGrouping.Album;
+            var songList = new List<Song>();
+            var albumList = new List<Album>();
 
-            List<Song> songList = new List<Song>();
-            List<Album> albumList = new List<Album>();
-
-            for (int i = 0; i < mediaQuery.Collections.Length; i++)
+            foreach (var collection in MPMediaQuery.AlbumsQuery.Collections)
             {
-                MPMediaItemCollection itemCollection = mediaQuery.Collections[i];
-				List<Song> albumSongs = new List<Song>((int)itemCollection.Count);
-
-                var nsAlbumArtist = itemCollection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumArtistProperty);
-                var nsAlbumName = itemCollection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumTitleProperty);
-                var nsAlbumGenre = itemCollection.RepresentativeItem.ValueForProperty(MPMediaItem.GenreProperty);
+                var nsAlbumArtist = collection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumArtistProperty);
+                var nsAlbumName = collection.RepresentativeItem.ValueForProperty(MPMediaItem.AlbumTitleProperty);
+                var nsAlbumGenre = collection.RepresentativeItem.ValueForProperty(MPMediaItem.GenreProperty);
                 string albumArtist = nsAlbumArtist == null ? "Unknown Artist" : nsAlbumArtist.ToString();
                 string albumName = nsAlbumName == null ? "Unknown Album" : nsAlbumName.ToString();
                 string albumGenre = nsAlbumGenre == null ? "Unknown Genre" : nsAlbumGenre.ToString();
-                MPMediaItemArtwork thumbnail = itemCollection.RepresentativeItem.ValueForProperty(MPMediaItem.ArtworkProperty) as MPMediaItemArtwork;
+                MPMediaItemArtwork thumbnail = collection.RepresentativeItem.ValueForProperty(MPMediaItem.ArtworkProperty) as MPMediaItemArtwork;
 
+                var albumSongs = new List<Song>((int)collection.Count);
                 var album = new Album(new SongCollection(albumSongs), albumName, new Artist(albumArtist), new Genre(albumGenre), thumbnail);
                 albumList.Add(album);
 
-                for (int j = 0; j < itemCollection.Count; j++)
+                foreach (var item in collection.Items)
                 {
-                    var nsArtist = itemCollection.Items[j].ValueForProperty(MPMediaItem.ArtistProperty);
-                    var nsTitle = itemCollection.Items[j].ValueForProperty(MPMediaItem.TitleProperty);
-                    var nsGenre = itemCollection.Items[j].ValueForProperty(MPMediaItem.GenreProperty);
-                    var assetUrl = itemCollection.Items[j].ValueForProperty(MPMediaItem.AssetURLProperty) as NSUrl;
+                    var nsArtist = item.ValueForProperty(MPMediaItem.ArtistProperty);
+                    var nsTitle = item.ValueForProperty(MPMediaItem.TitleProperty);
+                    var nsGenre = item.ValueForProperty(MPMediaItem.GenreProperty);
+                    var assetUrl = item.ValueForProperty(MPMediaItem.AssetURLProperty) as NSUrl;
 
                     if (nsTitle == null || assetUrl == null) // The Asset URL check will exclude iTunes match items from the Media Library that are not downloaded, but show up in the music app
                         continue;
@@ -55,13 +46,12 @@ namespace Microsoft.Xna.Framework.Media
                     string artist = nsArtist == null ? "Unknown Artist" : nsArtist.ToString();
                     string title = nsTitle.ToString();
                     string genre = nsGenre == null ? "Unknown Genre" : nsGenre.ToString();
-                    TimeSpan duration = TimeSpan.FromSeconds(((NSNumber)itemCollection.Items[j].ValueForProperty(MPMediaItem.PlaybackDurationProperty)).FloatValue);
+                    TimeSpan duration = TimeSpan.FromSeconds(((NSNumber)item.ValueForProperty(MPMediaItem.PlaybackDurationProperty)).FloatValue);
 
-                    var song = new Song(album, new Artist(artist), new Genre(genre), title, duration, itemCollection.Items[j], assetUrl);
+                    var song = new Song(album, new Artist(artist), new Genre(genre), title, duration, item, assetUrl);
                     albumSongs.Add(song);
                     songList.Add(song);
                 }
-
             }
 
             albumCollection = new AlbumCollection(albumList);

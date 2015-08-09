@@ -109,6 +109,7 @@
     <Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
+    <Compile Include="Framework\QuaternionTest.cs" />
     <Compile Include="Framework\RectangleTest.cs" />
     <Compile Include="Framework\Vector2Test.cs" />
     <Compile Include="Framework\Vector3Test.cs" />
@@ -653,6 +654,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Xml\24_GenericTypes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\25_StructArrayNoElements.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\26_ChildCollections.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -36,8 +36,6 @@ namespace Microsoft.Xna.Framework
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
-#elif PSM
-			return new PSSGamePlatform(game);
 #elif WINDOWS && DIRECTX
             return new MonoGame.Framework.WinFormsGamePlatform(game);
 #elif WINDOWS_PHONE
@@ -126,20 +124,6 @@ namespace Microsoft.Xna.Framework
         }
 #endif
 
-#if PSM
-        private PSSGameWindow _window;
-        public PSSGameWindow Window
-        {
-            get { return _window; }
-            protected set
-            {
-                if (_window == null)
-                    TouchPanel.PrimaryWindow = value;
-
-                _window = value;
-            }
-        }
-#else
         private GameWindow _window;
         public GameWindow Window
         {
@@ -157,7 +141,6 @@ namespace Microsoft.Xna.Framework
                 _window = value;
             }
         }
-#endif
 
         #endregion
 
@@ -337,6 +320,9 @@ namespace Microsoft.Xna.Framework
         {
             if (!disposed)
             {
+                Mouse.PrimaryWindow = null;
+                TouchPanel.PrimaryWindow = null;
+
                 disposed = true;
             }
         }

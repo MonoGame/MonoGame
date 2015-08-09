@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,Web">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,Web">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
@@ -15,7 +15,6 @@
   	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
   	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
   	<Platform Name="Ouya">8BEA875D-66D2-4A5F-B137-83D262A3851D</Platform>
-  	<Platform Name="PSMobile">EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9</Platform>
   	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
   	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
   	<Platform Name="WindowsGL">6D75E618-19CA-4C51-9546-F10965FBC0B8</Platform>
@@ -48,7 +47,6 @@
       <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;DESKTOPGL</Platform>
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL</Platform>
       <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA;OPENAL</Platform>
-      <Platform Name="PSMobile">PSM</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
@@ -69,9 +67,6 @@
     </Uses>
     <Uses Name="DirectXGraphics">
       <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
-    </Uses>
-    <Uses Name="PSMGraphics">
-      <Platforms>PSMobile</Platforms>
     </Uses>
     <Uses Name="WebGraphics">
       <Platforms>Web</Platforms>
@@ -97,48 +92,39 @@
       <RemoveDefine>DIRECTX;WINDOWS_MEDIA_SESSION;WINDOWS;MONOMAC;LINUX</RemoveDefine>
       <AddDefine>OPENGL;OPENAL;GLES;ANGLE</AddDefine>
       <Platforms>Windows,MacOS,Linux,Angle</Platforms>
-      <Conflicts>OpenGLGraphics,DirectXGraphics,PSMGraphics,WebGraphics</Conflicts>
+      <Conflicts>OpenGLGraphics,DirectXGraphics,WebGraphics</Conflicts>
       <Requires>OpenALAudio,_GLCompatible</Requires>
     </Service>
     <Service Name="OpenGLGraphics">
       <RemoveDefine>DIRECTX;WINDOWS_MEDIA_SESSION</RemoveDefine>
       <AddDefine>OPENGL;OPENAL</AddDefine>
       <Platforms>iOS,MacOS,Linux,Windows,WindowsGL,Ouya,Android</Platforms>
-      <Conflicts>ANGLEGraphics,DirectXGraphics,PSMGraphics,WebGraphics</Conflicts>
+      <Conflicts>ANGLEGraphics,DirectXGraphics,WebGraphics</Conflicts>
       <Requires>OpenALAudio,_GLCompatible</Requires>
     </Service>
     <Service Name="DirectXGraphics">
       <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
-      <Conflicts>ANGLEGraphics,OpenGLGraphics,PSMGraphics,WebGraphics</Conflicts>
+      <Conflicts>ANGLEGraphics,OpenGLGraphics,WebGraphics</Conflicts>
       <Requires>XAudioAudio</Requires>
-    </Service>
-    <Service Name="PSMGraphics">
-      <Platforms>PSMobile</Platforms>
-      <Conflicts>ANGLEGraphics,OpenGLGraphics,DirectXGraphics,WebGraphics</Conflicts>
-      <Requires>PSMAudio</Requires>
     </Service>
     <Service Name="WebGraphics">
       <Platforms>Web</Platforms>
-      <Conflicts>ANGLEGraphics,OpenGLGraphics,DirectXGraphics,PSMGraphics</Conflicts>
+      <Conflicts>ANGLEGraphics,OpenGLGraphics,DirectXGraphics</Conflicts>
       <Requires>WebAudio</Requires>
     </Service>
 
     <!-- Audio APIs -->
     <Service Name="OpenALAudio">
       <Platforms>Angle,iOS,Linux,Windows,WindowsGL,MacOS,Android,Ouya</Platforms>
-      <Conflicts>XAudioAudio,PSMAudio,WebAudio</Conflicts>
+      <Conflicts>XAudioAudio,WebAudio</Conflicts>
     </Service>
     <Service Name="XAudioAudio">
       <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
-      <Conflicts>OpenALAudio,PSMAudio,WebAudio</Conflicts>
-    </Service>
-    <Service Name="PSMAudio">
-      <Platforms>PSMobile</Platforms>
-      <Conflicts>OpenALAudio,XAudioAudio,WebAudio</Conflicts>
+      <Conflicts>OpenALAudio,WebAudio</Conflicts>
     </Service>
     <Service Name="WebAudio">
       <Platforms>Web</Platforms>
-      <Conflicts>OpenALAudio,XAudioAudio,PSMAudio</Conflicts>
+      <Conflicts>OpenALAudio,XAudioAudio</Conflicts>
     </Service>
 
     <!-- Base supporting features -->
@@ -246,7 +232,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUAP</Platforms>
     </Compile>
     <Compile Include="Threading.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Vector2.cs" />
@@ -261,12 +247,9 @@
     <Compile Include="Audio\AudioLoader.cs">
       <Platforms>Linux,WindowsGL,Angle,Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Audio\AudioUtil.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,Web</Platforms>
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
@@ -282,9 +265,6 @@
     <Compile Include="Audio\SoundEffect.OpenAL.cs">
       <Services>OpenALAudio</Services>
     </Compile>
-    <Compile Include="Audio\SoundEffect.PSM.cs">
-      <Services>PSMAudio</Services>
-    </Compile>
     <Compile Include="Audio\SoundEffect.XAudio.cs">
       <Services>XAudioAudio</Services>
     </Compile>
@@ -294,9 +274,6 @@
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundEffectInstance.OpenAL.cs">
       <Services>OpenALAudio</Services>
-    </Compile>
-    <Compile Include="Audio\SoundEffectInstance.PSM.cs">
-      <Services>PSMAudio</Services>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
       <Services>XAudioAudio</Services>
@@ -344,13 +321,13 @@
     <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
     <Compile Include="Content\ContentReaders\DoubleReader.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs">
-		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Content\ContentReaders\EnumReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs">
-		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
@@ -370,7 +347,7 @@
     <Compile Include="Content\ContentReaders\SByteReader.cs" />
     <Compile Include="Content\ContentReaders\SingleReader.cs" />
     <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs">
-		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
@@ -378,7 +355,7 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Content\ContentReaders\Texture3DReader.cs">
-      <Platforms>Angle,Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureCubeReader.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
@@ -396,7 +373,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs"/>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerCollectionItemNameAttribute.cs" />
@@ -427,7 +404,7 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs">
-		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
@@ -443,13 +420,13 @@
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs">
-		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\IEffectFog.cs" />
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs">
-		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -463,9 +440,6 @@
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs">
       <Services>OpenGLGraphics</Services>
-    </Compile>
-    <Compile Include="Graphics\GraphicsDevice.PSM.cs">
-      <Services>PSMGraphics</Services>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.Web.cs">
       <Services>WebGraphics</Services>
@@ -519,9 +493,6 @@
     <Compile Include="Graphics\RenderTarget2D.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\RenderTarget2D.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\RenderTarget2D.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -543,9 +514,6 @@
     <Compile Include="Graphics\SamplerStateCollection.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\SamplerStateCollection.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\SamplerStateCollection.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -558,9 +526,6 @@
     <Compile Include="Graphics\Shader\ConstantBuffer.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\ConstantBuffer.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -571,9 +536,6 @@
     <Compile Include="Graphics\Shader\Shader.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\Shader.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\Shader\Shader.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -582,9 +544,7 @@
     </Compile>
     <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
-    <Compile Include="Graphics\SpriteBatcher.cs">
-      <ExcludePlatforms>PSMobile</ExcludePlatforms>
-    </Compile>
+    <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
@@ -597,9 +557,6 @@
     </Compile>
     <Compile Include="Graphics\States\BlendState.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
-    </Compile>
-    <Compile Include="Graphics\States\BlendState.PSM.cs">
-      <Services>PSMGraphics</Services>
     </Compile>
     <Compile Include="Graphics\States\BlendState.Web.cs">
       <Services>WebGraphics</Services>
@@ -614,9 +571,6 @@
     <Compile Include="Graphics\States\DepthStencilState.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\States\DepthStencilState.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\States\DepthStencilState.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -627,9 +581,6 @@
     </Compile>
     <Compile Include="Graphics\States\RasterizerState.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
-    </Compile>
-    <Compile Include="Graphics\States\RasterizerState.PSM.cs">
-      <Services>PSMGraphics</Services>
     </Compile>
     <Compile Include="Graphics\States\RasterizerState.Web.cs">
       <Services>WebGraphics</Services>
@@ -659,9 +610,6 @@
     <Compile Include="Graphics\Texture2D.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture2D.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\Texture2D.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -672,9 +620,6 @@
     <Compile Include="Graphics\Texture3D.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture3D.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\Texture3D.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -684,9 +629,6 @@
     </Compile>
     <Compile Include="Graphics\TextureCollection.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
-    </Compile>
-    <Compile Include="Graphics\TextureCollection.PSM.cs">
-      <Services>PSMGraphics</Services>
     </Compile>
     <Compile Include="Graphics\TextureCollection.Web.cs">
       <Services>WebGraphics</Services>
@@ -701,18 +643,12 @@
     <Compile Include="Graphics\Texture.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Texture.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Graphics\TextureCube.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
     <Compile Include="Graphics\TextureCube.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
-    </Compile>
-    <Compile Include="Graphics\TextureCube.PSM.cs">
-      <Services>PSMGraphics</Services>
     </Compile>
     <Compile Include="Graphics\TextureCube.Web.cs">
       <Services>WebGraphics</Services>
@@ -727,9 +663,6 @@
     <Compile Include="Graphics\Vertices\IndexBuffer.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\IndexBuffer.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\Vertices\IndexBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -743,9 +676,6 @@
     <Compile Include="Graphics\Vertices\VertexBuffer.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexBuffer.PSM.cs">
-      <Services>PSMGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\Vertices\VertexBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
@@ -757,9 +687,6 @@
     </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
-    </Compile>
-    <Compile Include="Graphics\Vertices\VertexDeclaration.PSM.cs">
-      <Services>PSMGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.Web.cs">
       <Services>WebGraphics</Services>
@@ -788,9 +715,6 @@
     <Compile Include="Input\GamePad.Ouya.cs">
       <Platforms>Ouya</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.PSM.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
     <Compile Include="Input\GamePad.OpenTK.cs">
       <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
@@ -813,13 +737,13 @@
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\JoystickState.cs" />
     <Compile Include="Input\Joystick.Default.cs">
-      <Platforms>Android,Ouya,PSMobile,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,Web</Platforms>
+      <Platforms>Android,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,Web</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.OpenTK.cs">
       <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.cs">
-		<ExcludePlatforms>PSMobile,Android,Ouya</ExcludePlatforms>
+		<ExcludePlatforms>Android,Ouya</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
@@ -856,7 +780,6 @@
     </Compile>
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
-    <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
     <Compile Include="Input\Touch\TouchCollection.cs" />
@@ -910,7 +833,7 @@
       <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.Default.cs">
-      <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,Web</Platforms>
+      <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya,Web</Platforms>
     </Compile>
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSource.cs" />
@@ -919,12 +842,8 @@
     <Compile Include="Media\MusicProperties.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
     </Compile>
-    <Compile Include="Media\PlaylistCollection.cs">
-      <ExcludePlatforms>PSMobile</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Media\Playlist.cs">
-      <ExcludePlatforms>PSMobile</ExcludePlatforms>
-    </Compile>
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\Song.Default.cs">
@@ -932,9 +851,6 @@
     </Compile>
     <Compile Include="Media\Song.Android.cs">
         <Platforms>Android,Ouya</Platforms>
-    </Compile>
-    <Compile Include="Media\Song.PSM.cs">
-        <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Media\Song.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -953,7 +869,7 @@
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -968,7 +884,7 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -1020,7 +936,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUAP,Linux</Platforms>
+      <Platforms>Android,Angle,iOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUAP,Linux</Platforms>
     </Compile>
 
 
@@ -1149,39 +1065,6 @@
     </Compile>
 
 
-    <!-- PlayStation Mobile Platform -->
-    <Compile Include="PSSuite\Graphics\SpriteBatcher.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\Input\AccelerometerCapabilities.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\Input\Accelerometer.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\Input\AccelerometerState.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\Input\Keyboard.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\Input\Touch\GestureListener.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\PSSExtensions.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\PSSGamePlatform.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\PSSGameWindow.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\PSSHelper.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-
-
     <!-- Windows 8 Platform -->
     <Compile Include="Windows8\GameFrameworkViewSource.cs">
       <Platforms>Windows8</Platforms>
@@ -1219,6 +1102,9 @@
     <Compile Include="WindowsUAP\XamlGame.cs">
       <Platforms>WindowsUAP</Platforms>
     </Compile>	  
+    <None Include="project.json">
+      <Platforms>WindowsUAP</Platforms>
+    </None>
 
 	  
     <!-- Windows Desktop Platfom -->
@@ -1333,26 +1219,6 @@
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
 
-
-    <!-- PSM Stock Effects -->
-    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.fcg">
-      <Services>PSMGraphics</Services>
-    </EmbeddedShaderProgram>
-    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.vcg">
-      <Services>PSMGraphics</Services>
-    </EmbeddedShaderProgram>
-    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.fcg">
-      <Services>PSMGraphics</Services>
-    </EmbeddedShaderProgram>
-    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.vcg">
-      <Services>PSMGraphics</Services>
-    </EmbeddedShaderProgram>
-    <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.fcg">
-      <Services>PSMGraphics</Services>
-    </ShaderProgram>
-    <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.vcg">
-      <Services>PSMGraphics</Services>
-    </ShaderProgram>
 
   </Files>
 </Project>

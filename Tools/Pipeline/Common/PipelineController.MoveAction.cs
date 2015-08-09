@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.IO;
+using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -80,12 +81,24 @@ namespace MonoGame.Tools.Pipeline
                         return false;
                     }
 
+                    var cis = new List<ContentItem>();
+                    var nps = new List<string>();
+
                     for (var i = 0; i < _con._project.ContentItems.Count; i++)
                     {
                         var item = _con._project.ContentItems[i];
                         if (item.OriginalPath.StartsWith(path))
-                            MoveFile(item, newpath + item.OriginalPath.Substring(path.Length));
+                        {
+                            cis.Add(item);
+                            nps.Add(newpath + item.OriginalPath.Substring(path.Length));
+                        }
                     }
+
+                    for (int i = 0; i < nps.Count; i++)
+                    {
+                        MoveFile(cis[i], newpath +  cis[i].OriginalPath.Substring(path.Length));
+                    }
+
                     _con.View.RemoveTreeFolder(path);
                 }
                 else
