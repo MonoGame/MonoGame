@@ -16,6 +16,7 @@ The currently available packages are:
 	* Windows Phone 8
 	* Windows Phone 8.1 
 	* Windows Universal projects
+    * Windows 10
 	* iOS (Xamarin.iOS only)
 	* MacOS (net4 / net45 / MonoMac and Xamarin.Mac)
 	* Android

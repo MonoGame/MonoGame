@@ -19,20 +19,24 @@
         <references>
             <reference file="MonoGame.Framework.dll" />
         </references>
-	</metadata>
+    <dependencies>
+        <dependency id="Microsoft.NETCore.UniversalWindowsPlatform" version="5.0.0" />
+    </dependencies>
+    </metadata>
     <files>
-        <file src="WindowsUAP\AnyCPU\Release\Themes\generic.xbf" target="lib\netcore\MonoGame.Framework\Themes\generic.xbf" />
-        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
-        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore\MonoGame.Framework.xml" />
-        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
-        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\netcore\MonoGame.Framework\MonoGame.Framework.xr.xml" />
-        <file src="WindowsUAP\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\netcore\SharpDX.Direct2D1.dll" />
-        <file src="WindowsUAP\AnyCPU\Release\SharpDX.Direct3D11.dll" target="lib\netcore\SharpDX.Direct3D11.dll" />
-        <file src="WindowsUAP\AnyCPU\Release\SharpDX.dll" target="lib\netcore\SharpDX.dll" />
-        <file src="WindowsUAP\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\netcore\SharpDX.DXGI.dll" />
-        <file src="WindowsUAP\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\netcore\SharpDX.MediaFoundation.dll" />
-        <file src="WindowsUAP\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\netcore\SharpDX.XAudio2.dll" />
-        <file src="WindowsUAP\AnyCPU\Release\SharpDX.XInput.dll" target="lib\netcore\SharpDX.XInput.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\Themes\generic.xbf" target="lib\dotnet\MonoGame.Framework\Themes\generic.xbf" />
+        <file src="..\Properties\MonoGame.Framework.rd.xml" target="lib\dotnet\MonoGame.Framework\Properties\MonoGame.Framework.rd.xml" />
+        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.dll" target="lib\dotnet\MonoGame.Framework.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.xml" target="lib\dotnet\MonoGame.Framework.xml" />
+        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.pri" target="lib\dotnet\MonoGame.Framework.pri" />
+        <file src="WindowsUAP\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\dotnet\MonoGame.Framework\MonoGame.Framework.xr.xml" />
+        <file src="WindowsUAP\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\dotnet\SharpDX.Direct2D1.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\SharpDX.Direct3D11.dll" target="lib\dotnet\SharpDX.Direct3D11.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\SharpDX.dll" target="lib\dotnet\SharpDX.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\dotnet\SharpDX.DXGI.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\dotnet\SharpDX.MediaFoundation.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\dotnet\SharpDX.XAudio2.dll" />
+        <file src="WindowsUAP\AnyCPU\Release\SharpDX.XInput.dll" target="lib\dotnet\SharpDX.XInput.dll" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
 </package>
