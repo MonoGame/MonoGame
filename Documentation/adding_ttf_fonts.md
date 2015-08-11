@@ -6,9 +6,13 @@ Truetype fonts may be installed on the system, or added to the project manually 
 
 1. Create the .spritefont file.
 
-Image step 1
+<p align="center">
+<img src="images/adding_ttf_fonts_step_1.PNG"/>
+</p>
 
-Image step 2
+<p align="center">
+<img src="images/adding_ttf_fonts_step_2.PNG"/>
+</p>
 
 2- Open the newly created .spritefont file in your text editor of choice, find this line and change it to your selected .ttf font.
 If the font is installed on the system, just type the name of the font.
