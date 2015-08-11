@@ -6,9 +6,9 @@ This section will cover the following topics:
 
  - What is Game Content
  - [Using The Pipeline Tool](using_pipeline_tool.md)
- - [Loading Textures](loading_textures.md)
- - [Loading Fonts](loading_fonts.md)
- - [Loading Sounds](loading_sounds.md)
+ - [Adding Textures](adding_textures.md)
+ - [Adding Fonts](adding_fonts.md)
+ - [Adding Sounds](adding_sounds.md)
  - [Custom Effects](custom_effects.md)
  - Custom Content Types
  
