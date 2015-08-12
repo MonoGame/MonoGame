@@ -216,9 +216,6 @@ namespace Microsoft.Xna.Framework
         {
             lock (window)
             {
-                if (window == null)
-                    return;
-                
                 // Ignore resize events until intialization is complete
                 if (Game == null)
                     return;
@@ -251,9 +248,6 @@ namespace Microsoft.Xna.Framework
         {
             lock (window)
             {
-                if (window == null)
-                    return;
-
                 UpdateBorder();
                 Window.ProcessEvents();
                 UpdateWindowState();
