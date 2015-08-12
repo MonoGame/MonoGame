@@ -117,7 +117,12 @@ namespace Microsoft.Xna.Framework
 
         private static void BackRequested(object sender, BackRequestedEventArgs e)
         {
-            GamePad.Back = true;
+            // We need to manually hide the keyboard input UI when the back button is pressed
+            if (KeyboardInput.IsVisible)
+                KeyboardInput.Cancel(null);
+            else
+                GamePad.Back = true;
+
             e.Handled = true;
         }
 
