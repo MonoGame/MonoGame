@@ -34,8 +34,16 @@ namespace Microsoft.Xna.Framework.Media
             {
                 var ev = _session.EndGetEvent(asyncResultRef);
 
-                if (ev.TypeInfo == MediaEventTypes.EndOfPresentation)
-                    OnSongFinishedPlaying(null, null);
+                switch (ev.TypeInfo)
+                {
+                    case MediaEventTypes.EndOfPresentation:
+                        OnSongFinishedPlaying(null, null);
+                        break;
+                    case MediaEventTypes.SessionTopologyStatus:
+                        if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                            OnTopologyReady();
+                        break;
+                }
 
                 _session.BeginGetEvent(this, null);
             }
@@ -110,7 +118,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void SetChannelVolumes()
         {
-            if (_volumeController != null)
+            if (_volumeController != null && !_volumeController.IsDisposed)
             {
                 float volume = _volume;
                 if (IsMuted)
@@ -180,16 +188,6 @@ namespace Microsoft.Xna.Framework.Media
                 _clock.Dispose();
             }
 
-            // Set the new song.
-            _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
-
-            // Get the volume interface.
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(MediaPlayer.GetVolumeObj(_session));
-            SetChannelVolumes();
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
-
             //create the callback if it hasn't been created yet
             if (_callback == null)
             {
@@ -197,9 +195,28 @@ namespace Microsoft.Xna.Framework.Media
                 _session.BeginGetEvent(_callback, null);
             }
 
+            // Set the new song.
+            _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
+
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
+
             // Start playing.
             var varStart = new Variant();
             _session.Start(null, varStart);
+        }
+
+        private static void OnTopologyReady()
+        {
+            if (_session.IsDisposed)
+                return;
+
+            // Get the volume interface.
+            IntPtr volumeObjectPtr;
+            MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
+            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+
+            SetChannelVolumes();
         }
 
         private static void PlatformResume()
