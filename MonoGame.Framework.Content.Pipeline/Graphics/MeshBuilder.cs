@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public sealed class MeshBuilder
     {
-        private MeshContent _meshContent;
+        private readonly MeshContent _meshContent;
         private GeometryContent _currentGeometryContent;
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             _currentGeometryContent = new GeometryContent();
             _meshContent.Geometry.Add(_currentGeometryContent);
-            //_currentGeometryContent.OpaqueData = opaqueData;
+            _currentGeometryContent.OpaqueData.Add("default", opaqueData);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="channelData">New data values for the vertex data. The data type being set must match the data type for the vertex channel specified by vertexDataIndex.</param>
         public void SetVertexChannelData(int vertexDataIndex, Object channelData)
         {
-            
+            _currentGeometryContent.Vertices.Channels[vertexDataIndex].Items.Add(channelData);
         }
 
         /// <summary>
