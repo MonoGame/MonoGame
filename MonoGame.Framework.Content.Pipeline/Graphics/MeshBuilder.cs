@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public sealed class MeshBuilder
     {
         private MeshContent _meshContent;
+        private GeometryContent _currentGeometryContent;
 
         /// <summary>
         /// Gets or sets the current value for position merging of the mesh.
         /// </summary>
         public bool MergeDuplicatePositions { get; set; }
-
 
         /// <summary>
         /// Gets or sets the tolerance for <see cref="MergeDuplicatePositions"/>.
@@ -24,7 +22,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Gets or sets the name of the current  <see cref="MeshContent"/> object being processed.
         /// </summary>
         public string Name { get; set; }
-
 
         /// <summary>
         /// Reverses the triangle winding order of the specified mesh.
@@ -44,13 +41,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="indexIntoVertexCollection">Index of the inserted vertex, in the collection. This corresponds to the value returned by <see cref="CreatePosition"/>.</param>
         public void AddTriangleVertex(int indexIntoVertexCollection)
         {
-
+            _currentGeometryContent.Vertices.Add(indexIntoVertexCollection);
         }
 
 
-        public int CreateVertexChannel<T> (string usage)
+        public int CreateVertexChannel<T>(string usage)
         {
-            throw new NotImplementedException();
+            _currentGeometryContent.Vertices.Channels.Add<T>(usage, null);
+            return _currentGeometryContent.Vertices.Channels.Count - 1;
         }
 
         /// <summary>
@@ -82,12 +80,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Resultant mesh.</returns>
         public MeshContent FinishMesh()
         {
-            if(MergeDuplicatePositions)
+            if (MergeDuplicatePositions)
                 MeshHelper.MergeDuplicatePositions(_meshContent, MergePositionTolerance);
-            
+
             MeshHelper.MergeDuplicateVertices(_meshContent);
-            MeshHelper.CalculateNormals(_meshContent, true);
+            MeshHelper.CalculateNormals(_meshContent, false);
+
+            if (SwapWindingOrder)
+                MeshHelper.SwapWindingOrder(_meshContent);
+
             return _meshContent;
+
+            //TODO: The related MeshBuilder object can no longer be used after this function is called.
         }
 
         /// <summary>
@@ -97,7 +101,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="material">The material to be used by the mesh.</param>
         public void SetMaterial(MaterialContent material)
         {
-  
+            _currentGeometryContent = new GeometryContent();
+            _meshContent.Geometry.Add(_currentGeometryContent);
+            _currentGeometryContent.Material = material;
         }
 
         /// <summary>
@@ -106,7 +112,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="opaqueData">Opaque data to be applied to the GeometryContent object of the next triangle.</param>
         public void SetOpaqueData(OpaqueDataDictionary opaqueData)
         {
-
+            _currentGeometryContent = new GeometryContent();
+            _meshContent.Geometry.Add(_currentGeometryContent);
+            //_currentGeometryContent.OpaqueData = opaqueData;
         }
 
         /// <summary>
@@ -116,7 +124,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="channelData">New data values for the vertex data. The data type being set must match the data type for the vertex channel specified by vertexDataIndex.</param>
         public void SetVertexChannelData(int vertexDataIndex, Object channelData)
         {
-
+            
         }
 
         /// <summary>
