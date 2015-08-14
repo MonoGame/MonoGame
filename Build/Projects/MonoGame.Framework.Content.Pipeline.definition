@@ -115,6 +115,7 @@
     <Compile Include="Graphics\IndexCollection.cs" />
     <Compile Include="Graphics\IndirectPositionCollection.cs" />
     <Compile Include="Graphics\MaterialContent.cs" />
+    <Compile Include="Graphics\MeshBuilder.cs" />
     <Compile Include="Graphics\MeshContent.cs" />
     <Compile Include="Graphics\MeshHelper.cs" />
     <Compile Include="Graphics\MipmapChain.cs" />
