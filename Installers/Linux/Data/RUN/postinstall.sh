@@ -73,6 +73,14 @@ then
 	fi
 fi
 
+#monodevelop addin
+read -p "Install monodevelop addin(Y, n): " choice2
+case "$choice2" in 
+	n|N ) ;;
+	*)
+	sudo -H -u $SUDO_USER bash -c 'mdtool setup install $DIR/Main/MonoDevelop.MonoGame.mpack'
+esac
+
 #fix permissions
 usr="$SUDO_USER"
 if [ -z "$usr" -a "$usr"==" " ]; then
