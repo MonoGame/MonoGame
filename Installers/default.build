@@ -84,13 +84,14 @@
         <fileset basedir="../ThirdParty/Dependencies/makeself"/>
       </copy>
       <copy tofile="Linux/InstallerData/Data/Main/libstdc++.so.6" file="../ThirdParty/Dependencies/assimp/libstdc++.so.6" />
-    
+      <get src="http://addins.monodevelop.com/Stable/Linux/5.0/MonoDevelop.MonoGame-3.4.0.455.mpack" dest="Linux/InstallerData/Data/Main/MonoDevelop.MonoGame.mpack" failonerror="false"/>
+      
       <choose>
         <when test="${os == 'Unix'}">
           <exec program="Linux/InstallerData/generate_run.sh" workingdir="Linux/InstallerData/"/>
           <exec program="Linux/InstallerData/generate_deb.sh" workingdir="Linux/InstallerData/"/>
-          <copy tofile="Linux/monogame-linux.run" file="Linux/InstallerData/monogame-linux.run" />
-          <copy tofile="Linux/monogame-pipeline.deb" file="Linux/InstallerData/monogame-pipeline.deb" />
+          <copy tofile="Linux/monogame-sdk.run" file="Linux/InstallerData/monogame-sdk.run" />
+          <copy tofile="Linux/monogame-sdk.deb" file="Linux/InstallerData/monogame-sdk.deb" />
           <delete dir="Linux/InstallerData" failonerror="false"/>
         </when>
         <otherwise>
