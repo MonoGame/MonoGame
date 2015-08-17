@@ -18,36 +18,14 @@ namespace Microsoft.Xna.Framework.Media
         // HACK: Need SharpDX to fix this.
         private static Guid AudioStreamVolumeGuid;
 
-        private static Callback _callback;
+        private MediaSessionCallback _callback;
 
-        private class Callback : IAsyncCallback
+        private void OnMediaSessionEvent(MediaEvent ev)
         {
-            private VideoPlayer _player;
+            // Trigger an "on Video Ended" event here if needed
 
-            public Callback(VideoPlayer player)
-            {
-                _player = player;
-            }
-
-            public void Dispose()
-            {
-            }
-
-            public IDisposable Shadow { get; set; }
-            public void Invoke(AsyncResult asyncResultRef)
-            {
-                var ev = _session.EndGetEvent(asyncResultRef);
-
-                // Trigger an "on Video Ended" event here if needed
-
-                if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
-                    _player.OnTopologyReady();
-
-                _session.BeginGetEvent(this, null);
-            }
-
-            public AsyncCallbackFlags Flags { get; private set; }
-            public WorkQueueId WorkQueueId { get; private set; }
+            if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                OnTopologyReady();
         }
 
         private void PlatformInitialize()
@@ -116,12 +94,8 @@ namespace Microsoft.Xna.Framework.Media
                 _clock.Dispose();
             }
 
-            //create the callback if it hasn't been created yet
-            if (_callback == null)
-            {
-                _callback = new Callback(this);
-                _session.BeginGetEvent(_callback, null);
-            }
+            //create the callback
+            _callback = new MediaSessionCallback(_session, OnMediaSessionEvent);
 
             // Set the new song.
             _session.SetTopology(SessionSetTopologyFlags.Immediate, _currentVideo.Topology);

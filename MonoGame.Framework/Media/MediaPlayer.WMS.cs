@@ -21,35 +21,20 @@ namespace Microsoft.Xna.Framework.Media
 
         private static Guid AudioStreamVolumeGuid;
 
-        private static Callback _callback;
+        private static MediaSessionCallback _callback;
 
-        private class Callback : IAsyncCallback
+        private static void OnMediaSessionEvent(MediaEvent ev)
         {
-            public void Dispose()
+            switch (ev.TypeInfo)
             {
+                case MediaEventTypes.EndOfPresentation:
+                    OnSongFinishedPlaying(null, null);
+                    break;
+                case MediaEventTypes.SessionTopologyStatus:
+                    if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                        OnTopologyReady();
+                    break;
             }
-
-            public IDisposable Shadow { get; set; }
-            public void Invoke(AsyncResult asyncResultRef)
-            {
-                var ev = _session.EndGetEvent(asyncResultRef);
-
-                switch (ev.TypeInfo)
-                {
-                    case MediaEventTypes.EndOfPresentation:
-                        OnSongFinishedPlaying(null, null);
-                        break;
-                    case MediaEventTypes.SessionTopologyStatus:
-                        if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
-                            OnTopologyReady();
-                        break;
-                }
-
-                _session.BeginGetEvent(this, null);
-            }
-
-            public AsyncCallbackFlags Flags { get; private set; }
-            public WorkQueueId WorkQueueId { get; private set; }
         }
 
         private static void PlatformInitialize()
@@ -151,12 +136,8 @@ namespace Microsoft.Xna.Framework.Media
                 _clock.Dispose();
             }
 
-            //create the callback if it hasn't been created yet
-            if (_callback == null)
-            {
-                _callback = new Callback();
-                _session.BeginGetEvent(_callback, null);
-            }
+            //create the callback
+            _callback = new MediaSessionCallback(_session, OnMediaSessionEvent);
 
             // Set the new song.
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
