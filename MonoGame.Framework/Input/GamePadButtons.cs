@@ -164,13 +164,75 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadButtons"/> and has the same value as this instance; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is GamePadButtons) && (this == (GamePadButtons)obj);
+            if (obj is GamePadButtons)
+                return Equals((GamePadButtons)obj);
+            return false;
         }
 
-		public override int GetHashCode ()
+        public bool Equals(GamePadButtons other)
+        {
+            return buttons == other.buttons;
+        }
+
+        public override int GetHashCode ()
 		{
 			return (int)this.buttons;
 		}
+
+        public override string ToString()
+        {
+            string str = string.Empty;
+
+            if (A == ButtonState.Pressed)
+            {
+                str = "A";
+            }
+            if (B == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "B";
+            }
+            if (X == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "X";
+            }
+            if (Y == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "Y";
+            }
+            if (LeftShoulder == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "LeftShoulder";
+            }
+            if (RightShoulder == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "RightShoulder";
+            }
+            if (LeftStick == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "LeftStick";
+            }
+            if (RightStick == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "RightStick";
+            }
+            if (Start == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "Start";
+            }
+            if (Back == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "Back";
+            }
+            if (BigButton == ButtonState.Pressed)
+            {
+                str = str + (str.Length != 0 ? " " : "") + "BigButton";
+            }
+            if (str.Length == 0)
+            {
+                str = "None";
+            }
+            return "{Buttons:" + str + "}";
+        }
     }
 }
 

@@ -110,7 +110,12 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if the objects are not equal; false otherwise.</returns>
 		public static bool operator !=(MouseState left, MouseState right)
 		{
-			return !(left == right);
+			return left._x != right._x ||
+				   left._y != right._y ||
+				   left._leftButton != right._leftButton ||
+				   left._middleButton != right._middleButton ||
+				   left._rightButton != right._rightButton ||
+                   left._scrollWheelValue != right._scrollWheelValue;
 		}
 
         /// <summary>
@@ -121,8 +126,18 @@ namespace Microsoft.Xna.Framework.Input
         public override bool Equals(object obj)
         {
             if (obj is MouseState)
-                return this == (MouseState)obj;
+                return Equals((MouseState)obj);
             return false;
+        }
+
+        public bool Equals(MouseState other)
+        {
+            return _x == other._x &&
+               _y == other._y &&
+               _leftButton == other._leftButton &&
+               _middleButton == other._middleButton &&
+               _rightButton == other._rightButton &&
+               _scrollWheelValue == other._scrollWheelValue;
         }
 
         /// <summary>
@@ -229,6 +244,24 @@ namespace Microsoft.Xna.Framework.Input
                 _xButton2 = value;
             }
 		}
-	}
+
+        public override string ToString()
+        {
+            string str = string.Empty;
+            if (LeftButton == ButtonState.Pressed)
+                str = "Left";
+            if (RightButton == ButtonState.Pressed)
+                str = str + (str.Length != 0 ? " " : "") + "Right";
+            if (MiddleButton == ButtonState.Pressed)
+                str = str + (str.Length != 0 ? " " : "") + "Middle";
+            if (this.XButton1 == ButtonState.Pressed)
+                str = str + (str.Length != 0 ? " " : "") + "XButton1";
+            if (this.XButton2 == ButtonState.Pressed)
+                str = str + (str.Length != 0 ? " " : "") + "XButton2";
+            if (str.Length == 0)
+                str = "None";
+            return "{X:" + X + " Y:" + Y + " Buttons:" + str + " Wheel:" + ScrollWheelValue + "}";
+        }
+    }
 }
 
