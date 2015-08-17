@@ -165,13 +165,6 @@ namespace Microsoft.Xna.Framework.Media
 
             // Set the new song.
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
-
-            // Start playing.
-            var varStart = new Variant();
-            _session.Start(null, varStart);
         }
 
         private static void OnTopologyReady()
@@ -185,6 +178,13 @@ namespace Microsoft.Xna.Framework.Media
             _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
 
             SetChannelVolumes();
+
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
+
+            // Start playing.
+            var varStart = new Variant();
+            _session.Start(null, varStart);
         }
 
         private static void PlatformResume()
