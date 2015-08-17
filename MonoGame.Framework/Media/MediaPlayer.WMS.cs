@@ -3,12 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -21,35 +18,20 @@ namespace Microsoft.Xna.Framework.Media
 
         private static Guid AudioStreamVolumeGuid;
 
-        private static Callback _callback;
+        private static MediaSessionCallback _callback;
 
-        private class Callback : IAsyncCallback
+        private static void OnMediaSessionEvent(MediaEvent ev)
         {
-            public void Dispose()
+            switch (ev.TypeInfo)
             {
+                case MediaEventTypes.EndOfPresentation:
+                    OnSongFinishedPlaying(null, null);
+                    break;
+                case MediaEventTypes.SessionTopologyStatus:
+                    if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                        OnTopologyReady();
+                    break;
             }
-
-            public IDisposable Shadow { get; set; }
-            public void Invoke(AsyncResult asyncResultRef)
-            {
-                var ev = _session.EndGetEvent(asyncResultRef);
-
-                switch (ev.TypeInfo)
-                {
-                    case MediaEventTypes.EndOfPresentation:
-                        OnSongFinishedPlaying(null, null);
-                        break;
-                    case MediaEventTypes.SessionTopologyStatus:
-                        if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
-                            OnTopologyReady();
-                        break;
-                }
-
-                _session.BeginGetEvent(this, null);
-            }
-
-            public AsyncCallbackFlags Flags { get; private set; }
-            public WorkQueueId WorkQueueId { get; private set; }
         }
 
         private static void PlatformInitialize()
@@ -118,17 +100,12 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void SetChannelVolumes()
         {
-            if (_volumeController != null && !_volumeController.IsDisposed)
-            {
-                float volume = _volume;
-                if (IsMuted)
-                    volume = 0.0f;
+            if ((_volumeController == null) || _volumeController.IsDisposed)
+                return;
 
-                for (int i = 0; i < _volumeController.ChannelCount; i++)
-                {
-                    _volumeController.SetChannelVolume(i, volume);
-                }
-            }
+            var volume = IsMuted ? 0f : _volume;
+            for (int i = 0; i < _volumeController.ChannelCount; i++)
+                _volumeController.SetChannelVolume(i, volume);
         }
 
         private static void PlatformSetVolume(float volume)
@@ -156,22 +133,11 @@ namespace Microsoft.Xna.Framework.Media
                 _clock.Dispose();
             }
 
-            //create the callback if it hasn't been created yet
-            if (_callback == null)
-            {
-                _callback = new Callback();
-                _session.BeginGetEvent(_callback, null);
-            }
+            //create the callback
+            _callback = new MediaSessionCallback(_session, OnMediaSessionEvent);
 
             // Set the new song.
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
-
-            // Start playing.
-            var varStart = new Variant();
-            _session.Start(null, varStart);
         }
 
         private static void OnTopologyReady()
@@ -182,9 +148,16 @@ namespace Microsoft.Xna.Framework.Media
             // Get the volume interface.
             IntPtr volumeObjectPtr;
             MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+            _volumeController = new AudioStreamVolume(volumeObjectPtr);
 
             SetChannelVolumes();
+
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
+
+            // Start playing.
+            var varStart = new Variant();
+            _session.Start(null, varStart);
         }
 
         private static void PlatformResume()

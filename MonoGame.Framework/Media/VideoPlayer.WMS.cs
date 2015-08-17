@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading;
-using Microsoft.Xna.Framework.Graphics;
-using SharpDX;
+﻿using Microsoft.Xna.Framework.Graphics;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
 using System;
@@ -18,36 +15,14 @@ namespace Microsoft.Xna.Framework.Media
         // HACK: Need SharpDX to fix this.
         private static Guid AudioStreamVolumeGuid;
 
-        private static Callback _callback;
+        private MediaSessionCallback _callback;
 
-        private class Callback : IAsyncCallback
+        private void OnMediaSessionEvent(MediaEvent ev)
         {
-            private VideoPlayer _player;
+            // Trigger an "on Video Ended" event here if needed
 
-            public Callback(VideoPlayer player)
-            {
-                _player = player;
-            }
-
-            public void Dispose()
-            {
-            }
-
-            public IDisposable Shadow { get; set; }
-            public void Invoke(AsyncResult asyncResultRef)
-            {
-                var ev = _session.EndGetEvent(asyncResultRef);
-
-                // Trigger an "on Video Ended" event here if needed
-
-                if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
-                    _player.OnTopologyReady();
-
-                _session.BeginGetEvent(this, null);
-            }
-
-            public AsyncCallbackFlags Flags { get; private set; }
-            public WorkQueueId WorkQueueId { get; private set; }
+            if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                OnTopologyReady();
         }
 
         private void PlatformInitialize()
@@ -116,22 +91,11 @@ namespace Microsoft.Xna.Framework.Media
                 _clock.Dispose();
             }
 
-            //create the callback if it hasn't been created yet
-            if (_callback == null)
-            {
-                _callback = new Callback(this);
-                _session.BeginGetEvent(_callback, null);
-            }
+            //create the callback
+            _callback = new MediaSessionCallback(_session, OnMediaSessionEvent);
 
             // Set the new song.
             _session.SetTopology(SessionSetTopologyFlags.Immediate, _currentVideo.Topology);
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
-
-            // Start playing.
-            var varStart = new Variant();
-            _session.Start(null, varStart);
         }
 
         private void PlatformResume()
@@ -152,17 +116,12 @@ namespace Microsoft.Xna.Framework.Media
 
         private void SetChannelVolumes()
         {
-            if (_volumeController != null && !_volumeController.IsDisposed)
-            {
-                float volume = _volume;
-                if (IsMuted)
-                    volume = 0.0f;
+            if ((_volumeController == null) || _volumeController.IsDisposed)
+                return;
 
-                for (int i = 0; i < _volumeController.ChannelCount; i++)
-                {
-                    _volumeController.SetChannelVolume(i, volume);
-                }
-            }
+            var volume = IsMuted ? 0f : _volume;
+            for (int i = 0; i < _volumeController.ChannelCount; i++)
+                _volumeController.SetChannelVolume(i, volume);
         }
 
         private void PlatformSetVolume()
@@ -203,9 +162,16 @@ namespace Microsoft.Xna.Framework.Media
             // Get the volume interface.
             IntPtr volumeObjectPtr;
             MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+            _volumeController = new AudioStreamVolume(volumeObjectPtr);
 
             SetChannelVolumes();
+
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
+
+            // Start playing.
+            var varStart = new Variant();
+            _session.Start(null, varStart);
         }
     }
 }
