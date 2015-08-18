@@ -53,9 +53,14 @@ namespace Microsoft.Xna.Framework.Content
         /// 4 - Collection of Generic types
         /// 5 - ]
         /// 6 - Optional ', AssemblyName'
+        /// 
+        /// Windows 8 RT doesn't appear to support Compiled Regex.
         /// </summary>
+#if (WINDOWS_STOREAPP || WINDOWS_PHONE)
+        private static Regex _genericRegex = new Regex(@"^([\w.]+`)(\d)(\[)([\[]?[\w.\s,]+[\]]?)+(\])(,\s[\w.]+)*$");
+#else
         private static Regex _genericRegex = new Regex(@"^([\w.]+`)(\d)(\[)([\[]?[\w.\s,]+[\]]?)+(\])(,\s[\w.]+)*$", RegexOptions.Compiled);
-
+#endif
         static ContentTypeReaderManager()
         {
             _locker = new object();
@@ -362,7 +367,7 @@ namespace Microsoft.Xna.Framework.Content
                 }
 
                 var genericType = Type.GetType(genericTypeName);
-                if(genericType != null)
+                if (genericType != null)
                     return genericType.MakeGenericType(subTypes);
             }
 
