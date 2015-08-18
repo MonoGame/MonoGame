@@ -41,11 +41,23 @@ namespace Microsoft.Xna.Framework.Content
 
         private Dictionary<Type, ContentTypeReader> _contentReaders;
 
-		private static readonly string _assemblyName;
-		
+        private static readonly string _assemblyName;
 
-		static ContentTypeReaderManager()
-		{
+        /// <summary>
+        /// Regex to parse a Generic Type string.
+        /// Capture Groups:
+        /// 0 - Full String
+        /// 1 - Name up to `
+        /// 2 - Number of Generic Parameters
+        /// 3 - [
+        /// 4 - Collection of Generic types
+        /// 5 - ]
+        /// 6 - Optional ', AssemblyName'
+        /// </summary>
+        private static Regex _genericRegex = new Regex(@"^([\w.]+`)(\d)(\[)([\[]?[\w.\s,]+[\]]?)+(\])(,\s[\w.]+)*$", RegexOptions.Compiled);
+
+        static ContentTypeReaderManager()
+        {
             _locker = new object();
             _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
 
@@ -68,7 +80,7 @@ namespace Microsoft.Xna.Framework.Content
         // Trick to prevent the linker removing the code, but not actually execute the code
         static bool falseflag = false;
 
-		internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
+        internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
 #pragma warning disable 0219, 0649
             // Trick to prevent the linker removing the code, but not actually execute the code
@@ -88,7 +100,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hRectangleArrayReader = new ArrayReader<Rectangle>();
                 var hVector3ListReader = new ListReader<Vector3>();
                 var hStringListReader = new ListReader<StringReader>();
-				var hIntListReader = new ListReader<Int32>();
+                var hIntListReader = new ListReader<Int32>();
                 var hSpriteFontReader = new SpriteFontReader();
                 var hTexture2DReader = new Texture2DReader();
                 var hCharReader = new CharReader();
@@ -111,8 +123,8 @@ namespace Microsoft.Xna.Framework.Content
                 var hArrayMatrixReader = new ArrayReader<Matrix>();
                 var hEnumBlendReader = new EnumReader<Graphics.Blend>();
                 var hNullableRectReader = new NullableReader<Rectangle>();
-				var hEffectMaterialReader = new EffectMaterialReader();
-				var hExternalReferenceReader = new ExternalReferenceReader();
+                var hEffectMaterialReader = new EffectMaterialReader();
+                var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
                 var hModelReader = new ModelReader();
@@ -126,7 +138,7 @@ namespace Microsoft.Xna.Framework.Content
             }
 #pragma warning restore 0219, 0649
 
-		    // The first content byte i read tells me the number of content readers in this XNB file
+            // The first content byte i read tells me the number of content readers in this XNB file
             var numberOfReaders = reader.Read7BitEncodedInt();
             var contentReaders = new ContentTypeReader[numberOfReaders];
             var needsInitialize = new BitArray(numberOfReaders);
@@ -160,7 +172,7 @@ namespace Microsoft.Xna.Framework.Content
 
                         readerTypeString = PrepareType(readerTypeString);
 
-                        var l_readerType = Type.GetType(readerTypeString);
+                        var l_readerType = ParseType(readerTypeString);
                         if (l_readerType != null)
                         {
                             ContentTypeReader typeReader;
@@ -194,7 +206,7 @@ namespace Microsoft.Xna.Framework.Content
 
                     var targetType = contentReaders[i].TargetType;
                     if (targetType != null)
-                      _contentReaders.Add(targetType, contentReaders[i]);
+                        _contentReaders.Add(targetType, contentReaders[i]);
 
                     // I think the next 4 bytes refer to the "Version" of the type reader,
                     // although it always seems to be zero
@@ -210,46 +222,48 @@ namespace Microsoft.Xna.Framework.Content
 
             } // lock (_locker)
 
-		    return contentReaders;
+            return contentReaders;
         }
-		
-		/// <summary>
-		/// Removes Version, Culture and PublicKeyToken from a type string.
-		/// </summary>
-		/// <remarks>
-        /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
-		/// </remarks> 
-		/// <param name="type">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.String"/>
-		/// </returns>
-		public static string PrepareType(string type)
-		{			
-			//Needed to support nested types
-			int count = type.Split(new[] {"[["}, StringSplitOptions.None).Length - 1;
-			
-			string preparedType = type;
-			
-			for(int i=0; i<count; i++)
-			{
-				preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
-			}
-						
-			//Handle non generic types
-			if(preparedType.Contains("PublicKeyToken"))
-				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
-			// TODO: For WinRT this is most likely broken!
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
+        /// <summary>
+        /// Removes Version, Culture and PublicKeyToken from a type string.
+        /// </summary>
+        /// <remarks>
+        /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
+        /// </remarks> 
+        /// <param name="type">
+        /// A <see cref="System.String"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="System.String"/>
+        /// </returns>
+        public static string PrepareType(string type)
+        {
+            //Needed to support nested types
+            int count = type.Split(new[] { "[[" }, StringSplitOptions.None).Length - 1;
+
+            string preparedType = type;
+
+            for (int i = 0; i < count; i++)
+            {
+                preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
+            }
+
+            //Handle non generic types
+            if (preparedType.Contains("PublicKeyToken"))
+                preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
+
+            // TODO: For WinRT this is most likely broken!
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
-			
-			return preparedType;
-		}
 
-        // Static map of type names to creation functions. Required as iOS requires all types at compile time
+            return preparedType;
+        }
+
+        /// <summary>
+        /// Static map of type names to creation functions. Required as iOS requires all types at compile time
+        /// </summary>
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
 
         /// <summary>
@@ -272,5 +286,86 @@ namespace Microsoft.Xna.Framework.Content
             typeCreators.Clear();
         }
 
+        /// <summary>
+        /// Type.GetType will fail for Generics where T is not in the calling assembly or mscorelib.
+        /// This path tries a bit harder to find the actual type.
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
+        private static Type ParseType(string typeName)
+        {
+            try
+            {
+                return Type.GetType(typeName) ?? ParseGenericType(typeName) ?? AssemblyTypeSearch(typeName);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Unable to parse type name [{0}]. Parse attempt threw an Exception: {1}", typeName, ex.Message);
+
+                // Fail silently, to preserve original behaviour.
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Iterates over the currently loaded assemblies to try and find the Type,
+        /// Will strip the Assembly name off and reattempt if it's not found as is.
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
+        private static Type AssemblyTypeSearch(string typeName)
+        {
+            int idx = typeName.LastIndexOf(',');
+            var trimmedType = idx >= 0 ? typeName.Substring(0, idx) : null;
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var type = assembly.GetType(typeName) ?? (trimmedType == null ? null : assembly.GetType(trimmedType));
+                if (type != null)
+                    return type;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Attempt to parse a generic type and it's sub types.
+        /// Will recursively search sub types.
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns>Null if type is not a Generic, else the Generic type.</returns>
+        private static Type ParseGenericType(string typeName)
+        {
+            var match = _genericRegex.Match(typeName);
+            if (match.Success)
+            {
+                // Pull the Generic Type name out (e.g. Microsoft.Xna.Framework.Content.DictionaryReader`2)
+                var genericTypeName = match.Groups[1].Value + match.Groups[2].Value + match.Groups[6].Value;
+                var subTypes = new Type[int.Parse(match.Groups[2].Value)];
+
+                int idx = 0;
+                // Next we iterate over the sub types so that we can resolve them recursively.
+                foreach (Capture item in match.Groups[4].Captures)
+                {
+                    if (item.Value == ",")
+                        continue;
+
+                    // Sub types will be enclosed in square brackets if the assembly name is included, strip them.
+                    var subTypeName = item.Value.Replace("[", string.Empty).Replace("]", string.Empty);
+                    var type = ParseType(subTypeName);
+                    if (type != null)
+                    {
+                        subTypes[idx] = type;
+                        idx++;
+                    }
+                }
+
+                var genericType = Type.GetType(genericTypeName);
+                if(genericType != null)
+                    return genericType.MakeGenericType(subTypes);
+            }
+
+            return null;
+        }
     }
 }
