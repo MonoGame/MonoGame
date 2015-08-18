@@ -11,6 +11,7 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
+        private SharpDX.MediaFoundation.MediaSource _mediaSource;
         private Topology _topology;
 
         internal Topology Topology { get { return _topology; } }
@@ -24,19 +25,17 @@ namespace Microsoft.Xna.Framework.Media
 
             MediaFactory.CreateTopology(out _topology);
 
-            SharpDX.MediaFoundation.MediaSource mediaSource;
             {
                 SourceResolver resolver = new SourceResolver();
 
-                ObjectType otype;
-                ComObject source = resolver.CreateObjectFromURL(FilePath, SourceResolverFlags.MediaSource, null, out otype);
-                mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
+                ComObject source = resolver.CreateObjectFromURL(FilePath, SourceResolverFlags.MediaSource);
+                _mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
                 resolver.Dispose();
                 source.Dispose();
             }
 
             PresentationDescriptor presDesc;
-            mediaSource.CreatePresentationDescriptor(out presDesc);
+            _mediaSource.CreatePresentationDescriptor(out presDesc);
 
             for (var i = 0; i < presDesc.StreamDescriptorCount; i++)
             {
@@ -49,14 +48,15 @@ namespace Microsoft.Xna.Framework.Media
                     TopologyNode sourceNode;
                     MediaFactory.CreateTopologyNode(TopologyType.SourceStreamNode, out sourceNode);
 
-                    sourceNode.Set(TopologyNodeAttributeKeys.Source, mediaSource);
+                    sourceNode.Set(TopologyNodeAttributeKeys.Source, _mediaSource);
                     sourceNode.Set(TopologyNodeAttributeKeys.PresentationDescriptor, presDesc);
                     sourceNode.Set(TopologyNodeAttributeKeys.StreamDescriptor, desc);
 
                     TopologyNode outputNode;
                     MediaFactory.CreateTopologyNode(TopologyType.OutputNode, out outputNode);
 
-                    var majorType = desc.MediaTypeHandler.MajorType;
+                    var typeHandler = desc.MediaTypeHandler;
+                    var majorType = typeHandler.MajorType;
                     if (majorType != MediaTypeGuids.Audio)
                         throw new NotSupportedException("The song contains video data!");
 
@@ -70,13 +70,14 @@ namespace Microsoft.Xna.Framework.Media
 
                     sourceNode.Dispose();
                     outputNode.Dispose();
+                    typeHandler.Dispose();
+                    activate.Dispose();
                 }
 
                 desc.Dispose();
             }
 
             presDesc.Dispose();
-            mediaSource.Dispose();
         }
 
         private void PlatformDispose(bool disposing)
@@ -85,6 +86,12 @@ namespace Microsoft.Xna.Framework.Media
             {
                 _topology.Dispose();
                 _topology = null;
+            }
+            if (_mediaSource != null)
+            {
+                _mediaSource.Shutdown();
+                _mediaSource.Dispose();
+                _mediaSource = null;
             }
         }
         
