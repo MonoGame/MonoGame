@@ -152,17 +152,12 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void SetChannelVolumes()
         {
-            if (_volumeController != null)
-            {
-                float volume = _volume;
-                if (IsMuted)
-                    volume = 0.0f;
+            if (_volumeController == null)
+                return;
 
-                for (int i = 0; i < _volumeController.ChannelCount; i++)
-                {
-                    _volumeController.SetChannelVolume(i, volume);
-                }
-            }
+            float volume = _isMuted ? 0f : _volume;
+            for (int i = 0; i < _volumeController.ChannelCount; i++)
+                _volumeController.SetChannelVolume(i, volume);
         }
 
         private static void PlatformSetVolume(float volume)
