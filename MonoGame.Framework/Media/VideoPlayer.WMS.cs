@@ -155,8 +155,6 @@ namespace Microsoft.Xna.Framework.Media
             _session.ClearTopologies();
             _session.Stop();
             _session.Close();
-            _volumeController.Dispose();
-            _volumeController = null;
             _clock.Dispose();
             _clock = null;
         }
@@ -204,6 +202,18 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformDispose(bool disposing)
         {
+            if (_session != null)
+            {
+                _session.Shutdown();
+                _session.Dispose();
+            }
+
+            if (_volumeController != null)
+            {
+                _volumeController.Dispose();
+            }
+            _volumeController = null;
+
             if (retTexture != null && !retTexture.IsDisposed)
             {
                 retTexture.Dispose();
@@ -215,6 +225,11 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_session.IsDisposed)
                 return;
+
+            if (_volumeController != null)
+            {
+                _volumeController.Dispose();
+            }
 
             // Get the volume interface.
             IntPtr volumeObjectPtr;
