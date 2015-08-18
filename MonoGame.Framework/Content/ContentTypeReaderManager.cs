@@ -315,6 +315,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <returns></returns>
         private static Type AssemblyTypeSearch(string typeName)
         {
+#if !WINRT
             int idx = typeName.LastIndexOf(',');
             var trimmedType = idx >= 0 ? typeName.Substring(0, idx) : null;
 
@@ -324,7 +325,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (type != null)
                     return type;
             }
-
+#endif
             return null;
         }
 
