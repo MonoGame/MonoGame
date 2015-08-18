@@ -10,7 +10,11 @@ cp Data/DEBIAN/. tmp/DEBIAN/ -R
 
 mkdir tmp/opt
 cp Data/Pipeline/. tmp/opt/monogame-pipeline/ -R
-cp Data/Main/mgcb.xml tmp/opt/monogame-pipeline/
+cp Data/Main/MonoDevelop.MonoGame.mpack tmp/opt/monogame-pipeline/
+
+mkdir tmp/tmp
+cp Data/Main/mgcb.xml tmp/tmp/
+cp Data/Main/MonoDevelop.MonoGame.mpack tmp/tmp/
 
 mkdir tmp/bin
 cp Data/Main/mgcb tmp/bin/
@@ -30,5 +34,5 @@ cp Data/Pipeline/libnvimage.so tmp/lib/
 cp Data/Pipeline/libnvmath.so tmp/lib/
 cp Data/Pipeline/libnvtt.so tmp/lib/
 
-dpkg-deb --build tmp monogame-pipeline.deb
+dpkg-deb --build tmp monogame-sdk.deb
 rm -rf tmp

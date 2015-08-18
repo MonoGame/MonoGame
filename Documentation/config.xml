@@ -116,9 +116,4 @@
   </group>
   -->
 
-  <!-- PSMobile -->
-  <group api="psm|PlayStation Mobile">    
-    <source>..\MonoGame.Framework\bin\PSMobile\AnyCPU\Release\MonoGame.Framework.dll</source>
-  </group>
-
 </config>
