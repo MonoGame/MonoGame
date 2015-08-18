@@ -19,6 +19,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public XactClip (SoundBank soundBank, BinaryReader clipReader)
 		{
+#pragma warning disable 0219
             State = SoundState.Stopped;
 
 		    var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
@@ -335,7 +336,8 @@ namespace Microsoft.Xna.Framework.Audio
 				}
 			}
 			
-			clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
+            clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
+#pragma warning restore 0219
 		}
 
         internal void Update(float dt)

@@ -380,6 +380,13 @@ namespace Microsoft.Xna.Framework
         {
             _gameWindow.ResetElapsedTime();
         }
+		
+		public override void Present()
+        {
+            var device = Game.GraphicsDevice;
+            if (device != null)
+                device._graphicsMetrics = new GraphicsMetrics();
+        }
 
         #endregion
 

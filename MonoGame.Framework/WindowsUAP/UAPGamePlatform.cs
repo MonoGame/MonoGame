@@ -11,7 +11,9 @@ using System.Diagnostics;
 //using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml;
@@ -97,7 +99,15 @@ namespace Microsoft.Xna.Framework
 
             SystemNavigationManager.GetForCurrentView().BackRequested += BackRequested;
 
+            CoreApplication.Suspending += this.CoreApplication_Suspending;
+
             Game.PreviousExecutionState = PreviousExecutionState;
+        }
+
+        private void CoreApplication_Suspending(object sender, SuspendingEventArgs e)
+        {
+            if (this.Game.GraphicsDevice != null)
+                this.Game.GraphicsDevice.Trim();
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -107,7 +117,12 @@ namespace Microsoft.Xna.Framework
 
         private static void BackRequested(object sender, BackRequestedEventArgs e)
         {
-            GamePad.Back = true;
+            // We need to manually hide the keyboard input UI when the back button is pressed
+            if (KeyboardInput.IsVisible)
+                KeyboardInput.Cancel(null);
+            else
+                GamePad.Back = true;
+
             e.Handled = true;
         }
 

@@ -60,8 +60,6 @@ namespace MonoGame.Tools.Pipeline
 
         public static Pixbuf GetIcon(string fileName)
         {
-            Pixbuf icon = new Pixbuf(null, "MonoGame.Tools.Pipeline.Icons.blueprint.png");
-
             #if GTK3
             GLib.FileInfo info = new GLib.FileInfo(Gtk3Wrapper.g_file_query_info(Gtk3Wrapper.g_file_new_for_path(fileName), "standard::*", 0, new IntPtr(), new IntPtr()));
 
@@ -69,18 +67,22 @@ namespace MonoGame.Tools.Pipeline
             {
                 string[] sicon = info.Icon.ToString().Split(' ');
 
-                for(int i = sicon.Length - 1;i >= 0;i--)
+                for(int i = sicon.Length - 1;i >= 1;i--)
                 {
-                    icon = theme.LoadIcon(sicon[i], 16, (IconLookupFlags)0);
+                    try
+                    {
+                        var icon = theme.LoadIcon(sicon[i], 16, (IconLookupFlags)0);
 
-                    if(icon != null)
-                        i = 2;
+                        if(icon != null)
+                            return icon;
+                    }
+                    catch { }
                 }
             }
             catch { }
             #endif
 
-            return icon;
+            return theme.LoadIcon("text-x-generic", 16, (IconLookupFlags)0);
         }
     }
 }

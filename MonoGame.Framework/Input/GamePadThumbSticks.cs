@@ -141,11 +141,6 @@ namespace Microsoft.Xna.Framework.Input
             // They are a bit larger to accomodate OUYA Gamepad (but will also affect Xbox 360 controllers plugged to an OUYA)
             const float leftThumbDeadZone = 0.3f;
             const float rightThumbDeadZone = 0.3f;
-#elif PSM
-            // PlayStation Vita
-            // These values are arbitrary and still need empirical testing
-            const float leftThumbDeadZone = 0.25f;
-            const float rightThumbDeadZone = 0.25f;
 #else
             // Default & SDL Xbox 360 Controller dead zones
             // Based on the XInput constants

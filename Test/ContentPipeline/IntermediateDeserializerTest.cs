@@ -32,10 +32,13 @@ namespace MonoGame.Tests.ContentPipeline
             class FakeGraphicsService : IGraphicsDeviceService
             {
                 public GraphicsDevice GraphicsDevice { get; private set; }
+
+                #pragma warning disable 67
                 public event EventHandler<EventArgs> DeviceCreated;
                 public event EventHandler<EventArgs> DeviceDisposing;
                 public event EventHandler<EventArgs> DeviceReset;
                 public event EventHandler<EventArgs> DeviceResetting;
+                #pragma warning restore 67
             }
 
             class FakeServiceProvider : IServiceProvider
@@ -536,6 +539,34 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(3, genericTypes.A.Value);
                 Assert.IsNotNull(genericTypes.B);
                 Assert.AreEqual(4.2f, genericTypes.B.Value);
+            });
+        }
+
+        [Test]
+        public void StructArrayNoElements()
+        {
+            // Note that this does not contain a matching SerializeAndAssert test as Vector2ArrayNoElements
+            // will serialize to an empty Xml element which defeats the purpose of this test.
+            DeserializeCompileAndLoad<StructArrayNoElements>("25_StructArrayNoElements.xml", structArrayNoElems =>
+            {
+                Assert.IsNotNull(structArrayNoElems.Vector2ArrayNoElements);
+                Assert.AreEqual(0, structArrayNoElems.Vector2ArrayNoElements.Length);
+            });
+        }
+
+        [Test]
+        public void ChildCollections()
+        {
+            // ChildCollection is a ContentPipeline-only type, so we don't need to / shouldn't
+            // test running it through ContentCompiler.
+            Deserialize<ChildCollections>("26_ChildCollections.xml", childCollections =>
+            {
+                Assert.IsNotNull(childCollections.Children);
+                Assert.AreEqual(2, childCollections.Children.Count);
+                Assert.AreEqual(childCollections, childCollections.Children[0].Parent);
+                Assert.AreEqual("Foo", childCollections.Children[0].Name);
+                Assert.AreEqual(childCollections, childCollections.Children[1].Parent);
+                Assert.AreEqual("Bar", childCollections.Children[1].Name);
             });
         }
     }

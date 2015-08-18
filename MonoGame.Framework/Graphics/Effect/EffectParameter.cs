@@ -941,11 +941,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
-#if PSM
-            if(Data == null) {
-                return false;
-            }
-#endif
             if (((float[])Data)[0] == value)
             {
                 return false;

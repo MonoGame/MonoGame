@@ -43,7 +43,9 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
 #elif DESKTOPGL
+        #pragma warning disable 414
         private static AudioContext _acontext;
+        #pragma warning restore 414
         private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
@@ -196,9 +198,10 @@ namespace Microsoft.Xna.Framework.Audio
                 };
 
                 int[] attribute = new int[0];
-#else
+#elif !DESKTOPGL
                 int[] attribute = new int[0];
 #endif
+
 #if DESKTOPGL
                 _acontext = new AudioContext();
                 _context = Alc.GetCurrentContext();
@@ -304,11 +307,13 @@ namespace Microsoft.Xna.Framework.Audio
                 if (disposing)
                 {
                     if (_bSoundAvailable)
+                    {
                         CleanUpOpenAL();
-
 #if DESKTOPGL
-                    _oggstreamer.Dispose();
+                        if(_oggstreamer != null)
+                            _oggstreamer.Dispose();
 #endif
+                    }
                 }
                 _isDisposed = true;
             }

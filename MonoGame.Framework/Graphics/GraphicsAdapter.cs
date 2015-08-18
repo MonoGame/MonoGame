@@ -13,6 +13,7 @@ using MonoMac.Foundation;
 using UIKit;
 #elif ANDROID
 using Android.Views;
+using Android.Runtime;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

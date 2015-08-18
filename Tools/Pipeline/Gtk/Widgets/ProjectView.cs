@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Gtk;
+using System.Collections;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -56,6 +57,7 @@ namespace MonoGame.Tools.Pipeline
 
             listStore = new TreeStore (typeof (Gdk.Pixbuf), typeof (string), typeof (string));
 
+            treeview1.Reorderable = true;
             treeview1.Model = listStore;
             treeview1.Selection.Mode = SelectionMode.Multiple;
 
@@ -63,6 +65,15 @@ namespace MonoGame.Tools.Pipeline
             treeview1.KeyReleaseEvent += HandleKeyReleaseEvent;
             treeview1.ButtonReleaseEvent += OnTreeview1ButtonReleaseEvent;
             treeview1.CursorChanged += OnTreeview1CursorChanged;
+
+            Drag.SourceSet (this.treeview1, 0, null, Gdk.DragAction.Move);
+            Drag.DestSet (this.treeview1, 0, null, 0);
+
+            treeview1.DragBegin += Treeview1_DragBegin;
+            treeview1.DragMotion += Treeview1_DragMotion;
+            treeview1.DragDrop += Treeview1_DragDrop;
+            treeview1.DragDataReceived += Treeview1_DragDataReceived;
+            treeview1.DragEnd += Treeview1_DragEnd;
         }
 
         void HandleKeyReleaseEvent (object o, KeyReleaseEventArgs args)
@@ -158,6 +169,7 @@ namespace MonoGame.Tools.Pipeline
             basename = name;
             TreeIter iter = GetBaseIter ();
             treeview1.Model.SetValue (iter, 1, name);
+            window.ReloadTitle();
         }
 
         public TreeIter GetBaseIter()
@@ -404,7 +416,7 @@ namespace MonoGame.Tools.Pipeline
             if (dialog.Run() == (int)ResponseType.Ok)
             {
                 string newpath = System.IO.Path.GetDirectoryName(path[0]) + System.IO.Path.DirectorySeparatorChar + dialog.text;
-                window._controller.Move(path[0], newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath, type);
+                window._controller.Move(new[] { path[0] }, new[] { newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath }, new[] { type });
             }
         }
         
@@ -495,7 +507,7 @@ namespace MonoGame.Tools.Pipeline
                 if (ids.Count != 1)
                     return;
 
-                if(ids[0] == ID_FILE)
+                if (ids[0] == ID_FILE)
                 {
                     string start = window._controller.GetFullPath(GetPathFromIter(iters[0]));
 
@@ -505,33 +517,216 @@ namespace MonoGame.Tools.Pipeline
                     Process.Start(start);
                     #endif
                 }
-                else 
+                else
                 {
                     bool expanded = treeview1.GetRowExpanded(treeview1.Model.GetPath(iters[0]));
 
-                    if(!expanded)
+                    if (!expanded)
                         treeview1.ExpandRow(treeview1.Model.GetPath(iters[0]), false);
                     else
                         treeview1.CollapseRow(treeview1.Model.GetPath(iters[0]));
                 }
             }
-
-            if (args.Event.Button == 3) {
-                var paths = new List<TreePath> ();
-                paths.AddRange (treeview1.Selection.GetSelectedRows ());
+            else if (args.Event.Button == 3)
+            {
+                var paths = new List<TreePath>();
+                paths.AddRange(treeview1.Selection.GetSelectedRows());
 
                 TreeViewDropPosition pos; 
                 TreePath path;
 
-                treeview1.GetDestRowAtPos ((int)args.Event.X, (int)args.Event.Y, out path, out pos);
+                treeview1.GetDestRowAtPos((int)args.Event.X, (int)args.Event.Y, out path, out pos);
 
-                if (paths.Contains (path)) {
+                if (paths.Contains(path))
+                {
                     args.RetVal = true;
                     return;
                 }
             }
 
             args.RetVal = false;
+        }
+
+        List<TreeIter> siters = new List<TreeIter>();
+
+        void Treeview1_DragBegin (object o, DragBeginArgs args)
+        {
+            List<string> ids;
+            GetSelectedTreePath(out siters, out ids);
+
+            if (siters.Contains(GetBaseIter()))
+                siters = new List<TreeIter>();
+        }
+
+        void Treeview1_DragMotion (object o, DragMotionArgs args)
+        {
+            TreeViewDropPosition pos;
+            TreePath path;
+            TreeIter iter;
+
+            if (!treeview1.GetDestRowAtPos(args.X, args.Y, out path, out pos))
+                return;
+            
+            if (!listStore.GetIter(out iter, path))
+                return;
+
+            if (treeview1.Model.GetValue(iter, 2).ToString() != ID_FILE)
+                treeview1.SetDragDestRow(path, pos);
+            else if (pos == TreeViewDropPosition.IntoOrBefore || pos == TreeViewDropPosition.Before)
+                treeview1.SetDragDestRow(path, TreeViewDropPosition.Before);
+            else
+                treeview1.SetDragDestRow(path, TreeViewDropPosition.After);
+
+            Gdk.Drag.Status (args.Context, args.Context.SuggestedAction, args.Time); 
+            args.RetVal = true;
+        }
+
+        void Treeview1_DragEnd (object o, DragEndArgs args)
+        {
+            siters = new List<TreeIter>();
+        }
+
+        void Treeview1_DragDrop (object o, DragDropArgs args)
+        {
+            args.RetVal = true;
+
+            #if GTK3
+            if(args.Context.ListTargets().Length > 0)
+                Drag.GetData ((Widget)o, args.Context, args.Context.ListTargets()[0], args.Time);
+            #else
+            if(args.Context.Targets.Length > 0)
+                Drag.GetData ((Widget)o, args.Context, args.Context.Targets[0], args.Time);
+            #endif
+
+            var siters = this.siters;
+            this.siters = new List<TreeIter>();
+
+            if (siters.Count == 0)
+                return;
+            
+            TreeViewDropPosition pos;
+            TreePath path;
+            TreeIter iter;
+
+            if (treeview1.GetDestRowAtPos(args.X, args.Y, out path, out pos))
+            {
+                if (!listStore.GetIter(out iter, path))
+                    return;
+            }
+            else
+            {
+                iter = GetBaseIter();
+                pos = TreeViewDropPosition.IntoOrAfter;
+            }
+
+            if (treeview1.Model.GetValue(iter, 2).ToString() == ID_FILE)
+            {
+                if (pos == TreeViewDropPosition.IntoOrBefore || pos == TreeViewDropPosition.Before)
+                    pos = TreeViewDropPosition.Before;
+                else
+                    pos = TreeViewDropPosition.After;
+            }
+
+            if (pos == TreeViewDropPosition.After || pos == TreeViewDropPosition.Before)
+                if (!treeview1.Model.IterParent(out iter, iter))
+                    return;
+
+            string dest_folder = (iter.Equals(GetBaseIter())) ? "" : GetPathFromIter(iter) + "/";
+
+            List<string> sourcedata = new List<string>();
+            List<string> destdata = new List<string>();
+            List<FileType> types = new List<FileType>();
+
+            foreach(var si in siters)
+            {
+                string spath = GetPathFromIter(si);
+                string dpath = dest_folder + System.IO.Path.GetFileName(spath);
+
+                sourcedata.Add(spath);
+                destdata.Add(dpath);
+
+                types.Add((treeview1.Model.GetValue(si, 2).ToString() == ID_FILE) ? FileType.File : FileType.Folder);
+            }
+
+            window._controller.Move(sourcedata.ToArray(), destdata.ToArray(), types.ToArray());
+            window.UpdateMenus();
+        }
+
+        void Treeview1_DragDataReceived (object o, DragDataReceivedArgs args)
+        {
+            args.RetVal = true;
+
+            if (args.SelectionData.Length > 0 && args.SelectionData.Format == 8) {
+
+                byte[] data = args.SelectionData.Data;
+                string encoded = System.Text.Encoding.UTF8.GetString (data);
+                var paths = new List<string> (encoded.Split ('\r', '\n'));
+
+                var files = new List<string>();
+                var folders = new List<string>();
+
+                for (int i = 0; i < paths.Count; ++i)
+                {
+                    if (paths[i].StartsWith("file://"))
+                    {
+                        string path = paths[i].Substring(7);
+
+                        try
+                        {
+                            //convert hex to ascii if any
+                            for(int ih = 0;ih < path.Length;ih++)
+                            {
+                                if (path.Substring(ih, 1) == "%")
+                                {
+                                    string hex = path.Substring(ih + 1, 2);
+                                    path = path.Replace("%" + hex, Convert.ToChar(Convert.ToUInt32(hex, 16)).ToString());
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            window.ShowError("Error", "An unknown error has occured.");
+                            return;
+                        }
+
+                        if (System.IO.File.Exists(path))
+                            files.Add(path);
+                        else
+                            folders.Add(path);
+                    }
+                }
+
+                TreeViewDropPosition pos;
+                TreePath tpath;
+                TreeIter iter;
+
+                if (treeview1.GetDestRowAtPos(args.X, args.Y, out tpath, out pos))
+                {
+                    if (!listStore.GetIter(out iter, tpath))
+                        return;
+                }
+                else
+                {
+                    iter = GetBaseIter();
+                    pos = TreeViewDropPosition.IntoOrAfter;
+                }
+
+                if (treeview1.Model.GetValue(iter, 2).ToString() == ID_FILE)
+                {
+                    if (pos == TreeViewDropPosition.IntoOrBefore || pos == TreeViewDropPosition.Before)
+                        pos = TreeViewDropPosition.Before;
+                    else
+                        pos = TreeViewDropPosition.After;
+                }
+
+                if (pos == TreeViewDropPosition.After || pos == TreeViewDropPosition.Before)
+                if (!treeview1.Model.IterParent(out iter, iter))
+                    return;
+
+                string initDir = (iter.Equals(GetBaseIter())) ? window._controller.GetFullPath ("") : GetPathFromIter(iter);
+                window._controller.DragDrop(initDir, folders.ToArray(), files.ToArray());
+                window.UpdateMenus();
+            }
         }
 
         protected void OnTreeview1CursorChanged (object o, EventArgs args)
@@ -548,6 +743,15 @@ namespace MonoGame.Tools.Pipeline
 
         void ReloadPropertyGrid()
         {
+            string name = "????";
+            string location = "????";
+
+            if (!window._controller.ProjectOpen)
+            {
+                propertiesView.Load(null, name, location);
+                return;
+            }
+
             window._controller.Selection.Clear (window);
             List<TreeIter> iters;
             List<string> ids;
@@ -558,8 +762,6 @@ namespace MonoGame.Tools.Pipeline
 
             var citems = new List<ContentItem> ();
             var dirpaths = new List<string> ();
-            string name = "????";
-            string location = "????";
 
             for(int i = 0;i < paths.Length;i++)
             {

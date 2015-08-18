@@ -920,7 +920,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     // Apply transformation pivot.
                     var transform = pivot.GetTransform(scale, rotation, translation);
 
-                    channel.Add(new AnimationKeyframe(TimeSpan.FromSeconds(time / aiAnimation.TicksPerSecond), transform));
+                    long ticks = (long)(time * (TimeSpan.TicksPerSecond / aiAnimation.TicksPerSecond));
+                    channel.Add(new AnimationKeyframe(TimeSpan.FromTicks(ticks), transform));
                 }
 
                 animation.Channels[channelGroup.Key] = channel;

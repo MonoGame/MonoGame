@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content
 #if WINRT
             _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
 #else
-            _assemblyName = Assembly.GetExecutingAssembly().FullName;
+            _assemblyName = typeof(ContentTypeReaderManager).Assembly.FullName;
 #endif
         }
 
@@ -115,10 +115,10 @@ namespace Microsoft.Xna.Framework.Content
 				var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
+                var hModelReader = new ModelReader();
                 var hInt32Reader = new Int32Reader();
                 var hSingleReader = new SingleReader();
                 var hEffectReader = new EffectReader();
-                var hModelReader = new ModelReader();
                 var hVertexDeclarationReader = new VertexDeclarationReader();
                 var hTextureCubeReader = new TextureCubeReader();
 

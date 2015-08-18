@@ -325,7 +325,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.DepthStencilFormat = DepthFormat.None;
 
 
-#if WINDOWS || WINRT
+#if (WINDOWS || WINRT) && !DESKTOPGL
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
             presentationParameters.BackBufferFormat = _preferredBackBufferFormat;

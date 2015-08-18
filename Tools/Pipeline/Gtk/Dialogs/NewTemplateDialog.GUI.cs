@@ -80,7 +80,12 @@ namespace MonoGame.Tools.Pipeline
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Only Letters, numbers, space and \"_\" are allowed.");
+
+            #if GTK3
+            if(Global.GtkMajorVersion == 3 && Global.GtkMinorVersion >= 8)
+                Gtk3Wrapper.gtk_widget_set_opacity(label2.Handle, 0.7);
+            #endif
+
 			this.vbox2.Add (this.label2);
 			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.label2]));
 
@@ -112,7 +117,15 @@ namespace MonoGame.Tools.Pipeline
 			}
 			this.DefaultWidth = 340;
             this.DefaultHeight = ((Global.UseHeaderBar) ? 32 : 0) + 352;
-			this.label2.Hide ();
+            this.label2.Hide ();
+
+            #if GTK3
+            Gdk.Geometry geom = new Gdk.Geometry();
+            geom.MinWidth = this.DefaultWidth;
+            geom.MinHeight = 200;
+            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize);
+            #endif
+
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 			this.treeview1.CursorChanged += new global::System.EventHandler (this.OnTreeview1CursorChanged);

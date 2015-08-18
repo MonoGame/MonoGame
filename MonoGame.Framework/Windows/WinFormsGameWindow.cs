@@ -71,7 +71,7 @@ namespace MonoGame.Framework
         static private ReaderWriterLockSlim _allWindowsReaderWriterLockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
 
-        private readonly WinFormsGamePlatform _platform;
+        private WinFormsGamePlatform _platform;
 
         private bool _isResizable;
 
@@ -544,6 +544,11 @@ namespace MonoGame.Framework
                     _form = null;
                 }
             }
+            _platform = null;
+            Game = null;
+            Mouse.SetWindows(null);
+            Device.KeyboardInput -= OnRawKeyEvent;
+            Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.Remove);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

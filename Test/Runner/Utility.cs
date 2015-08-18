@@ -47,6 +47,28 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class FloatComparer : IEqualityComparer<float>
+    {
+        static public FloatComparer Epsilon = new FloatComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private FloatComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(float x, float y)
+        {
+            return Math.Abs(x - y) < _epsilon;
+        }
+
+        public int GetHashCode(float obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class BoundingSphereComparer : IEqualityComparer<BoundingSphere>
     {
         static public BoundingSphereComparer Epsilon = new BoundingSphereComparer(0.000001f);
@@ -144,6 +166,30 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class QuaternionComparer : IEqualityComparer<Quaternion>
+    {
+        static public QuaternionComparer Epsilon = new QuaternionComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private QuaternionComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Quaternion x, Quaternion y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon &&
+                   Math.Abs(x.Z - y.Z) < _epsilon &&
+                   Math.Abs(x.W - y.W) < _epsilon;
+        }
+
+        public int GetHashCode(Quaternion obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class PlaneComparer : IEqualityComparer<Plane>
     {
         static public PlaneComparer Epsilon = new PlaneComparer(0.000001f);
