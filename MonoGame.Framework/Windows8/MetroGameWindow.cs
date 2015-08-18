@@ -1,42 +1,6 @@
-﻿#region License
-/*
-Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.ComponentModel;
@@ -52,18 +16,22 @@ using Windows.Graphics.Display;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    [CLSCompliant(false)]
-    public partial class MetroGameWindow : GameWindow
+    partial class MetroGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         private Rectangle _clientBounds;
+#if !WINDOWS_PHONE81
         private ApplicationViewState _currentViewState;
+#endif
         private InputEvents _windowEvents;
+
+
         private Vector2 _backBufferScale;
 
         #region Internal Properties
@@ -132,10 +100,10 @@ namespace Microsoft.Xna.Framework
             Instance = new MetroGameWindow();
         }
 
-        public void Initialize(CoreWindow coreWindow, UIElement inputElement)
+        public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement);
+            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
@@ -144,9 +112,9 @@ namespace Microsoft.Xna.Framework
             _coreWindow.Closed += Window_Closed;
 
             _coreWindow.Activated += Window_FocusChanged;
-
+#if !WINDOWS_PHONE81
             _currentViewState = ApplicationView.Value;
-
+#endif
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
 
@@ -163,16 +131,17 @@ namespace Microsoft.Xna.Framework
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {
-            Game.Exit();
+            Game.SuppressDraw();
+            Game.Platform.Exit();
         }
 
         private void SetClientBounds(double width, double height)
         {
             var dpi = DisplayProperties.LogicalDpi;
-            var pwidth = width * dpi / 96.0;
-            var pheight = height * dpi / 96.0;
+            var pwidth = (int)Math.Round(width * dpi / 96.0);
+            var pheight = (int)Math.Round(height * dpi / 96.0);
 
-            _clientBounds = new Rectangle(0, 0, (int)pwidth, (int)pheight);
+            _clientBounds = new Rectangle(0, 0, pwidth, pheight);
         }
 
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
@@ -209,7 +178,7 @@ namespace Microsoft.Xna.Framework
             var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
             manager.PreferredBackBufferWidth = newWidth;
             manager.PreferredBackBufferHeight = newHeight;
-
+            if(manager.GraphicsDevice!=null)
             manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
 
             // If we have a valid client bounds then 
@@ -220,7 +189,9 @@ namespace Microsoft.Xna.Framework
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
+#if !WINDOWS_PHONE81
             Platform.ViewState = ApplicationView.Value;
+#endif
             OnClientSizeChanged();
         }
 
@@ -335,7 +306,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion
     }
-
+#if !WINDOWS_PHONE81
     [CLSCompliant(false)]
     public class ViewStateChangedEventArgs : EventArgs
     {
@@ -346,5 +317,6 @@ namespace Microsoft.Xna.Framework
             ViewState = newViewstate;
         }
     }
+#endif
 }
 

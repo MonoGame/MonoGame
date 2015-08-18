@@ -4,12 +4,10 @@
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -19,11 +17,14 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glTexture = -1;
         internal TextureTarget glTarget;
         internal TextureUnit glTextureUnit = TextureUnit.Texture0;
+        internal PixelInternalFormat glInternalFormat;
+        internal PixelFormat glFormat;
+        internal PixelType glType;
         internal SamplerState glLastSamplerState;
 
         private void PlatformGraphicsDeviceResetting()
         {
-            glTexture = -1;
+            DeleteGLTexture();
             glLastSamplerState = null;
         }
 
@@ -31,17 +32,25 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                GraphicsDevice.AddDisposeAction(() =>
-                {
-                    GL.DeleteTextures(1, ref glTexture);
-                    GraphicsExtensions.CheckGLError();
-                    glTexture = -1;
-                });
-
+                DeleteGLTexture();
                 glLastSamplerState = null;
             }
 
             base.Dispose(disposing);
+        }
+
+        private void DeleteGLTexture()
+        {
+            if (glTexture > 0)
+            {
+                int texture = glTexture;
+                Threading.BlockOnUIThread(() =>
+                {
+                    GL.DeleteTextures(1, ref texture);
+                    GraphicsExtensions.CheckGLError();
+                });
+            }
+            glTexture = -1;
         }
     }
 }

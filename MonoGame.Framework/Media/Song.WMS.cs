@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using SharpDX;
 using SharpDX.MediaFoundation;
 
@@ -25,13 +26,10 @@ namespace Microsoft.Xna.Framework.Media
 
             SharpDX.MediaFoundation.MediaSource mediaSource;
             {
-                SourceResolver resolver;
-                MediaFactory.CreateSourceResolver(out resolver);
+                SourceResolver resolver = new SourceResolver();
 
                 ObjectType otype;
-                ComObject source;
-                resolver.CreateObjectFromURL(FilePath, (int)SourceResolverFlags.MediaSource, null, out otype,
-                                                out source);
+                ComObject source = resolver.CreateObjectFromURL(FilePath, SourceResolverFlags.MediaSource, null, out otype);
                 mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
                 resolver.Dispose();
                 source.Dispose();
@@ -88,6 +86,56 @@ namespace Microsoft.Xna.Framework.Media
                 _topology.Dispose();
                 _topology = null;
             }
+        }
+        
+        private Album PlatformGetAlbum()
+        {
+            return null;
+        }
+
+        private Artist PlatformGetArtist()
+        {
+            return null;
+        }
+
+        private Genre PlatformGetGenre()
+        {
+            return null;
+        }
+
+        private TimeSpan PlatformGetDuration()
+        {
+            return _duration;
+        }
+
+        private bool PlatformIsProtected()
+        {
+            return false;
+        }
+
+        private bool PlatformIsRated()
+        {
+            return false;
+        }
+
+        private string PlatformGetName()
+        {
+            return Path.GetFileNameWithoutExtension(_name);
+        }
+
+        private int PlatformGetPlayCount()
+        {
+            return _playCount;
+        }
+
+        private int PlatformGetRating()
+        {
+            return 0;
+        }
+
+        private int PlatformGetTrackNumber()
+        {
+            return 0;
         }
     }
 }

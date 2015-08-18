@@ -51,6 +51,8 @@ namespace Microsoft.Xna.Framework.Input
 		ButtonState _leftButton;
 		ButtonState _rightButton;
 		ButtonState _middleButton;
+        ButtonState _xButton1;
+        ButtonState _xButton2;
 		
         /// <summary>
         /// Initializes a new instance of the MouseState.
@@ -80,6 +82,8 @@ namespace Microsoft.Xna.Framework.Input
 			_leftButton = leftButton;
 			_middleButton = middleButton;
 			_rightButton = rightButton;
+            _xButton1 = xButton1;
+            _xButton2 = xButton2;
 		}
 		
         /// <summary>
@@ -207,8 +211,11 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
 		public ButtonState XButton1 { 
 			get {
-				return ButtonState.Released;
+                return _xButton1;
 			}
+            set {
+                _xButton1 = value;
+            }
 		}
 
         /// <summary>
@@ -216,8 +223,11 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
 		public ButtonState XButton2 { 
 			get {
-				return ButtonState.Released;
+                return _xButton2;
 			}
+            set {
+                _xButton2 = value;
+            }
 		}
 	}
 }

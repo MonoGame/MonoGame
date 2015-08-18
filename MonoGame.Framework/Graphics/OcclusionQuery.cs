@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif ANGLE // Review for iOS and Android, and change to GLES
 using OpenTK.Graphics.ES30;
@@ -63,11 +63,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed)
             {
 #if OPENGL
-                GraphicsDevice.AddDisposeAction(() =>
-                    {
-                        GL.DeleteQueries(1, ref glQueryId);
-                        GraphicsExtensions.CheckGLError();
-                    });
+                Threading.BlockOnUIThread(() =>
+                {
+                    GL.DeleteQueries(1, ref glQueryId);
+                    GraphicsExtensions.CheckGLError();
+                });
 #elif DIRECTX
 #endif
             }

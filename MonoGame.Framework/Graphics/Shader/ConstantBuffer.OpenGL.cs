@@ -6,7 +6,7 @@ using System;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -31,7 +31,10 @@ namespace Microsoft.Xna.Framework.Graphics
             var data = new byte[_parameters.Length];
             for (var i = 0; i < _parameters.Length; i++)
             {
-                data[i] = (byte)(_parameters[i] | _offsets[i]);
+                unchecked
+                {
+                    data[i] = (byte)(_parameters[i] | _offsets[i]);
+                }
             }
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(data);

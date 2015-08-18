@@ -2,11 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Design;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -83,8 +85,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // out of the main assembly, they are registered here before their use.
 
             //TypeDescriptor.AddAttributes(typeof(Single), new TypeConverterAttribute(typeof(SingleTypeConverter)));
-            //TypeDescriptor.AddAttributes(typeof(Vector2), new TypeConverterAttribute(typeof(Vector2TypeConverter)));
-            //TypeDescriptor.AddAttributes(typeof(Vector3), new TypeConverterAttribute(typeof(Vector3TypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Vector2), new TypeConverterAttribute(typeof(Vector2TypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Vector3), new TypeConverterAttribute(typeof(Vector3TypeConverter)));
             TypeDescriptor.AddAttributes(typeof(Vector4), new TypeConverterAttribute(typeof(Vector4TypeConverter)));
             //TypeDescriptor.AddAttributes(typeof(IPackedVector), new TypeConverterAttribute(typeof(PackedVectorTypeConverter)));
         }
@@ -150,6 +152,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <typeparam name="TargetType">Target vector format for the converted channel data.</typeparam>
         /// <returns>The converted channel data.</returns>
         public override IEnumerable<TargetType> ReadConvertedContent<TargetType>()
+        {
+            if (typeof(TargetType).IsAssignableFrom(typeof(T)))
+                return items.Cast<TargetType>();
+
+            return Convert<TargetType>(items);
+        }
+
+        private static IEnumerable<TargetType> Convert<TargetType>(IEnumerable<T> items)
         {
             // The following formats are supported:
             // - Single

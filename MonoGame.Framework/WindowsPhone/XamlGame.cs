@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.Xna.Framework.Input;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Microsoft.Phone.Controls;
@@ -23,6 +25,13 @@ namespace MonoGame.Framework.WindowsPhone
     {
         class SurfaceTouchHandler : IDrawingSurfaceManipulationHandler
         {
+            private readonly TouchQueue _touchQueue;
+
+            public SurfaceTouchHandler(TouchQueue touchQueue)
+            {
+                _touchQueue = touchQueue;
+            }
+
             public void SetManipulationHost(DrawingSurfaceManipulationHost manipulationHost)
             {
                 manipulationHost.PointerPressed += OnPointerPressed;
@@ -37,7 +46,7 @@ namespace MonoGame.Framework.WindowsPhone
                 // To convert from DIPs (device independent pixels) to screen resolution pixels.
                 var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
                 var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos);
+                _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos);
             }
 
             private void OnPointerMoved(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
@@ -47,7 +56,7 @@ namespace MonoGame.Framework.WindowsPhone
                 // To convert from DIPs (device independent pixels) to screen resolution pixels.
                 var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
                 var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos);
+                _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Moved, pos);
             }
 
             private void OnPointerReleased(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
@@ -57,11 +66,11 @@ namespace MonoGame.Framework.WindowsPhone
                 // To convert from DIPs (device independent pixels) to screen resolution pixels.
                 var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
                 var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos);
+                _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Released, pos);
             }
         }
 
-        class DrawingSurfaceBackgroundContentProvider : DrawingSurfaceBackgroundContentProviderNativeBase                                                        
+        class DrawingSurfaceBackgroundContentProvider : DrawingSurfaceBackgroundContentProviderNativeBase
         {
             private readonly SurfaceUpdateHandler _surfaceUpdateHandler;
 
@@ -134,14 +143,14 @@ namespace MonoGame.Framework.WindowsPhone
 
             Microsoft.Xna.Framework.Audio.SoundEffect.InitializeSoundEffect();
 
-            page.BackKeyPress += Microsoft.Xna.Framework.Input.GamePad.GamePageWP8_BackKeyPress;
+            page.BackKeyPress += PageOnBackKeyPress;
 
             // Construct the game.
             var game = new T();
             if (game.graphicsDeviceManager == null)
                 throw new NullReferenceException("You must create the GraphicsDeviceManager in the Game constructor!");
 
-            SurfaceTouchHandler surfaceTouchHandler = new SurfaceTouchHandler();
+            SurfaceTouchHandler surfaceTouchHandler = new SurfaceTouchHandler(WindowsPhoneGamePlatform.TouchQueue);
 
             if (drawingSurface is DrawingSurfaceBackgroundGrid)
             {
@@ -181,6 +190,15 @@ namespace MonoGame.Framework.WindowsPhone
 
             // Return the constructed, but not initialized game.
             return game;
+        }
+
+        private static void PageOnBackKeyPress(object sender, CancelEventArgs e)
+        {
+            if (!e.Cancel)
+            {
+                GamePad.Back = true;
+                e.Cancel = true;
+            }
         }
 
         private static readonly System.Collections.Generic.Dictionary<DrawingSurface, bool> initializedSurfaces = new System.Collections.Generic.Dictionary<DrawingSurface, bool>();

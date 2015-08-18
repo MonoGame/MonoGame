@@ -78,11 +78,19 @@ namespace Microsoft.Xna.Framework.Media
                                         false,
                                         SurfaceFormat.Bgra32, 
                                         Texture2D.SurfaceType.RenderTarget);
-    
-            var region = new SharpDX.Rectangle(0, 0, _currentVideo.Width, _currentVideo.Height);
+
+#if WINDOWS_UAP
+			var region = new SharpDX.Mathematics.Interop.RawRectangle(0, 0, _currentVideo.Width, _currentVideo.Height);
+#else
+			var region = new SharpDX.Rectangle(0, 0, _currentVideo.Width, _currentVideo.Height);
+#endif
             _mediaEngine.TransferVideoFrame(_lastFrame._texture, null, region, null);
 
             return _lastFrame;
+        }
+
+        private void PlatformGetState(ref MediaState result)
+        {
         }
 
         private void PlatformPause()
@@ -117,6 +125,16 @@ namespace Microsoft.Xna.Framework.Media
             _mediaEngine.CurrentTime = 0.0;
         }
 
+        private void PlatformSetIsLooped()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
+        {
+            throw new NotImplementedException();
+        }
+
         private TimeSpan PlatformGetPlayPosition()
         {
             return TimeSpan.FromSeconds(_mediaEngine.CurrentTime);
@@ -125,6 +143,10 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformSetVolume()
         {
             _mediaEngine.Volume = _volume;
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }

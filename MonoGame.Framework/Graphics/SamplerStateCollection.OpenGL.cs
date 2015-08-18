@@ -6,12 +6,10 @@
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -32,9 +30,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformSetSamplers(GraphicsDevice device)
         {
-            for (var i = 0; i < _samplers.Length; i++)
+            for (var i = 0; i < _actualSamplers.Length; i++)
             {
-                var sampler = _samplers[i];
+                var sampler = _actualSamplers[i];
                 var texture = device.Textures[i];
 
                 if (sampler != null && texture != null && sampler != texture.glLastSamplerState)
@@ -51,7 +49,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // GL.BindTexture(texture.glTarget, texture.glTexture);
                     // GraphicsExtensions.CheckGLError();
 
-                    sampler.Activate(texture.glTarget, texture.LevelCount > 1);
+                    sampler.Activate(device, texture.glTarget, texture.LevelCount > 1);
                     texture.glLastSamplerState = sampler;
                 }
             }

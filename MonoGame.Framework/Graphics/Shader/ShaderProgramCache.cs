@@ -6,16 +6,14 @@ using System.Collections.Generic;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 
 #else
 using OpenTK.Graphics.ES20;
 #if IOS || ANDROID
-using ActiveUniformType = OpenTK.Graphics.ES20.All;
-using ShaderType = OpenTK.Graphics.ES20.All;
-using GetProgramParameterName = OpenTK.Graphics.ES20.All;
+using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
 #endif
 #endif
 
@@ -90,13 +88,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!_programCache.ContainsKey(key))
             {
                 // the key does not exist so we need to link the programs
-                Link(vertexShader, pixelShader);
+                _programCache.Add(key, Link(vertexShader, pixelShader));
             }
 
             return _programCache[key];
-        }        
+        }
 
-        private void Link(Shader vertexShader, Shader pixelShader)
+        private ShaderProgram Link(Shader vertexShader, Shader pixelShader)
         {
             // NOTE: No need to worry about background threads here
             // as this is only called at draw time when we're in the
@@ -124,18 +122,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var linked = 0;
 
-#if GLES && !ANGLE
-            GL.GetProgram(program, GetProgramParameterName.LinkStatus, ref linked);
-#else
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out linked);
-#endif
             GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.GetProgram");
             if (linked == 0)
             {
-#if !GLES
                 var log = GL.GetProgramInfoLog(program);
                 Console.WriteLine(log);
-#endif
                 GL.DetachShader(program, vertexShader.GetShaderHandle());
                 GL.DetachShader(program, pixelShader.GetShaderHandle());
 #if MONOMAC
@@ -146,9 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("Unable to link effect program");
             }
 
-            ShaderProgram shaderProgram = new ShaderProgram(program);
-
-            _programCache.Add(vertexShader.HashKey | pixelShader.HashKey, shaderProgram);
+            return new ShaderProgram(program);
         }
 
 

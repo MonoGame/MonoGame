@@ -70,6 +70,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -88,23 +89,7 @@ namespace Microsoft.Xna.Framework
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
         private Toolkit toolkit;
-        
-        public override bool VSyncEnabled
-        {
-            get
-            {
-                var context = GraphicsContext.CurrentContext;
-                return context != null && context.SwapInterval != 0;
-            }
-            set
-            {
-                var context = GraphicsContext.CurrentContext;
-                if (context != null)
-                {
-                    context.SwapInterval = value ? 1 : 0;
-                }
-            }
-        }
+        private int isExiting; // int, so we can use Interlocked.Increment
         
 		public OpenTKGamePlatform(Game game)
             : base(game)
@@ -122,16 +107,6 @@ namespace Microsoft.Xna.Framework
             {
                 throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
             }
-            
-#if LINUX
-            // also set up SdlMixer to play background music. If one of these functions fails, we will not get any background music (but that should rarely happen)
-            Tao.Sdl.Sdl.SDL_InitSubSystem(Tao.Sdl.Sdl.SDL_INIT_AUDIO);
-            Tao.Sdl.SdlMixer.Mix_OpenAudio(44100, (short)Tao.Sdl.Sdl.AUDIO_S16SYS, 2, 1024);			
-
-            //even though this method is called whenever IsMouseVisible is changed it needs to be called during startup
-            //so that the cursor can be put in the correct inital state (hidden)
-            OnIsMouseVisibleChanged();
-#endif
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -139,45 +114,56 @@ namespace Microsoft.Xna.Framework
             get { return GameRunBehavior.Synchronous; }
         }
 
-#if WINDOWS
         protected override void OnIsMouseVisibleChanged()
         {
             _view.SetMouseVisible(IsMouseVisible);
         }
-#endif
-
-#if LINUX
-        protected override void OnIsMouseVisibleChanged()
-        {
-            MouseState oldState = Mouse.GetState();
-            _view.Window.CursorVisible = IsMouseVisible;
-            // IsMouseVisible changes the location of the cursor on Linux and we have to manually set it back to the correct position
-            System.Drawing.Point mousePos = _view.Window.PointToScreen(new System.Drawing.Point(oldState.X, oldState.Y));
-            OpenTK.Input.Mouse.SetPosition(mousePos.X, mousePos.Y);
-        }
-#endif
 
         public override void RunLoop()
         {
             ResetWindowBounds();
-            _view.Run();
+            while (true)
+            {
+                _view.ProcessEvents();
+
+                // Stop the main loop iff Game.Exit() has been called.
+                // This can happen under the following circumstances:
+                // 1. Game.Exit() is called programmatically.
+                // 2. The GameWindow is closed through the 'X' (close) button
+                // 3. The GameWindow is closed through Alt-F4 or Cmd-Q
+                // Note: once Game.Exit() is called, we must stop raising 
+                // Update or Draw events as the GameWindow and/or OpenGL context
+                // may no longer be available. 
+                // Note 2: Game.Exit() can be called asynchronously from
+                // _view.ProcessEvents() (cases #2 and #3 above), so the
+                // isExiting check must be placed *after* _view.ProcessEvents()
+                if (isExiting > 0)
+                {
+                    break;
+                }
+
+                Game.Tick();
+            }
         }
 
         public override void StartRunLoop()
         {
             throw new NotSupportedException("The desktop platform does not support asynchronous run loops");
         }
-        
+
         public override void Exit()
         {
-            if (_view.Window.Exists)
+            //(SJ) Why is this called here when it's not in any other project
+            //Net.NetworkSession.Exit();
+            Interlocked.Increment(ref isExiting);
+
+            // sound controller must be disposed here
+            // so that it doesn't stop the game from disposing
+            if (soundControllerInstance != null)
             {
-                Net.NetworkSession.Exit();
-                _view.Window.Close();
+                soundControllerInstance.Dispose();
+                soundControllerInstance = null;
             }
-#if LINUX
-            Tao.Sdl.SdlMixer.Mix_CloseAudio();
-#endif
             OpenTK.DisplayDevice.Default.RestoreResolution();
         }
 
@@ -297,8 +283,6 @@ namespace Microsoft.Xna.Framework
 
         public override void Present()
         {
-            base.Present();
-
             var device = Game.GraphicsDevice;
             if (device != null)
                 device.Present();

@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal void PlatformApplyState(GraphicsDevice device)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

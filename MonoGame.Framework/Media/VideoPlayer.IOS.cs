@@ -4,9 +4,9 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using MediaPlayer;
+using Foundation;
+using UIKit;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -28,6 +28,10 @@ namespace Microsoft.Xna.Framework.Media
         private Texture2D PlatformGetTexture()
         {
             throw new NotImplementedException();
+        }
+
+        private void PlatformGetState(ref MediaState result)
+        {
         }
 
         private void PlatformPause()
@@ -71,7 +75,17 @@ namespace Microsoft.Xna.Framework.Media
             Stop();
         }
 
-                private TimeSpan PlatformGetPlayPosition()
+        private TimeSpan PlatformGetPlayPosition()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsLooped()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
         {
             throw new NotImplementedException();
         }
@@ -79,6 +93,10 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan PlatformSetVolume()
         {
             throw new NotImplementedException();
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }

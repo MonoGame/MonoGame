@@ -1,8 +1,16 @@
-using System;
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+	using System;
 using Microsoft.Xna.Framework;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.ApplicationModel.Activation;
+#if WINDOWS_PHONE81
+using Windows.Phone.UI.Input;
+using Microsoft.Xna.Framework.Input;
+#endif
 
 namespace MonoGame.Framework
 {
@@ -15,7 +23,7 @@ namespace MonoGame.Framework
         where T : Game, new()
     {
         /// <summary>
-        /// Creates your Game class initializing it to worth within a XAML application window.
+        /// Creates your Game class initializing it to work within a XAML application window.
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
@@ -34,7 +42,7 @@ namespace MonoGame.Framework
             MetroGamePlatform.LaunchParameters = launchParameters;
 
             // Setup the window class.
-            MetroGameWindow.Instance.Initialize(window, swapChainBackgroundPanel);
+            MetroGameWindow.Instance.Initialize(window, swapChainBackgroundPanel, MetroGamePlatform.TouchQueue);
 
             // Construct the game.
             var game = new T();
@@ -47,9 +55,24 @@ namespace MonoGame.Framework
             // Start running the game.
             game.Run(GameRunBehavior.Asynchronous);
 
+#if WINDOWS_PHONE81
+            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+#endif
+
             // Return the created game object.
             return game;
         }
+
+#if WINDOWS_PHONE81
+        static void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                GamePad.Back = true;
+                e.Handled = true;
+            }
+        }
+#endif
         
         /// <summary>
         /// Preserves the previous execution state in MetroGamePlatform and returns the constructed game object initialized with the given window.

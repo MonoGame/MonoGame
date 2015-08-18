@@ -1,125 +1,70 @@
-﻿#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2012 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-using Microsoft.Xna.Framework;
 
-namespace MonoGame.Tests.Components {
-	class PixelDeltaFrameComparer : IFrameComparer {
-		public float Compare (FramePixelData a, FramePixelData b)
-		{
-			int minWidth, maxWidth, minHeight, maxHeight;
+namespace MonoGame.Tests.Components 
+{
+	class PixelDeltaFrameComparer : IFrameComparer 
+    {
+        private static int[] GreyScale(FramePixelData pixelData, int newWidth, int newHeight)
+        {
+            var resized = new int[newWidth * newHeight];
 
-			MathUtility.MinMax (a.Width, b.Width, out minWidth, out maxWidth);
-			MathUtility.MinMax (a.Height, b.Height, out minHeight, out maxHeight);
+            var stepX = pixelData.Width / (float)newWidth;
+            var stepY = pixelData.Height / (float)newHeight;
 
-			var rect = new System.Drawing.Rectangle (0, 0, minWidth, minHeight);
+            for (var y = 0; y < newHeight; y++)
+            {
+                for (var x = 0; x < newWidth; x++)
+                {
+                    // We use a simple nearest neighbor sample as any blending
+                    // would only serve to increase the differences between the images.
 
-			long error = 0;
+                    var sx = (int)(x * stepX);
+                    var sy = (int)(y * stepY);
+                    var si = sx + (sy * pixelData.Width);
+                    var scolor = pixelData.Data[si];
+                    
+                    // Convert to a greyscale value which removes small
+                    // color differences that the eye cannot spot.
+                    var grayScale = (int)((scolor.R * 0.3) + (scolor.G * 0.59) + (scolor.B * 0.11));
 
-			int index = 0;
-			for (int y = 0; y < rect.Height; ++y) {
-				for (int x = 0; x < rect.Width; ++x) {
-					error += Delta (a.Data [index], b.Data [index]);
-					index++;
-				}
-			}
+                    var di = x + (y * newWidth);
+                    resized[di] = grayScale;
+                }
+            }
 
-			// FIXME: To temporarily accommodate the differing
-			//        resolutions of mobile platforms, we just
-			//        ignore all non-overlapping pixels.  This
-			//        is not ideal, but it's good enough for now.
-			// Mark all out-of-bounds pixels as non-match.
-			//error += PixelArgb.MaxDelta * ((maxWidth * maxHeight) - (minWidth * minHeight));
+            return resized;
+        }
 
-			var dissimilarity = ((float) error / (float) (PixelArgb.MaxDelta * minWidth * minHeight));
+        public float Compare(FramePixelData image, FramePixelData referenceImage)
+		{        
+            // Conver the images down to a common sized greyscale image.
+            var width = Math.Min(image.Width, referenceImage.Width);
+            var height = Math.Min(image.Height, referenceImage.Height);
+            var img = GreyScale(image, width, height);
+            var imgRef = GreyScale(referenceImage, width, height);
 
-			// Project dissimilarity to a logarithmic scale.  The
-			// difference between having zero pixels wrong and one
-			// pixel wrong is more significant than the difference
-			// betweeen 10,000 wrong and 10,001.
-			return 1.0f - (float) Math.Pow (dissimilarity, 0.5);
-		}
+            // Find the differences between the greyscale images.
+            var absDiff = new int[width * height];
+            for (var i = 0; i < absDiff.Length; i++)
+                absDiff[i] = Math.Abs(img[i] - imgRef[i]);
 
-		private static int Delta (Color a, Color b)
-		{
-			if (a.PackedValue == b.PackedValue)
-				return 0;
+            // Find all the differences over the threshold.
+		    const int threshold = 3;
+            var diffPixels = 0;
+            for (var i = 0; i < absDiff.Length; i++)
+            {
+                if (absDiff[i] > threshold) 
+                    diffPixels++;
+            }
 
-			return
-				Math.Abs (a.B - b.B) +
-				Math.Abs (a.G - b.G) +
-				Math.Abs (a.R - b.R) +
-				Math.Abs (a.A - b.A);
+            // Calculate the difference percentage.
+            var diff = diffPixels / (float)absDiff.Length;
+		    return 1.0f - diff;
 		}
 	}
 }

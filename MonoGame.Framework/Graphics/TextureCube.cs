@@ -31,8 +31,9 @@ namespace Microsoft.Xna.Framework.Graphics
         internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
             if (graphicsDevice == null)
-                throw new ArgumentNullException("graphicsDevice");
-			
+            {
+                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+            }
             this.GraphicsDevice = graphicsDevice;
 			this.size = size;
             this._format = format;
@@ -95,9 +96,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     // a 4x4 block. 
                     // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
                     if (_format == SurfaceFormat.Dxt1 ||
+                        _format == SurfaceFormat.Dxt1SRgb ||
                         _format == SurfaceFormat.Dxt1a ||
                         _format == SurfaceFormat.Dxt3 ||
-                        _format == SurfaceFormat.Dxt5)
+                        _format == SurfaceFormat.Dxt3SRgb ||
+                        _format == SurfaceFormat.Dxt5 ||
+                        _format == SurfaceFormat.Dxt5SRgb)
                     {
 #if DIRECTX
                         width = (width + 3) & ~3;

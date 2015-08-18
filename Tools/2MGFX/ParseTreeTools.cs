@@ -1,130 +1,61 @@
 ﻿using System;
-using Microsoft.Xna.Framework.Graphics;
+using System.Globalization;
+using Microsoft.Xna.Framework;
 
 namespace TwoMGFX
 {
-	public class ParseTreeTools
+	public static class ParseTreeTools
 	{
-        public static FillMode ParseFillMode(string value)
+        public static float ParseFloat(string value)
         {
-            switch (value.ToLower())
-            {
-                case "solid":
-                    return FillMode.Solid;
-                case "wireframe":
-                    return FillMode.WireFrame;
-                default:
-                    throw new Exception("Unknown fill mode '" + value + "'.");
-            }
+            // Remove all whitespace and trailing F or f.
+            value = value.Replace(" ", "");
+            value = value.TrimEnd('f', 'F');
+            return float.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture);
         }
 
-        public static CullMode ParseCullMode(string value)
+        public static int ParseInt(string value)
         {
-            switch (value.ToLower())
-            {
-                case "none":
-                    return CullMode.None;
-                case "cw":
-                    return CullMode.CullClockwiseFace;
-                case "ccw":
-                    return CullMode.CullCounterClockwiseFace;
-                default:
-                    throw new Exception("Unknown cull mode '" + value + "'.");
-            }
+            // We read it as a float and cast it down to
+            // an integer to match Microsoft FX behavior.
+            return (int)Math.Floor(ParseFloat(value));
         }
-
-		public static TextureAddressMode ParseAddressMode(string value)
-		{
-			switch (value.ToLower())
-			{
-				case "clamp":
-					return TextureAddressMode.Clamp;
-				case "mirror":
-					return TextureAddressMode.Mirror;
-				case "wrap":
-					return TextureAddressMode.Wrap;
-				default:
-					throw new Exception("Unknown texture address mode '" + value + "'.");
-			}
-		}
-
-		public static TextureFilterType ParseTextureFilterType(string value)
-		{
-			switch (value.ToLower())
-			{
-				case "linear":
-					return TextureFilterType.Linear;
-				case "point":
-					return TextureFilterType.Point;
-				case "anisotropic":
-					return TextureFilterType.Anisotropic;
-				default:
-					throw new Exception("Unknown texture filter type '" + value + "'.");
-			}
-		}
-
+       
 		public static bool ParseBool(string value)
 		{
-			if (value.ToLower() == "true" || value == "1")
+		    if (value.ToLowerInvariant() == "true" || value == "1")
 				return true;
-            else if (value.ToLower() == "false" || value == "0")
-				return false;
-			else
-				throw new Exception("Invalid boolean value '" + value + "'");
+		    if (value.ToLowerInvariant() == "false" || value == "0")
+		        return false;
+
+		    throw new Exception("Invalid boolean value '" + value + "'");
 		}
 
-		public static BlendFunction ParseBlendFunction(string value)
-		{
-			switch (value.ToLower())
-			{
-				case "add":
-					return BlendFunction.Add;
-				case "subtract":
-					return BlendFunction.Subtract;
-				case "revsubtract":
-					return BlendFunction.ReverseSubtract;
-				case "min":
-					return BlendFunction.Min;
-				case "max":
-					return BlendFunction.Max;
-				default:
-					throw new Exception("Invalid blend function value '" + value + "'");
-			}
-		}
+	    public static Color ParseColor(string value)
+	    {
+	        var hexValue = Convert.ToUInt32(value, 16);
 
-		public static Blend ParseBlend(string value)
-		{
-			switch (value.ToLower())
-			{
-				case "zero":
-					return Blend.Zero;
-				case "one":
-					return Blend.One;
-				case "srccolor":
-					return Blend.SourceColor;
-				case "invsrccolor":
-					return Blend.InverseSourceColor;
-				case "srcalpha":
-					return Blend.SourceAlpha;
-				case "invsrcalpha":
-					return Blend.InverseSourceAlpha;
-				case "destalpha":
-					return Blend.DestinationAlpha;
-				case "invdestalpha":
-					return Blend.InverseDestinationAlpha;
-				case "destcolor":
-					return Blend.DestinationColor;
-				case "invdestcolor":
-					return Blend.InverseDestinationColor;
-				case "srcalphasat":
-					return Blend.SourceAlphaSaturation;
-				case "blendfactor":
-					return Blend.BlendFactor;
-				case "invblendfactor":
-					return Blend.InverseBlendFactor;
-				default:
-					throw new Exception("Invalid blend value '" + value + "'");
-			}
-		}
+	        byte r, g, b, a;
+	        if (value.Length == 8)
+	        {
+	            r = (byte) ((hexValue >> 16) & 0xFF);
+                g = (byte) ((hexValue >> 8) & 0xFF);
+                b = (byte) ((hexValue >> 0) & 0xFF);
+	            a = 255;
+	        }
+	        else if (value.Length == 10)
+	        {
+                r = (byte) ((hexValue >> 24) & 0xFF);
+                g = (byte) ((hexValue >> 16) & 0xFF);
+                b = (byte) ((hexValue >> 8) & 0xFF);
+                a = (byte) ((hexValue >> 0) & 0xFF);
+	        }
+	        else
+	        {
+	            throw new NotSupportedException();
+	        }
+
+            return new Color(r, g, b, a);
+	    }
 	}
 }

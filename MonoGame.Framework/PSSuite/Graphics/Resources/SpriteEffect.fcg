@@ -1,9 +1,0 @@
-
-void main(  float4 in v_Color0  : COLOR0,
-            float2 in  v_TexCoord  : TEXCOORD0,
-            float4 out Color  : COLOR,
-            uniform sampler2D Texture0  : TEXUNIT0)
-{
-    Color = v_Color0 * tex2D(Texture0, v_TexCoord);
-}
-

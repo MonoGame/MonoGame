@@ -8,19 +8,17 @@ using System.IO;
 #if MONOMAC
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
+using MonoMac.AVFoundation;
+using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
 #if IOS
-using MonoTouch.AudioToolbox;
-using MonoTouch.AudioUnit;
+using AudioToolbox;
+using AudioUnit;
+using AVFoundation;
+using Foundation;
 #endif
-#elif ANDROID
-using Android.Content;
-using Android.Content.Res;
-using Android.Media;
-using Android.Util;
-using Stream = System.IO.Stream;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -33,67 +31,93 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal int Size { get; set; }
 
-#if OPENAL
-
         internal ALFormat Format { get; set; }
-#endif
-
-#if ANDROID
-		private int _soundID = -1;
-#endif
 
         #region Public Constructors
 
         private void PlatformLoadAudioStream(Stream s)
         {
-#if WINDOWS || LINUX || ANGLE
+#if OPENAL && !(MONOMAC || IOS)
             
             ALFormat format;
             int size;
             int freq;
 
-            _data = AudioLoader.Load(s, out format, out size, out freq);
-
+            var stream = s;
+#if ANDROID
+            var needsDispose = false;
+            try
+            {
+                // If seek is not supported (usually an indicator of a stream opened into the AssetManager), then copy
+                // into a temporary MemoryStream.
+                if (!s.CanSeek)
+                {
+                    needsDispose = true;
+                    stream = new MemoryStream();
+                    s.CopyTo(stream);
+                    stream.Position = 0;
+                }
+#endif
+                _data = AudioLoader.Load(stream, out format, out size, out freq);
+#if ANDROID
+            }
+            finally
+            {
+                if (needsDispose)
+                    stream.Dispose();
+            }
+#endif
             Format = format;
             Size = size;
             Rate = freq;
 
-            return;
 #endif
 
 #if MONOMAC || IOS
 
-            AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
+            var audiodata = new byte[s.Length];
+            s.Read(audiodata, 0, (int)s.Length);
 
-			var audiodata = new byte[s.Length];
-			s.Read(audiodata, 0, (int)s.Length);
-            afs.ParseBytes (audiodata, false); // AudioFileStreamStatus status
-            AudioStreamBasicDescription asbd = afs.StreamBasicDescription;
-            
-            Rate = (float)asbd.SampleRate;
-            Size = (int)afs.DataByteCount;
-            
-            if (asbd.ChannelsPerFrame == 1)
-                Format = asbd.BitsPerChannel == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
-            else
-                Format = asbd.BitsPerChannel == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
+            using (AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE))
+            {
+                afs.ParseBytes (audiodata, false);
+                Size = (int)afs.DataByteCount;
 
-            byte []d = new byte[afs.DataByteCount];
-            Array.Copy (audiodata, afs.DataOffset, d, 0, afs.DataByteCount);
+                _data = new byte[afs.DataByteCount];
+                Array.Copy (audiodata, afs.DataOffset, _data, 0, afs.DataByteCount);
 
-            _data = d;
+                AudioStreamBasicDescription asbd = afs.DataFormat;
+                int channelsPerFrame = asbd.ChannelsPerFrame;
+                int bitsPerChannel = asbd.BitsPerChannel;
 
-            var _dblDuration = (Size / ((asbd.BitsPerChannel / 8) * ((asbd.ChannelsPerFrame == 0) ? 1 : asbd.ChannelsPerFrame))) / asbd.SampleRate;
-            _duration = TimeSpan.FromSeconds(_dblDuration);
+                // There is a random chance that properties asbd.ChannelsPerFrame and asbd.BitsPerChannel are invalid because of a bug in Xamarin.iOS
+                // See: https://bugzilla.xamarin.com/show_bug.cgi?id=11074 (Failed to get buffer attributes error when playing sounds)
+                if (channelsPerFrame <= 0 || bitsPerChannel <= 0)
+                {
+                    NSError err;
+                    using (NSData nsData = NSData.FromArray(audiodata))
+                    using (AVAudioPlayer player = AVAudioPlayer.FromData(nsData, out err))
+                    {
+                        channelsPerFrame = (int)player.NumberOfChannels;
+                        bitsPerChannel = player.SoundSetting.LinearPcmBitDepth.GetValueOrDefault(16);
 
-			afs.Close ();
+						Rate = (float)player.SoundSetting.SampleRate;
+                        _duration = TimeSpan.FromSeconds(player.Duration);
+                    }
+                }
+                else
+                {
+                    Rate = (float)asbd.SampleRate;
+                    double duration = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
+                    _duration = TimeSpan.FromSeconds(duration);
+                }
 
-#endif
+                if (channelsPerFrame == 1)
+                    Format = (bitsPerChannel == 8) ? ALFormat.Mono8 : ALFormat.Mono16;
+                else
+                    Format = (bitsPerChannel == 8) ? ALFormat.Stereo8 : ALFormat.Stereo16;
+            }
 
-#if ANDROID
-
-			// Creating a soundeffect from a stream
-			// doesn't seem to be supported in Android
 #endif
         }
 
@@ -102,7 +126,7 @@ namespace Microsoft.Xna.Framework.Audio
 			Rate = (float)sampleRate;
             Size = (int)buffer.Length;
 
-#if WINDOWS || LINUX || ANGLE
+#if OPENAL && !(MONOMAC || IOS)
 
             _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
@@ -124,23 +148,7 @@ namespace Microsoft.Xna.Framework.Audio
             _data = buffer;
 
 #endif
-
-#if ANDROID
-            _name = "";
-
-            _data = AudioUtil.FormatWavData(buffer, sampleRate, (int)channels);
-#endif
         }
-
-#if ANDROID
-
-		internal SoundEffect(string fileName)
-		{
-			using (AssetFileDescriptor fd = Game.Activity.Assets.OpenFd(fileName))
-				_soundID = SoundEffectInstance.SoundPool.Load(fd.FileDescriptor, fd.StartOffset, fd.Length, 1);
-		}
-
-#endif
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
@@ -155,62 +163,24 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-#if OPENAL
-
             inst.InitializeSound();
             inst.BindDataBuffer(_data, Format, Size, (int)Rate);
-#endif
-
-#if ANDROID
-            inst._soundId = _soundID;
-            inst._sampleRate = Rate;
-#endif
-        }
-
-        #endregion
-
-        #region Static Members
-
-        private static void PlatformSetMasterVolume()
-        {
-            var activeSounds = SoundEffectInstancePool.GetAllPlayingSounds();
-
-            // A little gross here, but there's
-            // no if(value == value) check in SFXInstance.Volume
-            // This'll allow the sound's current volume to be recalculated
-            // against SoundEffect.MasterVolume.
-            foreach(var sound in activeSounds)
-                sound.Volume = sound.Volume;
         }
 
         #endregion
 
         #region IDisposable Members
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            // A No-op for WINDOWS and LINUX. Note that isDisposed remains false!
-
-#if ANDROID
-            if (!isDisposed)
-            {
-				if (_soundID != -1)
-					SoundEffectInstance.SoundPool.Unload(_soundID);
-
-				_soundID = -1;
-
-                isDisposed = true;
-            }
-#endif
+            // A no-op for OpenAL
         }
 
         #endregion
 
         internal static void PlatformShutdown()
         {
-#if OPENAL
             OpenALSoundController.DestroyInstance();
-#endif
         }
     }
 }

@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
+using Android.Views;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
@@ -21,32 +21,27 @@ namespace Microsoft.Xna.Framework
 
             _gameWindow = new AndroidGameWindow(Game.Activity, game);
             Window = _gameWindow;
+
+            MediaLibrary.Context = Game.Activity;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                AndroidGameActivity.Paused -= Activity_Paused;
+                AndroidGameActivity.Resumed -= Activity_Resumed;
+            }
+            base.Dispose(disposing);
         }
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
-        private bool _exiting = false;
         private AndroidGameWindow _gameWindow;
 
         public override void Exit()
         {
-            //TODO: Fix this
-            try
-            {
-				if (!_exiting)
-				{
-					_exiting = true;
-					AndroidGameActivity.Paused -= Activity_Paused;
-					AndroidGameActivity.Resumed -= Activity_Resumed;
-					Game.DoExiting();
-                    Net.NetworkSession.Exit();
-               	    Game.Activity.Finish();
-				    _gameWindow.GameView.Close();
-				}
-            }
-            catch
-            {
-            }
+            Game.Activity.MoveTaskToBack(true);
         }
 
         public override void RunLoop()
@@ -78,19 +73,15 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize()
         {
-            // TODO: Determine whether device natural orientation is Portrait or Landscape for OrientationListener
-            //SurfaceOrientation currentOrient = Game.Activity.WindowManager.DefaultDisplay.Rotation;
+            var currentOrientation = AndroidCompatibility.GetAbsoluteOrientation();
 
-			switch (Game.Activity.Resources.Configuration.Orientation)
+            switch (Game.Activity.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-					_gameWindow.SetOrientation(DisplayOrientation.Portrait, false);
-                    break;
-                case Android.Content.Res.Orientation.Landscape:
-					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+                    this._gameWindow.SetOrientation(currentOrientation == DisplayOrientation.PortraitDown ? DisplayOrientation.PortraitDown : DisplayOrientation.Portrait, false);
                     break;
                 default:
-					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+                    this._gameWindow.SetOrientation(currentOrientation == DisplayOrientation.LandscapeRight ? DisplayOrientation.LandscapeRight : DisplayOrientation.LandscapeLeft, false);
                     break;
             }
             base.BeforeInitialize();
@@ -131,7 +122,6 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = true;
 				_gameWindow.GameView.Resume();
-				SoundEffectInstance.SoundPool.AutoResume();
 				if(_MediaPlayer_PrevState == MediaState.Playing && Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Resume();
 				if (!_gameWindow.GameView.IsFocused)
@@ -149,7 +139,6 @@ namespace Microsoft.Xna.Framework
 				_MediaPlayer_PrevState = MediaPlayer.State;
 				_gameWindow.GameView.Pause();
 				_gameWindow.GameView.ClearFocus();
-				SoundEffectInstance.SoundPool.AutoPause();
 				if(Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Pause();
             }
@@ -169,8 +158,6 @@ namespace Microsoft.Xna.Framework
 		
         public override void Present()
         {
-			if (_exiting)
-                return;
             try
             {
                 var device = Game.GraphicsDevice;

@@ -1,70 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2011 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -76,16 +12,16 @@ using Windows.ApplicationModel.Activation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 
 namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
-        private const float DefaultTargetFramesPerSecond = 60.0f;
-
         private GameComponentCollection _components;
         private GameServiceContainer _services;
+        private ContentManager _content;
         internal GamePlatform Platform;
 
         private SortingFilteringCollection<IDrawable> _drawables =
@@ -112,10 +48,10 @@ namespace Microsoft.Xna.Framework
         private bool _initialized = false;
         private bool _isFixedTimeStep = true;
 
-        private TimeSpan _targetElapsedTime = TimeSpan.FromTicks((long)10000000 / (long)DefaultTargetFramesPerSecond);
-        private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(1);
+        private TimeSpan _targetElapsedTime = TimeSpan.FromTicks(166667); // 60fps
+        private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(0.02);
 
-        private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
+        private TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
 
         private bool _suppressDraw;
@@ -124,19 +60,17 @@ namespace Microsoft.Xna.Framework
         {
             _instance = this;
 
-            TitleContainer.Initialize();
-
             LaunchParameters = new LaunchParameters();
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
-            Content = new ContentManager(_services);
+            _content = new ContentManager(_services);
 
             Platform = GamePlatform.Create(this);
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif
         }
@@ -177,10 +111,10 @@ namespace Microsoft.Xna.Framework
                     }
                     _components = null;
 
-                    if (Content != null)
+                    if (_content != null)
                     {
-                        Content.Dispose();
-                        Content = null;
+                        _content.Dispose();
+                        _content = null;
                     }
 
                     if (_graphicsDeviceManager != null)
@@ -194,22 +128,16 @@ namespace Microsoft.Xna.Framework
                         Platform.Activated -= OnActivated;
                         Platform.Deactivated -= OnDeactivated;
                         _services.RemoveService(typeof(GamePlatform));
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
                         Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
 #endif
                         Platform.Dispose();
                         Platform = null;
                     }
 
-                    Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
 
                     SoundEffect.PlatformShutdown();
-
-                    BlendState.ResetStates();
-                    DepthStencilState.ResetStates();
-                    RasterizerState.ResetStates();
-                    SamplerState.ResetStates();
                 }
 #if ANDROID
                 Activity = null;
@@ -251,12 +179,30 @@ namespace Microsoft.Xna.Framework
         public TimeSpan InactiveSleepTime
         {
             get { return _inactiveSleepTime; }
-            set 
+            set
             {
-                if (_inactiveSleepTime != value)
-                {
-                    _inactiveSleepTime = value;
-                }
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+
+                _inactiveSleepTime = value;
+            }
+        }
+
+        /// <summary>
+        /// The maximum amount of time we will frameskip over and only perform Update calls with no Draw calls.
+        /// MonoGame extension.
+        /// </summary>
+        public TimeSpan MaxElapsedTime
+        {
+            get { return _maxElapsedTime; }
+            set
+            {
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+                if (value < _targetElapsedTime)
+                    throw new ArgumentOutOfRangeException("The time must be at least TargetElapsedTime", default(Exception));
+
+                _maxElapsedTime = value;
             }
         }
 
@@ -282,7 +228,7 @@ namespace Microsoft.Xna.Framework
 
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
-                        "value must be positive and non-zero.");
+                        "The time must be positive and non-zero.", default(Exception));
 
                 if (value != _targetElapsedTime)
                 {
@@ -302,7 +248,17 @@ namespace Microsoft.Xna.Framework
             get { return _services; }
         }
 
-        public ContentManager Content { get; set; }
+        public ContentManager Content
+        {
+            get { return _content; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException();
+
+                _content = value;
+            }
+        }
 
         public GraphicsDevice GraphicsDevice
         {
@@ -348,7 +304,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         [CLSCompliant(false)]
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
@@ -362,10 +318,13 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
+#if IOS || WINDOWS_STOREAPP && !WINDOWS_PHONE81
+        [Obsolete("This platform's policy does not allow programmatically closing.", true)]
+#endif
         public void Exit()
         {
             Platform.Exit();
-			_suppressDraw = true;
+            _suppressDraw = true;
         }
 
         public void ResetElapsedTime()
@@ -385,16 +344,19 @@ namespace Microsoft.Xna.Framework
         
         public void RunOneFrame()
         {
-            AssertNotDisposed();
+            if (Platform == null)
+                return;
+
             if (!Platform.BeforeRun())
                 return;
 
             if (!_initialized) {
                 DoInitialize ();
+                _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
             }
 
-            BeginRun();
+            BeginRun();            
 
             //Not quite right..
             Tick ();
@@ -412,7 +374,11 @@ namespace Microsoft.Xna.Framework
         {
             AssertNotDisposed();
             if (!Platform.BeforeRun())
+            {
+                BeginRun();
+                _gameTimer = Stopwatch.StartNew();
                 return;
+            }
 
             if (!_initialized) {
                 DoInitialize ();
@@ -420,6 +386,7 @@ namespace Microsoft.Xna.Framework
             }
 
             BeginRun();
+            _gameTimer = Stopwatch.StartNew();
             switch (runBehavior)
             {
             case GameRunBehavior.Asynchronous:
@@ -439,8 +406,9 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private Stopwatch _gameTimer = Stopwatch.StartNew();
+        private Stopwatch _gameTimer;
         private long _previousTicks = 0;
+        private int _updateFrameLag;
 
         public void Tick()
         {
@@ -448,9 +416,6 @@ namespace Microsoft.Xna.Framework
             // with even what looks like a safe change.  Be sure to test 
             // any change fully in both the fixed and variable timestep 
             // modes across multiple devices and platforms.
-
-            // Can only be running slow if we are fixed timestep
-            var possibleToBeRunningSlowly = IsFixedTimeStep;
 
         RetryTick:
 
@@ -465,10 +430,6 @@ namespace Microsoft.Xna.Framework
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
                 var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-
-                // If we have had to sleep, we shouldn't report being
-                // slow regardless of how long we actually sleep for.
-                possibleToBeRunningSlowly = false;
 
                 // NOTE: While sleep can be inaccurate in general it is 
                 // accurate enough for frame limiting purposes if some
@@ -485,12 +446,6 @@ namespace Microsoft.Xna.Framework
             if (_accumulatedElapsedTime > _maxElapsedTime)
                 _accumulatedElapsedTime = _maxElapsedTime;
 
-            // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gametime.isrunningslowly.aspx
-            // Calculate IsRunningSlowly for the fixed time step, but only when the accumulated time
-            // exceeds the target time, and we haven't slept.
-            _gameTime.IsRunningSlowly = (possibleToBeRunningSlowly &&
-                                        (_accumulatedElapsedTime > TargetElapsedTime));
-
             if (IsFixedTimeStep)
             {
                 _gameTime.ElapsedGameTime = TargetElapsedTime;
@@ -505,6 +460,25 @@ namespace Microsoft.Xna.Framework
 
                     DoUpdate(_gameTime);
                 }
+
+                //Every update after the first accumulates lag
+                _updateFrameLag += Math.Max(0, stepCount - 1);
+
+                //If we think we are running slowly, wait until the lag clears before resetting it
+                if (_gameTime.IsRunningSlowly)
+                {
+                    if (_updateFrameLag == 0)
+                        _gameTime.IsRunningSlowly = false;
+                }
+                else if (_updateFrameLag >= 5)
+                {
+                    //If we lag more than 5 frames, start thinking we are running slowly
+                    _gameTime.IsRunningSlowly = true;
+                }
+
+                //Every time we just do one update and one draw, then we are not running slowly, so decrease the lag
+                if (stepCount == 1 && _updateFrameLag > 0)
+                    _updateFrameLag--;
 
                 // Draw needs to know the total elapsed time
                 // that occured for the fixed length updates.
@@ -633,7 +607,7 @@ namespace Microsoft.Xna.Framework
 			DoExiting();
         }
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
         {
             AssertNotDisposed();
@@ -652,11 +626,14 @@ namespace Microsoft.Xna.Framework
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+
+#if !(WINDOWS && DIRECTX)
+
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 Platform.EnterFullScreen();
             else
                 Platform.ExitFullScreen();
-
+#endif
             var viewport = new Viewport(0, 0,
 			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
 			                            GraphicsDevice.PresentationParameters.BackBufferHeight);
@@ -674,9 +651,12 @@ namespace Microsoft.Xna.Framework
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
+
                 Update(gameTime);
+
+                //The TouchPanel needs to know the time for when touches arrive
+                TouchPanelState.CurrentTimestamp = gameTime.TotalGameTime;
             }
-                
         }
 
         internal void DoDraw(GameTime gameTime)
@@ -1057,11 +1037,5 @@ namespace Microsoft.Xna.Framework
                 return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
             }
         }
-    }
-
-    public enum GameRunBehavior
-    {
-        Asynchronous,
-        Synchronous
     }
 }

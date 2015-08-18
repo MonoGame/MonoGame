@@ -26,12 +26,10 @@ namespace Lidgren.Network
 	/// Incoming message either sent from a remote peer or generated within the library
 	/// </summary>
 	[DebuggerDisplay("Type={MessageType} LengthBits={LengthBits}")]
-	public partial class NetIncomingMessage
+	public sealed class NetIncomingMessage : NetBuffer
 	{
-		internal byte[] m_data;
-		internal int m_bitLength;
 		internal NetIncomingMessageType m_incomingMessageType;
-		internal IPEndPoint m_senderEndpoint;
+		internal IPEndPoint m_senderEndPoint;
 		internal NetConnection m_senderConnection;
 		internal int m_sequenceNumber;
 		internal NetMessageType m_receivedMessageType;
@@ -56,7 +54,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// IPEndPoint of sender, if any
 		/// </summary>
-		public IPEndPoint SenderEndpoint { get { return m_senderEndpoint; } }
+		public IPEndPoint SenderEndPoint { get { return m_senderEndPoint; } }
 
 		/// <summary>
 		/// NetConnection of sender, if any
@@ -67,23 +65,6 @@ namespace Lidgren.Network
 		/// What local time the message was received from the network
 		/// </summary>
 		public double ReceiveTime { get { return m_receiveTime; } }
-
-		/// <summary>
-		/// Gets the length of the message payload in bytes
-		/// </summary>
-		public int LengthBytes
-		{
-			get { return ((m_bitLength + 7) >> 3); }
-		}
-
-		/// <summary>
-		/// Gets the length of the message payload in bits
-		/// </summary>
-		public int LengthBits
-		{
-			get { return m_bitLength; }
-			internal set { m_bitLength = value; }
-		}
 
 		internal NetIncomingMessage()
 		{
@@ -109,9 +90,18 @@ namespace Lidgren.Network
 		/// </summary>
 		/// <param name="encryption">The encryption algorithm used to encrypt the message</param>
 		/// <returns>true on success</returns>
-		public bool Decrypt(INetEncryption encryption)
+		public bool Decrypt(NetEncryption encryption)
 		{
 			return encryption.Decrypt(this);
+		}
+
+		/// <summary>
+		/// Reads a value, in local time comparable to NetTime.Now, written using WriteTime()
+		/// Must have a connected sender
+		/// </summary>
+		public double ReadTime(bool highPrecision)
+		{
+			return ReadTime(m_senderConnection, highPrecision);
 		}
 
 		/// <summary>

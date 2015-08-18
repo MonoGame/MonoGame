@@ -8,26 +8,36 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    using MonoGame.Web;
+
     public sealed partial class SamplerStateCollection
     {
         private void PlatformSetSamplerState(int index)
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformClear()
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformDirty()
         {
-            throw new NotImplementedException();
         }
 
         internal void PlatformSetSamplers(GraphicsDevice device)
         {
-            throw new NotImplementedException();
+            for (var i = 0; i < _actualSamplers.Length; i++)
+            {
+                var sampler = _actualSamplers[i];
+                var texture = device.Textures[i];
+
+                if (sampler != null && texture != null && sampler != texture.glLastSamplerState)
+                {
+                    // TODO
+
+                    texture.glLastSamplerState = sampler;
+                }
+            }
         }
 	}
 }

@@ -1,42 +1,6 @@
-﻿#region License
-/*
-Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -53,14 +17,20 @@ namespace Microsoft.Xna.Framework
 {
     internal class InputEvents
     {
+        private readonly TouchQueue _touchQueue;
         private readonly List<Keys> _keys = new List<Keys>();
 
-        public InputEvents(CoreWindow window, UIElement inputElement)
+        public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
+            _touchQueue = touchQueue;
+
             // The key events are always tied to the window as those will
             // only arrive here if some other control hasn't gotten it.
             window.KeyDown += CoreWindow_KeyDown;
             window.KeyUp += CoreWindow_KeyUp;
+            window.VisibilityChanged += CoreWindow_VisibilityChanged;
+            window.Activated += CoreWindow_Activated;
+            window.SizeChanged += CoreWindow_SizeChanged;
 
             if (inputElement != null)
             {
@@ -68,6 +38,7 @@ namespace Microsoft.Xna.Framework
                 // to it else we'll get events for overlapping XAML controls.
                 inputElement.PointerPressed += UIElement_PointerPressed;
                 inputElement.PointerReleased += UIElement_PointerReleased;
+                inputElement.PointerCanceled += UIElement_PointerReleased;
                 inputElement.PointerMoved += UIElement_PointerMoved;
                 inputElement.PointerWheelChanged += UIElement_PointerWheelChanged;
             }
@@ -85,6 +56,9 @@ namespace Microsoft.Xna.Framework
 
         private void UIElement_PointerPressed(object sender, PointerRoutedEventArgs args)
         {
+            //Capture this pointer so we continue getting events even if it is dragged off us
+            ((UIElement)sender).CapturePointer(args.Pointer);
+
             var pointerPoint = args.GetCurrentPoint(null);
             PointerPressed(pointerPoint, sender as UIElement, args.Pointer);
             args.Handled = true;
@@ -99,6 +73,8 @@ namespace Microsoft.Xna.Framework
 
         private void UIElement_PointerReleased(object sender, PointerRoutedEventArgs args)
         {
+            ((UIElement)sender).ReleasePointerCapture(args.Pointer);
+
             var pointerPoint = args.GetCurrentPoint(null);
             PointerReleased(pointerPoint, sender as UIElement, args.Pointer);
             args.Handled = true;
@@ -149,7 +125,7 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
-            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
+            _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
             
             if (!isTouch)
             {
@@ -173,7 +149,7 @@ namespace Microsoft.Xna.Framework
 
             if (touchIsDown)
             {
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos, !isTouch);
+                _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Moved, pos, !isTouch);
             }
 
             if (!isTouch)
@@ -191,7 +167,7 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
-            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos, !isTouch);
+            _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Released, pos, !isTouch);
 
             if (!isTouch)
             {
@@ -265,6 +241,29 @@ namespace Microsoft.Xna.Framework
 
             if (!_keys.Contains(xnaKey))
                 _keys.Add(xnaKey);
+        }
+
+        private void CoreWindow_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
+        {
+            // If the window is resized then also 
+            // drop any current key states.
+            _keys.Clear();
+        }
+
+        private void CoreWindow_Activated(CoreWindow sender, WindowActivatedEventArgs args)
+        {
+            // Forget about the held keys when we lose focus as we don't
+            // receive key events for them while we are in the background
+            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
+                _keys.Clear();
+        }
+
+        private void CoreWindow_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
+        {
+            // Forget about the held keys when we disappear as we don't
+            // receive key events for them while we are in the background
+            if (!args.Visible)
+                _keys.Clear();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -10,7 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public enum TargetPlatform
     {
         /// <summary>
-        /// All supported versions of Windows (excluding Windows Phone)
+        /// All desktop versions of Windows using DirectX.
         /// </summary>
         Windows,
 
@@ -39,10 +40,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Android,
 
         /// <summary>
-        /// Linux-based PCs
+        /// All desktop versions using OpenGL.
         /// (MonoGame)
         /// </summary>
-        Linux,
+        DesktopGL,
 
         /// <summary>
         /// Apple Mac OSX-based devices (iMac, MacBook, MacBook Air, etc)
@@ -63,15 +64,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         NativeClient,
 
         /// <summary>
-        /// Ouya video game console, a variation of Android
-        /// (MonoGame)
-        /// </summary>
-        Ouya,
-
-        /// <summary>
         /// Sony PlayStation Mobile (PS Vita)
         /// (MonoGame)
         /// </summary>
+        [Obsolete("PlayStation Mobile is no longer supported")]
         PlayStationMobile,
 
         /// <summary>
@@ -90,5 +86,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Sony PlayStation4
         /// </summary>
         PlayStation4,
+
+        /// <summary>
+        /// All desktop versions of Windows using OpenGL.
+        /// (MonoGame)
+        /// </summary>
+        [Obsolete("This platform is obsolete, use DesktopGL instead")]
+        WindowsGL = DesktopGL,
+
+        /// <summary>
+        /// Linux-based PCs
+        /// (MonoGame)
+        /// </summary>
+        [Obsolete("This platform is obsolete, use DesktopGL instead")]
+        Linux = DesktopGL
     }
 }

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="Framework.Content.Pipeline.References">
+
+  <Platform Type="Linux">
+    <Binary
+      Name="AssimpNet"
+      Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
+    <Binary
+      Name="Nvidia.TextureTools"
+      Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
+    <Binary
+      Name="SharpFont"
+      Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
+    <Binary
+      Name="FreeImageNET"
+      Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
+    <Binary
+      Name="ATI.TextureConverter"
+      Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+  </Platform>
+
+
+  <Platform Type="MacOS">
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
+    <Binary
+      Name="AssimpNet"
+      Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
+    <Binary
+      Name="Nvidia.TextureTools"
+      Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
+    <Binary
+      Name="SharpFont"
+      Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
+    <Binary
+      Name="FreeImageNET"
+      Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
+    <Binary
+      Name="ATI.TextureConverter"
+      Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+  </Platform>
+
+
+  <Platform Type="Windows">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
+    <Binary
+      Name="SharpDX.D3DCompiler"
+      Path="ThirdParty\Dependencies\SharpDX\Windows\SharpDX.D3DCompiler.dll" />
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty\Dependencies\CppNet\CppNet.dll" />
+    <Binary
+      Name="AssimpNet"
+      Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
+    <Binary
+      Name="Nvidia.TextureTools"
+      Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
+    <Binary
+      Name="SharpFont"
+      Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
+    <Binary
+      Name="FreeImageNET"
+      Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
+    <Binary
+      Name="ATI.TextureConverter"
+      Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+  </Platform>
+	
+</ExternalProject>

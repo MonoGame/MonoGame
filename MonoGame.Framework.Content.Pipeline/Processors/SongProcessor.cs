@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     targetFormat = ConversionFormat.WindowsMedia;
                     break;
 
-                case TargetPlatform.Linux:
+                case TargetPlatform.DesktopGL:
                     targetFormat = ConversionFormat.Vorbis;
                     break;
             }
@@ -62,6 +62,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Convert and write out the song media file.
             input.ConvertFormat(targetFormat, quality, songFileName);
+
+            // Let the pipeline know about the song file so it can clean things up.
+            context.AddOutputFile(songFileName);
 
             // Return the XNB song content.
             return new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);

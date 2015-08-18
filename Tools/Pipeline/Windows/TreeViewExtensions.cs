@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public static class TreeViewExtensions
+    static class TreeViewExtensions
     {
         public static List<TreeNode> AllNodes(this TreeView tree)
         {
@@ -16,7 +16,7 @@ namespace MonoGame.Tools.Pipeline
             return list;
         }
 
-        private static void AddTreeNodesRecursive(TreeNodeCollection nodeCollection, List<TreeNode> results)
+        public static void AddTreeNodesRecursive(TreeNodeCollection nodeCollection, List<TreeNode> results)
         {
             foreach (var i in nodeCollection)
             {
@@ -26,6 +26,19 @@ namespace MonoGame.Tools.Pipeline
                 AddTreeNodesRecursive(node.Nodes, results);
             }
         }
+
+        public static IEnumerable<ContentItem> GetSelectedContentItems(this MultiSelectTreeview tree)
+        {
+            var found = tree.SelectedNodesRecursive;
+
+            foreach (var node in found)
+            {
+                var item = node.Tag as ContentItem;
+                if (item != null)
+                    yield return item;
+            }
+        }
+
     }
 
 }

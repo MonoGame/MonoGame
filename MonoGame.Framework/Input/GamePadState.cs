@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Input
         //   buttons:
         //     Array or parameter list of Buttons to initialize as pressed.
         public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, params Buttons[] buttons)
-            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad())
+            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad(buttons))
         {
         }
 
@@ -142,7 +142,6 @@ namespace Microsoft.Xna.Framework.Input
         private Buttons GetVirtualButtons () {
             var result = Buttons.buttons;
             var sticks = ThumbSticks;
-            sticks.ApplyDeadZone(GamePadDeadZone.IndependentAxes, 7849 / 32767f);
             
             if (sticks.Left.X < 0)
                 result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickLeft;

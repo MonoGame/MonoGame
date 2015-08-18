@@ -3,45 +3,83 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.ComponentModel;
+using System.Globalization;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal class ContentItem : IProjectItem
-    {       
-        public string SourceFile;
+    public enum BuildAction
+    {
+        Build,
+        Copy,
+    }
+
+    public class ContentItem : IProjectItem
+    {
+        public IContentItemObserver Observer;
+        
         public string ImporterName;
         public string ProcessorName;
         public OpaqueDataDictionary ProcessorParams;
 
         private ImporterTypeDescription _importer;
         private ProcessorTypeDescription _processor;
-
-        public IView View;
+        private BuildAction _buildAction;
 
         #region IProjectItem
 
+        [Browsable(false)]
+        public string OriginalPath { get; set; }
+
+        [Category("Common")]
+        [Description("The file name of this item.")]
         public string Name 
         { 
             get
             {
-                return System.IO.Path.GetFileName(SourceFile);
+                return System.IO.Path.GetFileName(OriginalPath);
             }
         }
 
+        [Category("Common")]
+        [Description("The folder where this item is located.")]
         public string Location
         {
             get
             {
-                return System.IO.Path.GetDirectoryName(SourceFile);
+                return System.IO.Path.GetDirectoryName(OriginalPath);
             }
         }
 
         [Browsable(false)]
         public string Icon { get; set; }
 
+        [Browsable(false)]
+        public bool Exists { get; set; }
+
         #endregion
 
+        [Category("Settings")]
+        [DisplayName("Build Action")]
+        [Description("The way to process this content item.")]
+        public BuildAction BuildAction
+        {
+            get { return _buildAction; }
+            set
+            {
+                if (_buildAction == value)
+                    return;
+
+                _buildAction = value;
+
+                if (Observer != null)
+                    Observer.OnItemModified(this);
+            }
+        }
+
+        [Category("Settings")]
+        [Description("The importer used to load the content file.")]
         [TypeConverter(typeof(ImporterConverter))]
         public ImporterTypeDescription Importer
         {
@@ -53,20 +91,22 @@ namespace MonoGame.Tools.Pipeline
                     return;
 
                 _importer = value;
-                ImporterName = _importer.TypeName;
+                ImporterName = _importer.TypeName;                
 
-                View.UpdateProperties(this);
-
-                // Validate that our processor can accept input content of the type
-                // output by the new importer.                
-                if (_processor == null || _processor.InputType != _importer.OutputType)
+                // Validate that our processor can accept input content of the type output by the new importer.
+                if ((_processor == null || _processor.InputType != _importer.OutputType) && _processor != PipelineTypes.MissingProcessor)
                 {
                     // If it cannot, set the default processor.
                     Processor = PipelineTypes.FindProcessor(_importer.DefaultProcessor, _importer);
                 }
+
+                if (Observer != null)
+                    Observer.OnItemModified(this);
             }
         }
 
+        [Category("Settings")]
+        [Description("The processor used to transform the content for runtime use.")]
         [TypeConverter(typeof(ProcessorConverter))]
         public ProcessorTypeDescription Processor
         {
@@ -87,8 +127,9 @@ namespace MonoGame.Tools.Pipeline
                 {
                     ProcessorParams.Add(p.Name, p.DefaultValue);
                 }
-                
-                View.UpdateProperties(this);
+
+                if (Observer != null)
+                    Observer.OnItemModified(this);
 
                 // Note:
                 // There is no need to validate that the new processor can accept input
@@ -99,34 +140,54 @@ namespace MonoGame.Tools.Pipeline
 
         public void ResolveTypes()
         {
-            Importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));            
-            //Processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
-
-            // ProcessorParams get deserialized as strings
-            // this code converts them to object(s) of their actual type
-            // so that the correct editor appears within the property grid.
-            foreach (var p in Processor.Properties)
+            if (BuildAction == BuildAction.Copy)
             {
-                if (!ProcessorParams.ContainsKey(p.Name))
+                // Copy items do not have importers or processors.
+                _importer = PipelineTypes.NullImporter;
+                _processor = PipelineTypes.NullProcessor;
+            }
+            else
+            {
+                _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(OriginalPath));
+                if (_importer != null && (string.IsNullOrEmpty(ImporterName) || ImporterName != _importer.TypeName))
+                    ImporterName = _importer.TypeName;
+
+                if (_importer == null)
+                    _importer = PipelineTypes.MissingImporter;
+
+                _processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
+                if (_processor != null && (string.IsNullOrEmpty(ProcessorName) || ProcessorName != _processor.TypeName))
+                    ProcessorName = _processor.TypeName;
+
+                if (_processor == null)
+                    _processor = PipelineTypes.MissingProcessor;
+
+                // ProcessorParams get deserialized as strings
+                // this code converts them to object(s) of their actual type
+                // so that the correct editor appears within the property grid.
+                foreach (var p in _processor.Properties)
                 {
-                    ProcessorParams[p.Name] = p.DefaultValue;
-                }
-                else
-                {
-                    var src = ProcessorParams[p.Name];
-                    if (src != null)
+                    if (!ProcessorParams.ContainsKey(p.Name))
                     {
-                        var srcType = src.GetType();
-
-                        var converter = TypeDescriptor.GetConverter(p.Type);
-
-                        // Should we throw an exception here?
-                        // This property will actually not be editable in the property grid
-                        // since we do not have a type converter for it.
-                        if (converter.CanConvertFrom(srcType))
+                        ProcessorParams[p.Name] = p.DefaultValue;
+                    }
+                    else
+                    {
+                        var src = ProcessorParams[p.Name];
+                        if (src != null)
                         {
-                            var dst = converter.ConvertFrom(src);
-                            ProcessorParams[p.Name] = dst;
+                            var srcType = src.GetType();
+
+                            var converter = PipelineTypes.FindConverter(p.Type);
+
+                            // Should we throw an exception here?
+                            // This property will actually not be editable in the property grid
+                            // since we do not have a type converter for it.
+                            if (converter.CanConvertFrom(srcType))
+                            {
+                                var dst = converter.ConvertFrom(null, CultureInfo.InvariantCulture, src);
+                                ProcessorParams[p.Name] = dst;
+                            }
                         }
                     }
                 }
@@ -135,120 +196,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override string ToString()
         {
-            return System.IO.Path.GetFileName(SourceFile);
+            return System.IO.Path.GetFileName(OriginalPath);
         }
     }
-
-    //internal class EditerContentItem
-    //{
-    //    private ContentItem _contentItem;
-    //    private ImporterTypeDescription _importer;
-
-    //    public EditerContentItem(ContentItem item)
-    //    {
-    //        _contentItem = item;
-    //    }
-
-    //    public string Name { get { return _contentItem.Label; } }
-
-    //    public ImporterTypeDescription Importer
-    //    {
-    //        get
-    //        {
-    //            return _importer;
-    //        }
-
-    //        set
-    //        {
-    //            _importer = value;
-    //        }
-    //    }
-    //}
-
-    //internal class ContentItemTypeDescriptor : ICustomTypeDescriptor
-    //{
-    //    private readonly ContentItem _target;
-    //    private readonly Type _targetType;
-    //    private readonly PropertyDescriptorCollection _propCache;
-
-    //    public ContentItemTypeDescriptor(ContentItem obj)
-    //    {
-    //        _target = obj;
-    //        _targetType = obj.GetType();
-
-    //        _propCache = new PropertyDescriptorCollection(null);
-    //        foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(_target, null, true))
-    //        {
-    //            _propCache.Add(prop);
-    //        }
-    //    }
-
-    //    object ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor pd)
-    //    {
-    //        return _target;
-    //    }
-
-    //    AttributeCollection ICustomTypeDescriptor.GetAttributes()
-    //    {
-    //        return TypeDescriptor.GetAttributes(_target, true);
-    //    }
-
-    //    string ICustomTypeDescriptor.GetClassName()
-    //    {
-    //        return TypeDescriptor.GetClassName(_target, true);
-    //    }
-
-    //    public string GetComponentName()
-    //    {
-    //        return TypeDescriptor.GetComponentName(_target);
-    //    }
-
-    //    public TypeConverter GetConverter()
-    //    {
-    //        return TypeDescriptor.GetConverter(_target);
-    //    }
-
-    //    public EventDescriptor GetDefaultEvent()
-    //    {
-    //        return TypeDescriptor.GetDefaultEvent(_target);
-    //    }
-
-    //    public PropertyDescriptor GetDefaultProperty()
-    //    {
-    //        return TypeDescriptor.GetDefaultProperty(_target);
-    //    }
-
-    //    public object GetEditor(Type editorBaseType)
-    //    {
-    //        return TypeDescriptor.GetEditor(_target, editorBaseType);
-    //    }
-
-    //    public EventDescriptorCollection GetEvents()
-    //    {
-    //        return TypeDescriptor.GetEvents(_target);
-    //    }
-
-    //    public EventDescriptorCollection GetEvents(Attribute[] attributes)
-    //    {
-    //        return TypeDescriptor.GetEvents(_target, attributes);
-    //    }       
-
-    //    PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties()
-    //    {
-    //        return ((ICustomTypeDescriptor)this).GetProperties(null);
-    //    }
-
-    //    public virtual PropertyDescriptorCollection GetProperties(Attribute[] attributes)
-    //    {
-    //        var results = new PropertyDescriptorCollection(null);
-    //        results.Add( new PropertyDescriptor())
-    //        foreach (var i in TypeDescriptor.GetProperties(_target, null, true))
-    //        {
-    //            _propCache.Add(prop);
-    //        }
-
-    //        // We currently ignore the attributes parameter b/c we don't need it and it complicates the implementation here.
-    //        return _propCache;
-    //    }
-    //}
 }
