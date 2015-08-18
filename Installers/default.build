@@ -84,6 +84,7 @@
         <fileset basedir="../ThirdParty/Dependencies/makeself"/>
       </copy>
       <copy tofile="Linux/InstallerData/Data/Main/libstdc++.so.6" file="../ThirdParty/Dependencies/assimp/libstdc++.so.6" />
+      <echo file="Linux/InstallerData/Data/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
       <get src="http://addins.monodevelop.com/Stable/Linux/5.0/MonoDevelop.MonoGame-3.4.0.455.mpack" dest="Linux/InstallerData/Data/Main/MonoDevelop.MonoGame.mpack" failonerror="false"/>
       
       <choose>
