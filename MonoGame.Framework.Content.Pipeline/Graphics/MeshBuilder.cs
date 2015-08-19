@@ -41,12 +41,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="indexIntoVertexCollection">Index of the inserted vertex, in the collection. This corresponds to the value returned by <see cref="CreatePosition"/>.</param>
         public void AddTriangleVertex(int indexIntoVertexCollection)
         {
-            _currentGeometryContent.Vertices.Add(indexIntoVertexCollection);
+            _currentGeometryContent.Indices.Add(indexIntoVertexCollection);
         }
 
 
         public int CreateVertexChannel<T>(string usage)
         {
+            if(_currentGeometryContent == null)
+                _currentGeometryContent = new GeometryContent();
             _currentGeometryContent.Vertices.Channels.Add<T>(usage, null);
             return _currentGeometryContent.Vertices.Channels.Count - 1;
         }

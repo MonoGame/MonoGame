@@ -94,6 +94,7 @@
     <Compile Include="ContentPipeline\FontDescriptionTests.cs" />
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs" />
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs" />
+    <Compile Include="ContentPipeline\MeshBuilderTests.cs" />
     <Compile Include="ContentPipeline\ModelProcessorTests.cs" />
     <Compile Include="ContentPipeline\Mp3ImporterTests.cs" />
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs" />
