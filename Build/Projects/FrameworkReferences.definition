@@ -120,6 +120,30 @@
       Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />
   </Platform>
 
+  <Platform Type="Windows81">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.dll" />
+    <Binary
+      Name="SharpDX.Direct2D1"
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.Direct2D1.dll" />
+    <Binary
+      Name="SharpDX.Direct3D11"
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.Direct3D11.dll" />
+    <Binary
+      Name="SharpDX.DXGI"
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.DXGI.dll" />
+    <Binary
+      Name="SharpDX.MediaFoundation"
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.MediaFoundation.dll" />
+    <Binary
+      Name="SharpDX.XAudio2"
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XAudio2.dll" />
+    <Binary
+      Name="SharpDX.XInput"
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />
+  </Platform>
+
   <Platform Type="WindowsGL">
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
