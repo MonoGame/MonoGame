@@ -43,6 +43,10 @@
     <Reference Include="MonoGame.Framework.Windows8" />
   </Platform>
 
+  <Platform Type="Windows81">
+    <Reference Include="MonoGame.Framework.Windows81" />
+  </Platform>
+
   <Platform Type="WindowsGL">
     <Reference Include="System.Core" />
     <Reference Include="Lidgren.Network" />
