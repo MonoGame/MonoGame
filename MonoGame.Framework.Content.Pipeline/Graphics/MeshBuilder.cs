@@ -8,6 +8,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private readonly MeshContent _meshContent;
         private GeometryContent _currentGeometryContent;
 
+        private bool _finishedAddingPositions = false;
+
         /// <summary>
         /// Gets or sets the current value for position merging of the mesh.
         /// </summary>
@@ -41,7 +43,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="indexIntoVertexCollection">Index of the inserted vertex, in the collection. This corresponds to the value returned by <see cref="CreatePosition"/>.</param>
         public void AddTriangleVertex(int indexIntoVertexCollection)
         {
-            _currentGeometryContent.Indices.Add(indexIntoVertexCollection);
+            _finishedAddingPositions = true;
+            //Add the vertex to the mesh and then add the vertex position to the indices list
+            int pos = _currentGeometryContent.Vertices.Add(indexIntoVertexCollection);
+            _currentGeometryContent.Indices.Add(pos);
         }
 
 
@@ -72,6 +77,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Index of the vertex being inserted.</returns>
         public int CreatePosition(Vector3 pos)
         {
+            if (_finishedAddingPositions)
+                throw new InvalidOperationException("Cannot add postions after calling AddTriangleVertex");
+
             _meshContent.Positions.Add(pos);
             return _meshContent.Positions.Count - 1;
         }
