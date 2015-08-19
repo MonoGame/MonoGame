@@ -23,7 +23,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Gets or sets the name of the current  <see cref="MeshContent"/> object being processed.
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get
+            {
+                return _meshContent.Name;
+            }
+            set
+            {
+                _meshContent.Name = value;
+            }
+        }
 
         /// <summary>
         /// Reverses the triangle winding order of the specified mesh.
@@ -33,8 +43,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         private MeshBuilder(string name)
         {
-            Name = name;
             _meshContent = new MeshContent();
+            Name = name;
         }
 
         /// <summary>
@@ -44,6 +54,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public void AddTriangleVertex(int indexIntoVertexCollection)
         {
             _finishedAddingPositions = true;
+
+            if (_currentGeometryContent == null)
+                _currentGeometryContent = new GeometryContent();
+
             //Add the vertex to the mesh and then add the vertex position to the indices list
             int pos = _currentGeometryContent.Vertices.Add(indexIntoVertexCollection);
             _currentGeometryContent.Indices.Add(pos);
@@ -93,7 +107,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (MergeDuplicatePositions)
                 MeshHelper.MergeDuplicatePositions(_meshContent, MergePositionTolerance);
 
-            MeshHelper.MergeDuplicateVertices(_meshContent);
+            //TODO: requires implementation
+            //MeshHelper.MergeDuplicateVertices(_meshContent);
+
             MeshHelper.CalculateNormals(_meshContent, false);
 
             if (SwapWindingOrder)
@@ -134,6 +150,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="channelData">New data values for the vertex data. The data type being set must match the data type for the vertex channel specified by vertexDataIndex.</param>
         public void SetVertexChannelData(int vertexDataIndex, Object channelData)
         {
+            if (_currentGeometryContent.Vertices.Channels[vertexDataIndex].ElementType != channelData.GetType())
+                throw new InvalidOperationException(string.Format("Chanel {0} data has a different type from input. Expected: {1}. Actual {2}",
+                    vertexDataIndex, _currentGeometryContent.Vertices.Channels[vertexDataIndex].ElementType, channelData.GetType()));
+
             _currentGeometryContent.Vertices.Channels[vertexDataIndex].Items.Add(channelData);
         }
 
