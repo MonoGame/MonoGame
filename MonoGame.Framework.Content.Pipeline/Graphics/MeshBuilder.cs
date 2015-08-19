@@ -44,6 +44,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private MeshBuilder(string name)
         {
             _meshContent = new MeshContent();
+            _meshContent.Transform = Matrix.Identity;
             Name = name;
         }
 

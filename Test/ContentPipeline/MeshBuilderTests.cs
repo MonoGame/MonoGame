@@ -85,10 +85,15 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(1, output.Geometry[0].Indices[1]);
             Assert.AreEqual(2, output.Geometry[0].Indices[2]);
 
+            Assert.AreEqual(0, output.Geometry[0].Vertices.PositionIndices[0]);
+            Assert.AreEqual(1, output.Geometry[0].Vertices.PositionIndices[1]);
+            Assert.AreEqual(2, output.Geometry[0].Vertices.PositionIndices[2]);
+
             //Check if normals are generated
             Assert.NotNull(output.Geometry[0].Vertices.Channels[VertexChannelNames.Normal(0)]);
 
             Assert.AreEqual(material1, output.Geometry[0].Material);
+            Assert.AreEqual(Matrix.Identity, output.Transform);
 
             Assert.AreEqual(3, output.Positions.Count);
             Assert.AreEqual("Mesh1", output.Name);
