@@ -154,6 +154,28 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <summary>
+        /// Iterates the list of playing instances, stop them and return them to the pool if they are instances of the given SoundEffect.
+        /// </summary>
+        /// <param name="effect">The SoundEffect</param>
+        internal static void StopPooledInstances(SoundEffect effect)
+        {
+            SoundEffectInstance inst = null;
+
+            for (var x = 0; x < _playingInstances.Count; x++)
+            {
+                inst = _playingInstances[x];
+                if (inst.State != SoundState.Stopped && inst._effect == effect)
+                {
+                    inst.Stop();
+                    Add(inst);
+                    continue;
+                }
+
+                x++;
+            }
+        }
+
         internal static void UpdateMasterVolume()
         {
             foreach (var inst in _playingInstances)
