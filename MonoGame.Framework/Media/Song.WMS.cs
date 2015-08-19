@@ -11,7 +11,6 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        private SharpDX.MediaFoundation.MediaSource _mediaSource;
         private Topology _topology;
 
         internal Topology Topology { get { return _topology; } }
@@ -25,17 +24,18 @@ namespace Microsoft.Xna.Framework.Media
 
             MediaFactory.CreateTopology(out _topology);
 
+            SharpDX.MediaFoundation.MediaSource mediaSource;
             {
                 SourceResolver resolver = new SourceResolver();
 
                 ComObject source = resolver.CreateObjectFromURL(FilePath, SourceResolverFlags.MediaSource);
-                _mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
+                mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
                 resolver.Dispose();
                 source.Dispose();
             }
 
             PresentationDescriptor presDesc;
-            _mediaSource.CreatePresentationDescriptor(out presDesc);
+            mediaSource.CreatePresentationDescriptor(out presDesc);
 
             for (var i = 0; i < presDesc.StreamDescriptorCount; i++)
             {
@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Media
                     TopologyNode sourceNode;
                     MediaFactory.CreateTopologyNode(TopologyType.SourceStreamNode, out sourceNode);
 
-                    sourceNode.Set(TopologyNodeAttributeKeys.Source, _mediaSource);
+                    sourceNode.Set(TopologyNodeAttributeKeys.Source, mediaSource);
                     sourceNode.Set(TopologyNodeAttributeKeys.PresentationDescriptor, presDesc);
                     sourceNode.Set(TopologyNodeAttributeKeys.StreamDescriptor, desc);
 
@@ -78,6 +78,7 @@ namespace Microsoft.Xna.Framework.Media
             }
 
             presDesc.Dispose();
+            mediaSource.Dispose();
         }
 
         private void PlatformDispose(bool disposing)
@@ -86,12 +87,6 @@ namespace Microsoft.Xna.Framework.Media
             {
                 _topology.Dispose();
                 _topology = null;
-            }
-            if (_mediaSource != null)
-            {
-                _mediaSource.Shutdown();
-                _mediaSource.Dispose();
-                _mediaSource = null;
             }
         }
         
