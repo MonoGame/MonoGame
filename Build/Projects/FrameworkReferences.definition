@@ -204,9 +204,6 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.XAudio2.dll" />
-    <Binary
-      Name="SharpDX.XInput"
-      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.XInput.dll" />
   </Platform>
 	
   <Platform Type="Web">
