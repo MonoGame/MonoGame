@@ -58,8 +58,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            if (index >= WGI.Gamepad.Gamepads.Count && index == 0)
-                return GetDefaultState();
+            if (index >= WGI.Gamepad.Gamepads.Count)
+                return (index == 0 ? GetDefaultState() : GamePadState.Default);
 
             var state = WGI.Gamepad.Gamepads[index].GetCurrentReading();
 
