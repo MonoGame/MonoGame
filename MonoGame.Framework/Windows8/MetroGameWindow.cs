@@ -40,6 +40,11 @@ namespace Microsoft.Xna.Framework
 
         internal bool IsExiting { get; set; }
 
+        /// <summary>
+        /// Used to stop orientation change events and the run loop from running at the same time
+        /// </summary>
+        internal readonly object RunLock = new object();
+
         #endregion
 
         #region Public Properties
@@ -227,15 +232,18 @@ namespace Microsoft.Xna.Framework
 
         private void DisplayProperties_OrientationChanged(object sender)
         {
-            // Set the new orientation.
-            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            lock (RunLock)
+            {
+                // Set the new orientation.
+                _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
 
-            // Call the user callback.
-            OnOrientationChanged();
+                // Call the user callback.
+                OnOrientationChanged();
 
-            // If we have a valid client bounds then update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                Game.graphicsDeviceManager.ApplyChanges();
+                // If we have a valid client bounds then update the graphics device.
+                if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                    Game.graphicsDeviceManager.ApplyChanges();
+            }
         }
 
         protected override void SetTitle(string title)
