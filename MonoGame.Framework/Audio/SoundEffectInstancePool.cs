@@ -140,15 +140,6 @@ namespace Microsoft.Xna.Framework.Audio
                     Add(inst);
                     continue;
                 }
-                else if (inst._effect.IsDisposed)
-                {
-                    Add(inst);
-                    // Instances created through SoundEffect.CreateInstance need to be disposed when
-                    // their owner SoundEffect is disposed.
-                    if (!inst._isPooled)
-                        inst.Dispose();
-                    continue;
-                }
 
                 x++;
             }
@@ -167,7 +158,7 @@ namespace Microsoft.Xna.Framework.Audio
                 inst = _playingInstances[x];
                 if (inst.State != SoundState.Stopped && inst._effect == effect)
                 {
-                    inst.Stop();
+                    inst.Stop(true); // stop immediatly
                     Add(inst);
                     continue;
                 }
