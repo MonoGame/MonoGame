@@ -152,7 +152,11 @@ namespace Microsoft.Xna.Framework.Media
                 _session.Stop();
                 _session.ClearTopologies();
                 _session.Close();
-                _volumeController.Dispose();
+                if (_volumeController != null)
+                {
+                    _volumeController.Dispose();
+                    _volumeController = null;
+                }
                 _clock.Dispose();
             }
 
@@ -198,8 +202,11 @@ namespace Microsoft.Xna.Framework.Media
             _session.ClearTopologies();
             _session.Stop();
             _session.Close();
-            _volumeController.Dispose();
-            _volumeController = null;
+            if (_volumeController != null)
+            {
+                _volumeController.Dispose();
+                _volumeController = null;
+            }
             _clock.Dispose();
             _clock = null;
         }
