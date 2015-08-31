@@ -34,7 +34,7 @@
 
   <Properties>
 
-    <NoWarn>1591,0436</NoWarn>
+    <NoWarn>1591,0436,0419</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>

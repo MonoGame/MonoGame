@@ -9,24 +9,24 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     public struct GraphicsMetrics
     {
-        internal ulong _spriteCount;
-        internal ulong _drawCount;
-        internal ulong _primitiveCount;
+        internal long _spriteCount;
+        internal long _drawCount;
+        internal long _primitiveCount;
 
         /// <summary>
         /// The count of sprites and text characters rendered via <see cref="SpriteBatch"/>.
         /// </summary>
-        public ulong SpriteCount { get { return _spriteCount; } }
+        public long SpriteCount { get { return _spriteCount; } }
 
         /// <summary>
         /// The count of draw calls.
         /// </summary>
-        public ulong DrawCount { get { return _drawCount; } }
+        public long DrawCount { get { return _drawCount; } }
 
         /// <summary>
         /// The count of rendered primitives.
         /// </summary>
-        public ulong PrimitiveCount { get { return _primitiveCount; } }
+        public long PrimitiveCount { get { return _primitiveCount; } }
 
         /// <summary>
         /// Returns the difference between two sets of metrics.

@@ -324,6 +324,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        //TODO Implement
+        public Color BlendFactor
+        {
+            get;
+            set;
+        }
+
         public BlendState BlendState
         {
 			get { return _blendState; }
@@ -837,7 +844,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (long) primitiveCount;
             }
 
             PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
@@ -873,7 +880,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (long) primitiveCount;
             }
 
             PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
@@ -896,7 +903,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (long) primitiveCount;
             }
 
             PlatformDrawPrimitives(primitiveType, vertexStart, vertexCount);
@@ -943,7 +950,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (long) primitiveCount;
             }
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
@@ -990,7 +997,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (long) primitiveCount;
             }
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
