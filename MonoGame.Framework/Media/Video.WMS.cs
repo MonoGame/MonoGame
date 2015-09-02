@@ -52,6 +52,8 @@ namespace Microsoft.Xna.Framework.Media
                         {
                             _video._session.BeginGetEvent(this, null);
                         }
+
+                        // If we don't dispose the event we leak memory.
                         ev.Dispose();
                     });
                 });
@@ -205,11 +207,14 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformDispose(bool disposing)
         {
-            // Referencing https://msdn.microsoft.com/en-us/library/windows/desktop/ms703190(v=vs.85).aspx
-            // 8a. We must close the session and dispose its resources after the close completes asynchronously.
-            if (_session != null)
+            if (disposing)
             {
-                _session.Close();
+                // Referencing https://msdn.microsoft.com/en-us/library/windows/desktop/ms703190(v=vs.85).aspx
+                // 8a. We must close the session and dispose its resources after the close completes asynchronously.
+                if (_session != null)
+                {
+                    _session.Close();
+                }
             }
         }
 
