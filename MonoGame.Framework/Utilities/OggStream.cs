@@ -1,4 +1,12 @@
-﻿using System;
+﻿// This code originated from:
+//
+//    http://theinstructionlimit.com/ogg-streaming-using-opentk-and-nvorbis
+//    https://github.com/renaudbedard/nvorbis/
+//
+// It was released to the public domain by the author (Renaud Bedard).
+// No other license is intended or required. 
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;

@@ -34,8 +34,16 @@ namespace Microsoft.Xna.Framework.Media
             {
                 var ev = _session.EndGetEvent(asyncResultRef);
 
-                if (ev.TypeInfo == MediaEventTypes.EndOfPresentation)
-                    OnSongFinishedPlaying(null, null);
+                switch (ev.TypeInfo)
+                {
+                    case MediaEventTypes.EndOfPresentation:
+                        OnSongFinishedPlaying(null, null);
+                        break;
+                    case MediaEventTypes.SessionTopologyStatus:
+                        if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                            OnTopologyReady();
+                        break;
+                }
 
                 _session.BeginGetEvent(this, null);
             }
@@ -110,7 +118,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void SetChannelVolumes()
         {
-            if (_volumeController != null)
+            if (_volumeController != null && !_volumeController.IsDisposed)
             {
                 float volume = _volume;
                 if (IsMuted)
@@ -131,38 +139,6 @@ namespace Microsoft.Xna.Framework.Media
 
         #endregion
 
-        internal static IntPtr GetVolumeObj(MediaSession session)
-        {
-            // Get the volume interface - shared between MediaPlayer and VideoPlayer
-            const int retries = 10;
-            const int sleepTimeFactor = 50;
-
-            var volumeObj = (IntPtr)0;
-
-            //See https://github.com/mono/MonoGame/issues/2620
-            //MediaFactory.GetService throws a SharpDX exception for unknown reasons. it appears retrying will solve the problem but there
-            //is no specific number of times, nor pause that works. So we will retry N times with an increasing Sleep between each one
-            //before finally throwing the error we saw in the first place.
-            for (int i = 0; i < retries; i++)
-            {
-                try
-                {
-                    MediaFactory.GetService(session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObj);
-                    break;
-                }
-                catch (SharpDXException)
-                {
-                    if (i == retries - 1)
-                    {
-                        throw;
-                    }
-                    Debug.WriteLine("MediaFactory.GetService failed({0}) sleeping for {1} ms", i + 1, i * sleepTimeFactor);
-                    Thread.Sleep(i * sleepTimeFactor); //Sleep for longer and longer times
-                }
-            }
-            return volumeObj;
-        }
-
         private static void PlatformPause()
         {
             _session.Pause();
@@ -176,19 +152,13 @@ namespace Microsoft.Xna.Framework.Media
                 _session.Stop();
                 _session.ClearTopologies();
                 _session.Close();
-                _volumeController.Dispose();
+                if (_volumeController != null)
+                {
+                    _volumeController.Dispose();
+                    _volumeController = null;
+                }
                 _clock.Dispose();
             }
-
-            // Set the new song.
-            _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
-
-            // Get the volume interface.
-            _volumeController = CppObject.FromPointer<AudioStreamVolume>(MediaPlayer.GetVolumeObj(_session));
-            SetChannelVolumes();
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
 
             //create the callback if it hasn't been created yet
             if (_callback == null)
@@ -197,9 +167,28 @@ namespace Microsoft.Xna.Framework.Media
                 _session.BeginGetEvent(_callback, null);
             }
 
+            // Set the new song.
+            _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
+
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
+
             // Start playing.
             var varStart = new Variant();
             _session.Start(null, varStart);
+        }
+
+        private static void OnTopologyReady()
+        {
+            if (_session.IsDisposed)
+                return;
+
+            // Get the volume interface.
+            IntPtr volumeObjectPtr;
+            MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
+            _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
+
+            SetChannelVolumes();
         }
 
         private static void PlatformResume()
@@ -213,8 +202,11 @@ namespace Microsoft.Xna.Framework.Media
             _session.ClearTopologies();
             _session.Stop();
             _session.Close();
-            _volumeController.Dispose();
-            _volumeController = null;
+            if (_volumeController != null)
+            {
+                _volumeController.Dispose();
+                _volumeController = null;
+            }
             _clock.Dispose();
             _clock = null;
         }

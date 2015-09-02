@@ -6,6 +6,13 @@ if [ "$(id -u)" != "0" ]; then
 	exit 1
 fi
 
+#check previous versions
+if [ -f /bin/mgcb ]
+then
+	echo "Please uninstall any previous versions of MonoGame SDK" 1>&2
+	exit 1
+fi
+
 #installation
 DIR=$(pwd)
 IDIR="/opt/monogame-pipeline"
@@ -72,6 +79,14 @@ then
 		esac
 	fi
 fi
+
+#monodevelop addin
+read -p "Install monodevelop addin(Y, n): " choice2
+case "$choice2" in 
+	n|N ) ;;
+	*)
+	sudo -H -u $SUDO_USER bash -c 'mdtool setup install $DIR/Main/MonoDevelop.MonoGame.mpack'
+esac
 
 #fix permissions
 usr="$SUDO_USER"

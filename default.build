@@ -3,7 +3,6 @@
   <description>Default MonoGame Automated Build script</description>
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
-  <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
   <property name="msbuild12dir" value="C:\Program Files (x86)\MSBuild\12.0\Bin" />
   <property name="msbuild14dir" value="C:\Program Files (x86)\MSBuild\14.0\Bin" />
 
@@ -35,23 +34,12 @@
     <call target="build_windowsphone" />
     <call target="build_windowsphone81" />
     <call target="build_windows10" />
-    <call target="build_psm" />
     <call target="build_web" />
     <call target="build_linux"/>
     <call target="build_android" />
     <call target="build_mac" />
     <call target="build_ios" />
 
-  </target>
-
-  <target name="build_psm" description="Build Play Station Mobile" depends="clean">
-    <if test="${os == 'Win32NT'}">
-      <if test="${file::exists('C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin\mdtool.exe')}">
-        <exec program="Protobuild" commandline="-generate PSMobile" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.PSMobile.sln" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.PSMobile.sln" />
-      </if>
-    </if>
   </target>
 
   <target name="build_windows" description="Build Windows" depends="clean">

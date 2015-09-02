@@ -19,11 +19,6 @@ namespace Microsoft.Xna.Framework.Audio
         // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
         private const int MAX_PLAYING_INSTANCES = 256;
 
-#elif PSM
-
-        // Reference: http://community.eu.playstation.com/t5/Audio/Multiple-sound-effects/m-p/16681132/highlight/true#M49
-        private const int MAX_PLAYING_INSTANCES = 128;
-
 #elif WINDOWS_PHONE
 
         // Reference: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.instanceplaylimitexception.aspx

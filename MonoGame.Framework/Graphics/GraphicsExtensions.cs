@@ -558,10 +558,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
-#if IOS
+#if IOS || ANDROID
 				glInternalFormat = PixelInternalFormat.Rgba;
-#elif ANDROID
-				glInternalFormat = (PixelInternalFormat)All.Rgba4;
 #else
 				glInternalFormat = PixelInternalFormat.Rgba4;
 #endif
