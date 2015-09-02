@@ -67,6 +67,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Sony PlayStation Mobile (PS Vita)
         /// (MonoGame)
         /// </summary>
+        [Obsolete("PlayStation Mobile is no longer supported")]
         PlayStationMobile,
 
         /// <summary>

@@ -149,6 +149,7 @@ namespace MonoGame.Tests.ContentPipeline
                     Assert.AreEqual(Color.Red, outFace.GetPixel(x, y));
         }
 
+#if !XNA
         void CompressDefault<T>(TargetPlatform platform, Color color)
         {
             var context = new TestProcessorContext(platform, "dummy.xnb");
@@ -217,5 +218,6 @@ namespace MonoGame.Tests.ContentPipeline
         {
             CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f);
         }
+#endif
     }
 }
