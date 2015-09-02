@@ -34,13 +34,6 @@
       Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
   </Platform>
 
-  <Platform Type="PSMobile">
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Sce.PlayStation.Core" />
-    <Reference Include="Lidgren.Network" />
-  </Platform>
-
   <Platform Type="Windows">
     <Reference Include="System.Core" />
     <Reference Include="Lidgren.Network" />
