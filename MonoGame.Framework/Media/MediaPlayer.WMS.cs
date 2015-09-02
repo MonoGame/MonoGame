@@ -17,8 +17,11 @@ namespace Microsoft.Xna.Framework.Media
         private static MediaSession _session;
         private static AudioStreamVolume _volumeController;
         private static PresentationClock _clock;
-        private static Song _newSong;
+        private static Song _nextSong;
         private static Song _currentSong;
+
+        private enum SessionState { Stopped, Stopping, Started, Paused, Ended }
+        private static SessionState _sessionState = SessionState.Stopped;
 
         private static Guid AudioStreamVolumeGuid;
 
@@ -57,6 +60,7 @@ namespace Microsoft.Xna.Framework.Media
             switch (ev.TypeInfo)
             {
                 case MediaEventTypes.EndOfPresentation:
+                    _sessionState = SessionState.Ended;
                     OnSongFinishedPlaying(null, null);
                     break;
                 case MediaEventTypes.SessionTopologyStatus:
@@ -121,7 +125,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private static TimeSpan PlatformGetPlayPosition()
         {
-            if (State == MediaState.Stopped)
+            if ((_sessionState == SessionState.Stopped) || (_sessionState == SessionState.Stopping))
                 return TimeSpan.Zero;
             try
             {
@@ -170,30 +174,47 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformPause()
         {
+            if (_sessionState != SessionState.Started)
+                return;
+            _sessionState = SessionState.Paused;
             _session.Pause();
         }
 
         private static void PlatformPlaySong(Song song)
         {
             if (_currentSong == song)
+                ReplayCurrentSong(song);
+            else
+                PlayNewSong(song);
+        }
+
+        private static void ReplayCurrentSong(Song song)
+        {
+            if (_sessionState == SessionState.Stopping)
             {
-                _session.Start(null, PositionBeginning);
+                // The song will be started after the SessionStopped event is received
+                _nextSong = song;
                 return;
             }
 
-            if (State != MediaState.Stopped)
+            StartSession(PositionBeginning);
+        }
+
+        private static void PlayNewSong(Song song)
+        {
+            if (_sessionState != SessionState.Stopped)
             {
                 // The session needs to be stopped to reset the play position
                 // The new song will be started after the SessionStopped event is received
-                _newSong = song;
-                _session.Stop();
+                _nextSong = song;
+                PlatformStop();
                 return;
             }
 
-            StartSong(song);
+            StartNewSong(song);
         }
 
-        private static void StartSong(Song song)
+        private static void StartNewSong(Song song)
         {
             if (_volumeController != null)
             {
@@ -205,10 +226,16 @@ namespace Microsoft.Xna.Framework.Media
 
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
 
-            _session.Start(null, PositionBeginning);
+            StartSession(PositionBeginning);
 
             // The volume service won't be available until the session topology
             // is ready, so we now need to wait for the event indicating this
+        }
+
+        private static void StartSession(Variant startPosition)
+        {
+            _sessionState = SessionState.Started;
+            _session.Start(null, startPosition);
         }
 
         private static void OnTopologyReady()
@@ -222,20 +249,35 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformResume()
         {
-            _session.Start(null, PositionCurrent);
+            if (_sessionState != SessionState.Paused)
+                return;
+            StartSession(PositionCurrent);
         }
 
         private static void PlatformStop()
         {
+            if ((_sessionState == SessionState.Stopped) || (_sessionState == SessionState.Stopping))
+                return;
+            bool hasFinishedPlaying = (_sessionState == SessionState.Ended);
+            _sessionState = SessionState.Stopping;
+            if (hasFinishedPlaying)
+            {
+                // The play position needs to be reset before stopping otherwise the next song may not start playing
+                _session.Start(null, PositionBeginning);
+            }
             _session.Stop();
         }
 
         private static void OnSessionStopped()
         {
-            if (_newSong != null)
+            _sessionState = SessionState.Stopped;
+            if (_nextSong != null)
             {
-                StartSong(_newSong);
-                _newSong = null;
+                if (_nextSong != _currentSong)
+                    StartNewSong(_nextSong);
+                else
+                    StartSession(PositionBeginning);
+                _nextSong = null;
             }
         }
     }
