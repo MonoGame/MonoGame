@@ -73,15 +73,6 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (Device == null)
                 {
-#if !WINRT && DEBUG
-                    try
-                    {
-                        //Fails if the XAudio2 SDK is not installed
-                        Device = new XAudio2(XAudio2Flags.DebugEngine, ProcessorSpecifier.DefaultProcessor);
-                        Device.StartEngine();
-                    }
-                    catch
-#endif
                     {
                         Device = new XAudio2(XAudio2Flags.None, ProcessorSpecifier.DefaultProcessor);
                         Device.StartEngine();
@@ -89,11 +80,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
 
                 // Just use the default device.
-#if WINRT
                 string deviceId = null;
-#else
-                const int deviceId = 0;
-#endif
 
                 if (MasterVoice == null)
                 {
@@ -102,12 +89,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
-#if WINRT
                 Speakers = (Speakers)MasterVoice.ChannelMask;
-#else
-                var deviceDetails = Device.GetDeviceDetails(deviceId);
-                Speakers = deviceDetails.OutputFormat.ChannelMask;
-#endif
             }
             catch
             {
@@ -143,10 +125,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             var soundStream = new SoundStream(s);
             var dataStream = soundStream.ToDataStream();
+            var sampleLength = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
             CreateBuffers(  soundStream.Format,
                             dataStream,
                             0,
-                            (int)dataStream.Length);
+                            sampleLength);
         }
 
         private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)

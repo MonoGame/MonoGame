@@ -17,6 +17,7 @@
     $endif$
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
     <MonoGameContentBuilderExe></MonoGameContentBuilderExe>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>

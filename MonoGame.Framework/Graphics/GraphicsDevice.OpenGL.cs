@@ -193,6 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!string.IsNullOrEmpty(extstring))
             {
                 extensions.AddRange(extstring.Split(' '));
+#if DEBUG
 #if ANDROID
                 Android.Util.Log.Debug("MonoGame", "Supported extensions:");
 #else
@@ -203,6 +204,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Android.Util.Log.Debug("MonoGame", extension);
 #else
                     System.Diagnostics.Debug.WriteLine(extension);
+#endif
 #endif
             }
 

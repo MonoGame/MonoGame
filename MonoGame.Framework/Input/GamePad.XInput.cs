@@ -152,6 +152,8 @@ namespace Microsoft.Xna.Framework.Input
             if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
                 return GetDefaultState();
 
+            int packetNumber = 0;
+
             // Try to get the controller state.
             var gamepad = new SharpDX.XInput.Gamepad();
             try
@@ -159,6 +161,7 @@ namespace Microsoft.Xna.Framework.Input
                 SharpDX.XInput.State xistate;
                 var controller = _controllers[index];
                 _connected[index] = controller.GetState(out xistate);
+                packetNumber = xistate.PacketNumber;
                 gamepad = xistate.Gamepad;
             }
             catch (Exception ex)
@@ -202,6 +205,8 @@ namespace Microsoft.Xna.Framework.Input
                 triggers: triggers,
                 buttons: buttons,
                 dPad: dpadState);
+
+            state.PacketNumber = packetNumber;
 
             return state;
         }

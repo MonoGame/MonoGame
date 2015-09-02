@@ -45,12 +45,13 @@ using Microsoft.Xna.Framework;
 using MonoGame.Utilities;
 using System;
 using System.IO;
-
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.Storage;
 using System.Linq;
 using Windows.Storage.Search;
+#endif
 
+#if WINDOWS_STOREAPP
 namespace System.IO
 {
     public enum FileMode

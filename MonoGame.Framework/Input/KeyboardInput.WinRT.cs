@@ -311,6 +311,7 @@ namespace Microsoft.Xna.Framework.Input
             if (_inputTextBox != null && _inputPasswordBox != null)
             {
                 _inputTextBox.Text = InputText;
+                _inputTextBox.IsTextPredictionEnabled = false;
                 _inputTextBox.TextChanged += OnInputTextBoxTextChanged;
                 _inputTextBox.KeyUp += OnInputTextBoxKeyUp;
 
@@ -346,6 +347,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private void OnLayoutRootTapped(object sender, TappedRoutedEventArgs e)
         {
+            _buttons[0].Focus(FocusState.Programmatic); // Hide input panel
+
             if (e.OriginalSource == sender &&
                 IsLightDismissEnabled)
             {

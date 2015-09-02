@@ -371,6 +371,7 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
+            updateClientBounds = true;
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)
