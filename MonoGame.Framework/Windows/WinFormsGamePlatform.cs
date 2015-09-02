@@ -153,6 +153,7 @@ namespace MonoGame.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            Threading.Run();
             return true;
         }
 

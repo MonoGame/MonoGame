@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework
         static int mainThreadId;
 #endif
 
-#if ANDROID || LINUX
+#if ANDROID || LINUX || (WINDOWS && DIRECTX)
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
 #elif IOS
@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if (DIRECTX && !WINDOWS_PHONE) || PSM
+#if (DIRECTX && !WINDOWS_PHONE && !WINDOWS) || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif WINDOWS || ANGLE
+#elif (WINDOWS && !DIRECTX) || ANGLE
             lock (BackgroundContext)
             {
                 // Make the context current on this thread
@@ -226,7 +226,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID || LINUX
+#if ANDROID || LINUX || (WINDOWS && DIRECTX)
         static void Add(Action action)
         {
             lock (actions)

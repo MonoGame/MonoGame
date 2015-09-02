@@ -166,6 +166,14 @@ namespace Microsoft.Xna.Framework.Media
             return texture;
         }
 
+        public Texture2D TryGetTexture()
+        {
+            if (_currentVideo == null)
+                throw new InvalidOperationException("Operation is not valid due to the current state of the object");
+
+            return PlatformGetTexture();
+        }
+
         /// <summary>
         /// Pauses the currently playing video.
         /// </summary>
@@ -218,7 +226,7 @@ namespace Microsoft.Xna.Framework.Media
 
             for (int i = 0; i < retries; i++)
             {
-                if (State == MediaState.Playing )
+            if (State == MediaState.Playing )
                 {
                     break;
                 }
@@ -236,6 +244,34 @@ namespace Microsoft.Xna.Framework.Media
                 Stop();
                 throw new InvalidOperationException("cannot start video"); 
             }
+        }
+
+        public void PlayAsync(Video video)
+        {
+            if (video == null)
+                throw new ArgumentNullException("video is null.");
+
+            if (_currentVideo == video)
+            {
+                var state = State;
+
+                // No work to do if we're already
+                // playing this video.
+                if (state == MediaState.Playing)
+                    return;
+
+                // If we try to Play the same video
+                // from a paused state, just resume it instead.
+                if (state == MediaState.Paused)
+                {
+                    PlatformResume();
+                    return;
+                }
+            }
+
+            _currentVideo = video;
+
+            PlatformPlay();
         }
 
         /// <summary>
