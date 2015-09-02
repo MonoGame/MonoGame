@@ -125,10 +125,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             var soundStream = new SoundStream(s);
             var dataStream = soundStream.ToDataStream();
+            var sampleLength = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
             CreateBuffers(  soundStream.Format,
                             dataStream,
                             0,
-                            (int)dataStream.Length);
+                            sampleLength);
         }
 
         private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)
