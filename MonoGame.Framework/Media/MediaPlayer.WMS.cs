@@ -42,35 +42,26 @@ namespace Microsoft.Xna.Framework.Media
             {
                 var ev = _session.EndGetEvent(asyncResultRef);
 
-                // Execute the event handler on the main UI thread to avoid potential deadlocks or unexpected results
-                var task = Task.Factory.StartNew(
-                    () => OnMediaSessionEvent(ev),
-                    CancellationToken.None, TaskCreationOptions.None, _uiTaskScheduler);
-                task.Wait();
+                switch (ev.TypeInfo)
+                {
+                    case MediaEventTypes.EndOfPresentation:
+                        _sessionState = SessionState.Ended;
+                        OnSongFinishedPlaying(null, null);
+                        break;
+                    case MediaEventTypes.SessionTopologyStatus:
+                        if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
+                            OnTopologyReady();
+                        break;
+                    case MediaEventTypes.SessionStopped:
+                        OnSessionStopped();
+                        break;
+                }
 
                 _session.BeginGetEvent(this, null);
             }
 
             public AsyncCallbackFlags Flags { get; private set; }
             public WorkQueueId WorkQueueId { get; private set; }
-        }
-
-        private static void OnMediaSessionEvent(MediaEvent ev)
-        {
-            switch (ev.TypeInfo)
-            {
-                case MediaEventTypes.EndOfPresentation:
-                    _sessionState = SessionState.Ended;
-                    OnSongFinishedPlaying(null, null);
-                    break;
-                case MediaEventTypes.SessionTopologyStatus:
-                    if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
-                        OnTopologyReady();
-                    break;
-                case MediaEventTypes.SessionStopped:
-                    OnSessionStopped();
-                    break;
-            }
         }
 
         private static void PlatformInitialize()
