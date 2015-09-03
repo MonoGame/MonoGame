@@ -7,8 +7,6 @@ using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -28,7 +26,6 @@ namespace Microsoft.Xna.Framework.Media
         private static readonly Variant PositionCurrent = new Variant();
         private static readonly Variant PositionBeginning = new Variant { ElementType = VariantElementType.Long, Value = 0L };
 
-        private static TaskScheduler _uiTaskScheduler;
         private static Callback _callback;
 
         private class Callback : IAsyncCallback
@@ -71,8 +68,6 @@ namespace Microsoft.Xna.Framework.Media
 
             MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
-
-            _uiTaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
             _callback = new Callback();
             _session.BeginGetEvent(_callback, null);
