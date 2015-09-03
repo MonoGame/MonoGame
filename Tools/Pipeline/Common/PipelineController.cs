@@ -789,6 +789,13 @@ namespace MonoGame.Tools.Pipeline
                 DirectoryCopy(subdir.FullName, temppath);
             }
         }
+        
+        public void Include(IEnumerable<string> inputfiles, IEnumerable<string> inputfolders)
+        {
+            var action = new PipelineController.IncludeAction(this, inputfiles, inputfolders);
+            action.Do();
+            _actionStack.Add(action);
+        }
 
         public void Move (string[] paths, string[] newnames, FileType[] types)
         {
