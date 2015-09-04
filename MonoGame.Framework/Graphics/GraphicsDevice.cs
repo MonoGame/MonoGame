@@ -808,13 +808,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="primitiveType">The type of primitives in the index buffer.</param>
         /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
-        /// <param name="minVertexIndex">A hint of the lowest vertex indexed relative to baseVertex.</param>
-        /// <param name="numVertices">An hint of the maximum vertex indexed.</param>
+        /// <param name="unused">This is unused and remains here only for XNA API compatibility.</param>
+        /// <param name="unused2">This is unused and remains here only for XNA API compatibility.</param>
         /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
         /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
         [Obsolete("Use DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount) instead. In future versions this method can be removed.")]
-        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int unused, int unused2, int startIndex, int primitiveCount)
         {
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawIndexedPrimitives.");
