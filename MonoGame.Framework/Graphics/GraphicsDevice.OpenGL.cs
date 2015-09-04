@@ -311,8 +311,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
+            unchecked
+            {
+                ++_graphicsMetrics._clearCount;
+            }
+            
+            GL.Clear(bufferMask);
 
-			GL.Clear(bufferMask);
             GraphicsExtensions.CheckGLError();
            		
             // Restore the previous render state.
@@ -736,6 +741,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 GL.UseProgram(shaderProgram.Program);
                 GraphicsExtensions.CheckGLError();
+                unchecked
+                {
+                    ++_graphicsMetrics._pixelShaderCount;
+                    ++_graphicsMetrics._vertexShaderCount;
+                }
                 _shaderProgram = shaderProgram;
             }
 

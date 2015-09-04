@@ -847,12 +847,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     foreach (var view in _currentRenderTargets)
                     {
                         if (view != null)
+                        {
+                            unchecked
+                            {
+                                ++_graphicsMetrics._clearCount;
+                            }
 #if WINDOWS_UAP
 							_d3dContext.ClearRenderTargetView(view, new RawColor4(color.X, color.Y, color.Z, color.W));
 #else
-							_d3dContext.ClearRenderTargetView(view, new Color4(color.X, color.Y, color.Z, color.W));
+                            _d3dContext.ClearRenderTargetView(view, new Color4(color.X, color.Y, color.Z, color.W));
 #endif
-					}
+                        }
+                    }
 				}
 
                 // Clear the depth/stencil render buffer.
@@ -1171,7 +1177,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("A pixel shader must be set!");
 
             if (_vertexShaderDirty)
+            {
+                unchecked
+                {
+                    ++_graphicsMetrics._vertexShaderCount;
+                }
                 _d3dContext.VertexShader.Set(_vertexShader.VertexShader);
+            }
 
             if (_vertexShaderDirty || _vertexBufferDirty)
             {
@@ -1181,6 +1193,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_pixelShaderDirty)
             {
+                unchecked
+                {
+                    ++_graphicsMetrics._pixelShaderCount;
+                }
                 _d3dContext.PixelShader.Set(_pixelShader.PixelShader);
                 _pixelShaderDirty = false;
             }

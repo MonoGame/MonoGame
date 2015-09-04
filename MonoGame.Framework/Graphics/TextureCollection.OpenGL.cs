@@ -56,6 +56,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (tex != null)
                 {
                     _targets[i] = tex.glTarget;
+
+                    unchecked
+                    {
+                        ++_graphicsDevice._graphicsMetrics._textureCount;
+                    }
+
                     GL.BindTexture(tex.glTarget, tex.glTexture);
                     GraphicsExtensions.CheckGLError();
                 }
