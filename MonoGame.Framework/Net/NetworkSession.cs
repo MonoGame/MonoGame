@@ -763,7 +763,9 @@ namespace Microsoft.Xna.Framework.Net
 								command.data);
 			crd.gamer = command.sender;
 			foreach(LocalNetworkGamer gamer in _localGamers) {
-				gamer.receivedData.Enqueue(crd);
+				lock (gamer.receivedData) {
+					gamer.receivedData.Enqueue(crd);
+				}
 			}
 		}
 		
