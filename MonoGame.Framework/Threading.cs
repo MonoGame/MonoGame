@@ -65,6 +65,12 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
+#if WINDOWS || DESKTOPGL || ANGLE
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        static extern bool IsWindow(IntPtr hWnd);
+#endif
+
         public const int kMaxWaitForUIThread = 750; // In milliseconds
 
 #if !WINDOWS_PHONE
@@ -194,15 +200,18 @@ namespace Microsoft.Xna.Framework
 #elif WINDOWS || DESKTOPGL || ANGLE
             lock (BackgroundContext)
             {
-                // Make the context current on this thread
-                BackgroundContext.MakeCurrent(WindowInfo);
-                // Execute the action
-                action();
-                // Must flush the GL calls so the texture is ready for the main context to use
-                GL.Flush();
-                GraphicsExtensions.CheckGLError();
-                // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
-                BackgroundContext.MakeCurrent(null);
+                if (MonoGame.Utilities.CurrentPlatform.OS != MonoGame.Utilities.OS.Windows || IsWindow(WindowInfo.Handle))
+                {
+                    // Make the context current on this thread
+                    BackgroundContext.MakeCurrent(WindowInfo);
+                    // Execute the action
+                    action();
+                    // Must flush the GL calls so the texture is ready for the main context to use
+                    GL.Flush();
+                    GraphicsExtensions.CheckGLError();
+                    // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
+                    BackgroundContext.MakeCurrent(null);
+                }
             }
 #elif WINDOWS_PHONE
             BlockOnContainerThread(Deployment.Current.Dispatcher, action);

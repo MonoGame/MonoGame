@@ -407,7 +407,7 @@ namespace Microsoft.Xna.Framework
             if (!disposed)
             {
                 // actual window disposing must occur only in GamePlatform
-                // in order to allow handl;e to remain valid until
+                // in order to allow handle to remain valid until
                 // we've disposed of all other resources
 
                 // The window handle no longer exists
