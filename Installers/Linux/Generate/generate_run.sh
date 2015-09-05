@@ -17,5 +17,5 @@ cp Data/RUN/uninstall.sh tmp/Pipeline/
 mkdir tmp/Dependencies
 cp Data/RUN/Dependencies/. tmp/Dependencies -R
 
-./Makeself/makeself.sh tmp/ monogame-linux.run "Monogame Pipeline Installer" ./postinstall.sh
+./Makeself/makeself.sh tmp/ monogame-sdk.run "Monogame Pipeline Installer" ./postinstall.sh
 rm -rf tmp

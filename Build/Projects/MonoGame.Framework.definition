@@ -722,7 +722,10 @@
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.XInput.cs">
-      <Platforms>Windows8,Windows,WindowsUAP</Platforms>
+      <Platforms>Windows8,Windows</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.UWP.cs">
+      <Platforms>WindowsUAP</Platforms>
     </Compile>
     <Compile Include="Input\GamePadButtons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />

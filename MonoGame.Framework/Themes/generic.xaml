@@ -12,7 +12,7 @@
             Value="#80000000" />
         <Setter
             Property="Padding"
-            Value="25" />
+            Value="15" />
         <Setter
             Property="TitleStyle">
             <Setter.Value>
@@ -23,7 +23,7 @@
                         Value="Segoe UI" />
                     <Setter
                         Property="FontSize"
-                        Value="50" />
+                        Value="24" />
                     <Setter
                         Property="Margin"
                         Value="3,0" />
@@ -43,10 +43,10 @@
                         Value="Segoe UI Semilight" />
                     <Setter
                         Property="FontSize"
-                        Value="30" />
+                        Value="16" />
                     <Setter
                         Property="Margin"
-                        Value="3,25,3,5" />
+                        Value="3,10,3,5" />
                     <Setter
                         Property="TextWrapping"
                         Value="Wrap" />
@@ -63,7 +63,7 @@
                     TargetType="TextBox">
                     <Setter
                         Property="Margin"
-                        Value="0,15,15,15" />
+                        Value="0,10,10,10" />
                     <Setter
                         Property="TextWrapping"
                         Value="Wrap" />
@@ -72,10 +72,13 @@
                         Value="Black" />
                     <Setter 
 						Property="FontSize"
-						Value="30" />
+						Value="16" />
                     <Setter
                         Property="MinHeight"
-                        Value="52" />
+                        Value="30" />
+                    <Setter
+                        Property="Background"
+                        Value="White" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -103,38 +106,10 @@
                         Value="#FFFFFF" />
                     <Setter
                         Property="Margin"
-                        Value="25,25,25,25" />
+                        Value="5" />
                     <Setter
                         Property="FontSize"
-                        Value="40" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="Button">
-                                <Border Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ButtonHighlight" BorderThickness="0" BorderBrush="Black">
-                                    <Grid>
-                                        <Rectangle x:Name="innerRectangle" HorizontalAlignment="Stretch" 
-                                           VerticalAlignment="Stretch" Fill="{TemplateBinding Background}" />
-                                        <ContentPresenter x:Name="Text" Content="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal">
-                                                    <Storyboard>
-                                                        <ColorAnimation From="Transparent" To="Black" Storyboard.TargetName="Text" Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)" BeginTime="0" Duration="1"></ColorAnimation>
-                                                        <ColorAnimation From="Transparent" To="White" Storyboard.TargetName="Text" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" BeginTime="0" Duration="1"></ColorAnimation>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="PointerOver">
-                                                    <Storyboard>
-                                                        <ColorAnimation From="Transparent" To="#888888" Storyboard.TargetName="ButtonHighlight" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"  Duration="0:0:1"></ColorAnimation>
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                    </Grid>
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
+                        Value="16" />
                 </Style>
             </Setter.Value>
         </Setter>

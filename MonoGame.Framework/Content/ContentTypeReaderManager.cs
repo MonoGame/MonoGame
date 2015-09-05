@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content
 #if WINRT
             _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
 #else
-            _assemblyName = Assembly.GetExecutingAssembly().FullName;
+            _assemblyName = typeof(ContentTypeReaderManager).Assembly.FullName;
 #endif
         }
 
