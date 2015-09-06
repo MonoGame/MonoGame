@@ -33,13 +33,14 @@ using System.Collections;
 using MonoMac.AppKit;
 
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework
 {
 	public static class KeyUtil
 	{
-		private static IDictionary keyNames;
-		private static IDictionary modifiers;
+        private static Dictionary<NSKey, Keys> keyNames;
+        private static Dictionary<string, Keys> modifiers;
 		private static bool initialized;
 		
 		static KeyUtil() 
@@ -52,64 +53,67 @@ namespace Microsoft.Xna.Framework
 			if (initialized)
 				return;
 			initialized = true;
-			keyNames = new Hashtable ();
-			modifiers = new Hashtable ();
+            keyNames = new Dictionary<NSKey, Keys>
+            {
+                { NSKey.Backslash, Keys.OemBackslash },
+                { NSKey.CapsLock, Keys.CapsLock },
+                { NSKey.Comma, Keys.OemComma },
+                { NSKey.Command, Keys.LeftWindows },
+                { NSKey.Delete, Keys.Back },
+                { NSKey.DownArrow, Keys.Down },
+                { NSKey.Equal, Keys.OemPlus },
+                { NSKey.ForwardDelete, Keys.Delete },
+                { NSKey.Keypad0, Keys.NumPad0 },
+                { NSKey.Keypad1, Keys.NumPad1 },
+                { NSKey.Keypad2, Keys.NumPad2 },
+                { NSKey.Keypad3, Keys.NumPad3 },
+                { NSKey.Keypad4, Keys.NumPad4 },
+                { NSKey.Keypad5, Keys.NumPad5 },
+                { NSKey.Keypad6, Keys.NumPad6 },
+                { NSKey.Keypad7, Keys.NumPad7 },
+                { NSKey.Keypad8, Keys.NumPad8 },
+                { NSKey.Keypad9, Keys.NumPad9 },
+                { NSKey.KeypadDecimal, Keys.Decimal },
+                { NSKey.KeypadDivide, Keys.Divide },
+                { NSKey.KeypadEnter, Keys.Enter },
+                { NSKey.KeypadEquals, Keys.OemPlus },
+                { NSKey.KeypadMinus, Keys.OemMinus },
+                { NSKey.KeypadMultiply, Keys.Multiply },
+                { NSKey.KeypadPlus, Keys.OemPlus },
+                { NSKey.LeftArrow, Keys.Left },
+                { NSKey.LeftBracket, Keys.OemOpenBrackets },
+                { NSKey.Minus, Keys.OemMinus },
+                { NSKey.Mute, Keys.VolumeMute },
+                { NSKey.Next, Keys.MediaNextTrack },
+                { NSKey.Option, Keys.LeftAlt },
+                { NSKey.Pause, Keys.MediaPlayPause },
+                { NSKey.Prev, Keys.MediaPreviousTrack },
+                { NSKey.Quote, Keys.OemQuotes },
+                { NSKey.RightArrow, Keys.Right },
+                { NSKey.RightBracket, Keys.OemCloseBrackets },
+                { NSKey.RightControl, Keys.RightControl },
+                { NSKey.RightOption, Keys.RightAlt },
+                { NSKey.RightShift, Keys.RightShift },
+                { NSKey.ScrollLock, Keys.Scroll },
+                { NSKey.Semicolon, Keys.OemSemicolon },
+                { NSKey.Slash, Keys.OemQuestion },
+                { NSKey.UpArrow, Keys.Up },
+                { NSKey.Period, Keys.OemPeriod },
+                { NSKey.Return, Keys.Enter },
+                { NSKey.Grave, Keys.OemTilde },
+            };
+            modifiers = new Dictionary<string, Keys>
+            {
+                { "524576", Keys.LeftAlt },
+                { "65792", Keys.CapsLock },
+                { "524608", Keys.LeftWindows },
+                { "262401", Keys.LeftControl },
+                { "131332", Keys.RightShift },
+                { "131330", Keys.LeftShift },
+                { "655650", Keys.RightShift },
+            };
 
-			keyNames.Add (NSKey.Backslash, Keys.OemBackslash);
-			keyNames.Add (NSKey.CapsLock, Keys.CapsLock);
-			keyNames.Add (NSKey.Comma, Keys.OemComma);
-			keyNames.Add (NSKey.Command, Keys.LeftWindows);
-			keyNames.Add (NSKey.Delete, Keys.Back);
-			keyNames.Add (NSKey.DownArrow, Keys.Down);
-			keyNames.Add (NSKey.Equal, Keys.OemPlus);
-			keyNames.Add (NSKey.ForwardDelete, Keys.Delete);
-			keyNames.Add (NSKey.Keypad0, Keys.NumPad0);
-			keyNames.Add (NSKey.Keypad1, Keys.NumPad1);
-			keyNames.Add (NSKey.Keypad2, Keys.NumPad2);
-			keyNames.Add (NSKey.Keypad3, Keys.NumPad3);
-			keyNames.Add (NSKey.Keypad4, Keys.NumPad4);
-			keyNames.Add (NSKey.Keypad5, Keys.NumPad5);
-			keyNames.Add (NSKey.Keypad6, Keys.NumPad6);
-			keyNames.Add (NSKey.Keypad7, Keys.NumPad7);
-			keyNames.Add (NSKey.Keypad8, Keys.NumPad8);
-			keyNames.Add (NSKey.Keypad9, Keys.NumPad9);
-			keyNames.Add (NSKey.KeypadDecimal, Keys.Decimal);
-			keyNames.Add (NSKey.KeypadDivide, Keys.Divide);
-			keyNames.Add (NSKey.KeypadEnter, Keys.Enter);
-			keyNames.Add (NSKey.KeypadEquals, Keys.OemPlus);
-			keyNames.Add (NSKey.KeypadMinus, Keys.OemMinus);
-			keyNames.Add (NSKey.KeypadMultiply, Keys.Multiply);
-			keyNames.Add (NSKey.KeypadPlus, Keys.OemPlus);
-			keyNames.Add (NSKey.LeftArrow, Keys.Left);
-			keyNames.Add (NSKey.LeftBracket, Keys.OemOpenBrackets);
-			keyNames.Add (NSKey.Minus, Keys.OemMinus);
-			keyNames.Add (NSKey.Mute, Keys.VolumeMute);
-			keyNames.Add (NSKey.Next, Keys.MediaNextTrack);
-			keyNames.Add (NSKey.Option, Keys.LeftAlt);
-			keyNames.Add (NSKey.Pause, Keys.MediaPlayPause);
-			keyNames.Add (NSKey.Prev, Keys.MediaPreviousTrack);
-			keyNames.Add (NSKey.Quote, Keys.OemQuotes);
-			keyNames.Add (NSKey.RightArrow, Keys.Right);
-			keyNames.Add (NSKey.RightBracket, Keys.OemCloseBrackets);
-			keyNames.Add (NSKey.RightControl, Keys.RightControl);
-			keyNames.Add (NSKey.RightOption, Keys.RightAlt);
-			keyNames.Add (NSKey.RightShift, Keys.RightShift);
-			keyNames.Add (NSKey.ScrollLock, Keys.Scroll);
-			keyNames.Add (NSKey.Semicolon, Keys.OemSemicolon);
-			keyNames.Add (NSKey.Slash, Keys.OemQuestion);
-			keyNames.Add (NSKey.UpArrow, Keys.Up);
-			keyNames.Add (NSKey.Period, Keys.OemPeriod);
-			keyNames.Add (NSKey.Return, Keys.Enter);
-			keyNames.Add (NSKey.Grave, Keys.OemTilde);
 			
-			// Modifiers
-			modifiers.Add ("524576", Keys.LeftAlt);
-			modifiers.Add ("65792", Keys.CapsLock);			
-			modifiers.Add ("524608", Keys.LeftWindows);
-			modifiers.Add ("262401", Keys.LeftControl);
-			modifiers.Add ("131332", Keys.RightShift);
-			modifiers.Add ("131330", Keys.LeftShift);
-			modifiers.Add ("655650", Keys.RightShift);
 			/*
 			keyNames.Add("+",Keys.Add);
 			keyNames.Add("524576",Keys.Alt);
@@ -147,7 +151,7 @@ namespace Microsoft.Xna.Framework
 		public static Keys GetKeys (NSEvent theEvent)
 		{
 			//Initialize ();
-			var nskey = Enum.ToObject (typeof(NSKey), theEvent.KeyCode);
+            var nskey = (NSKey)Enum.ToObject (typeof(NSKey), theEvent.KeyCode);
 			if ((theEvent.ModifierFlags & NSEventModifierMask.FunctionKeyMask) > 0) {
 				var chars = theEvent.Characters.ToCharArray ();
 				var thekey = chars [0];
@@ -158,7 +162,7 @@ namespace Microsoft.Xna.Framework
 			}
 
 			try {
-				var key = (Keys)keyNames [nskey];
+				Keys key = keyNames [nskey];
 				return key;
 			} catch {
 				try {
