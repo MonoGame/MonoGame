@@ -391,7 +391,12 @@ namespace Microsoft.Xna.Framework
         private bool AllowUserResizing
         {
             get { return (_mainWindow.StyleMask & NSWindowStyle.Resizable) != 0; }
-            set { _mainWindow.StyleMask ^= NSWindowStyle.Resizable; }
+            set {
+                if (value)
+                    _mainWindow.StyleMask |= NSWindowStyle.Resizable;
+                else
+                    _mainWindow.StyleMask &= ~NSWindowStyle.Resizable;
+            }
         }
 
         public void EnterBackground()
