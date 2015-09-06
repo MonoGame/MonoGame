@@ -147,13 +147,11 @@ namespace Microsoft.Xna.Framework
             {
                 // No need to dispose _gameWindow.  It will be released by the
                 // nearest NSAutoreleasePool.
-                if (_gameWindow != null)
-                    _gameWindow = null;
+                _gameWindow = null;
 
                 // No need to dispose _mainWindow.  It will be released by the
                 // nearest NSAutoreleasePool.
-                if (_mainWindow != null)
-                    _mainWindow = null;
+                _mainWindow = null;
             }
 
             base.Dispose(disposing);
