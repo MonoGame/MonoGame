@@ -6,6 +6,7 @@ using System;
 using System.IO;
 #if WINRT
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Resources.Core;
 #elif IOS
 using Foundation;
 using UIKit;
@@ -24,6 +25,11 @@ namespace Microsoft.Xna.Framework
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+
+            ResourceContext = new Windows.ApplicationModel.Resources.Core.ResourceContext();
+
+            FileResourceMap = ResourceManager.Current.MainResourceMap.GetSubtree("Files");
+
 #elif IOS || MONOMAC
 			Location = NSBundle.MainBundle.ResourcePath;
 #else
@@ -43,14 +49,14 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #if WINRT
+        static internal ResourceContext ResourceContext;
+        static internal ResourceMap FileResourceMap;
 
-        private static async Task<Stream> OpenStreamAsync(string name)
+        private static async Task<Stream> OpenStreamAsync(ResourceCandidate resource)
         {
-            var package = Windows.ApplicationModel.Package.Current;
-
             try
             {
-                var storageFile = await package.InstalledLocation.GetFileAsync(name);
+                var storageFile = await resource.GetValueAsFileAsync();
                 var randomAccessStream = await storageFile.OpenReadAsync();
                 return randomAccessStream.AsStreamForRead();
             }
@@ -78,11 +84,19 @@ namespace Microsoft.Xna.Framework
                 throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.");
 
 #if WINRT
-            var stream = Task.Run( () => OpenStreamAsync(safeName).Result ).Result;
-            if (stream == null)
-                throw new FileNotFoundException(name);
+            NamedResource result;
 
-            return stream;
+            if (FileResourceMap != null && FileResourceMap.TryGetValue(safeName, out result))
+            {
+                var resolved = result.Resolve(ResourceContext);
+
+                return Task.Run(() => OpenStreamAsync(resolved).Result).Result;
+            }
+            else
+            {
+                throw new FileNotFoundException();
+            }
+
 #elif ANDROID
             return Android.App.Application.Context.Assets.Open(safeName);
 #elif IOS
