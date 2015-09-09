@@ -2121,7 +2121,7 @@
         </xsl:if>
       </xsl:if>
 
-      {ADDITIONAL_TRANSFORMS}
+      <!-- {ADDITIONAL_TRANSFORMS} -->
 
       <ItemGroup>
         <xsl:for-each select="$project/References/Reference">
