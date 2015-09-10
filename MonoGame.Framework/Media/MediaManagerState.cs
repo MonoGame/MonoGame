@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using System.Runtime.InteropServices;
 using SharpDX.MediaFoundation;
 
 namespace Microsoft.Xna.Framework.Media
@@ -12,6 +14,9 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     internal sealed class MediaManagerState
     {
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+
         private static bool started;
 
         /// <summary>
@@ -21,6 +26,10 @@ namespace Microsoft.Xna.Framework.Media
         {
             if(!started)
             {
+                // Manually load XAudio, to prevent crashes caused if it is automatically unloaded
+                // after being automatically loaded.
+                LoadLibrary("XAudio_2.7.dll");
+
                 started = true;
                 MediaManager.Startup(true);
             }
