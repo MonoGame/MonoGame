@@ -7,19 +7,24 @@ using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public static partial class MediaPlayer
     {
-        //RAYB: This probably needs to get flipped back into a readonly.
         private static MediaSession _session;
         private static AudioStreamVolume _volumeController;
         private static PresentationClock _clock;
+        private static Song _nextSong;
+        private static Song _currentSong;
+
+        private enum SessionState { Stopped, Stopping, Started, Paused, Ended }
+        private static SessionState _sessionState = SessionState.Stopped;
 
         private static Guid AudioStreamVolumeGuid;
+
+        private static readonly Variant PositionCurrent = new Variant();
+        private static readonly Variant PositionBeginning = new Variant { ElementType = VariantElementType.Long, Value = 0L };
 
         private static Callback _callback;
 
@@ -37,11 +42,15 @@ namespace Microsoft.Xna.Framework.Media
                 switch (ev.TypeInfo)
                 {
                     case MediaEventTypes.EndOfPresentation:
+                        _sessionState = SessionState.Ended;
                         OnSongFinishedPlaying(null, null);
                         break;
                     case MediaEventTypes.SessionTopologyStatus:
                         if (ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
                             OnTopologyReady();
+                        break;
+                    case MediaEventTypes.SessionStopped:
+                        OnSessionStopped();
                         break;
                 }
 
@@ -59,6 +68,11 @@ namespace Microsoft.Xna.Framework.Media
 
             MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
+
+            _callback = new Callback();
+            _session.BeginGetEvent(_callback, null);
+
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
         }
 
         #region Properties
@@ -97,7 +111,17 @@ namespace Microsoft.Xna.Framework.Media
 
         private static TimeSpan PlatformGetPlayPosition()
         {
-            return _clock != null ? TimeSpan.FromTicks(_clock.Time) : TimeSpan.Zero;
+            if ((_sessionState == SessionState.Stopped) || (_sessionState == SessionState.Stopping))
+                return TimeSpan.Zero;
+            try
+            {
+                return TimeSpan.FromTicks(_clock.Time);
+            }
+            catch (SharpDXException)
+            {
+                // The presentation clock is most likely not quite ready yet
+                return TimeSpan.Zero;
+            }
         }
 
         private static bool PlatformGetGameHasControl()
@@ -118,17 +142,12 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void SetChannelVolumes()
         {
-            if (_volumeController != null && !_volumeController.IsDisposed)
-            {
-                float volume = _volume;
-                if (IsMuted)
-                    volume = 0.0f;
+            if (_volumeController == null)
+                return;
 
-                for (int i = 0; i < _volumeController.ChannelCount; i++)
-                {
-                    _volumeController.SetChannelVolume(i, volume);
-                }
-            }
+            float volume = _isMuted ? 0f : _volume;
+            for (int i = 0; i < _volumeController.ChannelCount; i++)
+                _volumeController.SetChannelVolume(i, volume);
         }
 
         private static void PlatformSetVolume(float volume)
@@ -141,49 +160,72 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformPause()
         {
+            if (_sessionState != SessionState.Started)
+                return;
+            _sessionState = SessionState.Paused;
             _session.Pause();
         }
 
         private static void PlatformPlaySong(Song song)
         {
-            // Cleanup the last song first.
-            if (State != MediaState.Stopped)
+            if (_currentSong == song)
+                ReplayCurrentSong(song);
+            else
+                PlayNewSong(song);
+        }
+
+        private static void ReplayCurrentSong(Song song)
+        {
+            if (_sessionState == SessionState.Stopping)
             {
-                _session.Stop();
-                _session.ClearTopologies();
-                _session.Close();
-                if (_volumeController != null)
-                {
-                    _volumeController.Dispose();
-                    _volumeController = null;
-                }
-                _clock.Dispose();
+                // The song will be started after the SessionStopped event is received
+                _nextSong = song;
+                return;
             }
 
-            //create the callback if it hasn't been created yet
-            if (_callback == null)
+            StartSession(PositionBeginning);
+        }
+
+        private static void PlayNewSong(Song song)
+        {
+            if (_sessionState != SessionState.Stopped)
             {
-                _callback = new Callback();
-                _session.BeginGetEvent(_callback, null);
+                // The session needs to be stopped to reset the play position
+                // The new song will be started after the SessionStopped event is received
+                _nextSong = song;
+                PlatformStop();
+                return;
             }
 
-            // Set the new song.
+            StartNewSong(song);
+        }
+
+        private static void StartNewSong(Song song)
+        {
+            if (_volumeController != null)
+            {
+                _volumeController.Dispose();
+                _volumeController = null;
+            }
+
+            _currentSong = song;
+
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
 
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
+            StartSession(PositionBeginning);
 
-            // Start playing.
-            var varStart = new Variant();
-            _session.Start(null, varStart);
+            // The volume service won't be available until the session topology
+            // is ready, so we now need to wait for the event indicating this
+        }
+
+        private static void StartSession(Variant startPosition)
+        {
+            _sessionState = SessionState.Started;
+            _session.Start(null, startPosition);
         }
 
         private static void OnTopologyReady()
         {
-            if (_session.IsDisposed)
-                return;
-
-            // Get the volume interface.
             IntPtr volumeObjectPtr;
             MediaFactory.GetService(_session, MediaServiceKeys.StreamVolume, AudioStreamVolumeGuid, out volumeObjectPtr);
             _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
@@ -193,22 +235,36 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformResume()
         {
-            var varStart = new Variant();
-            _session.Start(null, varStart);
+            if (_sessionState != SessionState.Paused)
+                return;
+            StartSession(PositionCurrent);
         }
 
         private static void PlatformStop()
         {
-            _session.ClearTopologies();
-            _session.Stop();
-            _session.Close();
-            if (_volumeController != null)
+            if ((_sessionState == SessionState.Stopped) || (_sessionState == SessionState.Stopping))
+                return;
+            bool hasFinishedPlaying = (_sessionState == SessionState.Ended);
+            _sessionState = SessionState.Stopping;
+            if (hasFinishedPlaying)
             {
-                _volumeController.Dispose();
-                _volumeController = null;
+                // The play position needs to be reset before stopping otherwise the next song may not start playing
+                _session.Start(null, PositionBeginning);
             }
-            _clock.Dispose();
-            _clock = null;
+            _session.Stop();
+        }
+
+        private static void OnSessionStopped()
+        {
+            _sessionState = SessionState.Stopped;
+            if (_nextSong != null)
+            {
+                if (_nextSong != _currentSong)
+                    StartNewSong(_nextSong);
+                else
+                    StartSession(PositionBeginning);
+                _nextSong = null;
+            }
         }
     }
 }
