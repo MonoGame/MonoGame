@@ -772,6 +772,29 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public static bool IsCompressedFormat(this SurfaceFormat format)
+        {
+            switch (format)
+            {
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1a:
+                case SurfaceFormat.Dxt1SRgb:
+                case SurfaceFormat.Dxt3:
+                case SurfaceFormat.Dxt3SRgb:
+                case SurfaceFormat.Dxt5:
+                case SurfaceFormat.Dxt5SRgb:
+                case SurfaceFormat.RgbaAtcExplicitAlpha:
+                case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                case SurfaceFormat.RgbaPvrtc2Bpp:
+                case SurfaceFormat.RgbaPvrtc4Bpp:
+                case SurfaceFormat.RgbEtc1:
+                case SurfaceFormat.RgbPvrtc2Bpp:
+                case SurfaceFormat.RgbPvrtc4Bpp:
+                    return true;
+            }
+            return false;
+        }
+
         public static int GetSize(this SurfaceFormat surfaceFormat)
         {
             switch (surfaceFormat)

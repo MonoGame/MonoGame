@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using FreeImageAPI;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -65,6 +66,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override TextureContent Import (string filename, ContentImporterContext context)
         {
+            // Special case for loading DDS
+            if (filename.ToLower().EndsWith(".dds"))
+                return DdsLoader.Import(filename, context);
+
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
             FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
@@ -181,7 +186,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     {
                         case 16:
                             // Swap R and B channels to make it BGR(A)
-                            if (FreeImage.IsRGB555(fBitmap))
+                            if (FreeImage.IsRGB555(fBitmap) && redMask == 0xF800)
                             {
                                 var alphaMask = (uint)1;
                                 for (var i = 0; i < bytes.Length; i += 2)
@@ -194,7 +199,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                                 face = new PixelBitmapContent<Bgra5551>(width, height);
                             }
-                            else if (FreeImage.IsRGB565(fBitmap))
+                            else if (FreeImage.IsRGB565(fBitmap) && redMask == 0xF800)
                             {
                                 for (var i = 0; i < bytes.Length; i += 2)
                                 {
@@ -206,7 +211,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                                 face = new PixelBitmapContent<Bgr565>(width, height);
                             }
-                            else
+                            else if (redMask == 0xF000)
                             {
                                 var alphaMask = (uint)0x000F;
                                 for (var i = 0; i < bytes.Length; i += 2)
