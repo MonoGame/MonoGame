@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>True if the sound controller was setup, and false if not.</returns>
         private bool OpenSoundController()
         {
-#if MONOMAC || IOS
+#if MONOMAC
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 #endif
 
