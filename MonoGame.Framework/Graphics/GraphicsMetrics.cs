@@ -12,6 +12,10 @@ namespace Microsoft.Xna.Framework.Graphics
         internal ulong _spriteCount;
         internal ulong _drawCount;
         internal ulong _primitiveCount;
+        internal ulong _pixelShaderCount;
+        internal ulong _vertexShaderCount;
+        internal ulong _textureCount;
+        internal ulong _clearCount;
 
         /// <summary>
         /// The count of sprites and text characters rendered via <see cref="SpriteBatch"/>.
@@ -29,6 +33,26 @@ namespace Microsoft.Xna.Framework.Graphics
         public ulong PrimitiveCount { get { return _primitiveCount; } }
 
         /// <summary>
+        /// The count of pixel shader switches
+        /// </summary>
+        public ulong PixelShaderCount { get { return _pixelShaderCount; } }
+
+        /// <summary>
+        /// The count of vertex shader switches
+        /// </summary>
+        public ulong VertexShaderCount { get { return _vertexShaderCount; } }
+
+        /// <summary>
+        /// The count of texture switches
+        /// </summary>
+        public ulong TextureCount { get { return _textureCount; } }
+
+        /// <summary>
+        /// The count of Clear calls
+        /// </summary>
+        public ulong ClearCount { get { return _clearCount; } }
+
+        /// <summary>
         /// Returns the difference between two sets of metrics.
         /// </summary>
         /// <param name="value1">Source <see cref="GraphicsMetrics"/> on the left of the sub sign.</param>
@@ -40,7 +64,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _spriteCount = value1._spriteCount - value2._spriteCount,
                 _drawCount = value1._drawCount - value2._drawCount,
-                _primitiveCount = value1._primitiveCount - value2._primitiveCount
+                _primitiveCount = value1._primitiveCount - value2._primitiveCount,
+                _pixelShaderCount = value1._pixelShaderCount - value2._pixelShaderCount,
+                _vertexShaderCount = value1._vertexShaderCount - value2._vertexShaderCount,
+                _textureCount = value1._textureCount - value2._textureCount,
+                _clearCount = value1._clearCount - value2._clearCount
             };
         }
 
@@ -56,7 +84,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _spriteCount = value1._spriteCount + value2._spriteCount,
                 _drawCount = value1._drawCount + value2._drawCount,
-                _primitiveCount = value1._primitiveCount + value2._primitiveCount
+                _primitiveCount = value1._primitiveCount + value2._primitiveCount,
+                _pixelShaderCount = value1._pixelShaderCount + value2._pixelShaderCount,
+                _vertexShaderCount = value1._vertexShaderCount + value2._vertexShaderCount,
+                _textureCount = value1._textureCount + value2._textureCount,
+                _clearCount = value1._clearCount + value2._clearCount
             };
         }
     }

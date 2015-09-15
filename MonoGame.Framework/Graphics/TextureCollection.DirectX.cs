@@ -78,9 +78,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 var tex = _textures[i];
 
                 if (_textures[i] == null || _textures[i].IsDisposed)
+                {
                     shaderStage.SetShaderResource(i, null);
+                }
                 else
+                {
+                    unchecked
+                    {
+                        ++device._graphicsMetrics._textureCount;
+                    }
                     shaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+                }
 
                 _dirty &= ~mask;
                 if (_dirty == 0)
