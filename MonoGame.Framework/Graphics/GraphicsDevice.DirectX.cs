@@ -1171,8 +1171,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("A pixel shader must be set!");
 
             if (_vertexShaderDirty)
+            {
                 _d3dContext.VertexShader.Set(_vertexShader.VertexShader);
 
+                unchecked
+                {
+                    _graphicsMetrics._vertexShaderCount++;
+                }
+            }
             if (_vertexShaderDirty || _vertexBufferDirty)
             {
                 _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
@@ -1183,6 +1189,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _d3dContext.PixelShader.Set(_pixelShader.PixelShader);
                 _pixelShaderDirty = false;
+
+                unchecked
+                {
+                    _graphicsMetrics._pixelShaderCount++;
+                }
             }
 
             _vertexConstantBuffers.SetConstantBuffers(this);
