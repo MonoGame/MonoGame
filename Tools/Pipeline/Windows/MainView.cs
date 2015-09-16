@@ -36,6 +36,10 @@ namespace MonoGame.Tools.Pipeline
         {            
             InitializeComponent();
 
+            // Set MenuBar color to Window color if the current OS is Windows 10
+            if (System.Environment.OSVersion.Version.Major == 10)
+                this._mainMenu.BackColor = SystemColors.Window;
+
             // Set the application icon this form.
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
