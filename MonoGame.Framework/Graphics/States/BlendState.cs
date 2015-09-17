@@ -6,7 +6,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public partial class BlendState : GraphicsResource
+	public partial class BlendState : GraphicsResource, ICloneable
 	{
         private readonly TargetBlendState[] _targetBlendState;
 
@@ -230,10 +230,23 @@ namespace Microsoft.Xna.Framework.Graphics
             Opaque = new BlendState("BlendState.Opaque", Blend.One, Blend.Zero);
 		}
 
-	    internal BlendState Clone()
-	    {
+        /// <summary>
+        /// Creates a new instance of <see cref="BlendState"/> which contains exact values from the current instance.
+        /// </summary>
+        /// <returns>A shallow copy of this state.</returns>
+        public BlendState Clone()
+        {
 	        return new BlendState(this);
-	    }
-	}
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="BlendState"/> which contains exact values from the current instance.
+        /// </summary>
+        /// <returns>A shallow copy of this state.</returns>
+        object ICloneable.Clone()
+        {
+            return new BlendState(this);
+        }
+    }
 }
 
