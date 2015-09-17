@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
+        private Color _blendFactor;
         private BlendState _blendState;
         private BlendState _actualBlendState;
         private bool _blendStateDirty;
@@ -324,6 +325,33 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Blend factor for alpha blending.
+        /// </summary>
+        public Color BlendFactor
+        {
+            get { return _blendFactor; }
+            set
+            {
+                if(_blendFactor == value)
+                    return;
+
+                _blendFactor = value;
+
+                var newBlendState = _blendState.Clone();
+
+                newBlendState.BlendFactor = value;
+
+                newBlendState.BindToGraphicsDevice(this);
+
+                _blendState = newBlendState;
+
+                _actualBlendState = newBlendState;
+
+                _blendStateDirty = true;
+            }
+        }
+
         public BlendState BlendState
         {
 			get { return _blendState; }
@@ -349,6 +377,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     newBlendState = _blendStateNonPremultiplied;
                 else if (ReferenceEquals(_blendState, BlendState.Opaque))
                     newBlendState = _blendStateOpaque;
+
+                // Setup blend factor.
+                _blendFactor = _blendState.BlendFactor;
 
                 // Blend state is now bound to a device... no one should
                 // be changing the state of the blend state object now!
