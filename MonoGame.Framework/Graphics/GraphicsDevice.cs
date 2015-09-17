@@ -328,7 +328,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Blend factor for alpha blending.
         /// </summary>
-        public Color BlendFactor { get { return _blendFactor; } set { _blendFactor = value; } }
+        public Color BlendFactor
+        {
+            get { return _blendFactor; }
+            set
+            {
+                if (_blendFactor != value)
+                {
+                    _blendFactor = value;
+                    _blendStateDirty = true;
+                }
+            }
+        }
 
         public BlendState BlendState
         {
