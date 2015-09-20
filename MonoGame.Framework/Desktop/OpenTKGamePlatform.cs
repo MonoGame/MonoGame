@@ -88,13 +88,11 @@ namespace Microsoft.Xna.Framework
 		private OpenALSoundController soundControllerInstance = null;
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
-        private Toolkit toolkit;
         private int isExiting; // int, so we can use Interlocked.Increment
         
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
-            toolkit = Toolkit.Init();
             _view = new OpenTKGameWindow(game);
             this.Window = _view;
 
@@ -290,22 +288,14 @@ namespace Microsoft.Xna.Framework
 		
         protected override void Dispose(bool disposing)
         {
-            if (!IsDisposed)
+            base.Dispose(disposing);
+
+            if (IsDisposed && _view != null)
             {
-                if (toolkit != null)
-                {
-                    toolkit.Dispose();
-                    toolkit = null;
-                }
-
-                if (_view != null)
-                {
-                    _view.Dispose();
-                    _view = null;
-                }
+                _view.Window.Close();
+                _view.Dispose();
+                _view = null;
             }
-
-			base.Dispose(disposing);
         }
 			
     }
