@@ -80,8 +80,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_textures[i] == null || _textures[i].IsDisposed)
                     shaderStage.SetShaderResource(i, null);
                 else
+                {
                     shaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
-
+                    unchecked
+                    {
+                        _graphicsDevice._graphicsMetrics._textureCount++;
+                    }
+                }
                 _dirty &= ~mask;
                 if (_dirty == 0)
                     break;

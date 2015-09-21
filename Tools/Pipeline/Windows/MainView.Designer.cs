@@ -145,12 +145,17 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _treeView
             // 
+            this._treeView.AllowDrop = true;
             this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._treeView.DragOverNodeBackColor = System.Drawing.SystemColors.Highlight;
+            this._treeView.DragOverNodeForeColor = System.Drawing.SystemColors.HighlightText;
             this._treeView.Location = new System.Drawing.Point(0, 0);
             this._treeView.Name = "_treeView";
             this._treeView.Size = new System.Drawing.Size(249, 210);
             this._treeView.TabIndex = 0;
             this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
+            this._treeView.DragDrop += new System.Windows.Forms.DragEventHandler(this._treeView_DragDrop);
+            this._treeView.DragOver += new System.Windows.Forms.DragEventHandler(this._treeView_DragOver);
             this._treeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TreeViewOnKeyDown);
             this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
             // 
@@ -310,7 +315,7 @@ namespace MonoGame.Tools.Pipeline
             this._undoMenuItem.Enabled = false;
             this._undoMenuItem.Name = "_undoMenuItem";
             this._undoMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this._undoMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._undoMenuItem.Size = new System.Drawing.Size(144, 22);
             this._undoMenuItem.Text = "Undo";
             this._undoMenuItem.Click += new System.EventHandler(this.OnUndoClick);
             // 
@@ -319,14 +324,14 @@ namespace MonoGame.Tools.Pipeline
             this._redoMenuItem.Enabled = false;
             this._redoMenuItem.Name = "_redoMenuItem";
             this._redoMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this._redoMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._redoMenuItem.Size = new System.Drawing.Size(144, 22);
             this._redoMenuItem.Text = "Redo";
             this._redoMenuItem.Click += new System.EventHandler(this.OnRedoClick);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(141, 6);
             // 
             // _addMenuItem
             // 
@@ -337,7 +342,7 @@ namespace MonoGame.Tools.Pipeline
             this.existingItemToolStripMenuItem,
             this.existingFolderToolStripMenuItem});
             this._addMenuItem.Name = "_addMenuItem";
-            this._addMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._addMenuItem.Size = new System.Drawing.Size(144, 22);
             this._addMenuItem.Text = "Add";
             // 
             // newItemToolStripMenuItem
@@ -376,12 +381,12 @@ namespace MonoGame.Tools.Pipeline
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(141, 6);
             // 
             // _renameMenuItem
             // 
             this._renameMenuItem.Name = "_renameMenuItem";
-            this._renameMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._renameMenuItem.Size = new System.Drawing.Size(144, 22);
             this._renameMenuItem.Text = "Rename";
             this._renameMenuItem.Click += new System.EventHandler(this.OnRenameItemClick);
             // 
@@ -389,7 +394,7 @@ namespace MonoGame.Tools.Pipeline
             // 
             this._deleteMenuItem.Name = "_deleteMenuItem";
             this._deleteMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this._deleteMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._deleteMenuItem.Size = new System.Drawing.Size(144, 22);
             this._deleteMenuItem.Text = "&Delete";
             this._deleteMenuItem.Click += new System.EventHandler(this.OnDeleteItemClick);
             // 
