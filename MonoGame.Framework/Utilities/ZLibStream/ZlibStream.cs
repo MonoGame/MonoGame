@@ -7543,11 +7543,11 @@ namespace MonoGame.Utilities
 
         internal int SetDictionary(byte[] dictionary)
         {
-            int length = dictionary.Length;
-            int index = 0;
-
             if (dictionary == null || status != INIT_STATE)
                 throw new ZlibException("Stream error.");
+
+            int length = dictionary.Length;
+            int index = 0;
 
             _codec._Adler32 = Adler.Adler32(_codec._Adler32, dictionary, 0, dictionary.Length);
 

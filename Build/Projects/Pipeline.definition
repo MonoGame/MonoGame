@@ -21,6 +21,7 @@
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
+	<ApplicationManifest>app.manifest</ApplicationManifest>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
       <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
@@ -36,6 +37,7 @@
       <Link>Common\CommandLineParser.cs</Link>
     </Compile>
     <None Include="App.config" />
+    <None Include="app.manifest" />
 
     <Compile Include="Common\ActionStack.cs" />
     <Compile Include="Common\AssemblyAttributes.cs" />

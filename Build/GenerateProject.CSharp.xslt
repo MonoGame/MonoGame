@@ -598,6 +598,15 @@
       </xsl:when>
     </xsl:choose>
     </PropertyGroup>
+	<xsl:choose>
+      <xsl:when test="/Input/Properties/ApplicationManifest">
+        <PropertyGroup>
+            <ApplicationManifest>
+                <xsl:value-of select="/Input/Properties/ApplicationManifest" />
+            </ApplicationManifest>
+        </PropertyGroup>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="NativeBinary"
