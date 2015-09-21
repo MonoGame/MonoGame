@@ -58,6 +58,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     _targets[i] = tex.glTarget;
                     GL.BindTexture(tex.glTarget, tex.glTexture);
                     GraphicsExtensions.CheckGLError();
+
+                    unchecked
+                    {
+                        _graphicsDevice._graphicsMetrics._textureCount++;
+                    }
                 }
 
                 _dirty &= ~mask;
