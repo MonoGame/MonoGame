@@ -54,9 +54,72 @@
          </fileset>
       </delete>
       <mkdir dir="root/tmp" />
+      <!-- Build Addin .pkg -->
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="./root/tmp/MonoDevelop.MonoGame_${buildNumber}.mpack" overwrite="true"/>
       <exec program="pkgbuild" workingdir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release" commandline=" --component ./Pipeline.app --identifier com.monogame.pipeline --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Pipeline --install-location /Applications ${project::get-base-directory()}/Pipeline.MacOS.pkg" />
       <exec program="pkgbuild" workingdir="." commandline=" --root ./root --identifier com.monogame.xsaddin --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Addin ${project::get-base-directory()}/MonoGame.XamarinStudio.Addin.pkg" />
+      <!-- Build Framework .pkg -->
+      <delete dir="./root/tmp" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOS" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
+      <!-- Copy the Files over for the framework -->
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools">
+         <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
+		<include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}">
+         <fileset basedir="../MonoGame.Framework.Content.Pipeline">
+                <include name="MonoGame.Content.Builder.targets"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS">
+         <fileset basedir="../MonoGame.Framework/bin/iOS/iPhoneSimulator/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android">
+         <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA">
+         <fileset basedir="../MonoGame.Framework/bin/Ouya/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOS">
+         <fileset basedir="../MonoGame.Framework/bin/MacOS/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <echo append="true" file="./MacOS/Scripts/Framework/postinstall">
+if [ -d '/Library/Frameworks/MonoGame.framework/v3.0' ]
+then
+	rm /Library/Frameworks/MonoGame.framework/v3.0
+fi
+if [ -d '/Library/Frameworks/MonoGame.framework/Current' ]
+then
+	rm /Library/Frameworks/MonoGame.framework/Current
+fi
+ln -sf /Library/Frameworks/MonoGame.framework/v${buildNumber} /Library/Frameworks/MonoGame.framework/v3.0
+ln -sf /Library/Frameworks/MonoGame.framework/v${buildNumber} /Library/Frameworks/MonoGame.framework/Current
+if [ -d '/Library/Frameworks/Mono.framework/External/xbuild' ]
+then
+        ln -sf /Library/Frameworks/MonoGame.framework /Library/Frameworks/Mono.framework/External/xbuild/MonoGame
+fi      
+      </echo>      
+      <exec program="pkgbuild" workingdir="." commandline=" --root ./root --identifier com.monogame.framework --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Framework ${project::get-base-directory()}/MonoGame.framework.pkg" />
+
       <copy tofile="./distribution.xml" file="./MacOS/distribution.xml" />
       <copy tofile="./MacOS/Resources/LICENSE.html" file="./../LICENSE.txt" />
       <xmlpoke file="./distribution.xml" xpath="/installer-gui-script/title" value="MonoGame ${buildNumber}" />
