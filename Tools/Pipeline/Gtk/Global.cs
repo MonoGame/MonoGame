@@ -55,7 +55,10 @@ namespace MonoGame.Tools.Pipeline
 
         public static Pixbuf GetFolderIcon()
         {
+            #if GTK3
             return theme.LoadIcon("folder", 16, (IconLookupFlags)0);
+            #endif
+            return new Pixbuf(null, "MonoGame.Tools.Pipeline.Icons.folder_open.png");
         }
 
         public static Pixbuf GetIcon(string fileName)
@@ -80,9 +83,10 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
             catch { }
+            return theme.LoadIcon("text-x-generic", 16, (IconLookupFlags)0);
             #endif
 
-            return theme.LoadIcon("text-x-generic", 16, (IconLookupFlags)0);
+            return new Pixbuf(null, "MonoGame.Tools.Pipeline.Icons.blueprint.png");
         }
     }
 }
