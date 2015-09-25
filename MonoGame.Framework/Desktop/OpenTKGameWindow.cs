@@ -186,6 +186,10 @@ namespace Microsoft.Xna.Framework
 
         private void OpenTkGameWindow_Closing(object sender, CancelEventArgs e)
         {
+            //block the window from getting destroyed before we dispose of
+            //the resources, than we will destroy it
+            e.Cancel = true;
+
             Game.Exit();
         }
 
@@ -214,35 +218,41 @@ namespace Microsoft.Xna.Framework
             if (Game == null)
                 return;
 
-            var winWidth = window.ClientRectangle.Width;
-            var winHeight = window.ClientRectangle.Height;
-            var winRect = new Rectangle(0, 0, winWidth, winHeight);
+            lock (window)
+            {
+                var winWidth = window.ClientRectangle.Width;
+                var winHeight = window.ClientRectangle.Height;
+                var winRect = new Rectangle(0, 0, winWidth, winHeight);
 
-            // If window size is zero, leave bounds unchanged
-            // OpenTK appears to set the window client size to 1x1 when minimizing
-            if (winWidth <= 1 || winHeight <= 1) 
-                return;
+                // If window size is zero, leave bounds unchanged
+                // OpenTK appears to set the window client size to 1x1 when minimizing
+                if (winWidth <= 1 || winHeight <= 1)
+                    return;
 
-            //If we've already got a pending change, do nothing
-            if (updateClientBounds)
-                return;
+                //If we've already got a pending change, do nothing
+                if (updateClientBounds)
+                    return;
             
-            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
 
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+                Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
 
-            clientBounds = winRect;
+                clientBounds = winRect;
 
-            OnClientSizeChanged();
+                OnClientSizeChanged();
+            }
         }
 
         internal void ProcessEvents()
         {
-            UpdateBorder();
-            Window.ProcessEvents();
-            UpdateWindowState();
-            HandleInput();
+            lock (window)
+            {
+                UpdateBorder();
+                Window.ProcessEvents();
+                UpdateWindowState();
+                HandleInput();
+            }
         }
 
         private void UpdateBorder()
