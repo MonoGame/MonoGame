@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             SoundEffectInstance inst = null;
 
-            for (var x = 0; x < _playingInstances.Count; x++)
+            for (var x = 0; x < _playingInstances.Count;)
             {
                 inst = _playingInstances[x];
                 if (inst.State != SoundState.Stopped && inst._effect == effect)
