@@ -179,10 +179,16 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
+            // If the instance came from the pool then it could
+            // already have a valid voice assigned.
             var voice = inst._voice;
 
             if (voice != null)
             {
+                // We can reuse this existing voice if the sample rate and
+                // channel count are the same which will reduce garbage generation
+                // and overhead of allocating another native resource.
+
                 var details = voice.VoiceDetails;
 
                 if (details.InputSampleRate != _format.SampleRate ||
