@@ -179,8 +179,22 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            SourceVoice voice = null;
-            if (Device != null)
+            var voice = inst._voice;
+
+            if (voice != null)
+            {
+                var details = voice.VoiceDetails;
+
+                if (details.InputSampleRate != _format.SampleRate ||
+                    details.InputChannelCount != _format.Channels)
+                {
+                    voice.DestroyVoice();
+                    voice.Dispose();
+                    voice = null;
+                }
+            }
+
+            if (voice == null && Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             inst._voice = voice;
