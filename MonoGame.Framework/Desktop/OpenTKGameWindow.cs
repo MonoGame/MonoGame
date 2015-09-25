@@ -409,8 +409,9 @@ namespace Microsoft.Xna.Framework
             {
                 if (disposing)
                 {
-                    // Dispose/release managed objects
-                    window.Dispose();
+                    // Disposing of window will cause a crash on Linux
+                    // tho it will get destroied anyway by not beeing updated
+                    window.Close();
                 }
                 // The window handle no longer exists
                 _windowHandle = IntPtr.Zero;
