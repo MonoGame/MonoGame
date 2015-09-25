@@ -185,18 +185,23 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (voice != null)
             {
-                // We can reuse this existing voice if the sample rate and
-                // channel count are the same which will reduce garbage generation
-                // and overhead of allocating another native resource.
-
-                var details = voice.VoiceDetails;
-
-                if (details.InputSampleRate != _format.SampleRate ||
-                    details.InputChannelCount != _format.Channels)
+                // TODO: This really shouldn't be here.  Instead we should fix the 
+                // SoundEffectInstancePool to internally to look for a compatible
+                // instance or return a new instance without a voice.
+                //
+                // For now we do the same test that the pool should be doing here.
+             
+                if (!ReferenceEquals(inst._format, _format))
                 {
-                    voice.DestroyVoice();
-                    voice.Dispose();
-                    voice = null;
+                    if (inst._format.Encoding != _format.Encoding ||
+                        inst._format.Channels != _format.Channels ||
+                        inst._format.SampleRate != _format.SampleRate ||
+                        inst._format.BitsPerSample != _format.BitsPerSample)
+                    {
+                        voice.DestroyVoice();
+                        voice.Dispose();
+                        voice = null;
+                    }
                 }
             }
 
@@ -204,6 +209,7 @@ namespace Microsoft.Xna.Framework.Audio
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             inst._voice = voice;
+            inst._format = _format;
         }
 
         #endregion
