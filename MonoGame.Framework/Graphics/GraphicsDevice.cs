@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
+        internal Color _blendFactor;
         private BlendState _blendState;
         private BlendState _actualBlendState;
         private bool _blendStateDirty;
@@ -324,6 +325,22 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Blend factor for alpha blending.
+        /// </summary>
+        public Color BlendFactor
+        {
+            get { return _blendFactor; }
+            set
+            {
+                if (_blendFactor != value)
+                {
+                    _blendFactor = value;
+                    _blendStateDirty = true;
+                }
+            }
+        }
+
         public BlendState BlendState
         {
 			get { return _blendState; }
@@ -337,6 +354,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
 				_blendState = value;
+                
+                _blendFactor = _blendState.BlendFactor;
 
                 // Static state properties never actually get bound;
                 // instead we use our GraphicsDevice-specific version of them.
