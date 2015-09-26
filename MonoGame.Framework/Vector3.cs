@@ -353,9 +353,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The cross product of two vectors as an output parameter.</param>
         public static void Cross(ref Vector3 vector1, ref Vector3 vector2, out Vector3 result)
         {
-            var x = vector1.Y*vector2.Z - vector2.Y*vector1.Z;
-            var y = -(vector1.X*vector2.Z - vector2.X*vector1.Z);
-            var z = vector1.X*vector2.Y - vector2.X*vector1.Y;
+            var x = vector1.Y * vector2.Z - vector2.Y * vector1.Z;
+            var y = -(vector1.X * vector2.Z - vector2.X * vector1.Z);
+            var z = vector1.X * vector2.Y - vector2.X * vector1.Y;
 
             result.X = x;
             result.Y = y;
@@ -748,7 +748,11 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            var factor = 1f / Distance(this, zero);
+            var ds = (X - 0) * (X - 0) +
+                     (Y - 0) * (Y - 0) +
+                     (Z - 0) * (Z - 0);
+            
+            var factor = 1f / (float)Math.Sqrt(ds);
 
             X *= factor;
             Y *= factor;
@@ -762,7 +766,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector3 Normalize(Vector3 value)
         {
-            var factor = 1f / Distance(value, zero);
+            var ds = (value.X - 0) * (value.X - 0) +
+                     (value.Y - 0) * (value.Y - 0) +
+                     (value.Z - 0) * (value.Z - 0);
+
+            var factor = 1f / (float)Math.Sqrt(ds);
             return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
         }
 
@@ -773,7 +781,11 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector3 value, out Vector3 result)
         {
-            var factor = 1f / Distance(value, zero);
+            var ds = (value.X - 0) * (value.X - 0) +
+                     (value.Y - 0) * (value.Y - 0) +
+                     (value.Z - 0) * (value.Z - 0);
+
+            var factor = 1f / (float)Math.Sqrt(ds);
             result.X = value.X * factor;
             result.Y = value.Y * factor;
             result.Z = value.Z * factor;
