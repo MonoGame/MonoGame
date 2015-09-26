@@ -353,9 +353,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The cross product of two vectors as an output parameter.</param>
         public static void Cross(ref Vector3 vector1, ref Vector3 vector2, out Vector3 result)
         {
-            float x = vector1.Y*vector2.Z - vector2.Y*vector1.Z;
-            float y = -(vector1.X*vector2.Z - vector2.X*vector1.Z);
-            float z = vector1.X*vector2.Y - vector2.X*vector1.Y;
+            var x = vector1.Y*vector2.Z - vector2.Y*vector1.Z;
+            var y = -(vector1.X*vector2.Z - vector2.X*vector1.Z);
+            var z = vector1.X*vector2.Y - vector2.X*vector1.Y;
 
             result.X = x;
             result.Y = y;
@@ -1119,9 +1119,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed normal as an output parameter.</param>
         public static void TransformNormal(ref Vector3 normal, ref Matrix matrix, out Vector3 result)
         {
-            var x = (normal.X*matrix.M11) + (normal.Y*matrix.M21) + (normal.Z*matrix.M31);
-            var y = (normal.X*matrix.M12) + (normal.Y*matrix.M22) + (normal.Z*matrix.M32);
-            var z = (normal.X*matrix.M13) + (normal.Y*matrix.M23) + (normal.Z*matrix.M33);
+            var x = (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31);
+            var y = (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32);
+            var z = (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33);
             result.X = x;
             result.Y = y;
             result.Z = z;
