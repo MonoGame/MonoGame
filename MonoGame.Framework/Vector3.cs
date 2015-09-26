@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Text;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -339,8 +338,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The cross product of two vectors.</returns>
         public static Vector3 Cross(Vector3 vector1, Vector3 vector2)
         {
-            Cross(ref vector1, ref vector2, out vector1);
-            return vector1;
+            Vector3 result;
+            result.X = vector1.Y * vector2.Z - vector2.Y * vector1.Z;
+            result.Y = -(vector1.X * vector2.Z - vector2.X * vector1.Z);
+            result.Z = vector1.X * vector2.Y - vector2.X * vector1.Y;
+            return result;
         }
 
         /// <summary>
@@ -351,12 +353,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The cross product of two vectors as an output parameter.</param>
         public static void Cross(ref Vector3 vector1, ref Vector3 vector2, out Vector3 result)
         {
-            var x = vector1.Y * vector2.Z - vector2.Y * vector1.Z;
-            var y = -(vector1.X * vector2.Z - vector2.X * vector1.Z);
-            var z = vector1.X * vector2.Y - vector2.X * vector1.Y;
-            result.X = x;
-            result.Y = y;
-            result.Z = z;
+            result.X = vector1.Y * vector2.Z - vector2.Y * vector1.Z;
+            result.Y = -(vector1.X * vector2.Z - vector2.X * vector1.Z);
+            result.Z = vector1.X * vector2.Y - vector2.X * vector1.Y;
         }
 
         /// <summary>
@@ -367,9 +366,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The distance between two vectors.</returns>
         public static float Distance(Vector3 value1, Vector3 value2)
         {
-            float result;
-            DistanceSquared(ref value1, ref value2, out result);
-            return (float)Math.Sqrt(result);
+            var ds = (value1.X - value2.X) * (value1.X - value2.X) +
+                     (value1.Y - value2.Y) * (value1.Y - value2.Y) +
+                     (value1.Z - value2.Z) * (value1.Z - value2.Z);
+
+            return (float)Math.Sqrt(ds);
         }
 
         /// <summary>
@@ -380,8 +381,11 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The distance between two vectors as an output parameter.</param>
         public static void Distance(ref Vector3 value1, ref Vector3 value2, out float result)
         {
-            DistanceSquared(ref value1, ref value2, out result);
-            result = (float)Math.Sqrt(result);
+            var ds = (value1.X - value2.X) * (value1.X - value2.X) +
+                     (value1.Y - value2.Y) * (value1.Y - value2.Y) +
+                     (value1.Z - value2.Z) * (value1.Z - value2.Z);
+            
+            result = (float)Math.Sqrt(ds);
         }
 
         /// <summary>
@@ -522,7 +526,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Vector3"/>.</returns>
         public override int GetHashCode()
         {
-            return (int)(this.X + this.Y + this.Z);
+            return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode();
         }
 
         /// <summary>
@@ -720,8 +724,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the vector inversion.</returns>
         public static Vector3 Negate(Vector3 value)
         {
-            value = new Vector3(-value.X, -value.Y, -value.Z);
-            return value;
+            return new Vector3(-value.X, -value.Y, -value.Z);
         }
 
         /// <summary>
@@ -741,7 +744,11 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            Normalize(ref this, out this);
+            var factor = 1f / Distance(this, zero);
+
+            X *= factor;
+            Y *= factor;
+            Z *= factor;
         }
 
         /// <summary>
@@ -751,8 +758,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector3 Normalize(Vector3 value)
         {
-            float factor = Distance(value, zero);
-            factor = 1f / factor;
+            var factor = 1f / Distance(value, zero);
             return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
         }
 
@@ -763,8 +769,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector3 value, out Vector3 result)
         {
-            float factor = Distance(value, zero);
-            factor = 1f / factor;
+            var factor = 1f / Distance(value, zero);
             result.X = value.X * factor;
             result.Y = value.Y * factor;
             result.Z = value.Z * factor;
@@ -778,12 +783,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Reflected vector.</returns>
         public static Vector3 Reflect(Vector3 vector, Vector3 normal)
         {
-            // I is the original array
-            // N is the normal of the incident plane
-            // R = I - (2 * N * ( DotProduct[ I,N] ))
             Vector3 reflectedVector;
-            // inline the dotProduct here instead of calling method
-            float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
+
+            var dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
             reflectedVector.X = vector.X - (2.0f * normal.X) * dotProduct;
             reflectedVector.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
             reflectedVector.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
@@ -799,12 +801,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Reflected vector as an output parameter.</param>
         public static void Reflect(ref Vector3 vector, ref Vector3 normal, out Vector3 result)
         {
-            // I is the original array
-            // N is the normal of the incident plane
-            // R = I - (2 * N * ( DotProduct[ I,N] ))
-
-            // inline the dotProduct here instead of calling method
-            float dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
+            var dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
             result.X = vector.X - (2.0f * normal.X) * dotProduct;
             result.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
             result.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
@@ -873,15 +870,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="Vector3"/>.</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder(32);
-            sb.Append("{X:");
-            sb.Append(this.X);
-            sb.Append(" Y:");
-            sb.Append(this.Y);
-            sb.Append(" Z:");
-            sb.Append(this.Z);
-            sb.Append("}");
-            return sb.ToString();
+            return "{X:" + X + " Y:" + Y + " Z:" + Z + "}";
         }
 
         #region Transform
@@ -894,8 +883,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed <see cref="Vector3"/>.</returns>
         public static Vector3 Transform(Vector3 position, Matrix matrix)
         {
-            Transform(ref position, ref matrix, out position);
-            return position;
+            Vector3 result;
+            result.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41;
+            result.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
+            result.Z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
+            return result;
         }
 
         /// <summary>
@@ -906,12 +898,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector3"/> as an output parameter.</param>
         public static void Transform(ref Vector3 position, ref Matrix matrix, out Vector3 result)
         {
-            var x = (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41;
-            var y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
-            var z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
-            result.X = x;
-            result.Y = y;
-            result.Z = z;
+            result.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41;
+            result.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
+            result.Z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
         }
 
         /// <summary>
@@ -923,7 +912,15 @@ namespace Microsoft.Xna.Framework
         public static Vector3 Transform(Vector3 value, Quaternion rotation)
         {
             Vector3 result;
-            Transform(ref value, ref rotation, out result);
+
+            var x = 2f * (rotation.Y * value.Z - rotation.Z * value.Y);
+            var y = 2f * (rotation.Z * value.X - rotation.X * value.Z);
+            var z = 2f * (rotation.X * value.Y - rotation.Y * value.X);
+
+            result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
+            result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
+            result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
+
             return result;
         }
 
@@ -935,9 +932,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector3"/> as an output parameter.</param>
         public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector3 result)
         {
-            float x = 2 * (rotation.Y * value.Z - rotation.Z * value.Y);
-            float y = 2 * (rotation.Z * value.X - rotation.X * value.Z);
-            float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
+            var x = 2f * (rotation.Y * value.Z - rotation.Z * value.Y);
+            var y = 2f * (rotation.Z * value.X - rotation.X * value.Z);
+            var z = 2f * (rotation.X * value.Y - rotation.Y * value.X);
 
             result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
             result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
@@ -1088,8 +1085,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed normal.</returns>
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
         {
-            TransformNormal(ref normal, ref matrix, out normal);
-            return normal;
+            Vector3 result;
+            result.X = (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31);
+            result.Y = (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32);
+            result.Z = (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33);
+            return result;
         }
 
         /// <summary>
@@ -1100,12 +1100,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed normal as an output parameter.</param>
         public static void TransformNormal(ref Vector3 normal, ref Matrix matrix, out Vector3 result)
         {
-            var x = (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31);
-            var y = (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32);
-            var z = (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33);
-            result.X = x;
-            result.Y = y;
-            result.Z = z;
+            result.X = (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31);
+            result.Y = (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32);
+            result.Z = (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33);
         }
 
         /// <summary>
@@ -1199,7 +1196,9 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
         public static bool operator !=(Vector3 value1, Vector3 value2)
         {
-            return !(value1 == value2);
+            return value1.X != value2.X
+                || value1.Y != value2.Y
+                || value1.Z != value2.Z;
         }
 
         /// <summary>
@@ -1223,8 +1222,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the inversion.</returns>
         public static Vector3 operator -(Vector3 value)
         {
-            value = new Vector3(-value.X, -value.Y, -value.Z);
-            return value;
+            return new Vector3(-value.X, -value.Y, -value.Z);
         }
 
         /// <summary>
@@ -1305,7 +1303,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of dividing a vector by a scalar.</returns>
         public static Vector3 operator /(Vector3 value1, float divider)
         {
-            float factor = 1 / divider;
+            var factor = 1f / divider;
             value1.X *= factor;
             value1.Y *= factor;
             value1.Z *= factor;

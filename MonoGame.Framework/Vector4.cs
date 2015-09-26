@@ -479,7 +479,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Vector4"/>.</returns>
         public override int GetHashCode()
         {
-            return (int)(this.W + this.X + this.Y + this.Y);
+            return W.GetHashCode() + X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode();
         }
 
         /// <summary>
