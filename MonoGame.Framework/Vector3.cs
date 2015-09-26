@@ -787,7 +787,13 @@ namespace Microsoft.Xna.Framework
         /// <returns>Reflected vector.</returns>
         public static Vector3 Reflect(Vector3 vector, Vector3 normal)
         {
+            // I is the original array
+            // N is the normal of the incident plane
+            // R = I - (2 * N * ( DotProduct[ I,N] ))
+
             Vector3 reflectedVector;
+            
+            // inline the dotProduct here instead of calling method
 
             var dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
             reflectedVector.X = vector.X - (2.0f * normal.X) * dotProduct;
@@ -805,6 +811,12 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Reflected vector as an output parameter.</param>
         public static void Reflect(ref Vector3 vector, ref Vector3 normal, out Vector3 result)
         {
+            // I is the original array
+            // N is the normal of the incident plane
+            // R = I - (2 * N * ( DotProduct[ I,N] ))
+
+            // inline the dotProduct here instead of calling method
+
             var dotProduct = ((vector.X * normal.X) + (vector.Y * normal.Y)) + (vector.Z * normal.Z);
             result.X = vector.X - (2.0f * normal.X) * dotProduct;
             result.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
@@ -902,9 +914,12 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector3"/> as an output parameter.</param>
         public static void Transform(ref Vector3 position, ref Matrix matrix, out Vector3 result)
         {
-            result.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41;
-            result.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
-            result.Z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
+            var x = (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41;
+            var y = (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + matrix.M42;
+            var z = (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + matrix.M43;
+            result.X = x;
+            result.Y = y;
+            result.Z = z;
         }
 
         /// <summary>
@@ -1104,9 +1119,12 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed normal as an output parameter.</param>
         public static void TransformNormal(ref Vector3 normal, ref Matrix matrix, out Vector3 result)
         {
-            result.X = (normal.X * matrix.M11) + (normal.Y * matrix.M21) + (normal.Z * matrix.M31);
-            result.Y = (normal.X * matrix.M12) + (normal.Y * matrix.M22) + (normal.Z * matrix.M32);
-            result.Z = (normal.X * matrix.M13) + (normal.Y * matrix.M23) + (normal.Z * matrix.M33);
+            var x = (normal.X*matrix.M11) + (normal.Y*matrix.M21) + (normal.Z*matrix.M31);
+            var y = (normal.X*matrix.M12) + (normal.Y*matrix.M22) + (normal.Z*matrix.M32);
+            var z = (normal.X*matrix.M13) + (normal.Y*matrix.M23) + (normal.Z*matrix.M33);
+            result.X = x;
+            result.Y = y;
+            result.Z = z;
         }
 
         /// <summary>
