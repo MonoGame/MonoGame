@@ -713,46 +713,50 @@ namespace MonoGame.Tools.Pipeline
 
             // Update the state of all menu items.
 
-            NewAction.Sensitive = notBuilding;
-            OpenAction.Sensitive = notBuilding;
-            ImportAction.Sensitive = notBuilding;
+            Application.Invoke(delegate
+                { 
+                    NewAction.Sensitive = notBuilding;
+                    OpenAction.Sensitive = notBuilding;
+                    ImportAction.Sensitive = notBuilding;
 
-            SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
-            SaveAsAction.Sensitive = projectOpenAndNotBuilding;
-            CloseAction.Sensitive = projectOpenAndNotBuilding;
+                    SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
+                    SaveAsAction.Sensitive = projectOpenAndNotBuilding;
+                    CloseAction.Sensitive = projectOpenAndNotBuilding;
 
-            ExitAction.Sensitive = notBuilding;
+                    ExitAction.Sensitive = notBuilding;
 
-            AddAction.Sensitive = projectOpen;
+                    AddAction.Sensitive = projectOpen;
             
-            RenameAction.Sensitive = paths.Length == 1;
+                    RenameAction.Sensitive = paths.Length == 1;
             
-            DeleteAction.Sensitive = projectOpen && somethingSelected;
+                    DeleteAction.Sensitive = projectOpen && somethingSelected;
 
-            BuildAction.Sensitive = projectOpen;
-            BuildAction1.Sensitive = projectOpenAndNotBuilding;
+                    BuildAction.Sensitive = projectOpen;
+                    BuildAction1.Sensitive = projectOpenAndNotBuilding;
 
-            treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
-            RebuildAction.Sensitive = treerebuild.Sensitive;
+                    treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
+                    RebuildAction.Sensitive = treerebuild.Sensitive;
 
-            CleanAction.Sensitive = projectOpenAndNotBuilding;
-            CancelBuildAction.Sensitive = !notBuilding;
-            CancelBuildAction.Visible = !notBuilding;
+                    CleanAction.Sensitive = projectOpenAndNotBuilding;
+                    CancelBuildAction.Sensitive = !notBuilding;
+                    CancelBuildAction.Visible = !notBuilding;
 
-            #if GTK3
-            if(Global.UseHeaderBar)
-            {
-                new_button.Sensitive = NewAction.Sensitive;
-                open_button.Sensitive = OpenAction.Sensitive;
-                save_button.Sensitive = SaveAction.Sensitive;
-                build_button.Sensitive = BuildAction1.Sensitive;
-            }
-            #endif
+                    #if GTK3
+                    if (Global.UseHeaderBar)
+                    {
+                        new_button.Sensitive = NewAction.Sensitive;
+                        open_button.Sensitive = OpenAction.Sensitive;
+                        save_button.Sensitive = SaveAction.Sensitive;
+                        build_button.Sensitive = BuildAction1.Sensitive;
+                    }
+                    #endif
 
-            DebugModeAction.Sensitive = notBuilding;
+                    DebugModeAction.Sensitive = notBuilding;
 
-            UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
-            UpdateRecentProjectList();
+                    UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
+                    UpdateRecentProjectList();
+
+                });
         }
 
         public void UpdateRecentProjectList()
