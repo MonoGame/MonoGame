@@ -353,9 +353,13 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">The cross product of two vectors as an output parameter.</param>
         public static void Cross(ref Vector3 vector1, ref Vector3 vector2, out Vector3 result)
         {
-            result.X = vector1.Y * vector2.Z - vector2.Y * vector1.Z;
-            result.Y = -(vector1.X * vector2.Z - vector2.X * vector1.Z);
-            result.Z = vector1.X * vector2.Y - vector2.X * vector1.Y;
+            float x = vector1.Y*vector2.Z - vector2.Y*vector1.Z;
+            float y = -(vector1.X*vector2.Z - vector2.X*vector1.Z);
+            float z = vector1.X*vector2.Y - vector2.X*vector1.Y;
+
+            result.X = x;
+            result.Y = y;
+            result.Z = z;
         }
 
         /// <summary>
