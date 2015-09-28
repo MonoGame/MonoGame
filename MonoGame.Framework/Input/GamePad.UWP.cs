@@ -49,10 +49,17 @@ namespace Microsoft.Xna.Framework.Input
             };
         }
 
+        private static GamePadState GetDefaultState()
+        {
+            var state = new GamePadState();
+            state.Buttons = new GamePadButtons(Back ? Buttons.Back : 0);
+            return state;
+        }
+
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             if (index >= WGI.Gamepad.Gamepads.Count)
-                return GamePadState.Default;
+                return (index == 0 ? GetDefaultState() : GamePadState.Default);
 
             var state = WGI.Gamepad.Gamepads[index].GetCurrentReading();
 
