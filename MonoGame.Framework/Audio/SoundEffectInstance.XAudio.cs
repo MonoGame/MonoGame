@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Audio
     public partial class SoundEffectInstance : IDisposable
     {
         internal SourceVoice _voice;
+        internal WaveFormat _format;
 
         private static float[] _panMatrix;
 

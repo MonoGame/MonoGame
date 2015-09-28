@@ -179,11 +179,37 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            SourceVoice voice = null;
-            if (Device != null)
+            // If the instance came from the pool then it could
+            // already have a valid voice assigned.
+            var voice = inst._voice;
+
+            if (voice != null)
+            {
+                // TODO: This really shouldn't be here.  Instead we should fix the 
+                // SoundEffectInstancePool to internally to look for a compatible
+                // instance or return a new instance without a voice.
+                //
+                // For now we do the same test that the pool should be doing here.
+             
+                if (!ReferenceEquals(inst._format, _format))
+                {
+                    if (inst._format.Encoding != _format.Encoding ||
+                        inst._format.Channels != _format.Channels ||
+                        inst._format.SampleRate != _format.SampleRate ||
+                        inst._format.BitsPerSample != _format.BitsPerSample)
+                    {
+                        voice.DestroyVoice();
+                        voice.Dispose();
+                        voice = null;
+                    }
+                }
+            }
+
+            if (voice == null && Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             inst._voice = voice;
+            inst._format = _format;
         }
 
         #endregion
