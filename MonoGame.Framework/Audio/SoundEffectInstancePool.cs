@@ -140,13 +140,26 @@ namespace Microsoft.Xna.Framework.Audio
                     Add(inst);
                     continue;
                 }
-                else if (inst._effect.IsDisposed)
+
+                x++;
+            }
+        }
+
+        /// <summary>
+        /// Iterates the list of playing instances, stop them and return them to the pool if they are instances of the given SoundEffect.
+        /// </summary>
+        /// <param name="effect">The SoundEffect</param>
+        internal static void StopPooledInstances(SoundEffect effect)
+        {
+            SoundEffectInstance inst = null;
+
+            for (var x = 0; x < _playingInstances.Count;)
+            {
+                inst = _playingInstances[x];
+                if (inst.State != SoundState.Stopped && inst._effect == effect)
                 {
+                    inst.Stop(true); // stop immediatly
                     Add(inst);
-                    // Instances created through SoundEffect.CreateInstance need to be disposed when
-                    // their owner SoundEffect is disposed.
-                    if (!inst._isPooled)
-                        inst.Dispose();
                     continue;
                 }
 

@@ -149,12 +149,37 @@ public class AllowNull
 #endregion
 
 #region Collections
+
+public enum CustomEnum
+{
+    Val1,
+    Val2
+}
+
+public class CustomItem
+{
+    public CustomEnum EnumVal;
+}
+
+public class CustomItemBase
+{
+    public double DoubleVal;
+    public Nullable<float> NullableFloatVal;
+}
+
+public class CustomItemInherited : CustomItemBase
+{
+    public char[] CharArrayVal;
+}
+
 public class Collections
 {
     public string[] StringArray;
     public List<string> StringList;
     public int[] IntArray;
     public Color[] ColorArray;
+    public List<CustomItem> CustomItemList;
+    public List<CustomItemInherited> CustomItemInheritedList;
 
     // Indexer - should be ignored by intermediate serializer.
     public Color this[int i]
@@ -428,11 +453,16 @@ class GenericTypes
 {
     public GenericClass<int> A;
     public GenericClass<float> B;
+    public GenericClass<GenericArg> C;
 }
 
 class GenericClass<T>
 {
     public T Value;
+}
+public class GenericArg
+{
+    public int Value;
 }
 #endregion
 

@@ -74,6 +74,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         }
 
         /// <summary>
+        /// Allows type writers to add their element type writers to the content writer.
+        /// </summary>
+        /// <param name="writer">The content writer.</param>
+        internal virtual void OnAddedToContentWriter(ContentWriter writer)
+        {
+
+        }
+
+        /// <summary>
         /// Indicates whether a given type of content should be compressed.
         /// </summary>
         /// <param name="targetPlatform">The target platform of the content build.</param>

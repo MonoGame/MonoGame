@@ -12,7 +12,7 @@
             Value="#80000000" />
         <Setter
             Property="Padding"
-            Value="25" />
+            Value="15" />
         <Setter
             Property="TitleStyle">
             <Setter.Value>
@@ -23,7 +23,7 @@
                         Value="Segoe UI" />
                     <Setter
                         Property="FontSize"
-                        Value="50" />
+                        Value="24" />
                     <Setter
                         Property="Margin"
                         Value="3,0" />
@@ -43,10 +43,10 @@
                         Value="Segoe UI Semilight" />
                     <Setter
                         Property="FontSize"
-                        Value="30" />
+                        Value="16" />
                     <Setter
                         Property="Margin"
-                        Value="3,25,3,5" />
+                        Value="3,10,3,5" />
                     <Setter
                         Property="TextWrapping"
                         Value="Wrap" />
@@ -63,7 +63,7 @@
                     TargetType="TextBox">
                     <Setter
                         Property="Margin"
-                        Value="0,15,15,15" />
+                        Value="0,10,10,10" />
                     <Setter
                         Property="TextWrapping"
                         Value="Wrap" />
@@ -72,10 +72,10 @@
                         Value="Black" />
                     <Setter 
 						Property="FontSize"
-						Value="30" />
+						Value="16" />
                     <Setter
                         Property="MinHeight"
-                        Value="52" />
+                        Value="30" />
                     <Setter
                         Property="Background"
                         Value="White" />
@@ -106,10 +106,10 @@
                         Value="#FFFFFF" />
                     <Setter
                         Property="Margin"
-                        Value="25,25,25,25" />
+                        Value="5" />
                     <Setter
                         Property="FontSize"
-                        Value="40" />
+                        Value="16" />
                 </Style>
             </Setter.Value>
         </Setter>

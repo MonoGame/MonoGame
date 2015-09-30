@@ -247,12 +247,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GetData(pixelData);
 
             //We Must convert from BGRA to RGBA
-            ConvertToRGBA(height, width, pixelData);
+            ConvertToRGBA(Height, Width, pixelData);
 
             var waitEvent = new ManualResetEventSlim(false);
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                var bitmap = new WriteableBitmap(width, height);
+                var bitmap = new WriteableBitmap(Width, Height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
                 waitEvent.Set();

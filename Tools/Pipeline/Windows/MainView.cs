@@ -36,6 +36,10 @@ namespace MonoGame.Tools.Pipeline
         {            
             InitializeComponent();
 
+            // Set MenuBar color to Window color if the current OS is Windows 10
+            if (System.Environment.OSVersion.Version.Major == 10)
+                this._mainMenu.BackColor = SystemColors.Window;
+
             // Set the application icon this form.
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
@@ -1105,7 +1109,59 @@ namespace MonoGame.Tools.Pipeline
             }
             return null;
         }
-      
+
         #endregion
+
+        private void _treeView_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void _treeView_DragDrop(object sender, DragEventArgs e)
+        {
+            string initDir = GetDropTargetPath(sender, e);
+
+            List<string> folders = new List<string>();
+            List<string> files = new List<string>();
+
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+                return;
+
+            try
+            {
+                string[] dropped_files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (string file in dropped_files)
+                {
+                    if (Directory.Exists(file))
+                        folders.Add(file);
+                    else
+                        files.Add(file);
+                }
+
+                _controller.DragDrop(initDir, folders.ToArray(), files.ToArray());
+            }
+            catch
+            {
+
+            }
+        }
+
+        private string GetDropTargetPath(object sender, DragEventArgs e)
+        {
+            var treeView = sender as TreeView;
+            var targetPoint = treeView.PointToClient(new Point(e.X, e.Y));
+            var targetNode = treeView.GetNodeAt(targetPoint);
+
+            if (targetNode == null)
+                targetNode = treeView.Nodes[0];
+
+            if (targetNode.Tag is ContentItem)
+                targetNode = targetNode.Parent;
+
+            if (targetNode.Tag is FolderItem)
+                return targetNode.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
+
+            return ((IProjectItem)treeView.Nodes[0].Tag).Location;
+        }
     }
 }

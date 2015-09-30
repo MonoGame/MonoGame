@@ -423,16 +423,31 @@ namespace Microsoft.Xna.Framework.Graphics
             options |= ClearOptions.DepthBuffer;
             options |= ClearOptions.Stencil;
             PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
+
+            unchecked
+            {
+                _graphicsMetrics._clearCount++;
+            }
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
             PlatformClear(options, color.ToVector4(), depth, stencil);
+
+            unchecked
+            {
+                _graphicsMetrics._clearCount++;
+            }
         }
 
 		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
 		{
             PlatformClear(options, color, depth, stencil);
+
+            unchecked
+            {
+                _graphicsMetrics._clearCount++;
+            }
         }
 
         public void Dispose()
@@ -658,7 +673,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 renderTargetCount = renderTargets.Length;
                 if (renderTargetCount == 0)
+                {
                     renderTargets = null;
+                }
             }
 
             // Try to early out if the current and new bindings are equal.
@@ -680,6 +697,21 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             ApplyRenderTargets(renderTargets);
+
+            if (renderTargetCount == 0)
+            {
+                unchecked
+                {
+                    _graphicsMetrics._targetCount++;
+                }
+            }
+            else
+            {
+                unchecked
+                {
+                    _graphicsMetrics._targetCount += (ulong)renderTargetCount;
+                }
+            }
         }
 
         internal void ApplyRenderTargets(RenderTargetBinding[] renderTargets)
@@ -808,12 +840,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="primitiveType">The type of primitives in the index buffer.</param>
         /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
-        /// <param name="minVertexIndex">A hint of the lowest vertex indexed relative to baseVertex.</param>
-        /// <param name="numVertices">An hint of the maximum vertex indexed.</param>
+        /// <param name="minVertexIndex">This is unused and remains here only for XNA API compatibility.</param>
+        /// <param name="numVertices">This is unused and remains here only for XNA API compatibility.</param>
         /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
         /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
+        [Obsolete("Use DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount) instead. In future versions this method can be removed.")]
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
+        {
+            DrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
+        }
+
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
             if (_vertexShader == null)
                 throw new InvalidOperationException("Vertex shader must be set before calling DrawIndexedPrimitives.");
@@ -827,20 +865,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
-            // NOTE: minVertexIndex and numVertices are only hints of the
-            // range of vertex data which will be indexed.
-            //
-            // They will only be used if the graphics API can use
-            // this range hint to optimize rendering.
+            PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
 
-           
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += (ulong)primitiveCount;
             }
-
-            PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
@@ -869,14 +900,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
-            
+
+            PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
+
             unchecked
             {
                 _graphicsMetrics._drawCount++;
                 _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-            PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
@@ -892,14 +923,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
-            
+            PlatformDrawPrimitives(primitiveType, vertexStart, vertexCount);
+
             unchecked
             {
                 _graphicsMetrics._drawCount++;
                 _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-            PlatformDrawPrimitives(primitiveType, vertexStart, vertexCount);
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -939,14 +969,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
 
-            
+            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
+
             unchecked
             {
                 _graphicsMetrics._drawCount++;
                 _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -986,14 +1015,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (vertexDeclaration == null)
                 throw new ArgumentNullException("vertexDeclaration");
 
+            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
             
             unchecked
             {
                 _graphicsMetrics._drawCount++;
                 _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
         }
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
