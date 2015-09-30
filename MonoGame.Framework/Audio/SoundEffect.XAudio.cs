@@ -183,11 +183,6 @@ namespace Microsoft.Xna.Framework.Audio
             // already have a valid voice assigned.
             var voice = inst._voice;
 
-            if (voice != null)
-            {
-                System.Diagnostics.Debug.Assert(PlatformIsInstanceCompatible(inst));
-            }
-
             if (voice == null && Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
