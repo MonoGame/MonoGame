@@ -212,6 +212,28 @@ namespace Microsoft.Xna.Framework.Audio
             inst._format = _format;
         }
 
+        /// <summary>
+        /// Test if a SoundEffectInstance is compatible (i.e. same sampling rate, number of channels, etc.) with the SoundEffect.
+        /// This method is used by the SoundEffectInstancePool to re-use instances efficiently.
+        /// </summary>
+        /// <param name="inst">The SoundEffectInstance to test</param>
+        /// <returns>True if compatible, false otherwise</returns>
+        internal bool PlatformIsInstanceCompatible(SoundEffectInstance inst)
+        {
+            if (inst != null)
+            {
+                if (ReferenceEquals(inst._format, _format) ||
+                    (inst._format.Encoding == _format.Encoding &&
+                    inst._format.Channels == _format.Channels &&
+                    inst._format.SampleRate == _format.SampleRate &&
+                    inst._format.BitsPerSample == _format.BitsPerSample))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         #endregion
 
         private void PlatformDispose(bool disposing)

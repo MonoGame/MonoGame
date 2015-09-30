@@ -166,6 +166,17 @@ namespace Microsoft.Xna.Framework.Audio
             inst.InitializeSound();
             inst.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
+		
+		/// <summary>
+        /// Test if a SoundEffectInstance is compatible (i.e. same sampling rate, number of channels, etc.) with the SoundEffect.
+        /// This method is used by the SoundEffectInstancePool to re-use instances efficiently.
+        /// </summary>
+        /// <param name="inst">The SoundEffectInstance to test</param>
+        /// <returns>True if compatible, false otherwise</returns>
+        internal bool PlatformIsInstanceCompatible(SoundEffectInstance inst)
+        {
+            return true; // OpenAL don't care about that
+        }
 
         #endregion
 

@@ -215,7 +215,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (!SoundEffectInstancePool.SoundsAvailable)
                 return null;
 
-            var inst = SoundEffectInstancePool.GetInstance(forXAct);
+            var inst = SoundEffectInstancePool.GetInstance(this, forXAct);
             inst._effect = this;
             PlatformSetupInstance(inst);
 

@@ -90,32 +90,43 @@ namespace Microsoft.Xna.Framework.Audio
         /// SoundEffectInstance if the pool is empty.
         /// </summary>
         /// <returns>The SoundEffectInstance.</returns>
-        internal static SoundEffectInstance GetInstance(bool forXAct)
+        internal static SoundEffectInstance GetInstance(SoundEffect effect, bool forXAct)
         {
             SoundEffectInstance inst = null;
             var count = _pooledInstances.Count;
             if (count > 0)
             {
-                // Grab the item at the end of the list so the remove doesn't copy all
-                // the list items down one slot.
-                inst = _pooledInstances[count - 1];
-                _pooledInstances.RemoveAt(count - 1);
+                // look for a compatible sound instance
+                for (int i = count - 1; i >= 0; i--)
+                {
+                    inst = _pooledInstances[i];
+                    if (effect.PlatformIsInstanceCompatible(inst))
+                    {
+                        // swap the instance to the end of the pool so that the List doesn't
+                        // copy all the items down one slot when removing it
+                        SoundEffectInstance tmpInst = _pooledInstances[count - 1];
+                        _pooledInstances[count - 1] = inst;
+                        _pooledInstances[i] = tmpInst;
+                        _pooledInstances.RemoveAt(count - 1);
 
-                // Reset used instance to the "default" state.
-                inst._isPooled = true;
-                inst._isXAct = forXAct;
-                inst.Volume = 1.0f;
-                inst.Pan = 0.0f;
-                inst.Pitch = 0.0f;
-                inst.IsLooped = false;
-            }
-            else
-            {
-                inst = new SoundEffectInstance();
-                inst._isPooled = true;
-                inst._isXAct = forXAct;
+                        // Reset used instance to the "default" state.
+                        inst._isPooled = true;
+                        inst._isXAct = forXAct;
+                        inst.Volume = 1.0f;
+                        inst.Pan = 0.0f;
+                        inst.Pitch = 0.0f;
+                        inst.IsLooped = false;
+
+                        return inst;
+                    }                   
+                }
             }
 
+            // no comptible instance found, let's return a new one
+            inst = new SoundEffectInstance();
+            inst._isPooled = true;
+            inst._isXAct = forXAct;
+            
             return inst;
         }
 
