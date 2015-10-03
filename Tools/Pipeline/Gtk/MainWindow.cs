@@ -43,9 +43,7 @@ namespace MonoGame.Tools.Pipeline
         FileFilter XnaContentProjectFileFilter;
         FileFilter AllFilesFilter;
 
-        MenuItem treerebuild;
         MenuItem recentMenu;
-        bool expand = false;
 
         public void ReloadTitle()
         {
@@ -105,16 +103,11 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            treerebuild = new MenuItem ("Rebuild");
-            treerebuild.Activated += delegate {
-                projectview1.Rebuild ();
-            };
-
             //This is always returning false, and solves a bug
             if (projectview1 == null || propertiesview1 == null)
                 return;
 
-            projectview1.Initalize (this, treerebuild, propertiesview1);
+            projectview1.Initalize (this, propertiesview1);
 
             if (Assembly.GetEntryAssembly ().FullName.Contains ("Pipeline"))
                 BuildMenu ();
@@ -166,9 +159,6 @@ namespace MonoGame.Tools.Pipeline
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
             }
-
-            if(_controller.ProjectOpen)
-                projectview1.ExpandBase();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -180,6 +170,51 @@ namespace MonoGame.Tools.Pipeline
         }
 
 #region IView implements
+
+        public void ReloadRecentList(List<string> paths)
+        {
+            recentMenu.Submenu = null;
+            var m = new Menu ();
+
+            int nop = 0;
+
+            foreach (var project in paths)
+            {
+                nop++;
+                var recentItem = new MenuItem(project);
+
+                // We need a local to make the delegate work correctly.
+                var localProject = project;
+                recentItem.Activated += delegate
+                    {
+                        _controller.OpenProject(localProject);
+                    };
+
+                m.Insert (recentItem, 0);
+            }
+
+            if (nop > 0)
+            {
+                m.Add(new SeparatorMenuItem());
+                var item = new MenuItem("Clear");
+                item.Activated += delegate
+                    {
+                        _controller.ClearRecentList();
+                    };
+                m.Add(item);
+            }
+            else
+            {
+                var item = new MenuItem("No History");
+                item.Sensitive = false;
+                m.Add(item);
+            }
+
+            recentMenu.Submenu = m;
+            m.ShowAll();
+
+            menubar1.ShowAll ();
+        }
 
         public void Attach (IController controller)
         {
@@ -309,18 +344,18 @@ namespace MonoGame.Tools.Pipeline
                 projectview1.openedProject = "";
                 projectview1.SetBaseIter ("");
                 projectview1.Close ();
-                UpdateMenus ();
             }
+            UpdateMenus ();
         }
 
         public void AddTreeItem (IProjectItem item)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false,  expand, _controller.GetFullPath(item.OriginalPath));
+            projectview1.AddItem (projectview1.GetBaseIter(), item.OriginalPath, item.Exists, false, _controller.GetFullPath(item.OriginalPath));
         }
 
         public void AddTreeFolder (string folder)
         {
-            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true,  expand, _controller.GetFullPath(folder));
+            projectview1.AddItem (projectview1.GetBaseIter(), folder, true, true, _controller.GetFullPath(folder));
         }
 
         public void RemoveTreeItem (ContentItem contentItem)
@@ -335,7 +370,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateTreeItem (IProjectItem item)
         {
-
+            
         }
 
         public void EndTreeUpdate ()
@@ -425,6 +460,38 @@ namespace MonoGame.Tools.Pipeline
             return result;
         }
 
+        public bool ChooseItemTemplate(out ContentItemTemplate template, out string name)
+        {
+            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
+
+            if (dialog.Run() == (int)ResponseType.Ok)
+            {
+                template = dialog.templateFile;
+                name = dialog.name;
+
+                return true;
+            }
+
+            template = null;
+            name = null;
+
+            return false;
+        }
+
+        public bool ChooseName(string title, string text, string oldname, bool docheck, out string newname)
+        {
+            var ted = new TextEditorDialog(this, title, text, oldname, docheck);
+
+            if (ted.Run() == (int)ResponseType.Ok)
+            {
+                newname = ted.text;
+                return true;
+            }
+
+            newname = "";
+            return false;
+        }
+
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
             var afd = new AddItemDialog(this, file, exists, FileType.File);
@@ -492,7 +559,97 @@ namespace MonoGame.Tools.Pipeline
 
             return _buildProcess;
         }
+
+        public void ExpandPath(string path)
+        {
+            projectview1.ExpandItem(projectview1.GetBaseIter(), path);
+        }
+
+        public bool GetSelection(out FileType type, out string path, out string location)
+        {
+            List<TreeIter> iters;
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
+
+            if (paths.Length != 1)
+            {
+                type = FileType.Base;
+                path = "";
+                location = "";
+                return false;
+            }
+
+            path = paths[0];
+            GetInfo(ids[0], paths[0], out type, out location);
+
+            return true;
+        }
+
+        public bool GetSelection(out FileType[] type, out string[] path, out string[] location)
+        {
+            var types = new List<FileType>();
+            var locations = new List<string>();
+
+            List<TreeIter> iters;
+            List<string> ids;
+            path = projectview1.GetSelectedTreePath (out iters, out ids);
+
+            for (int i = 0; i < path.Length; i++)
+            {
+                FileType tmp_type;
+                string tmp_loc;
+
+                GetInfo(ids[i], path[i], out tmp_type, out tmp_loc);
+
+                types.Add(tmp_type);
+                locations.Add(tmp_loc);
+            }
+
+            type = types.ToArray();
+            location = locations.ToArray();
+
+            return (path.Length > 0);
+        }
+
+        public List<ContentItem> GetChildItems(string path)
+        {
+            var items = new List<ContentItem>();
+            TreeIter iter;
+
+            if (!projectview1.GetIter(projectview1.GetBaseIter(), path, out iter))
+                return items;
+
+            var paths = projectview1.GetAllPaths(iter);
+            foreach (string p in paths)
+            {
+                var item = _controller.GetItem(p) as ContentItem;
+
+                if (item != null)
+                    items.Add(item);
+            }
+
+            return items;
+        }
 #endregion
+
+        private void GetInfo(string id, string path, out FileType type, out string location)
+        {
+            if (id == projectview1.ID_FOLDER)
+            {
+                type = FileType.Folder;
+                location = path;
+            }
+            else if (id == projectview1.ID_BASE)
+            {
+                type = FileType.Base;
+                location = "";
+            }
+            else
+            {
+                type = FileType.File;
+                location = System.IO.Path.GetDirectoryName(path);
+            }
+        }
 
         protected void OnNewActionActivated (object sender, EventArgs e)
         {
@@ -502,7 +659,6 @@ namespace MonoGame.Tools.Pipeline
         protected void OnOpenActionActivated (object sender, EventArgs e)
         {
             _controller.OpenProject();
-            projectview1.ExpandBase();
         }
 
         protected void OnCloseActionActivated (object sender, EventArgs e)
@@ -536,122 +692,48 @@ namespace MonoGame.Tools.Pipeline
         protected void OnUndoActionActivated (object sender, EventArgs e)
         {
             _controller.Undo ();
+            UpdateMenus();
         }
 
         protected void OnRedoActionActivated (object sender, EventArgs e)
         {
             _controller.Redo ();
+            UpdateMenus();
         }
 
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
-            expand = true;
-            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
-
-            if (dialog.Run () == (int)ResponseType.Ok) {
-
-                List<TreeIter> iters;
-                List<string> ids;
-                string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-                string location;
-
-                if (paths.Length == 1) {
-                    if (ids [0] == projectview1.ID_FOLDER)
-                        location = paths [0];
-                    else if (ids[0] == projectview1.ID_BASE)
-                        location = _controller.GetFullPath ("");
-                    else
-                        location = System.IO.Path.GetDirectoryName (paths [0]);
-                }
-                else
-                    location = _controller.GetFullPath ("");
-
-                _controller.NewItem(dialog.name, location, dialog.templateFile);
-                UpdateMenus();
-            }
-            expand = false;
+            _controller.NewItem();
+            UpdateMenus();
         }
 
         public void OnAddItemActionActivated (object sender, EventArgs e)
         {
-            expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.Include (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.Include (_controller.GetFullPath (""));
-                else
-                    _controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.Include (_controller.GetFullPath (""));
+            _controller.Include();
             UpdateMenus();
-            expand = false;
         }
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var ted = new TextEditorDialog(this, "New Folder", "Folder Name:", "", true);
-            if (ted.Run() != (int)ResponseType.Ok)
-                return;
-            var foldername = ted.text;
-
-            expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.NewFolder (foldername, paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.NewFolder (foldername, _controller.GetFullPath (""));
-                else
-                    _controller.NewFolder (foldername, System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.NewFolder (foldername, _controller.GetFullPath (""));
-
-            expand = false;
+            _controller.NewFolder();
+            UpdateMenus();
         }
 
         public void OnAddFolderActionActivated(object sender, EventArgs e)
         {
-            expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.IncludeFolder (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.IncludeFolder (_controller.GetFullPath (""));
-                else
-                    _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.IncludeFolder (_controller.GetFullPath (""));
+            _controller.IncludeFolder();
             UpdateMenus();
-            expand = false;
         }
 
         public void OnRenameActionActivated (object sender, EventArgs e)
         {
-            expand = true;
-            projectview1.Rename ();
+            _controller.Rename ();
             UpdateMenus();
-            expand = false;
         }
         
         public void OnDeleteActionActivated (object sender, EventArgs e)
         {
-            projectview1.Remove ();
+            _controller.Delete ();
             UpdateMenus();
         }
 
@@ -698,102 +780,42 @@ namespace MonoGame.Tools.Pipeline
         protected void OnCancelBuildActionActivated (object sender, EventArgs e)
         {
             _controller.CancelBuild();
+            UpdateMenus();
         }
 
         public void UpdateMenus()
         {
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
+            var ms = _controller.GetMenuSensitivityInfo();
 
-            var notBuilding = !_controller.ProjectBuilding;
-            var projectOpen = _controller.ProjectOpen;
-            var projectOpenAndNotBuilding = projectOpen && notBuilding;
-            var somethingSelected = paths.Length > 0;
-
-            // Update the state of all menu items.
-
-            NewAction.Sensitive = notBuilding;
-            OpenAction.Sensitive = notBuilding;
-            ImportAction.Sensitive = notBuilding;
-
-            SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
-            SaveAsAction.Sensitive = projectOpenAndNotBuilding;
-            CloseAction.Sensitive = projectOpenAndNotBuilding;
-
-            ExitAction.Sensitive = notBuilding;
-
-            AddAction.Sensitive = projectOpen;
-            
-            RenameAction.Sensitive = paths.Length == 1;
-            
-            DeleteAction.Sensitive = projectOpen && somethingSelected;
-
-            BuildAction.Sensitive = projectOpen;
-            BuildAction1.Sensitive = projectOpenAndNotBuilding;
-
-            treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
-            RebuildAction.Sensitive = treerebuild.Sensitive;
-
-            CleanAction.Sensitive = projectOpenAndNotBuilding;
-            CancelBuildAction.Sensitive = !notBuilding;
-            CancelBuildAction.Visible = !notBuilding;
+            NewAction.Sensitive = ms.New;
+            OpenAction.Sensitive = ms.Open;
+            ImportAction.Sensitive = ms.Import;
+            SaveAction.Sensitive = ms.Save;
+            SaveAsAction.Sensitive = ms.SaveAs;
+            CloseAction.Sensitive = ms.Close;
+            ExitAction.Sensitive = ms.Exit;
+            AddAction.Sensitive = ms.Add;
+            RenameAction.Sensitive = ms.Rename;
+            DeleteAction.Sensitive = ms.Delete;
+            BuildAction.Sensitive = ms.BuildMenu;
+            BuildAction1.Sensitive = ms.Build;
+            RebuildAction.Sensitive = ms.Rebuild;
+            CleanAction.Sensitive = ms.Clean;
+            CancelBuildAction.Sensitive = CancelBuildAction.Visible = ms.Cancel;
 
             #if GTK3
             if(Global.UseHeaderBar)
             {
-                new_button.Sensitive = NewAction.Sensitive;
-                open_button.Sensitive = OpenAction.Sensitive;
-                save_button.Sensitive = SaveAction.Sensitive;
-                build_button.Sensitive = BuildAction1.Sensitive;
+                new_button.Sensitive = ms.New;
+                open_button.Sensitive = ms.Open;
+                save_button.Sensitive = ms.Save;
+                build_button.Sensitive = ms.Build;
             }
             #endif
 
-            DebugModeAction.Sensitive = notBuilding;
+            DebugModeAction.Sensitive = ms.Debug;
 
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
-            UpdateRecentProjectList();
-        }
-
-        public void UpdateRecentProjectList()
-        {
-            History.Default.Load ();
-            recentMenu.Submenu = null;
-            var m = new Menu ();
-
-            int nop = 0;
-
-            foreach (var project in History.Default.ProjectHistory)
-            {
-                nop++;
-                var recentItem = new MenuItem(project);
-
-                // We need a local to make the delegate work correctly.
-                var localProject = project;
-                recentItem.Activated += delegate
-                {
-                    _controller.OpenProject(localProject);
-                    projectview1.ExpandBase();
-                };
-
-                m.Insert (recentItem, 0);
-            }
-                
-            if (nop > 0) {
-                m.Add (new SeparatorMenuItem ());
-                var item = new MenuItem ("Clear");
-                item.Activated += delegate {
-                    History.Default.Clear ();
-                    UpdateRecentProjectList ();
-                };
-                m.Add (item);
-
-                recentMenu.Submenu = m;
-                m.ShowAll ();
-            }
-
-            recentMenu.Sensitive = nop > 0;
-            menubar1.ShowAll ();
         }
 
         void UpdateUndoRedo(bool canUndo, bool canRedo)

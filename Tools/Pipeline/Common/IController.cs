@@ -98,19 +98,25 @@ namespace MonoGame.Tools.Pipeline
 
         bool Exit();
 
+        void ClearRecentList();
+
         #region ContentItem
 
         void DragDrop(string initialDirectory, string[] folders, string[] files);
 
-        void Include(string initialDirectory);
+        void Include();
 
-        void IncludeFolder(string initialDirectory);
+        void IncludeFolder();
 
         void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders);        
 
-        void NewItem(string name, string location, ContentItemTemplate template);
+        void NewItem();
 
-        void NewFolder(string name, string location);
+        void NewFolder();
+
+        void Rename();
+
+        void Delete();
 
         void Move (string[] paths, string[] newpaths, FileType[] types);
         
@@ -119,6 +125,12 @@ namespace MonoGame.Tools.Pipeline
         IProjectItem GetItem(string originalPath);
 
         #endregion
+
+        #region Menu
+
+        MenuSensitivity GetMenuSensitivityInfo();
+
+        ContextMenuVisibility GetContextMenuVisibilityInfo();
 
         #region Undo, Redo
 
@@ -132,7 +144,9 @@ namespace MonoGame.Tools.Pipeline
 
         void Redo();
 
-        #endregion        
+        #endregion     
+
+        #endregion
 
         string GetFullPath(string filePath);
     }

@@ -48,6 +48,7 @@
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
     <Compile Include="Common\FileType.cs" />
+    <Compile Include="Common\MenuInfo.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\Selection.cs" />
     <Compile Include="Common\PipelineController.MoveAction.cs" />
