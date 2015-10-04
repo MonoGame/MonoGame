@@ -84,9 +84,7 @@ namespace MonoGame.Tools.Pipeline
 		
 		private global::MonoGame.Tools.Pipeline.PropertiesView propertiesview1;
 		
-		private global::Gtk.ScrolledWindow GtkScrolledWindow;
-		
-		private global::Gtk.TextView textview2;
+        BuildOutput buildOutput1;
 
 		protected virtual void Build ()
 		{
@@ -224,16 +222,8 @@ namespace MonoGame.Tools.Pipeline
 			global::Gtk.Paned.PanedChild w5 = ((global::Gtk.Paned.PanedChild)(this.hpaned1 [this.vpaned2]));
 			w5.Resize = false;
 			// Container child hpaned1.Gtk.Paned+PanedChild
-			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
-			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
-			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
-			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
-			this.textview2 = new global::Gtk.TextView ();
-			this.textview2.CanFocus = true;
-			this.textview2.Name = "textview2";
-			this.textview2.Editable = false;
-			this.GtkScrolledWindow.Add (this.textview2);
-			this.hpaned1.Add (this.GtkScrolledWindow);
+            buildOutput1 = new BuildOutput();
+            this.hpaned1.Add (this.buildOutput1);
 			this.vbox2.Add (this.hpaned1);
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.hpaned1]));
 			w8.Position = 1;

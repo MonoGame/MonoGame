@@ -124,7 +124,6 @@ namespace MonoGame.Tools.Pipeline
             }
 
             propertiesview1.Initalize (this);
-            this.textview2.SizeAllocated += AutoScroll;
         }
             
         void BuildMenu() {
@@ -186,7 +185,12 @@ namespace MonoGame.Tools.Pipeline
             _controller = controller;
             propertiesview1.controller = _controller;
 
-            _controller.OnBuildStarted += UpdateMenus;
+            _controller.OnBuildStarted += delegate
+            {
+                buildOutput1.SetBaseFolder(_controller);
+                UpdateMenus();
+            };
+            
             _controller.OnBuildFinished += UpdateMenus;
             _controller.OnProjectLoading += UpdateMenus;
             _controller.OnProjectLoaded += UpdateMenus;
@@ -348,41 +352,25 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenus ();
         }
 
-        public void AutoScroll(object sender, SizeAllocatedArgs e)
-        {
-            textview2.ScrollToIter(textview2.Buffer.EndIter, 0, false, 0, 0);
-        }
-
         public void OutputAppend (string text)
         {
             if (text == null)
                 return;
 
-            Application.Invoke (delegate { 
-                try {
-                    lock(textview2.Buffer) {
-                        textview2.Buffer.Text += text + "\r\n";
-                        UpdateMenus();
-                        System.Threading.Thread.Sleep(1);
-                    }
-                }
-                catch {
-                }
-            });
+            Application.Invoke(delegate
+                { 
+                    buildOutput1.OutputAppend(text);
+                    UpdateMenus();
+                });
         }
 
         public void OutputClear ()
         {
-            Application.Invoke (delegate { 
-                try {
-                    lock(textview2.Buffer) {
-                        textview2.Buffer.Text = "";
-                        UpdateMenus();
-                    }
-                }
-                catch {
-                }
-            });
+            Application.Invoke(delegate
+                { 
+                    buildOutput1.ClearOutput();
+                    UpdateMenus();
+                });
         }
 
         public bool ChooseContentFile (string initialDirectory, out List<string> files)
@@ -713,45 +701,49 @@ namespace MonoGame.Tools.Pipeline
 
             // Update the state of all menu items.
 
-            NewAction.Sensitive = notBuilding;
-            OpenAction.Sensitive = notBuilding;
-            ImportAction.Sensitive = notBuilding;
 
-            SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
-            SaveAsAction.Sensitive = projectOpenAndNotBuilding;
-            CloseAction.Sensitive = projectOpenAndNotBuilding;
+            Application.Invoke(delegate
+                { 
+                    NewAction.Sensitive = notBuilding;
+                    OpenAction.Sensitive = notBuilding;
+                    ImportAction.Sensitive = notBuilding;
 
-            ExitAction.Sensitive = notBuilding;
+                    SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
+                    SaveAsAction.Sensitive = projectOpenAndNotBuilding;
+                    CloseAction.Sensitive = projectOpenAndNotBuilding;
 
-            AddAction.Sensitive = projectOpen;
+                    ExitAction.Sensitive = notBuilding;
+
+                    AddAction.Sensitive = projectOpen;
             
-            RenameAction.Sensitive = paths.Length == 1;
+                    RenameAction.Sensitive = paths.Length == 1;
             
-            DeleteAction.Sensitive = projectOpen && somethingSelected;
+                    DeleteAction.Sensitive = projectOpen && somethingSelected;
 
-            BuildAction.Sensitive = projectOpen;
-            BuildAction1.Sensitive = projectOpenAndNotBuilding;
+                    BuildAction.Sensitive = projectOpen;
+                    BuildAction1.Sensitive = projectOpenAndNotBuilding;
 
-            treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
-            RebuildAction.Sensitive = treerebuild.Sensitive;
+                    treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
+                    RebuildAction.Sensitive = treerebuild.Sensitive;
 
-            CleanAction.Sensitive = projectOpenAndNotBuilding;
-            CancelBuildAction.Sensitive = !notBuilding;
-            CancelBuildAction.Visible = !notBuilding;
+                    CleanAction.Sensitive = projectOpenAndNotBuilding;
+                    CancelBuildAction.Sensitive = !notBuilding;
+                    CancelBuildAction.Visible = !notBuilding;
 
-            #if GTK3
-            if(Global.UseHeaderBar)
-            {
-                new_button.Sensitive = NewAction.Sensitive;
-                open_button.Sensitive = OpenAction.Sensitive;
-                save_button.Sensitive = SaveAction.Sensitive;
-                build_button.Sensitive = BuildAction1.Sensitive;
-            }
-            #endif
+                    #if GTK3
+                    if (Global.UseHeaderBar)
+                    {
+                        new_button.Sensitive = NewAction.Sensitive;
+                        open_button.Sensitive = OpenAction.Sensitive;
+                        save_button.Sensitive = SaveAction.Sensitive;
+                        build_button.Sensitive = BuildAction1.Sensitive;
+                    }
+                    #endif
 
-            DebugModeAction.Sensitive = notBuilding;
+                    DebugModeAction.Sensitive = notBuilding;
+                    UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
+                });
 
-            UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();
         }
 
@@ -778,22 +770,27 @@ namespace MonoGame.Tools.Pipeline
 
                 m.Insert (recentItem, 0);
             }
-                
-            if (nop > 0) {
-                m.Add (new SeparatorMenuItem ());
-                var item = new MenuItem ("Clear");
-                item.Activated += delegate {
-                    History.Default.Clear ();
-                    UpdateRecentProjectList ();
-                };
-                m.Add (item);
 
-                recentMenu.Submenu = m;
-                m.ShowAll ();
-            }
+            Application.Invoke(delegate
+                { 
+                    if (nop > 0)
+                    {
+                        m.Add(new SeparatorMenuItem());
+                        var item = new MenuItem("Clear");
+                        item.Activated += delegate
+                        {
+                            History.Default.Clear();
+                            UpdateRecentProjectList();
+                        };
+                        m.Add(item);
 
-            recentMenu.Sensitive = nop > 0;
-            menubar1.ShowAll ();
+                        recentMenu.Submenu = m;
+                        m.ShowAll();
+                    }
+
+                    recentMenu.Sensitive = nop > 0;
+                    menubar1.ShowAll();
+                });
         }
 
         void UpdateUndoRedo(bool canUndo, bool canRedo)
