@@ -11,6 +11,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build()
         {
+            this.ShowTabs = false;
+
             scrollView1 = new ScrolledWindow();
 
             treeview1 = new TreeView();

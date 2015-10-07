@@ -683,6 +683,11 @@ namespace MonoGame.Tools.Pipeline
             _controller.LaunchDebugger = this.DebugModeAction.Active;
         }
 
+        protected void OnFilterOutputActionActivated (object sender, System.EventArgs e)
+        {
+            buildOutput1.CurrentPage = (FilterOutputAction.Active) ? 0 : 1;
+        }
+
         protected void OnCancelBuildActionActivated (object sender, EventArgs e)
         {
             _controller.CancelBuild();
