@@ -77,7 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The available SpriteBatchItem queue so that we reuse these objects when we can.
         /// </summary>
-        private readonly Queue<SpriteBatchItem> _freeBatchItemQueue;
+        private readonly List<SpriteBatchItem> _freeBatchItemPool;
+        /// <summary>
+        /// Index pointer to the next available SpriteBatchItem in _freeBatchItemPool.
+        /// </summary>
+        private int _freeBatchItemBase;
 
         /// <summary>
         /// The target graphics device.
@@ -96,7 +100,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _device = device;
 
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
-			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
+            _freeBatchItemPool = new List<SpriteBatchItem>(InitialBatchSize);
+            _freeBatchItemBase = 0;
+
+            for (int i = 0; i < InitialBatchSize; i++)
+                _freeBatchItemPool.Add(new SpriteBatchItem());
 
             EnsureArrayCapacity(InitialBatchSize);
 		}
@@ -108,11 +116,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns></returns>
         public SpriteBatchItem CreateBatchItem()
         {
-            SpriteBatchItem item;
-            if (_freeBatchItemQueue.Count > 0)
-                item = _freeBatchItemQueue.Dequeue();
-            else
-                item = new SpriteBatchItem();
+            if (_freeBatchItemBase >= _freeBatchItemPool.Count)
+                _freeBatchItemPool.Add(new SpriteBatchItem());
+            var item = _freeBatchItemPool[_freeBatchItemBase++];
             _batchItemList.Add(item);
             return item;
         }
@@ -267,9 +273,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     _vertexArray[index++] = item.vertexBL;
                     _vertexArray[index++] = item.vertexBR;
 
-                    // Release the texture and return the item to the queue.
+                    // Release the texture.
                     item.Texture = null;
-                    _freeBatchItemQueue.Enqueue(item);
                 }
                 // flush the remaining vertexArray data
                 FlushVertexArray(startIndex, index, effect, tex);
@@ -278,6 +283,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 batchCount -= numBatchesToProcess;
             }
 			_batchItemList.Clear();
+            // return items to the pool.  
+            _freeBatchItemBase = 0;
 		}
 
         /// <summary>
