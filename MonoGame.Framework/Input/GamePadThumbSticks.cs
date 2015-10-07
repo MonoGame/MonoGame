@@ -152,47 +152,30 @@ namespace Microsoft.Xna.Framework.Input
                 case GamePadDeadZone.None:
                     break;
                 case GamePadDeadZone.IndependentAxes:
-                    if (Math.Abs(left.X) < leftThumbDeadZone)
-                        left.X = 0f;
-                    if (Math.Abs(left.Y) < leftThumbDeadZone)
-                        left.Y = 0f;
-                    if (Math.Abs(right.X) < rightThumbDeadZone)
-                        right.X = 0f;
-                    if (Math.Abs(right.Y) < rightThumbDeadZone)
-                        right.Y = 0f;
+                    left = ExcludeIndependentAxesDeadZone(left, leftThumbDeadZone);
+                    right = ExcludeIndependentAxesDeadZone(right, rightThumbDeadZone);
                     break;
                 case GamePadDeadZone.Circular:
                     left = ExcludeCircularDeadZone(left, leftThumbDeadZone);
                     right = ExcludeCircularDeadZone(right, rightThumbDeadZone);
                     break;
             }
+        }
 
-            // excluding deadZone from the final output range
-            if (dz == GamePadDeadZone.IndependentAxes)
-            {
-                if (left.X < -leftThumbDeadZone)
-                     left.X = left.X + leftThumbDeadZone;
-                else if (left.X > leftThumbDeadZone)
-                    left.X = left.X - leftThumbDeadZone;
-                if (left.Y < -leftThumbDeadZone)
-                    left.Y = left.Y + leftThumbDeadZone;
-                else if (left.Y > leftThumbDeadZone)
-                    left.Y = left.Y - leftThumbDeadZone;
+        private Vector2 ExcludeIndependentAxesDeadZone(Vector2 value, float deadZone)
+        {
+            return new Vector2(ExcludeAxisDeadZone(value.X, deadZone), ExcludeAxisDeadZone(value.Y, deadZone));
+        }
 
-                if (right.X < -rightThumbDeadZone)
-                    right.X = right.X + rightThumbDeadZone;
-                else if (right.X > rightThumbDeadZone)
-                    right.X = right.X - rightThumbDeadZone;
-                if (right.Y < -rightThumbDeadZone)
-                    right.Y = right.Y + rightThumbDeadZone;
-                else if (right.Y > rightThumbDeadZone)
-                    right.Y = right.Y - rightThumbDeadZone;
-
-                left.X = left.X / (1.0f - leftThumbDeadZone);
-                left.Y = left.Y / (1.0f - leftThumbDeadZone);
-                right.X = right.X / (1.0f - rightThumbDeadZone);
-                right.Y = right.Y / (1.0f - rightThumbDeadZone);
-            }
+        private float ExcludeAxisDeadZone(float value, float deadZone)
+        {
+            if (value < -deadZone)
+                value += deadZone;
+            else if (value > deadZone)
+                value -= deadZone;
+            else
+                return 0f;
+            return value / (1f - deadZone);
         }
 
         private Vector2 ExcludeCircularDeadZone(Vector2 value, float deadZone)
