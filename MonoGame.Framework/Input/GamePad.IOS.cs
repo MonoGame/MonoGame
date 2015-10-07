@@ -6,6 +6,11 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
+        private static int PlatformGetMaxIndex()
+        {
+            return 0;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             return new GamePadCapabilities { IsConnected = false };

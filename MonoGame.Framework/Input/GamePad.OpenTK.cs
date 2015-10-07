@@ -37,6 +37,11 @@ namespace Microsoft.Xna.Framework.Input
             #endif
         }
 
+        private static int PlatformGetMaxIndex()
+        {
+            return 16;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             PrepSettings ();

@@ -24,12 +24,13 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly long[] _timeout = new long[4];
         private static readonly long TimeoutTicks = TimeSpan.FromSeconds(1).Ticks;
 
+        private static int PlatformGetMaxIndex()
+        {
+            return 4;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            // Make sure the player index is in range.
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
             if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
@@ -151,10 +152,6 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            // Make sure the player index is in range.
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
             if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
@@ -306,10 +303,6 @@ namespace Microsoft.Xna.Framework.Input
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-            // Make sure the player index is in range.
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-
 #if DIRECTX11_1
             if (!_connected[index])
                 return false;
