@@ -25,6 +25,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			this.Character = character;
 			this.Bitmap = bitmap;
 			this.Subrect = subrect.GetValueOrDefault(new Rectangle(0, 0, bitmap.Width, bitmap.Height));
+			this.Width = bitmap.Width;
+			this.Height = bitmap.Height;
 		}
             
 		// Unicode codepoint.
@@ -37,6 +39,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		// Layout information.
 		public float XOffset;
 		public float YOffset;
+        public int Width;
+        public int Height;
 
 		public float XAdvance;
 
