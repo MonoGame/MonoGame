@@ -162,10 +162,8 @@ namespace Microsoft.Xna.Framework.Input
                         right.Y = 0f;
                     break;
                 case GamePadDeadZone.Circular:
-                    if (left.LengthSquared() < leftThumbDeadZone * leftThumbDeadZone)
-                        left = Vector2.Zero;
-                    if (right.LengthSquared() < rightThumbDeadZone * rightThumbDeadZone)
-                        right = Vector2.Zero;
+                    left = ExcludeCircularDeadZone(left, leftThumbDeadZone);
+                    right = ExcludeCircularDeadZone(right, rightThumbDeadZone);
                     break;
             }
 
@@ -195,23 +193,15 @@ namespace Microsoft.Xna.Framework.Input
                 right.X = right.X / (1.0f - rightThumbDeadZone);
                 right.Y = right.Y / (1.0f - rightThumbDeadZone);
             }
-            else if (dz == GamePadDeadZone.Circular)
-            {
-                if (left.LengthSquared() >= leftThumbDeadZone * leftThumbDeadZone)
-                {
-                    Vector2 norm = left;
-                    norm.Normalize();
-                    left = left - norm * leftThumbDeadZone; // excluding deadzone
-                    left = left / leftThumbDeadZone; // re-range output
-                }
-                if (right.LengthSquared() >= rightThumbDeadZone * rightThumbDeadZone)
-                {
-                    Vector2 norm = right;
-                    norm.Normalize();
-                    right = right - norm * rightThumbDeadZone;
-                    right = right / rightThumbDeadZone;
-                }
-            }
+        }
+
+        private Vector2 ExcludeCircularDeadZone(Vector2 value, float deadZone)
+        {
+            var originalLength = value.Length();
+            if (originalLength <= deadZone)
+                return Vector2.Zero;
+            var newLength = (originalLength - deadZone) / (1f - deadZone);
+            return value * (newLength / originalLength);
         }
 
         /// <summary>
