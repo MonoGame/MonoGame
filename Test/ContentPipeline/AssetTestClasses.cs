@@ -507,6 +507,18 @@ public class ChildCollectionChild : ContentItem
 }
 #endregion
 
+#region Colors
+public class Colors
+{
+    public Color White { get; set; }
+    public Color Black { get; set; }
+    public Color Transparent { get; set; }
+    public Color Red { get; set; }
+    public Color Green { get; set; }
+    public Color Blue { get; set; }
+}
+#endregion
+
 class StructArrayNoElements
 {
     public Vector2[] Vector2ArrayNoElements = new Vector2[] {};

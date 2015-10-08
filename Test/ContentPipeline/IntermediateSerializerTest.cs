@@ -476,5 +476,19 @@ namespace MonoGame.Tests.ContentPipeline
                 }
             });
         }
+
+        [Test]
+        public void Colors()
+        {
+            SerializeAndAssert("27_Colors.xml", new Colors()
+            {
+                White = Color.White,
+                Black = Color.Black,
+                Transparent = Color.Transparent,
+                Red = Color.Red,
+                Green = Color.Green,
+                Blue = Color.Blue
+            });
+        }
     }
 }
