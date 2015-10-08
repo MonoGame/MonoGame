@@ -24,6 +24,11 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly long[] _timeout = new long[4];
         private static readonly long TimeoutTicks = TimeSpan.FromSeconds(1).Ticks;
 
+        private static int PlatformGetMaxIndex()
+        {
+            return 4;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             // If the device was disconneced then wait for 
