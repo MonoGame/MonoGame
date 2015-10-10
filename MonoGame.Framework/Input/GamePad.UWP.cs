@@ -11,6 +11,11 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static bool Back;
 
+        private static int PlatformGetMaxIndex()
+        {
+            return 16;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             if (index >= WGI.Gamepad.Gamepads.Count)
