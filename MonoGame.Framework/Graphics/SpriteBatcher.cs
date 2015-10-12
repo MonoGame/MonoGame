@@ -73,15 +73,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// The list of batch items to process.
         /// </summary>
 	    private readonly List<SpriteBatchItem> _batchItemList;
-
         /// <summary>
-        /// The available SpriteBatchItem queue so that we reuse these objects when we can.
+        /// Index pointer to the next available SpriteBatchItem in _batchItemList.
         /// </summary>
-        private readonly List<SpriteBatchItem> _freeBatchItemPool;
-        /// <summary>
-        /// Index pointer to the next available SpriteBatchItem in _freeBatchItemPool.
-        /// </summary>
-        private int _freeBatchItemBase;
+        private int _batchItemCount;
         
         /// <summary>
         /// IComparer instance for SpriteSortMode.Texture.
@@ -113,11 +108,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _device = device;
 
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
-            _freeBatchItemPool = new List<SpriteBatchItem>(InitialBatchSize);
-            _freeBatchItemBase = 0;
+            _batchItemCount = 0;
 
             for (int i = 0; i < InitialBatchSize; i++)
-                _freeBatchItemPool.Add(new SpriteBatchItem());
+                _batchItemList.Add(new SpriteBatchItem());
 
             EnsureArrayCapacity(InitialBatchSize);
 		}
@@ -129,10 +123,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns></returns>
         public SpriteBatchItem CreateBatchItem()
         {
-            if (_freeBatchItemBase >= _freeBatchItemPool.Count)
-                _freeBatchItemPool.Add(new SpriteBatchItem());
-            var item = _freeBatchItemPool[_freeBatchItemBase++];
-            _batchItemList.Add(item);
+            if (_batchItemCount >= _batchItemList.Count)
+                _batchItemList.Add(new SpriteBatchItem());
+            var item = _batchItemList[_batchItemCount++];
             return item;
         }
 
@@ -190,26 +183,26 @@ namespace Microsoft.Xna.Framework.Graphics
         public void DrawBatch(SpriteSortMode sortMode, Effect effect)
 		{
 			// nothing to do
-			if ( _batchItemList.Count == 0 )
+            if (_batchItemCount == 0)
 				return;
 			
 			// sort the batch items
 			switch ( sortMode )
 			{
 			case SpriteSortMode.Texture :
-				_batchItemList.Sort( _compareTexture );
+				_batchItemList.Sort( 0, _batchItemCount, _compareTexture );
 				break;
 			case SpriteSortMode.FrontToBack :
-				_batchItemList.Sort ( _compareDepth );
+				_batchItemList.Sort ( 0, _batchItemCount, _compareDepth );
 				break;
 			case SpriteSortMode.BackToFront :
-				_batchItemList.Sort ( _compareReverseDepth );
+				_batchItemList.Sort ( 0, _batchItemCount, _compareReverseDepth );
 				break;
 			}
 
             // Determine how many iterations through the drawing code we need to make
             int batchIndex = 0;
-            int batchCount = _batchItemList.Count;
+            int batchCount = _batchItemCount;
 
             
             unchecked
@@ -261,9 +254,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 // large batches
                 batchCount -= numBatchesToProcess;
             }
-			_batchItemList.Clear();
             // return items to the pool.  
-            _freeBatchItemBase = 0;
+            _batchItemCount = 0;
 		}
 
         /// <summary>
