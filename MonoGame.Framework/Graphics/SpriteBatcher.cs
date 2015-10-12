@@ -82,7 +82,20 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Index pointer to the next available SpriteBatchItem in _freeBatchItemPool.
         /// </summary>
         private int _freeBatchItemBase;
-
+        
+        /// <summary>
+        /// IComparer instance for SpriteSortMode.Texture.
+        /// </summary>
+        private static CompareTexture _compareTexture = new CompareTexture();
+        /// <summary>
+        /// IComparer instance for SpriteSortMode.FrontToBack.
+        /// </summary>
+        private static CompareDepth _compareDepth = new CompareDepth();
+        /// <summary>
+        /// IComparer instance for SpriteSortMode.BackToFront.
+        /// </summary>
+        private static CompareReverseDepth _compareReverseDepth = new CompareReverseDepth();
+        
         /// <summary>
         /// The target graphics device.
         /// </summary>
@@ -167,41 +180,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexArray = new VertexPositionColorTexture[4 * numBatchItems];
         }
-
-        /// <summary>
-        /// Comparison of the underlying Texture objects for each given SpriteBatchitem.
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns>0 if they are equal, -1 or 1 if not.</returns>
-	    static int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
-		{
-            return a.Texture.SortingKey.CompareTo(b.Texture.SortingKey);
-		}
-
-        /// <summary>
-        /// Compares the Depth of a against b returning -1 if a is less than b, 
-        /// 0 if equal, and 1 if a is greater than b. The test uses float.CompareTo(float)
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns>-1 if a is less than b, 0 if equal, and 1 if a is greater than b</returns>
-	    static int CompareDepth ( SpriteBatchItem a, SpriteBatchItem b )
-		{
-			return a.Depth.CompareTo(b.Depth);
-		}
-
-        /// <summary>
-        /// Implements the opposite of CompareDepth, where b is compared against a.
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns>-1 if b is less than a, 0 if equal, and 1 if b is greater than a</returns>
-        static int CompareReverseDepth(SpriteBatchItem a, SpriteBatchItem b)
-		{
-			return b.Depth.CompareTo(a.Depth);
-		}
-		
+                
         /// <summary>
         /// Sorts the batch items and then groups batch drawing into maximal allowed batch sets that do not
         /// overflow the 16 bit array indices for vertices.
@@ -218,13 +197,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch ( sortMode )
 			{
 			case SpriteSortMode.Texture :
-				_batchItemList.Sort( CompareTexture );
+				_batchItemList.Sort( _compareTexture );
 				break;
 			case SpriteSortMode.FrontToBack :
-				_batchItemList.Sort ( CompareDepth );
+				_batchItemList.Sort ( _compareDepth );
 				break;
 			case SpriteSortMode.BackToFront :
-				_batchItemList.Sort ( CompareReverseDepth );
+				_batchItemList.Sort ( _compareReverseDepth );
 				break;
 			}
 
@@ -338,6 +317,51 @@ namespace Microsoft.Xna.Framework.Graphics
                     VertexPositionColorTexture.VertexDeclaration);
             }
         }
+
+        #region Sorting
+        private class CompareTexture : IComparer<SpriteBatchItem>
+        {
+            /// <summary>
+            /// Comparison of the underlying Texture objects for each given SpriteBatchitem.
+            /// </summary>
+            /// <param name="a"></param>
+            /// <param name="b"></param>
+            /// <returns>0 if they are equal, -1 or 1 if not.</returns>
+            public int Compare(SpriteBatchItem x, SpriteBatchItem y)
+            {
+                return x.Texture.SortingKey.CompareTo(y.Texture.SortingKey);
+            }
+        }
+
+        private class CompareDepth : IComparer<SpriteBatchItem>
+        {
+            /// <summary>
+            /// Compares the Depth of a against b returning -1 if a is less than b, 
+            /// 0 if equal, and 1 if a is greater than b. The test uses float.CompareTo(float)
+            /// </summary>
+            /// <param name="a"></param>
+            /// <param name="b"></param>
+            /// <returns>-1 if a is less than b, 0 if equal, and 1 if a is greater than b</returns>
+            public int Compare(SpriteBatchItem x, SpriteBatchItem y)
+            {
+                return x.Depth.CompareTo(y.Depth);
+            }
+        }
+
+        private class CompareReverseDepth : IComparer<SpriteBatchItem>
+        {
+            /// <summary>
+            /// Implements the opposite of CompareDepth, where b is compared against a.
+            /// </summary>
+            /// <param name="a"></param>
+            /// <param name="b"></param>
+            /// <returns>-1 if b is less than a, 0 if equal, and 1 if b is greater than a</returns>
+            public int Compare(SpriteBatchItem x, SpriteBatchItem y)
+            {
+                return y.Depth.CompareTo(x.Depth);
+            }
+        }
+        #endregion
 	}
 }
 
