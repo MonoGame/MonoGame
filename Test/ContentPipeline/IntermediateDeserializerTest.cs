@@ -575,5 +575,19 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual("Bar", childCollections.Children[1].Name);
             });
         }
+
+        [Test]
+        public void Colors()
+        {
+            DeserializeCompileAndLoad<Colors>("27_Colors.xml", colors =>
+            {
+                Assert.AreEqual(colors.White, Color.White);
+                Assert.AreEqual(colors.Black, Color.Black);
+                Assert.AreEqual(colors.Transparent, Color.Transparent);
+                Assert.AreEqual(colors.Red, Color.Red);
+                Assert.AreEqual(colors.Green, Color.Green);
+                Assert.AreEqual(colors.Blue, Color.Blue);
+            });
+        }
     }
 }
