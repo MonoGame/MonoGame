@@ -117,14 +117,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Create an instance of SpriteBatchItem if there is none available in the free item queue. Otherwise,
-        /// a previously allocated SpriteBatchItem is reused.
+        /// Reuse a previously allocated SpriteBatchItem from the item pool. 
+        /// if there is none available grow the pool and initialize new items.
         /// </summary>
         /// <returns></returns>
         public SpriteBatchItem CreateBatchItem()
         {
             if (_batchItemCount >= _batchItemList.Count)
-                _batchItemList.Add(new SpriteBatchItem());
+            {
+                do
+                {
+                    _batchItemList.Add(new SpriteBatchItem());
+                } while (_batchItemList.Count < _batchItemList.Capacity);
+                    
+            }
             var item = _batchItemList[_batchItemCount++];
             return item;
         }
