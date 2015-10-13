@@ -39,6 +39,7 @@
 // #endregion License
 // 
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -72,24 +73,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The list of batch items to process.
         /// </summary>
-	    private readonly List<SpriteBatchItem> _batchItemList;
+	    private SpriteBatchItem[] _batchItemList;
         /// <summary>
         /// Index pointer to the next available SpriteBatchItem in _batchItemList.
         /// </summary>
         private int _batchItemCount;
-        
-        /// <summary>
-        /// IComparer instance for SpriteSortMode.Texture.
-        /// </summary>
-        private static CompareTexture _compareTexture = new CompareTexture();
-        /// <summary>
-        /// IComparer instance for SpriteSortMode.FrontToBack.
-        /// </summary>
-        private static CompareDepth _compareDepth = new CompareDepth();
-        /// <summary>
-        /// IComparer instance for SpriteSortMode.BackToFront.
-        /// </summary>
-        private static CompareReverseDepth _compareReverseDepth = new CompareReverseDepth();
         
         /// <summary>
         /// The target graphics device.
@@ -107,11 +95,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             _device = device;
 
-			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
+			_batchItemList = new SpriteBatchItem[InitialBatchSize];
             _batchItemCount = 0;
 
             for (int i = 0; i < InitialBatchSize; i++)
-                _batchItemList.Add(new SpriteBatchItem());
+                _batchItemList[i] = new SpriteBatchItem();
 
             EnsureArrayCapacity(InitialBatchSize);
 		}
@@ -123,13 +111,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns></returns>
         public SpriteBatchItem CreateBatchItem()
         {
-            if (_batchItemCount >= _batchItemList.Count)
+            if (_batchItemCount >= _batchItemList.Length)
             {
-                do
-                {
-                    _batchItemList.Add(new SpriteBatchItem());
-                } while (_batchItemList.Count < _batchItemList.Capacity);
-                    
+                var oldSize = _batchItemList.Length;
+                var newSize = oldSize + oldSize/2; // grow by x1.5
+                newSize = (newSize + 63) & (~63); // grow in chunks of 64.
+                Array.Resize(ref _batchItemList, newSize);
+                for(int i=oldSize; i<newSize; i++)
+                    _batchItemList[i]=new SpriteBatchItem();
             }
             var item = _batchItemList[_batchItemCount++];
             return item;
@@ -195,14 +184,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			// sort the batch items
 			switch ( sortMode )
 			{
-			case SpriteSortMode.Texture :
-				_batchItemList.Sort( 0, _batchItemCount, _compareTexture );
-				break;
+			case SpriteSortMode.Texture :                
 			case SpriteSortMode.FrontToBack :
-				_batchItemList.Sort ( 0, _batchItemCount, _compareDepth );
-				break;
 			case SpriteSortMode.BackToFront :
-				_batchItemList.Sort ( 0, _batchItemCount, _compareReverseDepth );
+                Array.Sort(_batchItemList, 0, _batchItemCount);
 				break;
 			}
 
@@ -315,51 +300,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     VertexPositionColorTexture.VertexDeclaration);
             }
         }
-
-        #region Sorting
-        private class CompareTexture : IComparer<SpriteBatchItem>
-        {
-            /// <summary>
-            /// Comparison of the underlying Texture objects for each given SpriteBatchitem.
-            /// </summary>
-            /// <param name="a"></param>
-            /// <param name="b"></param>
-            /// <returns>0 if they are equal, -1 or 1 if not.</returns>
-            public int Compare(SpriteBatchItem x, SpriteBatchItem y)
-            {
-                return x.Texture.SortingKey.CompareTo(y.Texture.SortingKey);
-            }
-        }
-
-        private class CompareDepth : IComparer<SpriteBatchItem>
-        {
-            /// <summary>
-            /// Compares the Depth of a against b returning -1 if a is less than b, 
-            /// 0 if equal, and 1 if a is greater than b. The test uses float.CompareTo(float)
-            /// </summary>
-            /// <param name="a"></param>
-            /// <param name="b"></param>
-            /// <returns>-1 if a is less than b, 0 if equal, and 1 if a is greater than b</returns>
-            public int Compare(SpriteBatchItem x, SpriteBatchItem y)
-            {
-                return x.Depth.CompareTo(y.Depth);
-            }
-        }
-
-        private class CompareReverseDepth : IComparer<SpriteBatchItem>
-        {
-            /// <summary>
-            /// Implements the opposite of CompareDepth, where b is compared against a.
-            /// </summary>
-            /// <param name="a"></param>
-            /// <param name="b"></param>
-            /// <returns>-1 if b is less than a, 0 if equal, and 1 if b is greater than a</returns>
-            public int Compare(SpriteBatchItem x, SpriteBatchItem y)
-            {
-                return y.Depth.CompareTo(x.Depth);
-            }
-        }
-        #endregion
 	}
 }
 

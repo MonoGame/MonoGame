@@ -355,8 +355,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			var item = _batcher.CreateBatchItem();
 
-			item.Depth = depth;
 			item.Texture = texture;
+
+            // set SortKey based on SpriteSortMode.
+            switch ( _sortMode )
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = depth;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = -depth;
+                    break;
+            }
 
 			if (sourceRectangle.HasValue) {
 				_tempRect = sourceRectangle.Value;
@@ -393,7 +409,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					(float)Math.Cos (rotation), 
 					color, 
 					_texCoordTL, 
-					_texCoordBR);			
+					_texCoordBR,
+                    depth);
 			
 			if (autoFlush)
 			{
