@@ -65,6 +65,7 @@
     <Compile Include="MonoGameBuildExtension.cs" />
     <Compile Include="MonoGameConditions.cs" />
     <Compile Include="ContentItemTemplate.cs" />
+    <Compile Include="MonoGameMSBuildImports.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
