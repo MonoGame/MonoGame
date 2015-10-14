@@ -130,45 +130,57 @@ fi
     </if>
 
     <!-- Linux Installer -->
-    <if test="${directory::exists('../Tools/Pipeline/bin/Linux/AnyCPU/Release')}">
-      <delete dir="Linux/InstallerData" failonerror="false"/>
-      <mkdir dir="Linux/InstallerData"/>
-      <copy todir="Linux/InstallerData/Data">
-        <fileset basedir="Linux/Data"/>
-      </copy>
-      <mkdir dir="Linux/InstallerData/Data/Pipeline/"/>
-      <copy todir="Linux/InstallerData/Data/Pipeline/">
-      <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
-      </copy>
-      <copy tofile="Linux/InstallerData/generate_run.sh" file="Linux/Generate/generate_run.sh" />
-      <copy tofile="Linux/InstallerData/generate_deb.sh" file="Linux/Generate/generate_deb.sh" />
-      <mkdir dir="Linux/InstallerData/Makeself"/>
-      <copy todir="Linux/InstallerData/Makeself">
-        <fileset basedir="../ThirdParty/Dependencies/makeself"/>
-      </copy>
-      <copy tofile="Linux/InstallerData/Data/Main/libstdc++.so.6" file="../ThirdParty/Dependencies/assimp/libstdc++.so.6" />
-      <echo file="Linux/InstallerData/Data/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
-      <get src="http://addins.monodevelop.com/Stable/Linux/5.0/MonoDevelop.MonoGame-3.4.0.455.mpack" dest="Linux/InstallerData/Data/Main/MonoDevelop.MonoGame.mpack" failonerror="false"/>
+    <if test="${(os == 'Unix' or os == 'MacOS') and directory::exists('../Tools/Pipeline/bin/Linux/AnyCPU/Release')}">
       
-      <choose>
-        <when test="${os == 'Unix'}">
-          <exec program="Linux/InstallerData/generate_run.sh" workingdir="Linux/InstallerData/"/>
-          <exec program="Linux/InstallerData/generate_deb.sh" workingdir="Linux/InstallerData/"/>
-          <copy tofile="Linux/monogame-sdk.run" file="Linux/InstallerData/monogame-sdk.run" />
-          <copy tofile="Linux/monogame-sdk.deb" file="Linux/InstallerData/monogame-sdk.deb" />
-          <delete dir="Linux/InstallerData" failonerror="false"/>
-        </when>
-        <otherwise>
-          <if test="${directory::exists('Linux/InstallerData')}">
-            <zip zipfile="Linux/LinuxInstaller.zip">
-              <fileset basedir="Linux/InstallerData">
-                <include name="**/*" />
-              </fileset>
-            </zip>
-            <delete dir="Linux/InstallerData" failonerror="false"/>
-          </if>
-        </otherwise>
-      </choose>
+      <delete dir="Linux/tmp_deb" failonerror="false"/>
+      <mkdir dir="Linux/tmp_deb"/>
+      <copy todir="Linux/tmp_deb/DEBIAN/">
+        <fileset basedir="Linux/DEBIAN"/>
+      </copy>
+      <copy todir="Linux/tmp_deb/opt/monogame-pipeline">
+        <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
+      </copy>
+      <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_deb/tmp/MonoDevelop.MonoGame.mpack" overwrite="true"/>
+      <copy file="Linux/Main/mgcb.xml" tofile="Linux/tmp_deb/tmp/mgcb.xml"/>
+      <copy file="Linux/Main/mgcb" tofile="Linux/tmp_deb/bin/mgcb"/>
+      <copy file="Linux/Main/monogame-pipeline" tofile="Linux/tmp_deb/bin/monogame-pipeline"/>
+      <copy file="Linux/Main/monogame.svg" tofile="Linux/tmp_deb/usr/share/icons/gnome/scalable/mimetypes/monogame.svg"/>
+      <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/MonoGame.Content.Builder.targets"/>
+      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvcore.so" tofile="Linux/tmp_deb/lib/libnvcore.so"/>
+      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvimage.so" tofile="Linux/tmp_deb/lib/libnvimage.so"/>
+      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvmath.so" tofile="Linux/tmp_deb/lib/libnvmath.so"/>
+      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvtt.so" tofile="Linux/tmp_deb/lib/libnvtt.so"/>
+      <echo file="Linux/tmp_deb/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
+      <copy todir="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/Linux">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+
+      <delete dir="Linux/tmp_run" failonerror="false"/>
+      <mkdir dir="Linux/tmp_run"/>
+      <copy todir="Linux/tmp_run/Main/">
+        <fileset basedir="Linux/Main"/>
+      </copy>
+      <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame.mpack" overwrite="true"/>
+      <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_run/Main/MonoGame.Content.Builder.targets"/>
+      <copy file="../ThirdParty/Dependencies/assimp/libstdc++.so.6" tofile="Linux/tmp_run/Main/libstdc++.so.6" />
+      <copy todir="Linux/tmp_run/Pipeline">
+        <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
+      </copy>
+      <copy todir="Linux/tmp_run/Assemblies/Linux">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="Linux/tmp_run">
+        <fileset basedir="Linux/RUN"/>
+      </copy>
+      <move file="Linux/tmp_run/uninstall.sh" tofile="Linux/tmp_run/Pipeline/uninstall.sh" />
+      
+      <exec program="Linux/compile.sh" workingdir="Linux/"/>
+      <delete dir="Linux/tmp_deb" failonerror="false"/>
+      <delete dir="Linux/tmp_run" failonerror="false"/>
     </if>
 
   </target>

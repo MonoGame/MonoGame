@@ -13,7 +13,7 @@ then
 	exit 1
 fi
 
-#installation
+#pipeline installation
 DIR=$(pwd)
 IDIR="/opt/monogame-pipeline"
 
@@ -39,23 +39,19 @@ echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
 ./Dependencies/dependencies.sh
 
 #setup nvtt libraries
-if [ ! -f /lib/libnvcore.so ]
-then
+if [ ! -f /lib/libnvcore.so ]; then
 	ln $IDIR/libnvcore.so /lib/libnvcore.so
 fi
 
-if [ ! -f /lib/libnvimage.so ]
-then
+if [ ! -f /lib/libnvimage.so ]; then
 	ln $IDIR/libnvimage.so /lib/libnvimage.so
 fi
 
-if [ ! -f /lib/libnvmath.so ]
-then
+if [ ! -f /lib/libnvmath.so ]; then
 	ln $IDIR/libnvmath.so /lib/libnvmath.so
 fi
 
-if [ ! -f /lib/libnvtt.so ]
-then
+if [ ! -f /lib/libnvtt.so ]; then
 	ln $IDIR/libnvtt.so /lib/libnvtt.so
 fi
 
@@ -87,6 +83,21 @@ case "$choice2" in
 	*)
 	sudo -H -u $SUDO_USER bash -c 'mdtool setup install $DIR/Main/MonoDevelop.MonoGame.mpack'
 esac
+
+#MonoGame.xbuild data
+if [ -d /usr/lib/mono/xbuild/MonoGame ]; then
+	rm -rf /usr/lib/mono/xbuild/MonoGame
+fi
+
+mkdir /usr/lib/mono/xbuild/MonoGame
+mkdir /usr/lib/mono/xbuild/MonoGame/v3.0
+
+mkdir /usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/
+cp "$DIR/Assemblies/." /usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/ -R
+
+sudo ln -s /opt/monogame-pipeline /usr/lib/mono/xbuild/MonoGame/v3.0/Tools
+
+sudo cp $DIR/Main/MonoGame.Content.Builder.targets /usr/lib/mono/xbuild/MonoGame/v3.0/
 
 #fix permissions
 usr="$SUDO_USER"
