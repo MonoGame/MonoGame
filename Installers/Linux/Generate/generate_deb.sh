@@ -28,11 +28,18 @@ mkdir tmp/usr/share/icons/gnome/scalable
 mkdir tmp/usr/share/icons/gnome/scalable/mimetypes
 cp Data/Main/monogame.svg tmp/usr/share/icons/gnome/scalable/mimetypes/
 
+mkdir tmp/usr/lib
+mkdir tmp/usr/lib/mono
+mkdir tmp/usr/lib/mono/xbuild
+mkdir tmp/usr/lib/mono/xbuild/MonoGame
+mkdir tmp/usr/lib/mono/xbuild/MonoGame/v3.0
+cp Data/Main/MonoGame.Content.Builder.targets tmp/usr/lib/mono/xbuild/MonoGame/v3.0/
+
 mkdir tmp/lib
 cp Data/Pipeline/libnvcore.so tmp/lib/
 cp Data/Pipeline/libnvimage.so tmp/lib/
 cp Data/Pipeline/libnvmath.so tmp/lib/
 cp Data/Pipeline/libnvtt.so tmp/lib/
 
-dpkg-deb --build tmp monogame-sdk.deb
+dpkg --build tmp monogame-sdk.deb
 rm -rf tmp
