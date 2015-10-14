@@ -67,7 +67,7 @@
     </if>
 
     <!-- Linux Installer -->
-    <if test="${directory::exists('../Tools/Pipeline/bin/Linux/AnyCPU/Release')}">
+    <if test="${(os == 'Unix' or os == 'MacOS') and directory::exists('../Tools/Pipeline/bin/Linux/AnyCPU/Release')}">
       <delete dir="Linux/InstallerData" failonerror="false"/>
       <mkdir dir="Linux/InstallerData"/>
       <copy todir="Linux/InstallerData/Data">
@@ -85,27 +85,14 @@
       </copy>
       <copy tofile="Linux/InstallerData/Data/Main/libstdc++.so.6" file="../ThirdParty/Dependencies/assimp/libstdc++.so.6" />
       <echo file="Linux/InstallerData/Data/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
+      <copy tofile="Linux/InstallerData/Data/Main/MonoGame.Content.Builder.targets" file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" />
       <get src="http://addins.monodevelop.com/Stable/Linux/5.0/MonoDevelop.MonoGame-3.4.0.455.mpack" dest="Linux/InstallerData/Data/Main/MonoDevelop.MonoGame.mpack" failonerror="false"/>
       
-      <choose>
-        <when test="${os == 'Unix'}">
-          <exec program="Linux/InstallerData/generate_run.sh" workingdir="Linux/InstallerData/"/>
-          <exec program="Linux/InstallerData/generate_deb.sh" workingdir="Linux/InstallerData/"/>
-          <copy tofile="Linux/monogame-sdk.run" file="Linux/InstallerData/monogame-sdk.run" />
-          <copy tofile="Linux/monogame-sdk.deb" file="Linux/InstallerData/monogame-sdk.deb" />
-          <delete dir="Linux/InstallerData" failonerror="false"/>
-        </when>
-        <otherwise>
-          <if test="${directory::exists('Linux/InstallerData')}">
-            <zip zipfile="Linux/LinuxInstaller.zip">
-              <fileset basedir="Linux/InstallerData">
-                <include name="**/*" />
-              </fileset>
-            </zip>
-            <delete dir="Linux/InstallerData" failonerror="false"/>
-          </if>
-        </otherwise>
-      </choose>
+      <exec program="Linux/InstallerData/generate_run.sh" workingdir="Linux/InstallerData/"/>
+      <exec program="Linux/InstallerData/generate_deb.sh" workingdir="Linux/InstallerData/"/>
+      <copy tofile="Linux/monogame-sdk.run" file="Linux/InstallerData/monogame-sdk.run" />
+      <copy tofile="Linux/monogame-sdk.deb" file="Linux/InstallerData/monogame-sdk.deb" />
+      <delete dir="Linux/InstallerData" failonerror="false"/>
     </if>
 
   </target>
