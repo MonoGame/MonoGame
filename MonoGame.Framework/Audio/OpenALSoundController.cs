@@ -22,6 +22,7 @@ using Android.Media;
 
 #if IOS
 using AudioToolbox;
+using AVFoundation;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -184,18 +185,21 @@ namespace Microsoft.Xna.Framework.Audio
                     0
                 };
 #elif IOS
-                AudioSession.Initialize();
-
-                AudioSession.Interrupted += (sender, e) => {
-                    AudioSession.SetActive(false);
-                    Alc.MakeContextCurrent(ContextHandle.Zero);
-                    Alc.SuspendContext(_context);
+                EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
+                    switch (e.InterruptionType) {
+                        case AVAudioSessionInterruptionType.Began:
+                            AVAudioSession.SharedInstance().SetActive(false);
+                            Alc.MakeContextCurrent(ContextHandle.Zero);
+                            Alc.SuspendContext(_context);
+                            break;
+                        case AVAudioSessionInterruptionType.Ended:
+                            AVAudioSession.SharedInstance().SetActive(true);
+                            Alc.MakeContextCurrent(_context);
+                            Alc.ProcessContext(_context);
+                            break;
+                    }
                 };
-                AudioSession.Resumed += (sender, e) => {
-                    AudioSession.SetActive(true);
-                    Alc.MakeContextCurrent(_context);
-                    Alc.ProcessContext(_context);
-                };
+                AVAudioSession.Notifications.ObserveInterruption(handler);
 
                 int[] attribute = new int[0];
 #elif !DESKTOPGL
