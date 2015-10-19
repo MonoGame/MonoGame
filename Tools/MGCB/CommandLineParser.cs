@@ -284,6 +284,8 @@ namespace MGCB
                 if (arg.StartsWith("/@:") || arg.StartsWith("-@:"))
                 {
                     var file = arg.Substring(3);
+                    Directory.SetCurrentDirectory(Path.GetDirectoryName(file));
+
                     var commands = File.ReadAllLines(file);
                     var offset = 0;
                     lines.Insert(0, string.Format("# Begin:{0} ", file));
