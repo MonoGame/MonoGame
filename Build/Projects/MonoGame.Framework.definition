@@ -472,6 +472,9 @@
       <Services>ANGLEGraphics,OpenGLGraphics</Services>
       <ExcludePlatforms>iOS,Android,Ouya</ExcludePlatforms>
     </Compile>
+    <Compile Include="Graphics\OcclusionQuery.Null.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\PackedVector\Alpha8.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
     <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
