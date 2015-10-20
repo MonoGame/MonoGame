@@ -25,6 +25,12 @@
       <ParentIntermediateDir Condition=" '$(ParentIntermediateDir)' == '' " >$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
 
       <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildThisFileDirectory)Tools\MGCB.exe</MonoGameContentBuilderExe>
+      <MonoGameContentBuilderCmd>&quot;$(MonoGameContentBuilderExe)&quot;</MonoGameContentBuilderCmd>
+      <MonoGameContentBuilderCmd Condition=" '$(OS)' != 'Windows_NT' ">mono $(MonoGameContentBuilderCmd)</MonoGameContentBuilderCmd>
+
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'">Resources\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(MonoGamePlatform)' == 'Android'">Assets\</PlatformResourcePrefix>
+      <PlatformResourcePrefix Condition="'$(PlatformResourcePrefix)' == ''"></PlatformResourcePrefix>
 
       <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
     </PropertyGroup>
@@ -58,7 +64,7 @@
 
     <Warning
         Text="No Content References Found. Please make sure your .mgcb file has a build action of MonoGameContentReference"
-        Condition=" '%(ContentReferences.FullPath)' == ''"
+        Condition=" '%(ContentReferences.FullPath)' == '' "
     />
 
     <MakeDir Directories="$(ParentIntermediateDir)"/>
@@ -74,9 +80,7 @@
   </PropertyGroup>
 
   <Target Name="RunContentBuilder">
-    <Exec Condition="'$(OS)' == 'Windows_NT'" Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
-          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
-    <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mono &quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)" 
+    <Exec Condition=" '%(ContentReferences.FullPath)' != '' " Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
     <CreateItem Include="$(ParentOutputDir)\**\*.*">
@@ -86,22 +90,13 @@
 
   <Target Name="BuildContent" DependsOnTargets="Prepare;RunContentBuilder"
         Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
-    <ItemGroup>
-      <Content Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)" 
-          Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'">
-        <Link>$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <BundleResource Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
-          Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'" >
-        <Link>Resources\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)</Link>
-      </BundleResource>
-      <AndroidAsset Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
-          Condition="'$(MonoGamePlatform)' == 'Android'">
-        <Link>Assets\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AndroidAsset>
-    </ItemGroup>
+      <CreateItem Include="$(ParentOutputDir)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
+            AdditionalMetadata="Link=$(PlatformResourcePrefix)$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest"
+            Condition="'%(ExtraContent.Filename)' != ''">
+           <Output TaskParameter="Include" ItemName="Content" Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'" />
+           <Output TaskParameter="Include" ItemName="BundleResource" Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'" />
+           <Output TaskParameter="Include" ItemName="AndroidAsset" Condition="'$(MonoGamePlatform)' == 'Android'" />
+      </CreateItem>
   </Target>
 
 </Project>
