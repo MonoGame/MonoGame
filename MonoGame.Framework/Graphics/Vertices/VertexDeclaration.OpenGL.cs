@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Get the vertex attribute info and cache it
                 attrInfo = new VertexDeclarationAttributeInfo(GraphicsDevice.MaxVertexAttributes);
 
-                foreach (var ve in _elements)
+                foreach (var ve in InternalVertexElements)
                 {
                     var attributeLocation = shader.GetAttribLocation(ve.VertexElementUsage, ve.UsageIndex);
                     // XNA appears to ignore usages it can't find a match for, so we will do the same
