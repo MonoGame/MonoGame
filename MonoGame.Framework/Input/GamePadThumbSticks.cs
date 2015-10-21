@@ -152,66 +152,39 @@ namespace Microsoft.Xna.Framework.Input
                 case GamePadDeadZone.None:
                     break;
                 case GamePadDeadZone.IndependentAxes:
-                    if (Math.Abs(left.X) < leftThumbDeadZone)
-                        left.X = 0f;
-                    if (Math.Abs(left.Y) < leftThumbDeadZone)
-                        left.Y = 0f;
-                    if (Math.Abs(right.X) < rightThumbDeadZone)
-                        right.X = 0f;
-                    if (Math.Abs(right.Y) < rightThumbDeadZone)
-                        right.Y = 0f;
+                    left = ExcludeIndependentAxesDeadZone(left, leftThumbDeadZone);
+                    right = ExcludeIndependentAxesDeadZone(right, rightThumbDeadZone);
                     break;
                 case GamePadDeadZone.Circular:
-                    if (left.LengthSquared() < leftThumbDeadZone * leftThumbDeadZone)
-                        left = Vector2.Zero;
-                    if (right.LengthSquared() < rightThumbDeadZone * rightThumbDeadZone)
-                        right = Vector2.Zero;
+                    left = ExcludeCircularDeadZone(left, leftThumbDeadZone);
+                    right = ExcludeCircularDeadZone(right, rightThumbDeadZone);
                     break;
             }
+        }
 
-            // excluding deadZone from the final output range
-            if (dz == GamePadDeadZone.IndependentAxes)
-            {
-                if (left.X < -leftThumbDeadZone)
-                     left.X = left.X + leftThumbDeadZone;
-                else if (left.X > leftThumbDeadZone)
-                    left.X = left.X - leftThumbDeadZone;
-                if (left.Y < -leftThumbDeadZone)
-                    left.Y = left.Y + leftThumbDeadZone;
-                else if (left.Y > leftThumbDeadZone)
-                    left.Y = left.Y - leftThumbDeadZone;
+        private Vector2 ExcludeIndependentAxesDeadZone(Vector2 value, float deadZone)
+        {
+            return new Vector2(ExcludeAxisDeadZone(value.X, deadZone), ExcludeAxisDeadZone(value.Y, deadZone));
+        }
 
-                if (right.X < -rightThumbDeadZone)
-                    right.X = right.X + rightThumbDeadZone;
-                else if (right.X > rightThumbDeadZone)
-                    right.X = right.X - rightThumbDeadZone;
-                if (right.Y < -rightThumbDeadZone)
-                    right.Y = right.Y + rightThumbDeadZone;
-                else if (right.Y > rightThumbDeadZone)
-                    right.Y = right.Y - rightThumbDeadZone;
+        private float ExcludeAxisDeadZone(float value, float deadZone)
+        {
+            if (value < -deadZone)
+                value += deadZone;
+            else if (value > deadZone)
+                value -= deadZone;
+            else
+                return 0f;
+            return value / (1f - deadZone);
+        }
 
-                left.X = left.X / (1.0f - leftThumbDeadZone);
-                left.Y = left.Y / (1.0f - leftThumbDeadZone);
-                right.X = right.X / (1.0f - rightThumbDeadZone);
-                right.Y = right.Y / (1.0f - rightThumbDeadZone);
-            }
-            else if (dz == GamePadDeadZone.Circular)
-            {
-                if (left.LengthSquared() >= leftThumbDeadZone * leftThumbDeadZone)
-                {
-                    Vector2 norm = left;
-                    norm.Normalize();
-                    left = left - norm * leftThumbDeadZone; // excluding deadzone
-                    left = left / leftThumbDeadZone; // re-range output
-                }
-                if (right.LengthSquared() >= rightThumbDeadZone * rightThumbDeadZone)
-                {
-                    Vector2 norm = right;
-                    norm.Normalize();
-                    right = right - norm * rightThumbDeadZone;
-                    right = right / rightThumbDeadZone;
-                }
-            }
+        private Vector2 ExcludeCircularDeadZone(Vector2 value, float deadZone)
+        {
+            var originalLength = value.Length();
+            if (originalLength <= deadZone)
+                return Vector2.Zero;
+            var newLength = (originalLength - deadZone) / (1f - deadZone);
+            return value * (newLength / originalLength);
         }
 
         /// <summary>
