@@ -17,6 +17,9 @@ fi
 echo "#!/bin/bash
 mono /Applications/Pipeline.app/Contents/MonoBundle/MGCB.exe \"\$@\"" >> /usr/local/bin/mgcb
 chmod u+x /usr/local/bin/mgcb
+#fix permissions
+chmod u+x /Applications/Pipeline.app/Contents/MonoBundle/ffmpeg
+chmod u+x /Applications/Pipeline.app/Contents/MonoBundle/ffprobe
 #write an uninstaller
 if [ -f /usr/local/bin/monogame-uninstall ]
 then
