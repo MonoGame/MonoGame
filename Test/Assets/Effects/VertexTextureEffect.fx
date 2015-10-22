@@ -21,7 +21,7 @@ struct VSOutput
     float4 Color : COLOR0;
 };
 
-VSOutput VS_Main(float2 xy : SV_POSITION)
+VSOutput VS_Main(float2 xy : POSITION)
 {
     float height = tex2Dlod(HeightMapSampler, float4((xy + float2(0.5, 0.5)) / HeightMapSize, 0, 0)).r;
     float3 worldPosition = float3(xy.x, height, xy.y);

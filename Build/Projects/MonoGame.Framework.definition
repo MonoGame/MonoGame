@@ -656,6 +656,9 @@
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\ImmutableVertexInputLayout.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.DirectX.cs">
       <Services>DirectXGraphics</Services>
@@ -667,6 +670,9 @@
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\InputLayoutCache.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
@@ -679,12 +685,14 @@
     <Compile Include="Graphics\Vertices\VertexBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
+    <Compile Include="Graphics\Vertices\VertexBufferBinding.cs" />
+    <Compile Include="Graphics\Vertices\VertexBufferBindings.cs" />
+    <Compile Include="Graphics\Vertices\VertexBufferBindings.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
-    <Compile Include="Graphics\Vertices\VertexDeclaration.DirectX.cs">
-      <Services>DirectXGraphics</Services>
-    </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
@@ -692,8 +700,15 @@
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
+    <Compile Include="Graphics\Vertices\VertexElement.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
     <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
+    <Compile Include="Graphics\Vertices\VertexInputLayout.cs" />
+    <Compile Include="Graphics\Vertices\VertexInputLayout.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />

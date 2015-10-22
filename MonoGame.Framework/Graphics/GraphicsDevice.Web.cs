@@ -85,6 +85,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        {
+        }
+
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             return GraphicsProfile.HiDef;

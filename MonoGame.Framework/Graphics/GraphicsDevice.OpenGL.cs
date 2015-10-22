@@ -243,6 +243,9 @@ namespace Microsoft.Xna.Framework.Graphics
             this.BlendState.PlatformApplyState(this, true);
             this.DepthStencilState.PlatformApplyState(this, true);
             this.RasterizerState.PlatformApplyState(this, true);            
+
+            // TODO: Add support for multiple vertex buffers (SetVertexBuffers).
+            _maxVertexBufferSlots = 1;
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -817,13 +820,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 _indexBufferDirty = false;
             }
 
-            if (_vertexBufferDirty)
+            if (_vertexBuffersDirty)
             {
-                if (_vertexBuffer != null)
+                if (_vertexBuffers.Count > 0)
                 {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffers.Get(0).VertexBuffer.vbo);
                     GraphicsExtensions.CheckGLError();
                 }
+                _vertexBuffersDirty = false;
             }
 
             if (_vertexShader == null)
@@ -872,9 +876,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);
-			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
+            var vertexDeclaration = _vertexBuffers.Get(0).VertexBuffer.VertexDeclaration;
+            var vertexOffset = (IntPtr)(vertexDeclaration.VertexStride * baseVertex);
 
-			_vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
+            vertexDeclaration.Apply(_vertexShader, vertexOffset);
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -892,7 +897,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            _vertexBuffersDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -915,7 +920,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             ApplyState(true);
 
-            _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
+            _vertexBuffers.Get(0).VertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -932,7 +937,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            _vertexBuffersDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -965,7 +970,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            _vertexBuffersDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -987,6 +992,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // Release the handles.
             ibHandle.Free();
             vbHandle.Free();
+        }
+
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        {
+            throw new NotImplementedException("GraphicsDevice.DrawInstancedPrimitives is not yet implemented for OpenGL.");
         }
 
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
