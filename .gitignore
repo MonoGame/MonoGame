@@ -38,7 +38,7 @@ obj/
 [Rr]elease*/
 Ankh.NoLoad
 .vs/
-project.lock.json
+MonoGame.Framework.WindowsUAP.project.lock.json
 artifacts/
 
 #Tooling
