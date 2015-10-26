@@ -45,14 +45,6 @@ namespace Microsoft.Xna.Framework.Input
 {
     public struct GamePadThumbSticks
     {
-        public enum GateType
-        {
-            None,
-            Round,
-            Square
-        };
-        public static GateType Gate = GateType.Round;
-
         Vector2 left;
         Vector2 right;
 
@@ -62,27 +54,6 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return left;
             }
-        	internal set
-            {
-        		switch (Gate)
-                {
-        		case GateType.None:
-        			left = value;
-        			break;
-        		case GateType.Round:
-        			if (value.LengthSquared () > 1f)
-        				left = Vector2.Normalize (value);
-        			else
-        				left = value;
-        			break;
-                    case GateType.Square:
-                        left = new Vector2(MathHelper.Clamp(value.X, -1f, 1f), MathHelper.Clamp(value.Y, -1f, 1f));
-                        break;
-                    default:
-                        left = Vector2.Zero;
-                        break;
-                }
-            }
         }
         public Vector2 Right
         {
@@ -90,33 +61,13 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return right;
             }
-        	internal set
-            {
-        		switch (Gate)
-                {
-        		case GateType.None:
-        			right = value;
-        			break;
-        		case GateType.Round:
-        			if (value.LengthSquared () > 1f)
-        				right = Vector2.Normalize (value);
-        			else
-        				right = value;
-        			break;
-                    case GateType.Square:
-                        right = new Vector2(MathHelper.Clamp(value.X, -1f, 1f), MathHelper.Clamp(value.Y, -1f, 1f));
-                        break;
-                    default:
-                        right = Vector2.Zero;
-                        break;
-                }
-            }
         }
 
 		public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition):this()
 		{
-			Left = leftPosition;
-			Right = rightPosition;
+			left = leftPosition;
+			right = rightPosition;
+            ApplySquareClamp();
 		}
 
         internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode):this()
@@ -125,8 +76,24 @@ namespace Microsoft.Xna.Framework.Input
             left = leftPosition;
             right = rightPosition;
             ApplyDeadZone(deadZoneMode);
-            Left = left;
-            Right = right;
+            if (deadZoneMode == GamePadDeadZone.Circular)
+                ApplyCircularClamp();
+            else
+                ApplySquareClamp();
+        }
+
+        private void ApplySquareClamp()
+        {
+            left = new Vector2(MathHelper.Clamp(left.X, -1f, 1f), MathHelper.Clamp(left.Y, -1f, 1f));
+            right = new Vector2(MathHelper.Clamp(right.X, -1f, 1f), MathHelper.Clamp(right.Y, -1f, 1f));
+        }
+
+        private void ApplyCircularClamp()
+        {
+            if (left.LengthSquared() > 1f)
+                left.Normalize();
+            if (right.LengthSquared() > 1f)
+                right.Normalize();
         }
 
         private void ApplyDeadZone(GamePadDeadZone dz)
