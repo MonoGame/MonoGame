@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.Media
             _queue.ActiveSong.Pause();
         }
 
-        private static void PlatformPlaySong(Song song)
+        private static void PlatformPlaySong(Song song, TimeSpan? startPosition)
         {
             if (_queue.ActiveSong == null)
                 return;
@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Media
             song.SetEventHandler(OnSongFinishedPlaying);
 
             song.Volume = _isMuted ? 0.0f : _volume;
-            song.Play();
+            song.Play(startPosition);
         }
 
         private static void PlatformResume()
