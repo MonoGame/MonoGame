@@ -34,9 +34,12 @@ namespace Microsoft.Xna.Framework.Media
             stream.Dispose();
         }
 
-        internal void Play()
+        internal void Play(TimeSpan? startPosition)
         {
             stream.Play();
+            if (startPosition != null)
+                stream.SeekToPosition((TimeSpan)startPosition);
+
             _playCount++;
         }
 
