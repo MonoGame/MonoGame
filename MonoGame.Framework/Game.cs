@@ -422,6 +422,9 @@ namespace Microsoft.Xna.Framework
         private Stopwatch _gameTimer;
         private long _previousTicks = 0;
         private int _updateFrameLag;
+#if WINRT
+        private readonly object _locker = new object();
+#endif
 
         public void Tick()
         {
@@ -449,7 +452,8 @@ namespace Microsoft.Xna.Framework
                     // accurate enough for frame limiting purposes if some
                     // fluctuation is an acceptable result.
 #if WINRT
-                    Task.Delay(1).Wait();
+                    lock (_locker)
+                        System.Threading.Monitor.Wait(_locker, 1);
 #elif WINDOWS
                     Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #else
