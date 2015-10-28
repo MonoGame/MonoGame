@@ -449,11 +449,11 @@ namespace Microsoft.Xna.Framework
                     // accurate enough for frame limiting purposes if some
                     // fluctuation is an acceptable result.
 #if WINRT
-                    Task.Delay((int)sleepTime).Wait();
+                    Task.Delay(1).Wait();
 #elif WINDOWS
                     Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #else
-                    System.Threading.Thread.Sleep((int)sleepTime);
+                    System.Threading.Thread.Sleep(1);
 #endif
                 }
                 goto RetryTick;
