@@ -443,17 +443,19 @@ namespace Microsoft.Xna.Framework
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
                 var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-
-                // NOTE: While sleep can be inaccurate in general it is 
-                // accurate enough for frame limiting purposes if some
-                // fluctuation is an acceptable result.
+                if (sleepTime > 1.0)
+                {
+                    // NOTE: While sleep can be inaccurate in general it is 
+                    // accurate enough for frame limiting purposes if some
+                    // fluctuation is an acceptable result.
 #if WINRT
-                Task.Delay((int)sleepTime).Wait();
+                    Task.Delay((int)sleepTime).Wait();
 #elif WINDOWS
-                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
+                    Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #else
-                System.Threading.Thread.Sleep((int)sleepTime);
+                    System.Threading.Thread.Sleep((int)sleepTime);
 #endif
+                }
                 goto RetryTick;
             }
 
