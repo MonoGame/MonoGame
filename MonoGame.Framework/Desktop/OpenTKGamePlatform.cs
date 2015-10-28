@@ -168,13 +168,6 @@ namespace Microsoft.Xna.Framework
             //Net.NetworkSession.Exit();
             Interlocked.Increment(ref isExiting);
 
-            // sound controller must be disposed here
-            // so that it doesn't stop the game from disposing
-            if (soundControllerInstance != null)
-            {
-                soundControllerInstance.Dispose();
-                soundControllerInstance = null;
-            }
             OpenTK.DisplayDevice.Default.RestoreResolution();
         }
 
