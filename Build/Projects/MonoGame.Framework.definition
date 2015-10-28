@@ -1009,6 +1009,9 @@
     </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Utilities\TimerHelper.cs">
+      <Platforms>Windows,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
     <Compile Include="Utilities\ZLibStream\ZlibStream.cs" />
     <Compile Include="Utilities\Png\PngCommon.cs" />

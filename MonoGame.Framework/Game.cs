@@ -442,15 +442,17 @@ namespace Microsoft.Xna.Framework
             // life and/or release CPU time to other threads and processes.
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
-                var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+                var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
 
                 // NOTE: While sleep can be inaccurate in general it is 
                 // accurate enough for frame limiting purposes if some
                 // fluctuation is an acceptable result.
 #if WINRT
-                Task.Delay(sleepTime).Wait();
+                Task.Delay((int)sleepTime).Wait();
+#elif WINDOWS
+                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #else
-                System.Threading.Thread.Sleep(sleepTime);
+                System.Threading.Thread.Sleep((int)sleepTime);
 #endif
                 goto RetryTick;
             }
