@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -27,6 +28,10 @@ namespace Microsoft.Xna.Framework.Windows
     [System.ComponentModel.DesignerCategory("Code")]
     internal class WinFormsGameForm : Form
     {
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr LoadLibrary(string dllToLoad);
+
+
         GameWindow _window;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
@@ -40,6 +45,10 @@ namespace Microsoft.Xna.Framework.Windows
 
         public WinFormsGameForm(GameWindow window)
         {
+            // Manually load XAudio, to prevent crashes caused if it is automatically unloaded
+            // after being automatically loaded.
+            LoadLibrary("XAudio_2.7.dll");
+
             _window = window;
         }
 
