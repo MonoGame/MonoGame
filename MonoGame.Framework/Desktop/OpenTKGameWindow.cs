@@ -334,17 +334,15 @@ namespace Microsoft.Xna.Framework
 
             window.KeyPress += OnKeyPress;
 
-            //make sure that the game is not running on linux
-            //on Linux people may want to use mkbundle to
-            //create native Linux binaries
-            if (CurrentPlatform.OS != OS.Linux)
-            {
-                // Set the window icon.
-                var assembly = Assembly.GetEntryAssembly();
-                if (assembly != null)
-                    window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-                Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
-            }
+            var assembly = Assembly.GetEntryAssembly();
+            var t = Type.GetType ("Mono.Runtime");
+
+            Title = assembly != null ? AssemblyHelper.GetDefaultWindowTitle() : "MonoGame Application";
+
+            if (t == null && assembly != null)
+                window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            else
+                window.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico"));
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,

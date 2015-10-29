@@ -1040,6 +1040,9 @@
     <Compile Include="Input\KeyboardUtil.OpenTK.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
+	 <EmbeddedResource Include="../Installers/monogame.ico">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </EmbeddedResource>
 
 
     <!-- iOS Platform -->
