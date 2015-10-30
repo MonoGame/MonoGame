@@ -435,6 +435,16 @@ namespace Microsoft.Xna.Framework
 
         RetryTick:
 
+            if (!IsActive && (InactiveSleepTime.TotalMilliseconds >= 1.0))
+            {
+#if WINRT
+                lock (_locker)
+                    System.Threading.Monitor.Wait(_locker, (int)InactiveSleepTime.TotalMilliseconds);
+#else
+                System.Threading.Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);
+#endif
+            }
+
             // Advance the accumulated elapsed time.
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
