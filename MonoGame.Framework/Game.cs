@@ -455,21 +455,10 @@ namespace Microsoft.Xna.Framework
             // life and/or release CPU time to other threads and processes.
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
+#if WINDOWS
                 var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-                if (sleepTime > 1.0)
-                {
-                    // NOTE: While sleep can be inaccurate in general it is 
-                    // accurate enough for frame limiting purposes if some
-                    // fluctuation is an acceptable result.
-#if WINRT
-                    lock (_locker)
-                        System.Threading.Monitor.Wait(_locker, 1);
-#elif WINDOWS
-                    Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
-#else
-                    System.Threading.Thread.Sleep(1);
+                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
 #endif
-                }
                 goto RetryTick;
             }
 
