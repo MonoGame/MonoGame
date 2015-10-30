@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework.Media
                 return;
             }
 
-            StartSession(startPosition.HasValue ? PositionVariantFor(startPosition.Value) : PositionBeginning);
+            StartSession(PositionVariantFor(startPosition));
         }
 
         private static void PlayNewSong(Song song, TimeSpan? startPosition)
@@ -217,6 +217,7 @@ namespace Microsoft.Xna.Framework.Media
 
             _currentSong = song;
 
+            //We need to start playing from 0, then seek the stream when the topology is ready, otherwise the song doesn't play.
             if (startPosition.HasValue)
                 _desiredPosition = PositionVariantFor(startPosition.Value);
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
@@ -277,14 +278,16 @@ namespace Microsoft.Xna.Framework.Media
                 if (_nextSong != _currentSong)
                     StartNewSong(_nextSong, _nextSongStartPosition);
                 else
-                    StartSession(_nextSongStartPosition.HasValue ? PositionVariantFor(_nextSongStartPosition.Value) : PositionBeginning);
+                    StartSession(PositionVariantFor(_nextSongStartPosition));
                 _nextSong = null;
             }
         }
 
-        private static Variant PositionVariantFor(TimeSpan position)
+        private static Variant PositionVariantFor(TimeSpan? position)
         {
-            return new Variant { Value = (long)(10000000L * (position.TotalSeconds)) };
+            if (position.HasValue)
+                return new Variant { Value = position.Value.Ticks };
+            return PositionBeginning;
         }
     }
 }
