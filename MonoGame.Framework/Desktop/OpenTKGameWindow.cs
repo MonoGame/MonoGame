@@ -248,7 +248,15 @@ namespace Microsoft.Xna.Framework
         {
             lock (window)
             {
-                UpdateBorder();
+                if (CurrentPlatform.OS == OS.Linux)
+                {
+                    if (updateborder == 1)
+                        UpdateBorder();
+
+                    if(updateborder > 0)
+                        updateborder--;
+                }
+
                 Window.ProcessEvents();
                 UpdateWindowState();
                 HandleInput();
@@ -257,20 +265,14 @@ namespace Microsoft.Xna.Framework
 
         private void UpdateBorder()
         {
-            if (updateborder == 1)
-            {
-                WindowBorder desired;
-                if (_isBorderless)
-                    desired = WindowBorder.Hidden;
-                else
-                    desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
-            
-                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
-                    window.WindowBorder = desired;
-            }
-
-            if(updateborder > 0)
-                updateborder--;
+            WindowBorder desired;
+            if (_isBorderless)
+                desired = WindowBorder.Hidden;
+            else
+                desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+        
+            if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                window.WindowBorder = desired;
         }
 
         private void UpdateWindowState()
@@ -279,7 +281,9 @@ namespace Microsoft.Xna.Framework
 
             if (updateClientBounds)
             {
-                window.WindowBorder = WindowBorder.Resizable;
+                if (CurrentPlatform.OS == OS.Linux)
+                    window.WindowBorder = WindowBorder.Resizable;
+                
                 updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
@@ -296,11 +300,17 @@ namespace Microsoft.Xna.Framework
 
                 // we need to create a small delay between resizing the window
                 // and changing the border to avoid OpenTK Linux bug
-                updateborder = 2;
+                if (CurrentPlatform.OS == OS.Linux)
+                    updateborder = 2;
+                else
+                    UpdateBorder();
 
                 var context = GraphicsContext.CurrentContext;
                 if (context != null)
                     context.Update(window.WindowInfo);
+
+                if (!Window.Visible)
+                    Window.Visible = true;
             }
         }
 
