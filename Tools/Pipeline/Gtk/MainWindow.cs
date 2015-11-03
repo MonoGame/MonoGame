@@ -46,6 +46,7 @@ namespace MonoGame.Tools.Pipeline
         MenuItem treerebuild;
         MenuItem recentMenu;
         bool expand = false;
+        uint _windowConfigurationSaveTimerID = 0;
 
         public void ReloadTitle()
         {
@@ -160,6 +161,11 @@ namespace MonoGame.Tools.Pipeline
                     OpenProjectPath = startupProject;                
             }
 
+            WindowConfiguration.Default.Load();
+            Resize (WindowConfiguration.Default.Settings.Width, WindowConfiguration.Default.Settings.Height);
+            Move (WindowConfiguration.Default.Settings.X, WindowConfiguration.Default.Settings.Y);
+            hpaned1.Position = WindowConfiguration.Default.Settings.SeparatorPosition;
+
             History.Default.StartupProject = null;
 
             if (!String.IsNullOrEmpty(OpenProjectPath)) {
@@ -173,7 +179,9 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
         {
-            if (_controller.Exit ()) 
+            WindowConfiguration.Default.Save ();
+
+            if (_controller.Exit ())
                 Application.Quit ();
             else
                 a.RetVal = true;
@@ -529,15 +537,42 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnExitActionActivated (object sender, EventArgs e)
         {
+            WindowConfiguration.Default.Save ();
+
             if (_controller.Exit ())
                 Application.Quit ();
+        }
+
+        protected void OnSizeAllocateActivated (object sender, SizeAllocatedArgs e)
+        {
+            int xPos, yPos;
+            this.GetPosition (out xPos, out yPos);
+
+            WindowConfiguration.Default.Settings.X = xPos;
+            WindowConfiguration.Default.Settings.Y = yPos;
+            WindowConfiguration.Default.Settings.Width = e.Allocation.Width;
+            WindowConfiguration.Default.Settings.Height = e.Allocation.Height;
+            WindowConfiguration.Default.Settings.SeparatorPosition = hpaned1.Position;
+
+            // only save when the user is done resizing the window
+            if (_windowConfigurationSaveTimerID > 0)
+            {
+                GLib.Source.Remove (_windowConfigurationSaveTimerID);
+                _windowConfigurationSaveTimerID = 0;
+            }
+
+            _windowConfigurationSaveTimerID = GLib.Timeout.Add( 500, () => {
+                WindowConfiguration.Default.Save ();
+                _windowConfigurationSaveTimerID = 0;
+                return false;
+            });
         }
 
         protected void OnUndoActionActivated (object sender, EventArgs e)
         {
             _controller.Undo ();
         }
-
+            
         protected void OnRedoActionActivated (object sender, EventArgs e)
         {
             _controller.Redo ();

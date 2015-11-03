@@ -317,6 +317,8 @@ namespace MonoGame.Tools.Pipeline
             History.Default.StartupProject = null;
             History.Default.Save();
 
+            WindowConfiguration.Default.Save ();
+
             Selection.Clear(this);
             UpdateTree();
         }
