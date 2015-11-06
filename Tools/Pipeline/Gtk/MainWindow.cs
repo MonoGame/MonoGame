@@ -466,6 +466,27 @@ namespace MonoGame.Tools.Pipeline
             projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists, _controller.GetFullPath(item.OriginalPath));
         }
 
+
+#if MONOMAC || LINUX
+        string FindSystemMono ()
+        {
+            // El Capitan Support. /usr/bin is now read only and /usr/local/bin is NOT included
+            // in $PATH for apps... only the shell. So we need to manaully find the full path to 
+            // the right location.
+            string[] pathsToCheck = new string[] {
+                "/usr/bin",
+                "/usr/local/bin",
+                "/Library/Frameworks/Mono.framework/Versions/Current/bin",
+            };
+            foreach (var path in pathsToCheck) {
+                if (System.IO.File.Exists (System.IO.Path.Combine (path, "mono")))
+                    return System.IO.Path.Combine (path, "mono");
+            }
+            OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
+            return "mono";
+        }
+#endif
+
         public Process CreateProcess(string exe, string commands)
         {
             var _buildProcess = new Process();
@@ -474,7 +495,7 @@ namespace MonoGame.Tools.Pipeline
             _buildProcess.StartInfo.Arguments = commands;
 #endif
 #if MONOMAC || LINUX
-            _buildProcess.StartInfo.FileName = "mono";
+            _buildProcess.StartInfo.FileName = FindSystemMono ();
             if (_controller.LaunchDebugger) {
                 var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
                 port = !string.IsNullOrEmpty (port) ? port : "55555";
