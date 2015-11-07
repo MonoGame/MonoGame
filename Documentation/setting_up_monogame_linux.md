@@ -27,7 +27,7 @@ cp fixpermissions.sh MonoGame.Linux/
 cd MonoGame.Linux
 ./fixpermissions.sh
 ./generate.sh
-sudo ./monogame_linux.run
+sudo ./monogame-linux.run
 ```
 * During the installation process the installer will ask you if you wish to install any missing dependencies automatically. If you for some reason don't want to install them automatically or the dependency installer is not available for your linux distribution, here is the list of needed packages:
   * monodevelop ([http://www.monodevelop.com/download/](http://www.monodevelop.com/download/))
