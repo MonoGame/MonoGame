@@ -5,7 +5,7 @@
 		<_Category>C#/MonoGame</_Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
-		<_Description>Creates a new C# MonoGame Windows Application. This application will use the DirecTX backend.</_Description>	   
+		<_Description>Creates a new C# MonoGame Windows Application. This application will use the DirectX backend.</_Description>	   
 	</TemplateConfiguration>
 	
 	<Actions>

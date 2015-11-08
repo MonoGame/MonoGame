@@ -131,9 +131,12 @@
   <Extension path="/MonoDevelop/Ide/DisplayBindings">
     <DisplayBinding id="MonoGamePipeline" insertbefore="DefaultDisplayBinding" class="MonoDevelop.MonoGame.PipelineDisplayBinding" />
   </Extension>
+  <!-- Disabled in favour of MSBuild .targets integration -->
+  <!--
   <Extension path="/MonoDevelop/ProjectModel/ProjectServiceExtensions">
     <Class class="MonoDevelop.MonoGame.MonoGameBuildExtension" />
   </Extension>
+  -->
   <Module>
     <Runtime>
       <Import assembly="MonoDevelop.MonoGame.Android.dll" />
