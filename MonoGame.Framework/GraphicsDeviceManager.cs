@@ -357,10 +357,10 @@ namespace Microsoft.Xna.Framework
 
 #else
 
-#if MONOMAC
+#if MONOMAC || DESKTOPGL
             presentationParameters.IsFullScreen = _wantFullScreen;
-#elif DESKTOPGL
-            presentationParameters.IsFullScreen = _wantFullScreen;
+#elif WEB
+            presentationParameters.IsFullScreen = false;
 #else
             // Set "full screen"  as default
             presentationParameters.IsFullScreen = true;

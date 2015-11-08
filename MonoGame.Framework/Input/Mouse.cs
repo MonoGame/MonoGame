@@ -220,6 +220,9 @@ namespace Microsoft.Xna.Framework.Input
             CGSetLocalEventsSuppressionInterval(0.0);
             CGWarpMouseCursorPosition(flippedPt);
             CGSetLocalEventsSuppressionInterval(0.25);
+#elif WEB
+            PrimaryWindow.MouseState.X = x;
+            PrimaryWindow.MouseState.Y = y;
 #endif
         }
 

@@ -207,7 +207,7 @@
   </Platform>
 	
   <Platform Type="Web">
-    <Reference Include="JSIL.Meta" />
+    <Reference Include="Microsoft.CSharp" />
   </Platform>
 
   <Service Name="MonoGame.Framework/ANGLEGraphics">
