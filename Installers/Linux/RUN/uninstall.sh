@@ -23,4 +23,10 @@ then
 	rm /usr/share/applications/Monogame\ Pipeline.desktop
 fi
 
+#remove MonoGame xbuild data
+if [ -d /usr/lib/mono/xbuild/MonoGame ]
+then
+	rm -rf /usr/lib/mono/xbuild/MonoGame
+fi
+
 #remove pipeline tool and self, the command for it is added by postinstall.sh

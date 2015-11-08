@@ -3,7 +3,8 @@
 *.DS_Store
 
 #Output Linux Installer
-Installers/Linux/InstallerData/
+Installers/Linux/tmp_deb/
+Installers/Linux/tmp_run/
 *.run
 *.deb
 
