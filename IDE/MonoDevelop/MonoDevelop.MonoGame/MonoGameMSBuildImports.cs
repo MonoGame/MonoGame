@@ -20,13 +20,16 @@ namespace MonoDevelop.MonoGame
 				project.PropertyGroups.Any (x => x.Properties.Any (p => p.Name == "AndroidApplication" && string.Compare (p.GetValue (), bool.TrueString, true)==0));
 			if (isMonoGame && containsMGCB && isApplication) {
 				var type = item.GetType ().Name;
-				var platform = "Windows";
+				var platform = Environment.OSVersion.Platform == PlatformID.Win32NT ? "Windows" : "DesktopGL";
 				switch (type) {
 				case "XamarinIOSProject":
 					platform = "iOS";
 					break;
 				case "MonoDroidProject":
 					platform = "Android";
+					break;
+				case "MonoGameProject":
+					platform = "DesktopGL";
 					break;
 				}
 				if (!project.PropertyGroups.Any (x => x.Properties.Any (p => p.Name == "MonoGamePlatform"))) {
