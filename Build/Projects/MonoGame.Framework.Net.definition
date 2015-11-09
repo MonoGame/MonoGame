@@ -301,6 +301,10 @@
       <Platforms>Windows</Platforms>
     </Compile>
 
+	    <!-- Windows UAP Platform -->
+    <None Include="MonoGame.Framework.Net.WindowsUAP.project.json">
+      <Platforms>WindowsUAP</Platforms>
+    </None>
  
   </Files>
 </Project>
