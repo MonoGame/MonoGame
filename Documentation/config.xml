@@ -44,6 +44,7 @@
     
     <topic id="Platform_Specific_Notes" name="Platform-Specific Notes" filename="platform_specific.md">
         <topic id="Android" name="Android" filename="android.md"/>
+        <topic id="tvOS" name="Android" filename="tvOS.md"/>
     </topic>
     
     <topic id="External_Links" name="External Links" filename="links.md"/>
