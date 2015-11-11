@@ -1,5 +1,6 @@
 #!/bin/sh
 xdg-mime install /tmp/mgcb.xml --novendor
+xdg-mime default "Monogame Pipeline.desktop" text/mgcb
 sudo -H -u $SUDO_USER bash -c 'mdtool setup install /tmp/MonoDevelop.MonoGame.mpack'
 
 if [ -L /usr/lib/mono/xbuild/MonoGame/v3.0/Tools ]; then
