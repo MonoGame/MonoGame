@@ -269,69 +269,6 @@
       <Platforms>Linux</Platforms>
     </EmbeddedResource>
 
-    <!-- Copy config files to output directory -->
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\atk-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>atk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gdk-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>gdk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gio-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>gio-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\glib-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>glib-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gtk-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>gtk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\pango-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>pango-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>atk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>gdk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>glade-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>glib-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>gtk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>pango-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
     <!-- Copy the template resources to the output -->
 	<None Include="Templates\Effect.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -27,11 +27,13 @@ sudo apt-get install libopenal-dev mono-runtime
 * Open up terminal and type in:
 ```
 cd Downloads
+chmod +x monogame-sdk.run
 sudo ./monogame-sdk.run
 ```
 * During the installation process the installer will ask you if you wish to install any missing dependencies automatically. If you for some reason don't want to install them automatically or the dependency installer is not available for your linux distribution, here is the list of needed packages:
   * monodevelop ([http://www.monodevelop.com/download/](http://www.monodevelop.com/download/))
   * libopenal-dev
   * referenceassemblies-pcl
+  * gtk-sharp3
   * ttf-mscorefonts-installer (recommended, but not needed)
 * That's it, MonoGame SDK is installed
