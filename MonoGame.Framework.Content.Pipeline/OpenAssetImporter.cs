@@ -311,20 +311,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     material.Textures.Add("Bump", texture);
                 }
 
-                if (aiMaterial.HasColorDiffuse)
-                    material.DiffuseColor = ToXna(aiMaterial.ColorDiffuse);
+                material.DiffuseColor = ToXna(aiMaterial.ColorDiffuse);
 
-                if (aiMaterial.HasColorEmissive)
-                    material.EmissiveColor = ToXna(aiMaterial.ColorEmissive);
+                material.EmissiveColor = ToXna(aiMaterial.ColorEmissive);
 
-                if (aiMaterial.HasOpacity)
-                    material.Alpha = aiMaterial.Opacity;
+                material.Alpha = aiMaterial.Opacity;
 
-                if (aiMaterial.HasColorSpecular)
-                    material.SpecularColor = ToXna(aiMaterial.ColorSpecular);
+                material.SpecularColor = ToXna(aiMaterial.ColorSpecular);
 
-                if (aiMaterial.HasShininessStrength)
-                    material.SpecularPower = aiMaterial.ShininessStrength;
+                material.SpecularPower = aiMaterial.ShininessStrength;
 
                 _materials.Add(material);
             }
