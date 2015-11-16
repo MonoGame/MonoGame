@@ -303,7 +303,6 @@ namespace Microsoft.Xna.Framework.Input
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-#if DIRECTX11_1
             if (!_connected[index])
                 return false;
 
@@ -315,9 +314,6 @@ namespace Microsoft.Xna.Framework.Input
             });
 
             return result == SharpDX.Result.Ok;
-#else
-            return false;
-#endif            
         }
     }
 }
