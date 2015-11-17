@@ -149,6 +149,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._treeView.DragOverNodeBackColor = System.Drawing.SystemColors.Highlight;
             this._treeView.DragOverNodeForeColor = System.Drawing.SystemColors.HighlightText;
+            this._treeView.ItemHeight = 18;
             this._treeView.Location = new System.Drawing.Point(0, 0);
             this._treeView.Name = "_treeView";
             this._treeView.Size = new System.Drawing.Size(249, 210);
