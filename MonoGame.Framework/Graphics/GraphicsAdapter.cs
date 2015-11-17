@@ -255,6 +255,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
        
+#if DIRECTX && !WINDOWS_PHONE
+        private static readonly Dictionary<SharpDX.DXGI.Format, SurfaceFormat> FormatTranslations = new Dictionary<SharpDX.DXGI.Format, SurfaceFormat>
+            {
+                { SharpDX.DXGI.Format.R8G8B8A8_UNorm, SurfaceFormat.Color },
+                { SharpDX.DXGI.Format.B8G8R8A8_UNorm, SurfaceFormat.Color },
+                { SharpDX.DXGI.Format.B5G6R5_UNorm, SurfaceFormat.Bgr565 },
+            };
+#endif
+
         public DisplayModeCollection SupportedDisplayModes
         {
             get
@@ -314,14 +323,23 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dxgiFactory = new SharpDX.DXGI.Factory1();
                     var adapter = dxgiFactory.GetAdapter(0);
                     var output = adapter.Outputs[0];
-                    var displayModes = output.GetDisplayModeList(SharpDX.DXGI.Format.R8G8B8A8_UNorm, 0);
 
                     modes.Clear();
-                    foreach (var displayMode in displayModes)
+                    foreach (var formatTranslation in FormatTranslations)
                     {
-                        int refreshRate = (int)Math.Round(displayMode.RefreshRate.Numerator / (float)displayMode.RefreshRate.Denominator);
-                        modes.Add(new DisplayMode(displayMode.Width, displayMode.Height, refreshRate, SurfaceFormat.Color));
+                        var displayModes = output.GetDisplayModeList(formatTranslation.Key, 0);
+                        foreach (var displayMode in displayModes)
+                        {
+                            int refreshRate = (int)Math.Round(displayMode.RefreshRate.Numerator / (float)displayMode.RefreshRate.Denominator);
+                            var xnaDisplayMode = new DisplayMode(displayMode.Width, displayMode.Height, refreshRate, formatTranslation.Value);
+                            if (!modes.Contains(xnaDisplayMode))
+                                modes.Add(xnaDisplayMode);
+                        }
                     }
+
+                    output.Dispose();
+                    adapter.Dispose();
+                    dxgiFactory.Dispose();
 #endif
                     _supportedDisplayModes = new DisplayModeCollection(modes);
                 }
