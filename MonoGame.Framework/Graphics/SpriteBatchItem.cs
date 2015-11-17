@@ -19,37 +19,6 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexBR = new VertexPositionColorTexture();            
 		}
 		
-		public void Set ( float x, float y, float w, float h, Color color, Vector2 texCoordTL, Vector2 texCoordBR, float depth )
-		{
-			vertexTL.Position.X = x;
-            vertexTL.Position.Y = y;
-            vertexTL.Position.Z = depth;
-            vertexTL.Color = color;
-            vertexTL.TextureCoordinate.X = texCoordTL.X;
-            vertexTL.TextureCoordinate.Y = texCoordTL.Y;            
-
-			vertexTR.Position.X = x+w;
-            vertexTR.Position.Y = y;
-            vertexTR.Position.Z = depth;
-            vertexTR.Color = color;
-            vertexTR.TextureCoordinate.X = texCoordBR.X;
-            vertexTR.TextureCoordinate.Y = texCoordTL.Y;
-
-			vertexBL.Position.X = x;
-            vertexBL.Position.Y = y+h;
-            vertexBL.Position.Z = depth;
-            vertexBL.Color = color;
-			vertexBL.TextureCoordinate.X = texCoordTL.X;
-            vertexBL.TextureCoordinate.Y = texCoordBR.Y;
-
-			vertexBR.Position.X = x+w;
-            vertexBR.Position.Y = y+h;
-            vertexBR.Position.Z = depth;
-            vertexBR.Color = color;
-			vertexBR.TextureCoordinate.X = texCoordBR.X;
-            vertexBR.TextureCoordinate.Y = texCoordBR.Y;
-		}
-
 		public void Set ( float x, float y, float dx, float dy, float w, float h, float sin, float cos, Color color, Vector2 texCoordTL, Vector2 texCoordBR, float depth )
 		{
             // TODO, Should we be just assigning the Depth Value to Z?
