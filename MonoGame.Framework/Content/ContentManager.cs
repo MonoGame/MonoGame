@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content
             'P', // PlayStation4
 
             // Old WindowsGL and Linux platform chars
-            'w',
+            'g',
             'l',
         };
 
