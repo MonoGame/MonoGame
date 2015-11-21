@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.AddressV = GetAddressMode(AddressV);
                 desc.AddressW = GetAddressMode(AddressW);
 
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
 				desc.BorderColor = new SharpDX.Mathematics.Interop.RawColor4(
 					BorderColor.R / 255.0f,
 					BorderColor.G / 255.0f,

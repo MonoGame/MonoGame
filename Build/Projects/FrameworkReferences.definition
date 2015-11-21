@@ -185,7 +185,7 @@
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
   </Platform>
 	
-  <Platform Type="WindowsUAP">
+  <Platform Type="WindowsUniversal">
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.dll" />

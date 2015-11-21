@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
-    class UAPGamePlatform : GamePlatform
+    class WindowsUniversalGamePlatform : GamePlatform
     {
 		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
@@ -31,12 +31,12 @@ namespace Microsoft.Xna.Framework
 
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
-        public UAPGamePlatform(Game game)
+        public WindowsUniversalGamePlatform(Game game)
             : base(game)
         {
             // Setup the game window.
-            Window = UAPGameWindow.Instance;
-			UAPGameWindow.Instance.Game = game;
+            Window = WindowsUniversalGameWindow.Instance;
+			WindowsUniversalGameWindow.Instance.Game = game;
 
             // Setup the launch parameters.
             // - Parameters can optionally start with a forward slash.
@@ -128,23 +128,23 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            UAPGameWindow.Instance.RunLoop();
+            WindowsUniversalGameWindow.Instance.RunLoop();
         }
 
         public override void StartRunLoop()
         {
             CompositionTarget.Rendering += (o, a) =>
             {
-				UAPGameWindow.Instance.Tick();
+				WindowsUniversalGameWindow.Instance.Tick();
                 GamePad.Back = false;
             };
         }
         
         public override void Exit()
         {
-            if (!UAPGameWindow.Instance.IsExiting)
+            if (!WindowsUniversalGameWindow.Instance.IsExiting)
             {
-				UAPGameWindow.Instance.IsExiting = true;
+				WindowsUniversalGameWindow.Instance.IsExiting = true;
                 Application.Current.Exit();
             }
         }
@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework
             var device = Game.GraphicsDevice;
             if (device != null)
             {
-				// For a UAP app we need to re-apply the
+				// For a Universal app we need to re-apply the
 				// render target before every draw.  
 				// 
 				// I guess the OS changes it and doesn't restore it?
@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework
 
         protected override void OnIsMouseVisibleChanged() 
         {
-			UAPGameWindow.Instance.SetCursor(Game.IsMouseVisible);
+			WindowsUniversalGameWindow.Instance.SetCursor(Game.IsMouseVisible);
         }
 		
         protected override void Dispose(bool disposing)
@@ -212,7 +212,7 @@ namespace Microsoft.Xna.Framework
             if (graphicsDeviceManager != null)
                 graphicsDeviceManager.Dispose();
 
-			UAPGameWindow.Instance.Dispose();
+			WindowsUniversalGameWindow.Instance.Dispose();
 			
 			base.Dispose(disposing);
         }

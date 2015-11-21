@@ -40,8 +40,8 @@ namespace Microsoft.Xna.Framework
             return new MonoGame.Framework.WinFormsGamePlatform(game);
 #elif WINDOWS_PHONE
             return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
-#elif WINDOWS_UAP
-            return new UAPGamePlatform(game);
+#elif WINDOWS_UNIVERSAL
+            return new WindowsUniversalGamePlatform(game);
 #elif WINRT
             return new MetroGamePlatform(game);
 #elif WEB

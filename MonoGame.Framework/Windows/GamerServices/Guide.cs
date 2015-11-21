@@ -61,7 +61,7 @@ using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.System;
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 using Microsoft.Xna.Framework.Input;
 #endif
 #else
@@ -84,13 +84,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 	    private static readonly CoreDispatcher _dispatcher;
 #endif 
 
         static Guide()
         {
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
             _dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
 
 
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             // Call the Microsoft implementation of BeginShowKeyboardInput using an alias.
             return MsXna_Guide.BeginShowKeyboardInput((MsXna_PlayerIndex)player, title, description, defaultText, callback, state, usePasswordMode);
-#elif !WINDOWS_UAP
+#elif !WINDOWS_UNIVERSAL
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
 			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             // Call the Microsoft implementation of BeginShowKeyboardInput using an alias.
             return MsXna_Guide.EndShowKeyboardInput(result);
-#elif !WINDOWS_UAP
+#elif !WINDOWS_UNIVERSAL
 			ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
 			return ski.EndInvoke(result);		
@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             int? result = null;
             IsVisible = true;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 
             MessageDialog dialog = new MessageDialog(text, title);
             foreach (string button in buttons)
@@ -251,7 +251,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		        buttons, focusButton,
                 (MsXna_MessageBoxIcon)icon, 
                 callback, state);
-#elif !WINDOWS_UAP
+#elif !WINDOWS_UNIVERSAL
             // TODO: GuideAlreadyVisibleException
             if (IsVisible)
                 throw new Exception("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
@@ -309,7 +309,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             // Call the Microsoft implementation of EndShowMessageBox using an alias.
             return MsXna_Guide.EndShowMessageBox(result);
-#elif WINDOWS_UAP
+#elif WINDOWS_UNIVERSAL
             var x = (Task<int?>)result;
             return  x.Result;
 #else

@@ -12,7 +12,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.ES20;
 #elif OPENGL
 using OpenTK.Graphics.OpenGL;
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#elif WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -37,11 +37,11 @@ namespace Microsoft.Xna.Framework
         bool disposed;
         private bool _hardwareModeSwitch = true;
 
-#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+#if (WINDOWS || WINDOWS_UNIVERSAL) && DIRECTX
         private bool _firstLaunch = true;
 #endif
 
-#if !WINRT || WINDOWS_UAP
+#if !WINRT || WINDOWS_UNIVERSAL
         private bool _wantFullScreen = false;
 #endif
         public static readonly int DefaultBackBufferHeight = 480;
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
             // Display orientation is always portrait on WP8
             _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#elif WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework
             // hardware feature level.
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
 			_graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
 			_graphicsDevice.PresentationParameters.SwapChainPanel = this.SwapChainPanel;
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
@@ -230,8 +230,8 @@ namespace Microsoft.Xna.Framework
 			_graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
-#if WINDOWS_UAP
-            ((UAPGameWindow)_game.Window).SetClientSize(_preferredBackBufferWidth, _preferredBackBufferHeight);
+#if WINDOWS_UNIVERSAL
+            ((WindowsUniversalGameWindow)_game.Window).SetClientSize(_preferredBackBufferWidth, _preferredBackBufferHeight);
 #endif
 
 #elif WINDOWS && DIRECTX
@@ -302,7 +302,7 @@ namespace Microsoft.Xna.Framework
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
 
-#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+#if (WINDOWS || WINDOWS_UNIVERSAL) && DIRECTX
 
             if (!_firstLaunch)
             {
@@ -335,7 +335,7 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS_PHONE
 			// Nothing to do!
-#elif WINDOWS_UAP
+#elif WINDOWS_UNIVERSAL
 			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
 			presentationParameters.SwapChainPanel = this.SwapChainPanel;
 #elif WINDOWS_STORE
@@ -403,7 +403,7 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
 
-#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+#if (WINDOWS || WINDOWS_UNIVERSAL) && DIRECTX
             ApplyChanges();
 #endif
         }
@@ -413,7 +413,7 @@ namespace Microsoft.Xna.Framework
         public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif
 
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
         [CLSCompliant(false)]
         public SwapChainPanel SwapChainPanel { get; set; }
 #endif
@@ -432,7 +432,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
                 return _wantFullScreen;
 #elif WINRT
                 return true;
@@ -444,7 +444,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
                 _wantFullScreen = value;
 #elif WINRT
                 // Just ignore this as it is not relevant on Windows 8

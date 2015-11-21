@@ -285,7 +285,7 @@
             <TargetPlatformVersion>8.1</TargetPlatformVersion>
             <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
           </xsl:when>
-          <xsl:when test="/Input/Generation/Platform = 'WindowsUAP'">
+          <xsl:when test="/Input/Generation/Platform = 'WindowsUniversal'">
 			  <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
 			  <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
 			  <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
@@ -319,13 +319,13 @@
           <xsl:value-of select="/Input/Properties/FrameworkVersions/Profile" />
         </TargetFrameworkProfile>
       </xsl:when>
-      <xsl:when test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsUAP' or /Input/Generation/Platform = 'PSMobile' or /Input/Generation/Platform = 'PCL'">
+      <xsl:when test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsUniversal' or /Input/Generation/Platform = 'PSMobile' or /Input/Generation/Platform = 'PCL'">
       </xsl:when>
       <xsl:otherwise>
         <TargetFrameworkProfile></TargetFrameworkProfile>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsUAP'">
+    <xsl:if test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsUniversal'">
       <DefaultLanguage>en-US</DefaultLanguage>
     </xsl:if>
   </xsl:template>
@@ -662,7 +662,7 @@
       </xsl:variable>
 
       <xsl:choose>
-        <xsl:when test="/Input/Generation/Platform = 'WindowsUAP'">
+        <xsl:when test="/Input/Generation/Platform = 'WindowsUniversal'">
           <xsl:text>14.0</xsl:text>
         </xsl:when>		  
         <xsl:when test="/Input/Generation/Platform = 'WindowsPhone81'">
@@ -697,7 +697,7 @@
       DefaultTargets="Build"
       xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="{$ToolsVersion}">
 
-      <xsl:if test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsPhone81' or /Input/Generation/Platform = 'WindowsUAP' or /Input/Generation/Platform = 'PCL'">
+      <xsl:if test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsPhone81' or /Input/Generation/Platform = 'WindowsUniversal' or /Input/Generation/Platform = 'PCL'">
         <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
       </xsl:if>
 
@@ -714,7 +714,7 @@
           </xsl:otherwise>
         </xsl:choose>
         <xsl:choose>
-			<xsl:when test="/Input/Generation/Platform = 'WindowsUAP'">
+			<xsl:when test="/Input/Generation/Platform = 'WindowsUniversal'">
 				<FileAlignment>512</FileAlignment>
 			</xsl:when>
 			<xsl:when test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'WindowsPhone81'">
@@ -790,7 +790,7 @@
               <xsl:text>{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</xsl:text>
             </ProjectTypeGuids>
           </xsl:when>
-          <xsl:when test="/Input/Generation/Platform = 'WindowsUAP'">
+          <xsl:when test="/Input/Generation/Platform = 'WindowsUniversal'">
             <ProjectTypeGuids>
               <xsl:text>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};</xsl:text>
               <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
@@ -2001,7 +2001,7 @@
           </PropertyGroup>
           <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
         </xsl:when>
-		  <xsl:when test="/Input/Generation/Platform = 'WindowsUAP'">
+		  <xsl:when test="/Input/Generation/Platform = 'WindowsUniversal'">
 			  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
 				  <VisualStudioVersion>14.0</VisualStudioVersion>
 			  </PropertyGroup>

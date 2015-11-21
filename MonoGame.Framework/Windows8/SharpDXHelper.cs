@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if !WINDOWS_UAP
+#if !WINDOWS_UNIVERSAL
 
 		static public SharpDX.Vector2 ToVector2(this Vector2 vec)
         {
@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework
             return new SharpDX.Color4(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
         }
 
-#endif // !WINDOWS_UAP
+#endif // !WINDOWS_UNIVERSAL
 
 		static public SharpDX.X3DAudio.Emitter ToEmitter(this Audio.AudioEmitter emitter)
         {           
@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework
 
             return new SharpDX.X3DAudio.Emitter()
             {
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
 				Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z },
 				Velocity = new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z },
 				OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z },
@@ -223,7 +223,7 @@ namespace Microsoft.Xna.Framework
 
             return new SharpDX.X3DAudio.Listener()
             {
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
 				Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z },
 				Velocity = new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z },
 				OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z },

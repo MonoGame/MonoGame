@@ -17,7 +17,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Microsoft.Xna.Framework
 {
-    partial class UAPGameWindow : GameWindow
+    partial class WindowsUniversalGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework
             get { return _orientation; }
         }
 
-        private UAPGamePlatform Platform { get { return Game.Instance.Platform as UAPGamePlatform; } }
+        private WindowsUniversalGamePlatform Platform { get { return Game.Instance.Platform as WindowsUniversalGamePlatform; } }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
@@ -90,11 +90,11 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        static public UAPGameWindow Instance { get; private set; }
+        static public WindowsUniversalGameWindow Instance { get; private set; }
 
-        static UAPGameWindow()
+        static WindowsUniversalGameWindow()
         {
-            Instance = new UAPGameWindow();
+            Instance = new WindowsUniversalGameWindow();
         }
 
         public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)

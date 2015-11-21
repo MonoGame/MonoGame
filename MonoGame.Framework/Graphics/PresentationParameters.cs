@@ -4,7 +4,7 @@
 
 	using System;
 
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private IntPtr deviceWindowHandle;
         private int multiSampleCount;
         private bool disposed;
-#if !WINRT || WINDOWS_UAP
+#if !WINRT || WINDOWS_UNIVERSAL
         private bool isFullScreen;
 #endif
 
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif
 
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
         [CLSCompliant(false)]
         public SwapChainPanel SwapChainPanel { get; set; }
 #endif
@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			get
             {
-#if WINRT &&  !WINDOWS_UAP
+#if WINRT &&  !WINDOWS_UNIVERSAL
                 // Always return true for Windows 8
                 return true;
 #else
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             set
             {
-#if !WINRT || WINDOWS_UAP
+#if !WINRT || WINDOWS_UNIVERSAL
                 // If we are not on windows 8 set the value otherwise ignore it.
                 isFullScreen = value;				
 #endif
