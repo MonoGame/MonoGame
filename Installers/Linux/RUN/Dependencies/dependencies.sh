@@ -21,4 +21,13 @@ then
 	fi
 fi
 
+if [ $OS = Fedora ]
+then
+	if [ $VER -ge 23 ]
+	then
+		./Dependencies/dependencies_fedora.sh
+		exit
+	fi
+fi
+
 echo -e "${red}There is no automatic installer of dependencies for your version of linux, please look at http://www.monogame.net/documentation/?page=Setting_Up_MonoGame_Linux for information on how to install MonoGame.${NC}"
