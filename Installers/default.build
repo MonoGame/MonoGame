@@ -69,7 +69,7 @@
       <!-- Copy the Files over for the framework -->
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
-		<include name="*.*"/>
+		<include name="*"/>
          </fileset>
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}">
@@ -113,6 +113,9 @@ then
 fi
 ln -sf /Library/Frameworks/MonoGame.framework/v${buildNumber} /Library/Frameworks/MonoGame.framework/v3.0
 ln -sf /Library/Frameworks/MonoGame.framework/v${buildNumber} /Library/Frameworks/MonoGame.framework/Current
+#fix permissions
+chmod u+x /Library/Frameworks/MonoGame.framework/Current/Tools/ffmpeg
+chmod u+x /Library/Frameworks/MonoGame.framework/Current/Tools/ffprobe
 if [ -d '/Library/Frameworks/Mono.framework/External/xbuild' ]
 then
         ln -sf /Library/Frameworks/MonoGame.framework /Library/Frameworks/Mono.framework/External/xbuild/MonoGame
