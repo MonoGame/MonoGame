@@ -339,10 +339,16 @@ namespace Microsoft.Xna.Framework
 
             Title = assembly != null ? AssemblyHelper.GetDefaultWindowTitle() : "MonoGame Application";
 
-            if (t == null && assembly != null)
-                window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-            else
-                window.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico"));
+            // In case when DesktopGL dll is compiled using .Net, and you
+            // try to load it using Mono, it will cause a crash because of this.
+            try
+            {
+                if (t == null && assembly != null)
+                    window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+                else
+                    window.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico"));
+            }
+            catch { }
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
