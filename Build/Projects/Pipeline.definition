@@ -208,6 +208,12 @@
     <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Widgets\BuildOutput.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Dialogs\AddItemDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -265,6 +271,12 @@
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\folder_missing.png" />
     <EmbeddedResource Include="Icons\settings.png" />
+    <EmbeddedResource Include="Icons\build_begin_end.png" />
+    <EmbeddedResource Include="Icons\build_clean.png" />
+    <EmbeddedResource Include="Icons\build_fail.png" />
+    <EmbeddedResource Include="Icons\build_processing.png" />
+    <EmbeddedResource Include="Icons\build_skip.png" />
+    <EmbeddedResource Include="Icons\build_succeed.png" />
     <EmbeddedResource Include="Gtk\MainWindow.HeaderBar.glade">
       <Platforms>Linux</Platforms>
     </EmbeddedResource>
