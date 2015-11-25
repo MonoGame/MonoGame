@@ -245,7 +245,7 @@ namespace MonoGame.Tools.Pipeline
         {
             _openRecentMenuItem.DropDownItems.Clear();
 
-            foreach (var project in History.Default.ProjectHistory)
+            foreach (var project in PipelineSettings.Default.ProjectHistory)
             {
                 var recentItem = new ToolStripMenuItem(project);
 
@@ -582,12 +582,12 @@ namespace MonoGame.Tools.Pipeline
             // already a project specified via command line.
             if (string.IsNullOrEmpty(OpenProjectPath))
             {
-                var startupProject = History.Default.StartupProject;
+                var startupProject = PipelineSettings.Default.StartupProject;
                 if (!string.IsNullOrEmpty(startupProject) && File.Exists(startupProject))                
                     OpenProjectPath = startupProject;                
             }
 
-            History.Default.StartupProject = null;
+            PipelineSettings.Default.StartupProject = null;
             
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {

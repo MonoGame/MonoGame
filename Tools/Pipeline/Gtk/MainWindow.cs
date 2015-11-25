@@ -45,7 +45,7 @@ namespace MonoGame.Tools.Pipeline
 
         MenuItem treerebuild;
         MenuItem recentMenu;
-        bool expand = false;
+        bool expand = false, startup = true;
 
         public void ReloadTitle()
         {
@@ -154,12 +154,12 @@ namespace MonoGame.Tools.Pipeline
         {
             if (string.IsNullOrEmpty(OpenProjectPath))
             {
-                var startupProject = History.Default.StartupProject;
+                var startupProject = PipelineSettings.Default.StartupProject;
                 if (!string.IsNullOrEmpty(startupProject) && System.IO.File.Exists(startupProject))                
                     OpenProjectPath = startupProject;                
             }
 
-            History.Default.StartupProject = null;
+            PipelineSettings.Default.StartupProject = null;
 
             if (!String.IsNullOrEmpty(OpenProjectPath)) {
                 _controller.OpenProject(OpenProjectPath);
@@ -168,14 +168,64 @@ namespace MonoGame.Tools.Pipeline
 
             if(_controller.ProjectOpen)
                 projectview1.ExpandBase();
+
+            if (PipelineSettings.Default.Size.X != 0)
+            {
+                Resize(PipelineSettings.Default.Size.X, PipelineSettings.Default.Size.Y);
+
+                this.vpaned2.Position = PipelineSettings.Default.VSeparator;
+                this.hpaned1.Position = PipelineSettings.Default.HSeparator;
+
+                _controller.LaunchDebugger = DebugModeAction.Active = PipelineSettings.Default.DebugMode;
+                buildOutput1.CurrentPage = (FilterOutputAction.Active = PipelineSettings.Default.FilterOutput) ? 0 : 1;
+            }
+        }
+
+        private bool Maximized()
+        {
+#if GTK2
+            return this.GdkWindow.State.HasFlag(Gdk.WindowState.Maximized);
+#elif GTK3
+            return this.Window.State.HasFlag(Gdk.WindowState.Maximized);
+#endif
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
         {
-            if (_controller.Exit ()) 
-                Application.Quit ();
+            if (_controller.Exit())
+            {
+                PipelineSettings.Default.FilterOutput = FilterOutputAction.Active;
+                PipelineSettings.Default.DebugMode = DebugModeAction.Active;
+                PipelineSettings.Default.Save();
+                Application.Quit();
+            }
             else
                 a.RetVal = true;
+        }
+
+        void MainWindow_SizeAllocated (object o, SizeAllocatedArgs args)
+        {
+            if (startup)
+            {
+                // this fixes a bug where vpaned and hpaned could get the wrong starting position
+                if (PipelineSettings.Default.Size.X != 0)
+                {
+                    this.vpaned2.Position = PipelineSettings.Default.VSeparator;
+                    this.hpaned1.Position = PipelineSettings.Default.HSeparator;
+                }
+
+                if (PipelineSettings.Default.Maximized)
+                    Maximize();
+
+                startup = false;
+            }
+
+            if (!(PipelineSettings.Default.Maximized = Maximized()))
+            {
+                this.GetSize(out PipelineSettings.Default.Size.X, out PipelineSettings.Default.Size.Y);
+                PipelineSettings.Default.VSeparator = vpaned2.Position;
+                PipelineSettings.Default.HSeparator = hpaned1.Position;
+            }
         }
 
 #region IView implements
@@ -775,13 +825,13 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateRecentProjectList()
         {
-            History.Default.Load ();
+            PipelineSettings.Default.Load ();
             recentMenu.Submenu = null;
             var m = new Menu ();
 
             int nop = 0;
 
-            foreach (var project in History.Default.ProjectHistory)
+            foreach (var project in PipelineSettings.Default.ProjectHistory)
             {
                 nop++;
                 var recentItem = new MenuItem(project);
@@ -805,7 +855,7 @@ namespace MonoGame.Tools.Pipeline
                         var item = new MenuItem("Clear");
                         item.Activated += delegate
                         {
-                            History.Default.Clear();
+                            PipelineSettings.Default.Clear();
                             UpdateRecentProjectList();
                         };
                         m.Add(item);
