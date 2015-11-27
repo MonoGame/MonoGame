@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>The capabilites of the controller.</returns>
         public static GamePadCapabilities GetCapabilities(int index)
         {
-            if (index < 0 || index > PlatformGetMaxIndex())
+            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
                 throw new InvalidOperationException();
 
             return PlatformGetCapabilities(index);
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>The state of the controller.</returns>
         public static GamePadState GetState(int index, GamePadDeadZone deadZoneMode)
         {
-            if (index < 0 || index > PlatformGetMaxIndex())
+            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
                 throw new InvalidOperationException();
             
             return PlatformGetState(index, deadZoneMode);
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Returns true if the vibration motors were set.</returns>
         public static bool SetVibration(int index, float leftMotor, float rightMotor)
         {
-            if (index < 0 || index > PlatformGetMaxIndex())
+            if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
                 throw new InvalidOperationException();
             
             return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f));

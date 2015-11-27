@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
-        private static int PlatformGetMaxIndex()
+        private static int PlatformGetMaxNumberOfGamePads()
         {
             return 0;
         }
