@@ -8,7 +8,7 @@ using MsAlbum = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.Album;
 #endif
 using System;
 using System.IO;
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 using Windows.Storage.FileProperties;
 #elif IOS
 using System.Drawing;
@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Media
         private Genre genre;
         private string album;
         private SongCollection songCollection;
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
         private StorageItemThumbnail thumbnail;
 #elif IOS
         private MPMediaItemArtwork thumbnail;
@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Media
             {
 #if WINDOWS_PHONE
                 return this.album.HasArt;
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#elif WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
                 return this.thumbnail != null;
 #elif IOS
                 // If album art is missing the bounds will be: Infinity, Infinity, 0, 0
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Media
             this.artist = artist;
             this.genre = genre;
         }
-#if WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
         internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, StorageItemThumbnail thumbnail)
             : this(songCollection, name, artist, genre)
         {
@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Media
         {
 #if WINDOWS_PHONE
             this.album.Dispose();
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#elif WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
             if (this.thumbnail != null)
                 this.thumbnail.Dispose();
 #endif
@@ -232,7 +232,7 @@ namespace Microsoft.Xna.Framework.Media
         {
 #if WINDOWS_PHONE
             return this.album.GetAlbumArt();
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#elif WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
             if (this.HasArt)
                 return this.thumbnail.AsStream();
             return null;
@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework.Media
         {
 #if WINDOWS_PHONE
             return this.album.GetThumbnail();
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#elif WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
             if (this.HasArt)
                 return this.thumbnail.AsStream();
 

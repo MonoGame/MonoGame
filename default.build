@@ -167,12 +167,12 @@
     </if>
   </target>
 
-  <target name="build_windows10" description="Build Windows 10 UAP" depends="clean">
+  <target name="build_windows10" description="Build Windows 10 Universal" depends="clean">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
-        <exec program="Protobuild" commandline="-generate WindowsUAP" />
-        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
-        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="Protobuild" commandline="-generate WindowsUniversal" />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
       </if>
     </if>
   </target>

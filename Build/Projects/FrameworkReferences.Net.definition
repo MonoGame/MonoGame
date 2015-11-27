@@ -61,8 +61,8 @@
     <Reference Include="MonoGame.Framework.WindowsPhone81" />
   </Platform>
   
-  <Platform Type="WindowsUAP">
-    <Reference Include="MonoGame.Framework.WindowsUAP" />
+  <Platform Type="WindowsUniversal">
+    <Reference Include="MonoGame.Framework.WindowsUniversal" />
   </Platform>
    
   <Platform Type="Web">

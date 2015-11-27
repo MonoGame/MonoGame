@@ -11,7 +11,7 @@
  
   <xsl:template match="/">
     <xsl:choose>
-		<xsl:when test="/Input/Generation/Platform = 'WindowsUAP'">
+		<xsl:when test="/Input/Generation/Platform = 'WindowsUniversal'">
 			<xsl:text>Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22609.0

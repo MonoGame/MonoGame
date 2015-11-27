@@ -1,4 +1,4 @@
-﻿#if WINDOWS_STOREAPP || WINDOWS_UAP
+﻿#if WINDOWS_STOREAPP || WINDOWS_UNIVERSAL
 
 using System;
 using System.IO;

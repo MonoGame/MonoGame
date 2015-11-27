@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework
 
         public bool SynchronizeWithVerticalRetrace { get; set; }
 
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
 		[CLSCompliant(false)]
 		public SwapChainPanel SwapChainPanel { get; set; }
 #else
@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.MultiSampleCount = MultiSampleCount;
             presentationParameters.PresentationInterval = PresentationInterval;
             presentationParameters.IsFullScreen = false;
-#if WINDOWS_UAP
+#if WINDOWS_UNIVERSAL
 			presentationParameters.SwapChainPanel = this.SwapChainPanel;
 #else
 			presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
