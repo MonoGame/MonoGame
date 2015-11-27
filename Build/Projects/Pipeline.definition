@@ -71,6 +71,9 @@
     <Compile Include="Windows\UpdateAction.cs" />
 
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\BuildIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\ContentIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -97,6 +100,14 @@
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\MultiSelectTreeview.cs">
+      <Platforms>Windows</Platforms>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\FilterOutputControl.cs">
+      <Platforms>Windows</Platforms>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\TabControlEx.cs">
       <Platforms>Windows</Platforms>
       <SubType>Component</SubType>
     </Compile>

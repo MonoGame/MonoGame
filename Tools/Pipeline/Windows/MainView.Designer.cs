@@ -42,7 +42,11 @@ namespace MonoGame.Tools.Pipeline
             System.Windows.Forms.SplitContainer _splitEditorOutput;
             this._treeView = new MonoGame.Tools.Pipeline.MultiSelectTreeview();
             this._propertyGrid = new System.Windows.Forms.PropertyGrid();
+            this._outputTabs = new MonoGame.Tools.Pipeline.Windows.Controls.TabControlEx();
+            this._outputTabPage1 = new System.Windows.Forms.TabPage();
             this._outputWindow = new System.Windows.Forms.RichTextBox();
+            this._outputTabPage2 = new System.Windows.Forms.TabPage();
+            this._filterOutputWindow = new MonoGame.Tools.Pipeline.Windows.Controls.FilterOutputControl();
             this._mainMenu = new System.Windows.Forms.MenuStrip();
             this._fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._newProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,6 +76,7 @@ namespace MonoGame.Tools.Pipeline
             this._rebuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._cleanMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this._filterOutputMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._debuggerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._cancelBuildSeparator = new System.Windows.Forms.ToolStripSeparator();
             this._cancelBuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -105,6 +110,9 @@ namespace MonoGame.Tools.Pipeline
             _splitEditorOutput.Panel1.SuspendLayout();
             _splitEditorOutput.Panel2.SuspendLayout();
             _splitEditorOutput.SuspendLayout();
+            this._outputTabs.SuspendLayout();
+            this._outputTabPage1.SuspendLayout();
+            this._outputTabPage2.SuspendLayout();
             this._mainMenu.SuspendLayout();
             this._treeContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -162,6 +170,7 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _propertyGrid
             // 
+            this._propertyGrid.CategoryForeColor = System.Drawing.SystemColors.InactiveCaptionText;
             this._propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this._propertyGrid.Location = new System.Drawing.Point(0, 0);
             this._propertyGrid.Name = "_propertyGrid";
@@ -181,11 +190,38 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _splitEditorOutput.Panel2
             // 
-            _splitEditorOutput.Panel2.Controls.Add(this._outputWindow);
+            _splitEditorOutput.Panel2.Controls.Add(this._outputTabs);
             _splitEditorOutput.Size = new System.Drawing.Size(784, 537);
             _splitEditorOutput.SplitterDistance = 249;
             _splitEditorOutput.TabIndex = 2;
             _splitEditorOutput.TabStop = false;
+            // 
+            // _outputTabs
+            // 
+            this._outputTabs.Appearance = System.Windows.Forms.TabAppearance.FlatButtons;
+            this._outputTabs.Controls.Add(this._outputTabPage1);
+            this._outputTabs.Controls.Add(this._outputTabPage2);
+            this._outputTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._outputTabs.HideTabHeader = true;
+            this._outputTabs.Location = new System.Drawing.Point(0, 0);
+            this._outputTabs.Margin = new System.Windows.Forms.Padding(0);
+            this._outputTabs.Name = "_outputTabs";
+            this._outputTabs.Padding = new System.Drawing.Point(0, 0);
+            this._outputTabs.SelectedIndex = 0;
+            this._outputTabs.Size = new System.Drawing.Size(531, 537);
+            this._outputTabs.TabIndex = 0;
+            this._outputTabs.TabStop = false;
+            // 
+            // _outputTabPage1
+            // 
+            this._outputTabPage1.Controls.Add(this._outputWindow);
+            this._outputTabPage1.Location = new System.Drawing.Point(4, 25);
+            this._outputTabPage1.Margin = new System.Windows.Forms.Padding(0);
+            this._outputTabPage1.Name = "_outputTabPage1";
+            this._outputTabPage1.Size = new System.Drawing.Size(523, 508);
+            this._outputTabPage1.TabIndex = 0;
+            this._outputTabPage1.Text = "_outputTabPage1";
+            this._outputTabPage1.UseVisualStyleBackColor = true;
             // 
             // _outputWindow
             // 
@@ -195,10 +231,36 @@ namespace MonoGame.Tools.Pipeline
             this._outputWindow.Name = "_outputWindow";
             this._outputWindow.ReadOnly = true;
             this._outputWindow.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this._outputWindow.Size = new System.Drawing.Size(531, 537);
+            this._outputWindow.Size = new System.Drawing.Size(523, 508);
             this._outputWindow.TabIndex = 0;
             this._outputWindow.TabStop = false;
             this._outputWindow.Text = "";
+            // 
+            // _outputTabPage2
+            // 
+            this._outputTabPage2.Controls.Add(this._filterOutputWindow);
+            this._outputTabPage2.Location = new System.Drawing.Point(4, 25);
+            this._outputTabPage2.Margin = new System.Windows.Forms.Padding(0);
+            this._outputTabPage2.Name = "_outputTabPage2";
+            this._outputTabPage2.Size = new System.Drawing.Size(523, 508);
+            this._outputTabPage2.TabIndex = 0;
+            this._outputTabPage2.Text = "_outputTabPage2";
+            this._outputTabPage2.UseVisualStyleBackColor = true;
+            // 
+            // _filterOutputWindow
+            // 
+            this._filterOutputWindow.BackColor = System.Drawing.SystemColors.Control;
+            this._filterOutputWindow.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._filterOutputWindow.FullRowSelect = true;
+            this._filterOutputWindow.ImageIndex = 0;
+            this._filterOutputWindow.SelectedImageIndex = 0;
+            this._filterOutputWindow.ItemHeight = 20;
+            this._filterOutputWindow.Location = new System.Drawing.Point(0, 0);
+            this._filterOutputWindow.Name = "_filterOutputWindow";
+            this._filterOutputWindow.ShowLines = false;
+            this._filterOutputWindow.ShowNodeToolTips = true;
+            this._filterOutputWindow.Size = new System.Drawing.Size(523, 508);
+            this._filterOutputWindow.TabIndex = 0;
             // 
             // _mainMenu
             // 
@@ -406,6 +468,7 @@ namespace MonoGame.Tools.Pipeline
             this._rebuildMenuItem,
             this._cleanMenuItem,
             this.toolStripSeparator5,
+            this._filterOutputMenuItem,
             this._debuggerMenuItem,
             this._cancelBuildSeparator,
             this._cancelBuildMenuItem});
@@ -439,6 +502,16 @@ namespace MonoGame.Tools.Pipeline
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(170, 6);
+            // 
+            // _filterOutputMenuItem
+            // 
+            this._filterOutputMenuItem.Checked = true;
+            this._filterOutputMenuItem.CheckOnClick = true;
+            this._filterOutputMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._filterOutputMenuItem.Name = "_filterOutputMenuItem";
+            this._filterOutputMenuItem.Size = new System.Drawing.Size(173, 22);
+            this._filterOutputMenuItem.Text = "Filter Output";
+            this._filterOutputMenuItem.CheckedChanged += new System.EventHandler(this.FilterOutputMenuItem_CheckedChanged);
             // 
             // _debuggerMenuItem
             // 
@@ -602,6 +675,7 @@ namespace MonoGame.Tools.Pipeline
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(_splitEditorOutput);
             this.Controls.Add(this._mainMenu);
+            this.DoubleBuffered = true;
             this.MainMenuStrip = this._mainMenu;
             this.MinimumSize = new System.Drawing.Size(320, 240);
             this.Name = "MainView";
@@ -619,6 +693,9 @@ namespace MonoGame.Tools.Pipeline
             _splitEditorOutput.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(_splitEditorOutput)).EndInit();
             _splitEditorOutput.ResumeLayout(false);
+            this._outputTabs.ResumeLayout(false);
+            this._outputTabPage1.ResumeLayout(false);
+            this._outputTabPage2.ResumeLayout(false);
             this._mainMenu.ResumeLayout(false);
             this._mainMenu.PerformLayout();
             this._treeContextMenu.ResumeLayout(false);
@@ -645,6 +722,9 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _viewHelpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _saveAsMenuItem;
+        private MonoGame.Tools.Pipeline.Windows.Controls.TabControlEx _outputTabs;
+        private System.Windows.Forms.TabPage _outputTabPage1;
+        private System.Windows.Forms.TabPage _outputTabPage2;
         private System.Windows.Forms.RichTextBox _outputWindow;
         private System.Windows.Forms.ToolStripMenuItem _closeMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _importProjectMenuItem;
@@ -662,6 +742,7 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem _treeRebuildMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem _filterOutputMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _debuggerMenuItem;
         private System.Windows.Forms.ToolStripSeparator _treeSeparator1;
         private System.Windows.Forms.ToolStripMenuItem _treeOpenFileMenuItem;
@@ -681,6 +762,7 @@ namespace MonoGame.Tools.Pipeline
         private ToolStripMenuItem toolStripMenuItem6;
         private ToolStripMenuItem _renameMenuItem;
         private ToolStripMenuItem _treeRenameMenuItem;
+        private Windows.Controls.FilterOutputControl _filterOutputWindow;
     }
 }
 
