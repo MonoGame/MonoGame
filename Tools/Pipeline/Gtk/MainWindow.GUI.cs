@@ -283,6 +283,7 @@ namespace MonoGame.Tools.Pipeline
 			this.SaveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
 			this.SaveAsAction.Activated += new global::System.EventHandler (this.OnSaveAsActionActivated);
 			this.ExitAction.Activated += new global::System.EventHandler (this.OnExitActionActivated);
+            this.SizeAllocated += new global::Gtk.SizeAllocatedHandler (this.OnSizeAllocateActivated);
 			this.UndoAction.Activated += new global::System.EventHandler (this.OnUndoActionActivated);
 			this.RedoAction.Activated += new global::System.EventHandler (this.OnRedoActionActivated);
 			RenameAction.Activated += this.OnRenameActionActivated;
