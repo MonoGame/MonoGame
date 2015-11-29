@@ -1,0 +1,18 @@
+#version 1
+
+set build-target Rebuild
+set build-property Configuration Release
+set execute-configuration Release
+
+if host Windows
+  set target-platforms Windows,WindowsGL,Linux,Web,Android,Ouya,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal
+endif
+if host MacOS
+  set target-platforms Linux,MacOS,iOS,Android,Ouya
+endif
+if host Linux
+  set target-platforms Windows,WindowsGL,Linux,Web
+endif
+
+generate
+build
