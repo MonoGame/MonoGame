@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using MonoGame.Tools.Pipeline.Common;
 
 namespace MonoGame.Tools.Pipeline.Windows.Controls
 {
@@ -15,8 +16,11 @@ namespace MonoGame.Tools.Pipeline.Windows.Controls
         [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = false)]
         static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
 
-        BuildIcons _buildIcons;
-        TreeNode tmpIter;
+        private BuildIcons _buildIcons;
+        private TreeNode _lastTreeNode;
+
+        private OutputParser outputParser;
+        private string _prevFilename;
         
         Uri folderUri;
         Uri outputUri;
@@ -25,8 +29,8 @@ namespace MonoGame.Tools.Pipeline.Windows.Controls
         {
             this._buildIcons = new BuildIcons();
             this.ImageList = _buildIcons.Icons;
+            outputParser = new OutputParser();
         }
-        
         
         internal void SetBaseFolder(IController controller)
         {
@@ -40,6 +44,8 @@ namespace MonoGame.Tools.Pipeline.Windows.Controls
                 pod += System.IO.Path.DirectorySeparatorChar;
             pod = Path.Combine(pl, pod);
             outputUri = new Uri(pod);
+
+            outputParser.Reset();
         }
 
         protected override void OnBeforeSelect(TreeViewCancelEventArgs e)
@@ -56,71 +62,83 @@ namespace MonoGame.Tools.Pipeline.Windows.Controls
             this.SuspendLayout();
             this.BeginUpdate();
 
+            outputParser.Parse(text);
+
             text = text.TrimEnd(new[] { ' ','\n','\r','\t' });
             
-            if (text.StartsWith("Build "))
+            switch (outputParser.State)
             {
-                AddItem(BuildIcons.BeginEnd, text);
-            }
-            else if (text.StartsWith("Time "))
-            {
-                tmpIter.Text = tmpIter.Text.TrimEnd(new[] {'.', ' '} ) + ", " + text;
-                SendMessage(this.Handle, WM_VSCROLL, SB_BOTTOM, 0); //scroll down to the end
-            }
-            else if (text.StartsWith("Skipping"))
-            {
-                var tn = AddItem(BuildIcons.Skip, "Skipping " + GetRelativePath(text.Substring(9)));
-                tn.ToolTipText = text; 
-                AddSubItem(tn, text.Substring(9));
-            }
-            else if (text.StartsWith("Cleaning"))
-            {
-                var tn = AddItem(BuildIcons.Clean, "Cleaning " + GetRelativeOutputPath(text.Substring(9)));
-                tn.ToolTipText = text;
-                AddSubItem(tn, text.Substring(9));
-            }
-            else if (Char.IsLetter(text[0]) && text[1]==':' && !text.Contains("error"))
-            {
-                var tn = AddItem(BuildIcons.Processing, "Building " + GetRelativePath(text));
-                tn.ToolTipText = text;
-                AddSubItem(tn, text);
-            }
-            else
-            {
-                if (text.ToLower().Contains("error") || (text.Contains("System") && text.Contains("Exception")))
-                {
-                    tmpIter.ImageIndex = BuildIcons.Fail;
-                    tmpIter.SelectedImageIndex = BuildIcons.Fail;
-                    tmpIter.ToolTipText += Environment.NewLine;
-                }
+                case OutputState.BuildBegin:
+                    var tn = AddItem(BuildIcons.BeginEnd, text);
+                    break;
+                case OutputState.Cleaning:
+                    tn = AddItem(BuildIcons.Clean, "Cleaning " + GetRelativeOutputPath(outputParser.Filename));
+                    tn.ToolTipText = text; 
+                    AddSubItem(tn, text);
+                    break;
+                case OutputState.Skipping:
+                    tn = AddItem(BuildIcons.Skip, "Skipping " + GetRelativePath(outputParser.Filename));
+                    tn.ToolTipText = text;
+                    AddSubItem(tn, text);
+                    break;
+                case OutputState.BuildAsset:
+                    tn = AddItem(BuildIcons.Skip, "Building " + GetRelativePath(outputParser.Filename));
+                    tn.ToolTipText = text;
+                    AddSubItem(tn, text);
+                    break;
+                case OutputState.BuildError:
 
-                AddSubItem(tmpIter, text);
-                tmpIter.ToolTipText += Environment.NewLine + text;
+                    if (_prevFilename != outputParser.Filename)
+                    {
+                        tn = AddItem(BuildIcons.Processing, "Building " + GetRelativePath(outputParser.Filename));
+                        tn.ToolTipText = outputParser.Filename;
+                        AddSubItem(tn, outputParser.Filename);
+                    }
+
+                    _lastTreeNode.ImageIndex = BuildIcons.Fail;
+                    _lastTreeNode.SelectedImageIndex = BuildIcons.Fail;
+                    _lastTreeNode.ToolTipText += Environment.NewLine + Environment.NewLine + outputParser.ErrorMessage;
+                    AddSubItem(_lastTreeNode, outputParser.ErrorMessage).ForeColor = System.Drawing.Color.DarkRed;
+                    break;
+                case OutputState.BuildErrorContinue:
+                    _lastTreeNode.ToolTipText += Environment.NewLine + outputParser.ErrorMessage;
+                    AddSubItem(_lastTreeNode, outputParser.ErrorMessage).ForeColor = System.Drawing.Color.DarkRed;
+                    break;
+                case OutputState.BuildEnd:
+                    tn = AddItem(BuildIcons.BeginEnd, text);
+                    break;
+                case OutputState.BuildTime:
+                    _lastTreeNode.Text = _lastTreeNode.Text.TrimEnd(new[] {'.', ' '} ) + ", " + text;
+                    SendMessage(this.Handle, WM_VSCROLL, SB_BOTTOM, 0); //scroll down to the end
+                    break;
             }
 
+            _prevFilename = outputParser.Filename;
+            
             this.EndUpdate();
             this.ResumeLayout();  
         }
         
         private TreeNode AddItem(int iconIdx, string text)
         {
-            if (tmpIter != null && tmpIter.ImageIndex == BuildIcons.Processing)
+            if (_lastTreeNode != null && _lastTreeNode.ImageIndex == BuildIcons.Processing)
             {
-                tmpIter.ImageIndex = BuildIcons.Succeed;
-                tmpIter.SelectedImageIndex = BuildIcons.Succeed;
+                _lastTreeNode.ImageIndex = BuildIcons.Succeed;
+                _lastTreeNode.SelectedImageIndex = BuildIcons.Succeed;
             }
             
-            tmpIter = new TreeNode(text, iconIdx, iconIdx);
-            this.Nodes.Add(tmpIter);
+            _lastTreeNode = new TreeNode(text, iconIdx, iconIdx);
+            this.Nodes.Add(_lastTreeNode);
             //tmpIter.EnsureVisible(); // too much flicker & doesn't work between BeginUpdate()/EndUpdate()
             SendMessage(this.Handle, WM_VSCROLL, SB_BOTTOM, 0); //scroll down to the end
-            return tmpIter;
+            return _lastTreeNode;
         }
 
-        private static void AddSubItem(TreeNode treeNode, string text)
+        private static TreeNode AddSubItem(TreeNode treeNode, string text)
         {
             var subTreeNode = new TreeNode(text, BuildIcons.Null, BuildIcons.Null);
             treeNode.Nodes.Add(subTreeNode);
+            return subTreeNode;
         }
         
         private string GetRelativePath(string path)

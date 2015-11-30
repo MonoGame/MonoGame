@@ -59,6 +59,7 @@
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
+    <Compile Include="Common\OutputParser.cs" />
     <Compile Include="Common\PipelineProjectParser.cs" />
     <Compile Include="Common\Util.cs" />
     <Compile Include="Common\StringExtensions.cs" />
