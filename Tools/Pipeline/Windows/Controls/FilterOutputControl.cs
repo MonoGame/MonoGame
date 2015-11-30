@@ -74,7 +74,7 @@ namespace MonoGame.Tools.Pipeline.Windows.Controls
                 tn.ToolTipText = text;
                 AddSubItem(tn, text.Substring(9));
             }
-            else if (File.Exists(text))
+            else if (Char.IsLetter(text[0]) && text[1]==':' && !text.Contains("error"))
             {
                 var tn = AddItem(BuildIcons.Processing, "Building " + GetRelativePath(text));
                 tn.ToolTipText = text;
