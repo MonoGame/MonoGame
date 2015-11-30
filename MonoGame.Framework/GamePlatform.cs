@@ -25,11 +25,18 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
+
+#if IOS
+        public static IViewControllerHooks Hooks { get; set; }
+#endif
+
         #region Construction/Destruction
         public static GamePlatform Create(Game game)
         {
 #if IOS
-            return new iOSGamePlatform(game);
+            iOSGamePlatform platform = new iOSGamePlatform(game);
+            platform.ViewController.Hooks = Hooks;
+            return platform;
 #elif MONOMAC
             return new MacGamePlatform(game);
 #elif DESKTOPGL || ANGLE
