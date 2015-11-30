@@ -42,6 +42,11 @@ namespace MonoGame.Tools.Pipeline.Windows.Controls
             outputUri = new Uri(pod);
         }
 
+        protected override void OnBeforeSelect(TreeViewCancelEventArgs e)
+        {
+            // disable selection for all nodes
+            e.Cancel = true;
+        }
 
         internal void AppendText(string text)
         {
