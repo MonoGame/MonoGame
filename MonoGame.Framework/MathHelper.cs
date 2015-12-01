@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework
         /// Relevant Wikipedia Article: https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support
         /// Relevant StackOverflow Answer: http://stackoverflow.com/questions/4353525/floating-point-linear-interpolation#answer-23716956
         /// </remarks>
-        public static object LerpPrecise(float value1, float value2, float amount)
+        public static float LerpPrecise(float value1, float value2, float amount)
         {
             return ((1 - amount) * value1) + (value2 * amount);
         }
