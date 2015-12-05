@@ -225,6 +225,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		    return ret;
 		}
 
+        /*
+		public Matrix GetValueMatrixTranspose ()
+		{
+			throw new NotImplementedException();
+		}
+        */
+
+        /*
+		public Matrix[] GetValueMatrixTransposeArray (int count)
+		{
+			throw new NotImplementedException();
+		}
+        */
+
 		public Quaternion GetValueQuaternion ()
 		{
             if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
@@ -642,6 +656,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			StateKey = unchecked(NextStateKey++);
 		}
+        
+		/*
+		public void SetValueTranspose (Matrix[] value)
+		{
+			throw new NotImplementedException();
+		}
+        */
 
 		public void SetValue (Matrix[] value)
 		{
