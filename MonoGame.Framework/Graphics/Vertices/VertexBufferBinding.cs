@@ -99,5 +99,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexOffset = vertexOffset;
             _instanceFrequency = instanceFrequency;
         }
+
+        public static implicit operator VertexBufferBinding(VertexBuffer vertexBuffer)
+        {
+            return new VertexBufferBinding(vertexBuffer);
+        }
     }
 }
