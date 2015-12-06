@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<application project_name="*" version="1.00" default_locale="en-US">
+	<runtime_config>
+		<memory managed_heap_size="32768" resource_heap_size="65536" />
+	</runtime_config>
+	<feature_list>
+		<feature value="GamePad" />
+		<feature value="Touch" />
+	</feature_list>
+</application>

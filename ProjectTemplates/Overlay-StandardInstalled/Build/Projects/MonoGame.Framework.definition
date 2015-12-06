@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExternalProject Name="MonoGame.Framework">
+    
+  <Platform Type="Android">
+    <Binary Name="Lidgren.Network" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Android\Lidgren.Network.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Android\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Android\MonoGame.Framework.Net.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="iOS">
+    <Binary Name="Lidgren.Network" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\iOS\Lidgren.Network.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\iOS\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\iOS\MonoGame.Framework.Net.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="Linux">
+    <Binary Name="Lidgren.Network" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\Lidgren.Network.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.Net.dll" Absolute="True" />
+    <Binary Name="NVorbis" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\NVorbis.dll" Absolute="True" />
+    <Binary Name="OpenTK" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\OpenTK.dll" Absolute="True" />
+    <NativeBinary Name="SDL" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\SDL.dll" Absolute="True" />
+    <NativeBinary Name="SDL_mixer" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\SDL_mixer.dll" Absolute="True" />
+    <Binary Name="Tao.Sdl" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Linux\Tao.Sdl.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="MacOS">
+  </Platform>
+  
+  <Platform Type="Ouya">
+    <Binary Name="Lidgren.Network" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\OUYA\Lidgren.Network.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\OUYA\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\OUYA\MonoGame.Framework.Net.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="Windows8">
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\MonoGame.Framework.Net.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct2D1" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct2D1.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct3D11" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct3D11.dll" Absolute="True" />
+    <Binary Name="SharpDX" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.dll" Absolute="True" />
+    <Binary Name="SharpDX.DXGI" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.DXGI.dll" Absolute="True" />
+    <Binary Name="SharpDX.MediaFoundation" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.MediaFoundation.dll" Absolute="True" />
+    <Binary Name="SharpDX.XAudio2" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XAudio2.dll" Absolute="True" />
+    <Binary Name="SharpDX.XInput" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XInput.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="Windows">
+    <Binary Name="Lidgren.Network" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\Lidgren.Network.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.Net.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct2D1" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.Direct2D1.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct3D9" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.Direct3D9.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct3D11" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.Direct3D11.dll" Absolute="True" />
+    <Binary Name="SharpDX" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.dll" Absolute="True" />
+    <Binary Name="SharpDX.DXGI" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.DXGI.dll" Absolute="True" />
+    <Binary Name="SharpDX.MediaFoundation" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.MediaFoundation.dll" Absolute="True" />
+    <Binary Name="SharpDX.RawInput" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.RawInput.dll" Absolute="True" />
+    <Binary Name="SharpDX.XAudio2" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.XAudio2.dll" Absolute="True" />
+    <Binary Name="SharpDX.XInput" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\SharpDX.XInput.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="DesktopGL">
+    <Binary Name="Lidgren.Network" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsGL\Lidgren.Network.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsGL\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsGL\MonoGame.Framework.Net.dll" Absolute="True" />
+    <Binary Name="NVorbis" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsGL\NVorbis.dll" Absolute="True" />
+    <Binary Name="OpenTK" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsGL\OpenTK.dll" Absolute="True" />
+    <Binary Name="SDL" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsGL\SDL.dll" Absolute="True" />
+    <Binary Name="Tao.Sdl" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsGL\Tao.Sdl.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="WindowsPhone">
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\MonoGame.Framework.Net.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct3D11" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\SharpDX.Direct3D11.dll" Absolute="True" />
+    <Binary Name="SharpDX" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\SharpDX.dll" Absolute="True" />
+    <Binary Name="SharpDX.DXGI" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\SharpDX.DXGI.dll" Absolute="True" />
+    <Binary Name="SharpDX.MediaFoundation" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\SharpDX.MediaFoundation.dll" Absolute="True" />
+    <Binary Name="SharpDX.WP8" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\SharpDX.WP8.dll" Absolute="True" />
+    <Binary Name="SharpDX.XAudio2" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone\$(Platform)\SharpDX.XAudio2.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="WindowsPhone81">
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\MonoGame.Framework.Net.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct2D1" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\SharpDX.Direct2D1.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct3D11" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\SharpDX.Direct3D11.dll" Absolute="True" />
+    <Binary Name="SharpDX" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\SharpDX.dll" Absolute="True" />
+    <Binary Name="SharpDX.DXGI" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\SharpDX.DXGI.dll" Absolute="True" />
+    <Binary Name="SharpDX.MediaFoundation" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\SharpDX.MediaFoundation.dll" Absolute="True" />
+    <Binary Name="SharpDX.XAudio2" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsPhone81\SharpDX.XAudio2.dll" Absolute="True" />
+  </Platform>
+
+  <Platform Type="WindowsUniversal">
+    <Binary Name="MonoGame.Framework" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\MonoGame.Framework.dll" Absolute="True" />
+    <Binary Name="MonoGame.Framework.Net" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\MonoGame.Framework.Net.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct2D1" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\SharpDX.Direct2D1.dll" Absolute="True" />
+    <Binary Name="SharpDX.Direct3D11" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\SharpDX.Direct3D11.dll" Absolute="True" />
+    <Binary Name="SharpDX" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\SharpDX.dll" Absolute="True" />
+    <Binary Name="SharpDX.DXGI" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\SharpDX.DXGI.dll" Absolute="True" />
+    <Binary Name="SharpDX.MediaFoundation" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\SharpDX.MediaFoundation.dll" Absolute="True" />
+    <Binary Name="SharpDX.XAudio2" Path="$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\SharpDX.XAudio2.dll" Absolute="True" />
+  </Platform>
+  
+</ExternalProject>

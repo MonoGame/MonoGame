@@ -71,6 +71,12 @@
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
+      <exec program="mono" basedir="ProjectCreationTool/Protobuild.Manager" commandline="Protobuild.exe -generate Linux" />
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release ProjectCreationTool/Protobuild.Manager/Protobuild.Manager.Linux.sln" />
+      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release ProjectCreationTool/Protobuild.Manager/Protobuild.Manager.Linux.sln" />
+      <exec program="mono" basedir="ProjectCreationTool/Protobuild.IDE.MonoDevelop" commandline="Protobuild.exe -generate Linux" />
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release ProjectCreationTool/Protobuild.IDE.MonoDevelop/Protobuild.IDE.MonoDevelop.Linux.sln" />
+      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release ProjectCreationTool/Protobuild.IDE.MonoDevelop/Protobuild.IDE.MonoDevelop.Linux.sln" />
     </if>
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
@@ -171,6 +177,8 @@
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
         <exec program="Protobuild" commandline="-generate WindowsUniversal" />
+        <exec program="ProjectCreationTool\Protobuild.Manager\Protobuild.exe" workingdir="ProjectCreationTool\Protobuild.Manager" commandline="-generate Windows" />
+        <exec program="ProjectCreationTool\Protobuild.IDE.VisualStudio\Protobuild.exe" workingdir="ProjectCreationTool\Protobuild.IDE.VisualStudio" commandline="-generate Windows" />
 
         <!--
             Currently MSBuild doesn't restore the nuget packages like buiding from the
@@ -181,8 +189,21 @@
 
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline="ProjectCreationTool\Protobuild.Manager\Protobuild.Manager.Windows.sln /t:Clean /p:Configuration=Release" />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline="ProjectCreationTool\Protobuild.Manager\Protobuild.Manager.Windows.sln /t:Build /p:Configuration=Release" />
+        
+        <!--
+            We need to build this into a compressed archive locally which the Protobuild Manager
+            will then install on the user's machine on silent setup.
+        -->
+        <exec program="ProjectCreationTool\Protobuild.IDE.VisualStudio\Protobuild.exe" workingdir="ProjectCreationTool\Protobuild.IDE.VisualStudio" commandline="-automated-build" />
+        
         <exec program="C:\Windows\system32\cmd.exe" commandline='/C rmdir /S /Q WindowsUAP' workingdir='MonoGame.Framework\bin' failonerror='false' />
-        <exec program="C:\Windows\system32\cmd.exe" commandline='/C rename WindowsUniversal WindowsUAP' workingdir='MonoGame.Framework\bin' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C mkdir WindowsUAP\AnyCPU\Release' workingdir='MonoGame.Framework\bin' failonerror='false' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C mkdir WindowsUAP\AnyCPU\Release\VisualStudio' workingdir='MonoGame.Framework\bin' failonerror='false' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C move WindowsUniversal\AnyCPU\Release WindowsUAP\AnyCPU\Release\FrameworkBinaries' workingdir='MonoGame.Framework\bin' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C move ..\..\ProjectCreationTool\Protobuild.Manager\Protobuild.Manager\bin\Windows\AnyCPU\Release WindowsUAP\AnyCPU\Release\ProtobuildManagerBinaries' workingdir='MonoGame.Framework\bin' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C move ..\..\ProjectCreationTool\Protobuild.IDE.VisualStudio\Windows.tar.lzma WindowsUAP\AnyCPU\Release\VisualStudio\Protobuild.IDE.VisualStudio.tar.lzma' workingdir='MonoGame.Framework\bin' />
       </if>
     </if>
   </target>

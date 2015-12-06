@@ -10,6 +10,9 @@
   <Packages>
     <Package Uri="https-git://github.com/OutOfOrder/MonoKickstart.git" Folder="ThirdParty/Kickstart" GitRef="master" />
     <Package Uri="https-git://github.com/Mono-Game/MonoGame.Dependencies.git" Folder="ThirdParty/Dependencies" GitRef="master" />
+    <Package Uri="https-git://github.com/hach-que/Protobuild.Manager" Folder="ProjectCreationTool/Protobuild.Manager" GitRef="master" />
+    <Package Uri="https-git://github.com/hach-que/Protobuild.IDE.VisualStudio" Folder="ProjectCreationTool/Protobuild.IDE.VisualStudio" GitRef="master" />
+    <Package Uri="https-git://github.com/hach-que/Protobuild.IDE.MonoDevelop" Folder="ProjectCreationTool/Protobuild.IDE.MonoDevelop" GitRef="monodevelop-5" />
   </Packages>
   <FeatureSet>
     <Feature>PackageManagement</Feature>

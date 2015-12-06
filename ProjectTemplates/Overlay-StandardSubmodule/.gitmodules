@@ -1,0 +1,3 @@
+[submodule "MonoGame"]
+	path = MonoGame
+	url = https://github.com/mono/MonoGame

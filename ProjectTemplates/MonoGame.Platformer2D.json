@@ -1,0 +1,58 @@
+{
+	"Name": "MonoGame 2D Platformer",
+	"Description": "A cross-platform MonoGame project that runs a 2D platformer.",
+    "AdditionalPlatforms": [
+        "DesktopGL"
+    ],
+    "Defaults": {
+        "BaseVariant": "standard",
+        "monogame-ref": "installed"
+    },
+	"ProtobuildVariants": [],
+	"StandardVariants": [],
+	"OptionalVariants": [
+		{
+			"ID": "monogame-ref",
+			"Name": "Reference MonoGame",
+			"ProtobuildOptions": [
+				{
+					"ID": "package",
+					"Name": "As a Protobuild Package",
+					"Overlay": "Overlay-ProtobuildPackage",
+					"EnableServices": [],
+					"DisableServices": []
+				},
+				{
+					"ID": "submodule",
+					"Name": "As a Git submodule",
+					"Overlay": "Overlay-ProtobuildSubmodule",
+					"EnableServices": [],
+					"DisableServices": []
+				}
+			],
+			"StandardOptions": [
+				{
+					"ID": "installed",
+					"Name": "Using Installed Assemblies",
+					"Overlay": "Overlay-StandardInstalled",
+					"EnableServices": [],
+					"DisableServices": []
+				},
+				{
+					"ID": "package",
+					"Name": "As a NuGet Package",
+					"Overlay": "Overlay-StandardPackage",
+					"EnableServices": [],
+					"DisableServices": []
+				},
+				{
+					"ID": "submodule",
+					"Name": "As a Git submodule",
+					"Overlay": "Overlay-StandardSubmodule",
+					"EnableServices": [],
+					"DisableServices": []
+				}
+			]
+		}
+	]
+}

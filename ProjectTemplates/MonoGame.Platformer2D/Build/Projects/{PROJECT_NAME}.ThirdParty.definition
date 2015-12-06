@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="{PROJECT_XML_NAME}.ThirdParty">
+
+  <Platform Type="Android">
+    <Reference Include="Mono.Android" />
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+  <Platform Type="iOS">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </Platform>
+
+  <Platform Type="Linux">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+  </Platform>
+
+  <Platform Type="Ouya">
+    <Reference Include="Mono.Android" />
+    <Reference Include="mscorlib" />
+    <Reference Include="OpenTK" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Ouya.Console.Api" />
+  </Platform>
+
+  <Platform Type="PSMobile">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Sce.PlayStation.Core" />
+  </Platform>
+
+  <Platform Type="Windows8">
+  </Platform>
+
+  <Platform Type="Windows">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+  <Platform Type="WindowsGL">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+  <Platform Type="WindowsPhone">
+  </Platform>
+
+</ExternalProject>
