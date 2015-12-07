@@ -171,7 +171,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         
         /*
-		public bool[] GetValueBooleanArray ()
+		public bool[] GetValueBooleanArray (int count)
 		{
 			throw new NotImplementedException();
 		}
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         
         /*
-		public int[] GetValueInt32Array ()
+		public int[] GetValueInt32Array (int count)
 		{
 			throw new NotImplementedException();
 		}
@@ -199,31 +199,164 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Matrix GetValueMatrix ()
 		{
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            if (RowCount != 4 || ColumnCount != 4)
+            if (Data == null)
                 throw new InvalidCastException();
+
+            var result = default(Matrix);
 
             var floatData = (float[])Data;
 
-            return new Matrix(  floatData[0], floatData[4], floatData[8], floatData[12],
-                                floatData[1], floatData[5], floatData[9], floatData[13],
-                                floatData[2], floatData[6], floatData[10], floatData[14],
-                                floatData[3], floatData[7], floatData[11], floatData[15]);
+            if (ParameterClass == EffectParameterClass.Scalar)
+            {
+                result.M11 =
+                result.M12 =
+                result.M13 =
+                result.M14 =
+                result.M21 =
+                result.M22 =
+                result.M23 =
+                result.M24 =
+                result.M31 =
+                result.M32 =
+                result.M33 =
+                result.M34 =
+                result.M41 =
+                result.M42 =
+                result.M43 =
+                result.M44 = floatData[0];
+            }
+            else if (ParameterClass == EffectParameterClass.Matrix)
+            {
+                if (RowCount == 4 && ColumnCount == 4)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+                    result.M41 = floatData[3];
+
+                    result.M12 = floatData[4];
+                    result.M22 = floatData[5];
+                    result.M32 = floatData[6];
+                    result.M42 = floatData[7];
+
+                    result.M13 = floatData[8];
+                    result.M23 = floatData[9];
+                    result.M33 = floatData[10];
+                    result.M43 = floatData[11];
+
+                    result.M14 = floatData[12];
+                    result.M24 = floatData[13];
+                    result.M34 = floatData[14];
+                    result.M44 = floatData[15];
+                }
+                else if (RowCount == 4 && ColumnCount == 3)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+                    result.M41 = floatData[3];
+
+                    result.M12 = floatData[4];
+                    result.M22 = floatData[5];
+                    result.M32 = floatData[6];
+                    result.M42 = floatData[7];
+
+                    result.M13 = floatData[8];
+                    result.M23 = floatData[9];
+                    result.M33 = floatData[10];
+                    result.M43 = floatData[11];
+                }
+                else if (RowCount == 3 && ColumnCount == 4)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+
+                    result.M12 = floatData[3];
+                    result.M22 = floatData[4];
+                    result.M32 = floatData[5];
+
+                    result.M13 = floatData[6];
+                    result.M23 = floatData[7];
+                    result.M33 = floatData[8];
+
+                    result.M14 = floatData[9];
+                    result.M24 = floatData[10];
+                    result.M34 = floatData[11];
+                }
+                else if (RowCount == 3 && ColumnCount == 3)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+
+                    result.M12 = floatData[3];
+                    result.M22 = floatData[4];
+                    result.M32 = floatData[5];
+
+                    result.M13 = floatData[6];
+                    result.M23 = floatData[7];
+                    result.M33 = floatData[8];
+                }
+                else if (RowCount == 3 && ColumnCount == 2)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+
+                    result.M12 = floatData[3];
+                    result.M22 = floatData[4];
+                    result.M32 = floatData[5];
+                }
+                else
+                {
+                    throw new InvalidCastException();
+                }
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+
+            return result;
 		}
         
 		public Matrix[] GetValueMatrixArray (int count)
 		{
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException ("count");
+
             if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
+            if (Elements == null || Elements.Count == 0)
+                throw new InvalidCastException();
+
             var ret = new Matrix[count];
-            for (var i = 0; i < count; i++)
+
+            var size = Math.Min(count, Elements.Count);
+            for (var i = 0; i < size; i++)
                 ret[i] = Elements[i].GetValueMatrix();
 
 		    return ret;
 		}
+
+        /*
+		public Matrix GetValueMatrixTranspose ()
+		{
+			throw new NotImplementedException();
+		}
+        */
+
+        /*
+		public Matrix[] GetValueMatrixTransposeArray (int count)
+		{
+			throw new NotImplementedException();
+		}
+        */
 
 		public Quaternion GetValueQuaternion ()
 		{
@@ -235,7 +368,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /*
-		public Quaternion[] GetValueQuaternionArray ()
+		public Quaternion[] GetValueQuaternionArray (int count)
 		{
 			throw new NotImplementedException();
 		}
@@ -250,33 +383,60 @@ namespace Microsoft.Xna.Framework.Graphics
 			return ((float[])Data)[0];
 		}
 
-		public Single[] GetValueSingleArray ()
+		public Single[] GetValueSingleArray (int count)
 		{
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException ("count");
+
 			if (Elements != null && Elements.Count > 0)
             {
-                var ret = new Single[RowCount * ColumnCount * Elements.Count];
-				for (int i=0; i<Elements.Count; i++)
+                var size = Math.Min(RowCount * ColumnCount * Elements.Count, count);
+                var ret = new Single[count];
+                var pos = 0;
+				for (int i=0; i<Elements.Count && pos<size; i++)
                 {
-                    var elmArray = Elements[i].GetValueSingleArray();
-                    for (var j = 0; j < elmArray.Length; j++)
+                    var elmArray = Elements[i].GetValueSingleArray(Elements[i].ColumnCount * Elements[i].RowCount);
+                    for (var j = 0; j < elmArray.Length && pos < size; j++)
+                    {
 						ret[RowCount*ColumnCount*i+j] = elmArray[j];
+						pos++;
+                    }
 				}
 				return ret;
 			}
 			
+			var otherArray = new Single[count];
 			switch(ParameterClass) 
             {
 			case EffectParameterClass.Scalar:
-				return new Single[] { GetValueSingle () };
+				otherArray[0] = GetValueSingle();
+				break;
             case EffectParameterClass.Vector:
 			case EffectParameterClass.Matrix:
                     if (Data is Matrix)
-                        return Matrix.ToFloatArray((Matrix)Data);
+                    {
+                        var source = Matrix.ToFloatArray((Matrix) Data);
+                        Array.Copy(source, otherArray, Math.Min(source.Length, count));
+                    }
                     else
-                        return (float[])Data;
+                    {
+                        var fData = (float[]) Data;
+                        var size = Math.Min(fData.Length, count);
+                        var pos = 0;
+                        for (int i = 0; i < RowCount && pos < size; i++)
+                        {
+                            for (int j = 0; j < ColumnCount && pos < size; j++)
+                            {
+                                otherArray[pos] = fData[j * RowCount + i];
+                                pos++;
+                            }
+                        }
+                    }
+                    break;
 			default:
 				throw new NotImplementedException();
 			}
+            return otherArray;
 		}
 
 		public string GetValueString ()
@@ -315,84 +475,159 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector2 GetValueVector2 ()
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            var vecInfo = (float[])Data;
-			return new Vector2(vecInfo[0],vecInfo[1]);
+            if (Data == null)
+                throw new InvalidCastException();
+
+            var result = default(Vector2);
+            var vecData = (float[])Data;
+            if (ParameterClass == EffectParameterClass.Scalar)
+            {
+                result.X =
+                result.Y = vecData[0];
+            }
+            else if (ParameterClass == EffectParameterClass.Vector)
+            {
+                if (ColumnCount != 2 || RowCount != 1)
+                    throw new InvalidCastException();
+                result.X = vecData[0];
+                result.Y = vecData[1];
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+            return result;
 		}
 
-		public Vector2[] GetValueVector2Array()
+		public Vector2[] GetValueVector2Array(int count)
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException("count");
+
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
-			if (Elements != null && Elements.Count > 0)
-			{
-				Vector2[] result = new Vector2[Elements.Count];
-				for (int i = 0; i < Elements.Count; i++)
-				{
-					var v = Elements[i].GetValueSingleArray();
-					result[i] = new Vector2(v[0], v[1]);
-				}
-			return result;
-			}
-			
-		return null;
+
+            Vector2[] result = new Vector2[count];
+
+            const int VectorSize = 2;
+            var size = count * VectorSize;
+            var array = GetValueSingleArray(size);
+            for (int i = 0; i < count; i++)
+            {
+                var pos = i * VectorSize;
+                result[i].X = array[pos];
+                result[i].Y = array[pos + 1];
+            }
+
+            return result;
 		}
 
 		public Vector3 GetValueVector3 ()
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (ParameterType != EffectParameterType.Single || Data == null)
                 throw new InvalidCastException();
 
             var vecInfo = (float[])Data;
-			return new Vector3(vecInfo[0],vecInfo[1],vecInfo[2]);
+            var result = default(Vector3);
+            if (ParameterClass == EffectParameterClass.Scalar)
+            {
+                result.X =
+                result.Y =
+                result.Z = vecInfo[0];
+            }
+            else if (ParameterClass == EffectParameterClass.Vector)
+            {
+                if (ColumnCount != 3 || RowCount != 1)
+                    throw new InvalidCastException();
+                result.X = vecInfo[0];
+                result.Y = vecInfo[1];
+                result.Z = vecInfo[2];
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+
+            return result;
 		}
 
-       public Vector3[] GetValueVector3Array()
+       public Vector3[] GetValueVector3Array(int count)
         {
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException("count");
+
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            if (Elements != null && Elements.Count > 0)
-            {
-                Vector3[] result = new Vector3[Elements.Count];
-                for (int i = 0; i < Elements.Count; i++)
-                {
-                    var v = Elements[i].GetValueSingleArray();
-                    result[i] = new Vector3(v[0], v[1], v[2]);
-                }
-                return result;
-            }
-            return null;
+            const int VectorSize = 3;
+            var size = count * VectorSize;
+            var array = GetValueSingleArray(size);
+            Vector3[] result = new Vector3[count];
+            for (int i = 0; i < count; i++)
+			{
+                var pos = i * VectorSize;
+                result[i].X = array[pos];
+                result[i].Y = array[pos + 1];
+                result[i].Z = array[pos + 2];
+			}
+            return result;
         }
 
 
 		public Vector4 GetValueVector4 ()
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (ParameterType != EffectParameterType.Single || Data == null)
                 throw new InvalidCastException();
 
             var vecInfo = (float[])Data;
-			return new Vector4(vecInfo[0],vecInfo[1],vecInfo[2],vecInfo[3]);
+            var result = default(Vector4);
+            if (ParameterClass == EffectParameterClass.Scalar)
+            {
+                result.X =
+                result.Y =
+                result.Z =
+                result.W = vecInfo[0];
+            }
+            else if (ParameterClass == EffectParameterClass.Vector)
+            {
+                if (ColumnCount != 4 || RowCount != 1)
+                    throw new InvalidCastException();
+                result.X = vecInfo[0];
+                result.Y = vecInfo[1];
+                result.Z = vecInfo[2];
+                result.W = vecInfo[3];
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+            return result;
 		}
         
-          public Vector4[] GetValueVector4Array()
+          public Vector4[] GetValueVector4Array(int count)
         {
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException("count");
+
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            if (Elements != null && Elements.Count > 0)
-            {
-                Vector4[] result = new Vector4[Elements.Count];
-                for (int i = 0; i < Elements.Count; i++)
-                {
-                    var v = Elements[i].GetValueSingleArray();
-                    result[i] = new Vector4(v[0], v[1],v[2], v[3]);
-                }
-                return result;
-            }
-            return null;
+            const int VectorSize = 4;
+            var size = count * VectorSize;
+            var array = GetValueSingleArray(size);
+            Vector4[] result = new Vector4[count];
+            for (int i = 0; i < count; i++)
+			{
+                var pos = i * VectorSize;
+                result[i].X = array[pos];
+                result[i].Y = array[pos + 1];
+                result[i].Z = array[pos + 2];
+                result[i].W = array[pos + 3];
+			}
+            return result;
         }
 
 		public void SetValue (bool value)
@@ -642,6 +877,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			StateKey = unchecked(NextStateKey++);
 		}
+        
+		/*
+		public void SetValueTranspose (Matrix[] value)
+		{
+			throw new NotImplementedException();
+		}
+        */
 
 		public void SetValue (Matrix[] value)
 		{
