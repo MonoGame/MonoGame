@@ -171,7 +171,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         
         /*
-		public bool[] GetValueBooleanArray ()
+		public bool[] GetValueBooleanArray (int count)
 		{
 			throw new NotImplementedException();
 		}
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         
         /*
-		public int[] GetValueInt32Array ()
+		public int[] GetValueInt32Array (int count)
 		{
 			throw new NotImplementedException();
 		}
@@ -368,7 +368,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /*
-		public Quaternion[] GetValueQuaternionArray ()
+		public Quaternion[] GetValueQuaternionArray (int count)
 		{
 			throw new NotImplementedException();
 		}
