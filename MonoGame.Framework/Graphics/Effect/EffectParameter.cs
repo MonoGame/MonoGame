@@ -554,22 +554,26 @@ namespace Microsoft.Xna.Framework.Graphics
             return result;
 		}
 
-       public Vector3[] GetValueVector3Array()
+       public Vector3[] GetValueVector3Array(int count)
         {
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException("count");
+
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            if (Elements != null && Elements.Count > 0)
-            {
-                Vector3[] result = new Vector3[Elements.Count];
-                for (int i = 0; i < Elements.Count; i++)
-                {
-                    var v = Elements[i].GetValueSingleArray();
-                    result[i] = new Vector3(v[0], v[1], v[2]);
-                }
-                return result;
-            }
-            return null;
+            const int VectorSize = 3;
+            var size = count * VectorSize;
+            var array = GetValueSingleArray(size);
+            Vector3[] result = new Vector3[count];
+            for (int i = 0; i < count; i++)
+			{
+                var pos = i * VectorSize;
+                result[i].X = array[pos];
+                result[i].Y = array[pos + 1];
+                result[i].Z = array[pos + 2];
+			}
+            return result;
         }
 
 
