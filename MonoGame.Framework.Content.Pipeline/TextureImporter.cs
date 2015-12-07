@@ -130,7 +130,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                                 FreeImage.UnloadEx(ref b);
                             }
                             break;
-                    }
+						default:
+							{
+								// Expand to 32-bit
+								var bgra = FreeImage.ConvertTo32Bits(fBitmap);
+								FreeImage.UnloadEx(ref fBitmap);
+								fBitmap = bgra;
+								
+								// Swap R and B channels to make it BGRA
+								var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+								var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+								FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+								FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
+								FreeImage.UnloadEx(ref r);
+								FreeImage.UnloadEx(ref b);
+							}
+							break;
+					}
                     break;
 
                 case FREE_IMAGE_TYPE.FIT_RGBF:
@@ -172,9 +188,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Get the bytes from the FreeImage bitmap
             var bytes = new byte[width * height * (bpp / 8)];
             FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
-
-            // Massage into the ordering and formats we want that wasn't possible earlier
-            switch (imageType)
+			// Massage into the ordering and formats we want that wasn't possible earlier
+			switch (imageType)
             {
                 case FREE_IMAGE_TYPE.FIT_BITMAP:
                     switch (bpp)

@@ -46,7 +46,17 @@ namespace MonoGame.Tests.ContentPipeline
             ImportStandard("Assets/Textures/LogoOnly_64px.bmp");
         }
 
-        [Test]
+		[Test]
+		public void ImportBmp4bits( ) {
+			ImportStandard("Assets/Textures/LogoOnly_64px-4bits.bmp");
+		}
+
+		[Test]
+		public void ImportBmpMonoCromo( ) {
+			ImportStandard("Assets/Textures/LogoOnly_64px-monocromo.bmp");
+		}
+
+		[Test]
         public void ImportGif()
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.gif");
