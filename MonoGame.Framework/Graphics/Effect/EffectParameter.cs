@@ -475,11 +475,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector2 GetValueVector2 ()
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            var vecInfo = (float[])Data;
-			return new Vector2(vecInfo[0],vecInfo[1]);
+            if (Data == null)
+                throw new InvalidCastException();
+
+            var result = default(Vector2);
+            var vecData = (float[])Data;
+            if (ParameterClass == EffectParameterClass.Scalar)
+            {
+                result.X =
+                result.Y = vecData[0];
+            }
+            else if (ParameterClass == EffectParameterClass.Vector)
+            {
+                if (ColumnCount != 2 || RowCount != 1)
+                    throw new InvalidCastException();
+                result.X = vecData[0];
+                result.Y = vecData[1];
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+            return result;
 		}
 
 		public Vector2[] GetValueVector2Array()
