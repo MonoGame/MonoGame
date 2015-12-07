@@ -199,18 +199,129 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Matrix GetValueMatrix ()
 		{
-            if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            if (RowCount != 4 || ColumnCount != 4)
+            if (Data == null)
                 throw new InvalidCastException();
+
+            var result = default(Matrix);
 
             var floatData = (float[])Data;
 
-            return new Matrix(  floatData[0], floatData[4], floatData[8], floatData[12],
-                                floatData[1], floatData[5], floatData[9], floatData[13],
-                                floatData[2], floatData[6], floatData[10], floatData[14],
-                                floatData[3], floatData[7], floatData[11], floatData[15]);
+            if (ParameterClass == EffectParameterClass.Scalar)
+            {
+                result.M11 =
+                result.M12 =
+                result.M13 =
+                result.M14 =
+                result.M21 =
+                result.M22 =
+                result.M23 =
+                result.M24 =
+                result.M31 =
+                result.M32 =
+                result.M33 =
+                result.M34 =
+                result.M41 =
+                result.M42 =
+                result.M43 =
+                result.M44 = floatData[0];
+            }
+            else if (ParameterClass == EffectParameterClass.Matrix)
+            {
+                if (RowCount == 4 && ColumnCount == 4)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+                    result.M41 = floatData[3];
+
+                    result.M12 = floatData[4];
+                    result.M22 = floatData[5];
+                    result.M32 = floatData[6];
+                    result.M42 = floatData[7];
+
+                    result.M13 = floatData[8];
+                    result.M23 = floatData[9];
+                    result.M33 = floatData[10];
+                    result.M43 = floatData[11];
+
+                    result.M14 = floatData[12];
+                    result.M24 = floatData[13];
+                    result.M34 = floatData[14];
+                    result.M44 = floatData[15];
+                }
+                else if (RowCount == 4 && ColumnCount == 3)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+                    result.M41 = floatData[3];
+
+                    result.M12 = floatData[4];
+                    result.M22 = floatData[5];
+                    result.M32 = floatData[6];
+                    result.M42 = floatData[7];
+
+                    result.M13 = floatData[8];
+                    result.M23 = floatData[9];
+                    result.M33 = floatData[10];
+                    result.M43 = floatData[11];
+                }
+                else if (RowCount == 3 && ColumnCount == 4)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+
+                    result.M12 = floatData[3];
+                    result.M22 = floatData[4];
+                    result.M32 = floatData[5];
+
+                    result.M13 = floatData[6];
+                    result.M23 = floatData[7];
+                    result.M33 = floatData[8];
+
+                    result.M14 = floatData[9];
+                    result.M24 = floatData[10];
+                    result.M34 = floatData[11];
+                }
+                else if (RowCount == 3 && ColumnCount == 3)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+
+                    result.M12 = floatData[3];
+                    result.M22 = floatData[4];
+                    result.M32 = floatData[5];
+
+                    result.M13 = floatData[6];
+                    result.M23 = floatData[7];
+                    result.M33 = floatData[8];
+                }
+                else if (RowCount == 3 && ColumnCount == 2)
+                {
+                    result.M11 = floatData[0];
+                    result.M21 = floatData[1];
+                    result.M31 = floatData[2];
+
+                    result.M12 = floatData[3];
+                    result.M22 = floatData[4];
+                    result.M32 = floatData[5];
+                }
+                else
+                {
+                    throw new InvalidCastException();
+                }
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+
+            return result;
 		}
         
 		public Matrix[] GetValueMatrixArray (int count)
