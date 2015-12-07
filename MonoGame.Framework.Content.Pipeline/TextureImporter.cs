@@ -227,7 +227,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline {
                                     bytes[i] = (byte) bgra;
                                     bytes[i + 1] = (byte) (bgra >> 8);
                                 }
-
+                                
                                 face = new PixelBitmapContent<Bgra4444>(width, height);
                             }
                             break;
@@ -263,7 +263,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline {
             var width = (int) FreeImage.GetWidth(fBitmap);
             var bpp = FreeImage.GetBPP(fBitmap);
             var imageType = FreeImage.GetImageType(fBitmap);
-
+            
             // Swizzle channels and expand to include an alpha channel
             fBitmap = PreProcess(fBitmap, bpp, imageType);
 
@@ -335,59 +335,67 @@ namespace Microsoft.Xna.Framework.Content.Pipeline {
         }
 
         private static FIBITMAP PreProcess(FIBITMAP fBitmap, uint bpp, FREE_IMAGE_TYPE imageType) {
+            FIBITMAP bgra;
             switch(imageType) {
                 case FREE_IMAGE_TYPE.FIT_BITMAP:
-                    switch(bpp) {
-                        case 8:
-                            {
-                                // Expand to 32-bit
-                                var bgra = FreeImage.ConvertTo32Bits(fBitmap);
-                                FreeImage.UnloadEx(ref fBitmap);
-                                fBitmap = bgra;
-                                // Swap R and B channels to make it BGRA
-                                switchRedAndBlueChannels(fBitmap);
-                            }
-                            break;
+                    if(bpp != 16) {
 
-                        case 16:
-                            // Channel swizzling for 16-bit formats is done after we get the bytes from the bitmap
-                            break;
-
-                        case 24:
-                            {
-                                // Swap R and B channels to make it BGR, then add an alpha channel
-                                switchRedAndBlueChannels(fBitmap);
-                                var bgra = FreeImage.ConvertTo32Bits(fBitmap);
-                                FreeImage.UnloadEx(ref fBitmap);
-                                fBitmap = bgra;
-                            }
-                            break;
-
-                        case 32:
-                            {
-                                // Swap R and B channels to make it BGRA
-                                switchRedAndBlueChannels(fBitmap);
-                            }
-                            break;
-                        default:
-                            {
-                                // Expand to 32-bit
-                                var bgra = FreeImage.ConvertTo32Bits(fBitmap);
-                                FreeImage.UnloadEx(ref fBitmap);
-                                fBitmap = bgra;
-
-                                // Swap R and B channels to make it BGRA
-                                switchRedAndBlueChannels(fBitmap);
-                            }
-                            break;
+                        bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                        FreeImage.UnloadEx(ref fBitmap);
+                        fBitmap = bgra;
+                        switchRedAndBlueChannels(fBitmap);
                     }
+                    //switch(bpp) {
+                    //    case 8:
+                    //        {
+                    //            // Expand to 32-bit
+                    //            var bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                    //            FreeImage.UnloadEx(ref fBitmap);
+                    //            fBitmap = bgra;
+                    //            // Swap R and B channels to make it BGRA
+                    //            switchRedAndBlueChannels(fBitmap);
+                    //        }
+                    //        break;
+
+                    //    case 16:
+                    //        // Channel swizzling for 16-bit formats is done after we get the bytes from the bitmap
+                    //        break;
+
+                    //    case 24:
+                    //        {
+                    //            // Swap R and B channels to make it BGR, then add an alpha channel
+                    //            switchRedAndBlueChannels(fBitmap);
+                    //            var bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                    //            FreeImage.UnloadEx(ref fBitmap);
+                    //            fBitmap = bgra;
+                    //        }
+                    //        break;
+
+                    //    case 32:
+                    //        {
+                    //            // Swap R and B channels to make it BGRA
+                    //            switchRedAndBlueChannels(fBitmap);
+                    //        }
+                    //        break;
+                    //    default:
+                    //        {
+                    //            // Expand to 32-bit
+                    //            var bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                    //            FreeImage.UnloadEx(ref fBitmap);
+                    //            fBitmap = bgra;
+
+                    //            // Swap R and B channels to make it BGRA
+                    //            switchRedAndBlueChannels(fBitmap);
+                    //        }
+                    //        break;
+                    //}
                     break;
 
                 case FREE_IMAGE_TYPE.FIT_RGBF:
                     {
                         // Swap R and B channels to make it BGR, then add an alpha channel
                         switchRedAndBlueChannels(fBitmap);
-                        var bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
+                        bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
                         FreeImage.UnloadEx(ref fBitmap);
                         fBitmap = bgra;
                     }
