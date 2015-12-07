@@ -527,11 +527,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector3 GetValueVector3 ()
 		{
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (ParameterType != EffectParameterType.Single || Data == null)
                 throw new InvalidCastException();
 
             var vecInfo = (float[])Data;
-			return new Vector3(vecInfo[0],vecInfo[1],vecInfo[2]);
+            var result = default(Vector3);
+            if (ParameterClass == EffectParameterClass.Scalar)
+            {
+                result.X =
+                result.Y =
+                result.Z = vecInfo[0];
+            }
+            else if (ParameterClass == EffectParameterClass.Vector)
+            {
+                if (ColumnCount != 3 || RowCount != 1)
+                    throw new InvalidCastException();
+                result.X = vecInfo[0];
+                result.Y = vecInfo[1];
+                result.Z = vecInfo[2];
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
+
+            return result;
 		}
 
        public Vector3[] GetValueVector3Array()
