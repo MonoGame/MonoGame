@@ -607,22 +607,27 @@ namespace Microsoft.Xna.Framework.Graphics
             return result;
 		}
         
-          public Vector4[] GetValueVector4Array()
+          public Vector4[] GetValueVector4Array(int count)
         {
-            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException("count");
+
+            if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
-            if (Elements != null && Elements.Count > 0)
-            {
-                Vector4[] result = new Vector4[Elements.Count];
-                for (int i = 0; i < Elements.Count; i++)
-                {
-                    var v = Elements[i].GetValueSingleArray();
-                    result[i] = new Vector4(v[0], v[1],v[2], v[3]);
-                }
-                return result;
-            }
-            return null;
+            const int VectorSize = 4;
+            var size = count * VectorSize;
+            var array = GetValueSingleArray(size);
+            Vector4[] result = new Vector4[count];
+            for (int i = 0; i < count; i++)
+			{
+                var pos = i * VectorSize;
+                result[i].X = array[pos];
+                result[i].Y = array[pos + 1];
+                result[i].Z = array[pos + 2];
+                result[i].W = array[pos + 3];
+			}
+            return result;
         }
 
 		public void SetValue (bool value)
