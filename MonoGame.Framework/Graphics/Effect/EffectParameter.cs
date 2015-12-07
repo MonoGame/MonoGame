@@ -383,33 +383,60 @@ namespace Microsoft.Xna.Framework.Graphics
 			return ((float[])Data)[0];
 		}
 
-		public Single[] GetValueSingleArray ()
+		public Single[] GetValueSingleArray (int count)
 		{
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException ("count");
+
 			if (Elements != null && Elements.Count > 0)
             {
-                var ret = new Single[RowCount * ColumnCount * Elements.Count];
-				for (int i=0; i<Elements.Count; i++)
+                var size = Math.Min(RowCount * ColumnCount * Elements.Count, count);
+                var ret = new Single[count];
+                var pos = 0;
+				for (int i=0; i<Elements.Count && pos<size; i++)
                 {
-                    var elmArray = Elements[i].GetValueSingleArray();
-                    for (var j = 0; j < elmArray.Length; j++)
+                    var elmArray = Elements[i].GetValueSingleArray(Elements[i].ColumnCount * Elements[i].RowCount);
+                    for (var j = 0; j < elmArray.Length && pos < size; j++)
+                    {
 						ret[RowCount*ColumnCount*i+j] = elmArray[j];
+						pos++;
+                    }
 				}
 				return ret;
 			}
 			
+			var otherArray = new Single[count];
 			switch(ParameterClass) 
             {
 			case EffectParameterClass.Scalar:
-				return new Single[] { GetValueSingle () };
+				otherArray[0] = GetValueSingle();
+				break;
             case EffectParameterClass.Vector:
 			case EffectParameterClass.Matrix:
                     if (Data is Matrix)
-                        return Matrix.ToFloatArray((Matrix)Data);
+                    {
+                        var source = Matrix.ToFloatArray((Matrix) Data);
+                        Array.Copy(source, otherArray, Math.Min(source.Length, count));
+                    }
                     else
-                        return (float[])Data;
+                    {
+                        var fData = (float[]) Data;
+                        var size = Math.Min(fData.Length, count);
+                        var pos = 0;
+                        for (int i = 0; i < RowCount && pos < size; i++)
+                        {
+                            for (int j = 0; j < ColumnCount && pos < size; j++)
+                            {
+                                otherArray[pos] = fData[j * RowCount + i];
+                                pos++;
+                            }
+                        }
+                    }
+                    break;
 			default:
 				throw new NotImplementedException();
 			}
+            return otherArray;
 		}
 
 		public string GetValueString ()
