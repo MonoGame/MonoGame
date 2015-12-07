@@ -326,11 +326,19 @@ namespace Microsoft.Xna.Framework.Graphics
         
 		public Matrix[] GetValueMatrixArray (int count)
 		{
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException ("count");
+
             if (ParameterClass != EffectParameterClass.Matrix || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
+            if (Elements == null || Elements.Count == 0)
+                throw new InvalidCastException();
+
             var ret = new Matrix[count];
-            for (var i = 0; i < count; i++)
+
+            var size = Math.Min(count, Elements.Count);
+            for (var i = 0; i < size; i++)
                 ret[i] = Elements[i].GetValueMatrix();
 
 		    return ret;
