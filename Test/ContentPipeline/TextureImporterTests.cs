@@ -17,9 +17,9 @@ namespace MonoGame.Tests.ContentPipeline
         const string intermediateDirectory = "TestObj";
         const string outputDirectory = "TestBin";
 
-        void ImportStandard(string filename)
+        void ImportStandard(string filename, SurfaceFormat expectedSurfaceFormat)
         {
-            var importer = new TextureImporter();
+            var importer = new TextureImporter( );
             var context = new TestImporterContext(intermediateDirectory, outputDirectory);
             var content = importer.Import(filename, context);
             Assert.NotNull(content);
@@ -29,68 +29,85 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(content.Faces[0][0].Height, 64);
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
-            Assert.AreEqual(format, SurfaceFormat.Color);
+            Assert.AreEqual(expectedSurfaceFormat, format);
             // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
             try
             {
                 Directory.Delete(intermediateDirectory, true);
                 Directory.Delete(outputDirectory, true);
             }
-            catch (DirectoryNotFoundException)
-            { }
+            catch(DirectoryNotFoundException)
+            {
+            }
         }
 
         [Test]
-        public void ImportBmp()
+        public void ImportBmp( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.bmp");
+            ImportStandard("Assets/Textures/LogoOnly_64px.bmp", SurfaceFormat.Color);
         }
         [Test]
-        public void ImportBmp555( ) {
-            ImportStandard("Assets/Textures/Logo555.bmp");
-        }
-        [Test]
-        public void ImportBmp565( ) {
-            ImportStandard("Assets/Textures/Logo565.bmp");
-        }
-        [Test]
-        public void ImportBmp4bits( ) {
-            ImportStandard("Assets/Textures/LogoOnly_64px-4bits.bmp");
-        }
-
-        [Test]
-        public void ImportBmpMonoCromo( ) {
-            ImportStandard("Assets/Textures/LogoOnly_64px-monocromo.bmp");
-        }
-
-        [Test]
-        public void ImportGif()
+        public void ImportBmpRGB555( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.gif");
+            ImportStandard("Assets/Textures/Logo555.bmp", SurfaceFormat.Color);
+        }
+        [Test]
+        public void ImportBmpRGB565( )
+        {
+            ImportStandard("Assets/Textures/Logo565.bmp", SurfaceFormat.Color);
+        }
+        [Test]
+        public void ImportBmp4bits( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px-4bits.bmp", SurfaceFormat.Color);
         }
 
         [Test]
-        public void ImportJpg()
+        public void ImportBmpMonochrome( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.jpg");
+            ImportStandard("Assets/Textures/LogoOnly_64px-monochrome.bmp", SurfaceFormat.Color);
         }
 
         [Test]
-        public void ImportPng()
+        public void ImportGif( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.png");
+            ImportStandard("Assets/Textures/LogoOnly_64px.gif", SurfaceFormat.Color);
         }
 
         [Test]
-        public void ImportTga()
+        public void ImportJpg( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.tga");
+            ImportStandard("Assets/Textures/LogoOnly_64px.jpg", SurfaceFormat.Color);
         }
 
         [Test]
-        public void ImportTif()
+        public void ImportPng( )
         {
-            ImportStandard("Assets/Textures/LogoOnly_64px.tif");
+            ImportStandard("Assets/Textures/LogoOnly_64px.png", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportTga( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.tga", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportTif( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color);
+        }
+        /// <summary>
+        /// This test tries to load a tiff file encoded in rgbf, but freeimage seems to be failing to read files with this encoding
+        /// Might be necessary to modify this test with future updates of freeimage.
+        /// 
+        /// Note that the image was created with Freeimage from a bitmap
+        /// </summary>
+        [Test]
+        public void ImportImageWithBadContent( )
+        {
+            Assert.Throws(typeof(InvalidContentException), ( ) => ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Vector4));
+            //ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Color);
         }
     }
 }
