@@ -17,12 +17,12 @@ namespace Microsoft.Xna.Framework.Audio
 #if WINDOWS || (WINRT && !WINDOWS_PHONE)
 
         // These platforms are only limited by memory.
-        private const int MAX_PLAYING_INSTANCES = int.MaxValue;
+        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
 
 #elif WINDOWS_PHONE
 
         // Reference: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.instanceplaylimitexception.aspx
-        private const int MAX_PLAYING_INSTANCES = 64;
+        internal const int MAX_PLAYING_INSTANCES = 64;
 
 #endif
 
