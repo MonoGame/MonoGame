@@ -498,26 +498,37 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
 #if ANDROID
+        const string Lib = "openal32.dll";
+        const CallingConvention Style = CallingConvention.Cdecl;
+
+        [DllImport(Lib, EntryPoint = "alcDevicePauseSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDevicePauseSOFT(IntPtr device);
+
+        [DllImport(Lib, EntryPoint = "alcDeviceResumeSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDeviceResumeSOFT(IntPtr device);
+
         void Activity_Paused(object sender, EventArgs e)
         {
             // Pause all currently playing sounds. The internal pause count in OALSoundBuffer
             // will take care of sounds that were already paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Pause();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Pause();
+            //            }
+            alcDevicePauseSOFT(_device);
         }
 
         void Activity_Resumed(object sender, EventArgs e)
         {
             // Resume all sounds that were playing when the activity was paused. The internal
             // pause count in OALSoundBuffer will take care of sounds that were previously paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Resume();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Resume();
+            //            }
+            alcDeviceResumeSOFT(_device);
         }
 #endif
 
@@ -527,7 +538,6 @@ namespace Microsoft.Xna.Framework.Audio
 		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]
 		static extern void alcMacOSXMixerOutputRate (double rate); // caution
 #endif
-
-	}
+    }
 }
 
