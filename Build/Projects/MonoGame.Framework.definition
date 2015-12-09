@@ -195,6 +195,12 @@
     <Compile Include="GameComponent.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GamePlatform.Desktop.cs">
+      <Platforms>Angle,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="GamePlatform.Mobile.cs">
+      <Platforms>Android,iOS,Ouya,WindowsPhone,WindowsPhone81,Web</Platforms>
+    </Compile>
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
