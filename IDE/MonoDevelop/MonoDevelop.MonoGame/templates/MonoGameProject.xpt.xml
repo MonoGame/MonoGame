@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <Template>
 	<TemplateConfiguration>
-		<_Name>MonoGame Application (OpenGL)</_Name>
+		<_Name>MonoGame Cross Platform Desktop Project</_Name>
 		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
-		<_Description>Creates a new C# MonoGame Application. This applicaiton will use an OpenGL backend.</_Description>	   
+		<_Description>A MonoGame game project for Windows, Mac and Linux using OpenGL.</_Description>	   
 	</TemplateConfiguration>
 	
 	<Actions>
@@ -25,7 +25,7 @@
 				<Reference type="Gac" refto="System.Core" />
 			</References>
 			<Packages>
-				<Package id="MonoGame.Framework.Linux" version="3.3.0" targetFramework="net40" />
+				<Package id="MonoGame.Framework.WindowsGL" version="3.3.0" targetFramework="net40" />
 			</Packages>
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
