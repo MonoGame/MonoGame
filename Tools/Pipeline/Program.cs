@@ -25,7 +25,7 @@ namespace MonoGame.Tools.Pipeline
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            History.Default.Load();
+            PipelineSettings.Default.Load();
 
 			var view = new MainView();
             if (args != null && args.Length > 0)
@@ -42,8 +42,8 @@ namespace MonoGame.Tools.Pipeline
 			Gtk.Application.Init ();
             Global.Initalize ();
 			MainWindow win = new MainWindow ();
-			win.Show (); 
-			new PipelineController(win);
+            new PipelineController(win);
+            win.Show ();
 			#if LINUX
 			if (args != null && args.Length > 0)
 			{
@@ -56,7 +56,7 @@ namespace MonoGame.Tools.Pipeline
 				win.OpenProjectPath = project;
 			}
 			#endif
-			win.OnShowEvent ();
+            win.OnShowEvent ();
 			Gtk.Application.Run ();
 #endif
         }
