@@ -226,6 +226,12 @@
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Stetic.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
