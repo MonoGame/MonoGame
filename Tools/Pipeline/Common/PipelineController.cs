@@ -5,9 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using MGCB;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
@@ -238,17 +240,25 @@ namespace MonoGame.Tools.Pipeline
                 watcher.Filter = "*.*";
                 watcher.IncludeSubdirectories = true;
                 watcher.Created += delegate(object sender, FileSystemEventArgs e) {
+                    if (e.FullPath.Contains (this._project.IntermediateDir) || e.FullPath.Contains (this._project.OutputDir))
+                        return;
                     HandleCreated(e.FullPath);
                 };
                 watcher.Deleted += delegate(object sender, FileSystemEventArgs e) {
+                    if (e.FullPath.Contains (this._project.IntermediateDir) || e.FullPath.Contains (this._project.OutputDir))
+                        return;
                     HandleDeleted(e.FullPath);
                 };
                 watcher.Renamed += delegate(object sender, RenamedEventArgs e) {
+                    if (e.FullPath.Contains (this._project.IntermediateDir) || e.FullPath.Contains (this._project.OutputDir))
+                        return;
                     HandleDeleted(e.OldFullPath);
                     HandleCreated(e.FullPath);
                 };
-
-                watcher.EnableRaisingEvents = true;
+                try {
+                    watcher.EnableRaisingEvents = true;
+                } catch (IOException) {
+                }
 
                 PipelineSettings.Default.AddProjectHistory(projectFilePath);
                 PipelineSettings.Default.StartupProject = projectFilePath;
@@ -477,6 +487,7 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
+                _buildProcess.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.

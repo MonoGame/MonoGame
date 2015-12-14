@@ -567,6 +567,43 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains linear interpolation of the specified vectors.
+        /// Uses <see cref="MathHelper.LerpPrecise"/> on MathHelper for the interpolation.
+        /// Less efficient but more precise compared to <see cref="Vector4.Lerp(Vector4, Vector4, float)"/>.
+        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+        /// <returns>The result of linear interpolation of the specified vectors.</returns>
+        public static Vector4 LerpPrecise(Vector4 value1, Vector4 value2, float amount)
+        {
+            return new Vector4(
+                MathHelper.LerpPrecise(value1.X, value2.X, amount),
+                MathHelper.LerpPrecise(value1.Y, value2.Y, amount),
+                MathHelper.LerpPrecise(value1.Z, value2.Z, amount),
+                MathHelper.LerpPrecise(value1.W, value2.W, amount));
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains linear interpolation of the specified vectors.
+        /// Uses <see cref="MathHelper.LerpPrecise"/> on MathHelper for the interpolation.
+        /// Less efficient but more precise compared to <see cref="Vector4.Lerp(ref Vector4, ref Vector4, float, out Vector4)"/>.
+        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+        /// <param name="result">The result of linear interpolation of the specified vectors as an output parameter.</param>
+        public static void LerpPrecise(ref Vector4 value1, ref Vector4 value2, float amount, out Vector4 result)
+        {
+            result.X = MathHelper.LerpPrecise(value1.X, value2.X, amount);
+            result.Y = MathHelper.LerpPrecise(value1.Y, value2.Y, amount);
+            result.Z = MathHelper.LerpPrecise(value1.Z, value2.Z, amount);
+            result.W = MathHelper.LerpPrecise(value1.W, value2.W, amount);
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Vector4"/> that contains a maximal values from the two vectors.
         /// </summary>
         /// <param name="value1">The first vector.</param>

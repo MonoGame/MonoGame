@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 if (GraphicsUtil.IsCompressedTextureFormat(format))
                 {
-                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, true, true);
+                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, true);
                 }
 			}
 			catch(Exception ex) {
