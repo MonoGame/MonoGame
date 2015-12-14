@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Create the byte array for the data,
             // In case of modifying the code to generate pixel data with less than 8 bpp do not remove the casts or the size or the size will be wrong
             var bytes = new byte[(int) (width * height * ((float) bpp / 8))];
-
+            //var bytes = new byte[(width * height * bpp) / 8];
             //Converts the pixel data to bytes, do not try to use this call to switch the color channels because that only works for 16bpp bitmaps
             FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
             // Create the Pixel bitmap content depending on the image type
@@ -131,14 +131,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     bgra = FreeImage.ConvertTo32Bits(fBitmap);
                     FreeImage.UnloadEx(ref fBitmap);
                     fBitmap = bgra;
-                    switchRedAndBlueChannels(fBitmap);
+                    SwitchRedAndBlueChannels(fBitmap);
                     break;
 
                 //RGBF are switched before adding an alpha channel.
                 case FREE_IMAGE_TYPE.FIT_RGBF:
                     {
                         // Swap R and B channels to make it BGR, then add an alpha channel
-                        switchRedAndBlueChannels(fBitmap);
+                        SwitchRedAndBlueChannels(fBitmap);
                         bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
                         FreeImage.UnloadEx(ref fBitmap);
                         fBitmap = bgra;
@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 case FREE_IMAGE_TYPE.FIT_RGBAF:
                     {
                         // Swap R and B channels to make it BGRA
-                        switchRedAndBlueChannels(fBitmap);
+                        SwitchRedAndBlueChannels(fBitmap);
                     }
                     break;
             }
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Switches the red and blue channels
         /// </summary>
         /// <param name="fBitmap">image</param>
-        private static void switchRedAndBlueChannels(FIBITMAP fBitmap)
+        private static void SwitchRedAndBlueChannels(FIBITMAP fBitmap)
         {
             var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
             var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
