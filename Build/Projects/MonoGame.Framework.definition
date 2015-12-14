@@ -1018,14 +1018,6 @@
     </Compile>
 
 
-    <!-- Microsoft.Xna.Framework.Storage -->
-    <Compile Include="Storage\StorageContainer.cs" />
-    <Compile Include="Storage\StorageDevice.cs" />
-    <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUniversal,Linux,tvOS</Platforms>
-    </Compile>
-
-
     <!-- Utility Classes -->
     <Compile Include="Utilities\AssemblyHelper.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
@@ -1163,9 +1155,6 @@
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 
