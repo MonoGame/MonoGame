@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Input
             platformlimit = navigator.getGamepads ? 16 : 4; // Chrome has a limit of 4 gamepads
         }
 
-        private static int PlatformGetMaxIndex()
+        private static int PlatformGetMaxNumberOfGamePads()
         {
             return platformlimit;
         }

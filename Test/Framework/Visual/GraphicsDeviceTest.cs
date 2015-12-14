@@ -110,6 +110,8 @@ namespace MonoGame.Tests.Visual
             Game.Run();
         }
 
+        // This overload of DrawIndexedPrimitives is not supported on XNA.
+#if !XNA
         [Test]
         public void DrawIndexedPrimitivesParameterValidation2()
         {
@@ -140,35 +142,24 @@ namespace MonoGame.Tests.Visual
                 // Success - "normal" usage.
                 Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1));
 
-                // XNA doesn't do upfront parameter validation on the Assert.DoesNotThrow tests,
-                // but it *sometimes* fails later with an AccessViolationException, so we can't actually
-                // run these tests as part of the XNA test suite.
-
                 // baseVertex too small / large.
-#if !XNA
                 Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, -1, 0, 1));
                 Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 3, 0, 1));
-#endif
 
                 // startIndex too small / large.
-#if !XNA
                 Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, -1, 1));
                 Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 3, 1));
-#endif
 
                 // primitiveCount too small / large.
                 Assert.Throws<ArgumentOutOfRangeException>(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 0));
-#if !XNA
                 Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2));
-#endif
 
                 // startIndex + primitiveCount too large.
-#if !XNA
                 Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 1, 1));
-#endif
             };
             Game.Run();
         }
+#endif
 
 #if XNA || DIRECTX
         [Test]

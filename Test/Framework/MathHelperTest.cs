@@ -50,6 +50,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(MathHelper.Lerp(10000000000000000f, 1f, 1f), 0f, "Lerp test failed on [10000000000000000,1,1]");
         }
 
+#if !XNA
         [Test]
         public void LerpPreciseTest()
         {
@@ -59,6 +60,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(MathHelper.LerpPrecise(-5f, -1f, 0.5f), -3f, "LerpPrecise test failed on [-5,-1, 0.5]");
             Assert.AreEqual(MathHelper.LerpPrecise(10000000000000000f, 1f, 1f), 1, "LerpPrecise test failed on [10000000000000000,1,1]");
         }
+#endif
 
         [Test]
         public void Min()

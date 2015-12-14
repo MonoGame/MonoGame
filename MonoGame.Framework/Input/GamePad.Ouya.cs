@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Input
     {
         private static readonly OuyaGamePad[] GamePads = new OuyaGamePad[OuyaController.MaxControllers];
 
-        private static int PlatformGetMaxIndex()
+        private static int PlatformGetMaxNumberOfGamePads()
         {
             return 4;
         }

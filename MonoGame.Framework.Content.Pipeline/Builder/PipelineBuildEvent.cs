@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
@@ -14,6 +15,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 {
     public class PipelineBuildEvent
     {
+        private static readonly OpaqueDataDictionary EmptyParameters = new OpaqueDataDictionary();
         public static readonly string Extension = ".mgcontent";
 
         public PipelineBuildEvent()
@@ -207,54 +209,84 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 return true;
 
             // Did the parameters change?
-            if (!AreParametersEqual(cachedEvent.Parameters, Parameters))
+            var defaultValues = manager.GetProcessorDefaultValues(Processor);
+            if (!AreParametersEqual(cachedEvent.Parameters, Parameters, defaultValues))
                 return true;
 
             return false;
         }
 
-        internal static bool AreParametersEqual(OpaqueDataDictionary parameters0, OpaqueDataDictionary parameters1)
+        internal static bool AreParametersEqual(OpaqueDataDictionary parameters0, OpaqueDataDictionary parameters1, OpaqueDataDictionary defaultValues)
         {
+            Debug.Assert(defaultValues != null, "defaultValues must not be empty.");
+            Debug.Assert(EmptyParameters != null && EmptyParameters.Count == 0);
+
             // Same reference or both null?
             if (parameters0 == parameters1)
                 return true;
 
-            // Are both dictionaries are empty?
-            if ((parameters0 == null || parameters0.Count == 0) && (parameters1 == null || parameters1.Count == 0))
+            if (parameters0 == null)
+                parameters0 = EmptyParameters;
+            if (parameters1 == null)
+                parameters1 = EmptyParameters;
+
+            // Are both dictionaries empty?
+            if (parameters0.Count == 0 && parameters1.Count == 0)
                 return true;
 
-            // Is one dictionary empty?
-            if (parameters0 == null || parameters1 == null)
-                return false;
+            // Compare the values with the second dictionary or
+            // the default values.
+            if (parameters0.Count < parameters1.Count)
+            {
+                var dummy = parameters0;
+                parameters0 = parameters1;
+                parameters1 = dummy;
+            }
 
-            // Is number of parameters different?
-            // (This assumes that default values are always set the same way, i.e.
-            // either parameters with default values are set in both dictionaries
-            // or omitted in both dictionaries!)
-            if (parameters0.Count != parameters1.Count)
-                return false;
-
-            // Compare parameter by parameter.
+            // Compare parameters0 with parameters1 or defaultValues.
             foreach (var pair in parameters0)
             {
                 object value0 = pair.Value;
                 object value1;
 
-                if (!parameters1.TryGetValue(pair.Key, out value1))
+                // Search for matching parameter.
+                if (!parameters1.TryGetValue(pair.Key, out value1) && !defaultValues.TryGetValue(pair.Key, out value1))
                     return false;
 
-                // Are values equal or both null?
-                if (Equals(value0, value1))
-                    continue;
-
-                // Is one value null?
-                if (value0 == null || value1 == null)
-                    return false;
-
-                // Values are of different type: Compare string representation.
-                if (ConvertToString(value0) != ConvertToString(value1))
+                if (!AreEqual(value0, value1))
                     return false;
             }
+
+            // Compare parameters which are only in parameters1 with defaultValues.
+            foreach (var pair in parameters1)
+            {
+                if (parameters0.ContainsKey(pair.Key))
+                    continue;
+
+                object defaultValue;
+                if (!defaultValues.TryGetValue(pair.Key, out defaultValue))
+                    return false;
+
+                if (!AreEqual(pair.Value, defaultValue))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static bool AreEqual(object value0, object value1)
+        {
+            // Are values equal or both null?
+            if (Equals(value0, value1))
+                return true;
+
+            // Is one value null?
+            if (value0 == null || value1 == null)
+                return false;
+
+            // Values are of different type: Compare string representation.
+            if (ConvertToString(value0) != ConvertToString(value1))
+                return false;
 
             return true;
         }

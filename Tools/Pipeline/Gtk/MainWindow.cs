@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System;
 using Gtk;
 using System.Reflection;
+using System.Linq;
 
 #if MONOMAC
 using IgeMacIntegration;
@@ -781,7 +782,7 @@ namespace MonoGame.Tools.Pipeline
 
             int nop = 0;
 
-            foreach (var project in History.Default.ProjectHistory)
+            foreach (var project in History.Default.ProjectHistory.ToList ())
             {
                 nop++;
                 var recentItem = new MenuItem(project);
