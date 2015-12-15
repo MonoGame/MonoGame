@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Pipeline Library</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/library/pipeline</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Pipeline Extenson so you can extend the Content Pipeline.</_Description>

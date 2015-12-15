@@ -6,7 +6,11 @@
     <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
   </Platform>
-
+  <Platform Type="tvOS">
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.TVOS" />
+    <Reference Include="OpenTK-1.0" />
+  </Platform>
   <Platform Type="Linux">
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Drawing" />

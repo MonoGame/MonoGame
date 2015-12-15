@@ -536,7 +536,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 #endif
 
-#if MONOMAC || IOS
+#if MONOMAC
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 
 		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]

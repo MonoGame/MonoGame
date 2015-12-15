@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Portable Library</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/library/crossplat</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Portable Library (PCL). This can be used to share most of your games code.</_Description>
