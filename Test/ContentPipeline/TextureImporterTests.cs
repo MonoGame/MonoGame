@@ -75,5 +75,44 @@ namespace MonoGame.Tests.ContentPipeline
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.tif");
         }
+
+        [Test]
+        public void ImportDdsCubemapDxt1()
+        {
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/SampleCube64DXT1Mips.dds", context);
+            Assert.NotNull(content);
+            Assert.AreEqual(content.Faces.Count, 6);
+            for (int f = 0; f < 6; ++f)
+            {
+                Assert.AreEqual(content.Faces[f].Count, 7);
+                Assert.AreEqual(content.Faces[f][0].Width, 64);
+                Assert.AreEqual(content.Faces[f][0].Height, 64);
+                Assert.AreEqual(content.Faces[f][1].Width, 32);
+                Assert.AreEqual(content.Faces[f][1].Height, 32);
+                Assert.AreEqual(content.Faces[f][2].Width, 16);
+                Assert.AreEqual(content.Faces[f][2].Height, 16);
+                Assert.AreEqual(content.Faces[f][3].Width, 8);
+                Assert.AreEqual(content.Faces[f][3].Height, 8);
+                Assert.AreEqual(content.Faces[f][4].Width, 4);
+                Assert.AreEqual(content.Faces[f][4].Height, 4);
+                Assert.AreEqual(content.Faces[f][5].Width, 2);
+                Assert.AreEqual(content.Faces[f][5].Height, 2);
+                Assert.AreEqual(content.Faces[f][6].Width, 1);
+                Assert.AreEqual(content.Faces[f][6].Height, 1);
+            }
+            SurfaceFormat format;
+            Assert.True(content.Faces[0][0].TryGetFormat(out format));
+            Assert.AreEqual(format, SurfaceFormat.Dxt1);
+            // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch (DirectoryNotFoundException)
+            { }
+        }
     }
 }

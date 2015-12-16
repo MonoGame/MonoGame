@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static bool Back;
 
-        private static int PlatformGetMaxIndex()
+        private static int PlatformGetMaxNumberOfGamePads()
         {
             return 16;
         }

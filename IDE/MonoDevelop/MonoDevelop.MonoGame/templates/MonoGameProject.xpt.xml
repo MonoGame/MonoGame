@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Application (OpenGL)</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a new C# MonoGame Application. This applicaiton will use an OpenGL backend.</_Description>	   

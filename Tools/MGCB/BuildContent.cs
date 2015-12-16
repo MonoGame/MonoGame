@@ -284,6 +284,20 @@ namespace MGCB
             errorCount = 0;
             successCount = 0;
 
+            // Before building the content, register all files to be built. (Necessary to
+            // correctly resolve external references.)
+            foreach (var c in _content)
+            {
+                try
+                {
+                    _manager.RegisterContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
+                }
+                catch
+                {
+                    // Ignore exception. Exception will be handled below.
+                }
+            }
+
             foreach (var c in _content)
             {
                 try

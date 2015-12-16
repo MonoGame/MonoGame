@@ -43,6 +43,9 @@
     <Import file="templates/iOS/iOSDefault.png" />
     <Import file="templates/iOS/iOSGameThumbnail.png" />
     <Import file="templates/iOS/iOSInfo.plist" />
+    <Import file="templates/MonoGametvOSProject.xpt.xml" />
+    <Import file="templates/iOS/Entitlements.plist.xml" />
+    <Import file="templates/iOS/Info_tvOS.plist.xml" />
     <!-- Shared Templates -->
     <Import file="templates/MonoGameMobileOnly-SAP.xpt.xml" />
     <Import file="templates/Shared/Program.cs" />
@@ -86,6 +89,17 @@
     <DotNetProjectSubtype id="MonoGame" guid="{9b831fef-f496-498f-9fe8-180da5cb4258}" type="MonoDevelop.MonoGame.MonoGameProject">
       <!-- Add MonoGame Specific Imports  -->
     </DotNetProjectSubtype>
+  </Extension>
+  <Extension path="/MonoDevelop/Ide/ProjectTemplateCategories">
+    <Category id="monogame" name="MonoGame" icon="monogame-project" insertbefore="other">
+      <Category id="app" name="App">
+        <Category id="games" name="Games" mappedCategories="C#/MonoGame;monogame/app/games" />
+      </Category>
+      <Category id="library" name="Library">
+        <Category id="crossplat" name="Cross Platform" />
+        <Category id="pipeline" name="Content Pipeline" />
+      </Category>
+    </Category>
   </Extension>
   <Extension path="/MonoDevelop/Ide/FileTemplateTypes">
     <FileTemplateType name="ContentFile" class="MonoDevelop.MonoGame.ContentItemTemplate" />
@@ -158,6 +172,7 @@
     </Dependencies>
     <Extension path="/MonoDevelop/Ide/ProjectTemplates">
       <ProjectTemplate id="MonoGameForIPhoneProject" file="templates/MonoGameiOSProject.xpt.xml" />
+      <ProjectTemplate id="MonoGameFortvOSProject" file="templates/MonoGametvOSProject.xpt.xml" />
     </Extension>
   </Module>
   <Module>

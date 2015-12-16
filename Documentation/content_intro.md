@@ -6,6 +6,7 @@ This section will cover the following topics:
 
  - What is Game Content
  - [Using The Pipeline Tool](using_pipeline_tool.md)
+ - [Using TrueType Fonts](adding_fonts.md)
  - [Custom Effects](custom_effects.md)
  - Custom Content Types
  

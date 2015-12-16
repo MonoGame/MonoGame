@@ -49,12 +49,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _valid = 0;
         }
 
-#if DIRECTX
-        internal void SetConstantBuffers(GraphicsDevice device)
-#elif WEB
+#if WEB
         internal void SetConstantBuffers(GraphicsDevice device, int shaderProgram)
 #elif OPENGL
         internal void SetConstantBuffers(GraphicsDevice device, ShaderProgram shaderProgram)
+#else
+        internal void SetConstantBuffers(GraphicsDevice device)
 #endif
         {
             // If there are no constant buffers then skip it.
@@ -68,10 +68,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 var buffer = _buffers[i];
                 if (buffer != null && !buffer.IsDisposed)
                 {
-#if DIRECTX
-                    buffer.PlatformApply(device, _stage, i);
-#elif OPENGL || WEB
+#if OPENGL || WEB
                     buffer.PlatformApply(device, shaderProgram);
+#else
+                    buffer.PlatformApply(device, _stage, i);
 #endif
                 }
 

@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Application (DirectX)</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a new C# MonoGame Windows Application. This application will use the DirectX backend.</_Description>	   
