@@ -7,6 +7,12 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
+  <Platform Type="tvOS">
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.TVOS" />
+    <Reference Include="Lidgren.Network" />
+  </Platform>
+
   <Platform Type="Linux">
     <Reference Include="Lidgren.Network" />
   </Platform>

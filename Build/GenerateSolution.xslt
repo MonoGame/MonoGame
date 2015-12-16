@@ -57,6 +57,19 @@ MinimumVisualStudioVersion = 10.0.40219.1
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 </xsl:text>
       </xsl:when>
+      <xsl:when test="/Input/Generation/Platform = 'tvOS'">
+        <xsl:text>Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+		Release|iPhone = Release|iPhone
+		Ad-Hoc|iPhone = Ad-Hoc|iPhone
+		AppStore|iPhone = AppStore|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+</xsl:text>
+      </xsl:when>
       <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
         <xsl:text>Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -150,6 +163,164 @@ EndGlobal
     
     <xsl:choose>
       <xsl:when test="/Input/Generation/Platform = 'iOS'">
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Ad-Hoc|iPhone.ActiveCfg = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$adhoc-mapping != ''">
+            <xsl:value-of select="$adhoc-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Ad-Hoc|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Ad-Hoc|iPhone.Build.0 = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$adhoc-mapping != ''">
+            <xsl:value-of select="$adhoc-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Ad-Hoc|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.AppStore|iPhone.ActiveCfg = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$appstore-mapping != ''">
+            <xsl:value-of select="$appstore-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>AppStore|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.AppStore|iPhone.Build.0 = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$appstore-mapping != ''">
+            <xsl:value-of select="$appstore-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>AppStore|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Debug|iPhone.ActiveCfg = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$debug-mapping != ''">
+            <xsl:value-of select="$debug-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Debug|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Debug|iPhone.Build.0 = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$debug-mapping != ''">
+            <xsl:value-of select="$debug-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Debug|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Debug|iPhoneSimulator.ActiveCfg = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$debug-mapping != ''">
+            <xsl:value-of select="$debug-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Debug|iPhoneSimulator</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Debug|iPhoneSimulator.Build.0 = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$debug-mapping != ''">
+            <xsl:value-of select="$debug-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Debug|iPhoneSimulator</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Release|iPhone.ActiveCfg = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$release-mapping != ''">
+            <xsl:value-of select="$release-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Release|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Release|iPhone.Build.0 = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$release-mapping != ''">
+            <xsl:value-of select="$release-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Release|iPhone</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Release|iPhoneSimulator.ActiveCfg = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$release-mapping != ''">
+            <xsl:value-of select="$release-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Release|iPhoneSimulator</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+        <xsl:text>		{</xsl:text>
+        <xsl:value-of select="$guid" />
+        <xsl:text>}.Release|iPhoneSimulator.Build.0 = </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$release-mapping != ''">
+            <xsl:value-of select="$release-mapping" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>Release|iPhoneSimulator</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>
+</xsl:text>
+      </xsl:when>
+      <xsl:when test="/Input/Generation/Platform = 'tvOS'">
         <xsl:text>		{</xsl:text>
         <xsl:value-of select="$guid" />
         <xsl:text>}.Ad-Hoc|iPhone.ActiveCfg = </xsl:text>

@@ -34,6 +34,7 @@
     <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
         <topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>
         <topic id="Custom_Effects" name="Custom Effects" filename="custom_effects.md"/>
+        <topic id="Using_TrueType_Fonts" name="Using TrueType Fonts" filename="adding_ttf_fonts.md"/>
     </topic>
 
     <topic id="Tools" name="Tools" filename="tools.md">
@@ -44,6 +45,7 @@
     
     <topic id="Platform_Specific_Notes" name="Platform-Specific Notes" filename="platform_specific.md">
         <topic id="Android" name="Android" filename="android.md"/>
+        <topic id="tvOS" name="Android" filename="tvOS.md"/>
     </topic>
     
     <topic id="External_Links" name="External Links" filename="links.md"/>

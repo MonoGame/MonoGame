@@ -69,6 +69,12 @@ namespace MonoGame.Tools.Pipeline
         {
             ButtonOkEnabled();
         }
+
+        protected void OnEntry1Activated (object sender, EventArgs e)
+        {
+            if (buttonOk.Sensitive)
+                Respond(ResponseType.Ok);
+        }
     }
 }
 
