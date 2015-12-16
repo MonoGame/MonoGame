@@ -128,8 +128,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             parameters.Add("ColorKeyColor", ColorKeyColor);
             parameters.Add("ColorKeyEnabled", ColorKeyEnabled);
             parameters.Add("GenerateMipmaps", GenerateMipmaps);
-            parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
-            parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
+            parameters.Add("PremultiplyAlpha", PremultiplyTextureAlpha);
+            parameters.Add("ResizeToPowerOfTwo", ResizeTexturesToPowerOfTwo);
             parameters.Add("TextureFormat", TextureFormat);
 
             return context.BuildAsset<TextureContent, TextureContent>(texture, "TextureProcessor", parameters, "TextureImporter", null);
