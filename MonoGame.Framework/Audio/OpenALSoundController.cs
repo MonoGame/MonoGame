@@ -22,6 +22,7 @@ using Android.Media;
 
 #if IOS
 using AudioToolbox;
+using AVFoundation;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -184,18 +185,21 @@ namespace Microsoft.Xna.Framework.Audio
                     0
                 };
 #elif IOS
-                AudioSession.Initialize();
-
-                AudioSession.Interrupted += (sender, e) => {
-                    AudioSession.SetActive(false);
-                    Alc.MakeContextCurrent(ContextHandle.Zero);
-                    Alc.SuspendContext(_context);
+                EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
+                    switch (e.InterruptionType) {
+                        case AVAudioSessionInterruptionType.Began:
+                            AVAudioSession.SharedInstance().SetActive(false);
+                            Alc.MakeContextCurrent(ContextHandle.Zero);
+                            Alc.SuspendContext(_context);
+                            break;
+                        case AVAudioSessionInterruptionType.Ended:
+                            AVAudioSession.SharedInstance().SetActive(true);
+                            Alc.MakeContextCurrent(_context);
+                            Alc.ProcessContext(_context);
+                            break;
+                    }
                 };
-                AudioSession.Resumed += (sender, e) => {
-                    AudioSession.SetActive(true);
-                    Alc.MakeContextCurrent(_context);
-                    Alc.ProcessContext(_context);
-                };
+                AVAudioSession.Notifications.ObserveInterruption(handler);
 
                 int[] attribute = new int[0];
 #elif !DESKTOPGL
@@ -498,36 +502,46 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
 #if ANDROID
+        const string Lib = "openal32.dll";
+        const CallingConvention Style = CallingConvention.Cdecl;
+
+        [DllImport(Lib, EntryPoint = "alcDevicePauseSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDevicePauseSOFT(IntPtr device);
+
+        [DllImport(Lib, EntryPoint = "alcDeviceResumeSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDeviceResumeSOFT(IntPtr device);
+
         void Activity_Paused(object sender, EventArgs e)
         {
             // Pause all currently playing sounds. The internal pause count in OALSoundBuffer
             // will take care of sounds that were already paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Pause();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Pause();
+            //            }
+            alcDevicePauseSOFT(_device);
         }
 
         void Activity_Resumed(object sender, EventArgs e)
         {
             // Resume all sounds that were playing when the activity was paused. The internal
             // pause count in OALSoundBuffer will take care of sounds that were previously paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Resume();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Resume();
+            //            }
+            alcDeviceResumeSOFT(_device);
         }
 #endif
 
-#if MONOMAC || IOS
+#if MONOMAC
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 
 		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]
 		static extern void alcMacOSXMixerOutputRate (double rate); // caution
 #endif
-
-	}
+    }
 }
 

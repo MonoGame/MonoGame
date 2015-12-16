@@ -72,29 +72,26 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 #if MONOMAC
                 //Dummy values until MonoMac implements Quartz Display Services
-                int refreshRate = 60;
                 SurfaceFormat format = SurfaceFormat.Color;
                 
                 return new DisplayMode((int)_screen.Frame.Width,
                                        (int)_screen.Frame.Height,
-                                       refreshRate,
                                        format);
 #elif IOS
                 return new DisplayMode((int)(_screen.Bounds.Width * _screen.Scale),
                        (int)(_screen.Bounds.Height * _screen.Scale),
-                       60,
                        SurfaceFormat.Color);
 #elif ANDROID
                 View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
-                return new DisplayMode(view.Width, view.Height, 60, SurfaceFormat.Color);
+                return new DisplayMode(view.Width, view.Height, SurfaceFormat.Color);
 #elif DESKTOPGL
 
-                return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
+                return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, SurfaceFormat.Color);
 #elif WINDOWS
                 var dc = System.Drawing.Graphics.FromHwnd(IntPtr.Zero).GetHdc();
-                return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), GetDeviceCaps(dc, VREFRESH), SurfaceFormat.Color);
+                return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), SurfaceFormat.Color);
 #else
-                return new DisplayMode(800, 600, 60, SurfaceFormat.Color);
+                return new DisplayMode(800, 600, SurfaceFormat.Color);
 #endif
             }
         }
@@ -313,7 +310,9 @@ namespace Microsoft.Xna.Framework.Graphics
                                 // Need to decide what to do about other surface formats
                                 if (format == SurfaceFormat.Color)
                                 {
-                                    modes.Add(new DisplayMode(resolution.Width, resolution.Height, (int)resolution.RefreshRate, format));
+                                    var displayMode = new DisplayMode(resolution.Width, resolution.Height, format);
+                                    if (!modes.Contains(displayMode))
+                                        modes.Add(displayMode);
                                 }
                             }
 
@@ -330,8 +329,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         var displayModes = output.GetDisplayModeList(formatTranslation.Key, 0);
                         foreach (var displayMode in displayModes)
                         {
-                            int refreshRate = (int)Math.Round(displayMode.RefreshRate.Numerator / (float)displayMode.RefreshRate.Denominator);
-                            var xnaDisplayMode = new DisplayMode(displayMode.Width, displayMode.Height, refreshRate, formatTranslation.Value);
+                            var xnaDisplayMode = new DisplayMode(displayMode.Width, displayMode.Height, formatTranslation.Value);
                             if (!modes.Contains(xnaDisplayMode))
                                 modes.Add(xnaDisplayMode);
                         }
@@ -383,7 +381,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private const int HORZRES = 8;
         private const int VERTRES = 10;
-        private const int VREFRESH = 116;
 #endif
     }
 }

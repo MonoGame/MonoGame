@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame iPhone/iPad Application</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Application for the iPhone/iPad</_Description>
@@ -31,6 +31,7 @@
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
 				<File name="Main.cs" AddStandardHeader="True" src="Common/Program.cs" />
+				<File name="Entitlements.plist" AddStandardHeader="False" src="iOS/Entitlements.plist.xml" />
 				<File name="Info.plist" AddStandardHeader="False" src="iOS/iOSInfo.plist" />
 				<RawFile name="Default.png" src="iOS/iOSDefault.png" />
 				<RawFile name="GameThumbnail.png" src="iOS/iOSGameThumbnail.png" />

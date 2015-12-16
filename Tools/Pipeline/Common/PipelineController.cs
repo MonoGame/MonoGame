@@ -240,17 +240,25 @@ namespace MonoGame.Tools.Pipeline
                 watcher.Filter = "*.*";
                 watcher.IncludeSubdirectories = true;
                 watcher.Created += delegate(object sender, FileSystemEventArgs e) {
+                    if (e.FullPath.Contains (this._project.IntermediateDir) || e.FullPath.Contains (this._project.OutputDir))
+                        return;
                     HandleCreated(e.FullPath);
                 };
                 watcher.Deleted += delegate(object sender, FileSystemEventArgs e) {
+                    if (e.FullPath.Contains (this._project.IntermediateDir) || e.FullPath.Contains (this._project.OutputDir))
+                        return;
                     HandleDeleted(e.FullPath);
                 };
                 watcher.Renamed += delegate(object sender, RenamedEventArgs e) {
+                    if (e.FullPath.Contains (this._project.IntermediateDir) || e.FullPath.Contains (this._project.OutputDir))
+                        return;
                     HandleDeleted(e.OldFullPath);
                     HandleCreated(e.FullPath);
                 };
-
-                watcher.EnableRaisingEvents = true;
+                try {
+                    watcher.EnableRaisingEvents = true;
+                } catch (IOException) {
+                }
 
                 History.Default.AddProjectHistory(projectFilePath);
                 History.Default.StartupProject = projectFilePath;

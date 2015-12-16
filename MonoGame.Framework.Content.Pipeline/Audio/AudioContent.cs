@@ -260,14 +260,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         case "streams.stream.0.channels":
                             channelCount = int.Parse(kv[1].Trim('"'), numberFormat);
                             break;
+                        case "streams.stream.0.bit_rate":
+                            averageBytesPerSecond = (int.Parse(kv[1].Trim('"'), numberFormat) / 8);
+                            break;
                     }
                 }
 
-                // This information is not available from ffprobe (and may or may not
-                // be relevant for non-PCM formats anyway):
-                //
-                // * averageBytesPerSecond
-                // * blockAlign
+                // Calculate blockAlign.
+                switch (formatType)
+                {
+                    case ConversionFormat.Pcm:
+                        // Block alignment value is the number of bytes in an atomic unit (that is, a block) of audio for a particular format. For Pulse Code Modulation (PCM) formats, the formula for calculating block alignment is as follows: 
+                        //  •   Block Alignment = Bytes per Sample x Number of Channels
+                        // For example, the block alignment value for 16-bit PCM format mono audio is 2 (2 bytes per sample x 1 channel). For 16-bit PCM format stereo audio, the block alignment value is 4.
+                        // https://msdn.microsoft.com/en-us/library/system.speech.audioformat.speechaudioformatinfo.blockalign(v=vs.110).aspx
+                        blockAlign = (bitsPerSample / 8) * channelCount;
+                        break;
+                    default:
+                        // blockAlign is not available from ffprobe (and may or may not
+                        // be relevant for non-PCM formats anyway)
+                        break;
+                }
+
 
                 this.duration = TimeSpan.FromSeconds(durationInSeconds);
                 this.format = new AudioFormat(
