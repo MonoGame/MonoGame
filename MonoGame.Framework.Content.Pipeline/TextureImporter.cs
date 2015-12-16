@@ -97,10 +97,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var greenMask = FreeImage.GetGreenMask(fBitmap);
             var blueMask = FreeImage.GetBlueMask(fBitmap);
 
-            // Create the byte array for the data,
-            // In case of modifying the code to generate pixel data with less than 8 bpp do not remove the casts or the size of the array will be wrong
-            var bytes = new byte[(int) (width * height * ((float) bpp / 8))];
-            //var bytes = new byte[(width * height * bpp) / 8];
+            // Create the byte array for the data
+            byte[] bytes = new byte[((width * height * bpp - 1) / 8) + 1];
+            
             //Converts the pixel data to bytes, do not try to use this call to switch the color channels because that only works for 16bpp bitmaps
             FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
             // Create the Pixel bitmap content depending on the image type
