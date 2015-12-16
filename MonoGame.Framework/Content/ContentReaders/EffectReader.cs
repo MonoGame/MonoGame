@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Content
         {
             var effect = existingInstance;
             
-            int dataSize = input.ReadInt32();
+            int dataSize = (int)input.ReadUInt32();
             byte[] data = input.ContentManager.GetScratchBuffer(dataSize);
             input.Read(data, 0, dataSize);
 
