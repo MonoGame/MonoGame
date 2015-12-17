@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
 #else
 using OpenTK.Audio.OpenAL;

@@ -4,6 +4,8 @@
 
 using System;
 
+#if !(MONOMAC && !PLATFORM_MACOS_LEGACY)
+
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class Joystick
@@ -80,3 +82,5 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
+
+#endif

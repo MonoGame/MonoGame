@@ -10,7 +10,11 @@ using System.Threading.Tasks;
 using Foundation;
 using UIKit;
 #elif MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
+#else
+using Foundation;
+#endif
 #endif
 using Microsoft.Xna.Framework.Utilities;
 

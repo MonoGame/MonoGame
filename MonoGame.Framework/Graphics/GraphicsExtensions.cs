@@ -3,7 +3,11 @@ using System.Diagnostics;
 
 #if OPENGL
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 #elif DESKTOPGL
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
