@@ -560,7 +560,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Logger.PushFile(pipelineEvent.SourceFile);
 
             // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
-            TrackPipelineBuildEvent(pipelineEvent);
+            var matchingEvent = TrackPipelineBuildEvent(pipelineEvent);
 
             var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
             if (!rebuild)
@@ -613,7 +613,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
             else
             {
-                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+                // Suppress warnings for assets allready build in the current process, otherwise 3D models
+                // with multiple textures will flood the output with 'Skipping modelTexture'.
+                // The warning will be shown for unmodified assets when build without '/Rebuild' command.
+                if (matchingEvent == null || matchingEvent.DestTime == DateTime.MinValue)
+                    Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
             }
 
             Logger.PopFile();
@@ -780,7 +784,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Stores the pipeline build event (in memory) if no matching event is found.
         /// </summary>
         /// <param name="pipelineEvent">The pipeline build event.</param>
-        private void TrackPipelineBuildEvent(PipelineBuildEvent pipelineEvent)
+        private PipelineBuildEvent TrackPipelineBuildEvent(PipelineBuildEvent pipelineEvent)
         {
             List<PipelineBuildEvent> pipelineBuildEvents;
             bool eventsFound = _pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents);
@@ -790,8 +794,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 _pipelineBuildEvents.Add(pipelineEvent.SourceFile, pipelineBuildEvents);
             }
 
-            if (FindMatchingEvent(pipelineBuildEvents, pipelineEvent.DestFile, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters) == null)
+            var matchingEvent = FindMatchingEvent(pipelineBuildEvents, pipelineEvent.DestFile, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters);
+            if (matchingEvent == null)
                 pipelineBuildEvents.Add(pipelineEvent);
+
+            return matchingEvent;
         }
 
         /// <summary>
