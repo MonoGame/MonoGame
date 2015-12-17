@@ -565,6 +565,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
             if (!rebuild)
             {
+                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+
                 // While this asset doesn't need to be rebuilt the dependent assets might.
                 foreach (var asset in cachedEvent.BuildAsset)
                 {
@@ -610,11 +612,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
                 // Store the new event into the intermediate folder.
                 pipelineEvent.Save(eventFilepath);
-            }
-            else
-            {
-                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
-            }
+            }           
 
             Logger.PopFile();
         }
