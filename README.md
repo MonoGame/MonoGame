@@ -1,6 +1,6 @@
-# [MonoGame](http://monogame.net/) [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/project.html?projectId=MonoGame&guest=1)
+# [MonoGame](http://www.monogame.net/) [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/project.html?projectId=MonoGame&guest=1)
 
-[MonoGame](http://monogame.net) is an open source implementation of the Microsoft XNA 4.x Framework.
+[MonoGame](http://www.monogame.net/) is an open source implementation of the Microsoft XNA 4.x Framework.
 
 Our goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
 
@@ -11,15 +11,15 @@ Our goal is to make it easy for XNA developers to create cross-platform games wi
 * Windows (OpenGL & DirectX)
 * Mac OS X
 * Linux
-* [Windows Store Apps](http://dev.windows.com) (for Windows 8 and Windows RT)
+* [Windows Store Apps](https://dev.windows.com/) (for Windows 8 and Windows RT)
 * [Windows Phone 8](http://dev.windowsphone.com)
 * [Windows Phone 8.1](http://dev.windows.com)
 * [Windows 10 UWP](http://dev.windows.com)
-* [OUYA](http://ouya.tv), an Android-based gaming console
+* [OUYA](https://www.ouya.tv/), an Android-based gaming console
 
 ## Quick Start
 
-There are a few pre-requisites that you should be aware of for the various platforms. Please check them over [MonoGame](http://monogame.net/downloads) website.
+There are a few pre-requisites that you should be aware of for the various platforms. Please check them over [MonoGame](http://www.monogame.net/downloads/) website.
 
 There are four quick start options available:
 * Download the current stable release from [our website](http://monogame.net/downloads).
@@ -35,7 +35,7 @@ For more information and advanced usage, please refer to the [Protobuild documen
 
 ### Samples
 
-Once you have MonoGame, grab the [MonoGame StarterKits](https://github.com/kungfubanana/MonoGame-StarterKits) or [MonoGame Samples](https://github.com/Mono-Game/MonoGame.Samples) to help get you started on your first project.
+Once you have MonoGame, grab the [MonoGame StarterKits](https://github.com/kungfubanana/MonoGame-StarterKits) or [MonoGame Samples](https://github.com/MonoGame/MonoGame.Samples) to help get you started on your first project.
 
 ## Bug Tracker
 
