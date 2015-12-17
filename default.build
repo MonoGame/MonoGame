@@ -171,6 +171,14 @@
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
         <exec program="Protobuild" commandline="-generate WindowsUAP" />
+
+        <!--
+            Currently MSBuild doesn't restore the nuget packages like buiding from the
+            IDE does.  So we have to do it ourselves using the recommended work around.
+        -->
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUAP.project.json -NonInteractive' />
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.Net.WindowsUAP.project.json -NonInteractive' />
+
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
         <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
       </if>
