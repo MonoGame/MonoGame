@@ -7,9 +7,11 @@
   <DefaultWindowsPlatforms>Android,Angle,Linux,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,tvOS</DefaultWindowsPlatforms>
   <SupportedPlatforms>Android,Angle,Linux,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,MacOS,Web,tvOS</SupportedPlatforms>
   <DisableSynchronisation>true</DisableSynchronisation>
+  <!--
   <GenerateNuGetRepositories>true</GenerateNuGetRepositories>
   <Packages>
     <Package Uri="https-git://github.com/OutOfOrder/MonoKickstart.git" Folder="ThirdParty/Kickstart" GitRef="master" />
     <Package Uri="https-git://github.com/Mono-Game/MonoGame.Dependencies.git" Folder="ThirdParty/Dependencies" GitRef="master" />
   </Packages>
+  -->
 </Module>
