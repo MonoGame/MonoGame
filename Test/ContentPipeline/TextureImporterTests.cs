@@ -86,21 +86,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(content.Faces.Count, 6);
             for (int f = 0; f < 6; ++f)
             {
-                Assert.AreEqual(content.Faces[f].Count, 7);
-                Assert.AreEqual(content.Faces[f][0].Width, 64);
-                Assert.AreEqual(content.Faces[f][0].Height, 64);
-                Assert.AreEqual(content.Faces[f][1].Width, 32);
-                Assert.AreEqual(content.Faces[f][1].Height, 32);
-                Assert.AreEqual(content.Faces[f][2].Width, 16);
-                Assert.AreEqual(content.Faces[f][2].Height, 16);
-                Assert.AreEqual(content.Faces[f][3].Width, 8);
-                Assert.AreEqual(content.Faces[f][3].Height, 8);
-                Assert.AreEqual(content.Faces[f][4].Width, 4);
-                Assert.AreEqual(content.Faces[f][4].Height, 4);
-                Assert.AreEqual(content.Faces[f][5].Width, 2);
-                Assert.AreEqual(content.Faces[f][5].Height, 2);
-                Assert.AreEqual(content.Faces[f][6].Width, 1);
-                Assert.AreEqual(content.Faces[f][6].Height, 1);
+                CheckFaceMipMaps(content, f);
             }
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
@@ -113,6 +99,79 @@ namespace MonoGame.Tests.ContentPipeline
             }
             catch (DirectoryNotFoundException)
             { }
+        }
+
+        private static void CheckFaceMipMaps(TextureContent content, int faceIndex)
+        {
+            Assert.AreEqual(content.Faces[faceIndex].Count, 7);
+            Assert.AreEqual(content.Faces[faceIndex][0].Width, 64);
+            Assert.AreEqual(content.Faces[faceIndex][0].Height, 64);
+            Assert.AreEqual(content.Faces[faceIndex][1].Width, 32);
+            Assert.AreEqual(content.Faces[faceIndex][1].Height, 32);
+            Assert.AreEqual(content.Faces[faceIndex][2].Width, 16);
+            Assert.AreEqual(content.Faces[faceIndex][2].Height, 16);
+            Assert.AreEqual(content.Faces[faceIndex][3].Width, 8);
+            Assert.AreEqual(content.Faces[faceIndex][3].Height, 8);
+            Assert.AreEqual(content.Faces[faceIndex][4].Width, 4);
+            Assert.AreEqual(content.Faces[faceIndex][4].Height, 4);
+            Assert.AreEqual(content.Faces[faceIndex][5].Width, 2);
+            Assert.AreEqual(content.Faces[faceIndex][5].Height, 2);
+            Assert.AreEqual(content.Faces[faceIndex][6].Width, 1);
+            Assert.AreEqual(content.Faces[faceIndex][6].Height, 1);
+        }
+
+
+        //When merging with pull #4304 uncomment the first line and delete the rest
+        [Test]
+        public void ImportDds()
+        {
+            //ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3);
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/LogoOnly_64px.dds", context);
+            Assert.NotNull(content);
+            Assert.AreEqual(content.Faces.Count, 1);
+            Assert.AreEqual(content.Faces[0].Count, 1);
+            Assert.AreEqual(content.Faces[0][0].Width, 64);
+            Assert.AreEqual(content.Faces[0][0].Height, 64);
+            SurfaceFormat format;
+            Assert.True(content.Faces[0][0].TryGetFormat(out format));
+            Assert.AreEqual(format, SurfaceFormat.Dxt3);
+            // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch(DirectoryNotFoundException)
+            {
+            }
+        }
+        [Test]
+        public void ImportDdsMipMap()
+        {
+            
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/LogoOnly_64px-mipmaps.dds", context);
+            Assert.NotNull(content);
+            Assert.AreEqual(content.Faces.Count, 1);
+            CheckFaceMipMaps(content, 0);
+            //Assert.AreEqual(content.Faces[0].Count, 7);
+            //Assert.AreEqual(content.Faces[0][0].Width, 64);
+            //Assert.AreEqual(content.Faces[0][0].Height, 64);
+            SurfaceFormat format;
+            Assert.True(content.Faces[0][0].TryGetFormat(out format));
+            Assert.AreEqual(format, SurfaceFormat.Dxt3);
+            // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch(DirectoryNotFoundException)
+            {
+            }
         }
     }
 }
