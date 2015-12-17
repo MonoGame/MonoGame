@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     {
         Stack<string> filenames = new Stack<string>();
 
+        protected string Indent { get { return String.Empty.PadLeft(Math.Max(0,filenames.Count - 1), '\t'); } }
+
         /// <summary>
         /// Gets or sets the base reference path used when reporting errors during the content build process.
         /// </summary>
