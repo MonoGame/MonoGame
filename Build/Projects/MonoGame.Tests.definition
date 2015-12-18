@@ -784,6 +784,12 @@
     <Content Include="Assets\Textures\SampleCube64DXT1Mips.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px-mipmaps.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
   </Files>
 </Project>

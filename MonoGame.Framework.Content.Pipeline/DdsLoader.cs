@@ -285,6 +285,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         output = new Texture2DContent() { Identity = identity };
                     }
                 }
+                else
+                {
+                    output = new Texture2DContent() { Identity = identity };
+                }
 
                 bool rbSwap;
                 var format = GetSurfaceFormat(ref header.ddspf, out rbSwap);
