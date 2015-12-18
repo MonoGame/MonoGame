@@ -3,6 +3,7 @@
 
   <Platform Type="Windows">
     <Reference Include="System.Drawing" />
+    <Reference Include="MonoGame.Framework.Core" />
 
     <Binary
       Name="NDesk.Options"
@@ -23,6 +24,7 @@
 
   <Platform Type="WindowsGL">
     <Reference Include="System.Drawing" />
+    <Reference Include="MonoGame.Framework.Core" />
 
     <Binary
       Name="NDesk.Options"
@@ -44,6 +46,7 @@
   <Platform Type="MacOS">
     <Reference Include="System.Drawing" />
     <Reference Include="OpenTK" />
+    <Reference Include="MonoGame.Framework.Core" />
 
     <Binary
       Name="NDesk.Options"
@@ -84,6 +87,7 @@
 
   <Platform Type="iOS">
     <Reference Include="monotouch" />
+    <Reference Include="MonoGame.Framework.Core" />
     
     <Binary
       Name="NDesk.Options"

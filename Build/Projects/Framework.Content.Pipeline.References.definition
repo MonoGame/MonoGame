@@ -43,6 +43,7 @@
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
 
@@ -74,6 +75,7 @@
     <Binary
       Name="ATI.TextureConverter"
       Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
-	
+    
 </ExternalProject>

@@ -7,12 +7,14 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="Lidgren.Network" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="tvOS">
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.TVOS" />
     <Reference Include="Lidgren.Network" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Linux">
@@ -28,6 +30,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="Lidgren.Network" />
     <Reference Include="OpenTK" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Android">
@@ -37,6 +40,7 @@
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="Lidgren.Network" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Ouya">
@@ -49,6 +53,7 @@
     <Binary
       Name="Ouya.Console.Api"
       Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Windows">
@@ -56,11 +61,13 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="Lidgren.Network" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Windows8">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -68,6 +75,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="Lidgren.Network" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="WindowsPhone">
@@ -79,14 +87,17 @@
     <Reference Include="Microsoft.Xna.Framework">
       <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
     </Reference>
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
   
   <Platform Type="WindowsPhone81">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
   
   <Platform Type="WindowsUniversal">
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
    
   <Platform Type="Web">

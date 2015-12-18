@@ -45,12 +45,14 @@
     <Reference Include="gtk-sharp"/>
     <Reference Include="pango-sharp"/>
     <Reference Include="Mono.Posix"/>
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Windows">
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 	
 </ExternalProject>

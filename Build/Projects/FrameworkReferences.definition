@@ -7,12 +7,16 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
+
   <Platform Type="tvOS">
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.TVOS" />
     <Reference Include="OpenTK-1.0" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
+
   <Platform Type="Linux">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
@@ -40,6 +44,7 @@
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Android">
@@ -49,6 +54,7 @@
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="Ouya">
@@ -58,6 +64,7 @@
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
+    <Reference Include="MonoGame.Framework.Core" />
     <Binary
       Name="Ouya.Console.Api"
       Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
@@ -74,6 +81,7 @@
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
+    <Reference Include="MonoGame.Framework.Core" />
       <Binary
         Name="SharpDX"
         Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
@@ -107,6 +115,7 @@
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
+    <Reference Include="MonoGame.Framework.Core" />
       <Binary
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />
@@ -138,6 +147,7 @@
     <Binary
       Name="SharpDX.XInput"
       Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -158,6 +168,7 @@
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 
   <Platform Type="WindowsPhone">
@@ -185,6 +196,7 @@
     <Reference Include="Microsoft.Xna.Framework.GamerServices">
       <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
     </Reference>
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
   
   <Platform Type="WindowsPhone81">
@@ -212,6 +224,7 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 	
   <Platform Type="WindowsUniversal">
@@ -233,6 +246,7 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.XAudio2.dll" />
+    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
 	
   <Platform Type="Web">
