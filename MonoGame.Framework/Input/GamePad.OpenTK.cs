@@ -4,6 +4,8 @@
 
 using System;
 
+#if !(MONOMAC && !PLATFORM_MACOS_LEGACY)
+
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
@@ -140,3 +142,5 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
+
+#endif

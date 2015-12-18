@@ -4,8 +4,13 @@ using System;
 using System.Collections.Generic;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
+#else
+using OpenTK.Graphics.OpenGL;
+using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
+#endif
 #elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif WINRT

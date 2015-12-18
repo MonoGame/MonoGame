@@ -9,7 +9,11 @@ using Windows.UI.Xaml.Controls;
 #endif
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
+#else
+using AppKit;
+#endif
 #elif IOS
 using UIKit;
 using Microsoft.Xna.Framework.Input.Touch;

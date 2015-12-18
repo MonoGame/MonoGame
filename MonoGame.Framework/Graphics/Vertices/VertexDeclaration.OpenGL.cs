@@ -5,9 +5,9 @@
 using System;
 using System.Collections.Generic;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif DESKTOPGL
+#elif DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
