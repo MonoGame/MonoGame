@@ -7,7 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+#else
+using OpenGL;
+#endif
 #elif GLES
 using OpenTK.Graphics.ES20;
 #elif OPENGL

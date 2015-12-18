@@ -4,7 +4,7 @@
 
 using System;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;

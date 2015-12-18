@@ -40,6 +40,8 @@
 !define INSTALLERVERSION "${buildNumber}"
         </echo>
         <call target="download"/>
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C rmdir /S /Q WindowsUniversal' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" failonerror='false' />
+		<exec program="C:\Windows\system32\cmd.exe" commandline='/C rename WindowsUAP WindowsUniversal' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" />
         <exec program="makensis" workingdir="Windows" basedir="C:\Program Files (x86)\NSIS">
 		      <arg value="MonoGame.nsi"/>
 		    </exec>

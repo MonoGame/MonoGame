@@ -43,6 +43,7 @@
 
   <Platform Type="MacOS">
     <Reference Include="System.Drawing" />
+    <Reference Include="OpenTK" />
 
     <Binary
       Name="NDesk.Options"

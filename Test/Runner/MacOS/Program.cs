@@ -68,8 +68,13 @@ non-infringement
 
 using System;
 
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+#else
+using Foundation;
+using AppKit;
+#endif
 
 namespace MonoGame.Tests {
 	static class Program {

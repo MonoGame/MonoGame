@@ -3,7 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 #elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
