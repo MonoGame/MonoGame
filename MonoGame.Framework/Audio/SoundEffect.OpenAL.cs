@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.AVFoundation;
@@ -13,7 +13,7 @@ using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
-#if IOS
+#if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
 using AVFoundation;

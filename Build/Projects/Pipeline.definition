@@ -16,6 +16,7 @@
   </References>
 
   <Properties>
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
@@ -224,6 +225,12 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Stetic.cs">

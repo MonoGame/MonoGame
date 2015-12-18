@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
 #else
 using OpenTK.Audio.OpenAL;
@@ -536,7 +536,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 #endif
 
-#if MONOMAC || IOS
+#if MONOMAC
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 
 		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]

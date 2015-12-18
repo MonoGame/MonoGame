@@ -426,31 +426,11 @@ namespace MonoGame.Tools.Pipeline
             if (node == null)
                 return;
 
-            var parent = node.Parent;
             node.Remove();
 
-            {
-                var obj = _propertyGrid.SelectedObject as ContentItem;
-                if (obj != null && obj.OriginalPath == item.OriginalPath)
-                    _propertyGrid.SelectedObject = null;
-            }
-
-            // Clean up the parent nodes without children
-            // and be sure not to delete the root node.
-            while (parent != null && parent.Parent != null && parent.Nodes.Count == 0)
-            {
-                var parentParent = parent.Parent;
-
-                parent.Remove();
-
-                {
-                    var obj = _propertyGrid.SelectedObject as ContentItem;
-                    if (obj != null && obj.OriginalPath == item.OriginalPath)
-                        _propertyGrid.SelectedObject = null;
-                }
-
-                parent = parentParent;
-            }            
+            var obj = _propertyGrid.SelectedObject as ContentItem;
+            if (obj != null && obj.OriginalPath == item.OriginalPath)
+                _propertyGrid.SelectedObject = null;
         }
 
         public void SelectTreeItem(IProjectItem item)

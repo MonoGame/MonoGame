@@ -319,43 +319,26 @@ namespace MonoGame.Tools.Pipeline
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new FileChooserDialog("Add Content Folder",
-                        window,
-                        FileChooserAction.SelectFolder,
-                        "Cancel", ResponseType.Cancel,
-                        "Open", ResponseType.Accept);
-                    dialog.SetCurrentFolder (window._controller.GetFullPath(model.GetValue(iter, 17).ToString()));
-
-                    int responseid = dialog.Run();
-                    string fileName = dialog.Filename;
+                    var dialog = new CustomFolderDialog(window, model.GetValue(iter, 17).ToString());
+                    var responseid = dialog.Run();
+                    var fileName = dialog.FileName;
                     dialog.Destroy();
 
-                    if(responseid == (int)ResponseType.Accept)
+                    if(responseid != (int)ResponseType.Ok)
+                        return;
+
+                    int id = Convert.ToInt32(model.GetValue(iter, 11));
+
+                    for(int i = 0;i < eitems.Count;i++)
                     {
-                        int id = Convert.ToInt32(model.GetValue(iter, 11));
+                        if(eitems[i].id != id || eitems[i].eventHandler == null)
+                            continue;
 
-                        for(int i = 0;i < eitems.Count;i++)
-                        {
-                            if(eitems[i].id == id)
-                            {
-                                if(eitems[i].eventHandler != null)
-                                {
-                                    string pl = ((PipelineController)window._controller).ProjectLocation;
-                                    if (!pl.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-                                        pl += System.IO.Path.DirectorySeparatorChar;
+                        var fwidget = new FalseWidget(fileName);
+                        eitems[i].eventHandler(fwidget, EventArgs.Empty);
+                        model.SetValue(iter, 17, fileName);
 
-                                    Uri folderUri = new Uri(pl);
-                                    Uri pathUri = new Uri(fileName);
-
-                                    string newpath = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
-
-                                    var fwidget = new FalseWidget(newpath);
-                                    eitems[i].eventHandler(fwidget, EventArgs.Empty);
-                                    model.SetValue(iter, 17, newpath);
-                                    break;
-                                }
-                            }
-                        }
+                        break;
                     }
                 }
             };

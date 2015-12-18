@@ -155,7 +155,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
 				try
                 {
-					GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, PremultiplyAlpha, true);
+					GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, true);
 				}
 				catch(Exception ex)
                 {

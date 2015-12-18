@@ -162,10 +162,10 @@ namespace Microsoft.Xna.Framework
         /// <param name="value2">Destination value.</param>
         /// <param name="amount">Value between 0 and 1 indicating the weight of value2.</param>
         /// <returns>Interpolated value.</returns> 
-        /// <remarks>This method performs the linear interpolation based on the following formula.
-        /// <c>value1 + (value2 - value1) * amount</c>
+        /// <remarks>This method performs the linear interpolation based on the following formula:
+        /// <code>value1 + (value2 - value1) * amount</code>.
         /// Passing amount a value of 0 will cause value1 to be returned, a value of 1 will cause value2 to be returned.
-        /// <seealso cref="MathHelper.LerpPrecise"/> For a less efficient version with more precision around edge cases.
+        /// See <see cref="MathHelper.LerpPrecise"/> for a less efficient version with more precision around edge cases.
         /// </remarks>
         public static float Lerp(float value1, float value2, float amount)
         {
@@ -182,8 +182,8 @@ namespace Microsoft.Xna.Framework
         /// <param name="value2">Destination value.</param>
         /// <param name="amount">Value between 0 and 1 indicating the weight of value2.</param>
         /// <returns>Interpolated value.</returns>
-        /// <remarks>This method performs the linear interpolation based on the following formula.
-        /// <c> ((1 - amount) * value1) + (value2 * amount) </c>
+        /// <remarks>This method performs the linear interpolation based on the following formula:
+        /// <code>((1 - amount) * value1) + (value2 * amount)</code>.
         /// Passing amount a value of 0 will cause value1 to be returned, a value of 1 will cause value2 to be returned.
         /// This method does not have the floating point precision issue that <see cref="MathHelper.Lerp"/> has.
         /// i.e. If there is a big gap between value1 and value2 in magnitude (e.g. value1=10000000000000000, value2=1),
@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework
         /// Relevant Wikipedia Article: https://en.wikipedia.org/wiki/Linear_interpolation#Programming_language_support
         /// Relevant StackOverflow Answer: http://stackoverflow.com/questions/4353525/floating-point-linear-interpolation#answer-23716956
         /// </remarks>
-        public static object LerpPrecise(float value1, float value2, float amount)
+        public static float LerpPrecise(float value1, float value2, float amount)
         {
             return ((1 - amount) * value1) + (value2 * amount);
         }

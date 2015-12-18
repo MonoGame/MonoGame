@@ -22,6 +22,15 @@ namespace MonoGame.Tools.Pipeline
             textBox1.Text = text;
         }
 
+        private void TextBox1_KeyUp (object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && button2.Enabled)
+            {
+                this.DialogResult = button2.DialogResult;
+                button2_Click(sender, e);
+            }
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             text = textBox1.Text;
