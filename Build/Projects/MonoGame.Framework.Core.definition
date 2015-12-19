@@ -4,6 +4,13 @@
   <Properties>
     <Property Name="ForcePCL" Value="True" />
     <LangVersion>Default</LangVersion>
+    <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
+
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <RemoveXnaAssembliesOnWP8>false</RemoveXnaAssembliesOnWP8>
+    <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+
     <CustomDefinitions>
         <Platform Name="Android">PORTABLE</Platform>
         <Platform Name="iOS">PORTABLE</Platform>
@@ -15,8 +22,9 @@
         <Platform Name="WindowsGL">PORTABLE</Platform>
         <Platform Name="WindowsPhone">PORTABLE</Platform>
         <Platform Name="WindowsPhone81">PORTABLE</Platform>
-    </CustomDefinitions>	
+    </CustomDefinitions>
   </Properties>
+  
   <References>
     <Reference Include="System" />
     <Reference Include="MonoGame.Framework.Core.Include" />

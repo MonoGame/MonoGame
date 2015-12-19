@@ -87,7 +87,6 @@
     <Reference Include="Microsoft.Xna.Framework">
       <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
     </Reference>
-    <Reference Include="MonoGame.Framework.Core" />
   </Platform>
   
   <Platform Type="WindowsPhone81">
