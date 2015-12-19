@@ -29,6 +29,7 @@
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
+    <Reference Include="MonoGame.Framework.Core.Include" />
   </Platform>
 
   <Platform Type="MacOS">
@@ -253,6 +254,7 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MonoGame.Framework.Core.Include" />
   </Platform>
 
   <Service Name="MonoGame.Framework/ANGLEGraphics">
@@ -265,6 +267,7 @@
     <Binary
       Name="OpenTK"
       Path="ThirdParty/Dependencies/OpenTK.dll" />
+    <Reference Include="MonoGame.Framework.Core.Include" />
   </Service>
 
 </ExternalProject>
