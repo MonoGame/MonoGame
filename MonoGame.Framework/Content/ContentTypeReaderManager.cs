@@ -161,6 +161,14 @@ namespace Microsoft.Xna.Framework.Content
                         readerTypeString = PrepareType(readerTypeString);
 
                         var l_readerType = Type.GetType(readerTypeString);
+
+                        if (l_readerType == null)
+                        {
+                            readerTypeString = PrepareTypeCore(readerTypeString);
+
+                            l_readerType = Type.GetType(readerTypeString);
+                        }
+
                         if (l_readerType != null)
                         {
                             ContentTypeReader typeReader;
@@ -248,6 +256,13 @@ namespace Microsoft.Xna.Framework.Content
 			
 			return preparedType;
 		}
+
+        public static string PrepareTypeCore(string type)
+        {
+            string preparedType = type;
+
+            return preparedType.Replace(", MonoGame.Framework,",", MonoGame.Framework.Core,");
+        }
 
         // Static map of type names to creation functions. Required as iOS requires all types at compile time
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
