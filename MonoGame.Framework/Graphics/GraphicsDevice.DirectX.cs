@@ -717,7 +717,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Entering fullscreen mode may raise a SharpDXException with HRESULT 0x887A0022 [DXGI_ERROR_NOT_CURRENTLY_AVAILABLE/NotCurrentlyAvailable] if the device is not yet ready to do so.
                     // The DXGI documention states that "when this error is returned, an application can continue to run in windowed mode and try to switch to full-screen mode later"
                     // See https://msdn.microsoft.com/en-us/library/windows/desktop/bb174579(v=vs.85).aspx
-                    // Another error may be raised here, 0x887A0004 [DXGI_ERROR_UNSUPPORTED/Unsupported], upon which we disable fullscreen state
+                    // Another error may be raised here, 0x887A0004 [DXGI_ERROR_UNSUPPORTED/Unsupported], upon which we fall back to borberless in EnterFullScreen()
                     try
                     {
                         _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
@@ -726,13 +726,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     catch (SharpDXException ex)
                     {
                         if (ex.ResultCode.Code == unchecked((int)0x887A0022)) // [DXGI_ERROR_NOT_CURRENTLY_AVAILABLE/NotCurrentlyAvailable]
-                            _shouldRetrySettingFullscreen = true;
-                        else if (ex.ResultCode.Code == unchecked((int)0x887A0004)) // [DXGI_ERROR_UNSUPPORTED/Unsupported]
-                        {
-                            PresentationParameters.IsFullScreen = false;
-                        }
+                            _shouldRetrySettingFullscreen = true;   
                         else
-                            throw ex;
+                            throw;
                     }
                 }
 
@@ -986,7 +982,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Exception related to the device not being ready shall be silent because it can safely retry to set the fullscreen mode later
                 if (!_shouldRetrySettingFullscreen || ex.ResultCode.Code != unchecked((int)0x887A0022))
-                    throw ex;
+                    throw;
 
                 // TODO: How should we deal with a device lost case here?
             }
