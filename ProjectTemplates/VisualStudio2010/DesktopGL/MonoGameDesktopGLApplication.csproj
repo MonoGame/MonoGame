@@ -57,8 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
-    <Content Include="$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\DesktopGL\OpenTK.dll.config">
-      <Link>OpenTK.dll.config</Link>
+    <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
