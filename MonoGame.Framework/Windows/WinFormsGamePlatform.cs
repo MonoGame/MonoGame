@@ -175,6 +175,13 @@ namespace MonoGame.Framework
                  Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
                  Game.GraphicsDevice.CreateSizeDependentResources(true);
                  Game.GraphicsDevice.ApplyRenderTargets(null);
+                 // if IsFullScreen is false after CreateSizeDependentResources, it means that it encountered a [DXGI_ERROR_UNSUPPORTED/Unsupported]
+                 if (Game.GraphicsDevice.PresentationParameters.IsFullScreen == false)
+                 {
+                     // falling back to borderless mode
+                     Game.graphicsDeviceManager.HardwareModeSwitch = false;
+                     _window.IsBorderless = true;
+                 }
                 _window._form.WindowState = FormWindowState.Maximized;
             }
             else
