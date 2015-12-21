@@ -724,7 +724,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     catch (SharpDXException ex)
                     {
-                        if (unchecked((uint)ex.ResultCode.Code) == 0x887A0022)
+                        if (ex.ResultCode.Code == unchecked((int)0x887A0022))
                             _shouldRetrySettingFullscreen = true;
                         else
                             throw ex;
@@ -980,7 +980,7 @@ namespace Microsoft.Xna.Framework.Graphics
             catch (SharpDX.SharpDXException ex)
             {
                 // Exception related to the device not being ready shall be silent because it can safely retry to set the fullscreen mode later
-                if (_shouldRetrySettingFullscreen && unchecked((uint)ex.ResultCode.Code) != 0x887A0022)
+                if (!_shouldRetrySettingFullscreen || ex.ResultCode.Code != unchecked((int)0x887A0022))
                     throw ex;
 
                 // TODO: How should we deal with a device lost case here?
