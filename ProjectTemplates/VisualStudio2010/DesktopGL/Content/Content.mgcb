@@ -1,8 +1,8 @@
 
 #----------------------------- Global Properties ----------------------------#
 
-/outputDir:bin/Linux
-/intermediateDir:obj/Linux
+/outputDir:bin/$(Platform)
+/intermediateDir:obj/$(Platform)
 /platform:DesktopGL
 /config:
 /profile:Reach
