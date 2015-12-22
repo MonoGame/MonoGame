@@ -562,59 +562,67 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
             TrackPipelineBuildEvent(pipelineEvent);
 
-            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
-            if (!rebuild)
-            {
+            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);            
+            if (rebuild)
+                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
+            else
                 Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
-
-                // While this asset doesn't need to be rebuilt the dependent assets might.
-                foreach (var asset in cachedEvent.BuildAsset)
+            
+            Logger.Indent();
+            try
+            {
+                if (!rebuild)
                 {
-                    string assetEventFilepath;
-                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
-
-                    // If we cannot find the cached event for the dependancy
-                    // then we have to trigger a rebuild of the parent content.
-                    if (assetCachedEvent == null)
+                    // While this asset doesn't need to be rebuilt the dependent assets might.
+                    foreach (var asset in cachedEvent.BuildAsset)
                     {
-                        rebuild = true;
-                        break;
+                        string assetEventFilepath;
+                        var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
+
+                        // If we cannot find the cached event for the dependancy
+                        // then we have to trigger a rebuild of the parent content.
+                        if (assetCachedEvent == null)
+                        {
+                            rebuild = true;
+                            break;
+                        }
+
+                        var depEvent = new PipelineBuildEvent
+                        {
+                            SourceFile = assetCachedEvent.SourceFile,
+                            DestFile = assetCachedEvent.DestFile,
+                            Importer = assetCachedEvent.Importer,
+                            Processor = assetCachedEvent.Processor,
+                            Parameters = assetCachedEvent.Parameters,
+                        };
+
+                        // Give the asset a chance to rebuild.                    
+                        BuildContent(depEvent, assetCachedEvent, assetEventFilepath);
                     }
+                }
 
-                    var depEvent = new PipelineBuildEvent
-                    {
-                        SourceFile = assetCachedEvent.SourceFile,
-                        DestFile = assetCachedEvent.DestFile,
-                        Importer = assetCachedEvent.Importer,
-                        Processor = assetCachedEvent.Processor,
-                        Parameters = assetCachedEvent.Parameters,
-                    };
+                // Do we need to rebuild?
+                if (rebuild)
+                {
+                    // Import and process the content.
+                    var processedObject = ProcessContent(pipelineEvent);
 
-                    // Give the asset a chance to rebuild.                    
-                    BuildContent(depEvent, assetCachedEvent, assetEventFilepath);
+                    // Write the content to disk.
+                    WriteXnb(processedObject, pipelineEvent);
+
+                    // Store the timestamp of the DLLs containing the importer and processor.
+                    pipelineEvent.ImporterTime = GetImporterAssemblyTimestamp(pipelineEvent.Importer);
+                    pipelineEvent.ProcessorTime = GetProcessorAssemblyTimestamp(pipelineEvent.Processor);
+
+                    // Store the new event into the intermediate folder.
+                    pipelineEvent.Save(eventFilepath);
                 }
             }
-
-            // Do we need to rebuild?
-            if (rebuild)
+            finally
             {
-                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
-
-                // Import and process the content.
-                var processedObject = ProcessContent(pipelineEvent);
-
-                // Write the content to disk.
-                WriteXnb(processedObject, pipelineEvent);
-
-                // Store the timestamp of the DLLs containing the importer and processor.
-                pipelineEvent.ImporterTime = GetImporterAssemblyTimestamp(pipelineEvent.Importer);
-                pipelineEvent.ProcessorTime = GetProcessorAssemblyTimestamp(pipelineEvent.Processor);
-
-                // Store the new event into the intermediate folder.
-                pipelineEvent.Save(eventFilepath);
-            }           
-
-            Logger.PopFile();
+                Logger.Unindent();
+                Logger.PopFile();
+            }
         }
 
         public object ProcessContent(PipelineBuildEvent pipelineEvent)
