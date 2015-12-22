@@ -1,7 +1,9 @@
 ﻿// MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
 using System;
+using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -68,6 +70,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// (MonoGame)
         /// </summary>
         [Obsolete("PlayStation Mobile is no longer supported")]
+        [Browsable(false)]
         PlayStationMobile,
 
         /// <summary>
@@ -92,6 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// (MonoGame)
         /// </summary>
         [Obsolete("This platform is obsolete, use DesktopGL instead")]
+        [Browsable(false)]
         WindowsGL = DesktopGL,
 
         /// <summary>
@@ -99,6 +103,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// (MonoGame)
         /// </summary>
         [Obsolete("This platform is obsolete, use DesktopGL instead")]
+        [Browsable(false)]
         Linux = DesktopGL
     }
 }

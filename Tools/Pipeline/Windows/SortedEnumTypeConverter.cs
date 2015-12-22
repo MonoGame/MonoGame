@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -6,14 +7,9 @@ namespace MonoGame.Tools.Pipeline
 {
     class SortedEnumTypeConverter : EnumConverter
     {
-        private readonly StandardValuesCollection _values;
-
         public SortedEnumTypeConverter(Type type) : 
             base(type)
         {
-            var values = Enum.GetNames(EnumType);
-            Array.Sort(values);
-            _values = new StandardValuesCollection(values);
         }
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
@@ -28,7 +24,9 @@ namespace MonoGame.Tools.Pipeline
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            return _values;
+            var values = new ArrayList(base.GetStandardValues(context));
+            values.Sort();
+            return new StandardValuesCollection(values);
         }
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
