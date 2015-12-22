@@ -162,6 +162,7 @@ namespace Microsoft.Xna.Framework.Content
 
                         var l_readerType = Type.GetType(readerTypeString);
 
+                        //If the content type was not found in the base MG framework, check the .Core base classes (vector2/rectangle/etc)
                         if (l_readerType == null)
                         {
                             readerTypeString = PrepareTypeCore(readerTypeString);
