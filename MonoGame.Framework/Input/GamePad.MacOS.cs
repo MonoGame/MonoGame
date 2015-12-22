@@ -13,24 +13,24 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public static partial class GamePad
     {
-        private static int PlatformGetMaxIndex()
+        private static int PlatformGetMaxNumberOfGamePads()
         {
             return 0;
         }
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            throw new NotSupportedException("We don't support game pads under the new Xamarin.Mac API yet");
+            return new GamePadCapabilities { IsConnected = false };
         }
-
+               
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            throw new NotSupportedException("We don't support game pads under the new Xamarin.Mac API yet");
+            return new GamePadState() { IsConnected = false };
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-            throw new NotSupportedException("We don't support game pads under the new Xamarin.Mac API yet");
+            return false;
         }
     }
 }
