@@ -102,7 +102,14 @@ namespace Microsoft.Xna.Framework
 
         public override string ScreenDeviceName { get { return window.Title; } }
 
-        public override Rectangle ClientBounds { get { return clientBounds; } }
+        public override Rectangle ClientBounds 
+        { 
+            get 
+            {
+                var pos = window.PointToScreen(new System.Drawing.Point(0));
+                return new Rectangle(pos.X, pos.Y, clientBounds.Width, clientBounds.Height);
+            }
+        }
 
         // TODO: this is buggy on linux - report to opentk team
         public override bool AllowUserResizing
