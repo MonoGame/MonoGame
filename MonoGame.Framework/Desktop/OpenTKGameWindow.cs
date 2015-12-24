@@ -292,6 +292,14 @@ namespace Microsoft.Xna.Framework
                     window.WindowBorder = WindowBorder.Resizable;
                 
                 updateClientBounds = false;
+
+                // when we resize, we also have to move the window to center of the screen here again
+                // to do this, we simply compare the old size to the target size
+                int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
+                int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
+                window.X += centerOffsetX;
+                window.Y += centerOffsetY;
+
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
                 
