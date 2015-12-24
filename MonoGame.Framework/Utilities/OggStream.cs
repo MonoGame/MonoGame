@@ -52,6 +52,8 @@ namespace MonoGame.Utilities
         public Action FinishedAction { get; private set; }
         public int BufferCount { get; private set; }
 
+        private bool _isDisposed = false;
+
         public OggStream(string filename, Action finishedAction = null, int bufferCount = DefaultBufferCount) : this(File.OpenRead(filename), finishedAction, bufferCount) { }
         public OggStream(Stream stream, Action finishedAction = null, int bufferCount = DefaultBufferCount)
         {
@@ -158,6 +160,9 @@ namespace MonoGame.Utilities
 
         public void Stop()
         {
+            if (_isDisposed)
+                return;
+
             var state = AL.GetSourceState(alSourceId);
             if (state == ALSourceState.Playing || state == ALSourceState.Paused)
                 StopPlayback();
@@ -243,8 +248,10 @@ namespace MonoGame.Utilities
 
             if (ALHelper.Efx.IsInitialized)
                 ALHelper.Efx.DeleteFilter(alFilterId);
-
+            
             ALHelper.Check();
+
+            _isDisposed = true;
         }
 
         void StopPlayback()
