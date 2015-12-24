@@ -297,8 +297,8 @@ namespace Microsoft.Xna.Framework
                 // to do this, we simply compare the old size to the target size
                 int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
                 int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
-                window.X += centerOffsetX;
-                window.Y += centerOffsetY;
+                window.X = Math.Max(0, centerOffsetX + window.X);
+                window.Y = Math.Max(0, centerOffsetY + window.Y);
 
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
