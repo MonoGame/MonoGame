@@ -272,7 +272,15 @@ namespace MGCB
                 var cleanOldContent = !inContent && !Incremental;
                 var cleanRebuiltContent = inContent && (Rebuild || Clean);
                 if (cleanRebuiltContent || cleanOldContent || targetChanged)
-                    _manager.CleanContent(sourceFile);                
+                {
+                    // Make sure we specify location of output path in case it doesn't coincide with source path
+                    // PipelineManager will handle searching for output with correct file extension, 
+                    // so don't worry about it here
+                    var fileName = Path.GetFileName(sourceFile);
+                    var outputFilePath = Path.Combine(outputPath, fileName);
+
+                    _manager.CleanContent(sourceFile, outputFilePath);
+                }
             }
 
             var newContent = new SourceFileCollection
