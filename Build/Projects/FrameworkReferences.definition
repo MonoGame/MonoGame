@@ -2,6 +2,8 @@
 <ExternalProject Name="FrameworkReferences">
 
   <Platform Type="iOS">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
@@ -12,6 +14,8 @@
     <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="Linux">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Drawing" />
       <Binary
@@ -24,6 +28,8 @@
   </Platform>
 
   <Platform Type="MacOS">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
@@ -37,6 +43,8 @@
   </Platform>
 
   <Platform Type="Android">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
@@ -44,6 +52,8 @@
   </Platform>
 
   <Platform Type="Ouya">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
@@ -54,6 +64,9 @@
   </Platform>
 
   <Platform Type="Windows">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Service Name="MonoGame.Framework/DirectXGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
@@ -101,6 +114,9 @@
   </Platform>
 
   <Platform Type="Windows8">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.dll" />
@@ -125,6 +141,9 @@
   </Platform>
 
   <Platform Type="WindowsGL">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
@@ -142,6 +161,9 @@
   </Platform>
 
   <Platform Type="WindowsPhone">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.dll" />
@@ -166,6 +188,9 @@
   </Platform>
   
   <Platform Type="WindowsPhone81">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />
@@ -189,7 +214,7 @@
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
   </Platform>
 	
-  <Platform Type="WindowsUAP">
+  <Platform Type="WindowsUniversal">
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.dll" />
@@ -211,6 +236,8 @@
   </Platform>
 	
   <Platform Type="Web">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Microsoft.CSharp" />
   </Platform>
 

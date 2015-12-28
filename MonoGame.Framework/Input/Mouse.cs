@@ -49,8 +49,14 @@ using System.Drawing;
 #if DESKTOPGL
 using MouseInfo = OpenTK.Input.Mouse;
 #elif MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+#else
+using Foundation;
+using AppKit;
+using PointF = CoreGraphics.CGPoint;
+#endif
 #endif
 #endif
 
@@ -209,7 +215,7 @@ namespace Microsoft.Xna.Framework.Input
                     break;
                 }
             }
-            
+
             var point = new PointF(x, Window.ClientBounds.Height-y);
             var windowPt = Window.ConvertPointToView(point, null);
             var screenPt = Window.Window.ConvertBaseToScreen(windowPt);
@@ -258,11 +264,19 @@ namespace Microsoft.Xna.Framework.Input
         }
 
 #elif MONOMAC
+#if PLATFORM_MACOS_LEGACY
         [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
         extern static void CGWarpMouseCursorPosition(PointF newCursorPosition);
         
         [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
         extern static void CGSetLocalEventsSuppressionInterval(double seconds);
+#else
+        [DllImport (ObjCRuntime.Constants.CoreGraphicsLibrary)]
+        extern static void CGWarpMouseCursorPosition(CoreGraphics.CGPoint newCursorPosition);
+
+        [DllImport (ObjCRuntime.Constants.CoreGraphicsLibrary)]
+        extern static void CGSetLocalEventsSuppressionInterval(double seconds);
+#endif
 #endif
 
     }
