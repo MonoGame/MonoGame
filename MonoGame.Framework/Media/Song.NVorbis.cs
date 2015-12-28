@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Media
             set
             {
                 _volume = value;
-                if (stream == null)
+                if (stream != null)
                     stream.Volume = _volume;
             }
         }
