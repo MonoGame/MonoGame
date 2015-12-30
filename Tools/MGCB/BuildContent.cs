@@ -330,14 +330,14 @@ namespace MGCB
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
                 }
             }
@@ -399,7 +399,7 @@ namespace MGCB
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
 
                     ++errorCount;
                 }
