@@ -35,6 +35,9 @@
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Framework.Core">
+      <HintPath>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MonoGame.Framework.Core.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework.Content.Pipeline">
       <HintPath>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MonoGame.Framework.Content.Pipeline.dll</HintPath>
     </Reference>
