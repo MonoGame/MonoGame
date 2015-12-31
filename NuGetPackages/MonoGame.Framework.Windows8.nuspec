@@ -23,6 +23,7 @@
     <files>
         <file src="Windows8\AnyCPU\Release\Themes\Generic.xaml" target="lib\netcore\MonoGame.Framework\Themes\Generic.xaml" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
+        <file src="Windows8\AnyCPU\Release\MonoGame.Framework.Core.dll" target="lib\netcore\MonoGame.Framework.Core.dll" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore\MonoGame.Framework.xml" />
         <file src="Windows8\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
         <file src="Windows8\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\netcore\SharpDX.Direct2D1.dll" />

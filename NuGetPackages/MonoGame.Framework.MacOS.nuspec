@@ -20,18 +20,22 @@
     </metadata>
     <files>
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="MacOS\AnyCPU\Release\MonoGame.Framework.Core.dll" target="lib\net40\MonoGame.Framework.Core.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
         <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\net40\Tao.Sdl.dll" />
         <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net45\MonoGame.Framework.dll" />
+        <file src="MacOS\AnyCPU\Release\MonoGame.Framework.Core.dll" target="lib\net45\MonoGame.Framework.Core.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net45\MonoGame.Framework.xml" />
         <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\net45\Tao.Sdl.dll" />
         <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\net45\OpenTK.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\MonoMac\MonoGame.Framework.dll" />
+        <file src="MacOS\AnyCPU\Release\MonoGame.Framework.Core.dll" target="lib\MonoMac\MonoGame.Framework.Core.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\MonoMac\MonoGame.Framework.xml" />
         <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\MonoMac\Tao.Sdl.dll" />
         <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\MonoMac\OpenTK.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.dll" target="lib\XamarinMac\MonoGame.Framework.dll" />
+        <file src="MacOS\AnyCPU\Release\MonoGame.Framework.Core.dll" target="lib\XamarinMac\MonoGame.Framework.Core.dll" />
         <file src="MacOS\AnyCPU\Release\MonoGame.Framework.xml" target="lib\XamarinMac\MonoGame.Framework.xml" />
         <file src="MacOS\AnyCPU\Release\Tao.Sdl.dll" target="lib\XamarinMac\Tao.Sdl.dll" />
         <file src="MacOS\AnyCPU\Release\OpenTK.dll" target="lib\XamarinMac\OpenTK.dll" />

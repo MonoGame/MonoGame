@@ -18,11 +18,13 @@
         <language>en-US</language>
         <references>
             <reference file="MonoGame.Framework.dll" />
+            <reference file="MonoGame.Framework.Core.dll" />
         </references>
 	</metadata>
     <files>
         <file src="WindowsUniversal\AnyCPU\Release\Themes\generic.xbf" target="lib\netcore\MonoGame.Framework\Themes\generic.xbf" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
+        <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.Core.dll" target="lib\netcore\MonoGame.Framework.Core.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore\MonoGame.Framework.xml" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
         <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\netcore\MonoGame.Framework\MonoGame.Framework.xr.xml" />
