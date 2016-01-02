@@ -252,6 +252,12 @@ namespace Microsoft.Xna.Framework
                 PresentationParameters parms = device.PresentationParameters;
                 parms.BackBufferHeight = (int)bounds.Height;
                 parms.BackBufferWidth = (int)bounds.Width;
+
+                var viewport = new Viewport(0, 0,
+                            parms.BackBufferWidth,
+                            parms.BackBufferHeight);
+
+                device.Viewport = viewport;
             }
 
             if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
