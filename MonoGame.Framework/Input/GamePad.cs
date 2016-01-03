@@ -107,5 +107,15 @@ namespace Microsoft.Xna.Framework.Input
             
             return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f));
         }
+
+        /// <summary>
+        /// The maximum number of game pads supported on this system.  Attempting to
+        /// access a gamepad index higher than this number will result in an <see cref="InvalidOperationException"/>
+        /// being thrown by the API.
+        /// </summary>
+        public static int MaximumGamePadCount
+        {
+            get { return PlatformGetMaxNumberOfGamePads(); }
+        }
     }
 }
