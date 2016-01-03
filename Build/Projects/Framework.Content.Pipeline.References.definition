@@ -24,7 +24,6 @@
 
 
   <Platform Type="MacOS">
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />

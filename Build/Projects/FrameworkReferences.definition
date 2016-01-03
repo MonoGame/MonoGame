@@ -5,12 +5,10 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="tvOS">
     <Reference Include="System.Core" />
-    <Reference Include="Xamarin.TVOS" />
     <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="Linux">
@@ -45,7 +43,6 @@
   <Platform Type="Android">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
@@ -54,7 +51,6 @@
   <Platform Type="Ouya">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />

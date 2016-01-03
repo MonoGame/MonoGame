@@ -83,8 +83,6 @@
   </Platform>
 
   <Platform Type="iOS">
-    <Reference Include="monotouch" />
-    
     <Binary
       Name="NDesk.Options"
       Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />

@@ -5,13 +5,11 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="Xamarin.iOS" />
     <Reference Include="Lidgren.Network" />
   </Platform>
 
   <Platform Type="tvOS">
     <Reference Include="System.Core" />
-    <Reference Include="Xamarin.TVOS" />
     <Reference Include="Lidgren.Network" />
   </Platform>
 
@@ -34,7 +32,6 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="Lidgren.Network" />
   </Platform>
@@ -43,7 +40,6 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="Lidgren.Network" />
     <Binary
