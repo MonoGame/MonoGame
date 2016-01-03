@@ -111,6 +111,9 @@
     <Reference Include="MonoGame.Framework">
        <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Framework.Core">
+       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\MonoGame.Framework.Core.dll</HintPath>
+    </Reference>	
     <Reference Include="SharpDX">
        <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.dll</HintPath>
     </Reference>

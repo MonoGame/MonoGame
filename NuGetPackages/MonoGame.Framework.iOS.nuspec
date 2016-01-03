@@ -19,6 +19,7 @@
     </metadata>
     <files>
         <file src="iOS\iPhoneSimulator\Release\MonoGame.Framework.dll" target="lib\XamariniOS\MonoGame.Framework.dll" />
+        <file src="iOS\iPhoneSimulator\Release\MonoGame.Framework.Core.dll" target="lib\XamariniOS\MonoGame.Framework.Core.dll" />
         <file src="iOS\iPhoneSimulator\Release\MonoGame.Framework.xml" target="lib\XamariniOS\MonoGame.Framework.xml" />
         <!--
         <file src="tvOS\iPhoneSimulator\Release\MonoGame.Framework.dll" target="lib\Xamarin.TVOS10\MonoGame.Framework.dll" />

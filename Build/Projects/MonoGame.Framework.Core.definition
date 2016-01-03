@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="MonoGame.Framework.Core" Path="MonoGame.Framework" Type="Library">
+
+  <Properties>
+    <Property Name="ForcePCL" Value="True" />
+    <LangVersion>Default</LangVersion>
+    <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
+
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <RemoveXnaAssembliesOnWP8>false</RemoveXnaAssembliesOnWP8>
+    <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+
+    <CustomDefinitions>
+        <Platform Name="Android">PORTABLE</Platform>
+        <Platform Name="iOS">PORTABLE</Platform>
+        <Platform Name="MacOS">PORTABLE</Platform>
+        <Platform Name="Ouya">PORTABLE</Platform>
+        <Platform Name="PCL">PORTABLE</Platform>
+        <Platform Name="Windows">PORTABLE</Platform>
+        <Platform Name="Windows8">PORTABLE</Platform>
+        <Platform Name="WindowsGL">PORTABLE</Platform>
+        <Platform Name="WindowsPhone">PORTABLE</Platform>
+        <Platform Name="WindowsPhone81">PORTABLE</Platform>
+    </CustomDefinitions>
+  </Properties>
+  
+  <References>
+    <Reference Include="System" />
+    <Reference Include="MonoGame.Framework.Core.Include" />
+  </References>
+
+  <Files>
+
+    <Compile Include="Properties\AssemblyInfo.cs" />
+
+  </Files>
+</Project>

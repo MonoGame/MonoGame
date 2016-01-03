@@ -24,6 +24,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for iOS")]
 #elif WINDOWS_PHONE
 [assembly: AssemblyDescription("MonoGame for Windows Phone 8")]
+#elif PORTABLE
+[assembly: AssemblyDescription("MonoGame Core Framework Assembly")]
 #endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -41,8 +43,11 @@ using System.Resources;
 [assembly: InternalsVisibleTo("MonoGame.Framework.Net")]
 
 //Tests projects need access too
+[assembly: InternalsVisibleTo("MonoGame.Framework.Core")]
+[assembly: InternalsVisibleTo("MonoGame.Framework")]
 [assembly: InternalsVisibleTo("MonoGameTests")]
 
+#if !PORTABLE
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
@@ -50,6 +55,7 @@ using System.Resources;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("81119db2-82a6-45fb-a366-63a08437b485")]
+#endif
 
 // This was needed in WinRT releases to inform the system that we
 // don't need to load any language specific resources.

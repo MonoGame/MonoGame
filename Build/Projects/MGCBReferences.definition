@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="MGCBReferences">
+
+  <Platform Type="MacOS">
+	<Reference Include="MonoGame.Framework.Core" />
+  </Platform>
+
+  <Platform Type="Windows">
+	<Reference Include="MonoGame.Framework.Core" />
+  </Platform>
+	
+</ExternalProject>

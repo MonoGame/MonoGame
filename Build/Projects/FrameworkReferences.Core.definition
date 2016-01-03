@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="FrameworkReferences.Core">
+
+  <Platform Type="WindowsPhone">
+    <Reference Include="Microsoft.Xna.Framework">
+      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.GamerServices">
+      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
+    </Reference>
+  </Platform>
+
+</ExternalProject>
