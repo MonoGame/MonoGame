@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name>{PROJECT_XML_NAME}</Name>
+  <Packages>
+    <Package Uri="http://protobuild.org/MonoGame/MonoGame" Folder="MonoGame" GitRef="master" />
+  </Packages>
+</Module>

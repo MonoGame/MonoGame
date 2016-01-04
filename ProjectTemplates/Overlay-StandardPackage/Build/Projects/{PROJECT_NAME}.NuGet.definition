@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<IncludeProject Name="{PROJECT_XML_NAME}.NuGet" AppliesTo="{PROJECT_XML_NAME}">
+  <Files>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.iOS.config">
+      <Platforms>iOS</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.Windows.config">
+      <Platforms>Windows</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.MacOS.config">
+      <Platforms>MacOS</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.Linux.config">
+      <Platforms>Linux</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.Android.config">
+      <Platforms>Android</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.Windows8.config">
+      <Platforms>Windows8</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.WindowsPhone81.config">
+      <Platforms>WindowsPhone81</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.WindowsUniversal.config">
+      <Platforms>WindowsUniversal</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.Ouya.config">
+      <Platforms>Ouya</Platforms>
+      <Link />
+    </None>
+    <None Include="{PROJECT_XML_NAME}\packages.{PROJECT_XML_NAME}.DesktopGL.config">
+      <Platforms>DesktopGL</Platforms>
+      <Link />
+    </None>
+  </Files>
+</IncludeProject>

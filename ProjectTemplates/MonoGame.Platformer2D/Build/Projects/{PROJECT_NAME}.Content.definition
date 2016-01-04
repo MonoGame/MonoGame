@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentProject Name="{PROJECT_XML_NAME}.Content">
+  <Source Include="{PROJECT_XML_NAME}.Content/source" Match="*" Primary="true" />
+  <Source Include="{PROJECT_XML_NAME}.Content/compiled/$(Platform)" Match="*.xnb" />
+</ContentProject>

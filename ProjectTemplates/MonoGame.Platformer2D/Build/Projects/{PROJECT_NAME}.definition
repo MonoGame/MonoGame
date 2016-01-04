@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="{PROJECT_XML_NAME}" Path="{PROJECT_XML_NAME}" Type="App">
+  <Properties>
+    <CustomDefinitions>
+      <Platform Name="Android">TRACE;ANDROID</Platform>
+      <Platform Name="iOS">IPHONE</Platform>
+      <Platform Name="Linux">TRACE;LINUX</Platform>
+      <Platform Name="MacOS">MONOMAC</Platform>
+      <Platform Name="Ouya">TRACE;ANDROID;OUYA</Platform>
+      <Platform Name="PSMobile">PSM</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS</Platform>
+      <Platform Name="Windows8">TRACE;NETFX_CORE</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
+      <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE</Platform>
+    </CustomDefinitions>
+  </Properties>
+  <References>
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="{PROJECT_XML_NAME}.Content" />
+    <Reference Include="{PROJECT_XML_NAME}.ThirdParty" />
+  </References>
+  <Files>
+    <!-- Common files -->
+    <Compile Include="Game\Accelerometer.cs" />
+    <Compile Include="Game\Animation.cs" />
+    <Compile Include="Game\AnimationPlayer.cs" />
+    <Compile Include="Game\Circle.cs" />
+    <Compile Include="Game\Enemy.cs" />
+    <Compile Include="Game\Gem.cs" />
+    <Compile Include="Game\Level.cs" />
+    <Compile Include="Game\Player.cs" />
+    <Compile Include="Game\RectangleExtensions.cs" />
+    <Compile Include="Game\Tile.cs" />
+    <Compile Include="Game\TouchCollectionExtensions.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="Program.cs">
+      <Platforms>iOS,Linux,MacOS,PSMobile,Windows8,Windows</Platforms>
+    </Compile>
+
+    <!-- Android files -->
+    <Compile Include="Android\Activity1.cs">
+      <Platforms>Android</Platforms>
+      <Link>Activity1.cs</Link>
+    </Compile>
+    <Compile Include="Android\Resources\Resource.Designer.cs">
+      <Platforms>Android</Platforms>
+      <Link>Resources\Resource.Designer.cs</Link>
+    </Compile>
+    <Compile Include="Android\Properties\AssemblyInfo.cs">
+      <Platforms>Android</Platforms>
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <None Include="Android\Resources\AboutResources.txt">
+      <Platforms>Android</Platforms>
+      <Link>Resources\AboutResources.txt</Link>
+    </None>
+    <None Include="Android\Assets\AboutAssets.txt">
+      <Platforms>Android</Platforms>
+      <Link>Assets\AboutAssets.txt</Link>
+    </None>
+    <AndroidResource Include="Android\Resources\Values\Strings.xml">
+      <Platforms>Android</Platforms>
+      <Link>Resources\Values\Strings.xml</Link>
+    </AndroidResource>
+    <AndroidResource Include="Android\Resources\Drawable\Icon.png">
+      <Platforms>Android</Platforms>
+      <Link>Resources\Drawable\Icon.png</Link>
+    </AndroidResource>
+    <AndroidResource Include="Android\Resources\Drawable\Splash.png">
+      <Platforms>Android</Platforms>
+      <Link>Resources\Drawable\Splash.png</Link>
+    </AndroidResource>
+    <AndroidResource Include="Android\Resources\Values\Styles.xml">
+      <Platforms>Android</Platforms>
+      <Link>Resources\Values\Styles.xml</Link>
+    </AndroidResource>
+    <Content Include="Android\Properties\AndroidManifest.xml">
+      <Platforms>Android</Platforms>
+      <Link>Properties\AndroidManifest.xml</Link>
+    </Content>
+
+    <!-- iOS Files -->
+    <None Include="iOS\monogameicon.png">
+      <Platforms>iOS</Platforms>
+      <Link>monogameicon.png</Link>
+    </None>
+    <None Include="iOS\Info.plist">
+      <Platforms>iOS</Platforms>
+      <Link>Info.plist</Link>
+    </None>
+    <None Include="iOS\packages.config">
+      <Platforms>iOS</Platforms>
+      <Link>packages.config</Link>
+    </None>
+
+    <!-- Linux Files -->
+    <Compile Include="Linux\Properties\AssemblyInfo.cs">
+      <Platforms>Linux</Platforms>
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Content Include="Linux\Icon.ico">
+      <Platforms>Linux</Platforms>
+      <Link>Icon.ico</Link>
+    </Content>
+
+    <!-- Mac OS Files -->
+    <Compile Include="MacOS\Properties\AssemblyInfo.cs">
+      <Platforms>MacOS</Platforms>
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Content Include="MacOS\monogameicon.png">
+      <Platforms>MacOS</Platforms>
+      <Link>monogameicon.png</Link>
+    </Content>
+    <Content Include="MacOS\Default.png">
+      <Platforms>MacOS</Platforms>
+      <Link>Default.png</Link>
+    </Content>
+    <None Include="MacOS\Info.plist">
+      <Platforms>MacOS</Platforms>
+      <Link>Info.plist</Link>
+    </None>
+
+    <!-- Ouya files -->
+    <Compile Include="Ouya\Activity1.cs">
+      <Platforms>Ouya</Platforms>
+      <Link>Activity1.cs</Link>
+    </Compile>
+    <Compile Include="Ouya\Resources\Resource.Designer.cs">
+      <Platforms>Ouya</Platforms>
+      <Link>Resources\Resource.Designer.cs</Link>
+    </Compile>
+    <Compile Include="Ouya\Properties\AssemblyInfo.cs">
+      <Platforms>Ouya</Platforms>
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <None Include="Ouya\Resources\AboutResources.txt">
+      <Platforms>Ouya</Platforms>
+      <Link>Resources\AboutResources.txt</Link>
+    </None>
+    <None Include="Ouya\Assets\AboutAssets.txt">
+      <Platforms>Ouya</Platforms>
+      <Link>Assets\AboutAssets.txt</Link>
+    </None>
+    <AndroidResource Include="Ouya\Resources\Values\Strings.xml">
+      <Platforms>Ouya</Platforms>
+      <Link>Resources\Values\Strings.xml</Link>
+    </AndroidResource>
+    <AndroidResource Include="Ouya\Resources\Drawable\Icon.png">
+      <Platforms>Ouya</Platforms>
+      <Link>Resources\Drawable\Icon.png</Link>
+    </AndroidResource>
+    <AndroidResource Include="Ouya\Resources\Drawable\Splash.png">
+      <Platforms>Ouya</Platforms>
+      <Link>Resources\Drawable\Splash.png</Link>
+    </AndroidResource>
+    <AndroidResource Include="Ouya\Resources\Values\Styles.xml">
+      <Platforms>Ouya</Platforms>
+      <Link>Resources\Values\Styles.xml</Link>
+    </AndroidResource>
+    <Content Include="Ouya\Properties\AndroidManifest.xml">
+      <Platforms>Ouya</Platforms>
+      <Link>Properties\AndroidManifest.xml</Link>
+    </Content>
+
+    <!-- PSMobile Files -->
+    <PsmMetadata Include="PSMobile\app.xml">
+      <Platforms>PSMobile</Platforms>
+      <Link>app.xml</Link>
+    </PsmMetadata>
+
+    <!-- Windows8 Files -->
+    <Compile Include="Windows8\Properties\AssemblyInfo.cs">
+      <Platforms>Windows8</Platforms>
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <AppxManifest Include="Windows8\Package.appxmanifest">
+      <Platforms>Windows8</Platforms>
+      <SubType>Designer</SubType>
+      <Link>Package.appxmanifest</Link>
+    </AppxManifest>
+    <None Include="Windows8\Platformer2D_TemporaryKey.pfx">
+      <Platforms>Windows8</Platforms>
+      <Link>Platformer2D_TemporaryKey.pfx</Link>
+    </None>
+    <Content Include="Windows8\Assets\Logo.png">
+      <Platforms>Windows8</Platforms>
+      <Link>Assets\Logo.png</Link>
+    </Content>
+    <Content Include="Windows8\Assets\SmallLogo.png">
+      <Platforms>Windows8</Platforms>
+      <Link>Assets\SmallLogo.png</Link>
+    </Content>
+    <Content Include="Windows8\Assets\SplashScreen.png">
+      <Platforms>Windows8</Platforms>
+      <Link>Assets\SplashScreen.png</Link>
+    </Content>
+    <Content Include="Windows8\Assets\StoreLogo.png">
+      <Platforms>Windows8</Platforms>
+      <Link>Assets\StoreLogo.png</Link>
+    </Content>
+
+    <!-- Windows Files -->
+    <Compile Include="Windows\Properties\AssemblyInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+
+  </Files>
+</Project>

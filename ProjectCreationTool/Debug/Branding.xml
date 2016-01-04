@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Branding>
+  <!--
+  The name of the product, as displayed to the user.
+  -->
+  <ProductName>MonoGame</ProductName>
+  
+  <!--
+  The name of the storage folder to use when storing information
+  inside the Application Data (or Linux / Mac equivalent).  You
+  MUST change this value to something unique, or the configuration
+  of your branded application will clash with the configuration
+  settings of the generic Protobuild project manager.
+  -->
+  <ProductStorageID>.monogame-manager</ProductStorageID>
+  
+  <!--
+  The online RSS feed URL that should be used for displaying news.  If
+  you leave this blank, no news will be displayed.
+  -->
+  <RSSFeedURL></RSSFeedURL>
+
+  <!--
+  For an external icon on disk, use the full path to the .ico file.  For
+  an embedded resource, prefix it with the @ symbol, followed immediately
+  by the resource name.
+  -->
+  <WindowsIcon>MonoGame.ico</WindowsIcon>
+
+  <!--
+  For an external icon on disk, use the full path to the .ico file.  For
+  an embedded resource, prefix it with the @ symbol, followed immediately
+  by the resource name.
+  -->
+  <LinuxIcon>MonoGame.ico</LinuxIcon>
+
+  <!--
+  The source to draw on templates from.  Supports the following options:
+    * builtin
+    * online
+    * dir:<path to a folder on disk>
+  -->
+  <TemplateSource>dir:..\..\ProjectTemplates</TemplateSource>
+  
+  <!--
+  The name of the project template category to show in IDEs.
+  -->
+  <TemplateIDECategory>MonoGame</TemplateIDECategory>
+  
+  <!--
+  The location of the Visual Studio IDE package to install.  You can change
+  this URL to local-lzma://<some relative or absolute file path> if you want to
+  ship a local copy of the package and avoid downloading it from the
+  internet.
+  -->
+  <VisualStudioAddinPackage>local-tool-lzma://../Protobuild.IDE.VisualStudio/Windows.tar.lzma</VisualStudioAddinPackage>
+
+  <!--
+  The location of the MonoDevelop / Xamarin Studio IDE package to install.
+  You can change this URL to local-lzma://<some relative or absolute file path>
+  if you want to ship a local copy of the package and avoid downloading
+  it from the internet.
+  -->
+  <MonoDevelopAddinPackage>http://protobuild.org/hach-que/Protobuild.IDE.MonoDevelop@monodevelop-5</MonoDevelopAddinPackage>
+  
+  <!--
+  The policy on when to download a newer version of Protobuild for use in
+  new projects.  You can set this to either:
+    * when-available (it checks GitHub to see if there is a newer release)
+    * never (never check for updates)
+  If you set this option to 'never', the Protobuild Manager will never go
+  online to check for updates, UNLESS there is no local copy of Protobuild.
+  To completely avoid online updates, make sure you copy Protobuild.exe to
+  "%appdata%\<storageid>\Protobuild.exe".
+  -->
+  <ProtobuildUpdatePolicy>when-available</ProtobuildUpdatePolicy>
+</Branding>

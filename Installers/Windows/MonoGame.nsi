@@ -23,7 +23,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright ï¿½ The MonoGame Team"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -219,6 +219,26 @@ Section "OpenAL" OpenAL
   ; SetOutPath $INSTDIR
   File '..\..\ThirdParty\Dependencies\oalinst.exe'
   ExecWait '"$INSTDIR\oalinst.exe /S"'
+SectionEnd
+
+Section "Project Templates" WizTemplates
+
+  ; Install the Protobuild Manager
+  SetOutPath '$INSTDIR'
+  File '..\..\ProjectCreationTool\Protobuild.Manager.Built\Protobuild.Manager.exe'
+  File '..\..\ProjectCreationTool\Protobuild.IDE.VisualStudio\Protobuild.IDE.VisualStudio.tar.lzma'
+  File '..\..\ProjectCreationTool\Install\Branding.xml'
+  
+  ; Install the templates
+  SetOutPath '$INSTDIR\Templates'
+  File /r '..\..\ProjectTemplates\*.json'
+  File /r '..\..\ProjectTemplates\MonoGame.Platformer2D'
+  File /r '..\..\ProjectTemplates\Overlay-*'
+
+  ; Configure the templates and add-in into the IDE
+  SetOutPath '$INSTDIR'
+  ExecWait "Protobuild.Manager.exe --silent-setup"
+
 SectionEnd
 
 Section "Visual Studio 2010 Templates" VS2010

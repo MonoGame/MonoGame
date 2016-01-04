@@ -1,0 +1,304 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{256B1D7C-1127-4D8B-9F2B-3A8A69741B54}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DX_GameName1</RootNamespace>
+    <AssemblyName>DX-GameName1</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Windows\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Windows\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Game\Accelerometer.cs">
+      <Link>Game\Accelerometer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Animation.cs">
+      <Link>Game\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\AnimationPlayer.cs">
+      <Link>Game\AnimationPlayer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Circle.cs">
+      <Link>Game\Circle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Enemy.cs">
+      <Link>Game\Enemy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Gem.cs">
+      <Link>Game\Gem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Level.cs">
+      <Link>Game\Level.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Player.cs">
+      <Link>Game\Player.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\RectangleExtensions.cs">
+      <Link>Game\RectangleExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Tile.cs">
+      <Link>Game\Tile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\TouchCollectionExtensions.cs">
+      <Link>Game\TouchCollectionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game.cs">
+      <Link>Game.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer0_0.xnb">
+      <Link>Content\Backgrounds\Layer0_0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer0_1.xnb">
+      <Link>Content\Backgrounds\Layer0_1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer0_2.xnb">
+      <Link>Content\Backgrounds\Layer0_2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer1_0.xnb">
+      <Link>Content\Backgrounds\Layer1_0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer1_1.xnb">
+      <Link>Content\Backgrounds\Layer1_1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer1_2.xnb">
+      <Link>Content\Backgrounds\Layer1_2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer2_0.xnb">
+      <Link>Content\Backgrounds\Layer2_0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer2_1.xnb">
+      <Link>Content\Backgrounds\Layer2_1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Backgrounds\Layer2_2.xnb">
+      <Link>Content\Backgrounds\Layer2_2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Fonts\Hud.xnb">
+      <Link>Content\Fonts\Hud.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Overlays\you_died.xnb">
+      <Link>Content\Overlays\you_died.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Overlays\you_lose.xnb">
+      <Link>Content\Overlays\you_lose.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Overlays\you_win.xnb">
+      <Link>Content\Overlays\you_win.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\ExitReached.xnb">
+      <Link>Content\Sounds\ExitReached.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\GemCollected.xnb">
+      <Link>Content\Sounds\GemCollected.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\MonsterKilled.xnb">
+      <Link>Content\Sounds\MonsterKilled.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\Music.xnb">
+      <Link>Content\Sounds\Music.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\PlayerFall.xnb">
+      <Link>Content\Sounds\PlayerFall.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\PlayerJump.xnb">
+      <Link>Content\Sounds\PlayerJump.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\PlayerKilled.xnb">
+      <Link>Content\Sounds\PlayerKilled.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\Powerup.xnb">
+      <Link>Content\Sounds\Powerup.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\Gem.xnb">
+      <Link>Content\Sprites\Gem.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterA\Idle.xnb">
+      <Link>Content\Sprites\MonsterA\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterA\Run.xnb">
+      <Link>Content\Sprites\MonsterA\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterB\Idle.xnb">
+      <Link>Content\Sprites\MonsterB\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterB\Run.xnb">
+      <Link>Content\Sprites\MonsterB\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterC\Idle.xnb">
+      <Link>Content\Sprites\MonsterC\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterC\Run.xnb">
+      <Link>Content\Sprites\MonsterC\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterD\Idle.xnb">
+      <Link>Content\Sprites\MonsterD\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\MonsterD\Run.xnb">
+      <Link>Content\Sprites\MonsterD\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\Player\Celebrate.xnb">
+      <Link>Content\Sprites\Player\Celebrate.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\Player\Die.xnb">
+      <Link>Content\Sprites\Player\Die.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\Player\Idle.xnb">
+      <Link>Content\Sprites\Player\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\Player\Jump.xnb">
+      <Link>Content\Sprites\Player\Jump.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sprites\Player\Run.xnb">
+      <Link>Content\Sprites\Player\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockA0.xnb">
+      <Link>Content\Tiles\BlockA0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockA1.xnb">
+      <Link>Content\Tiles\BlockA1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockA2.xnb">
+      <Link>Content\Tiles\BlockA2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockA3.xnb">
+      <Link>Content\Tiles\BlockA3.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockA4.xnb">
+      <Link>Content\Tiles\BlockA4.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockA5.xnb">
+      <Link>Content\Tiles\BlockA5.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockA6.xnb">
+      <Link>Content\Tiles\BlockA6.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockB0.xnb">
+      <Link>Content\Tiles\BlockB0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\BlockB1.xnb">
+      <Link>Content\Tiles\BlockB1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\Exit.xnb">
+      <Link>Content\Tiles\Exit.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Tiles\Platform.xnb">
+      <Link>Content\Tiles\Platform.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Levels\0.txt">
+      <Link>Content\Levels\0.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Levels\1.txt">
+      <Link>Content\Levels\1.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Levels\2.txt">
+      <Link>Content\Levels\2.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Windows\Content\Sounds\Music.wma">
+      <Link>Content\Sounds\Music.wma</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

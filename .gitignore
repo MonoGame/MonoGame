@@ -92,3 +92,4 @@ Test/*.csproj
 #Zip files
 *.zip
 
+ProjectCreationTool/Protobuild.Manager.Built/

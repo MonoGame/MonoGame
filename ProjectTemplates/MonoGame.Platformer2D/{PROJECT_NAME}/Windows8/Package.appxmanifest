@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+  <Identity Name="ae0c6d86-7fbe-4686-9e0a-e7402d296f70" Publisher="CN=Simon-Darkside" Version="1.0.0.0" />
+  <Properties>
+    <DisplayName>Platformer2D</DisplayName>
+    <PublisherDisplayName>Simon-Darkside</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.2.1</OSMinVersion>
+    <OSMaxVersionTested>6.2.1</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Platformer2D.App">
+      <VisualElements DisplayName="Platformer2D" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Platformer2D" ForegroundText="light" BackgroundColor="#FFFFFF">
+        <DefaultTile ShowName="noLogos" />
+        <SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#FFFFFF" />
+      </VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>

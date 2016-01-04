@@ -40,8 +40,14 @@
 !define INSTALLERVERSION "${buildNumber}"
         </echo>
         <call target="download"/>
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C mkdir ..\..\ProjectCreationTool\Protobuild.Manager\Protobuild.Manager\bin\Windows\AnyCPU' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" failonerror='false' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C mkdir ..\..\ProjectCreationTool\Protobuild.IDE.VisualStudio' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" failonerror='false' />
         <exec program="C:\Windows\system32\cmd.exe" commandline='/C rmdir /S /Q WindowsUniversal' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" failonerror='false' />
-		<exec program="C:\Windows\system32\cmd.exe" commandline='/C rename WindowsUAP WindowsUniversal' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C rmdir /S /Q ..\..\ProjectCreationTool\Protobuild.Manager.Built' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" failonerror='false' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C mkdir WindowsUniversal\AnyCPU' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" failonerror='false' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C move WindowsUAP\AnyCPU\Release\VisualStudio\Protobuild.IDE.VisualStudio.tar.lzma ..\..\ProjectCreationTool\Protobuild.IDE.VisualStudio\Protobuild.IDE.VisualStudio.tar.lzma' workingdir='${project::get-base-directory()}\..\MonoGame.Framework\bin' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C move WindowsUAP\AnyCPU\Release\ProtobuildManagerBinaries ..\..\ProjectCreationTool\Protobuild.Manager.Built' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" />
+		<exec program="C:\Windows\system32\cmd.exe" commandline='/C move WindowsUAP\AnyCPU\Release\FrameworkBinaries WindowsUniversal\AnyCPU\Release' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" />
         <exec program="makensis" workingdir="Windows" basedir="C:\Program Files (x86)\NSIS">
 		      <arg value="MonoGame.nsi"/>
 		    </exec>

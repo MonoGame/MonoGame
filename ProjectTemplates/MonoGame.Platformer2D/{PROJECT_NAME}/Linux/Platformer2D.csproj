@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F2E1E56C-E6CA-4381-8F51-325A5801C92B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Platformer2D</RootNamespace>
+    <AssemblyName>Platformer2D</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\Linux\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Game\Accelerometer.cs">
+      <Link>Game\Accelerometer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Animation.cs">
+      <Link>Game\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\AnimationPlayer.cs">
+      <Link>Game\AnimationPlayer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Circle.cs">
+      <Link>Game\Circle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Enemy.cs">
+      <Link>Game\Enemy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Gem.cs">
+      <Link>Game\Gem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Level.cs">
+      <Link>Game\Level.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Player.cs">
+      <Link>Game\Player.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\RectangleExtensions.cs">
+      <Link>Game\RectangleExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\Tile.cs">
+      <Link>Game\Tile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game\TouchCollectionExtensions.cs">
+      <Link>Game\TouchCollectionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Game.cs">
+      <Link>Game.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Lidgren.Network, Version=2011.3.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Linux\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Linux\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Linux\Tao.Sdl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\Linux\SDL.dll">
+      <Link>SDL.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\Linux\SDL_Mixer.dll">
+      <Link>SDL_Mixer.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer0_0.xnb">
+      <Link>Content\Backgrounds\Layer0_0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer0_1.xnb">
+      <Link>Content\Backgrounds\Layer0_1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer0_2.xnb">
+      <Link>Content\Backgrounds\Layer0_2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer1_0.xnb">
+      <Link>Content\Backgrounds\Layer1_0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer1_1.xnb">
+      <Link>Content\Backgrounds\Layer1_1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer1_2.xnb">
+      <Link>Content\Backgrounds\Layer1_2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer2_0.xnb">
+      <Link>Content\Backgrounds\Layer2_0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer2_1.xnb">
+      <Link>Content\Backgrounds\Layer2_1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Backgrounds\Layer2_2.xnb">
+      <Link>Content\Backgrounds\Layer2_2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Fonts\Hud.xnb">
+      <Link>Content\Fonts\Hud.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Overlays\you_died.xnb">
+      <Link>Content\Overlays\you_died.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Overlays\you_lose.xnb">
+      <Link>Content\Overlays\you_lose.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Overlays\you_win.xnb">
+      <Link>Content\Overlays\you_win.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\ExitReached.xnb">
+      <Link>Content\Sounds\ExitReached.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\GemCollected.xnb">
+      <Link>Content\Sounds\GemCollected.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\MonsterKilled.xnb">
+      <Link>Content\Sounds\MonsterKilled.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\Music.xnb">
+      <Link>Content\Sounds\Music.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\PlayerFall.xnb">
+      <Link>Content\Sounds\PlayerFall.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\PlayerJump.xnb">
+      <Link>Content\Sounds\PlayerJump.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\PlayerKilled.xnb">
+      <Link>Content\Sounds\PlayerKilled.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\Powerup.xnb">
+      <Link>Content\Sounds\Powerup.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\Gem.xnb">
+      <Link>Content\Sprites\Gem.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterA\Idle.xnb">
+      <Link>Content\Sprites\MonsterA\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterA\Run.xnb">
+      <Link>Content\Sprites\MonsterA\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterB\Idle.xnb">
+      <Link>Content\Sprites\MonsterB\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterB\Run.xnb">
+      <Link>Content\Sprites\MonsterB\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterC\Idle.xnb">
+      <Link>Content\Sprites\MonsterC\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterC\Run.xnb">
+      <Link>Content\Sprites\MonsterC\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterD\Idle.xnb">
+      <Link>Content\Sprites\MonsterD\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\MonsterD\Run.xnb">
+      <Link>Content\Sprites\MonsterD\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\Player\Celebrate.xnb">
+      <Link>Content\Sprites\Player\Celebrate.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\Player\Die.xnb">
+      <Link>Content\Sprites\Player\Die.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\Player\Idle.xnb">
+      <Link>Content\Sprites\Player\Idle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\Player\Jump.xnb">
+      <Link>Content\Sprites\Player\Jump.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sprites\Player\Run.xnb">
+      <Link>Content\Sprites\Player\Run.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockA0.xnb">
+      <Link>Content\Tiles\BlockA0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockA1.xnb">
+      <Link>Content\Tiles\BlockA1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockA2.xnb">
+      <Link>Content\Tiles\BlockA2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockA3.xnb">
+      <Link>Content\Tiles\BlockA3.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockA4.xnb">
+      <Link>Content\Tiles\BlockA4.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockA5.xnb">
+      <Link>Content\Tiles\BlockA5.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockA6.xnb">
+      <Link>Content\Tiles\BlockA6.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockB0.xnb">
+      <Link>Content\Tiles\BlockB0.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\BlockB1.xnb">
+      <Link>Content\Tiles\BlockB1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\Exit.xnb">
+      <Link>Content\Tiles\Exit.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Tiles\Platform.xnb">
+      <Link>Content\Tiles\Platform.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Levels\0.txt">
+      <Link>Content\Levels\0.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Levels\1.txt">
+      <Link>Content\Levels\1.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Levels\2.txt">
+      <Link>Content\Levels\2.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ContentBuilder\bin\Linux\Content\Sounds\Music.wma">
+      <Link>Content\Sounds\Music.wma</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
