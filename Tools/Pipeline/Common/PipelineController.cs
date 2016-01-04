@@ -260,9 +260,9 @@ namespace MonoGame.Tools.Pipeline
                 } catch (IOException) {
                 }
 
-                History.Default.AddProjectHistory(projectFilePath);
-                History.Default.StartupProject = projectFilePath;
-                History.Default.Save();
+                PipelineSettings.Default.AddProjectHistory(projectFilePath);
+                PipelineSettings.Default.StartupProject = projectFilePath;
+                PipelineSettings.Default.Save();
             }
 #if SHIPPING
             catch (Exception e)
@@ -324,8 +324,8 @@ namespace MonoGame.Tools.Pipeline
             _actionStack.Clear();
             View.OutputClear();
 
-            History.Default.StartupProject = null;
-            History.Default.Save();
+            PipelineSettings.Default.StartupProject = null;
+            PipelineSettings.Default.Save();
 
             Selection.Clear(this);
             UpdateTree();
@@ -377,11 +377,11 @@ namespace MonoGame.Tools.Pipeline
             parser.SaveProject();
 
             // Note: This is where a project loaded via 'new project' or 'import project' 
-            //       get recorded into history because up until this point they did not
+            //       get recorded into PipelineSettings because up until this point they did not
             //       exist as files on disk.
-            History.Default.AddProjectHistory(_project.OriginalPath);
-            History.Default.StartupProject = _project.OriginalPath;
-            History.Default.Save();
+            PipelineSettings.Default.AddProjectHistory(_project.OriginalPath);
+            PipelineSettings.Default.StartupProject = _project.OriginalPath;
+            PipelineSettings.Default.Save();
 
             return true;
         }
