@@ -32,6 +32,7 @@ Installers/Linux/tmp_run/
 *.lib
 *.sbr
 *.sdf
+*.csproj.csdat
 ipch/
 obj/
 [Bb]in
@@ -48,6 +49,9 @@ artifacts/
 _ReSharper*/
 *.resharper
 [Tt]est[Rr]esult*
+
+#Visual Studio Rebracer extension, allows the user to automatically change the style configuration by project
+rebracer.xml
 
 #Subversion files
 .svn
