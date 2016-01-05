@@ -18,7 +18,9 @@ namespace Microsoft.Xna.Framework.Media
         private Genre genre;
         private string title;
         private TimeSpan duration;
+        #if !TVOS
         private MPMediaItem mediaItem;
+        #endif
         private AVPlayerItem _sound;
         private AVPlayer _player;
         private NSUrl assetUrl;
@@ -30,14 +32,20 @@ namespace Microsoft.Xna.Framework.Media
             get { return this.assetUrl; }
         }
 
+        #if !TVOS
         internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, MPMediaItem mediaItem, NSUrl assetUrl)
+        #else
+        internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, object mediaItem, NSUrl assetUrl)
+        #endif
         {
             this.album = album;
             this.artist = artist;
             this.genre = genre;
             this.title = title;
             this.duration = duration;
+            #if !TVOS
             this.mediaItem = mediaItem;
+            #endif
             this.assetUrl = assetUrl;
         }
 
@@ -188,9 +196,10 @@ namespace Microsoft.Xna.Framework.Media
 
         private TimeSpan PlatformGetDuration()
         {
+            #if !TVOS
             if (this.mediaItem != null)
                 return this.duration;
-
+            #endif
             return _duration;
         }
 

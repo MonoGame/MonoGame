@@ -238,6 +238,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
+            SoundEffectInstancePool.Shutdown();
+
             if (MasterVoice != null)
             {
                 MasterVoice.DestroyVoice();

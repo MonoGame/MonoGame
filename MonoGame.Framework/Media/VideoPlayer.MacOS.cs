@@ -3,8 +3,15 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.QTKit;
+using RectF = System.Drawing.RectangleF;
+#else
+using Foundation;
+using QTKit;
+using RectF = CoreGraphics.CGRect;
+#endif
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
@@ -47,7 +54,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             //_currentVideo.MovieView.SetFrameOrigin(new System.Drawing.PointF(0,0));
             //_currentVideo.MovieView.SetFrameSize(new System.Drawing.SizeF(_game.GraphicsDevice.PresentationParameters.BackBufferWidth,_game.GraphicsDevice.PresentationParameters.BackBufferHeight));
-            _currentVideo.MovieView.Frame = new System.Drawing.RectangleF(0, 0, _game.GraphicsDevice.PresentationParameters.BackBufferWidth, _game.GraphicsDevice.PresentationParameters.BackBufferHeight);
+            _currentVideo.MovieView.Frame = new RectF(0, 0, _game.GraphicsDevice.PresentationParameters.BackBufferWidth, _game.GraphicsDevice.PresentationParameters.BackBufferHeight);
 
             /*  A primitive way of launching the media player
              * MonoMac.AppKit.NSWorkspace workspace = MonoMac.AppKit.NSWorkspace.SharedWorkspace; 
@@ -81,7 +88,7 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformStop()
         {
             var movieView = _currentVideo.MovieView;
-            MonoMac.Foundation.NSObject o = new MonoMac.Foundation.NSObject();
+            var o = new NSObject();
             movieView.Pause(o);
             movieView.GotoBeginning(o);
             

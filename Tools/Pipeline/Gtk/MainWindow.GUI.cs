@@ -299,6 +299,7 @@ namespace MonoGame.Tools.Pipeline
 			this.DebugModeAction.Activated += new global::System.EventHandler (this.OnDebugModeActionActivated); 
             this.FilterOutputAction.Activated += OnFilterOutputActionActivated;
 			this.CancelBuildAction.Activated += new global::System.EventHandler (this.OnCancelBuildActionActivated);
+			this.SizeAllocated += MainWindow_SizeAllocated;
 		}
 	}
 }

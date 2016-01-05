@@ -119,6 +119,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 Array.Resize(ref _batchItemList, newSize);
                 for(int i=oldSize; i<newSize; i++)
                     _batchItemList[i]=new SpriteBatchItem();
+
+                EnsureArrayCapacity(Math.Min(newSize, MaxBatchSize));
             }
             var item = _batchItemList[_batchItemCount++];
             return item;
@@ -214,7 +216,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     numBatchesToProcess = MaxBatchSize;
                 }
-                EnsureArrayCapacity(numBatchesToProcess);
                 // Draw the batches
                 for(int i = 0; i < numBatchesToProcess; i++, batchIndex++) 
                 {

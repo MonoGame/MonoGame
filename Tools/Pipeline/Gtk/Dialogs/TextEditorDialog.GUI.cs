@@ -80,6 +80,7 @@ namespace MonoGame.Tools.Pipeline
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 			this.entry1.Changed += new global::System.EventHandler (this.OnEntry1Changed);
+            this.entry1.Activated += OnEntry1Activated;
 		}
 	}
 }

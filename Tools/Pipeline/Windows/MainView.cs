@@ -245,7 +245,7 @@ namespace MonoGame.Tools.Pipeline
         {
             _openRecentMenuItem.DropDownItems.Clear();
 
-            foreach (var project in History.Default.ProjectHistory)
+            foreach (var project in PipelineSettings.Default.ProjectHistory)
             {
                 var recentItem = new ToolStripMenuItem(project);
 
@@ -426,31 +426,11 @@ namespace MonoGame.Tools.Pipeline
             if (node == null)
                 return;
 
-            var parent = node.Parent;
             node.Remove();
 
-            {
-                var obj = _propertyGrid.SelectedObject as ContentItem;
-                if (obj != null && obj.OriginalPath == item.OriginalPath)
-                    _propertyGrid.SelectedObject = null;
-            }
-
-            // Clean up the parent nodes without children
-            // and be sure not to delete the root node.
-            while (parent != null && parent.Parent != null && parent.Nodes.Count == 0)
-            {
-                var parentParent = parent.Parent;
-
-                parent.Remove();
-
-                {
-                    var obj = _propertyGrid.SelectedObject as ContentItem;
-                    if (obj != null && obj.OriginalPath == item.OriginalPath)
-                        _propertyGrid.SelectedObject = null;
-                }
-
-                parent = parentParent;
-            }            
+            var obj = _propertyGrid.SelectedObject as ContentItem;
+            if (obj != null && obj.OriginalPath == item.OriginalPath)
+                _propertyGrid.SelectedObject = null;
         }
 
         public void SelectTreeItem(IProjectItem item)
@@ -578,16 +558,16 @@ namespace MonoGame.Tools.Pipeline
 
         private void MainView_Load(object sender, EventArgs e)
         {            
-            // We only load the History.StartupProject if there was not
+            // We only load the PipelineSettings.StartupProject if there was not
             // already a project specified via command line.
             if (string.IsNullOrEmpty(OpenProjectPath))
             {
-                var startupProject = History.Default.StartupProject;
+                var startupProject = PipelineSettings.Default.StartupProject;
                 if (!string.IsNullOrEmpty(startupProject) && File.Exists(startupProject))                
                     OpenProjectPath = startupProject;                
             }
 
-            History.Default.StartupProject = null;
+            PipelineSettings.Default.StartupProject = null;
             
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {

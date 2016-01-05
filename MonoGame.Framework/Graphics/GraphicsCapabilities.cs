@@ -6,7 +6,11 @@ using System;
 using System.Collections.Generic;
 #if OPENGL
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 #elif GLES
 using OpenTK.Graphics.ES20;
 #else

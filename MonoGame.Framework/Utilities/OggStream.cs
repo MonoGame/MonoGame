@@ -243,7 +243,7 @@ namespace MonoGame.Utilities
 
             if (ALHelper.Efx.IsInitialized)
                 ALHelper.Efx.DeleteFilter(alFilterId);
-
+            
             ALHelper.Check();
         }
 

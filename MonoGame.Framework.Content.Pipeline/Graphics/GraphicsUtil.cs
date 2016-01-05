@@ -79,11 +79,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     */
     public static class GraphicsUtil
     {
-        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
-        {
-            content.Faces[0][0] = content.Faces[0][0].Resize(newWidth, newHeight);
-        }
-
         internal static BitmapContent Resize(this BitmapContent bitmap, int newWidth, int newHeight)
         {
             BitmapContent src = bitmap;
@@ -307,35 +302,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(GraphicsProfile profile, TextureContent content, TextureProcessorOutputFormat format, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha, bool sharpAlpha)
+        public static void CompressTexture(GraphicsProfile profile, TextureContent content, TextureProcessorOutputFormat format, ContentProcessorContext context, bool generateMipmaps, bool sharpAlpha)
         {
             format = GetTextureFormatForPlatform(format, context.TargetPlatform);
 
             switch (format)
             {
                 case TextureProcessorOutputFormat.AtcCompressed:
-                    CompressAti(content, generateMipmaps, premultipliedAlpha);
+                    CompressAti(content, generateMipmaps);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:
-                    CompressColor16Bit(content, generateMipmaps, premultipliedAlpha);
+                    CompressColor16Bit(content, generateMipmaps);
                     break;
 
                 case TextureProcessorOutputFormat.DxtCompressed:
-                    CompressDxt(profile, content, generateMipmaps, premultipliedAlpha, sharpAlpha);
+                    CompressDxt(profile, content, generateMipmaps, sharpAlpha);
                     break;
 
                 case TextureProcessorOutputFormat.Etc1Compressed:
-                    CompressEtc1(content, generateMipmaps, premultipliedAlpha);
+                    CompressEtc1(content, generateMipmaps);
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    CompressPvrtc(content, generateMipmaps, premultipliedAlpha);
+                    CompressPvrtc(content, generateMipmaps);
                     break;
             }
         }
         
-        private static void CompressPvrtc(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
+        private static void CompressPvrtc(TextureContent content, bool generateMipMaps)
         {
             // TODO: Once uncompressed mipmap generation is supported, first use NVTT to generate mipmaps,
             // then compress them withthe PVRTC tool, so we have the same implementation of mipmap generation
@@ -362,7 +357,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 Compress(typeof(PvrtcRgba4BitmapContent), content, generateMipMaps);
         }
 
-        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool premultipliedAlpha, bool sharpAlpha)
+        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool sharpAlpha)
         {
             var texData = content.Faces[0][0];
 
@@ -425,7 +420,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             */
         }
   
-        static void CompressAti(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
+        static void CompressAti(TextureContent content, bool generateMipMaps)
         {
 			var face = content.Faces[0][0];
 			var pixelData = face.GetPixelData();
@@ -437,7 +432,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 Compress(typeof(AtcInterpolatedBitmapContent), content, generateMipMaps);
         }
 
-        static void CompressEtc1(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
+        static void CompressEtc1(TextureContent content, bool generateMipMaps)
         {
             var face = content.Faces[0][0];
 
@@ -458,7 +453,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        static void CompressColor16Bit(TextureContent content, bool generateMipMaps, bool premultipliedAlpha)
+        static void CompressColor16Bit(TextureContent content, bool generateMipMaps)
         {
             var face = content.Faces[0][0];
 
@@ -480,32 +475,51 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 for (int i = 0; i < content.Faces.Count; ++i)
                 {
-                    var src = content.Faces[i][0];
-                    var w = src.Width;
-                    var h = src.Height;
-
-                    content.Faces[i].Clear();
-                    wh[0] = w;
-                    wh[1] = h;
-                    var dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
-                    BitmapContent.Copy(src, dest);
-                    content.Faces[i].Add(dest);
-                    while (w > 1 && h > 1)
+                    // Only generate mipmaps if there are none already
+                    if (content.Faces[i].Count == 1)
                     {
-                        if (w > 1)
-                            w = w >> 1;
-                        if (h > 1)
-                            h = h >> 1;
+                        var src = content.Faces[i][0];
+                        var w = src.Width;
+                        var h = src.Height;
+
+                        content.Faces[i].Clear();
                         wh[0] = w;
                         wh[1] = h;
-                        dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
+                        var dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
                         BitmapContent.Copy(src, dest);
                         content.Faces[i].Add(dest);
+                        while (w > 1 && h > 1)
+                        {
+                            if (w > 1)
+                                w = w >> 1;
+                            if (h > 1)
+                                h = h >> 1;
+                            wh[0] = w;
+                            wh[1] = h;
+                            dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
+                            BitmapContent.Copy(src, dest);
+                            content.Faces[i].Add(dest);
+                        }
+                    }
+                    else
+                    {
+                        // Convert the existing mipmaps
+                        var chain = content.Faces[i];
+                        for (int j = 0; j < chain.Count; ++j)
+                        {
+                            var src = chain[j];
+                            wh[0] = src.Width;
+                            wh[1] = src.Height;
+                            var dest = (BitmapContent)Activator.CreateInstance(targetType, wh);
+                            BitmapContent.Copy(src, dest);
+                            chain[j] = dest;
+                        }
                     }
                 }
             }
             else
             {
+                // Converts all existing faces and mipmaps
                 content.ConvertBitmapType(targetType);
             }
         }
