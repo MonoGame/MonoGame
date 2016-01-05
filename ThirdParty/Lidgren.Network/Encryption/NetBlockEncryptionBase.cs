@@ -6,7 +6,7 @@ namespace Lidgren.Network
 	/// <summary>
 	/// Base for a non-threadsafe encryption class
 	/// </summary>
-	public abstract class NetBlockEncryptionBase : INetEncryption
+	public abstract class NetBlockEncryptionBase : NetEncryption
 	{
 		// temporary space for one block to avoid reallocating every time
 		private byte[] m_tmp;
@@ -19,7 +19,8 @@ namespace Lidgren.Network
 		/// <summary>
 		/// NetBlockEncryptionBase constructor
 		/// </summary>
-		public NetBlockEncryptionBase()
+		public NetBlockEncryptionBase(NetPeer peer)
+			: base(peer)
 		{
 			m_tmp = new byte[BlockSize];
 		}
@@ -27,7 +28,7 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Encrypt am outgoing message with this algorithm; no writing can be done to the message after encryption, or message will be corrupted
 		/// </summary>
-		public bool Encrypt(NetOutgoingMessage msg)
+		public override bool Encrypt(NetOutgoingMessage msg)
 		{
 			int payloadBitLength = msg.LengthBits;
 			int numBytes = msg.LengthBytes;
@@ -35,7 +36,7 @@ namespace Lidgren.Network
 			int numBlocks = (int)Math.Ceiling((double)numBytes / (double)blockSize);
 			int dstSize = numBlocks * blockSize;
 
-			msg.EnsureBufferSize(dstSize * 8 + 2); // add 2 bytes for payload length at end
+			msg.EnsureBufferSize(dstSize * 8 + (4 * 8)); // add 4 bytes for payload length at end
 			msg.LengthBits = dstSize * 8; // length will automatically adjust +4 bytes when payload length is written
 
 			for(int i=0;i<numBlocks;i++)
@@ -45,7 +46,7 @@ namespace Lidgren.Network
 			}
 
 			// add true payload length last
-			msg.Write((ushort)payloadBitLength);
+			msg.Write((UInt32)payloadBitLength);
 
 			return true;
 		}
@@ -55,9 +56,9 @@ namespace Lidgren.Network
 		/// </summary>
 		/// <param name="msg">message to decrypt</param>
 		/// <returns>true if successful; false if failed</returns>
-		public bool Decrypt(NetIncomingMessage msg)
+		public override bool Decrypt(NetIncomingMessage msg)
 		{
-			int numEncryptedBytes = msg.LengthBytes - 2; // last 2 bytes is true bit length
+			int numEncryptedBytes = msg.LengthBytes - 4; // last 4 bytes is true bit length
 			int blockSize = BlockSize;
 			int numBlocks = numEncryptedBytes / blockSize;
 			if (numBlocks * blockSize != numEncryptedBytes)
@@ -69,8 +70,8 @@ namespace Lidgren.Network
 				Buffer.BlockCopy(m_tmp, 0, msg.m_data, (i * blockSize), m_tmp.Length);
 			}
 
-			// read 16 bits of true payload length
-			uint realSize = NetBitWriter.ReadUInt32(msg.m_data, 16, (numEncryptedBytes * 8));
+			// read 32 bits of true payload length
+			uint realSize = NetBitWriter.ReadUInt32(msg.m_data, 32, (numEncryptedBytes * 8));
 			msg.m_bitLength = (int)realSize;
 			return true;
 		}

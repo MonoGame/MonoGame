@@ -14,6 +14,18 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
+#if WINDOWS || (WINRT && !WINDOWS_PHONE)
+
+        // These platforms are only limited by memory.
+        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
+
+#elif WINDOWS_PHONE
+
+        // Reference: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.instanceplaylimitexception.aspx
+        internal const int MAX_PLAYING_INSTANCES = 64;
+
+#endif
+
         #region Static Fields & Properties
 
         internal static XAudio2 Device { get; private set; }
@@ -123,33 +135,52 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
+        private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
-            PlatformInitialize(buffer, 0, buffer.Length, sampleRate, channels, 0, buffer.Length);
+            CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
+                            DataStream.Create(buffer, true, false),
+                            0, 
+                            buffer.Length);
         }
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-            _format = new WaveFormat(sampleRate, (int)channels);
+            CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
+                            DataStream.Create(buffer, true, false, offset),
+                            loopStart, 
+                            loopLength);
+        }
 
-            _dataStream = DataStream.Create<byte>(buffer, true, false);
+        private void PlatformLoadAudioStream(Stream s)
+        {
+            var soundStream = new SoundStream(s);
+            var dataStream = soundStream.ToDataStream();
+            var sampleLength = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
+            CreateBuffers(  soundStream.Format,
+                            dataStream,
+                            0,
+                            sampleLength);
+        }
 
-            // Use the loopStart and loopLength also as the range
-            // when playing this SoundEffect a single time / unlooped.
-            _buffer = new AudioBuffer()
+        private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)
+        {
+            _format = format;
+            _dataStream = dataStream;
+
+            _buffer = new AudioBuffer
             {
                 Stream = _dataStream,
-                AudioBytes = count,
+                AudioBytes = (int)_dataStream.Length,
                 Flags = BufferFlags.EndOfStream,
                 PlayBegin = loopStart,
                 PlayLength = loopLength,
                 Context = new IntPtr(42),
             };
 
-            _loopedBuffer = new AudioBuffer()
+            _loopedBuffer = new AudioBuffer
             {
                 Stream = _dataStream,
-                AudioBytes = count,
+                AudioBytes = (int)_dataStream.Length,
                 Flags = BufferFlags.EndOfStream,
                 LoopBegin = loopStart,
                 LoopLength = loopLength,
@@ -160,40 +191,37 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            SourceVoice voice = null;
-            if (Device != null)
+            // If the instance came from the pool then it could
+            // already have a valid voice assigned.
+            var voice = inst._voice;
+
+            if (voice != null)
+            {
+                // TODO: This really shouldn't be here.  Instead we should fix the 
+                // SoundEffectInstancePool to internally to look for a compatible
+                // instance or return a new instance without a voice.
+                //
+                // For now we do the same test that the pool should be doing here.
+             
+                if (!ReferenceEquals(inst._format, _format))
+                {
+                    if (inst._format.Encoding != _format.Encoding ||
+                        inst._format.Channels != _format.Channels ||
+                        inst._format.SampleRate != _format.SampleRate ||
+                        inst._format.BitsPerSample != _format.BitsPerSample)
+                    {
+                        voice.DestroyVoice();
+                        voice.Dispose();
+                        voice = null;
+                    }
+                }
+            }
+
+            if (voice == null && Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             inst._voice = voice;
-        }
-
-        private void PlatformLoadAudioStream(Stream s)
-        {
-            SoundStream soundStream = new SoundStream(s);
-
-            _format = soundStream.Format;
-            _dataStream = soundStream.ToDataStream();
-
-            _buffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = (int)_dataStream.Length,
-                Flags = BufferFlags.EndOfStream,
-                PlayBegin = 0,
-                PlayLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
-                Context = new IntPtr(42),
-            };
-
-            _loopedBuffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = (int)_dataStream.Length,
-                Flags = BufferFlags.EndOfStream,
-                LoopBegin = 0,
-                LoopLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
-                LoopCount = AudioBuffer.LoopInfinite,
-                Context = new IntPtr(42),
-            }; 
+            inst._format = _format;
         }
 
         #endregion
@@ -210,6 +238,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
+            SoundEffectInstancePool.Shutdown();
+
             if (MasterVoice != null)
             {
                 MasterVoice.DestroyVoice();

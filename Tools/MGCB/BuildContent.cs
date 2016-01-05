@@ -37,6 +37,14 @@ namespace MGCB
             set { throw new InvalidOperationException(); }
         }
 
+        [CommandLineParameter(
+            Name = "workingDir",
+            ValueName = "directoryPath",
+            Description = "The working directory where all source content is located.")]
+        public void SetWorkingDir(string path)
+        {
+            Directory.SetCurrentDirectory(path);
+        }
 
         [CommandLineParameter(
             Name = "outputDir",
@@ -205,17 +213,28 @@ namespace MGCB
             get { return _content.Count > 0 || _copyItems.Count > 0 || Clean; }    
         }
 
+        string ReplaceSymbols(string parameter)
+        {
+            if (string.IsNullOrWhiteSpace(parameter))
+                return parameter;
+            return parameter
+                .Replace("$(Platform)", Platform.ToString())
+                .Replace("$(Configuration)", Config)
+                .Replace("$(Config)", Config)
+                .Replace("$(Profile)", this.Profile.ToString());
+        }
+
         public void Build(out int successCount, out int errorCount)
         {
             var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
 
-            var outputPath = OutputDir;
+            var outputPath = ReplaceSymbols (OutputDir);
             if (!Path.IsPathRooted(outputPath))
                 outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, outputPath)));
 
-            var intermediatePath = IntermediateDir;
+            var intermediatePath = ReplaceSymbols (IntermediateDir);
             if (!Path.IsPathRooted(intermediatePath))
-                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, intermediatePath)));
             
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
@@ -265,6 +284,20 @@ namespace MGCB
             errorCount = 0;
             successCount = 0;
 
+            // Before building the content, register all files to be built. (Necessary to
+            // correctly resolve external references.)
+            foreach (var c in _content)
+            {
+                try
+                {
+                    _manager.RegisterContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
+                }
+                catch
+                {
+                    // Ignore exception. Exception will be handled below.
+                }
+            }
+
             foreach (var c in _content)
             {
                 try
@@ -297,7 +330,14 @@ namespace MGCB
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
+                    ++errorCount;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    if (ex.InnerException != null)
+                        Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
                 }
             }
@@ -359,7 +399,7 @@ namespace MGCB
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
 
                     ++errorCount;
                 }

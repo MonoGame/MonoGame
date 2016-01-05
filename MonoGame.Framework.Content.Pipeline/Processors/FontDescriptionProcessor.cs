@@ -4,13 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.ComponentModel;
 using System.Linq;
 using SharpFont;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
@@ -38,21 +36,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			var fontName = input.FontName;
 
+#if WINDOWS || LINUX
 #if WINDOWS
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
-		        var fontDirectory = Path.Combine(windowsfolder,"Fonts");
+		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
 			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+#elif LINUX
+            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
+#endif
 			if (string.IsNullOrWhiteSpace(fontName)) {
 				fontName = input.FontName;
 #endif
 				
 			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
-			var directories = new string[] { directory, 
-				"/Library/Fonts",
+
+			List<string> directories = new List<string>();
+			directories.Add(directory);
+			directories.Add("/Library/Fonts");
 #if WINDOWS
-				fontDirectory,
+			directories.Add(fontDirectory);
 #endif
-			};
 
 			foreach( var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
@@ -70,10 +73,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					directory = dir;
 					break;
 				}
-			}
+            }
 
-			fontName = Path.Combine (directory, fontName);
-#if WINDOWS
+            fontName = Path.Combine (directory, fontName);
+
+#if WINDOWS || LINUX
 			}
 #endif
 
@@ -92,9 +96,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
+                var format = GraphicsUtil.GetTextureFormatForPlatform(TextureFormat, context.TargetPlatform);
+                var requiresPOT = GraphicsUtil.RequiresPowerOfTwo(format, context.TargetPlatform, context.TargetProfile);
+                var requiresSquare = GraphicsUtil.RequiresSquare(format, context.TargetPlatform);
 
-				//systemBitmap.Save ("fontglyphs.png");
+                var face = GlyphPacker.ArrangeGlyphs(glyphs, requiresPOT, requiresSquare);
 
 				// Adjust line and character spacing.
 				lineSpacing += input.Spacing;
@@ -117,12 +123,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
 				}
 
-                output.Texture.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap(true)));
-			    systemBitmap.Dispose();
+                output.Texture.Faces[0].Add(face);
 
-                if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed)
+                if (GraphicsUtil.IsCompressedTextureFormat(format))
                 {
-                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
+                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, true);
                 }
 			}
 			catch(Exception ex) {
@@ -138,7 +143,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			IFontImporter importer;
 
 			var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
-			var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
+			//var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
 			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
 
@@ -148,15 +153,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			//			}
 			//			else
 			//			{
-			if (TrueTypeFileExtensions.Contains (fileExtension)) 
-			{
-				importer = new SharpFontImporter ();
-			}
-			else 
-			{
-				//importer = new TrueTypeImporter();
-				importer = new SharpFontImporter ();
-			}
+			if (!TrueTypeFileExtensions.Contains(fileExtension)) 
+                throw new PipelineException("Unknown file extension " + fileExtension);
+
+			importer = new SharpFontImporter();
 
 			// Import the source font data.
 			importer.Import(options, fontName);
@@ -210,6 +210,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 			return String.Empty;
 		}
+#endif
+
+#if LINUX
+        string FindFontFileFromFontName(string fontname, string style)
+        {
+            string s, e;
+            ExternalTool.Run("/bin/bash", string.Format ("-c \"fc-match -f '%{{file}}:%{{family}}\\n' '{0}:style={1}'\"", fontname, style), out s, out e);
+            s = s.Trim();
+
+            var split = s.Split (':');
+            //check font family, fontconfig might return a fallback
+            if (split [1].Contains (",")) { //this file defines multiple family names
+                var families = split [1].Split (',');
+                foreach (var f in families) {
+                    if (f.ToLowerInvariant () == fontname.ToLowerInvariant ())
+                        return split [0];
+                }
+                //didn't find it
+                return String.Empty;
+            } else {
+                if (split [1].ToLowerInvariant () != fontname.ToLowerInvariant ())
+                    return String.Empty;
+            }
+            return split [0];
+        }
 #endif
     }
 }

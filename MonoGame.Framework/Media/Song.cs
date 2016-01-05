@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Media
         public Album Album
         {
             get { return PlatformGetAlbum(); }
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
             internal set { PlatformSetAlbum(value); }
 #endif
         }
@@ -41,9 +41,9 @@ namespace Microsoft.Xna.Framework.Media
             get { return PlatformGetGenre(); }
         }
 
-#if ANDROID || OPENAL || PSM || WEB || IOS
+#if ANDROID || OPENAL || WEB || IOS
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
-#if !LINUX
+#if !DESKTOPGL
         event FinishedPlayingHandler DonePlaying;
 #endif
 #endif

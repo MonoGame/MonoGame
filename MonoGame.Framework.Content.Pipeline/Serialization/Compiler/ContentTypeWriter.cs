@@ -20,10 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <value>true if the object can be deserialized into; false otherwise.</value>
         public virtual bool CanDeserializeIntoExistingObject
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return false; }
         }
 
         /// <summary>
@@ -72,6 +69,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// </summary>
         /// <param name="compiler">The content compiler.</param>
         protected virtual void Initialize(ContentCompiler compiler)
+        {
+
+        }
+
+        /// <summary>
+        /// Allows type writers to add their element type writers to the content writer.
+        /// </summary>
+        /// <param name="writer">The content writer.</param>
+        internal virtual void OnAddedToContentWriter(ContentWriter writer)
         {
 
         }

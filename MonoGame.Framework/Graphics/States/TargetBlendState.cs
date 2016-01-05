@@ -8,9 +8,19 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class TargetBlendState
 	{
-        internal TargetBlendState()
+	    private readonly BlendState _parent;
+	    private BlendFunction _alphaBlendFunction;
+	    private Blend _alphaDestinationBlend;
+	    private Blend _alphaSourceBlend;
+	    private BlendFunction _colorBlendFunction;
+	    private Blend _colorDestinationBlend;
+	    private Blend _colorSourceBlend;
+	    private ColorWriteChannels _colorWriteChannels;
+
+	    internal TargetBlendState(BlendState parent)
         {
-            AlphaBlendFunction = BlendFunction.Add;
+	        _parent = parent;
+	        AlphaBlendFunction = BlendFunction.Add;
             AlphaDestinationBlend = Blend.Zero;
             AlphaSourceBlend = Blend.One;
             ColorBlendFunction = BlendFunction.Add;
@@ -19,19 +29,89 @@ namespace Microsoft.Xna.Framework.Graphics
             ColorWriteChannels = ColorWriteChannels.All;
         }
 
-		public BlendFunction AlphaBlendFunction { get; set; }
+	    internal TargetBlendState Clone(BlendState parent)
+	    {
+	        return new TargetBlendState(parent)
+	        {
+	            AlphaBlendFunction = AlphaBlendFunction,
+                AlphaDestinationBlend = AlphaDestinationBlend,
+                AlphaSourceBlend = AlphaSourceBlend,
+                ColorBlendFunction = ColorBlendFunction,
+                ColorDestinationBlend = ColorDestinationBlend,
+                ColorSourceBlend = ColorSourceBlend,
+                ColorWriteChannels = ColorWriteChannels
+	        };
+	    }
 
-		public Blend AlphaDestinationBlend { get; set; }
+	    public BlendFunction AlphaBlendFunction
+	    {
+	        get { return _alphaBlendFunction; }
+	        set
+	        {
+	            _parent.ThrowIfBound();
+	            _alphaBlendFunction = value;
+	        }
+	    }
 
-		public Blend AlphaSourceBlend { get; set; }
+	    public Blend AlphaDestinationBlend
+	    {
+	        get { return _alphaDestinationBlend; }
+	        set
+	        {
+                _parent.ThrowIfBound();
+	            _alphaDestinationBlend = value;
+	        }
+	    }
 
-		public BlendFunction ColorBlendFunction { get; set; }
+	    public Blend AlphaSourceBlend
+	    {
+	        get { return _alphaSourceBlend; }
+	        set
+	        {
+                _parent.ThrowIfBound();
+	            _alphaSourceBlend = value;
+	        }
+	    }
 
-		public Blend ColorDestinationBlend { get; set; }
+	    public BlendFunction ColorBlendFunction
+	    {
+	        get { return _colorBlendFunction; }
+	        set
+	        {
+                _parent.ThrowIfBound();
+	            _colorBlendFunction = value;
+	        }
+	    }
 
-		public Blend ColorSourceBlend { get; set; }
+	    public Blend ColorDestinationBlend
+	    {
+	        get { return _colorDestinationBlend; }
+	        set
+	        {
+                _parent.ThrowIfBound();
+	            _colorDestinationBlend = value;
+	        }
+	    }
 
-		public ColorWriteChannels ColorWriteChannels { get; set; }
+	    public Blend ColorSourceBlend
+	    {
+	        get { return _colorSourceBlend; }
+	        set
+	        {
+                _parent.ThrowIfBound();
+	            _colorSourceBlend = value;
+	        }
+	    }
+
+	    public ColorWriteChannels ColorWriteChannels
+	    {
+	        get { return _colorWriteChannels; }
+	        set
+	        {
+                _parent.ThrowIfBound();
+	            _colorWriteChannels = value;
+	        }
+	    }
 
 #if DIRECTX
 

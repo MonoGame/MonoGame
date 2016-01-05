@@ -26,7 +26,7 @@ namespace Lidgren.Network
 	/// Outgoing message used to send data to remote peer(s)
 	/// </summary>
 	[DebuggerDisplay("LengthBits={LengthBits}")]
-	public sealed partial class NetOutgoingMessage
+	public sealed class NetOutgoingMessage : NetBuffer
 	{
 		internal NetMessageType m_messageType;
 		internal bool m_isSent;
@@ -110,14 +110,13 @@ namespace Lidgren.Network
 			if (m_fragmentGroup != 0)
 				retval += NetFragmentationHelper.GetFragmentationHeaderSize(m_fragmentGroup, m_fragmentGroupTotalBits / 8, m_fragmentChunkByteSize, m_fragmentChunkNumber);
 			retval += this.LengthBytes;
-
 			return retval;
 		}
 
 		/// <summary>
 		/// Encrypt this message using the provided algorithm; no more writing can be done before sending it or the message will be corrupt!
 		/// </summary>
-		public bool Encrypt(INetEncryption encryption)
+		public bool Encrypt(NetEncryption encryption)
 		{
 			return encryption.Encrypt(this);
 		}
@@ -127,7 +126,10 @@ namespace Lidgren.Network
 		/// </summary>
 		public override string ToString()
 		{
-			return "[NetOutgoingMessage " + m_messageType + " " + this.LengthBytes + " bytes]";
+			if (m_isSent)
+				return "[NetOutgoingMessage " + m_messageType + " " + this.LengthBytes + " bytes]";
+
+			return "[NetOutgoingMessage " + this.LengthBytes + " bytes]";
 		}
 	}
 }

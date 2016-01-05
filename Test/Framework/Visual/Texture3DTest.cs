@@ -94,7 +94,7 @@ namespace MonoGame.Tests.Visual
 
                 Assert.AreEqual(savedData, readData);
             };
-            Game.RunOneFrame();
+            Game.Run();
         }
     }
 }

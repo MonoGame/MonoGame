@@ -46,11 +46,17 @@ using System.Drawing;
 #endif
 
 #if OPENGL
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using MouseInfo = OpenTK.Input.Mouse;
 #elif MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+#else
+using Foundation;
+using AppKit;
+using PointF = CoreGraphics.CGPoint;
+#endif
 #endif
 #endif
 
@@ -65,7 +71,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly MouseState _defaultState = new MouseState();
 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
 
         static OpenTK.INativeWindow Window;
 
@@ -99,7 +105,7 @@ namespace Microsoft.Xna.Framework.Input
         { 
             get
             { 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
                 return Window.WindowInfo.Handle;
 #elif WINRT
                 return IntPtr.Zero; // WinRT platform does not create traditionally window, so returns IntPtr.Zero.
@@ -131,10 +137,10 @@ namespace Microsoft.Xna.Framework.Input
             //We need to maintain precision...
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 
-#elif (WINDOWS && OPENGL) || LINUX || ANGLE
+#elif DESKTOPGL || ANGLE
 
             var state = OpenTK.Input.Mouse.GetCursorState();
-            var pc = Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
+            var pc = ((OpenTKGameWindow)window).Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
             window.MouseState.X = pc.X;
             window.MouseState.Y = pc.Y;
 
@@ -188,7 +194,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             UpdateStatePosition(x, y);
 
-#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX || ANGLE
+#if (WINDOWS && DIRECTX) || DESKTOPGL || ANGLE
             // correcting the coordinate system
             // Only way to set the mouse position !!!
             var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
@@ -196,7 +202,7 @@ namespace Microsoft.Xna.Framework.Input
             var pt = new System.Drawing.Point(0, 0);
 #endif
 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             OpenTK.Input.Mouse.SetPosition(pt.X, pt.Y);
 #elif WINDOWS
             SetCursorPos(pt.X, pt.Y);
@@ -209,7 +215,7 @@ namespace Microsoft.Xna.Framework.Input
                     break;
                 }
             }
-            
+
             var point = new PointF(x, Window.ClientBounds.Height-y);
             var windowPt = Window.ConvertPointToView(point, null);
             var screenPt = Window.Window.ConvertBaseToScreen(windowPt);
@@ -220,6 +226,9 @@ namespace Microsoft.Xna.Framework.Input
             CGSetLocalEventsSuppressionInterval(0.0);
             CGWarpMouseCursorPosition(flippedPt);
             CGSetLocalEventsSuppressionInterval(0.25);
+#elif WEB
+            PrimaryWindow.MouseState.X = x;
+            PrimaryWindow.MouseState.Y = y;
 #endif
         }
 
@@ -255,11 +264,19 @@ namespace Microsoft.Xna.Framework.Input
         }
 
 #elif MONOMAC
+#if PLATFORM_MACOS_LEGACY
         [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
         extern static void CGWarpMouseCursorPosition(PointF newCursorPosition);
         
         [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
         extern static void CGSetLocalEventsSuppressionInterval(double seconds);
+#else
+        [DllImport (ObjCRuntime.Constants.CoreGraphicsLibrary)]
+        extern static void CGWarpMouseCursorPosition(CoreGraphics.CGPoint newCursorPosition);
+
+        [DllImport (ObjCRuntime.Constants.CoreGraphicsLibrary)]
+        extern static void CGSetLocalEventsSuppressionInterval(double seconds);
+#endif
 #endif
 
     }

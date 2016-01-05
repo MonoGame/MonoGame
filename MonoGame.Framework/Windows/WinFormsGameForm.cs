@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
         public const int WM_POINTERUPDATE = 0x0245;
-
+        public const int WM_KEYDOWN = 0x0100;
         public const int WM_TABLET_QUERYSYSTEMGESTURESTA = (0x02C0 + 12);
 
         public const int WM_SYSCOMMAND = 0x0112;
@@ -66,7 +66,23 @@ namespace Microsoft.Xna.Framework.Windows
                         m.Result = new IntPtr(flags);
                         return;
                     }
+#if (WINDOWS && DIRECTX)
+                case WM_KEYDOWN:
+                    switch (m.WParam.ToInt32())
+                    {
+                        case 0x5B:  // Left Windows Key
 
+                            if (this.WindowState == FormWindowState.Maximized)
+                            {
+                                this.WindowState = FormWindowState.Minimized;
+                            }
+ 		 
+                            break;
+                        case 0x5C: // Right Windows Key
+                            goto case 0x5B;
+                    }
+                    break;
+#endif
                 case WM_SYSCOMMAND:
 
                     var wParam = m.WParam.ToInt32();

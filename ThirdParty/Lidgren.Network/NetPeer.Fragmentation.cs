@@ -6,7 +6,7 @@ namespace Lidgren.Network
 {
 	internal class ReceivedFragmentGroup
 	{
-		public float LastReceived;
+		//public float LastReceived;
 		public byte[] Data;
 		public NetBitVector ReceivedChunks;
 	}
@@ -18,7 +18,7 @@ namespace Lidgren.Network
 		private Dictionary<NetConnection, Dictionary<int, ReceivedFragmentGroup>> m_receivedFragmentGroups;
 
 		// on user thread
-		private void SendFragmentedMessage(NetOutgoingMessage msg, IList<NetConnection> recipients, NetDeliveryMethod method, int sequenceChannel)
+		private NetSendResult SendFragmentedMessage(NetOutgoingMessage msg, IList<NetConnection> recipients, NetDeliveryMethod method, int sequenceChannel)
 		{
 			// Note: this group id is PER SENDING/NetPeer; ie. same id is sent to all recipients;
 			// this should be ok however; as long as recipients differentiate between same id but different sender
@@ -44,11 +44,13 @@ namespace Lidgren.Network
 			if (numChunks * bytesPerChunk < totalBytes)
 				numChunks++;
 
+			NetSendResult retval = NetSendResult.Sent;
+
 			int bitsPerChunk = bytesPerChunk * 8;
 			int bitsLeft = msg.LengthBits;
 			for (int i = 0; i < numChunks; i++)
 			{
-				NetOutgoingMessage chunk = CreateMessage(mtu);
+				NetOutgoingMessage chunk = CreateMessage(0);
 
 				chunk.m_bitLength = (bitsLeft > bitsPerChunk ? bitsPerChunk : bitsLeft);
 				chunk.m_data = msg.m_data;
@@ -63,16 +65,22 @@ namespace Lidgren.Network
 				Interlocked.Add(ref chunk.m_recyclingCount, recipients.Count);
 
 				foreach (NetConnection recipient in recipients)
-					recipient.EnqueueMessage(chunk, method, sequenceChannel);
+				{
+					var res = recipient.EnqueueMessage(chunk, method, sequenceChannel);
+					if ((int)res > (int)retval)
+						retval = res; // return "worst" result
+				}
 
 				bitsLeft -= bitsPerChunk;
 			}
 
-			return;
+			return retval;
 		}
 
 		private void HandleReleasedFragment(NetIncomingMessage im)
 		{
+			VerifyNetworkThread();
+
 			//
 			// read fragmentation header and combine fragments
 			//
@@ -124,7 +132,7 @@ namespace Lidgren.Network
 			}
 
 			info.ReceivedChunks[chunkNumber] = true;
-			info.LastReceived = (float)NetTime.Now;
+			//info.LastReceived = (float)NetTime.Now;
 
 			// copy to data
 			int offset = (chunkNumber * chunkByteSize);
@@ -143,6 +151,7 @@ namespace Lidgren.Network
 				im.m_isFragment = false;
 
 				LogVerbose("Fragment group #" + group + " fully received in " + totalNumChunks + " chunks (" + totalBits + " bits)");
+				groups.Remove(group);
 
 				ReleaseMessage(im);
 			}

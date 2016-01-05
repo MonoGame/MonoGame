@@ -10,6 +10,8 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
+        internal static bool Back;
+
         private static readonly SharpDX.XInput.Controller[] _controllers = new[]
         {
             new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One),
@@ -21,6 +23,11 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly bool[] _connected = new bool[4];
         private static readonly long[] _timeout = new long[4];
         private static readonly long TimeoutTicks = TimeSpan.FromSeconds(1).Ticks;
+
+        private static int PlatformGetMaxNumberOfGamePads()
+        {
+            return 4;
+        }
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
@@ -136,32 +143,48 @@ namespace Microsoft.Xna.Framework.Input
             return ret;
         }
 
+        private static GamePadState GetDefaultState()
+        {
+            var state = new GamePadState();
+            state.Buttons = new GamePadButtons(Back ? Buttons.Back : 0);
+            return state;
+        }
+
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
             if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
-                return new GamePadState();
+                return GetDefaultState();
+
+            int packetNumber = 0;
 
             // Try to get the controller state.
-            SharpDX.XInput.State xistate;
-            var controller = _controllers[index];
-            _connected[index] = controller.GetState(out xistate);
-            var gamepad = xistate.Gamepad;
+            var gamepad = new SharpDX.XInput.Gamepad();
+            try
+            {
+                SharpDX.XInput.State xistate;
+                var controller = _controllers[index];
+                _connected[index] = controller.GetState(out xistate);
+                packetNumber = xistate.PacketNumber;
+                gamepad = xistate.Gamepad;
+            }
+            catch (Exception ex)
+            {
+            }
 
             // If the device is disconnected retry it after the
             // timeout period has elapsed to avoid the overhead.
             if (!_connected[index])
             {
                 _timeout[index] = DateTime.UtcNow.Ticks + TimeoutTicks;
-                return new GamePadState();
+                return GetDefaultState();
             }
 
             var thumbSticks = new GamePadThumbSticks(
-                leftPosition: ConvertThumbStick(gamepad.LeftThumbX, gamepad.LeftThumbY,
-                    SharpDX.XInput.Gamepad.LeftThumbDeadZone, deadZoneMode),
-                rightPosition: ConvertThumbStick(gamepad.RightThumbX, gamepad.RightThumbY,
-                    SharpDX.XInput.Gamepad.RightThumbDeadZone, deadZoneMode));
+                leftPosition: new Vector2(gamepad.LeftThumbX, gamepad.LeftThumbY) / (float)short.MaxValue,
+                rightPosition: new Vector2(gamepad.RightThumbX, gamepad.RightThumbY) / (float)short.MaxValue,
+                    deadZoneMode: deadZoneMode);
 
             var triggers = new GamePadTriggers(
                     leftTrigger: gamepad.LeftTrigger / (float)byte.MaxValue,
@@ -188,37 +211,9 @@ namespace Microsoft.Xna.Framework.Input
                 buttons: buttons,
                 dPad: dpadState);
 
+            state.PacketNumber = packetNumber;
+
             return state;
-        }
-
-        private static Vector2 ConvertThumbStick(short x, short y, short deadZone, GamePadDeadZone deadZoneMode)
-        {
-            if (deadZoneMode == GamePadDeadZone.IndependentAxes)
-            {
-                // using int to prevent overrun
-                int fx = x;
-                int fy = y;
-                int fdz = deadZone;
-                if (fx * fx < fdz * fdz)
-                    x = 0;
-                if (fy * fy < fdz * fdz)
-                    y = 0;
-            }
-            else if (deadZoneMode == GamePadDeadZone.Circular)
-            {
-                // using int to prevent overrun
-                int fx = x;
-                int fy = y;
-                int fdz = deadZone;
-                if ((fx * fx) + (fy * fy) < fdz * fdz)
-                {
-                    x = 0;
-                    y = 0;
-                }
-            }
-
-            return new Vector2(x < 0 ? -((float)x / (float)short.MinValue) : (float)x / (float)short.MaxValue,
-                               y < 0 ? -((float)y / (float)short.MinValue) : (float)y / (float)short.MaxValue);
         }
 
         private static ButtonState ConvertToButtonState(
@@ -251,9 +246,9 @@ namespace Microsoft.Xna.Framework.Input
             if (thumbX > deadZone)
                 result |= thumbStickRight;
             if (thumbY < -deadZone)
-                result |= thumbStickUp;
-            else if (thumbY > deadZone)
                 result |= thumbStickDown;
+            else if (thumbY > deadZone)
+                result |= thumbStickUp;
             return result;
         }
 
@@ -299,12 +294,15 @@ namespace Microsoft.Xna.Framework.Input
             if (rightTrigger >= SharpDX.XInput.Gamepad.TriggerThreshold)
                 ret |= Buttons.RightTrigger;
 
+            // Check for the hardware back button.
+            if (Back)
+                ret |= Buttons.Back;
+
             return new GamePadButtons(ret);
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-#if DIRECTX11_1
             if (!_connected[index])
                 return false;
 
@@ -316,9 +314,6 @@ namespace Microsoft.Xna.Framework.Input
             });
 
             return result == SharpDX.Result.Ok;
-#else
-            return false;
-#endif            
         }
     }
 }

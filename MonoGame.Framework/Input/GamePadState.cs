@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Input
         //   buttons:
         //     Array or parameter list of Buttons to initialize as pressed.
         public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, params Buttons[] buttons)
-            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad())
+            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad(buttons))
         {
         }
 
@@ -142,7 +142,6 @@ namespace Microsoft.Xna.Framework.Input
         private Buttons GetVirtualButtons () {
             var result = Buttons.buttons;
             var sticks = ThumbSticks;
-            sticks.ApplyDeadZone(GamePadDeadZone.IndependentAxes, 7849 / 32767f);
             
             if (sticks.Left.X < 0)
                 result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickLeft;
@@ -163,7 +162,16 @@ namespace Microsoft.Xna.Framework.Input
                 result |= Microsoft.Xna.Framework.Input.Buttons.RightThumbstickDown;
             else if (sticks.Right.Y > 0)
                 result |= Microsoft.Xna.Framework.Input.Buttons.RightThumbstickUp;
-            
+
+            if (DPad.Down == ButtonState.Pressed)
+                result |= Microsoft.Xna.Framework.Input.Buttons.DPadDown;
+            if (DPad.Up == ButtonState.Pressed)
+                result |= Microsoft.Xna.Framework.Input.Buttons.DPadUp;
+            if (DPad.Left == ButtonState.Pressed)
+                result |= Microsoft.Xna.Framework.Input.Buttons.DPadLeft;
+            if (DPad.Right == ButtonState.Pressed)
+                result |= Microsoft.Xna.Framework.Input.Buttons.DPadRight;
+
             return result;
         }
         

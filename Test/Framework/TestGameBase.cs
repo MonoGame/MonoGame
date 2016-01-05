@@ -176,7 +176,8 @@ namespace MonoGame.Tests {
 				// does, all future windows that are created are
 				// instantly killed.  So, we manually absorb any
 				// WM_QUIT that exists.
-				AbsorbQuitMessage ();
+				if (_isExiting)
+					AbsorbQuitMessage ();
 			}
 #elif IOS || ANDROID
 			RunOnMainThreadAndWait();
@@ -322,7 +323,7 @@ namespace MonoGame.Tests {
 
 		const uint WM_QUIT = 0x12;
 
-		private static void AbsorbQuitMessage ()
+		protected static void AbsorbQuitMessage ()
 		{
 			NativeMessage msg;
 			if (!PeekMessage (out msg, IntPtr.Zero, 0, 0, 0))

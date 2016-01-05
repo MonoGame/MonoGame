@@ -45,14 +45,6 @@ namespace Microsoft.Xna.Framework.Input
 {
     public struct GamePadThumbSticks
     {
-        public enum GateType
-        {
-            None,
-            Round,
-            Square
-        };
-        public static GateType Gate = GateType.Round;
-
         Vector2 left;
         Vector2 right;
 
@@ -62,27 +54,6 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return left;
             }
-        	internal set
-            {
-        		switch (Gate)
-                {
-        		case GateType.None:
-        			left = value;
-        			break;
-        		case GateType.Round:
-        			if (value.LengthSquared () > 1f)
-        				left = Vector2.Normalize (value);
-        			else
-        				left = value;
-        			break;
-                    case GateType.Square:
-                        left = new Vector2(MathHelper.Clamp(value.X, -1f, 1f), MathHelper.Clamp(value.Y, -1f, 1f));
-                        break;
-                    default:
-                        left = Vector2.Zero;
-                        break;
-                }
-            }
         }
         public Vector2 Right
         {
@@ -90,58 +61,97 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return right;
             }
-        	internal set
-            {
-        		switch (Gate)
-                {
-        		case GateType.None:
-        			right = value;
-        			break;
-        		case GateType.Round:
-        			if (value.LengthSquared () > 1f)
-        				right = Vector2.Normalize (value);
-        			else
-        				right = value;
-        			break;
-                    case GateType.Square:
-                        right = new Vector2(MathHelper.Clamp(value.X, -1f, 1f), MathHelper.Clamp(value.Y, -1f, 1f));
-                        break;
-                    default:
-                        right = Vector2.Zero;
-                        break;
-                }
-            }
         }
 
 		public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition):this()
 		{
-			Left = leftPosition;
-			Right = rightPosition;
+			left = leftPosition;
+			right = rightPosition;
+            ApplySquareClamp();
 		}
 
-        internal void ApplyDeadZone(GamePadDeadZone dz, float size)
+        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode):this()
         {
+            // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
+            left = leftPosition;
+            right = rightPosition;
+            ApplyDeadZone(deadZoneMode);
+            if (deadZoneMode == GamePadDeadZone.Circular)
+                ApplyCircularClamp();
+            else
+                ApplySquareClamp();
+        }
+
+        private void ApplySquareClamp()
+        {
+            left = new Vector2(MathHelper.Clamp(left.X, -1f, 1f), MathHelper.Clamp(left.Y, -1f, 1f));
+            right = new Vector2(MathHelper.Clamp(right.X, -1f, 1f), MathHelper.Clamp(right.Y, -1f, 1f));
+        }
+
+        private void ApplyCircularClamp()
+        {
+            if (left.LengthSquared() > 1f)
+                left.Normalize();
+            if (right.LengthSquared() > 1f)
+                right.Normalize();
+        }
+
+        private void ApplyDeadZone(GamePadDeadZone dz)
+        {
+#if DIRECTX && !WINDOWS_PHONE && !WINDOWS_PHONE81 && !WINDOWS_UAP
+            // XInput Xbox 360 Controller dead zones
+            // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
+            const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
+            const float rightThumbDeadZone = SharpDX.XInput.Gamepad.RightThumbDeadZone / (float)short.MaxValue;
+#elif OUYA
+            // OUYA dead zones should
+            // They are a bit larger to accomodate OUYA Gamepad (but will also affect Xbox 360 controllers plugged to an OUYA)
+            const float leftThumbDeadZone = 0.3f;
+            const float rightThumbDeadZone = 0.3f;
+#else
+            // Default & SDL Xbox 360 Controller dead zones
+            // Based on the XInput constants
+            const float leftThumbDeadZone = 0.24f;
+            const float rightThumbDeadZone = 0.265f;
+#endif
             switch (dz)
             {
                 case GamePadDeadZone.None:
                     break;
                 case GamePadDeadZone.IndependentAxes:
-                    if (Math.Abs(left.X) < size)
-                        left.X = 0f;
-                    if (Math.Abs(left.Y) < size)
-                        left.Y = 0f;
-                    if (Math.Abs(right.X) < size)
-                        right.X = 0f;
-                    if (Math.Abs(right.Y) < size)
-                        right.Y = 0f;
+                    left = ExcludeIndependentAxesDeadZone(left, leftThumbDeadZone);
+                    right = ExcludeIndependentAxesDeadZone(right, rightThumbDeadZone);
                     break;
                 case GamePadDeadZone.Circular:
-                    if (left.LengthSquared() < size * size)
-                        left = Vector2.Zero;
-                    if (right.LengthSquared() < size * size)
-                        right = Vector2.Zero;
+                    left = ExcludeCircularDeadZone(left, leftThumbDeadZone);
+                    right = ExcludeCircularDeadZone(right, rightThumbDeadZone);
                     break;
             }
+        }
+
+        private Vector2 ExcludeIndependentAxesDeadZone(Vector2 value, float deadZone)
+        {
+            return new Vector2(ExcludeAxisDeadZone(value.X, deadZone), ExcludeAxisDeadZone(value.Y, deadZone));
+        }
+
+        private float ExcludeAxisDeadZone(float value, float deadZone)
+        {
+            if (value < -deadZone)
+                value += deadZone;
+            else if (value > deadZone)
+                value -= deadZone;
+            else
+                return 0f;
+            return value / (1f - deadZone);
+        }
+
+        private Vector2 ExcludeCircularDeadZone(Vector2 value, float deadZone)
+        {
+            var originalLength = value.Length();
+            if (originalLength <= deadZone)
+                return Vector2.Zero;
+            var newLength = (originalLength - deadZone) / (1f - deadZone);
+            return value * (newLength / originalLength);
         }
 
         /// <summary>

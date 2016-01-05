@@ -36,10 +36,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
 		{
-            if (graphicsDevice == null)
-                throw new ArgumentNullException("graphicsDevice");
-
-			this.GraphicsDevice = graphicsDevice;
+		    if (graphicsDevice == null)
+		    {
+		        throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+		    }
+		    this.GraphicsDevice = graphicsDevice;
             this._width = width;
             this._height = height;
             this._depth = depth;

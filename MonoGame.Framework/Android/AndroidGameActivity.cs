@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework
         private OrientationListener _orientationListener;
 
         public bool AutoPauseAndResumeMediaPlayer = true;
+        public bool RenderOnUIThread = true; 
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
@@ -89,6 +90,7 @@ namespace Microsoft.Xna.Framework
 		protected override void OnDestroy ()
 		{
             UnregisterReceiver(screenReceiver);
+            ScreenReceiver.ScreenLocked = false;
             _orientationListener = null;
             if (Game != null)
                 Game.Dispose();
