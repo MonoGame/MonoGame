@@ -19,5 +19,5 @@ The Pipeline Tool is still relatively new to MonoGame, but it already has the fo
 
 Currently the Pipeline Tool is only available on Windows and is part of the SDK installation.  The Mac and Linux versions are in development and should be available soon.
 
-
+[Read detailed documentation](using_pipeline_tool.md)
 

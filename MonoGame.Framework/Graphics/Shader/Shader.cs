@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Graphics
 					Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
 					Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
 					Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
+                    Samplers[s].state.BorderColor = new Color(
+                        reader.ReadByte(), 
+                        reader.ReadByte(), 
+                        reader.ReadByte(), 
+                        reader.ReadByte());
 					Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
 					Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
 					Samplers[s].state.MaxMipLevel = reader.ReadInt32();

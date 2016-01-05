@@ -17,9 +17,12 @@ namespace MonoGame.Tests.Framework
             get { throw new NotImplementedException(); }
         }
 
-// TODO: Make this common so that all platforms have it!
-#if WINDOWS && DIRECTX
+        // TODO: Make this common so that all platforms have it!
+#if (WINDOWS && !WINRT) || LINUX
         public override Point Position { get; set; }
+#endif
+#if DESKTOPGL
+        public override System.Drawing.Icon Icon { get; set; } 
 #endif
 
         public override DisplayOrientation CurrentOrientation

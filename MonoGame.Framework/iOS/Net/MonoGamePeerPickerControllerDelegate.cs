@@ -43,8 +43,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using MonoTouch.UIKit;
-using MonoTouch.GameKit;
+using UIKit;
+using GameKit;
 
 using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
@@ -52,7 +52,7 @@ using Microsoft.Xna.Framework.GamerServices;
 namespace Microsoft.Xna.Framework.Net
 {
     [CLSCompliant(false)]
-	public class MonoGamePeerPickerControllerDelegate : MonoTouch.GameKit.GKPeerPickerControllerDelegate
+	public class MonoGamePeerPickerControllerDelegate : GameKit.GKPeerPickerControllerDelegate
 	{
 		private GKSession gkSession;
 		private EventHandler<GKDataReceivedEventArgs> receivedData;

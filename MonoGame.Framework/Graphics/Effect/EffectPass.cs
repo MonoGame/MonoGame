@@ -1,10 +1,5 @@
 using System.Diagnostics;
 
-#if PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
-
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPass
@@ -21,10 +16,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		public string Name { get; private set; }
 
         public EffectAnnotationCollection Annotations { get; private set; }
-
-#if PSM
-        internal ShaderProgram _shaderProgram;
-#endif
 
         internal EffectPass(    Effect effect, 
                                 string name,
@@ -67,9 +58,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
-#if PSM
-            _shaderProgram = cloneSource._shaderProgram;
-#endif
         }
 
         public void Apply()
@@ -94,6 +82,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 device.VertexShader = _vertexShader;
 
+				// Update the texture parameters.
+                SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
+
                 // Update the constant buffers.
                 for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
                 {
@@ -108,20 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.PixelShader = _pixelShader;
 
                 // Update the texture parameters.
-                foreach (var sampler in _pixelShader.Samplers)
-                {
-                    var param = _effect.Parameters[sampler.parameter];
-                    var texture = param.Data as Texture;
-										
-					// If there is no texture assigned then skip it
-					// and leave whatever set directly on the device.
-					if (texture != null)
-						device.Textures[sampler.textureSlot] = texture;
-
-                    // If there is a sampler state set it.
-                    if (sampler.state != null)
-                        device.SamplerStates[sampler.samplerSlot] = sampler.state;
-                }
+                SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
                 
                 // Update the constant buffers.
                 for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
@@ -141,25 +119,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.BlendState = _blendState;
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
-            
-#if PSM
-            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
-
-            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
-
-            float[] data;
-            if (_effect.Parameters["WorldViewProj"] != null) 
-                data = (float[])_effect.Parameters["WorldViewProj"].Data;
-            else
-                data = (float[])_effect.Parameters["MatrixTransform"].Data;
-            Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
-            matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
-            _shaderProgram.SetUniformValue(0, ref matrix4);
-            
-            if (_effect.Parameters["Texture0"].Data != null && _effect.Parameters["Texture0"].Data != null)
-                _effect.GraphicsDevice._graphics.SetTexture(0, ((Texture2D)_effect.Parameters["Texture0"].Data)._texture2D);
-#endif
         }
-		
+
+        private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
+        {
+            foreach (var sampler in shader.Samplers)
+            {
+                var param = _effect.Parameters[sampler.parameter];
+                var texture = param.Data as Texture;
+
+                textures[sampler.textureSlot] = texture;
+
+                // If there is a sampler state set it.
+                if (sampler.state != null)
+                    samplerStates[sampler.samplerSlot] = sampler.state;
+            }
+        }
     }
 }

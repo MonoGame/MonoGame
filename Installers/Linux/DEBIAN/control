@@ -1,0 +1,6 @@
+Package: monogame-sdk
+Section: Development
+Architecture: amd64
+Depends: libgtk-3-0 (>= 3.0.0), ttf-mscorefonts-installer (>= 1.0), monodevelop (>= 5.0), gtk-sharp3 (>= 2.99), referenceassemblies-pcl (>= 2014.04)
+Maintainer: Harry <cra0zy@email.com>
+Description: MonoGame SDK

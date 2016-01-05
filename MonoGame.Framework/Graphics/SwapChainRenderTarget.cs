@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // First, retrieve the underlying DXGI Device from the D3D Device.
             // Creates the swap chain 
-            using (var dxgiDevice = d3dDevice.QueryInterface<Device1>())
+            using (var dxgiDevice = d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
             using (var dxgiAdapter = dxgiDevice.Adapter)
             using (var dxgiFactory = dxgiAdapter.GetParent<Factory1>())
             {
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0);
 
             // Create a view interface on the rendertarget to use on bind.
-            _renderTargetView = new RenderTargetView(d3dDevice, backBuffer);
+            _renderTargetViews = new[] { new RenderTargetView(d3dDevice, backBuffer) };
 
             // Get the rendertarget dimensions for later.
             var backBufferDesc = backBuffer.Description;

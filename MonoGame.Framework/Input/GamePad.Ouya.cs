@@ -142,6 +142,11 @@ namespace Microsoft.Xna.Framework.Input
     {
         private static readonly OuyaGamePad[] GamePads = new OuyaGamePad[OuyaController.MaxControllers];
 
+        private static int PlatformGetMaxNumberOfGamePads()
+        {
+            return 4;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             var gamePad = GamePads[index];
@@ -178,8 +183,7 @@ namespace Microsoft.Xna.Framework.Input
                     return state;
                 }
 
-                GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick);
-                thumbSticks.ApplyDeadZone(deadZoneMode, 0.3f);
+                GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick, deadZoneMode);
 
                 if (gamePad._startButtonPressed)
                 {

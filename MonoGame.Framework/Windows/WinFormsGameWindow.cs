@@ -41,8 +41,10 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -58,13 +60,14 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    class WinFormsGameWindow : GameWindow
+    class WinFormsGameWindow : GameWindow, IDisposable
     {
         internal WinFormsGameForm _form;
 
+        static private ReaderWriterLockSlim _allWindowsReaderWriterLockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
 
-        private readonly WinFormsGamePlatform _platform;
+        private WinFormsGamePlatform _platform;
 
         private bool _isResizable;
 
@@ -90,8 +93,9 @@ namespace MonoGame.Framework
         {
             get
             {
-                var clientRect = _form.ClientRectangle;
-                return new Rectangle(clientRect.X, clientRect.Y, clientRect.Width, clientRect.Height);
+                var position = _form.PointToScreen(Point.Empty);
+                var size = _form.ClientSize;
+                return new Rectangle(position.X, position.Y, size.Width, size.Height);
             }
         }
 
@@ -194,11 +198,58 @@ namespace MonoGame.Framework
 
             _form.KeyPress += OnKeyPress;
 
-            _allWindows.Add(this);
+            RegisterToAllWindows();
+        }
+
+        ~WinFormsGameWindow()
+        {
+            Dispose(false);
+        }
+
+        private void RegisterToAllWindows()
+        {
+            _allWindowsReaderWriterLockSlim.EnterWriteLock();
+
+            try
+            {
+                _allWindows.Add(this);
+            }
+            finally
+            {
+                _allWindowsReaderWriterLockSlim.ExitWriteLock();
+            }
+        }
+
+        private void UnregisterFromAllWindows()
+        {
+            _allWindowsReaderWriterLockSlim.EnterWriteLock();
+
+            try
+            {
+                _allWindows.Remove(this);
+            }
+            finally
+            {
+                _allWindowsReaderWriterLockSlim.ExitWriteLock();
+            }
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
+#if (WINDOWS && DIRECTX)
+            if (Game.GraphicsDevice != null)
+            {
+                if (Game.graphicsDeviceManager.HardwareModeSwitch)
+                {
+                    if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
+                   {
+                       Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
+                       Game.GraphicsDevice.CreateSizeDependentResources(true);
+                        Game.GraphicsDevice.ApplyRenderTargets(null);
+                   }
+                }
+          }
+#endif
             _platform.IsActive = true;
         }
 
@@ -217,6 +268,12 @@ namespace MonoGame.Framework
 
         private void UpdateMouseState()
         {
+            // If we call the form client functions before the form has
+            // been made visible it will cause the wrong window size to
+            // be applied at startup.
+            if (!_form.Visible)
+                return;
+
             var clientPos = _form.PointToClient(Control.MousePosition);
             var withinClient = _form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
@@ -331,9 +388,11 @@ namespace MonoGame.Framework
 
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
+
+#if !(WINDOWS && DIRECTX)
                 manager.PreferredBackBufferWidth = newWidth;
                 manager.PreferredBackBufferHeight = newHeight;
-
+#endif
                 if (manager.GraphicsDevice == null)
                     return;
             }
@@ -351,39 +410,66 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            Application.Idle += OnIdle;
-            Application.Run(_form);
-            Application.Idle -= OnIdle;
+            // https://bugzilla.novell.com/show_bug.cgi?id=487896
+            // Since there's existing bug from implementation with mono WinForms since 09'
+            // Application.Idle is not working as intended
+            // So we're just going to emulate Application.Run just like Microsoft implementation
+            _form.Show();
 
-            // We need to remove the last message in the message 
+            var nativeMsg = new NativeMessage();
+            while (_form != null && _form.IsDisposed == false)
+            {
+                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
+                {
+                    Application.DoEvents();
+
+                    if (nativeMsg.msg == WM_QUIT)
+                        break;
+
+                    continue;
+                }
+
+                UpdateWindows();
+                Game.Tick();
+            }
+
+            // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
             // same thread.
             //
             // This is critical for some NUnit runners which
             // typically will run all the tests on the same
             // process/thread.
-            NativeMessage msg;
-            PeekMessage(out msg, IntPtr.Zero, 0, 0, 1);
-        }
 
-        private void OnIdle(object sender, EventArgs eventArgs)
-        {
-            // While there are no pending messages 
-            // to be processed tick the game.
-            NativeMessage msg;
-            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
+            var msg = new NativeMessage();
+            do
             {
-                UpdateWindows();
-                Game.Tick();
-            }
+                if (msg.msg == WM_QUIT)
+                    break;
+
+                Thread.Sleep(100);
+            } 
+            while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
         }
 
         internal void UpdateWindows()
         {
-            // Update the mouse state for each window.
-            foreach (var window in _allWindows)
-                window.UpdateMouseState();
+            _allWindowsReaderWriterLockSlim.EnterReadLock();
+
+            try
+            {
+                // Update the mouse state for each window.
+                foreach (var window in _allWindows)
+                    if (window.Game == Game)
+                        window.UpdateMouseState();
+            }
+            finally
+            {
+                _allWindowsReaderWriterLockSlim.ExitReadLock();
+            }
         }
+
+        private const uint WM_QUIT = 0x12;
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NativeMessage
@@ -409,11 +495,26 @@ namespace MonoGame.Framework
 
         public void Dispose()
         {
-            if (_form != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _form.Dispose();
-                _form = null;
+                if (_form != null)
+                {
+                    UnregisterFromAllWindows(); 
+                    _form.Dispose();
+                    _form = null;
+                }
             }
+            _platform = null;
+            Game = null;
+            Mouse.SetWindows(null);
+            Device.KeyboardInput -= OnRawKeyEvent;
+            Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.Remove);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

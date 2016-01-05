@@ -50,14 +50,16 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void Do()
+        public bool Do()
         {
             Toggle();
+            return true;
         }
 
-        public void Undo()
+        public bool Undo()
         {
             Toggle();
+            return true;
         }
 
         private void Toggle()
@@ -118,14 +120,16 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void Do()
+        public bool Do()
         {
             Toggle();
+            return true;
         }
 
-        public void Undo()
+        public bool Undo()
         {
             Toggle();
+            return true;
         }
 
         private void Toggle()

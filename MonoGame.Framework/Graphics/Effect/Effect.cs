@@ -3,13 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-#if PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
 #if WINRT
 using System.Reflection;
 #endif
@@ -33,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 6;
+            public const int MGFXVersion = 7;
 
             public int Signature;
             public int Version;
@@ -56,10 +52,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal Effect(GraphicsDevice graphicsDevice)
 		{
-			if (graphicsDevice == null)
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-
-			this.GraphicsDevice = graphicsDevice;
+            if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+            }
+            this.GraphicsDevice = graphicsDevice;
 		}
 			
 		protected Effect(Effect cloneSource)
@@ -89,15 +86,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			// This might need to change slightly if/when we support
 			// shared constant buffers as 'new' should return unique
 			// effects without any shared instance state.
-            
+ 
             //Read the header
             MGFXHeader header = ReadHeader(effectCode);
+			var effectKey = header.EffectKey;
+			int headerSize = header.HeaderSize;
+
             // First look for it in the cache.
             //
             Effect cloneSource;
-            if (!EffectCache.TryGetValue(header.EffectKey, out cloneSource))
+            if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
-                using (var stream = new MemoryStream(effectCode, header.HeaderSize, effectCode.Length - header.HeaderSize, false))
+                using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
             	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     cloneSource.ReadEffect(reader);
 
                 // Cache the effect for later in its original unmodified state.
-                    EffectCache.Add(header.EffectKey, cloneSource);
+                    graphicsDevice.EffectCache.Add(effectKey, cloneSource);
                 }
             }
 
@@ -248,8 +248,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-
-#if !PSM
 
 		private void ReadEffect (BinaryReader reader)
 		{
@@ -483,99 +481,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return new EffectParameterCollection(parameters);
 		}
-#else //PSM
-		internal void ReadEffect(BinaryReader reader)
-		{
-			var effectPass = new EffectPass(this, "Pass", null, null, null, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
-			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
-			var shaderProgram = effectPass._shaderProgram;
-            
-            EffectParameter[] parametersArray = new EffectParameter[shaderProgram.UniformCount+4];
-			for (int i = 0; i < shaderProgram.UniformCount; i++)
-			{	
-                parametersArray[i]= EffectParameterForUniform(shaderProgram, i);
-			}
-			
-			#warning Hacks for BasicEffect as we don't have these parameters yet
-            parametersArray[shaderProgram.UniformCount] = new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
-                3, 1, "float3",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[3]);
-            parametersArray[shaderProgram.UniformCount+1] = new EffectParameter(
-                EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
-                1, 1, "float",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, 0.0f);
-            parametersArray[shaderProgram.UniformCount+2] = new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
-                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
-            parametersArray[shaderProgram.UniformCount+3] = new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
-                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
-
-            Parameters = new EffectParameterCollection(parametersArray);
-                       
-            EffectPass []effectsPassArray = new EffectPass[1];
-            effectsPassArray[0] = effectPass;
-            var effectPassCollection = new EffectPassCollection(effectsPassArray);            
-            
-            EffectTechnique []effectTechniqueArray = new EffectTechnique[1]; 
-            effectTechniqueArray[0] = new EffectTechnique(this, "Name", effectPassCollection, EffectAnnotationCollection.Empty);
-            Techniques = new EffectTechniqueCollection(effectTechniqueArray);
-            
-            ConstantBuffers = new ConstantBuffer[0];            
-            CurrentTechnique = Techniques[0];
-        }
-        
-        internal EffectParameter EffectParameterForUniform(ShaderProgram shaderProgram, int index)
-        {
-            //var b = shaderProgram.GetUniformBinding(i);
-            var name = shaderProgram.GetUniformName(index);
-            //var s = shaderProgram.GetUniformSize(i);
-            //var x = shaderProgram.GetUniformTexture(i);
-            var type = shaderProgram.GetUniformType(index);
-            
-            //EffectParameter.Semantic => COLOR0 / POSITION0 etc
-   
-            //FIXME: bufferOffset in below lines is 0 but should probably be something else
-            switch (type)
-            {
-            case ShaderUniformType.Float4x4:
-                return new EffectParameter(
-                    EffectParameterClass.Matrix, EffectParameterType.Single, name,
-                    4, 4, "float4x4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4 * 4]);
-            case ShaderUniformType.Float4:
-                return new EffectParameter(
-                    EffectParameterClass.Vector, EffectParameterType.Single, name,
-                    4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
-            case ShaderUniformType.Sampler2D:
-                return new EffectParameter(
-                    EffectParameterClass.Object, EffectParameterType.Texture2D, name,
-                    1, 1, "texture2d",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, null);
-            default:
-                throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
-            }
-        }
-        
-#endif
         #endregion // Effect File Reader
-
-
-        #region Effect Cache        
-
-        /// <summary>
-        /// The cache of effects from unique byte streams.
-        /// </summary>
-        private static readonly Dictionary<int, Effect> EffectCache = new Dictionary<int, Effect>();
-
-        internal static void FlushCache()
-        {
-            // Dispose all the cached effects.
-            foreach (var effect in EffectCache)
-                effect.Value.Dispose();
-
-            // Clear the cache.
-            EffectCache.Clear();
-        }
-
-        #endregion // Effect Cache
-
 	}
 }

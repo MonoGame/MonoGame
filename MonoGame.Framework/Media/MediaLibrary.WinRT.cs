@@ -14,37 +14,51 @@ namespace Microsoft.Xna.Framework.Media
 {
     public partial class MediaLibrary
     {
+        private const string CacheFile = "MediaLibrary.cache";
+
         private static StorageFolder musicFolder;
         private static AlbumCollection albumCollection;
         private static SongCollection songCollection;
 
-        static MediaLibrary()
-        {
-            musicFolder = KnownFolders.MusicLibrary;
-        }
-
         private void PlatformLoad(Action<int> progressCallback)
         {
-            List<StorageFile> files = new List<StorageFile>();
-            this.GetAllFiles(musicFolder, files);
-
-            List<Song> songList = new List<Song>();
-            List<Album> albumList = new List<Album>();
-
             Task.Run(async () =>
             {
-                Dictionary<string, Artist> artists = new Dictionary<string, Artist>();
-                Dictionary<string, Album> albums = new Dictionary<string, Album>();
-                Dictionary<string, Genre> genres = new Dictionary<string, Genre>();
+                if (musicFolder == null)
+                {
+                    try
+                    {
+                        musicFolder = KnownFolders.MusicLibrary;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine("Failed to access Music Library: " + e.Message);
+                        albumCollection = new AlbumCollection(new List<Album>());
+                        songCollection = new SongCollection(new List<Song>());
+                        return;
+                    }
+                }
+                    
+            
+                var files = new List<StorageFile>();
+                await this.GetAllFiles(musicFolder, files);
 
-                var cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("MediaLibrary.cache", CreationCollisionOption.OpenIfExists);
+                var songList = new List<Song>();
+                var albumList = new List<Album>();
+
+                var artists = new Dictionary<string, Artist>();
+                var albums = new Dictionary<string, Album>();
+                var genres = new Dictionary<string, Genre>();
+
                 var cache = new Dictionary<string, MusicProperties>();
 
                 // Read cache
-                using (var stream = new BinaryReader(await cacheFile.OpenStreamForReadAsync()))
+                var cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(CacheFile, CreationCollisionOption.OpenIfExists);
+                using (var baseStream = await cacheFile.OpenStreamForReadAsync())
+                using (var stream = new BinaryReader(baseStream))
                     try
                     {
-                        for (; stream.BaseStream.Position < stream.BaseStream.Length; )
+                        for (; baseStream.Position < baseStream.Length; )
                         {
                             var entry = MusicProperties.Deserialize(stream);
                             cache.Add(entry.Path, entry);
@@ -53,6 +67,7 @@ namespace Microsoft.Xna.Framework.Media
                     catch { }
 
                 // Write cache
+                cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(CacheFile, CreationCollisionOption.ReplaceExisting);
                 using (var stream = new BinaryWriter(await cacheFile.OpenStreamForWriteAsync()))
                 {
                     int prevProgress = 0;
@@ -118,23 +133,29 @@ namespace Microsoft.Xna.Framework.Media
                         }
                     }
                 }
+
+                if (progressCallback != null)
+                    progressCallback.Invoke(100);
+
+                albumCollection = new AlbumCollection(albumList);
+                songCollection = new SongCollection(songList);
             }).Wait();
-
-            if (progressCallback != null)
-                progressCallback.Invoke(100);
-
-            albumCollection = new AlbumCollection(albumList);
-            songCollection = new SongCollection(songList);
         }
 
-        private void GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
+        private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
         {
-            foreach (var file in Task.Run(async () => await storageFolder.GetFilesAsync()).Result)
-                if (file.ContentType.StartsWith("audio") && !file.ContentType.EndsWith("url"))
-                    musicFiles.Add(file);
-
-            foreach (var folder in Task.Run(async () => await storageFolder.GetFoldersAsync()).Result)
-                this.GetAllFiles(folder, musicFiles);
+            foreach (var item in await storageFolder.GetItemsAsync())
+                if (item is StorageFile)
+                {
+                    var file = item as StorageFile;
+                    if (file.ContentType.StartsWith("audio") && !file.ContentType.EndsWith("url"))
+                        musicFiles.Add(file);
+                }
+                else
+                {
+                    var folder = item as StorageFolder;
+                    await this.GetAllFiles(folder, musicFiles);
+                }
         }
 
         private AlbumCollection PlatformGetAlbums()

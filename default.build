@@ -3,8 +3,9 @@
   <description>Default MonoGame Automated Build script</description>
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
-  <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
-  
+  <property name="msbuild12dir" value="C:\Program Files (x86)\MSBuild\12.0\Bin" />
+  <property name="msbuild14dir" value="C:\Program Files (x86)\MSBuild\14.0\Bin" />
+
   <!-- Temporary work around so that we don't need to change the targets on the build server -->
   <target name="build" depends="build_code,run_tests,build_docs,build_installer" />
 
@@ -31,25 +32,14 @@
     <call target="build_windows"/>
     <call target="build_windows8" />
     <call target="build_windowsphone" />
-    <call target="build_psm" />
+    <call target="build_windowsphone81" />
+    <call target="build_windows10" />
     <call target="build_web" />
     <call target="build_linux"/>
     <call target="build_android" />
     <call target="build_mac" />
     <call target="build_ios" />
 
-    <call target="build_contentprocessor"/>
-
-  </target>
-
-  <target name="build_psm" description="Build Play Station Mobile" depends="clean">
-    <if test="${os == 'Win32NT'}">
-      <if test="${file::exists('C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin\mdtool.exe')}">
-        <exec program="Protobuild" commandline="-generate PSMobile" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.PSMobile.sln" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.PSMobile.sln" />
-      </if>
-    </if>
   </target>
 
   <target name="build_windows" description="Build Windows" depends="clean">
@@ -81,6 +71,11 @@
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
+    </if>
+    <if test="${os == 'MacOS'}">
+      <exec program="mono" commandline="Protobuild.exe -generate Linux" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.Linux.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.Linux.sln" />
     </if>
   </target>
 
@@ -162,16 +157,41 @@
     </if>
   </target>
 
-  <target name="build_contentprocessor" description="Build the old content processors" depends="clean">
+  <target name="build_windowsphone81" description="Build Windows Phone 8.1" depends="clean">
     <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Build /p:Configuration=Release" />
+      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.1\Microsoft.Cpp.WindowsPhone.8.1.targets')}">
+        <exec program="Protobuild" commandline="-generate WindowsPhone81" />
+        <exec program="${msbuild12dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild12dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+      </if>
+    </if>
+  </target>
+
+  <target name="build_windows10" description="Build Windows 10 UAP" depends="clean">
+    <if test="${os == 'Win32NT'}">
+      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
+        <exec program="Protobuild" commandline="-generate WindowsUniversal" />
+
+        <!--
+            Currently MSBuild doesn't restore the nuget packages like buiding from the
+            IDE does.  So we have to do it ourselves using the recommended work around.
+        -->
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUniversal.project.json -NonInteractive' />
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
+
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C rmdir /S /Q WindowsUAP' workingdir='MonoGame.Framework\bin' failonerror='false' />
+        <exec program="C:\Windows\system32\cmd.exe" commandline='/C rename WindowsUniversal WindowsUAP' workingdir='MonoGame.Framework\bin' />
+      </if>
     </if>
   </target>
 
   <target name="run_tests" description="Run all the tests" depends="build_code">
-    <if test="${os == 'Win32NT'}">
-    </if>
+    <nunit2 if="${os == 'Win32NT'}">
+      <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
+      <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
+    </nunit2>
   </target>
 
   <target name="build_docs" description="Build the documentation." depends="build_code,run_tests">
@@ -183,12 +203,11 @@
 
   <target name="build_installer" description="Build the installers." depends="build_code,build_docs,run_tests">
 
-    <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
-    <nant buildfile="IDE/MonoDevelop/default.build" target="build"/>
-
+    <nant buildfile="ProjectTemplates/VisualStudio2015/default.build" target="build" />
+    <nant buildfile="IDE/MonoDevelop/default.build" target="build" />
     <nant buildfile="Installers/default.build" target="build" />
 
   </target>

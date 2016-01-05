@@ -14,6 +14,7 @@ namespace Lidgren.Network
 
 		private int m_listenPort;
 		private object m_tag;
+		private object m_messageReceivedEventCreationLock = new object();
 
 		internal readonly List<NetConnection> m_connections;
 		private readonly Dictionary<IPEndPoint, NetConnection> m_connectionLookup;
@@ -31,7 +32,21 @@ namespace Lidgren.Network
 		/// find the message in the queue. Other user created threads could be preempted and dequeue 
 		/// the message before the waiting thread wakes up.
 		/// </summary>
-		public AutoResetEvent MessageReceivedEvent { get { return m_messageReceivedEvent; } }
+		public AutoResetEvent MessageReceivedEvent
+		{
+			get
+			{
+				if (m_messageReceivedEvent == null)
+				{
+					lock (m_messageReceivedEventCreationLock) // make sure we don't create more than one event object
+					{
+						if (m_messageReceivedEvent == null)
+							m_messageReceivedEvent = new AutoResetEvent(false);
+					}
+				}
+				return m_messageReceivedEvent;
+			}
+		}
 
 		/// <summary>
 		/// Gets a unique identifier for this NetPeer based on Mac address and ip/port. Note! Not available until Start() has been called!
@@ -150,7 +165,11 @@ namespace Lidgren.Network
 		public NetConnection GetConnection(IPEndPoint ep)
 		{
 			NetConnection retval;
-			m_connectionLookup.TryGetValue(ep, out retval); // this should not pose a threading problem, afaict
+
+			// this should not pose a threading problem, m_connectionLookup is never added to concurrently
+			// and TryGetValue will not throw an exception on fail, only yield null, which is acceptable
+			m_connectionLookup.TryGetValue(ep, out retval);
+
 			return retval;
 		}
 
@@ -159,8 +178,11 @@ namespace Lidgren.Network
 		/// </summary>
 		public NetIncomingMessage WaitMessage(int maxMillis)
 		{
-			if (m_messageReceivedEvent != null)
-				m_messageReceivedEvent.WaitOne(maxMillis);
+			var msg = ReadMessage();
+			if (msg != null)
+				return msg; // no need to wait; we already have a message to deliver
+			var msgEvt = MessageReceivedEvent;
+			msgEvt.WaitOne(maxMillis);
 			return ReadMessage();
 		}
 
@@ -180,7 +202,29 @@ namespace Lidgren.Network
 			}
 			return retval;
 		}
-		
+
+		/// <summary>
+		/// Read a pending message from any connection, if any
+		/// </summary>
+		public int ReadMessages(IList<NetIncomingMessage> addTo)
+		{
+			int added = m_releasedIncomingMessages.TryDrain(addTo);
+			if (added > 0)
+			{
+				for (int i = 0; i < added; i++)
+				{
+					var index = addTo.Count - added + i;
+					var nim = addTo[index];
+					if (nim.MessageType == NetIncomingMessageType.StatusChanged)
+					{
+						NetConnectionStatus status = (NetConnectionStatus)nim.PeekByte();
+						nim.SenderConnection.m_visibleStatus = status;
+					}
+				}
+			}
+			return added;
+		}
+
 		// send message immediately
 		internal void SendLibrary(NetOutgoingMessage msg, IPEndPoint recipient)
 		{
@@ -211,32 +255,32 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Create a connection to a remote endpoint
 		/// </summary>
-		public NetConnection Connect(IPEndPoint remoteEndpoint)
+		public NetConnection Connect(IPEndPoint remoteEndPoint)
 		{
-			return Connect(remoteEndpoint, null);
+			return Connect(remoteEndPoint, null);
 		}
 
 		/// <summary>
 		/// Create a connection to a remote endpoint
 		/// </summary>
-		public virtual NetConnection Connect(IPEndPoint remoteEndpoint, NetOutgoingMessage hailMessage)
+		public virtual NetConnection Connect(IPEndPoint remoteEndPoint, NetOutgoingMessage hailMessage)
 		{
-			if (remoteEndpoint == null)
-				throw new ArgumentNullException("remoteEndpoint");
+			if (remoteEndPoint == null)
+				throw new ArgumentNullException("remoteEndPoint");
 
 			lock (m_connections)
 			{
 				if (m_status == NetPeerStatus.NotRunning)
 					throw new NetException("Must call Start() first");
 
-				if (m_connectionLookup.ContainsKey(remoteEndpoint))
+				if (m_connectionLookup.ContainsKey(remoteEndPoint))
 					throw new NetException("Already connected to that endpoint!");
 
 				NetConnection hs;
-				if (m_handshakes.TryGetValue(remoteEndpoint, out hs))
+				if (m_handshakes.TryGetValue(remoteEndPoint, out hs))
 				{
 					// already trying to connect to that endpoint; make another try
-					switch (hs.Status)
+					switch (hs.m_status)
 					{
 						case NetConnectionStatus.InitiatedConnect:
 							// send another connect
@@ -248,13 +292,13 @@ namespace Lidgren.Network
 							break;
 						default:
 							// weird
-							LogWarning("Weird situation; Connect() already in progress to remote endpoint; but hs status is " + hs.Status);
+							LogWarning("Weird situation; Connect() already in progress to remote endpoint; but hs status is " + hs.m_status);
 							break;
 					}
 					return hs;
 				}
 
-				NetConnection conn = new NetConnection(this, remoteEndpoint);
+				NetConnection conn = new NetConnection(this, remoteEndPoint);
 				conn.m_status = NetConnectionStatus.InitiatedConnect;
 				conn.m_localHailMessage = hailMessage;
 
@@ -262,7 +306,7 @@ namespace Lidgren.Network
 				conn.m_connectRequested = true;
 				conn.m_connectionInitiator = true;
 
-				m_handshakes.Add(remoteEndpoint, conn);
+				m_handshakes.Add(remoteEndPoint, conn);
 
 				return conn;
 			}
@@ -274,13 +318,26 @@ namespace Lidgren.Network
 #if DEBUG
 		public void RawSend(byte[] arr, int offset, int length, IPEndPoint destination)
 #else
-		internal void RawSend(byte[] arr, int offset, int length, IPEndPoint destination)
+		public void RawSend(byte[] arr, int offset, int length, IPEndPoint destination)
 #endif
 	{
 			// wrong thread - this miiiight crash with network thread... but what's a boy to do.
 			Array.Copy(arr, offset, m_sendBuffer, 0, length);
 			bool unused;
 			SendPacket(length, destination, 1, out unused);
+		}
+
+		/// <summary>
+		/// In DEBUG, throws an exception, in RELEASE logs an error message
+		/// </summary>
+		/// <param name="message"></param>
+		internal void ThrowOrLog(string message)
+		{
+#if DEBUG
+			throw new NetException(message);
+#else
+			LogError(message);
+#endif
 		}
 
 		/// <summary>

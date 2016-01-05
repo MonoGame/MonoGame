@@ -13,19 +13,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     [ContentTypeWriter]
     class EnumWriter<T> : BuiltInContentWriter<T>
     {
-        Type underlyingType;
-        ContentTypeWriter elementWriter;
+        Type _underlyingType;
+        ContentTypeWriter _underlyingTypeWriter;
 
-        /// <summary>
-        /// Initialize the writer.
-        /// </summary>
-        /// <param name="compiler">Compiler instance calling this writer.</param>
-        protected override void Initialize(ContentCompiler compiler)
+        /// <inheritdoc/>
+        internal override void OnAddedToContentWriter(ContentWriter output)
         {
-            base.Initialize(compiler);
-
-            underlyingType = Enum.GetUnderlyingType(typeof(T));
-            elementWriter = compiler.GetTypeWriter(underlyingType);
+            base.OnAddedToContentWriter(output);
+            _underlyingType = Enum.GetUnderlyingType(typeof(T));
+            _underlyingTypeWriter = output.GetTypeWriter(_underlyingType);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
@@ -33,14 +29,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             return "Microsoft.Xna.Framework.Content.EnumReader`1[[" + GetRuntimeType(targetPlatform) + "]]";
         }
 
-        /// <summary>
-        /// Writes the value to the output.
-        /// </summary>
-        /// <param name="output">The output writer object.</param>
-        /// <param name="value">The value to write to the output.</param>
         protected internal override void Write(ContentWriter output, T value)
         {
-            elementWriter.Write(output, Convert.ChangeType(value, underlyingType));
+            output.WriteRawObject(Convert.ChangeType(value, _underlyingType), _underlyingTypeWriter);
         }
     }
 }

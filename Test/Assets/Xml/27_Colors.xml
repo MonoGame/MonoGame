@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="Colors">
+    <White>FFFFFFFF</White>
+    <Black>FF000000</Black>
+    <Transparent>00000000</Transparent>
+    <Red>FFFF0000</Red>
+    <Green>FF008000</Green>
+    <Blue>FF0000FF</Blue>
+  </Asset>
+</XnaContent>

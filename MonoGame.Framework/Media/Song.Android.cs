@@ -4,7 +4,6 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -18,7 +17,14 @@ namespace Microsoft.Xna.Framework.Media
         private Genre genre;
         private string name;
         private TimeSpan duration;
+        private TimeSpan position;
         private Android.Net.Uri assetUri;
+
+        [CLSCompliant(false)]
+        public Android.Net.Uri AssetUri
+        {
+            get { return this.assetUri; }
+        }
 
         static Song()
         {
@@ -65,7 +71,7 @@ namespace Microsoft.Xna.Framework.Media
             // Appears to be a noOp on Android
         }
 
-        internal void Play()
+        internal void Play(TimeSpan? startPosition)
         {
             // Prepare the player
             _androidPlayer.Reset();
@@ -88,6 +94,8 @@ namespace Microsoft.Xna.Framework.Media
             _androidPlayer.Looping = MediaPlayer.IsRepeating;
             _playingSong = this;
 
+            if (startPosition.HasValue)
+                Position = startPosition.Value;
             _androidPlayer.Start();
             _playCount++;
         }
@@ -107,6 +115,7 @@ namespace Microsoft.Xna.Framework.Media
             _androidPlayer.Stop();
             _playingSong = null;
             _playCount = 0;
+            position = TimeSpan.Zero;
         }
 
         internal float Volume
@@ -126,10 +135,10 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                if (_playingSong == this)
-                    return TimeSpan.FromMilliseconds(_androidPlayer.CurrentPosition);
+                if (_playingSong == this && _androidPlayer.IsPlaying)
+                    position = TimeSpan.FromMilliseconds(_androidPlayer.CurrentPosition);
 
-                return TimeSpan.Zero;
+                return position;
             }
             set
             {

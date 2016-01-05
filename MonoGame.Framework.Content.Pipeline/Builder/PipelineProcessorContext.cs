@@ -36,14 +36,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public override void AddDependency(string filename)
         {
-            if (!_pipelineEvent.Dependencies.Contains(filename))
-                _pipelineEvent.Dependencies.Add(filename);
+            _pipelineEvent.Dependencies.AddUnique(filename);
         }
 
         public override void AddOutputFile(string filename)
         {
-            if (!_pipelineEvent.BuildOutput.Contains(filename))
-                _pipelineEvent.BuildOutput.Add(filename);
+            _pipelineEvent.BuildOutput.AddUnique(filename);
         }
 
         public override TOutput Convert<TInput, TOutput>(   TInput input, 
@@ -67,17 +65,27 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                                     string importerName)
         {
             var sourceFilepath = PathHelper.Normalize(sourceAsset.Filename);
+
+            // The processorName can be null or empty. In this case the asset should
+            // be imported but not processed. This is, for example, necessary to merge
+            // animation files as described here:
+            // http://blogs.msdn.com/b/shawnhar/archive/2010/06/18/merging-animation-files.aspx.
+            bool processAsset = !string.IsNullOrEmpty(processorName);
             _manager.ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
 
             var buildEvent = new PipelineBuildEvent 
             { 
                 SourceFile = sourceFilepath,
                 Importer = importerName,
-                Processor = processorName,
+                Processor = processAsset ? processorName : null,
                 Parameters = _manager.ValidateProcessorParameters(processorName, processorParameters),
             };
 
             var processedObject = _manager.ProcessContent(buildEvent);
+
+            // Record that we processed this dependent asset.
+            _pipelineEvent.Dependencies.AddUnique(sourceFilepath);
+
             return (TOutput)processedObject;
         }
 
@@ -88,20 +96,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                                                 string assetName)
         {
             if (string.IsNullOrEmpty(assetName))
-            {
-                var contentPath = PathHelper.GetRelativePath(_manager.ProjectDirectory, sourceAsset.Filename);
-                var filename = Path.GetFileNameWithoutExtension(contentPath);
-                var path = Path.GetDirectoryName(contentPath);
-
-                // TODO: Is this only does for textures or 
-                // for all sub-assets like this?
-                //
-                // TODO: Replace the _0 with a hex 32bit hash of
-                // the processor+parameters.  This ensures no collisions
-                // when two models process textures with different settings.
-                //
-                assetName = Path.Combine(path, filename) + "_0";
-            }
+                assetName = _manager.GetAssetName(sourceAsset.Filename, importerName, processorName, processorParameters);
 
             // Build the content.
             var buildEvent = _manager.BuildContent(sourceAsset.Filename, assetName, importerName, processorName, processorParameters);

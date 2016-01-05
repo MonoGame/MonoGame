@@ -47,6 +47,28 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class FloatComparer : IEqualityComparer<float>
+    {
+        static public FloatComparer Epsilon = new FloatComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private FloatComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(float x, float y)
+        {
+            return Math.Abs(x - y) < _epsilon;
+        }
+
+        public int GetHashCode(float obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class BoundingSphereComparer : IEqualityComparer<BoundingSphere>
     {
         static public BoundingSphereComparer Epsilon = new BoundingSphereComparer(0.000001f);
@@ -72,6 +94,127 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class Vector2Comparer : IEqualityComparer<Vector2>
+    {
+        static public Vector2Comparer Epsilon = new Vector2Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector2Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector2 x, Vector2 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon;
+        }
+
+        public int GetHashCode(Vector2 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class Vector3Comparer : IEqualityComparer<Vector3>
+    {
+        static public Vector3Comparer Epsilon = new Vector3Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector3Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector3 x, Vector3 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon &&
+                   Math.Abs(x.Z - y.Z) < _epsilon;
+        }
+
+        public int GetHashCode(Vector3 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class Vector4Comparer : IEqualityComparer<Vector4>
+    {
+        static public Vector4Comparer Epsilon = new Vector4Comparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private Vector4Comparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Vector4 x, Vector4 y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon &&
+                   Math.Abs(x.Z - y.Z) < _epsilon &&
+                   Math.Abs(x.W - y.W) < _epsilon;
+        }
+
+        public int GetHashCode(Vector4 obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class QuaternionComparer : IEqualityComparer<Quaternion>
+    {
+        static public QuaternionComparer Epsilon = new QuaternionComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private QuaternionComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Quaternion x, Quaternion y)
+        {
+            return Math.Abs(x.X - y.X) < _epsilon &&
+                   Math.Abs(x.Y - y.Y) < _epsilon &&
+                   Math.Abs(x.Z - y.Z) < _epsilon &&
+                   Math.Abs(x.W - y.W) < _epsilon;
+        }
+
+        public int GetHashCode(Quaternion obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class PlaneComparer : IEqualityComparer<Plane>
+    {
+        static public PlaneComparer Epsilon = new PlaneComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private PlaneComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Plane x, Plane y)
+        {
+            return Math.Abs(x.Normal.X - y.Normal.X) < _epsilon &&
+                   Math.Abs(x.Normal.Y - y.Normal.Y) < _epsilon &&
+                   Math.Abs(x.Normal.Z - y.Normal.Z) < _epsilon &&
+                   Math.Abs(x.D - y.D) < _epsilon;
+        }
+
+        public int GetHashCode(Plane obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public static class ArrayUtil
     {
         public static T[] ConvertTo<T>(byte[] source) where T : struct
@@ -90,18 +233,35 @@ namespace MonoGame.Tests {
 
             return dest;
         }
+
+        public static byte[] ConvertFrom<T>(T[] source) where T : struct
+        {
+            var sizeOfSource = Marshal.SizeOf(typeof(T));
+            var count = source.Length;
+            var dest = new byte[sizeOfSource * count];
+
+            var pinned = GCHandle.Alloc(dest, GCHandleType.Pinned);
+            var pointer = pinned.AddrOfPinnedObject();
+
+            for (var i = 0; i < count; i++, pointer += sizeOfSource)
+                Marshal.StructureToPtr(source[i], pointer, true);
+
+            pinned.Free();
+
+            return dest;
+        }
     }
 
-	static class MathUtility 
+	static class MathUtility
     {
 		public static void MinMax (int a, int b, out int min, out int max)
 		{
-			if (a > b) 
+			if (a > b)
             {
 				min = b;
 				max = a;
-			} 
-            else 
+			}
+            else
             {
 				min = a;
 				max = b;
@@ -109,7 +269,7 @@ namespace MonoGame.Tests {
 		}
 	}
 
-	static class Paths 
+	static class Paths
     {
 		private const string AssetFolder = "Assets";
 		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
@@ -178,5 +338,4 @@ namespace MonoGame.Tests {
 			Directory.SetCurrentDirectory(directory);
 		}
 	}
-
 }

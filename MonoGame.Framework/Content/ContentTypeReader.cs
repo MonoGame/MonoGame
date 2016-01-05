@@ -56,6 +56,11 @@ namespace Microsoft.Xna.Framework.Content
 
         #region Public Properties
 
+        public virtual bool CanDeserializeIntoExistingObject
+        {
+            get { return false; }
+        }
+
         public Type TargetType
         {
             get { return this.targetType; }
@@ -107,7 +112,7 @@ namespace Microsoft.Xna.Framework.Content
             string[] files = null;
             if (!filesInFolders.TryGetValue(path, out files))
             {
-                files = Game.Activity.Assets.List(path);
+                files = Android.App.Application.Context.Assets.List(path);
                 filesInFolders[path] = files;
             }
 

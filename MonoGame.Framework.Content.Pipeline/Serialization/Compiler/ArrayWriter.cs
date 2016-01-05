@@ -12,17 +12,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     [ContentTypeWriter]
     class ArrayWriter<T> : BuiltInContentWriter<T[]>
     {
-        ContentTypeWriter elementWriter;
+        ContentTypeWriter _elementWriter;
 
-        /// <summary>
-        /// Initialize the writer.
-        /// </summary>
-        /// <param name="compiler">Compiler instance calling this writer.</param>
-        protected override void Initialize(ContentCompiler compiler)
+        /// <inheritdoc/>
+        internal override void OnAddedToContentWriter(ContentWriter output)
         {
-            base.Initialize(compiler);
+            base.OnAddedToContentWriter(output);
 
-            elementWriter = compiler.GetTypeWriter(typeof(T));
+            _elementWriter = output.GetTypeWriter(typeof(T));
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
@@ -30,22 +27,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             return string.Concat(   typeof(ContentTypeReader).Namespace, 
                                     ".", 
                                     "ArrayReader`1[[", 
-                                    elementWriter.GetRuntimeType(targetPlatform), 
+                                    _elementWriter.GetRuntimeType(targetPlatform), 
                                     "]]");
         }
 
-        /// <summary>
-        /// Writes the value to the output.
-        /// </summary>
-        /// <param name="output">The output writer object.</param>
-        /// <param name="value">The value to write to the output.</param>
         protected internal override void Write(ContentWriter output, T[] value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
             output.Write(value.Length);
             foreach (var element in value)
-                output.WriteObject(element, elementWriter);
+                output.WriteObject(element, _elementWriter);
         }
     }
 }

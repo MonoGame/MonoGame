@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Utilities;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
 #else
 using OpenTK.Audio.OpenAL;
+using OpenTK.Audio;
 using OpenTK;
 #endif
 
@@ -18,10 +20,15 @@ using Android.Content;
 using Android.Media;
 #endif
 
+#if IOS
+using AudioToolbox;
+using AVFoundation;
+#endif
+
 namespace Microsoft.Xna.Framework.Audio
 {
 	internal sealed class OpenALSoundController : IDisposable
-	{
+    {
         private static OpenALSoundController _instance = null;
         private IntPtr _device;
         private ContextHandle _context;
@@ -32,11 +39,15 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MAX_NUMBER_OF_SOURCES = 32;
 #if MONOMAC || IOS
         private const double PREFERRED_MIX_RATE = 44100;
-#endif
-#if ANDROID
+#elif ANDROID
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
+#elif DESKTOPGL
+        #pragma warning disable 414
+        private static AudioContext _acontext;
+        #pragma warning restore 414
+        private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
         private List<OALSoundBuffer> inUseSourcesCollection;
@@ -50,7 +61,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Sets up the hardware resources used by the controller.
         /// </summary>
 		private OpenALSoundController()
-		{
+        {
             if (!OpenSoundController())
             {
                 return;
@@ -81,9 +92,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>True if the sound controller was setup, and false if not.</returns>
         private bool OpenSoundController()
         {
-#if MONOMAC || IOS
+#if MONOMAC
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 #endif
+
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
@@ -172,10 +184,36 @@ namespace Microsoft.Xna.Framework.Audio
                     AlcUpdateBuffers, updateBuffers,
                     0
                 };
-#else
+#elif IOS
+                EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
+                    switch (e.InterruptionType) {
+                        case AVAudioSessionInterruptionType.Began:
+                            AVAudioSession.SharedInstance().SetActive(false);
+                            Alc.MakeContextCurrent(ContextHandle.Zero);
+                            Alc.SuspendContext(_context);
+                            break;
+                        case AVAudioSessionInterruptionType.Ended:
+                            AVAudioSession.SharedInstance().SetActive(true);
+                            Alc.MakeContextCurrent(_context);
+                            Alc.ProcessContext(_context);
+                            break;
+                    }
+                };
+                AVAudioSession.Notifications.ObserveInterruption(handler);
+
+                int[] attribute = new int[0];
+#elif !DESKTOPGL
                 int[] attribute = new int[0];
 #endif
+
+#if DESKTOPGL
+                _acontext = new AudioContext();
+                _context = Alc.GetCurrentContext();
+                _oggstreamer = new OggStreamer();
+#else
                 _context = Alc.CreateContext(_device, attribute);
+#endif
+
                 if (CheckALError("Could not create AL context"))
                 {
                     CleanUpOpenAL();
@@ -273,7 +311,16 @@ namespace Microsoft.Xna.Framework.Audio
                 if (disposing)
                 {
                     if (_bSoundAvailable)
+                    {
+#if DESKTOPGL
+                        if(_oggstreamer != null)
+                            _oggstreamer.Dispose();
+#endif
+                        for (int i = 0; i < allSourcesArray.Length; i++)
+                            AL.DeleteSource(allSourcesArray[i]);
+                        
                         CleanUpOpenAL();
+                    }
                 }
                 _isDisposed = true;
             }
@@ -443,45 +490,58 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
             }
-            foreach (var soundBuffer in purgeMe)
+            lock (purgeMe)
             {
-                AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, 0);
-                RecycleSource(soundBuffer);
+                foreach (var soundBuffer in purgeMe)
+                {
+                    AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, 0);
+                    RecycleSource(soundBuffer);
+                }
+                purgeMe.Clear();
             }
-            purgeMe.Clear();
         }
 
 #if ANDROID
+        const string Lib = "openal32.dll";
+        const CallingConvention Style = CallingConvention.Cdecl;
+
+        [DllImport(Lib, EntryPoint = "alcDevicePauseSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDevicePauseSOFT(IntPtr device);
+
+        [DllImport(Lib, EntryPoint = "alcDeviceResumeSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDeviceResumeSOFT(IntPtr device);
+
         void Activity_Paused(object sender, EventArgs e)
         {
             // Pause all currently playing sounds. The internal pause count in OALSoundBuffer
             // will take care of sounds that were already paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Pause();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Pause();
+            //            }
+            alcDevicePauseSOFT(_device);
         }
 
         void Activity_Resumed(object sender, EventArgs e)
         {
             // Resume all sounds that were playing when the activity was paused. The internal
             // pause count in OALSoundBuffer will take care of sounds that were previously paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Resume();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Resume();
+            //            }
+            alcDeviceResumeSOFT(_device);
         }
 #endif
 
-#if MONOMAC || IOS
+#if MONOMAC
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 
 		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]
 		static extern void alcMacOSXMixerOutputRate (double rate); // caution
 #endif
-
-	}
+    }
 }
 

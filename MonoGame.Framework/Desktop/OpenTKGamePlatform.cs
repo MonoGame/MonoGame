@@ -88,13 +88,13 @@ namespace Microsoft.Xna.Framework
 		private OpenALSoundController soundControllerInstance = null;
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
-        private Toolkit toolkit;
         private int isExiting; // int, so we can use Interlocked.Increment
+
+        int windowDelay = 2;
         
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
-            toolkit = Toolkit.Init();
             _view = new OpenTKGameWindow(game);
             this.Window = _view;
 
@@ -107,16 +107,6 @@ namespace Microsoft.Xna.Framework
             {
                 throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
             }
-            
-#if LINUX
-            // also set up SdlMixer to play background music. If one of these functions fails, we will not get any background music (but that should rarely happen)
-            Tao.Sdl.Sdl.SDL_InitSubSystem(Tao.Sdl.Sdl.SDL_INIT_AUDIO);
-            Tao.Sdl.SdlMixer.Mix_OpenAudio(44100, (short)Tao.Sdl.Sdl.AUDIO_S16SYS, 2, 1024);			
-
-            //even though this method is called whenever IsMouseVisible is changed it needs to be called during startup
-            //so that the cursor can be put in the correct inital state (hidden)
-            OnIsMouseVisibleChanged();
-#endif
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -147,12 +137,23 @@ namespace Microsoft.Xna.Framework
                 // Note 2: Game.Exit() can be called asynchronously from
                 // _view.ProcessEvents() (cases #2 and #3 above), so the
                 // isExiting check must be placed *after* _view.ProcessEvents()
-                if (isExiting > 0)
+                // Note 3: We need to continue processing view events until  
+                // everything gets disposed of, otherwise it will close the window
+                // and make the window handle invalid
+                if (isExiting == 0)
+                    Game.Tick();
+                else if (windowDelay == 2)
                 {
+                    windowDelay--;
+                    Game.ExitEverything();
+                }
+                else if (windowDelay > 0)
+                    windowDelay--;
+                else
+                {
+                    _view.Dispose();
                     break;
                 }
-
-                Game.Tick();
             }
         }
 
@@ -166,16 +167,8 @@ namespace Microsoft.Xna.Framework
             //(SJ) Why is this called here when it's not in any other project
             //Net.NetworkSession.Exit();
             Interlocked.Increment(ref isExiting);
-#if LINUX
-            Tao.Sdl.SdlMixer.Mix_CloseAudio();
-#endif
-            OpenTK.DisplayDevice.Default.RestoreResolution();
-        }
 
-        public override void BeforeInitialize()
-        {
-            _view.Window.Visible = true;
-            base.BeforeInitialize();
+            OpenTK.DisplayDevice.Default.RestoreResolution();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -253,6 +246,12 @@ namespace Microsoft.Xna.Framework
                 PresentationParameters parms = device.PresentationParameters;
                 parms.BackBufferHeight = (int)bounds.Height;
                 parms.BackBufferWidth = (int)bounds.Width;
+
+                var viewport = new Viewport(0, 0,
+                            parms.BackBufferWidth,
+                            parms.BackBufferHeight);
+
+                device.Viewport = viewport;
             }
 
             if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
@@ -288,32 +287,9 @@ namespace Microsoft.Xna.Framework
 
         public override void Present()
         {
-            base.Present();
-
             var device = Game.GraphicsDevice;
             if (device != null)
                 device.Present();
-        }
-		
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                if (toolkit != null)
-                {
-                    toolkit.Dispose();
-                    toolkit = null;
-                }
-
-                if (_view != null)
-                {
-                    _view.Dispose();
-                    _view = null;
-                }
-            }
-
-			base.Dispose(disposing);
-        }
-			
+        }	
     }
 }

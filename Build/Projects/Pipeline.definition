@@ -10,42 +10,51 @@
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
+    <Reference Include="MGCB" />
 
     <Reference Include="PipelineReferences" />
   </References>
 
   <Properties>
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+    <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
+	<ApplicationManifest>app.manifest</ApplicationManifest>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;XWT</Platform>
-      <Platform Name="Linux">TRACE;LINUX;XWT</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
     </CustomDefinitions>
   </Properties>
 
   <Files>
-    <Compile Include="Common\History.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\MGCB\CommandLineParser.cs">
       <Link>Common\CommandLineParser.cs</Link>
     </Compile>
-    <None Include="app.config" />
+    <None Include="App.config" />
+    <None Include="app.manifest" />
 
     <Compile Include="Common\ActionStack.cs" />
+    <Compile Include="Common\AssemblyAttributes.cs" />
     <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />
     <Compile Include="Common\ContentItem.Processor.cs" />
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\Selection.cs" />
+    <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
+    <Compile Include="Common\PipelineSettings.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
@@ -62,6 +71,9 @@
     <Compile Include="Windows\UpdateAction.cs" />
 
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\ContentIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\EditorIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -88,10 +100,6 @@
       <Platforms>Windows</Platforms>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Windows\AssemblyReferenceEditing.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Windows\PipelineProjectProxy.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -101,6 +109,53 @@
     <Compile Include="Windows\SortedEnumTypeConverter.cs">
       <Platforms>Windows</Platforms>
     </Compile>
+	<Compile Include="Windows\AboutDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AboutDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Windows\ReferenceDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\ReferenceDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Windows\AddFileDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AddFileDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFileDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\AddFileDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFileDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	<Compile Include="Windows\AddFolderDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AddFolderDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFolderDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\AddFolderDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AddFolderDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	<Compile Include="Windows\TextEditDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\TextEditDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>TextEditDialog.cs</DependentUpon>
+    </Compile>
+	 <EmbeddedResource Include="Windows\TextEditDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>TextEditDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -110,6 +165,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="Windows\AboutDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="Windows\ReferenceDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
@@ -133,28 +196,114 @@
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </EmbeddedResource>
 
-    <!-- The Xwt specific stuff -->
-    <Compile Include="Xwt\PipelineProjectProxy.cs">
+    <!-- The Gtk specific stuff -->
+    <Compile Include="Gtk\MainWindow.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\XwtView.cs">
+    <Compile Include="Gtk\Widgets\ProjectView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\OutputTextView.cs">
+    <Compile Include="Gtk\Widgets\PropertyGridTable.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\PropertyGrid.cs">
+    <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\BuildOutput.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\AddItemDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\TextEditorDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Stetic.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\MainWindow.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\NewTemplateDialog.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\ProjectView.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\AddItemDialog.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Global.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\IgeMacIntegration.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Gtk3Integration.cs">
+      <Platforms>Linux</Platforms>
     </Compile>
 
     <!-- The resources for icons and buttons -->
+    <EmbeddedResource Include="App.ico" />
     <EmbeddedResource Include="Icons\blueprint.png" />
+    <EmbeddedResource Include="Icons\missing.png" />
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />
+    <EmbeddedResource Include="Icons\folder_missing.png" />
     <EmbeddedResource Include="Icons\settings.png" />
-
+    <EmbeddedResource Include="Icons\build_begin_end.png" />
+    <EmbeddedResource Include="Icons\build_clean.png" />
+    <EmbeddedResource Include="Icons\build_fail.png" />
+    <EmbeddedResource Include="Icons\build_processing.png" />
+    <EmbeddedResource Include="Icons\build_skip.png" />
+    <EmbeddedResource Include="Icons\build_succeed.png" />
+    <EmbeddedResource Include="Gtk\MainWindow.HeaderBar.glade">
+      <Platforms>Linux</Platforms>
+    </EmbeddedResource>
 
     <!-- Copy the template resources to the output -->
+	<None Include="Templates\Effect.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Templates\Xml.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -174,6 +323,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
+    <BundleResource Include="Resources\App.icns">
+      <Platforms>MacOS</Platforms>
+    </BundleResource>
+
+    <Content Include="Resources\background.png">
+      <Platforms>MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="distribution.xml">
+      <Platforms>MacOS</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </Files>
 
 </Project>

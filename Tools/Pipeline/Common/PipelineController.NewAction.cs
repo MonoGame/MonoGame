@@ -25,7 +25,7 @@ namespace MonoGame.Tools.Pipeline
                 _template = template;                
             }
 
-            public void Do()
+            public bool Do()
             {
                 var ext = Path.GetExtension(_template.TemplateFile);
                 var filename = Path.ChangeExtension(_name, ext);
@@ -33,14 +33,14 @@ namespace MonoGame.Tools.Pipeline
 
                 if (File.Exists(fullpath))
                 {
-                    _con._view.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
-                    return;
+                    _con.View.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
+                    return false;
                 }
 
                 File.Copy(_template.TemplateFile, fullpath);
 
                 var parser = new PipelineProjectParser(_con, _con._project);
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 _con.Selection.Clear(_con);
 
@@ -52,15 +52,17 @@ namespace MonoGame.Tools.Pipeline
                     item.ProcessorName = _template.ProcessorName;
                     item.ResolveTypes();
 
-                    _con._view.AddTreeItem(item);
+                    _con.View.AddTreeItem(item);
                     _con.Selection.Add(item, _con);
                 }
 
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
 
-            public void Undo()
+            public bool Undo()
             {
                 var ext = Path.GetExtension(_template.TemplateFile);
                 var filename = Path.ChangeExtension(_name, ext);
@@ -68,13 +70,13 @@ namespace MonoGame.Tools.Pipeline
 
                 if (!File.Exists(fullpath))
                 {
-                    _con._view.ShowError("Error", string.Format("File does not exist: '{0}'.", fullpath));
-                    return;
+                    _con.View.ShowError("Error", string.Format("File does not exist: '{0}'.", fullpath));
+                    return false;
                 }
 
                 File.Delete(fullpath);
                 
-                _con._view.BeginTreeUpdate();
+                _con.View.BeginTreeUpdate();
 
                 for (var i = 0; i < _con._project.ContentItems.Count; i++)
                 {
@@ -84,14 +86,16 @@ namespace MonoGame.Tools.Pipeline
                     if (fullpath == path)
                     {
                         _con._project.ContentItems.Remove(item);
-                        _con._view.RemoveTreeItem(item);
+                        _con.View.RemoveTreeItem(item);
                         _con.Selection.Remove(item, _con);
                     }
                 }
                     
-                _con._view.EndTreeUpdate();
+                _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
-        }            
+        }
     }
 }

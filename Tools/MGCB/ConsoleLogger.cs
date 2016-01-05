@@ -11,19 +11,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
     {
         public override void LogMessage(string message, params object[] messageArgs)
         {
-			Console.WriteLine(message, messageArgs);
+			Console.WriteLine(IndentString + message, messageArgs);
         }
 
         public override void LogImportantMessage(string message, params object[] messageArgs)
         {
             // TODO: How do i make it high importance?
-            Console.WriteLine(message, messageArgs);
+            Console.WriteLine(IndentString + message, messageArgs);
         }
 
         public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
         {
             var warning = string.Empty;
-            if (!string.IsNullOrEmpty(contentIdentity.SourceFilename))
+            if (contentIdentity != null && !string.IsNullOrEmpty(contentIdentity.SourceFilename))
             {
                 warning = contentIdentity.SourceFilename;
                 if (!string.IsNullOrEmpty(contentIdentity.FragmentIdentifier))

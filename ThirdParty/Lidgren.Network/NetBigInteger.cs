@@ -12,7 +12,7 @@ namespace Lidgren.Network
 	internal class NetBigInteger
 	{
 		private const long IMASK = 0xffffffffL;
-		private static readonly ulong UIMASK = (ulong)IMASK;
+		private const ulong UIMASK = (ulong)IMASK;
 
 		private static readonly int[] ZeroMagnitude = new int[0];
 		private static readonly byte[] ZeroEncoding = new byte[0];
@@ -23,15 +23,15 @@ namespace Lidgren.Network
 		public static readonly NetBigInteger Three = createUValueOf(3);
 		public static readonly NetBigInteger Ten = createUValueOf(10);
 
-		private static readonly int chunk2 = 1;
+		private const int chunk2 = 1;
 		private static readonly NetBigInteger radix2 = ValueOf(2);
 		private static readonly NetBigInteger radix2E = radix2.Pow(chunk2);
 
-		private static readonly int chunk10 = 19;
+		private const int chunk10 = 19;
 		private static readonly NetBigInteger radix10 = ValueOf(10);
 		private static readonly NetBigInteger radix10E = radix10.Pow(chunk10);
 
-		private static readonly int chunk16 = 16;
+		private const int chunk16 = 16;
 		private static readonly NetBigInteger radix16 = ValueOf(16);
 		private static readonly NetBigInteger radix16E = radix16.Pow(chunk16);
 

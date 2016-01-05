@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.AVFoundation;
@@ -13,11 +13,11 @@ using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
-#if IOS
-using MonoTouch.AudioToolbox;
-using MonoTouch.AudioUnit;
-using MonoTouch.AVFoundation;
-using MonoTouch.Foundation;
+#if IOS || MONOMAC
+using AudioToolbox;
+using AudioUnit;
+using AVFoundation;
+using Foundation;
 #endif
 #endif
 
@@ -25,6 +25,28 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
+#if DESKTOPGL || ANGLE
+
+        // These platforms are only limited by memory.
+        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
+
+#elif MONOMAC
+
+        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
+        internal const int MAX_PLAYING_INSTANCES = 256;
+
+#elif IOS
+
+        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
+        internal const int MAX_PLAYING_INSTANCES = 32;
+
+#elif ANDROID
+
+        // Set to the same as OpenAL on iOS
+        internal const int MAX_PLAYING_INSTANCES = 32;
+
+#endif
+
         internal byte[] _data;
 
 		internal float Rate { get; set; }
@@ -101,7 +123,7 @@ namespace Microsoft.Xna.Framework.Audio
                         channelsPerFrame = (int)player.NumberOfChannels;
                         bitsPerChannel = player.SoundSetting.LinearPcmBitDepth.GetValueOrDefault(16);
 
-                        Rate = player.Settings.SampleRate;
+						Rate = (float)player.SoundSetting.SampleRate;
                         _duration = TimeSpan.FromSeconds(player.Duration);
                     }
                 }
