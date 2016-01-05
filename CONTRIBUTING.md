@@ -40,3 +40,31 @@ If you need to make changes to the pull request, simply repeat steps 2-4.  Addin
 The majority of code in MonoGame is cross-platform and must build and behave correctly on all supported platforms.  All pull requests to MonoGame are built using an automated system that compiles the pull request on all supported platforms and will report any build errors.
 
 Once a pull request has been accepted, your feature branch can be deleted if desired.
+
+Generating Documentation
+========================
+Monogame generates its documentation using the [SharpDoc library] (https://github.com/xoofx/SharpDoc)
+
+You can view the documentation for your changes both locally, and (after you have submitted a PR) on the build server.
+
+### Local documentation generation
+Local documentation generation is not automatic. You have to run the SharpDoc tool to generate it for you.
+The commandline for doing this is: `ThirdParty\Dependencies\SharpDoc\SharpDoc.exe -config <config file> -output <output directory>`
+e.g. `ThirdParty\Dependencies\SharpDoc\SharpDoc.exe -config Documentation\config.xml -output GeneratedDocs`
+Run this command from the root folder of your local MonoGame repository clone. It will generate all the documentation under `Documentation\<output directory>` folder. You can go ahead and start browsing from the `index.html` file.
+
+**Gotchas:**
+- This assumes that all platforms (Windows, Linux, Mac, etc.) have been built. If you can't (or don't want to) build for all of the platforms, you can comment out the relevant sections in `Documentation\config.xml`.
+- By default, SharpDoc looks for the build artifacts in the Release folder. Remember to build for Release.
+- Browsing local documentation seems to work best with Internet Explorer. When you open up `index.html`, you might be prompted to give permission to an ActiveX control. Click "Allow", and you will be able to browse through the docs.
+
+### Documentation Generation On The Build Server
+When you submit a PR, the documentation for that PR gets generated, along with all the other build artifacts, on the build server.
+You can browse this generated documentation.
+The link for this will be: `http://teamcity.monogame.net/repository/download/MonoGame_DevelopWin/<YOUR_BUILD_ID>:id*/Documentation.zip%21/index.html?guest=1`.
+You can figure out your build id by inspecting the link that mgbot gives you after a successful build.
+![Example build success image](/Documentation/images/Example_Build_Success.png)
+
+Inspect the link that reads `Build X.X.X.XXXX` and plug the build id into `<YOUR_BUILD_ID>`.
+e.g. `http://teamcity.monogame.net/repository/download/MonoGame_DevelopWin/11957:id/Documentation.zip%21/index.html?guest=1`
+ 
