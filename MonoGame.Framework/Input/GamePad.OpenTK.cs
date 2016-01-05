@@ -118,10 +118,6 @@ namespace Microsoft.Xna.Framework.Input
                 (stateTK.Buttons.Start == OpenTK.Input.ButtonState.Pressed ? Buttons.Start : 0) |
                 (stateTK.Buttons.X == OpenTK.Input.ButtonState.Pressed ? Buttons.X : 0) |
                 (stateTK.Buttons.Y == OpenTK.Input.ButtonState.Pressed ? Buttons.Y : 0) |
-                (stateTK.DPad.IsUp ? Buttons.DPadUp : 0) |
-                (stateTK.DPad.IsDown ? Buttons.DPadDown : 0) |
-                (stateTK.DPad.IsLeft ? Buttons.DPadLeft : 0) |
-                (stateTK.DPad.IsRight ? Buttons.DPadRight : 0) |
                 0;
             var buttons = new GamePadButtons(buttonStates);
 

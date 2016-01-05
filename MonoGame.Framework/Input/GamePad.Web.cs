@@ -95,10 +95,6 @@ namespace Microsoft.Xna.Framework.Input
                     (gpc.ButtonPressed("start", jstate) ? Buttons.Start : 0) |
                     (gpc.ButtonPressed("x", jstate) ? Buttons.X : 0) |
                     (gpc.ButtonPressed("y", jstate) ? Buttons.Y : 0) |
-					(gpc.ButtonPressed("dpup", jstate) ? Buttons.DPadUp : 0) |
-					(gpc.ButtonPressed("dpdown", jstate) ? Buttons.DPadDown : 0) |
-					(gpc.ButtonPressed("dpleft", jstate) ? Buttons.DPadLeft : 0) |
-					(gpc.ButtonPressed("dpright", jstate) ? Buttons.DPadRight : 0) |
                     0;
 
                 var sticks = 

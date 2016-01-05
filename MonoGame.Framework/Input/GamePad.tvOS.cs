@@ -100,7 +100,8 @@ namespace Microsoft.Xna.Framework.Input
                     Up = controller.ExtendedGamepad.DPad.Up.IsPressed ? ButtonState.Pressed : ButtonState.Released;
                     Down = controller.ExtendedGamepad.DPad.Down.IsPressed ? ButtonState.Pressed : ButtonState.Released;
                     Left = controller.ExtendedGamepad.DPad.Left.IsPressed ? ButtonState.Pressed : ButtonState.Released;
-                    Right = controller.ExtendedGamepad.DPad.Right.IsPressed ? ButtonState.Pressed : ButtonState.Released;                   
+                    Right = controller.ExtendedGamepad.DPad.Right.IsPressed ? ButtonState.Pressed : ButtonState.Released;
+                   
                 }
                 else if (controller.Gamepad != null)
                 {
@@ -112,10 +113,11 @@ namespace Microsoft.Xna.Framework.Input
                         buttons.Add(Buttons.X);
                     if (controller.Gamepad.ButtonY.IsPressed == true && !buttons.Contains (Buttons.Y))
                         buttons.Add(Buttons.Y);
-                    Up = controller.Gamepad.DPad.Up.IsPressed ? ButtonState.Pressed : ButtonState.Released;					
-                    Down = controller.Gamepad.DPad.Down.IsPressed ? ButtonState.Pressed : ButtonState.Released;				
+                    Up = controller.Gamepad.DPad.Up.IsPressed ? ButtonState.Pressed : ButtonState.Released;
+                    Down = controller.Gamepad.DPad.Down.IsPressed ? ButtonState.Pressed : ButtonState.Released;
                     Left = controller.Gamepad.DPad.Left.IsPressed ? ButtonState.Pressed : ButtonState.Released;
                     Right = controller.Gamepad.DPad.Right.IsPressed ? ButtonState.Pressed : ButtonState.Released;
+
                 }
                 else if (controller.MicroGamepad != null)
                 {
@@ -128,14 +130,6 @@ namespace Microsoft.Xna.Framework.Input
                     Left = controller.MicroGamepad.Dpad.Left.IsPressed ? ButtonState.Pressed : ButtonState.Released;
                     Right = controller.MicroGamepad.Dpad.Right.IsPressed ? ButtonState.Pressed : ButtonState.Released;
                 }
-                if (Up == ButtonState.Pressed)
-                    buttons.Add(Buttons.DPadUp);
-                if (Down == ButtonState.Pressed)
-                    buttons.Add(Buttons.DPadDown);
-                if (Left == ButtonState.Pressed)
-                    buttons.Add(Buttons.DPadLeft);
-                if (Right == ButtonState.Pressed)
-                    buttons.Add(Buttons.DPadRight);
             }
             var state = new GamePadState(
                 new GamePadThumbSticks(),
