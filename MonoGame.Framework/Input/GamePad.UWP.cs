@@ -91,6 +91,10 @@ namespace Microsoft.Xna.Framework.Input
                 (state.Buttons.HasFlag(WGI.GamepadButtons.Menu) ? Buttons.Start : 0) |
                 (state.Buttons.HasFlag(WGI.GamepadButtons.X) ? Buttons.X : 0) |
                 (state.Buttons.HasFlag(WGI.GamepadButtons.Y) ? Buttons.Y : 0) |
+				(state.Buttons.HasFlag(WGI.GamepadButtons.DPadUp) ? Buttons.DPadUp : 0) |
+				(state.Buttons.HasFlag(WGI.GamepadButtons.DPadDown) ? Buttons.DPadDown : 0) |
+				(state.Buttons.HasFlag(WGI.GamepadButtons.DPadLeft) ? Buttons.DPadLeft : 0) |
+				(state.Buttons.HasFlag(WGI.GamepadButtons.DPadRight) ? Buttons.DPadRight : 0) |
                 0;
             var buttons = new GamePadButtons(buttonStates);
 

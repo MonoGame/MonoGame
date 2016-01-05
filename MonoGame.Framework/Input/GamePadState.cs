@@ -163,15 +163,6 @@ namespace Microsoft.Xna.Framework.Input
             else if (sticks.Right.Y > 0)
                 result |= Microsoft.Xna.Framework.Input.Buttons.RightThumbstickUp;
 
-            if (DPad.Down == ButtonState.Pressed)
-                result |= Microsoft.Xna.Framework.Input.Buttons.DPadDown;
-            if (DPad.Up == ButtonState.Pressed)
-                result |= Microsoft.Xna.Framework.Input.Buttons.DPadUp;
-            if (DPad.Left == ButtonState.Pressed)
-                result |= Microsoft.Xna.Framework.Input.Buttons.DPadLeft;
-            if (DPad.Right == ButtonState.Pressed)
-                result |= Microsoft.Xna.Framework.Input.Buttons.DPadRight;
-
             return result;
         }
         
