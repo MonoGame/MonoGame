@@ -278,12 +278,51 @@
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\folder_missing.png" />
     <EmbeddedResource Include="Icons\settings.png" />
+    
+    <!-- The resources for output filtering -->
     <EmbeddedResource Include="Icons\build_begin_end.png" />
     <EmbeddedResource Include="Icons\build_clean.png" />
     <EmbeddedResource Include="Icons\build_fail.png" />
     <EmbeddedResource Include="Icons\build_processing.png" />
     <EmbeddedResource Include="Icons\build_skip.png" />
     <EmbeddedResource Include="Icons\build_succeed.png" />
+    
+    <!-- The resources for toolbar -->
+    <EmbeddedResource Include="Icons\Toolbar\New.png">
+      <LogicalName>Toolbar.New.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Open.png">
+      <LogicalName>Toolbar.Open.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Save.png">
+      <LogicalName>Toolbar.Save.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\NewItem.png">
+      <LogicalName>Toolbar.NewItem.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\ExistingItem.png">
+      <LogicalName>Toolbar.ExistingItem.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\NewFolder.png">
+      <LogicalName>Toolbar.NewFolder.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\ExistingFolder.png">
+      <LogicalName>Toolbar.ExistingFolder.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Build.png">
+      <LogicalName>Toolbar.Build.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Rebuild.png">
+      <LogicalName>Toolbar.Rebuild.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Clean.png">
+      <LogicalName>Toolbar.Clean.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\FilterOutput.png">
+      <LogicalName>Toolbar.FilterOutput.png</LogicalName>
+    </EmbeddedResource>
+    
+    <!-- Linux specific resources -->
     <EmbeddedResource Include="Gtk\MainWindow.HeaderBar.glade">
       <Platforms>Linux</Platforms>
     </EmbeddedResource>
