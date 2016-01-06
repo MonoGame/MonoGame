@@ -87,14 +87,6 @@ namespace MonoGame.Tools.Pipeline.Windows.Controls
                     AddSubItem(tn, text);
                     break;
                 case OutputState.BuildError:
-
-                    if (_prevFilename != outputParser.Filename)
-                    {
-                        tn = AddItem(BuildIcons.Processing, "Building " + GetRelativePath(outputParser.Filename));
-                        tn.ToolTipText = outputParser.Filename;
-                        AddSubItem(tn, outputParser.Filename);
-                    }
-
                     _lastTreeNode.ImageIndex = BuildIcons.Fail;
                     _lastTreeNode.SelectedImageIndex = BuildIcons.Fail;
                     _lastTreeNode.ToolTipText += Environment.NewLine + Environment.NewLine + outputParser.ErrorMessage;
