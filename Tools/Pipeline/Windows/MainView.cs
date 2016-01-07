@@ -48,6 +48,7 @@ namespace MonoGame.Tools.Pipeline
             for (var f=0; f < faces.Length; f++)
             {
                 _outputWindow.Font = new System.Drawing.Font(faces[f], 9F, FontStyle.Regular, GraphicsUnit.Point, (byte)0);
+                _filterOutputWindow.Font = new System.Drawing.Font(faces[f], 9F, FontStyle.Regular, GraphicsUnit.Point, (byte)0);
                 if (_outputWindow.Font.Name == faces[f])
                     break;               
             }
@@ -66,6 +67,9 @@ namespace MonoGame.Tools.Pipeline
 
             InitOutputWindowContextMenu();
 
+            // set visible output tab from _filterOutputMenuItem state
+            _outputTabs.SelectedIndex = _filterOutputMenuItem.Checked ? 1 : 0;
+
             Form = this;
         }
 
@@ -76,7 +80,11 @@ namespace MonoGame.Tools.Pipeline
             var updateMenus = new Action(UpdateMenus);
             var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
 
-            _controller.OnBuildStarted += invokeUpdateMenus;
+            _controller.OnBuildStarted += delegate
+            {
+                _filterOutputWindow.SetBaseFolder(_controller);
+                UpdateMenus();
+            };
             _controller.OnBuildFinished += invokeUpdateMenus;
             _controller.OnProjectLoading += invokeUpdateMenus;
             _controller.OnProjectLoaded += invokeUpdateMenus;
@@ -507,9 +515,15 @@ namespace MonoGame.Tools.Pipeline
 
             // Write the output... safely if needed.
             if (InvokeRequired)
+            {
                 _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { line });
+                _filterOutputWindow.Invoke(new Action<string>(_filterOutputWindow.AppendText), new object[] { line });
+            }
             else
+            {
                 _outputWindow.AppendText(line);
+                _filterOutputWindow.AppendText(line);
+            }
         }
 
         public bool ChooseContentFile(string initialDirectory, out List<string> files)
@@ -540,6 +554,7 @@ namespace MonoGame.Tools.Pipeline
         public void OutputClear()
         {
             _outputWindow.Clear();
+            _filterOutputWindow.Clear();
         }
 
         public Process CreateProcess(string exe, string commands)
@@ -671,6 +686,12 @@ namespace MonoGame.Tools.Pipeline
         {
             _controller.LaunchDebugger = _debuggerMenuItem.Checked;
             _controller.Clean();
+        }
+        
+        private void FilterOutputMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            // set visible output tab from _filterOutputMenuItem state
+            _outputTabs.SelectedIndex = _filterOutputMenuItem.Checked ? 1 : 0;
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
