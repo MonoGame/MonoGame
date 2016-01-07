@@ -12,14 +12,23 @@ namespace Microsoft.Xna.Framework.Utilities
         [DllImport("ntdll.dll", SetLastError = true)]
         private static extern int NtQueryTimerResolution(out int MinimumResolution, out int MaximumResolution, out int CurrentResolution);
 
-        /// <summary>
-        /// Returns the current timer resolution in 100ns units
-        /// </summary>
-        public static int GetCurrentResolution()
+        private static readonly double LowestSleepThreshold;
+
+        static TimerHelper()
         {
             int min, max, current;
             NtQueryTimerResolution(out min, out max, out current);
-            return current;
+            LowestSleepThreshold = 1.0 + (max / 10000.0);
+        }
+
+        /// <summary>
+        /// Returns the current timer resolution in milliseconds
+        /// </summary>
+        public static double GetCurrentResolution()
+        {
+            int min, max, current;
+            NtQueryTimerResolution(out min, out max, out current);
+            return current / 10000.0;
         }
 
         /// <summary>
@@ -27,15 +36,13 @@ namespace Microsoft.Xna.Framework.Utilities
         /// </summary>
         public static void SleepForNoMoreThan(double milliseconds)
         {
-            if (milliseconds < 1.0)
+            // Assumption is that Thread.Sleep(t) will sleep for at least (t), and at most (t + timerResolution)
+            if (milliseconds < LowestSleepThreshold)
                 return;
-            var timerResolution = GetCurrentResolution();
-            int adjustedTime = (int)(milliseconds * 10000);
-            if (timerResolution > adjustedTime)
+            var sleepTime = (int)(milliseconds - GetCurrentResolution());
+            if (sleepTime < 1)
                 return;
-            var tickCount = adjustedTime / timerResolution;
-            int adjustedSleepTime = (((tickCount - 1) * timerResolution) / 10000) + 1;
-            Thread.Sleep(adjustedSleepTime);
+            Thread.Sleep(sleepTime);
         }
     }
 }
