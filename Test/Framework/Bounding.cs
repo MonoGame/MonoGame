@@ -140,5 +140,47 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(0.0f, value);
             Assert.AreEqual(null, value2);
         }
+
+        [TestCase(0, 10, 80, 90, 0)]
+        [TestCase(0, 50, 40, 90, 10)]
+        [TestCase(0, 50, 40, 45, 5)]
+        [TestCase(0, 100, 0, 20, 20)]
+        [TestCase(80, 90, 0, 10, 0)]
+        [TestCase(40, 90, 0, 50, 10)]
+        [TestCase(40, 45, 0, 50, 5)]
+        [TestCase(0, 20, 0, 100, 20)]
+        public void LineOverlapCalculatedCorrectly1(float min1, float max1, float min2, float max2, float overlap)
+        {
+            var line1 = new Line1D(min1, max1);
+            var line2 = new Line1D(min2, max2);
+            var calculatedOverlap = line1.OverlapSize(line2);
+
+            Assert.That(calculatedOverlap, Is.EqualTo(overlap));
+        }
+
+        [TestCase(20, 0, 0, false, 0, 0, 0)]
+        [TestCase(10, 8, 0, false, 0, 0, 0)]
+        [TestCase(-20, 0, 0, false, 0, 0, 0)]
+        [TestCase(-10, -8, 0, false, 0, 0, 0)]
+        [TestCase(5, 0, 0, true, 5, 0, 0)]
+        [TestCase(9, 0, 0, true, 1, 0, 0)]
+        [TestCase(9, 8, 0, true, 1, 0, 0)]
+        [TestCase(-5, 0, 0, true, -5, 0, 0)]
+        [TestCase(-9, 0, 0, true, -1, 0, 0)]
+        [TestCase(-9, -8, 0, true, -1, 0, 0)]
+        [TestCase(6, 3, 9, true, 0, 0, 1)]
+        public void IntersectionWithSatBoundingBoxWithBoundingBox(float x, float y, float z, bool hasCollision, float separationX, float separationY, float separationZ)
+        {
+            var distance = new Vector3(x, y, z);
+            var boundingBox1 = new BoundingBox(new Vector3(-5), new Vector3(5));
+            var boundingBox2 = new BoundingBox(new Vector3(-5) + distance, new Vector3(5) + distance);
+
+            var collisionResult = boundingBox1.IntersectsWithSat(boundingBox2);
+            var separation = new Vector3(separationX, separationY, separationZ);
+
+            Assert.That(collisionResult, Is.Not.Null);
+            Assert.That(collisionResult.Intersects, Is.EqualTo(hasCollision));
+            Assert.That(collisionResult.Separtion, Is.EqualTo(separation));
+        }
     }
 }
