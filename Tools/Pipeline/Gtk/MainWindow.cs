@@ -178,7 +178,7 @@ namespace MonoGame.Tools.Pipeline
                 this.hpaned1.Position = PipelineSettings.Default.HSeparator;
 
                 _controller.LaunchDebugger = DebugModeAction.Active = PipelineSettings.Default.DebugMode;
-                buildOutput1.CurrentPage = (FilterOutputAction.Active = PipelineSettings.Default.FilterOutput) ? 0 : 1;
+                FilterOutputAction.Active = toolFilterOutput.Active = PipelineSettings.Default.FilterOutput;
             }
         }
 
@@ -755,9 +755,12 @@ namespace MonoGame.Tools.Pipeline
             _controller.LaunchDebugger = this.DebugModeAction.Active;
         }
 
-        protected void OnFilterOutputActionActivated (object sender, System.EventArgs e)
+        protected void OnFilterOutputActionActivated (object sender, EventArgs e)
         {
-            buildOutput1.CurrentPage = (FilterOutputAction.Active) ? 0 : 1;
+            bool active = sender is ToggleAction ? ((ToggleAction)sender).Active : ((ToggleToolButton)sender).Active;
+
+            buildOutput1.CurrentPage = active ? 0 : 1;
+            FilterOutputAction.Active = toolFilterOutput.Active = active;
         }
 
         protected void OnCancelBuildActionActivated (object sender, EventArgs e)
@@ -781,29 +784,29 @@ namespace MonoGame.Tools.Pipeline
 
             Application.Invoke(delegate
                 { 
-                    NewAction.Sensitive = notBuilding;
-                    OpenAction.Sensitive = notBuilding;
+                    NewAction.Sensitive = toolNew.Sensitive = notBuilding;
+                    OpenAction.Sensitive = toolOpen.Sensitive = notBuilding;
                     ImportAction.Sensitive = notBuilding;
 
-                    SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
+                    SaveAction.Sensitive = toolSave.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
                     SaveAsAction.Sensitive = projectOpenAndNotBuilding;
                     CloseAction.Sensitive = projectOpenAndNotBuilding;
 
                     ExitAction.Sensitive = notBuilding;
 
-                    AddAction.Sensitive = projectOpen;
+                    AddAction.Sensitive = toolAddItem.Sensitive = toolAddFolder.Sensitive = 
+                        toolNewItem.Sensitive = toolNewFolder.Sensitive = projectOpen;
             
                     RenameAction.Sensitive = paths.Length == 1;
-            
                     DeleteAction.Sensitive = projectOpen && somethingSelected;
 
                     BuildAction.Sensitive = projectOpen;
-                    BuildAction1.Sensitive = projectOpenAndNotBuilding;
+                    BuildAction1.Sensitive = toolBuild.Sensitive = projectOpenAndNotBuilding;
 
-                    treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
+                    treerebuild.Sensitive = RebuildAction.Sensitive = toolRebuild.Sensitive = projectOpenAndNotBuilding;
                     RebuildAction.Sensitive = treerebuild.Sensitive;
 
-                    CleanAction.Sensitive = projectOpenAndNotBuilding;
+                    CleanAction.Sensitive = toolClean.Sensitive = projectOpenAndNotBuilding;
                     CancelBuildAction.Sensitive = !notBuilding;
                     CancelBuildAction.Visible = !notBuilding;
 
