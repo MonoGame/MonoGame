@@ -5,7 +5,6 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
-using MonoGame.Tools.Pipeline.Common;
 
 namespace MonoGame.Tools.Pipeline.Windows.Controls
 {
