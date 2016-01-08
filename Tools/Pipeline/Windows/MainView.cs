@@ -67,9 +67,6 @@ namespace MonoGame.Tools.Pipeline
 
             InitOutputWindowContextMenu();
 
-            // set visible output tab from _filterOutputMenuItem state
-            _outputTabs.SelectedIndex = _filterOutputMenuItem.Checked ? 1 : 0;
-
             Form = this;
         }
 
@@ -382,6 +379,8 @@ namespace MonoGame.Tools.Pipeline
             root.Text = item.Name;
 
             _propertyGrid.SelectedObject = root.Tag;
+
+            UpdateMenus();
         }
 
         public void AddTreeItem(IProjectItem item)
@@ -484,6 +483,8 @@ namespace MonoGame.Tools.Pipeline
             _treeView.EndUpdate();
 
             _treeUpdating = false;
+
+            UpdateMenus();
         }
 
         public void ShowProperties(IProjectItem item)
@@ -503,6 +504,8 @@ namespace MonoGame.Tools.Pipeline
                     break;
                 }
             }
+
+            UpdateMenus();
         }
 
         public void OutputAppend(string text)
@@ -589,6 +592,29 @@ namespace MonoGame.Tools.Pipeline
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
             }
+
+            UpdateMenus();
+        }
+
+        private void MainView_SizeChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState != FormWindowState.Maximized)
+            {
+                PipelineSettings.Default.Size.X = this.Width;
+                PipelineSettings.Default.Size.Y = this.Height;
+            }
+        }
+
+        private void _splitTreeProps_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            if (this.WindowState != FormWindowState.Maximized)
+                PipelineSettings.Default.HSeparator = _splitTreeProps.SplitterDistance;
+        }
+
+        private void _splitEditorOutput_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            if (this.WindowState != FormWindowState.Maximized)
+                PipelineSettings.Default.VSeparator = _splitEditorOutput.SplitterDistance;
         }
 
         private void MainView_FormClosing(object sender, FormClosingEventArgs e)
@@ -597,6 +623,11 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (!_controller.Exit())
                     e.Cancel = true;
+
+                PipelineSettings.Default.Maximized = (this.WindowState == FormWindowState.Maximized);
+                PipelineSettings.Default.FilterOutput = _filterOutputMenuItem.Checked;
+                PipelineSettings.Default.DebugMode = _debuggerMenuItem.Checked;
+                PipelineSettings.Default.Save();
             }
         }        
 
@@ -690,8 +721,8 @@ namespace MonoGame.Tools.Pipeline
         
         private void FilterOutputMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            // set visible output tab from _filterOutputMenuItem state
             _outputTabs.SelectedIndex = _filterOutputMenuItem.Checked ? 1 : 0;
+            _toolFilterOutput.Checked = _filterOutputMenuItem.Checked;
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
@@ -743,26 +774,27 @@ namespace MonoGame.Tools.Pipeline
 
             // Update the state of all menu items.
 
-            _newProjectMenuItem.Enabled = notBuilding;
-            _openProjectMenuItem.Enabled = notBuilding;
+            _newProjectMenuItem.Enabled = _toolNew.Enabled = notBuilding;
+            _openProjectMenuItem.Enabled = _toolOpen.Enabled = notBuilding;
             _importProjectMenuItem.Enabled = notBuilding;
 
-            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
+            _saveMenuItem.Enabled = _toolSave.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
             _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
             _closeMenuItem.Enabled = projectOpenAndNotBuilding;
 
             _exitMenuItem.Enabled = notBuilding;
 
-            _addMenuItem.Enabled = projectOpen & count <= 1;
+            _addMenuItem.Enabled = _toolNewItem.Enabled = _toolAddItem.Enabled =
+                _toolNewFolder.Enabled = _toolAddFolder.Enabled = projectOpen & count <= 1;
             _deleteMenuItem.Enabled = projectOpen & count > 0;
             _renameMenuItem.Enabled = projectOpen & count == 1;
 
-            _buildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _buildMenuItem.Enabled = _toolBuild.Enabled = projectOpenAndNotBuilding;
 
-            _treeRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _treeRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = _toolRebuild.Enabled = projectOpenAndNotBuilding;
             _rebuildMenuItem.Enabled = _treeRebuildMenuItem.Enabled;
 
-            _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
+            _cleanMenuItem.Enabled = _toolClean.Enabled = projectOpenAndNotBuilding;
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
@@ -943,6 +975,32 @@ namespace MonoGame.Tools.Pipeline
             IntPtr ptr_func = Marshal.GetFunctionPointerForDelegate(WordWrapCallbackEvent);
 
             SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
+
+            // load settings
+            if (PipelineSettings.Default.Size.X != 0)
+            {
+                this.Width = PipelineSettings.Default.Size.X;
+                this.Height = PipelineSettings.Default.Size.Y;
+
+                _splitEditorOutput.SplitterDistance = PipelineSettings.Default.VSeparator;
+                _splitTreeProps.SplitterDistance = PipelineSettings.Default.HSeparator;
+
+                _debuggerMenuItem.Checked = PipelineSettings.Default.DebugMode;
+                _filterOutputMenuItem.Checked = _toolFilterOutput.Checked = PipelineSettings.Default.FilterOutput;
+
+                if (PipelineSettings.Default.Maximized)
+                    this.WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                PipelineSettings.Default.Size.X = this.Width;
+                PipelineSettings.Default.Size.Y = this.Height;
+
+                PipelineSettings.Default.VSeparator = _splitEditorOutput.SplitterDistance;
+                PipelineSettings.Default.HSeparator = _splitTreeProps.SplitterDistance;
+            }
+            
+            _outputTabs.SelectedIndex = _filterOutputMenuItem.Checked ? 1 : 0;
         }
 
         public void ItemExistanceChanged(IProjectItem item)
@@ -1163,6 +1221,11 @@ namespace MonoGame.Tools.Pipeline
                 return targetNode.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
 
             return ((IProjectItem)treeView.Nodes[0].Tag).Location;
+        }
+
+        private void _toolFilterOutput_Click(object sender, EventArgs e)
+        {
+            _filterOutputMenuItem.Checked = !_filterOutputMenuItem.Checked;
         }
     }
 }
