@@ -5,7 +5,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace MonoGame.Tools.Pipeline.Common
+namespace MonoGame.Tools.Pipeline
 {
     enum OutputState
     {
@@ -33,8 +33,8 @@ namespace MonoGame.Tools.Pipeline.Common
 
 
         Regex _reBuildBegin = new Regex(@"^(Build started)\W+(?<buildBeginTime>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reCleaning = new Regex(@"^(Cleaning)\W+(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reSkipping = new Regex(@"^(Skipping)\W+(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        Regex _reCleaning = new Regex(@"^(Cleaning)\W(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        Regex _reSkipping = new Regex(@"^(Skipping)\W(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildAsset = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?:\W*?error\W*?:\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildEnd = new Regex(@"^(Build)\W+(?<buildInfo>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);

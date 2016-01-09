@@ -153,6 +153,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnShowEvent()
         {
+            PipelineSettings.Default.Load ();
+
             if (string.IsNullOrEmpty(OpenProjectPath))
             {
                 var startupProject = PipelineSettings.Default.StartupProject;
@@ -829,7 +831,6 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateRecentProjectList()
         {
-            PipelineSettings.Default.Load ();
             recentMenu.Submenu = null;
             var m = new Menu ();
 
