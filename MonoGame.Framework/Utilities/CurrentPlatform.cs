@@ -17,68 +17,72 @@ namespace MonoGame.Utilities
 
     internal static class CurrentPlatform
     {
-        private static bool init = false;
         private static OS os;
+        private static int osversion;
 
         [DllImport ("libc")]
         static extern int uname (IntPtr buf);
 
-        private static void Init()
+        static CurrentPlatform()
         {
-            if (!init)
+            PlatformID pid = Environment.OSVersion.Platform;
+
+            switch (pid) 
             {
-                PlatformID pid = Environment.OSVersion.Platform;
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.WinCE:
+                    os = OS.Windows;
+                    break;
+                case PlatformID.MacOSX:
+                    os = OS.MacOSX;
+                    break;
+                case PlatformID.Unix:
 
-                switch (pid) 
-                {
-                    case PlatformID.Win32NT:
-                    case PlatformID.Win32S:
-                    case PlatformID.Win32Windows:
-                    case PlatformID.WinCE:
-                        os = OS.Windows;
-                        break;
-                    case PlatformID.MacOSX:
-                        os = OS.MacOSX;
-                        break;
-                    case PlatformID.Unix:
+                    // Mac can return a value of Unix sometimes, We need to double check it.
+                    IntPtr buf = IntPtr.Zero;
+                    try
+                    {
+                        buf = Marshal.AllocHGlobal (8192);
 
-                        // Mac can return a value of Unix sometimes, We need to double check it.
-                        IntPtr buf = IntPtr.Zero;
-                        try
-                        {
-                            buf = Marshal.AllocHGlobal (8192);
-
-                            if (uname (buf) == 0) {
-                                string sos = Marshal.PtrToStringAnsi (buf);
-                                if (sos == "Darwin")
-                                {
-                                    os = OS.MacOSX;
-                                    return;
-                                }
+                        if (uname (buf) == 0) {
+                            string sos = Marshal.PtrToStringAnsi (buf);
+                            if (sos == "Darwin")
+                            {
+                                os = OS.MacOSX;
+                                return;
                             }
-                        } catch {
-                        } finally {
-                            if (buf != IntPtr.Zero)
-                                Marshal.FreeHGlobal (buf);
                         }
+                    } catch {
+                    } finally {
+                        if (buf != IntPtr.Zero)
+                            Marshal.FreeHGlobal (buf);
+                    }
 
-                        os = OS.Linux;
-                        break;
-                    default:
-                        os = OS.Unknown;
-                        break;
-                }
-
-                init = true;
+                    os = OS.Linux;
+                    break;
+                default:
+                    os = OS.Unknown;
+                    break;
             }
+
+            osversion = Environment.OSVersion.Version.Major * 10 + Environment.OSVersion.Version.Minor;
         }
 
         public static OS OS
         {
             get
             {
-                Init();
                 return os;
+            }
+        }
+
+        public static int OSVersion
+        {
+            get
+            {
+                return osversion;
             }
         }
     }

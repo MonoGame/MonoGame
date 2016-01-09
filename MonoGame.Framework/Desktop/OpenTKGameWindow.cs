@@ -293,12 +293,16 @@ namespace Microsoft.Xna.Framework
                 
                 updateClientBounds = false;
 
-                // when we resize, we also have to move the window to center of the screen here again
-                // to do this, we simply compare the old size to the target size
-                int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
-                int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
-                window.X = Math.Max(0, centerOffsetX + window.X);
-                window.Y = Math.Max(0, centerOffsetY + window.Y);
+                // On Windows window already gets centered so this would cause trouble
+                if (!(CurrentPlatform.OS == OS.Windows && CurrentPlatform.OSVersion >= 62))
+                {
+                    // when we resize, we also have to move the window to center of the screen here again
+                    // to do this, we simply compare the old size to the target size
+                    int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
+                    int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
+                    window.X = Math.Max(0, centerOffsetX + window.X);
+                    window.Y = Math.Max(0, centerOffsetY + window.Y);
+                }
 
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
@@ -313,9 +317,8 @@ namespace Microsoft.Xna.Framework
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
 
-                // we need to create a small delay between resizing the window
-                // and changing the border to avoid OpenTK Linux bug
-                if (CurrentPlatform.OS == OS.Linux)
+                // At this stage Mac is the only thing that doesn't have trouble with borders...
+                if (CurrentPlatform.OS != OS.MacOSX)
                     updateborder = 2;
                 else
                     UpdateBorder();
