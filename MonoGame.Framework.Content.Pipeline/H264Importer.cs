@@ -2,6 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using System.IO;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     [ContentImporter(".mp4", DisplayName = "H.264 Video - MonoGame", DefaultProcessor = "VideoProcessor")]
@@ -15,6 +18,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var content = new VideoContent(filename);
             return content;
+        }
+
+        public override VideoContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            throw new NotSupportedException("Video content must be stored on disk, not imported from a stream.");
         }
     }
 }

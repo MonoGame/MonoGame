@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.IO;
 using System.Xml;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
 
@@ -25,6 +26,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             using (var reader = XmlReader.Create(filename))
                 return IntermediateSerializer.Deserialize<object>(reader, filename);
+        }
+
+        public override object Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            using (var reader = XmlReader.Create(input))
+                return IntermediateSerializer.Deserialize<object>(reader, virtualFilename);
         }
     }
 }

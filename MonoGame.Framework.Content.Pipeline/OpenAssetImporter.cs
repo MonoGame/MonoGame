@@ -223,6 +223,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
+            using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            {
+                return Import(stream, filename, context);
+            }
+        }
+
+        public override NodeContent Import(Stream stream, string virtualFilename, ContentImporterContext context)
+        {
             _context = context;
 #if LINUX
 			var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
@@ -236,7 +244,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 			catch { }
 #endif
 
-            _identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
+            _identity = new ContentIdentity(virtualFilename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
 
             using (var importer = new AssimpContext())
             {
@@ -255,7 +263,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // the model as is. We don't want to lose any information, i.e. empty
                 // nodes shoud not be thrown away, meshes/materials should not be merged,
                 // etc. Custom model processors may depend on this information!
-                _scene = importer.ImportFile(filename,
+                _scene = importer.ImportFileFromStream(stream,
                     PostProcessSteps.FindDegenerates |
                     PostProcessSteps.FindInvalidData |
                     PostProcessSteps.FlipUVs |              // Required for Direct3D
@@ -283,7 +291,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     //PostProcessSteps.SplitByBoneCount |
                     //PostProcessSteps.SplitLargeMeshes |
                     //PostProcessSteps.TransformUVCoords |
-                    //PostProcessSteps.ValidateDataStructure |
+                    //PostProcessSteps.ValidateDataStructure |,
+                    
+                    ,
+                    Path.GetExtension(virtualFilename)
                     );
 
                 FindSkeleton();     // Find _rootBone, _bones, _deformationBones.

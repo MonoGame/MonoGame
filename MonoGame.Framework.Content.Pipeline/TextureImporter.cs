@@ -66,20 +66,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override TextureContent Import(string filename, ContentImporterContext context)
         {
-            // Special case for loading DDS
-            if (filename.ToLower().EndsWith(".dds"))
-                return DdsLoader.Import(filename, context);
+            using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            {
+                return this.Import(stream, filename, context);
+            }
+        }
 
-            var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
+        public override TextureContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            // Special case for loading DDS
+            if (virtualFilename.ToLower().EndsWith(".dds"))
+                return DdsLoader.Import(input, virtualFilename, context);
+
+            var output = new Texture2DContent { Identity = new ContentIdentity(virtualFilename) };
 
             FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
-            var fBitmap = FreeImage.LoadEx(filename, FREE_IMAGE_LOAD_FLAGS.DEFAULT, ref format);
+            var fBitmap = FreeImage.LoadFromStream(input, FREE_IMAGE_LOAD_FLAGS.DEFAULT, ref format);
             //if freeimage can not recognize the image type
             if(format == FREE_IMAGE_FORMAT.FIF_UNKNOWN)
-                throw new ContentLoadException("TextureImporter failed to load '" + filename + "'");
+                throw new ContentLoadException("TextureImporter failed to load '" + virtualFilename + "'");
             //if freeimage can recognize the file headers but can't read its contents
             else if(fBitmap.IsNull)
-                throw new InvalidContentException("TextureImporter couldn't understand the contents of '" + filename + "'", output.Identity);
+                throw new InvalidContentException("TextureImporter couldn't understand the contents of '" + virtualFilename + "'", output.Identity);
             BitmapContent face = null;
             var height = (int) FreeImage.GetHeight(fBitmap);
             var width = (int) FreeImage.GetWidth(fBitmap);

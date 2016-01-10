@@ -40,5 +40,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
 	        return fontDescription;
 	    }
+
+	    public override FontDescription Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            FontDescription fontDescription = null;
+
+            using (var xmlInput = XmlReader.Create(input))
+                fontDescription = IntermediateSerializer.Deserialize<FontDescription>(xmlInput, virtualFilename);
+
+            fontDescription.Identity = new ContentIdentity(virtualFilename, "FontDescriptionImporter");
+
+            return fontDescription;
+        }
 	}
 }

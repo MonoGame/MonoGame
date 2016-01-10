@@ -212,12 +212,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return pitch * rows;
         }
 
-        static internal TextureContent Import(string filename, ContentImporterContext context)
+        static internal TextureContent Import(Stream input, string virtualFilename, ContentImporterContext context)
         {
-            var identity = new ContentIdentity(filename);
+            var identity = new ContentIdentity(virtualFilename);
             TextureContent output = null;
 
-            using (var reader = new BinaryReader(new FileStream(filename, FileMode.Open, FileAccess.Read)))
+            using (var reader = new BinaryReader(input))
             {
                 // Read signature ("DDS ")
                 var valid = reader.ReadByte() == 0x44;

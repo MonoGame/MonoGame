@@ -41,5 +41,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             
             return content;
         }
+
+        public override AudioContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            throw new NotSupportedException("WAV content must be stored on disk, not imported from a stream.");
+        }
     }
 }

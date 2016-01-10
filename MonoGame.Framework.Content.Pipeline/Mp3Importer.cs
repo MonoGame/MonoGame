@@ -40,5 +40,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var content = new AudioContent(filename, AudioFileType.Mp3);
             return content;
         }
+
+        public override AudioContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            throw new NotSupportedException("MP3 content must be stored on disk, not imported from a stream.");
+        }
     }
 }

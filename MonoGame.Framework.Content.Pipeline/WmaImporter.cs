@@ -40,5 +40,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var content = new AudioContent(filename, AudioFileType.Wma);
             return content;
         }
+
+        public override AudioContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            throw new NotSupportedException("WMA content must be stored on disk, not imported from a stream.");
+        }
     }
 }

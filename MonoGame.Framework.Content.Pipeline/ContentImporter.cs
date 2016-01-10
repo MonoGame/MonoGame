@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -29,6 +30,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
         /// <returns>Resulting game asset.</returns>
         public abstract T Import(string filename, ContentImporterContext context);
+
+        /// <summary>
+        /// Called by external third-party systems when importing a game asset.  This method is used when the asset is being imported from a stream.
+        /// </summary>
+        /// <param name="input">The stream to read the asset from.</param>
+        /// <param name="virtualFilename">For importers that depend on filenames (such as file extensions), this provides a virtual filename for those importers.</param>
+        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+        /// <returns>Resulting game asset.</returns>
+        public virtual T Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            var temp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + Path.GetExtension(virtualFilename));
+            try
+            {
+                using (var writer = new FileStream(temp, FileMode.Truncate, FileAccess.Write))
+                {
+                    input.CopyTo(writer);
+                }
+
+                return Import(temp, context);
+            }
+            finally
+            {
+                File.Delete(temp);
+            }
+        }
 
         /// <summary>
         /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.

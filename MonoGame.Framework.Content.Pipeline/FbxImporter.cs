@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -20,6 +21,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             };
 
             return importer.Import(filename, context);
+        }
+
+        public override NodeContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            var importer = new OpenAssetImporter
+            {
+                ImporterName = "FbxImporter",
+            };
+
+            return importer.Import(input, virtualFilename, context);
         }
     }
 }

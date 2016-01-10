@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.IO;
+using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -28,9 +29,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override EffectContent Import(string filename, ContentImporterContext context)
         {
+            using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            {
+                return Import(stream, filename, context);
+            }
+        }
+
+        /// <summary>
+        /// Called by third-party systems when importing an .fx file to be used as a game asset.
+        /// </summary>
+        /// <param name="input">The stream to read the asset from.</param>
+        /// <param name="virtualFilename">For importers that depend on filenames (such as file extensions), this provides a virtual filename for those importers.</param>
+        /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
+        /// <returns>Resulting game asset.</returns>
+        public override EffectContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
             var effect = new EffectContent();
-            effect.Identity = new ContentIdentity(filename);
-            using (var reader = new StreamReader(filename))
+            effect.Identity = new ContentIdentity(virtualFilename);
+            using (var reader = new StreamReader(input, Encoding.UTF8, true, 1024, true))
                 effect.EffectCode = reader.ReadToEnd();
             return effect;
         }

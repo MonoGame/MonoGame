@@ -33,5 +33,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var content = new AudioContent(filename, AudioFileType.Ogg);
             return content;
         }
+
+        public override AudioContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            throw new NotSupportedException("OGG content must be stored on disk, not imported from a stream.");
+        }
     }
 }

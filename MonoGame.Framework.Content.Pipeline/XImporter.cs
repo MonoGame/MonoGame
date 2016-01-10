@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -33,6 +34,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 ImporterName = "XImporter",
             };
             return importer.Import(filename, context);
+        }
+
+        public override NodeContent Import(Stream input, string virtualFilename, ContentImporterContext context)
+        {
+            var importer = new OpenAssetImporter
+            {
+                ImporterName = "XImporter",
+            };
+
+            return importer.Import(input, virtualFilename, context);
         }
     }
 }
