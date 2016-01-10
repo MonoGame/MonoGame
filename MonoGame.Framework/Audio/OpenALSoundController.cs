@@ -36,7 +36,27 @@ namespace Microsoft.Xna.Framework.Audio
 		//int[] buffers;
         private AlcError _lastOpenALError;
         private int[] allSourcesArray;
-        private const int MAX_NUMBER_OF_SOURCES = 32;
+#if DESKTOPGL || ANGLE
+
+        // MacOS & Linux shares a limit of 256.
+        internal const int MAX_NUMBER_OF_SOURCES = 256;
+
+#elif MONOMAC
+
+        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
+        internal const int MAX_NUMBER_OF_SOURCES = 256;
+
+#elif IOS
+
+        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
+        internal const int MAX_NUMBER_OF_SOURCES = 32;
+
+#elif ANDROID
+
+        // Set to the same as OpenAL on iOS
+        internal const int MAX_NUMBER_OF_SOURCES = 32;
+
+#endif
 #if MONOMAC || IOS
         private const double PREFERRED_MIX_RATE = 44100;
 #elif ANDROID
