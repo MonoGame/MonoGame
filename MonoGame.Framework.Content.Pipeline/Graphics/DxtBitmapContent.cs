@@ -4,6 +4,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 using PVRTexLibNET;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -57,8 +58,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             // Destination region copy is not yet supported
-            if (destinationRegion != new Rectangle(0, 0, Width, Height))
-                return false;
+			var fullRegion = new Rectangle();
+			fullRegion.Width = Width;
+			fullRegion.Height = Height;
+			if (destinationRegion != fullRegion)
+				return false;
+//            if (destinationRegion != new Rectangle(0, 0, Width, Height))
+//                return false;
 
             // If the source is not Vector4 or requires resizing, send it through BitmapContent.Copy
             if (!(sourceBitmap is PixelBitmapContent<Vector4>) || sourceRegion.Width != destinationRegion.Width || sourceRegion.Height != destinationRegion.Height)
@@ -109,14 +115,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             try
             {
                 // Create the texture object in the PVR library
-                var sourceData = sourceBitmap.GetPixelData();
                 var rgba32F = (PixelFormat)0x2020202061626772; // static const PixelType PVRStandard32PixelType = PixelType('r', 'g', 'b', 'a', 32, 32, 32, 32);
-                PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
-                    rgba32F, true, VariableType.Float, colourSpace);
+                using (var sourceData = new AlignedArray(sourceBitmap.GetPixelData(), 16))
+                {
+                    PVRTexture.CreateTexture(sourceData.Buffer, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
+                        rgba32F, true, VariableType.Float, colourSpace);
+                }
                 // Resize the bitmap if needed
                 if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
                     PVRTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
-                if (!PVRTexture.Transcode(targetFormat, VariableType.UnsignedByteNorm, colourSpace))
+                if (!PVRTexture.Transcode(targetFormat, VariableType.UnsignedByteNorm, colourSpace, CompressorQuality.PVRTCHigh))
                     return false;
                 var texDataSize = PVRTexture.GetTextureDataSize(0);
                 var texData = new byte[texDataSize];
