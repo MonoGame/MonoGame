@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if DESKTOPGL || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
-            var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+            var wnd = (Game.Instance.Window as SDLGameWindow).Window.WindowInfo;
 
             #if GLES
             // Create an OpenGL ES 2.0 context
