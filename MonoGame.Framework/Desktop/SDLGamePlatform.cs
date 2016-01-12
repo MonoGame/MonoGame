@@ -80,11 +80,13 @@ using Microsoft.Xna.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 
+using MonoGame.Utilities;
+
 namespace Microsoft.Xna.Framework
 {
-    class OpenTKGamePlatform : GamePlatform
+    class SDLGamePlatform : GamePlatform
     {
-        private OpenTKGameWindow _view;
+        private SDLGameWindow _view;
 		private OpenALSoundController soundControllerInstance = null;
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
@@ -92,11 +94,16 @@ namespace Microsoft.Xna.Framework
 
         int windowDelay = 2;
         
-		public OpenTKGamePlatform(Game game)
+		public SDLGamePlatform(Game game)
             : base(game)
         {
-            _view = new OpenTKGameWindow(game);
+            _view = new SDLGameWindow(game);
             this.Window = _view;
+
+            var initsdl = SDL.SDL_Init(SDL.SDL_INIT_JOYSTICK);
+
+            if (initsdl < 0)
+                throw new Exception("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());
 
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
             try
@@ -141,7 +148,19 @@ namespace Microsoft.Xna.Framework
                 // everything gets disposed of, otherwise it will close the window
                 // and make the window handle invalid
                 if (isExiting == 0)
+                {
+                    SDL.SDL_Event ev;
+
+                    if (SDL.SDL_PollEvent(out ev) != 0)
+                    {
+                        if (ev.type == SDL.SDL_EventType.SDL_JOYDEVICEADDED)
+                            Joystick.AddDevice(ev.jdevice.which);
+                        else if (ev.type == SDL.SDL_EventType.SDL_JOYDEVICEREMOVED)
+                            Joystick.RemoveDevice(ev.jdevice.which);
+                    }
+
                     Game.Tick();
+                }
                 else if (windowDelay == 2)
                 {
                     windowDelay--;
@@ -167,6 +186,8 @@ namespace Microsoft.Xna.Framework
             //(SJ) Why is this called here when it's not in any other project
             //Net.NetworkSession.Exit();
             Interlocked.Increment(ref isExiting);
+
+            Joystick.CloseDevices();
 
             OpenTK.DisplayDevice.Default.RestoreResolution();
         }
@@ -290,6 +311,13 @@ namespace Microsoft.Xna.Framework
             var device = Game.GraphicsDevice;
             if (device != null)
                 device.Present();
-        }	
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            SDL.SDL_Quit();
+
+            base.Dispose(disposing);
+        }
     }
 }

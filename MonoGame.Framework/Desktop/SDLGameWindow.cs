@@ -57,7 +57,7 @@ using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-    class OpenTKGameWindow : GameWindow, IDisposable
+    class SDLGameWindow : GameWindow, IDisposable
     {
         private bool _isResizable;
         private bool _isBorderless;
@@ -175,12 +175,12 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        public OpenTKGameWindow(Game game)
+        public SDLGameWindow(Game game)
         {
             Initialize(game);
         }
 
-        ~OpenTKGameWindow()
+        ~SDLGameWindow()
         {
             Dispose(false);
         }
