@@ -585,6 +585,16 @@ namespace Microsoft.Xna.Framework.Storage
                     }
                     return osConfigDir;
                 }
+                else if (CurrentPlatform.OS == OS.MacOSX)
+                {
+                    string osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                    if (String.IsNullOrEmpty(osConfigDir))
+                    {
+                        return "."; // Oh well.
+                    }
+                    osConfigDir += "/Library/Application Support";
+                    return osConfigDir;
+                }
                 else if(CurrentPlatform.OS == OS.Windows)
                     return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 else
