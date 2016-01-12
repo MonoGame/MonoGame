@@ -153,9 +153,9 @@
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
-      <Link>OpenTK.dll.config</Link>
+    <None Include="Desktop\MonoGame.Framework.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>MonoGame.Framework.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
@@ -797,10 +797,10 @@
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\JoystickState.cs" />
     <Compile Include="Input\Joystick.Default.cs">
-      <Platforms>Android,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
+      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="Input\Joystick.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    <Compile Include="Input\Joystick.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.MacOS.cs">
       <Platforms>MacOS</Platforms>
@@ -1014,6 +1014,15 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
+<<<<<<< 74d00fb395f5808ac335a878ef66f1e9298ad145
+=======
+    <Compile Include="Utilities\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Utilities\SDL2.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+>>>>>>> Replaced OpenTK with SDL2 for Joystick
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
@@ -1066,10 +1075,10 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\OpenTKGamePlatform.cs">
+    <Compile Include="Desktop\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Desktop\OpenTKGameWindow.cs">
+    <Compile Include="Desktop\SDLGameWindow.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardUtil.OpenTK.cs">

@@ -78,9 +78,9 @@ namespace Microsoft.Xna.Framework.Input
         internal static void setWindows(GameWindow window)
         {
             PrimaryWindow = window;
-            if (window is OpenTKGameWindow)
+            if (window is SDLGameWindow)
             {
-                Window = (window as OpenTKGameWindow).Window;
+                Window = (window as SDLGameWindow).Window;
             }
         }
 
@@ -141,8 +141,9 @@ namespace Microsoft.Xna.Framework.Input
 
             var state = OpenTK.Input.Mouse.GetCursorState();
             
-            window.MouseState.X = state.X;
-            window.MouseState.Y = state.Y;
+            var pc = ((SDLGameWindow)window).Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
+            window.MouseState.X = pc.X;
+            window.MouseState.Y = pc.Y;
 
             window.MouseState.LeftButton = (ButtonState)state.LeftButton;
             window.MouseState.RightButton = (ButtonState)state.RightButton;
