@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.GraphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
-            _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _spriteEffect = new Effect(graphicsDevice, EffectResources.SpriteEffect);
             _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
