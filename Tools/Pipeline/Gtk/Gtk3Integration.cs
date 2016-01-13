@@ -54,6 +54,21 @@ namespace MonoGame.Tools.Pipeline
 
         [DllImport (giolibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr g_file_query_info (IntPtr gfile, string attributes, int flag, IntPtr cancelable, IntPtr error);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr gtk_popover_new (IntPtr relative_to_widget);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr gtk_menu_button_new ();
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr gtk_menu_button_get_popover (IntPtr menu_button);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void gtk_menu_button_set_popover (IntPtr menu_button, IntPtr popover);
+
+        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void gtk_tree_view_set_activate_on_single_click (IntPtr treeview, bool value);
     }
 
     public class ColorChooserDialog : Dialog
@@ -119,6 +134,33 @@ namespace MonoGame.Tools.Pipeline
         {
             Gtk3Wrapper.gtk_window_set_titlebar(window.Handle, this.Handle);
         }
+    }
+
+    public class Popover : Bin
+    {
+        public Popover(Widget relativeWidget) : base(Gtk3Wrapper.gtk_popover_new(relativeWidget.Handle)) { }
+
+        public Popover(IntPtr handle) : base(handle) { }
+    }
+
+    public class MenuButton : ToggleButton
+    {
+        public Popover Popup
+        {
+            get
+            {
+                var ret = Gtk3Wrapper.gtk_menu_button_get_popover(this.Handle);
+                return new Popover(ret);
+            }
+            set
+            {
+                Gtk3Wrapper.gtk_menu_button_set_popover(this.Handle, value.Handle);
+            }
+        }
+
+        public MenuButton() : base(Gtk3Wrapper.gtk_menu_button_new()) { }
+
+        public MenuButton(IntPtr handle) : base(handle) { }
     }
 }
 
