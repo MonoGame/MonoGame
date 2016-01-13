@@ -4,6 +4,10 @@
 
 using System.IO;
 
+#if WINRT
+using System.Reflection;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
