@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework
             ((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
 
 #elif DESKTOPGL
-            ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
+            ((SDLGamePlatform)_game.Platform).ResetWindowBounds();
 
             //Set the swap interval based on if vsync is desired or not.
             //See GetSwapInterval for more details
