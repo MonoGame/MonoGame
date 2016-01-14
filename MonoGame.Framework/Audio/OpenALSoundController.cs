@@ -50,9 +50,9 @@ namespace Microsoft.Xna.Framework.Audio
         private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
-        private List<OALSoundBuffer> inUseSourcesCollection;
-        private List<OALSoundBuffer> playingSourcesCollection;
-        private List<OALSoundBuffer> purgeMe;
+        private List<int> inUseSourcesCollection;
+        private List<int> playingSourcesCollection;
+        private List<int> purgeMe;
         private bool _bSoundAvailable = false;
         private Exception _SoundInitException; // Here to bubble back up to the developer
         bool _isDisposed;
@@ -73,9 +73,9 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.GenSources(allSourcesArray);
 
             availableSourcesCollection = new List<int>(allSourcesArray);
-			inUseSourcesCollection = new List<OALSoundBuffer>();
-			playingSourcesCollection = new List<OALSoundBuffer>();
-            purgeMe = new List<OALSoundBuffer>();
+			inUseSourcesCollection = new List<int>();
+			playingSourcesCollection = new List<int>();
+            purgeMe = new List<int>();
 		}
 
         ~OpenALSoundController()
@@ -333,7 +333,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <param name="soundBuffer">The sound buffer you want to play</param>
         /// <returns>True if the buffer can be played, and false if not.</returns>
-		public bool ReserveSource (OALSoundBuffer soundBuffer)
+		public bool ReserveSource (SoundEffectInstance inst)
 		{
             if (!CheckInitState())
             {
@@ -342,14 +342,16 @@ namespace Microsoft.Xna.Framework.Audio
             int sourceNumber;
 			if (availableSourcesCollection.Count == 0) {
 
-				soundBuffer.SourceId = 0;
+                inst.SourceId = 0;
+                inst.HasSourceId = false;
 				return false;
 			}
 			
 
 			sourceNumber = availableSourcesCollection.First ();
-			soundBuffer.SourceId = sourceNumber;
-			inUseSourcesCollection.Add (soundBuffer);
+            inst.SourceId = sourceNumber;
+            inst.HasSourceId = true;
+            inUseSourcesCollection.Add(inst.SourceId);
 
 			availableSourcesCollection.Remove (sourceNumber);
 
@@ -357,18 +359,20 @@ namespace Microsoft.Xna.Framework.Audio
 			return true;
 		}
 
-		public void RecycleSource (OALSoundBuffer soundBuffer)
+        public void RecycleSource(SoundEffectInstance inst)
 		{
             if (!CheckInitState())
             {
                 return;
             }
-            inUseSourcesCollection.Remove(soundBuffer);
-			availableSourcesCollection.Add (soundBuffer.SourceId);
-			soundBuffer.RecycleSoundBuffer();
+            inUseSourcesCollection.Remove(inst.SourceId);
+            availableSourcesCollection.Add(inst.SourceId);
+            inst.SourceId = 0;
+            inst.HasSourceId = false;
+            inst.SoundState = SoundState.Stopped;
 		}
 
-		public void PlaySound (OALSoundBuffer soundBuffer)
+        public void PlaySound(SoundEffectInstance inst)
         {
             if (!CheckInitState())
             {
@@ -376,59 +380,17 @@ namespace Microsoft.Xna.Framework.Audio
             }
             lock (playingSourcesCollection)
             {
-                playingSourcesCollection.Add (soundBuffer);
+                playingSourcesCollection.Add(inst.SourceId);
             }
-			AL.SourcePlay (soundBuffer.SourceId);
+            AL.SourcePlay(inst.SourceId);
 		}
 
-		public void StopSound (OALSoundBuffer soundBuffer)
+        public void FreeSource(SoundEffectInstance inst)
         {
-            if (!CheckInitState())
-            {
-                return;
-            }
-            AL.SourceStop(soundBuffer.SourceId);
-
-            AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
             lock (playingSourcesCollection) {
-                playingSourcesCollection.Remove (soundBuffer);
+                playingSourcesCollection.Remove(inst.SourceId);
             }
-            RecycleSource (soundBuffer);
-		}
-
-		public void PauseSound (OALSoundBuffer soundBuffer)
-		{
-            if (!CheckInitState())
-            {
-                return;
-            }
-            soundBuffer.Pause();
-		}
-
-        public void ResumeSound(OALSoundBuffer soundBuffer)
-        {
-            if (!CheckInitState())
-            {
-                return;
-            }
-            soundBuffer.Resume();
-        }
-
-		public bool IsState (OALSoundBuffer soundBuffer, int state)
-		{
-            if (!CheckInitState())
-            {
-                return (false);
-            }
-            int sourceState;
-
-			AL.GetSource (soundBuffer.SourceId, ALGetSourcei.SourceState, out sourceState);
-
-			if (state == sourceState) {
-				return true;
-			}
-
-			return false;
+            RecycleSource(inst);
 		}
 
         /// <summary>
@@ -437,7 +399,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// inside of NoAudioHardwareException.
         /// </summary>
         /// <returns>True if the controller was initialized, false if not.</returns>
-        private bool CheckInitState()
+        internal bool CheckInitState()
         {
             if (!_bSoundAvailable)
             {
@@ -481,21 +443,22 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 for (int i = playingSourcesCollection.Count - 1; i >= 0; --i)
                 {
-                    var soundBuffer = playingSourcesCollection[i];
-                    state = AL.GetSourceState(soundBuffer.SourceId);
+                    int sourceId = playingSourcesCollection[i];
+                    state = AL.GetSourceState(sourceId);
                     if (state == ALSourceState.Stopped)
                     {
-                        purgeMe.Add(soundBuffer);
+                        purgeMe.Add(sourceId);
                         playingSourcesCollection.RemoveAt(i);
                     }
                 }
             }
             lock (purgeMe)
             {
-                foreach (var soundBuffer in purgeMe)
+                foreach (int sourceId in purgeMe)
                 {
-                    AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, 0);
-                    RecycleSource(soundBuffer);
+                    AL.Source(sourceId, ALSourcei.Buffer, 0);
+                    inUseSourcesCollection.Remove(sourceId);
+                    availableSourcesCollection.Add(sourceId);
                 }
                 purgeMe.Clear();
             }

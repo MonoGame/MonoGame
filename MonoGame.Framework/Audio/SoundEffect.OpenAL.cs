@@ -49,6 +49,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal byte[] _data;
 
+        internal OALSoundBuffer SoundBuffer;
+
 		internal float Rate { get; set; }
 
         internal int Size { get; set; }
@@ -152,7 +154,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-            return;
 
 #endif
 
@@ -170,6 +171,10 @@ namespace Microsoft.Xna.Framework.Audio
             _data = buffer;
 
 #endif
+
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -186,7 +191,6 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
             inst.InitializeSound();
-            inst.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
         #endregion
@@ -195,7 +199,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose(bool disposing)
         {
-            // A no-op for OpenAL
+            if (SoundBuffer != null)
+            {
+                SoundBuffer.Dispose();
+                SoundBuffer = null;
+            }
         }
 
         #endregion
