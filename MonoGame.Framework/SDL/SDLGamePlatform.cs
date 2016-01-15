@@ -80,8 +80,6 @@ using Microsoft.Xna.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 
-using MonoGame.Utilities;
-
 namespace Microsoft.Xna.Framework
 {
     class SDLGamePlatform : GamePlatform
@@ -100,7 +98,7 @@ namespace Microsoft.Xna.Framework
             _view = new SDLGameWindow(game);
             this.Window = _view;
 
-            var initsdl = SDL.SDL_Init(SDL.SDL_INIT_JOYSTICK);
+            var initsdl = SDL.SDL_Init((int)(SDL.SDL_INIT_JOYSTICK | SDL.SDL_INIT_GAMECONTROLLER | SDL.SDL_INIT_HAPTIC));
 
             if (initsdl < 0)
                 throw new Exception("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());

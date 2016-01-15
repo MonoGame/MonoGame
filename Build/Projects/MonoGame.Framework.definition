@@ -153,7 +153,12 @@
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Desktop\MonoGame.Framework.dll.config">
+    <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
+      <Platforms>MacOS, Linux</Platforms>
+      <Link>OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SDL\MonoGame.Framework.dll.config">
       <Platforms>Linux</Platforms>
       <Link>MonoGame.Framework.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -748,7 +753,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>Android,MacOS,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -759,8 +764,8 @@
     <Compile Include="Input\GamePad.Ouya.cs">
       <Platforms>Ouya</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    <Compile Include="Input\GamePad.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.MacOS.cs">
       <Platforms>MacOS</Platforms>
@@ -1007,9 +1012,6 @@
     <Compile Include="Utilities\OggStream.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="Utilities\SDL2.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
-    </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
@@ -1062,17 +1064,24 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\SDLGamePlatform.cs">
+    <Compile Include="SDL\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Desktop\SDLGameWindow.cs">
+    <Compile Include="SDL\SDLGameWindow.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="SDL\SDL2.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardUtil.OpenTK.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
 	 <EmbeddedResource Include="../Installers/monogame.ico">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="SDL\gamecontrollerdb.txt">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>
 
 

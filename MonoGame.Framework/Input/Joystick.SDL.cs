@@ -5,26 +5,30 @@
 using System;
 using System.Collections.Generic;
 
-using MonoGame.Utilities;
-
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class Joystick
     {
-        private static Dictionary<int, IntPtr> joysticks = new Dictionary<int, IntPtr>();
+        internal static Dictionary<int, IntPtr> joysticks = new Dictionary<int, IntPtr>();
 
         internal static void AddDevice(int device_id)
         {
-            joysticks.Add(device_id, SDL.SDL_JoystickOpen(device_id));
+            var jdevice = SDL.SDL_JoystickOpen(device_id);
+            joysticks.Add(device_id, jdevice);
+            GamePad.AddDevice(device_id, jdevice);
         }
 
         internal static void RemoveDevice(int device_id)
         {
+            SDL.SDL_JoystickClose(joysticks[device_id]);
             joysticks.Remove(device_id);
+            GamePad.RemoveDevice(device_id);
         }
 
         internal static void CloseDevices()
         {
+            GamePad.CloseDevices();
+
             foreach (KeyValuePair<int, IntPtr> entry in joysticks)
                 SDL.SDL_JoystickClose(entry.Value);
         }
