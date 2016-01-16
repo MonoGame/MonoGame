@@ -3,20 +3,36 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Text;
 using System.Runtime.InteropServices;
 
 internal class SDL
 {
     private const string nativeLibName = "SDL2.dll";
 
-    internal const int    SDL_INIT_JOYSTICK       = 0x00000200;
-    internal const uint   SDL_INIT_HAPTIC         = 0x00001000;
-    internal const uint   SDL_INIT_GAMECONTROLLER = 0x00002000;
+    public const int    SDL_INIT_JOYSTICK       = 0x00000200;
+    public const uint   SDL_INIT_HAPTIC         = 0x00001000;
+    public const uint   SDL_INIT_GAMECONTROLLER = 0x00002000;
 
-    internal const ushort SDL_HAPTIC_LEFTRIGHT    = (1 << 2);
-    internal const uint   SDL_HAPTIC_INFINITY     = uint.MaxValue;
+    public const ushort SDL_HAPTIC_LEFTRIGHT    = (1 << 2);
+    public const uint   SDL_HAPTIC_INFINITY     = uint.MaxValue;
 
-    internal enum SDL_WindowEventID : byte
+    private unsafe static string SDL_GetString(IntPtr handle)
+    {
+        if (handle == IntPtr.Zero)
+            return "";
+        
+        var ptr = (byte*)handle;
+        while (*ptr != 0)
+            ptr++;
+        
+        var bytes = new byte[ptr - (byte*)handle];
+        Marshal.Copy(handle, bytes, 0, bytes.Length);
+
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    public enum SDL_WindowEventID : byte
     {
         SDL_WINDOWEVENT_NONE,
         SDL_WINDOWEVENT_SHOWN,
@@ -35,7 +51,7 @@ internal class SDL
         SDL_WINDOWEVENT_CLOSE,
     }
 
-    internal enum SDL_EventType
+    public enum SDL_EventType
     {
         SDL_QUIT             = 0x100,
         SDL_WINDOWEVENT      = 0x200,
@@ -43,7 +59,7 @@ internal class SDL
         SDL_JOYDEVICEREMOVED = 0x606,
     }
 
-    internal enum SDL_HAT
+    public enum SDL_HAT
     {
         SDL_HAT_CENTERED  = 0,
         SDL_HAT_UP        = 1,
@@ -56,7 +72,7 @@ internal class SDL
         SDL_HAT_LEFTDOWN  = 12,
     }
 
-    internal enum SDL_GameControllerButton
+    public enum SDL_GameControllerButton
     {
         SDL_CONTROLLER_BUTTON_INVALID = -1,
         SDL_CONTROLLER_BUTTON_A,
@@ -77,7 +93,7 @@ internal class SDL
         SDL_CONTROLLER_BUTTON_MAX,
     }
 
-    internal enum SDL_GameControllerAxis
+    public enum SDL_GameControllerAxis
     {
         SDL_CONTROLLER_AXIS_INVALID = -1,
         SDL_CONTROLLER_AXIS_LEFTX,
@@ -89,13 +105,13 @@ internal class SDL
         SDL_CONTROLLER_AXIS_MAX,
     }
 
-    internal enum SDL_Scancode
+    public enum SDL_Scancode
     {
         SDL_SCANCODE_UNKNOWN = 0
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct SDL_WindowEvent
+    public struct SDL_WindowEvent
     {
         public SDL_EventType type;
         public UInt32 timestamp;
@@ -109,7 +125,7 @@ internal class SDL
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct SDL_JoyDeviceEvent
+    public struct SDL_JoyDeviceEvent
     {
         public SDL_EventType type;
         public UInt32 timestamp;
@@ -117,7 +133,7 @@ internal class SDL
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    internal struct SDL_Event
+    public struct SDL_Event
     {
         [FieldOffset(0)]
         public SDL_EventType type;
@@ -148,13 +164,18 @@ internal class SDL
     // Main
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_Init(int flags);
+    public static extern int       SDL_Init(int flags);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_PollEvent(out SDL_Event _event);
+    public static extern int       SDL_PollEvent(out SDL_Event _event);
 
-    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern string  SDL_GetError();
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetError")]
+    private static extern IntPtr __SDL_GetError();
+
+    public static string SDL_GetError()
+    {
+        return SDL_GetString(__SDL_GetError());
+    }
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void      SDL_Quit();
@@ -162,93 +183,98 @@ internal class SDL
     // Joystick
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr  SDL_JoystickOpen(int device_index);
+    public static extern IntPtr    SDL_JoystickOpen(int device_index);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void      SDL_JoystickClose(IntPtr joystick);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern Guid    SDL_JoystickGetGUID(IntPtr joystick);
+    public static extern Guid      SDL_JoystickGetGUID(IntPtr joystick);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern short   SDL_JoystickGetAxis(IntPtr joystick, int axis);
+    public static extern short     SDL_JoystickGetAxis(IntPtr joystick, int axis);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern byte    SDL_JoystickGetButton(IntPtr joystick, int button);
+    public static extern byte      SDL_JoystickGetButton(IntPtr joystick, int button);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern SDL_HAT SDL_JoystickGetHat(IntPtr joystick, int hat);
+    public static extern SDL_HAT   SDL_JoystickGetHat(IntPtr joystick, int hat);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_JoystickNumAxes(IntPtr joystick);
+    public static extern int       SDL_JoystickNumAxes(IntPtr joystick);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_JoystickNumButtons(IntPtr joystick);
+    public static extern int       SDL_JoystickNumButtons(IntPtr joystick);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_JoystickNumHats(IntPtr joystick);
+    public static extern int       SDL_JoystickNumHats(IntPtr joystick);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_NumJoysticks();
+    public static extern int       SDL_NumJoysticks();
 
     // GameController
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr  SDL_GameControllerOpen(int joystick_index);
+    public static extern IntPtr    SDL_GameControllerOpen(int joystick_index);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerName")]
+    private static extern IntPtr __SDL_GameControllerName(IntPtr gamecontroller);
+
+    public static string SDL_GameControllerName(IntPtr gamecontroller)
+    {
+        return SDL_GetString(__SDL_GameControllerName(gamecontroller));
+    }
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern string  SDL_GameControllerName(IntPtr gamecontroller);
+    public static extern int       SDL_GameControllerAddMapping(string mappingString);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_GameControllerAddMapping(string mappingString);
+    public static extern IntPtr    SDL_GameControllerGetJoystick(IntPtr gamecontroller);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr  SDL_GameControllerGetJoystick(IntPtr gamecontroller);
-
-    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern byte    SDL_GameControllerGetButton(IntPtr gamecontroller, SDL_GameControllerButton button);
+    public static extern byte      SDL_GameControllerGetButton(IntPtr gamecontroller, SDL_GameControllerButton button);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern short     SDL_GameControllerGetAxis(IntPtr gamecontroller, SDL_GameControllerAxis axis);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern byte    SDL_IsGameController(int joystick_index);
+    public static extern byte      SDL_IsGameController(int joystick_index);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void    SDL_GameControllerClose(IntPtr gamecontroller);
+    public static extern void      SDL_GameControllerClose(IntPtr gamecontroller);
 
     // Haptic (aka. Vibrations for Joystick and GameController)
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_JoystickIsHaptic(IntPtr joystick);
+    public static extern int       SDL_JoystickIsHaptic(IntPtr joystick);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr  SDL_HapticOpenFromJoystick(IntPtr joystick);
+    public static extern IntPtr    SDL_HapticOpenFromJoystick(IntPtr joystick);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticRumbleInit(IntPtr haptic);
+    public static extern int       SDL_HapticRumbleInit(IntPtr haptic);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticRumbleSupported(IntPtr haptic);
+    public static extern int       SDL_HapticRumbleSupported(IntPtr haptic);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticRumblePlay(IntPtr haptic, float strength, uint length);
+    public static extern int       SDL_HapticRumblePlay(IntPtr haptic, float strength, uint length);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticEffectSupported(IntPtr haptic, ref SDL_HapticEffect effect);
+    public static extern int       SDL_HapticEffectSupported(IntPtr haptic, ref SDL_HapticEffect effect);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticNewEffect(IntPtr haptic, ref SDL_HapticEffect effect);
+    public static extern int       SDL_HapticNewEffect(IntPtr haptic, ref SDL_HapticEffect effect);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticUpdateEffect(IntPtr haptic, int effect, ref SDL_HapticEffect data);
+    public static extern int       SDL_HapticUpdateEffect(IntPtr haptic, int effect, ref SDL_HapticEffect data);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticRunEffect(IntPtr haptic, int effect, uint iterations);
+    public static extern int       SDL_HapticRunEffect(IntPtr haptic, int effect, uint iterations);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int     SDL_HapticStopAll(IntPtr haptic);
+    public static extern int       SDL_HapticStopAll(IntPtr haptic);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void    SDL_HapticClose(IntPtr haptic);
+    public static extern void      SDL_HapticClose(IntPtr haptic);
 }

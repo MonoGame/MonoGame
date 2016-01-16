@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Input
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
-                    if (!line.StartsWith("#"))
+                    if (!line.StartsWith("#") && !string.IsNullOrWhiteSpace(line))
                         SDL.SDL_GameControllerAddMapping(line);
             }
         }
