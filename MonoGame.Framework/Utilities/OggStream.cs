@@ -59,7 +59,7 @@ namespace MonoGame.Utilities
             BufferCount = bufferCount;
 
             alBufferIds = AL.GenBuffers(bufferCount);
-            alSourceId = AL.GenSource();
+            alSourceId = OpenALSoundController.GetInstance.ReserveSource();
 
             if (ALHelper.XRam.IsInitialized)
             {
@@ -238,9 +238,11 @@ namespace MonoGame.Utilities
                 underlyingStream.Dispose();
             }
 
-            AL.DeleteSource(alSourceId);
+            AL.Source(alSourceId, ALSourcei.Buffer, 0);
+            OpenALSoundController.GetInstance.RecycleSource(alSourceId);
+            ALHelper.Check();
             AL.DeleteBuffers(alBufferIds);
-
+            ALHelper.Check();
             if (ALHelper.Efx.IsInitialized)
                 ALHelper.Efx.DeleteFilter(alFilterId);
             

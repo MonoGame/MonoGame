@@ -353,43 +353,33 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <param name="soundBuffer">The sound buffer you want to play</param>
         /// <returns>True if the buffer can be played, and false if not.</returns>
-		public bool ReserveSource (SoundEffectInstance inst)
+		public int ReserveSource()
 		{
             if (!CheckInitState())
             {
-                return(false);
+                throw new InstancePlayLimitException();
             }
             int sourceNumber;
-			if (availableSourcesCollection.Count == 0) {
-
-                inst.SourceId = 0;
-                inst.HasSourceId = false;
-				return false;
+			if (availableSourcesCollection.Count == 0)
+            {
+                throw new InstancePlayLimitException();
 			}
 			
-
 			sourceNumber = availableSourcesCollection.First ();
-            inst.SourceId = sourceNumber;
-            inst.HasSourceId = true;
-            inUseSourcesCollection.Add(inst.SourceId);
-
+            inUseSourcesCollection.Add(sourceNumber);
 			availableSourcesCollection.Remove (sourceNumber);
 
-			//sourceId = sourceNumber;
-			return true;
+            return sourceNumber;
 		}
 
-        public void RecycleSource(SoundEffectInstance inst)
+        public void RecycleSource(int sourceId)
 		{
             if (!CheckInitState())
             {
                 return;
             }
-            inUseSourcesCollection.Remove(inst.SourceId);
-            availableSourcesCollection.Add(inst.SourceId);
-            inst.SourceId = 0;
-            inst.HasSourceId = false;
-            inst.SoundState = SoundState.Stopped;
+            inUseSourcesCollection.Remove(sourceId);
+            availableSourcesCollection.Add(sourceId);
 		}
 
         public void PlaySound(SoundEffectInstance inst)
@@ -410,7 +400,10 @@ namespace Microsoft.Xna.Framework.Audio
             lock (playingSourcesCollection) {
                 playingSourcesCollection.Remove(inst.SourceId);
             }
-            RecycleSource(inst);
+            RecycleSource(inst.SourceId);
+            inst.SourceId = 0;
+            inst.HasSourceId = false;
+            inst.SoundState = SoundState.Stopped;
 		}
 
         /// <summary>
