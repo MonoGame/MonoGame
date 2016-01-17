@@ -297,19 +297,29 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Destroys the AL context and closes the device, when they exist.
         /// </summary>
-		private void CleanUpOpenAL()
-		{
-			Alc.MakeContextCurrent (ContextHandle.Zero);
-			if (_context != ContextHandle.Zero) {
-				Alc.DestroyContext (_context);
-				_context = ContextHandle.Zero;
-			}
-			if (_device != IntPtr.Zero) {
-				Alc.CloseDevice (_device);
-				_device = IntPtr.Zero;
-			}
+        private void CleanUpOpenAL()
+        {
+            Alc.MakeContextCurrent(ContextHandle.Zero);
+#if DESKTOPGL
+            if (_acontext != null)
+            {
+                _acontext.Dispose();
+                _acontext = null;
+            }
+#else
+            if (_context != ContextHandle.Zero)
+            {
+                Alc.DestroyContext (_context);
+                _context = ContextHandle.Zero;
+            }
+            if (_device != IntPtr.Zero)
+            {
+                Alc.CloseDevice (_device);
+                _device = IntPtr.Zero;
+            }
+#endif
             _bSoundAvailable = false;
-		}
+        }
 
         /// <summary>
         /// Dispose of the OpenALSoundCOntroller.
