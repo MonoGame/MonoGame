@@ -10,12 +10,15 @@ internal class SDL
 {
     private const string nativeLibName = "SDL2.dll";
 
+    public const uint   SDL_INIT_VIDEO          = 0x00000020;
     public const int    SDL_INIT_JOYSTICK       = 0x00000200;
     public const uint   SDL_INIT_HAPTIC         = 0x00001000;
     public const uint   SDL_INIT_GAMECONTROLLER = 0x00002000;
 
     public const ushort SDL_HAPTIC_LEFTRIGHT    = (1 << 2);
     public const uint   SDL_HAPTIC_INFINITY     = uint.MaxValue;
+
+    public const int    SDL_WINDOWPOS_CENTERED  = 0x2FFF0000;
 
     private unsafe static string SDL_GetString(IntPtr handle)
     {
@@ -58,7 +61,7 @@ internal class SDL
         SDL_JOYDEVICEADDED   = 0x605,
         SDL_JOYDEVICEREMOVED = 0x606,
     }
-
+ 
     public enum SDL_HAT
     {
         SDL_HAT_CENTERED  = 0,
@@ -108,6 +111,19 @@ internal class SDL
     public enum SDL_Scancode
     {
         SDL_SCANCODE_UNKNOWN = 0
+    }
+
+    [Flags]
+    public enum SDL_WindowFlags
+    {
+        SDL_WINDOW_FULLSCREEN  = 0x00000001,
+        SDL_WINDOW_OPENGL      = 0x00000002,
+        SDL_WINDOW_SHOWN       = 0x00000004,
+        SDL_WINDOW_HIDDEN      = 0x00000008,
+        SDL_WINDOW_BORDERLESS  = 0x00000010,
+        SDL_WINDOW_RESIZABLE   = 0x00000020,
+        SDL_WINDOW_INPUT_FOCUS = 0x00000200,
+        SDL_WINDOW_MOUSE_FOCUS = 0x00000400,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -179,6 +195,41 @@ internal class SDL
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void      SDL_Quit();
+
+    // Window
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr    SDL_CreateWindow(string title, int x, int y, int w, int h, SDL_WindowFlags flags);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_DestroyWindow(IntPtr window);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_GetWindowPosition(IntPtr window, out int x, out int y);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_GetWindowSize(IntPtr window, out int w, out int h);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_SetWindowBordered(IntPtr window, int bordered);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int       SDL_SetWindowFullscreen(IntPtr window, SDL_WindowFlags flags);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_SetWindowPosition(IntPtr window, int x, int y);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_SetWindowSize(IntPtr window, int w, int h);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_SetWindowTitle(IntPtr window, string title);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_ShowWindow(IntPtr window);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int       SDL_ShowCursor(int toggle);
 
     // Joystick
 
