@@ -49,6 +49,15 @@
     </topic>
     
     <topic id="External_Links" name="External Links" filename="links.md"/>
+	
+	<topic id="Package_and_distribute_games" name="Package and distribute games" filename="package_and_distribute.md">
+        <topic id="How_to_package_DesktopGL_projects" name="How to package DesktopGL projects" filename="package_DesktopGL.md">
+			<topic id="How_to_package_DesktopGL_projects_Windows" name="How to package a DesktopGL Windows game" filename="package_DesktopGL_Windows.md"/>
+			<topic id="How_to_package_DesktopGL_projects_OSX" name="How to package a DesktopGL OS X game" filename="package_DesktopGL_OSX.md"/>
+			<topic id="How_to_package_DesktopGL_projects_Linux" name="How to package a Linux game" filename="package_DesktopGL_Linux.md"/>
+		</topic>
+        <topic id="How_to_package_Windows_desktop_DirectX_projects" name="How to package Windows (desktop DirectX) projects" filename="package_Windows.md"/>
+    </topic>
 
     <!-- Special topic X:ClassLibrary to include generated class library references. No filename to setup as it is generated -->
     <topic id="X:ClassLibraryReference" page-id="api" name="Class Library Reference" index="100" on-url="true"/>
