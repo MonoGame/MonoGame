@@ -19,6 +19,10 @@ namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
+#if DESKTOPGL
+        public static bool Resizable = false;
+#endif
+
         private GameComponentCollection _components;
         private GameServiceContainer _services;
         private ContentManager _content;
@@ -395,27 +399,14 @@ namespace Microsoft.Xna.Framework
                 break;
             case GameRunBehavior.Synchronous:
                 Platform.RunLoop();
-#if !DESKTOPGL
                 EndRun();
 				DoExiting();
-#endif
                 break;
             default:
                 throw new ArgumentException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
-
-#if DESKTOPGL
-        // This code is used so that the Window could stay alive
-        // while all the resources are getting destroyed
-        internal void ExitEverything()
-        {
-            EndRun();
-            DoExiting();
-            this.Dispose();
-        }
-#endif
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
