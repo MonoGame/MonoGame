@@ -25,27 +25,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
-#if DESKTOPGL || ANGLE
-
-        // These platforms are only limited by memory.
-        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
-
-#elif MONOMAC
-
-        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
-        internal const int MAX_PLAYING_INSTANCES = 256;
-
-#elif IOS
-
-        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
-        internal const int MAX_PLAYING_INSTANCES = 32;
-
-#elif ANDROID
-
-        // Set to the same as OpenAL on iOS
-        internal const int MAX_PLAYING_INSTANCES = 32;
-
-#endif
+        internal const int MAX_PLAYING_INSTANCES = OpenALSoundController.MAX_NUMBER_OF_SOURCES;
 
         internal byte[] _data;
 
