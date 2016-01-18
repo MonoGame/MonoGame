@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 using Microsoft.Xna.Framework.Audio;
@@ -16,13 +17,15 @@ namespace Microsoft.Xna.Framework
         private OpenALSoundController soundControllerInstance = null;
         private int isExiting;
         private SDLGameWindow _view;
-
+        private List<Keys> _keys;
         private Game _game;
 
         public SDLGamePlatform(Game game)
             : base(game)
         {
             this._game = game;
+            this._keys = new List<Keys>();
+            Keyboard.SetKeys(_keys);
 
             var initsdl = SDL.SDL_Init((int)(
                 SDL.SDL_INIT_VIDEO |
@@ -74,6 +77,18 @@ namespace Microsoft.Xna.Framework
                         Joystick.RemoveDevice(ev.jdevice.which);
                     else if (ev.type == SDL.SDL_EventType.SDL_MOUSEWHEEL)
                         Mouse.ScrollY += ev.wheel.y * 120;
+                    else if (ev.type == SDL.SDL_EventType.SDL_KEYDOWN)
+                    {
+                        var key = KeyboardUtil.ToXna(ev.key.keysym.sym);
+
+                        if (!_keys.Contains(key))
+                            _keys.Add(key);
+                    }
+                    else if (ev.type == SDL.SDL_EventType.SDL_KEYUP)
+                    {
+                        var key = KeyboardUtil.ToXna(ev.key.keysym.sym);
+                        _keys.Remove(key);
+                    }
                 }
 
                 Game.Tick();

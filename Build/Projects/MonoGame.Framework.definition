@@ -1083,7 +1083,7 @@
     <Compile Include="SDL\SDL2.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardUtil.OpenTK.cs">
+    <Compile Include="Input\KeyboardUtil.SDL.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
 	 <EmbeddedResource Include="../Installers/monogame.ico">

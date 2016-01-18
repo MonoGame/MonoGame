@@ -64,6 +64,9 @@ internal class SDL
     {
         SDL_QUIT             = 0x100,
         SDL_WINDOWEVENT      = 0x200,
+        SDL_KEYDOWN          = 0x300,
+        SDL_KEYUP            = 0x301,
+        SDL_TEXTINPUT        = 0x303,
         SDL_JOYDEVICEADDED   = 0x605,
         SDL_JOYDEVICEREMOVED = 0x606,
         SDL_MOUSEWHEEL       = 0x403,
@@ -115,11 +118,6 @@ internal class SDL
         SDL_CONTROLLER_AXIS_MAX,
     }
 
-    public enum SDL_Scancode
-    {
-        SDL_SCANCODE_UNKNOWN = 0,
-    }
-
     [Flags]
     public enum SDL_WindowFlags
     {
@@ -167,6 +165,28 @@ internal class SDL
         public Int32 which;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SDL_KeyboardEvent
+    {
+        public SDL_EventType type;
+        public UInt32 timestamp;
+        public UInt32 windowID;
+        public byte state;
+        public byte repeat;
+        private byte padding2;
+        private byte padding3;
+        public SDL_Keysym keysym;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SDL_Keysym
+    {
+        public int scancode;
+        public int sym;
+        public short mod;
+        public int unicode;
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     public struct SDL_Event
     {
@@ -174,6 +194,8 @@ internal class SDL
         public SDL_EventType type;
         [FieldOffset(0)]
         public SDL_WindowEvent window;
+        [FieldOffset(0)]
+        public SDL_KeyboardEvent key;
         [FieldOffset(0)]
         public SDL_MouseWheelEvent wheel;
         [FieldOffset(0)]
