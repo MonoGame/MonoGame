@@ -683,7 +683,7 @@ namespace TwoMGFX
                     pass.state_count = 0;
                     var tempstate = new d3dx_state[2];
 
-                    pinfo.ValidateShaderModels(shaderInfo.Profile);
+                    shaderInfo.Profile.ValidateShaderModels(pinfo);
 
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
@@ -795,17 +795,7 @@ namespace TwoMGFX
         private d3dx_state CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, ref string errorsAndWarnings)
         {
             // Compile the shader.
-            byte[] bytecode;
-            if (shaderInfo.Profile == ShaderProfile.DirectX_11 || shaderInfo.Profile == ShaderProfile.OpenGL)
-            {
-                // For now GLSL is only supported via translation
-                // using MojoShader which works from HLSL bytecode.                
-                bytecode = CompileHLSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
-            }
-            else if (shaderInfo.Profile == ShaderProfile.PlayStation4)
-                bytecode = CompilePSSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
-            else
-                throw new NotSupportedException("Unknown shader profile!");
+            byte[] bytecode = shaderInfo.Profile.CompileShader(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
 
             // First look to see if we already created this same shader.
             ShaderData shaderData = null;
@@ -821,15 +811,7 @@ namespace TwoMGFX
             // Create a new shader.
             if (shaderData == null)
             {
-                if (shaderInfo.Profile == ShaderProfile.DirectX_11)
-                    shaderData = ShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
-                else if (shaderInfo.Profile == ShaderProfile.OpenGL)
-                    shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
-                else if (shaderInfo.Profile == ShaderProfile.PlayStation4)
-                    shaderData = ShaderData.CreatePSSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
-                else
-                    throw new NotSupportedException("Unknown shader profile!");
-
+                shaderData = shaderInfo.Profile.CreateShader(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
                 Shaders.Add(shaderData);
             }
 

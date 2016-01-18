@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.IO;
 
 namespace TwoMGFX
@@ -8,8 +12,8 @@ namespace TwoMGFX
         public static int Main(string[] args)
         {
             var options = new Options();
-            var parser = new Utilities.CommandLineParser(options);
-            parser.Title = "2MGFX - Converts Microsoft FX files to a compiled MonoGame Effect.";
+            var parser = new CommandLineParser(options);
+            parser.Title = "2MGFX - The MonoGame Effect compiler.";
 
             if (!parser.ParseCommandLine(args))
                 return 1;
