@@ -18,9 +18,7 @@ namespace Microsoft.Xna.Framework.Audio
 		ALFormat openALFormat;
 		int dataSize;
 		int sampleRate;
-		private int _sourceId;
         bool _isDisposed;
-        internal int _pauseCount;
 
 		public OALSoundBuffer ()
 		{
@@ -91,20 +89,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         }
 
-        public void Pause()
-        {
-            if (_pauseCount == 0)
-                AL.SourcePause(_sourceId);
-            ++_pauseCount;
-        }
-
-        public void Resume()
-        {
-            --_pauseCount;
-            if (_pauseCount == 0)
-                AL.SourcePlay(_sourceId);
-        }
-
 		public void Dispose()
 		{
             Dispose(true);
@@ -128,31 +112,6 @@ namespace Microsoft.Xna.Framework.Audio
                 _isDisposed = true;
             }
         }
-
-		public int SourceId
-		{
-			get {
-				return _sourceId;
-			}
-
-			set {
-				_sourceId = value;
-				if (Reserved != null)
-					Reserved(this, EventArgs.Empty);
-
-			}
-		}
-
-		public void RecycleSoundBuffer()
-		{
-			if (Recycled != null)
-				Recycled(this, EventArgs.Empty);
-		}
-
-		#region Events
-		public event EventHandler<EventArgs> Reserved;
-		public event EventHandler<EventArgs> Recycled;
-		#endregion
 	}
 }
 

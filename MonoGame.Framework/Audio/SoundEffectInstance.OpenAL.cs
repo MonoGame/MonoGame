@@ -14,16 +14,16 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public partial class SoundEffectInstance : IDisposable
     {
-		private SoundState soundState = SoundState.Stopped;
+		internal SoundState SoundState = SoundState.Stopped;
 		private bool _looped = false;
 		private float _alVolume = 1;
 
-		int sourceId;
-
-        private OALSoundBuffer soundBuffer;
+		internal int SourceId;
+        int pauseCount;
+        
         private OpenALSoundController controller;
         
-        bool hasSourceId = false;
+        internal bool HasSourceId = false;
 
         #region Initialization
 
@@ -33,25 +33,6 @@ namespace Microsoft.Xna.Framework.Audio
         internal void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
             InitializeSound();
-            BindDataBuffer(
-                buffer,
-                (channels == 2) ? ALFormat.Stereo16 : ALFormat.Mono16,
-                buffer.Length,
-                sampleRate
-			    );
-        }
-
-        /// <summary>
-        /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
-        /// that is created in the InitializeSound method.
-        /// </summary>
-        /// <param name="data">The sound data buffer</param>
-        /// <param name="format">The sound buffer data format, e.g. Mono, Mono16 bit, Stereo, etc.</param>
-        /// <param name="size">The size of the data buffer</param>
-        /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
-        internal void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
-        {
-            soundBuffer.BindDataBuffer(data, format, size, rate);
         }
 
         /// <summary>
@@ -61,35 +42,6 @@ namespace Microsoft.Xna.Framework.Audio
         internal void InitializeSound()
         {
             controller = OpenALSoundController.GetInstance;
-            soundBuffer = new OALSoundBuffer();
-            soundBuffer.Reserved += HandleSoundBufferReserved;
-            soundBuffer.Recycled += HandleSoundBufferRecycled;
-        }
-
-        /// <summary>
-        /// Event handler that resets internal state of this instance. The sound state will report
-        /// SoundState.Stopped after this event handler.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HandleSoundBufferRecycled(object sender, EventArgs e)
-        {
-            sourceId = 0;
-            hasSourceId = false;
-            soundState = SoundState.Stopped;
-            //Console.WriteLine ("recycled: " + soundEffect.Name);
-        }
-
-        /// <summary>
-        /// Called after the hardware has allocated a sound buffer, this event handler will
-        /// maintain the numberical ID of the source ID.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HandleSoundBufferReserved(object sender, EventArgs e)
-        {
-            sourceId = soundBuffer.SourceId;
-            hasSourceId = true;
         }
 
         #endregion // Initialization
@@ -133,80 +85,104 @@ namespace Microsoft.Xna.Framework.Audio
             finalVel = Vector3.Transform(finalVel, orientation);
 
             // set the position based on relative positon
-            AL.Source(sourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
-            AL.Source(sourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
+            AL.Source(SourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
+            AL.Source(SourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
         }
 
         private void PlatformPause()
         {
-            if (!hasSourceId || soundState != SoundState.Playing)
+            if (!HasSourceId || SoundState != SoundState.Playing)
                 return;
 
-            controller.PauseSound(soundBuffer);
-            soundState = SoundState.Paused;
+            if (!controller.CheckInitState())
+            {
+                return;
+            }
+
+            if (pauseCount == 0)
+                AL.SourcePause(SourceId);
+            ++pauseCount;
+            SoundState = SoundState.Paused;
         }
 
         private void PlatformPlay()
         {
-            if (hasSourceId)
-                return;
-            
-            bool isSourceAvailable = controller.ReserveSource (soundBuffer);
-            if (!isSourceAvailable)
-                throw new InstancePlayLimitException();
 
-            int bufferId = soundBuffer.OpenALDataBuffer;
-            AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
+            SourceId = 0;
+            HasSourceId = false;
+            SourceId = controller.ReserveSource();
+            HasSourceId = true;
+
+            int bufferId = _effect.SoundBuffer.OpenALDataBuffer;
+            AL.Source(SourceId, ALSourcei.Buffer, bufferId);
 
             // Send the position, gain, looping, pitch, and distance model to the OpenAL driver.
-            if (!hasSourceId)
+            if (!HasSourceId)
 				return;
 
 			// Distance Model
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
 			// Pan
-			AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0.1f);
+			AL.Source (SourceId, ALSource3f.Position, _pan, 0, 0.1f);
 			// Volume
-			AL.Source (sourceId, ALSourcef.Gain, _alVolume);
+			AL.Source (SourceId, ALSourcef.Gain, _alVolume);
 			// Looping
-			AL.Source (sourceId, ALSourceb.Looping, IsLooped);
+			AL.Source (SourceId, ALSourceb.Looping, IsLooped);
 			// Pitch
-			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
+			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 
-            controller.PlaySound (soundBuffer);
+            controller.PlaySound (this);
             //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
-            soundState = SoundState.Playing;
+            SoundState = SoundState.Playing;
         }
 
         private void PlatformResume()
         {
-            if (!hasSourceId)
+            if (!HasSourceId)
             {
                 Play();
                 return;
             }
-            
-            if (soundState == SoundState.Paused)
-                controller.ResumeSound(soundBuffer);
-            soundState = SoundState.Playing;
+
+            if (SoundState == SoundState.Paused)
+            {
+                if (!controller.CheckInitState())
+                {
+                    return;
+                }
+                --pauseCount;
+                if (pauseCount == 0)
+                    AL.SourcePlay(SourceId);
+            }
+            SoundState = SoundState.Playing;
         }
 
         private void PlatformStop(bool immediate)
         {
-            if (hasSourceId)
+            if (HasSourceId)
             {
                 //Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
-                controller.StopSound(soundBuffer);
+                
+
+                if (!controller.CheckInitState())
+                {
+                    return;
+                }
+                AL.SourceStop(SourceId);
+
+                AL.Source(SourceId, ALSourcei.Buffer, 0);
+
+                controller.FreeSource(this);
             }
-            soundState = SoundState.Stopped;
+            SoundState = SoundState.Stopped;
         }
 
         private void PlatformSetIsLooped(bool value)
         {
             _looped = value;
             
-            if (hasSourceId)
-                AL.Source(sourceId, ALSourceb.Looping, _looped);
+            if (HasSourceId)
+                AL.Source(SourceId, ALSourceb.Looping, _looped);
         }
 
         private bool PlatformGetIsLooped()
@@ -216,63 +192,53 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPan(float value)
         {
-            if (hasSourceId)
-                AL.Source(sourceId, ALSource3f.Position, value, 0.0f, 0.1f);
+            if (HasSourceId)
+                AL.Source(SourceId, ALSource3f.Position, value, 0.0f, 0.1f);
         }
 
         private void PlatformSetPitch(float value)
         {
-            if (hasSourceId)
-                AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(value));
+            if (HasSourceId)
+                AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(value));
         }
 
         private SoundState PlatformGetState()
         {
-            if (!hasSourceId)
+            if (!HasSourceId)
                 return SoundState.Stopped;
             
-            var alState = AL.GetSourceState(sourceId);
+            var alState = AL.GetSourceState(SourceId);
 
             switch (alState)
             {
                 case ALSourceState.Initial:
                 case ALSourceState.Stopped:
-                    soundState = SoundState.Stopped;
+                    SoundState = SoundState.Stopped;
                     break;
 
                 case ALSourceState.Paused:
-                    soundState = SoundState.Paused;
+                    SoundState = SoundState.Paused;
                     break;
 
                 case ALSourceState.Playing:
-                    soundState = SoundState.Playing;
+                    SoundState = SoundState.Playing;
                     break;
             }
 
-            return soundState;
+            return SoundState;
         }
 
         private void PlatformSetVolume(float value)
         {
             _alVolume = value;
 
-            if (hasSourceId)
-                AL.Source(sourceId, ALSourcef.Gain, _alVolume);
+            if (HasSourceId)
+                AL.Source(SourceId, ALSourcef.Gain, _alVolume);
         }
 
         private void PlatformDispose(bool disposing)
         {
-            if (disposing)
-            {
-                if (soundBuffer != null)
-                {
-                    this.Stop(true);
-                    soundBuffer.Reserved -= HandleSoundBufferReserved;
-                    soundBuffer.Recycled -= HandleSoundBufferRecycled;
-                    soundBuffer.Dispose();
-                    soundBuffer = null;
-                }
-            }
+            
         }
     }
 }
