@@ -72,6 +72,8 @@ namespace Microsoft.Xna.Framework
                         Joystick.AddDevice(ev.jdevice.which);
                     else if (ev.type == SDL.SDL_EventType.SDL_JOYDEVICEREMOVED)
                         Joystick.RemoveDevice(ev.jdevice.which);
+                    else if (ev.type == SDL.SDL_EventType.SDL_MOUSEWHEEL)
+                        Mouse.ScrollY += ev.wheel.y * 120;
                 }
 
                 Game.Tick();

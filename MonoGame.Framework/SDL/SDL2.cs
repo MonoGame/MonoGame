@@ -15,10 +15,16 @@ internal class SDL
     public const uint   SDL_INIT_HAPTIC         = 0x00001000;
     public const uint   SDL_INIT_GAMECONTROLLER = 0x00002000;
 
-    public const ushort SDL_HAPTIC_LEFTRIGHT    = (1 << 2);
+    public const ushort SDL_HAPTIC_LEFTRIGHT    = 1 << 2;
     public const uint   SDL_HAPTIC_INFINITY     = uint.MaxValue;
 
     public const int    SDL_WINDOWPOS_CENTERED  = 0x2FFF0000;
+
+    public const int    SDL_BUTTON_LMASK        = 1 << 0;
+    public const int    SDL_BUTTON_MMASK        = 1 << 1;
+    public const int    SDL_BUTTON_RMASK        = 1 << 2;
+    public const int    SDL_BUTTON_X1MASK       = 1 << 3;
+    public const int    SDL_BUTTON_X2MASK       = 1 << 4;
 
     private unsafe static string SDL_GetString(IntPtr handle)
     {
@@ -60,6 +66,7 @@ internal class SDL
         SDL_WINDOWEVENT      = 0x200,
         SDL_JOYDEVICEADDED   = 0x605,
         SDL_JOYDEVICEREMOVED = 0x606,
+        SDL_MOUSEWHEEL       = 0x403,
     }
  
     public enum SDL_HAT
@@ -110,7 +117,7 @@ internal class SDL
 
     public enum SDL_Scancode
     {
-        SDL_SCANCODE_UNKNOWN = 0
+        SDL_SCANCODE_UNKNOWN = 0,
     }
 
     [Flags]
@@ -141,6 +148,18 @@ internal class SDL
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    public struct SDL_MouseWheelEvent
+    {
+        public SDL_EventType type;
+        public uint timestamp;
+        public uint windowID;
+        public uint which;
+        public int x;
+        public int y;
+        public uint direction;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public struct SDL_JoyDeviceEvent
     {
         public SDL_EventType type;
@@ -155,6 +174,8 @@ internal class SDL
         public SDL_EventType type;
         [FieldOffset(0)]
         public SDL_WindowEvent window;
+        [FieldOffset(0)]
+        public SDL_MouseWheelEvent wheel;
         [FieldOffset(0)]
         public SDL_JoyDeviceEvent jdevice;
     }
@@ -228,8 +249,19 @@ internal class SDL
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void      SDL_ShowWindow(IntPtr window);
 
+    // Mouse
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int       SDL_GetGlobalMouseState(out int x, out int y);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int       SDL_GetMouseState(out int x, out int y);
+
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int       SDL_ShowCursor(int toggle);
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_WarpMouseInWindow(IntPtr window, int x, int y);
 
     // Joystick
 

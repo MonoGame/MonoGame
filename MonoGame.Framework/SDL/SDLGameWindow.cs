@@ -24,12 +24,22 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                var pos = Position;
-                int w, h;
+                int x = 0, y = 0, w, h;
 
                 SDL.SDL_GetWindowSize(Handle, out w, out h);
 
-                return new Rectangle(pos.X, pos.Y, w, h);
+                if (!_isFullScreen)
+                {
+                    SDL.SDL_GetWindowPosition(Handle, out x, out y);
+
+                    if (!IsBorderless)
+                    {
+                        x += BorderX;
+                        y += BorderY;
+                    }
+                }
+
+                return new Rectangle(x, y, w, h);
             }
         }
 
@@ -37,8 +47,11 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                int x, y;
-                SDL.SDL_GetWindowPosition(Handle, out x, out y);
+                int x = 0, y = 0;
+
+                if (!_isFullScreen)
+                    SDL.SDL_GetWindowPosition(Handle, out x, out y);
+                
                 return new Point(x, y);
             }
             set
@@ -84,8 +97,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        internal int BorderX, BorderY;
+        internal bool _isFullScreen;
+
         private IntPtr _handle;
-        private bool _disposed, _reziable, _borderless, _willBeFullScreen, isFullScreen;
+        private bool _disposed, _reziable, _borderless, _willBeFullScreen;
         private string _screenDeviceName;
 
         public SDLGameWindow()
@@ -110,6 +126,13 @@ namespace Microsoft.Xna.Framework
                 initflags);
 
             SetCursorVisible(false);
+
+            // TODO, per platform border detection
+        }
+
+        ~SDLGameWindow()
+        {
+            Dispose(false);
         }
 
         public void SetCursorVisible(bool visible)
@@ -118,11 +141,6 @@ namespace Microsoft.Xna.Framework
 
             if (err < 0)
                 Console.WriteLine("Failed to set cursor! SDL Error: " + SDL.SDL_GetError());
-        }
-        
-        ~SDLGameWindow()
-        {
-            Dispose(false);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
@@ -137,20 +155,19 @@ namespace Microsoft.Xna.Framework
             var prevBounds = ClientBounds;
 
             SDL.SDL_SetWindowSize(Handle, clientWidth, clientHeight);
+            SDL.SDL_SetWindowFullscreen(Handle, (_willBeFullScreen) ? SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN : 0);
 
-            if (!_willBeFullScreen && isFullScreen)
+            if (!_willBeFullScreen && _isFullScreen)
                 SDL.SDL_SetWindowPosition(_handle, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED);
             else if (!_willBeFullScreen)
             {
                 SDL.SDL_SetWindowPosition(Handle,
-                    Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0),
-                    Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0)
+                    Math.Max(prevBounds.X - ((IsBorderless || _isFullScreen) ? 0 : BorderX) + ((prevBounds.Width - clientWidth) / 2), 0),
+                    Math.Max(prevBounds.Y - ((IsBorderless || _isFullScreen) ? 0 : BorderY)  + ((prevBounds.Height - clientHeight) / 2), 0)
                 );
             }
 
-            SDL.SDL_SetWindowFullscreen(Handle, (_willBeFullScreen) ? SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN : 0);
-
-            isFullScreen = _willBeFullScreen;
+            _isFullScreen = _willBeFullScreen;
             OnClientSizeChanged();
         }
 
