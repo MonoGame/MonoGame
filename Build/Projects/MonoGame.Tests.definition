@@ -106,6 +106,7 @@
 	<Compile Include="Framework\QuaternionTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
 	<Compile Include="Framework\RectangleTest.cs" />
+	<Compile Include="Framework\SpriteFontNonVisualTest.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
     <Compile Include="Framework\TouchCollectionTest.cs" />
     <Compile Include="Framework\TouchLocationTest.cs" />
