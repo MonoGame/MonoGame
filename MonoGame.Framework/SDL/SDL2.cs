@@ -248,6 +248,9 @@ internal class SDL
     public static extern void      SDL_DestroyWindow(IntPtr window);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void      SDL_DisableScreenSaver();
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void      SDL_GetWindowPosition(IntPtr window, out int x, out int y);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
