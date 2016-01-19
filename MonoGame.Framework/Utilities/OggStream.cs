@@ -408,8 +408,9 @@ namespace MonoGame.Utilities
                 readSamples = stream.Reader.ReadSamples(readSampleBuffer, 0, BufferSize);
                 CastBuffer(readSampleBuffer, castBuffer, readSamples);
             }
-            AL.BufferData(bufferId, stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, castBuffer,
-                readSamples * sizeof (short), stream.Reader.SampleRate);
+            if (readSamples > 0)
+                AL.BufferData(bufferId, stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, castBuffer,
+                    readSamples * sizeof (short), stream.Reader.SampleRate);
             ALHelper.Check();
 
             return readSamples != BufferSize;
@@ -482,7 +483,7 @@ namespace MonoGame.Utilities
                             }
                         }
 
-                        if (!finished)
+                        if (!finished && tempBuffers.Length > 0)
                         {
                             AL.SourceQueueBuffers(stream.alSourceId, tempBuffers.Length, tempBuffers);
                             ALHelper.Check();
