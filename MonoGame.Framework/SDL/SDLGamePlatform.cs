@@ -49,6 +49,13 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        public override bool BeforeRun()
+        {
+            _view.CreateWindow();
+
+            return base.BeforeRun();
+        }
+
         public override GameRunBehavior DefaultRunBehavior
         {
             get { return GameRunBehavior.Synchronous; }
