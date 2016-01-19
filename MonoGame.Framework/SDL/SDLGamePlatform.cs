@@ -37,6 +37,8 @@ namespace Microsoft.Xna.Framework
             if (initsdl < 0)
                 throw new Exception("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());
 
+            SDL.SDL_DisableScreenSaver();
+
             this.Window = _view = new SDLGameWindow();
 
             try
