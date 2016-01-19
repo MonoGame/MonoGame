@@ -12,11 +12,14 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return !this.IsBorderless && _reziable;
+                return !this.IsBorderless && _resizable;
             }
             set
             {
-                throw new Exception("SDL does not support changing resizable parameter. Please use static property Game.Resizable before your game creation.");
+                if (!_handle.Equals(IntPtr.Zero))
+                    throw new Exception("SDL does not support changing resizable parameter of the window after it's already been created.");
+                
+                _resizable = value;
             }
         }
 
@@ -101,14 +104,16 @@ namespace Microsoft.Xna.Framework
         internal bool _isFullScreen;
 
         private IntPtr _handle;
-        private bool _disposed, _reziable, _borderless, _willBeFullScreen;
+        private bool _disposed, _resizable, _borderless, _willBeFullScreen, _mouseVisible;
         private string _screenDeviceName;
 
         public SDLGameWindow()
         {
-            this._reziable = Game.Resizable;
             this._screenDeviceName = "";
+        }
 
+        internal void CreateWindow()
+        {
             var title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             var initflags = 
@@ -117,7 +122,7 @@ namespace Microsoft.Xna.Framework
                 SDL.SDL_WindowFlags.SDL_WINDOW_INPUT_FOCUS |
                 SDL.SDL_WindowFlags.SDL_WINDOW_MOUSE_FOCUS;
 
-            if (AllowUserResizing)
+            if (_resizable)
                 initflags |= SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
 
             this._handle = SDL.SDL_CreateWindow(title, 
@@ -125,9 +130,9 @@ namespace Microsoft.Xna.Framework
                 GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight, 
                 initflags);
 
-            SetCursorVisible(false);
+            SetCursorVisible(_mouseVisible);
 
-            // TODO, per platform border detection
+            // TODO, per platform border size detection
         }
 
         ~SDLGameWindow()
@@ -137,6 +142,7 @@ namespace Microsoft.Xna.Framework
 
         public void SetCursorVisible(bool visible)
         {
+            _mouseVisible = visible;
             var err = SDL.SDL_ShowCursor(visible ? 1 : 0);
 
             if (err < 0)

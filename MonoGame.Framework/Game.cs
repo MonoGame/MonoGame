@@ -19,10 +19,6 @@ namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
-#if DESKTOPGL
-        public static bool Resizable = false;
-#endif
-
         private GameComponentCollection _components;
         private GameServiceContainer _services;
         private ContentManager _content;
