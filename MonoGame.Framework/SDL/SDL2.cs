@@ -121,14 +121,15 @@ internal class SDL
     [Flags]
     public enum SDL_WindowFlags
     {
-        SDL_WINDOW_FULLSCREEN  = 0x00000001,
-        SDL_WINDOW_OPENGL      = 0x00000002,
-        SDL_WINDOW_SHOWN       = 0x00000004,
-        SDL_WINDOW_HIDDEN      = 0x00000008,
-        SDL_WINDOW_BORDERLESS  = 0x00000010,
-        SDL_WINDOW_RESIZABLE   = 0x00000020,
-        SDL_WINDOW_INPUT_FOCUS = 0x00000200,
-        SDL_WINDOW_MOUSE_FOCUS = 0x00000400,
+        SDL_WINDOW_FULLSCREEN         = 0x00000001,
+        SDL_WINDOW_OPENGL             = 0x00000002,
+        SDL_WINDOW_SHOWN              = 0x00000004,
+        SDL_WINDOW_HIDDEN             = 0x00000008,
+        SDL_WINDOW_BORDERLESS         = 0x00000010,
+        SDL_WINDOW_RESIZABLE          = 0x00000020,
+        SDL_WINDOW_INPUT_FOCUS        = 0x00000200,
+        SDL_WINDOW_MOUSE_FOCUS        = 0x00000400,
+        SDL_WINDOW_FULLSCREEN_DESKTOP = 0x00001001,
     }
 
     [StructLayout(LayoutKind.Sequential)]
