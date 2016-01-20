@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework
 
             SDL.SDL_DisableScreenSaver();
 
-            this.Window = _view = new SDLGameWindow();
+            this.Window = _view = new SDLGameWindow(_game);
 
             try
             {

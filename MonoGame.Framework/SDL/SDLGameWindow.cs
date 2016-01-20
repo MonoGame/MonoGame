@@ -103,12 +103,14 @@ namespace Microsoft.Xna.Framework
         internal int BorderX, BorderY;
         internal bool _isFullScreen;
 
+        private Game _game;
         private IntPtr _handle;
         private bool _disposed, _resizable, _borderless, _willBeFullScreen, _mouseVisible;
         private string _screenDeviceName;
 
-        public SDLGameWindow()
+        public SDLGameWindow(Game game)
         {
+            this._game = game;
             this._screenDeviceName = "";
         }
 
@@ -161,7 +163,12 @@ namespace Microsoft.Xna.Framework
             var prevBounds = ClientBounds;
 
             SDL.SDL_SetWindowSize(Handle, clientWidth, clientHeight);
-            SDL.SDL_SetWindowFullscreen(Handle, (_willBeFullScreen) ? SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN : 0);
+
+            if (_willBeFullScreen != _isFullScreen)
+            {
+                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN : SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP;
+                SDL.SDL_SetWindowFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
+            }
 
             if (!_willBeFullScreen && _isFullScreen)
                 SDL.SDL_SetWindowPosition(_handle, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED);
