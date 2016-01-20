@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
 
-            options.Profile = ShaderProfile.FindProfile(context.TargetPlatform.ToString());
+            options.Profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
             if (options.Profile == null)
                 throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
 
