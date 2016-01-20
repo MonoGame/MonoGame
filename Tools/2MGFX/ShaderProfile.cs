@@ -4,67 +4,31 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace TwoMGFX
 {
-    [TypeConverter(typeof(StringTypeConverter))]
-    public abstract partial class ShaderProfile
+    public abstract partial class ShaderProfile : Enumeration<ShaderProfile>
     {
-        private static readonly List<ShaderProfile> _profiles = new List<ShaderProfile>();
-
-        private readonly string _name;
-
-        private readonly int _value;
-
         private ShaderProfile(string name, int value)
+            : base(name, value)
         {
-            _name = name;
-            _value = value;
-            _profiles.Add(this);
-        }
-
-        public static explicit operator int(ShaderProfile profile)
-        {
-            return profile._value;
         }
 
         internal abstract void AddMacros(Dictionary<string, string> macros);
 
         internal abstract void ValidateShaderModels(PassInfo pass);
 
-        internal abstract byte[] CompileShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, ref string errorsAndWarnings);
-
-        internal abstract ShaderData CreateShader(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug);
+        internal abstract ShaderData CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings);
 
         internal abstract bool Supports(string platform);
 
-        public static List<string> GetProfileNames()
+        public static ShaderProfile ForPlatform(string platform)
         {
-            var names = new List<string>();
-
-            foreach (var profile in _profiles)
-                names.Add(profile.ToString());
-
-            return names;
-        }
-
-        public static ShaderProfile FindProfile(string platform)
-        {
-            foreach (var profile in _profiles)
-            {
-                if (profile.Supports(platform))
-                    return profile;
-            }
-
-            return null;
-        }
-
-        public override string ToString()
-        {
-            return _name;
+            return All.FirstOrDefault(p => p.Supports(platform));
         }
 
         private static void ParseShaderModel(string text, Regex regex, out int major, out int minor)
@@ -79,24 +43,6 @@ namespace TwoMGFX
 
             major = int.Parse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
             minor = int.Parse(match.Groups["minor"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
-        }
-
-
-        private class StringTypeConverter : TypeConverter
-        {
-            public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-            {
-                if (value is string)
-                {
-                    foreach (var profile in _profiles)
-                    {
-                        if (profile._name == (value as string))
-                            return profile;
-                    }
-                }
-
-                return base.ConvertFrom(context, culture, value);
-            }
         }
     }
 }

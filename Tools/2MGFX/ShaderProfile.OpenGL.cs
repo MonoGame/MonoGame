@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace TwoMGFX
@@ -47,18 +48,25 @@ namespace TwoMGFX
                 }
             }
 
-            internal override byte[] CompileShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, ref string errorsAndWarnings)
+            internal override ShaderData CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
             {
                 // For now GLSL is only supported via translation
                 // using MojoShader which works from HLSL bytecode.
-                return EffectObject.CompileHLSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
-            }
+                var bytecode = EffectObject.CompileHLSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
 
-            internal override ShaderData CreateShader(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
-            {
-                return ShaderData.CreateGLSL(byteCode, isVertexShader, cbuffers, sharedIndex, samplerStates, debug);
-            }
+                // First look to see if we already created this same shader.
+                foreach (var shader in effect.Shaders)
+                {
+                    if (bytecode.SequenceEqual(shader.Bytecode))
+                        return shader;
+                }
 
+                var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+                effect.Shaders.Add(shaderData);
+
+                return shaderData;
+            }
+            
             internal override bool Supports(string platform)
             {
                 if (platform == "iOS" ||

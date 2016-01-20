@@ -272,7 +272,8 @@ namespace TwoMGFX
             public ProfileNameAttribute()
                 : base("Profile")
             {
-                Description = "\t - Must be one of the following: " + string.Join(", ", ShaderProfile.GetProfileNames());                               
+                var names = ShaderProfile.All.Select(p => p.Name);
+                Description = "\t - Must be one of the following: " + string.Join(", ", names);                               
             }
         }
     }

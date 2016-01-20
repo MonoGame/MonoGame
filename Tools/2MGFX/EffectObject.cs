@@ -794,26 +794,8 @@ namespace TwoMGFX
 
         private d3dx_state CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, ref string errorsAndWarnings)
         {
-            // Compile the shader.
-            byte[] bytecode = shaderInfo.Profile.CompileShader(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
-
-            // First look to see if we already created this same shader.
-            ShaderData shaderData = null;
-            foreach (var shader in Shaders)
-            {
-                if (bytecode.SequenceEqual(shader.Bytecode))
-                {
-                    shaderData = shader;
-                    break;
-                }
-            }
-
-            // Create a new shader.
-            if (shaderData == null)
-            {
-                shaderData = shaderInfo.Profile.CreateShader(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
-                Shaders.Add(shaderData);
-            }
+            // Compile and create the shader.
+            var shaderData = shaderInfo.Profile.CreateShader(shaderInfo, shaderFunction, shaderProfile, isVertexShader, this, ref errorsAndWarnings);
 
             var state = new d3dx_state();
             state.index = 0;

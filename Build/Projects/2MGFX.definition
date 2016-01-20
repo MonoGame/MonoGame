@@ -162,7 +162,15 @@
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
     </Compile>
-
+    
+    <!-- We also use a few types from the content pipeline. -->
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Enumeration.cs">
+      <Link>MonoGame.Framework.Content.Pipeline\Enumeration.c</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs">
+      <Link>MonoGame.Framework.Content.Pipeline\ExternalTool.cs</Link>
+    </Compile>
+    
     <!-- A fake GraphicsDevice to satisfy some of the framework classes above! -->
     <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
 
@@ -204,5 +212,6 @@
     
     <!-- The MGFX preprocessor -->
     <Compile Include="Preprocessor.cs" />
+    
   </Files>
 </Project>

@@ -418,6 +418,7 @@
     <Compile Include="ContentProcessorContext.cs" />
     <Compile Include="DdsLoader.cs" />
     <Compile Include="EffectImporter.cs" />
+    <Compile Include="Enumeration.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="ExternalTool.cs" />
     <Compile Include="FbxImporter.cs" />
