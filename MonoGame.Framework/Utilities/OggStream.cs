@@ -43,7 +43,7 @@ namespace MonoGame.Utilities
         internal readonly int[] alBufferIds;
 
         readonly int alFilterId;
-        readonly Stream underlyingStream;
+        readonly string oggFileName;
 
         internal VorbisReader Reader { get; private set; }
         internal bool Ready { get; private set; }
@@ -52,9 +52,9 @@ namespace MonoGame.Utilities
         public Action FinishedAction { get; private set; }
         public int BufferCount { get; private set; }
 
-        public OggStream(string filename, Action finishedAction = null, int bufferCount = DefaultBufferCount) : this(File.OpenRead(filename), finishedAction, bufferCount) { }
-        public OggStream(Stream stream, Action finishedAction = null, int bufferCount = DefaultBufferCount)
+        public OggStream(string filename, Action finishedAction = null, int bufferCount = DefaultBufferCount)
         {
+            oggFileName = filename;
             FinishedAction = finishedAction;
             BufferCount = bufferCount;
 
@@ -76,8 +76,6 @@ namespace MonoGame.Utilities
                 ALHelper.Efx.Filter(alFilterId, EfxFilterf.LowpassGain, 1);
                 LowPassHFGain = 1;
             }
-
-            underlyingStream = stream;
         }
 
         public void Prepare()
@@ -234,8 +232,6 @@ namespace MonoGame.Utilities
                     Empty();
 
                 Close();
-
-                underlyingStream.Dispose();
             }
 
             AL.Source(alSourceId, ALSourcei.Buffer, 0);
@@ -290,8 +286,7 @@ namespace MonoGame.Utilities
 
         internal void Open(bool precache = false)
         {
-            underlyingStream.Seek(0, SeekOrigin.Begin);
-            Reader = new VorbisReader(underlyingStream, false);
+            Reader = new VorbisReader(oggFileName);
 
             if (precache)
             {
@@ -400,20 +395,36 @@ namespace MonoGame.Utilities
                 return streams.Remove(stream);
         }
 
-        public bool FillBuffer(OggStream stream, int bufferId)
+        public int FillBuffer(OggStream stream, int bufferId)
         {
             int readSamples;
+            long readerPosition = 0;
             lock (readMutex)
             {
+                readerPosition = stream.Reader.DecodedPosition;
                 readSamples = stream.Reader.ReadSamples(readSampleBuffer, 0, BufferSize);
                 CastBuffer(readSampleBuffer, castBuffer, readSamples);
             }
             if (readSamples > 0)
+            {
                 AL.BufferData(bufferId, stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, castBuffer,
-                    readSamples * sizeof (short), stream.Reader.SampleRate);
-            ALHelper.Check();
+                    readSamples * sizeof(short), stream.Reader.SampleRate);
+                ALHelper.Check();
+            }
+            else
+            {
+                // this shouldn't be happening
+                // if ReadSamples() returns 0, it means that NVorbis failed (this looks to be related to Mono, and has been reported to happen on OS X)
 
-            return readSamples != BufferSize;
+                // let's try to reset the stream
+                stream.Close();
+                stream.Open();
+                stream.Reader.DecodedPosition = readerPosition;
+
+                return 2;
+            }            
+
+            return (readSamples != BufferSize ? 1 : 0);
         }
         static void CastBuffer(float[] inBuffer, short[] outBuffer, int length)
         {
@@ -444,7 +455,7 @@ namespace MonoGame.Utilities
                             if (!streams.Contains(stream))
                                 continue;
 
-                        bool finished = false;
+                        int finished = 0;
 
                         int queued;
                         AL.GetSource(stream.alSourceId, ALGetSourcei.BuffersQueued, out queued);
@@ -461,11 +472,17 @@ namespace MonoGame.Utilities
                         else
                             tempBuffers = stream.alBufferIds.Skip(queued).ToArray();
 
+                        int bufferFilled = 0;
                         for (int i = 0; i < tempBuffers.Length; i++)
                         {
-                            finished |= FillBuffer(stream, tempBuffers[i]);
+                            finished = FillBuffer(stream, tempBuffers[i]); // 0 = not finished, 1 = finished, 2 = NVorbis failed
+                            if (i < 2)
+                                bufferFilled++;
+                            else
+                                // if NVorbis failed, we skip the remaining buffers
+                                i = tempBuffers.Length;
 
-                            if (finished)
+                            if (finished == 1)
                             {
                                 if (stream.IsLooped)
                                 {
@@ -483,9 +500,9 @@ namespace MonoGame.Utilities
                             }
                         }
 
-                        if (!finished && tempBuffers.Length > 0)
+                        if (finished == 0 && bufferFilled > 0) // queue only successfully filled buffers
                         {
-                            AL.SourceQueueBuffers(stream.alSourceId, tempBuffers.Length, tempBuffers);
+                            AL.SourceQueueBuffers(stream.alSourceId, bufferFilled, tempBuffers);
                             ALHelper.Check();
                         }
                         else if (!stream.IsLooped)
