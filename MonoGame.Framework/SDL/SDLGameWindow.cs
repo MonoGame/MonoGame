@@ -29,11 +29,11 @@ namespace Microsoft.Xna.Framework
             {
                 int x = 0, y = 0, w, h;
 
-                SDL.SDL_GetWindowSize(Handle, out w, out h);
+                SDL.Window.GetSize(Handle, out w, out h);
 
                 if (!_isFullScreen)
                 {
-                    SDL.SDL_GetWindowPosition(Handle, out x, out y);
+                    SDL.Window.GetPosition(Handle, out x, out y);
 
                     if (!IsBorderless)
                     {
@@ -53,13 +53,13 @@ namespace Microsoft.Xna.Framework
                 int x = 0, y = 0;
 
                 if (!_isFullScreen)
-                    SDL.SDL_GetWindowPosition(Handle, out x, out y);
+                    SDL.Window.GetPosition(Handle, out x, out y);
                 
                 return new Point(x, y);
             }
             set
             {
-                SDL.SDL_SetWindowPosition(Handle, value.X, value.Y);
+                SDL.Window.SetPosition(Handle, value.X, value.Y);
             }
         }
 
@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-                SDL.SDL_SetWindowBordered(this._handle, value ? 1 : 0);
+                SDL.Window.SetBordered(this._handle, value ? 1 : 0);
                 _borderless = value;
             }
         }
@@ -119,16 +119,16 @@ namespace Microsoft.Xna.Framework
             var title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             var initflags = 
-                SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL |
-                SDL.SDL_WindowFlags.SDL_WINDOW_HIDDEN |
-                SDL.SDL_WindowFlags.SDL_WINDOW_INPUT_FOCUS |
-                SDL.SDL_WindowFlags.SDL_WINDOW_MOUSE_FOCUS;
+                SDL.Window.State.OpenGL |
+                SDL.Window.State.Hidden |
+                SDL.Window.State.InputFocus |
+                SDL.Window.State.MouseFocus;
 
             if (_resizable)
-                initflags |= SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
+                initflags |= SDL.Window.State.Resizable;
 
-            this._handle = SDL.SDL_CreateWindow(title, 
-                SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED, 
+            this._handle = SDL.Window.Create(title, 
+                SDL.Window.PosCentered, SDL.Window.PosCentered, 
                 GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight, 
                 initflags);
 
@@ -145,10 +145,10 @@ namespace Microsoft.Xna.Framework
         public void SetCursorVisible(bool visible)
         {
             _mouseVisible = visible;
-            var err = SDL.SDL_ShowCursor(visible ? 1 : 0);
+            var err = SDL.Mouse.ShowCursor(visible ? 1 : 0);
 
             if (err < 0)
-                Console.WriteLine("Failed to set cursor! SDL Error: " + SDL.SDL_GetError());
+                Console.WriteLine("Failed to set cursor! SDL Error: " + SDL.GetError());
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
@@ -162,19 +162,19 @@ namespace Microsoft.Xna.Framework
 
             var prevBounds = ClientBounds;
 
-            SDL.SDL_SetWindowSize(Handle, clientWidth, clientHeight);
+            SDL.Window.SetSize(Handle, clientWidth, clientHeight);
 
             if (_willBeFullScreen != _isFullScreen)
             {
-                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN : SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP;
-                SDL.SDL_SetWindowFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
+                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? SDL.Window.State.Fullscreen : SDL.Window.State.FullscreenDesktop;
+                SDL.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
             }
 
             if (!_willBeFullScreen && _isFullScreen)
-                SDL.SDL_SetWindowPosition(_handle, SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED);
+                SDL.Window.SetPosition(_handle, SDL.Window.PosCentered, SDL.Window.PosCentered);
             else if (!_willBeFullScreen)
             {
-                SDL.SDL_SetWindowPosition(Handle,
+                SDL.Window.SetPosition(Handle,
                     Math.Max(prevBounds.X - ((IsBorderless || _isFullScreen) ? 0 : BorderX) + ((prevBounds.Width - clientWidth) / 2), 0),
                     Math.Max(prevBounds.Y - ((IsBorderless || _isFullScreen) ? 0 : BorderY)  + ((prevBounds.Height - clientHeight) / 2), 0)
                 );
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            SDL.SDL_SetWindowTitle(this._handle, title);
+            SDL.Window.SetTitle(this._handle, title);
         }
 
         public void Dispose()
@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework
         {
             if (!_disposed)
             {
-                SDL.SDL_DestroyWindow(_handle);
+                SDL.Window.Destroy(_handle);
                 _handle = IntPtr.Zero;
 
                 _disposed = true;

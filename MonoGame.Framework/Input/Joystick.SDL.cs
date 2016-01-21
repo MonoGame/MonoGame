@@ -13,14 +13,14 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void AddDevice(int device_id)
         {
-            var jdevice = SDL.SDL_JoystickOpen(device_id);
+            var jdevice = SDL.Joystick.Open(device_id);
             joysticks.Add(device_id, jdevice);
             GamePad.AddDevice(device_id, jdevice);
         }
 
         internal static void RemoveDevice(int device_id)
         {
-            SDL.SDL_JoystickClose(joysticks[device_id]);
+            SDL.Joystick.Close(joysticks[device_id]);
             joysticks.Remove(device_id);
             GamePad.RemoveDevice(device_id);
         }
@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Input
             GamePad.CloseDevices();
 
             foreach (KeyValuePair<int, IntPtr> entry in joysticks)
-                SDL.SDL_JoystickClose(entry.Value);
+                SDL.Joystick.Close(entry.Value);
         }
 
         private static JoystickCapabilities PlatformGetCapabilities(int index)
@@ -49,10 +49,10 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities
             {
                 IsConnected = true,
-                Id = SDL.SDL_JoystickGetGUID(jdevice).ToString(),
-                AxisCount = SDL.SDL_JoystickNumAxes(jdevice),
-                ButtonCount = SDL.SDL_JoystickNumButtons(jdevice),
-                HatCount = SDL.SDL_JoystickNumHats(jdevice)
+                Id = SDL.Joystick.GetGUID(jdevice).ToString(),
+                AxisCount = SDL.Joystick.NumAxes(jdevice),
+                ButtonCount = SDL.Joystick.NumButtons(jdevice),
+                HatCount = SDL.Joystick.NumHats(jdevice)
             };
         }
 
@@ -72,45 +72,24 @@ namespace Microsoft.Xna.Framework.Input
 
             var axes = new float[jcap.AxisCount];
             for (int i = 0; i < axes.Length; i++)
-                axes[i] = SDL.SDL_JoystickGetAxis(jdevice, i);
+                axes[i] = SDL.Joystick.GetAxis(jdevice, i);
             
             var buttons = new ButtonState[jcap.ButtonCount];
             for (int i = 0; i < buttons.Length; i++)
-                buttons[i] = (SDL.SDL_JoystickGetButton(jdevice, i) == 0) ? ButtonState.Released : ButtonState.Pressed;
+                buttons[i] = (SDL.Joystick.GetButton(jdevice, i) == 0) ? ButtonState.Released : ButtonState.Pressed;
 
             var hats = new JoystickHat[jcap.HatCount];
             for (int i = 0; i < hats.Length; i++)
             {
-                hats[i] = new JoystickHat();
-                var hatstate = SDL.SDL_JoystickGetHat(jdevice, i);
+                var hatstate = SDL.Joystick.GetHat(jdevice, i);
 
-                switch (hatstate)
+                hats[i] = new JoystickHat
                 {
-                    case SDL.SDL_HAT.SDL_HAT_UP:
-                    case SDL.SDL_HAT.SDL_HAT_LEFTUP:
-                    case SDL.SDL_HAT.SDL_HAT_RIGHTUP:
-                        hats[i].Up = ButtonState.Pressed;
-                        break;
-                    case SDL.SDL_HAT.SDL_HAT_DOWN:
-                    case SDL.SDL_HAT.SDL_HAT_LEFTDOWN:
-                    case SDL.SDL_HAT.SDL_HAT_RIGHTDOWN:
-                        hats[i].Down = ButtonState.Pressed;
-                        break;
-                }
-
-                switch (hatstate)
-                {
-                    case SDL.SDL_HAT.SDL_HAT_LEFT:
-                    case SDL.SDL_HAT.SDL_HAT_LEFTDOWN:
-                    case SDL.SDL_HAT.SDL_HAT_LEFTUP:
-                        hats[i].Left = ButtonState.Pressed;
-                        break;
-                    case SDL.SDL_HAT.SDL_HAT_RIGHT:
-                    case SDL.SDL_HAT.SDL_HAT_RIGHTDOWN:
-                    case SDL.SDL_HAT.SDL_HAT_RIGHTUP:
-                        hats[i].Right = ButtonState.Pressed;
-                        break;
-                }
+                    Up = hatstate.HasFlag(SDL.Joystick.Hat.Up) ? ButtonState.Pressed : ButtonState.Released,
+                    Down = hatstate.HasFlag(SDL.Joystick.Hat.Down) ? ButtonState.Pressed : ButtonState.Released,
+                    Left = hatstate.HasFlag(SDL.Joystick.Hat.Left) ? ButtonState.Pressed : ButtonState.Released,
+                    Right = hatstate.HasFlag(SDL.Joystick.Hat.Right) ? ButtonState.Pressed : ButtonState.Released
+                };
             }
 
             return new JoystickState

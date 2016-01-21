@@ -95,16 +95,16 @@ namespace Microsoft.Xna.Framework.Input
             int x, y;
             
             //var clientBounds = PrimaryWindow.ClientBounds;
-            var state = SDL.SDL_GetMouseState(out x, out y); // once we have border and titlebar detection code, replace this with GlobalMouseState
+            var state = SDL.Mouse.GetState(out x, out y); // once we have border and titlebar detection code, replace this with GlobalMouseState
             
             window.MouseState.X = x; // - clientBounds.X;
             window.MouseState.Y = y; // - clientBounds.Y;
 
-            window.MouseState.LeftButton = (ButtonState) ((state & SDL.SDL_BUTTON_LMASK) >> 0);
-            window.MouseState.MiddleButton = (ButtonState) ((state & SDL.SDL_BUTTON_MMASK) >> 1);
-            window.MouseState.RightButton = (ButtonState) ((state & SDL.SDL_BUTTON_RMASK) >> 2);
-            window.MouseState.XButton1 = (ButtonState) ((state & SDL.SDL_BUTTON_X1MASK) >> 3);
-            window.MouseState.XButton2 = (ButtonState) ((state & SDL.SDL_BUTTON_X2MASK) >> 4);
+            window.MouseState.LeftButton = (state.HasFlag(SDL.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.MiddleButton = (state.HasFlag(SDL.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.RightButton = (state.HasFlag(SDL.Mouse.Button.Right)) ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.XButton1 = (state.HasFlag(SDL.Mouse.Button.X1Mask)) ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.XButton2 = (state.HasFlag(SDL.Mouse.Button.X2Mask)) ? ButtonState.Pressed : ButtonState.Released;
 
             window.MouseState.ScrollWheelValue = ScrollY;
 #endif
@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework.Input
 #endif
 
 #if DESKTOPGL || ANGLE
-            SDL.SDL_WarpMouseInWindow(PrimaryWindow.Handle, x, y);
+            SDL.Mouse.WarpInWindow(PrimaryWindow.Handle, x, y);
 #elif WINDOWS
             SetCursorPos(pt.X, pt.Y);
 #elif MONOMAC
