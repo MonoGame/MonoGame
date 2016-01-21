@@ -163,7 +163,11 @@ namespace MonoGame.Utilities
             lock (stopMutex)
             {
                 OggStreamer.Instance.RemoveStream(this);
+
+                if (state != ALSourceState.Initial)
+                    Empty(); // force the queued buffers to be unqueued to avoid issues on Mac
             }
+            AL.Source(alSourceId, ALSourcei.Buffer, 0);
         }
 
         public ALSourceState GetState()
@@ -294,9 +298,6 @@ namespace MonoGame.Utilities
                 OggStreamer.Instance.FillBuffer(this, alBufferIds[0]);
                 AL.SourceQueueBuffer(alSourceId, alBufferIds[0]);
                 ALHelper.Check();
-
-                // Schedule the others asynchronously
-                OggStreamer.Instance.AddStream(this);
             }
 
             Ready = true;
@@ -414,7 +415,7 @@ namespace MonoGame.Utilities
             else
             {
                 // this shouldn't be happening
-                // if ReadSamples() returns 0, it means that NVorbis failed (this looks to be related to Mono, and has been reported to happen on OS X)
+                // if ReadSamples() returns 0, it means that NVorbis failed
 
                 // let's try to reset the stream
                 stream.Close();
@@ -491,7 +492,8 @@ namespace MonoGame.Utilities
                                 }
                                 else
                                 {
-                                    streams.Remove(stream);
+                                    lock (iterationMutex)
+                                        streams.Remove(stream);
                                     i = tempBuffers.Length;
                                 }
 
