@@ -27,17 +27,17 @@ namespace Microsoft.Xna.Framework
             this._keys = new List<Keys>();
             Keyboard.SetKeys(_keys);
 
-            var initsdl = SDL.SDL_Init((int)(
-                SDL.SDL_INIT_VIDEO |
-                SDL.SDL_INIT_JOYSTICK | 
-                SDL.SDL_INIT_GAMECONTROLLER |
-                SDL.SDL_INIT_HAPTIC
+            var initsdl = SDL.Init((int)(
+                SDL.InitFlags.Video |
+                SDL.InitFlags.Joystick | 
+                SDL.InitFlags.GameController |
+                SDL.InitFlags.Haptic
             ));
 
             if (initsdl < 0)
-                throw new Exception("SDL could not initialize! SDL Error: " + SDL.SDL_GetError());
+                throw new Exception("SDL could not initialize! SDL Error: " + SDL.GetError());
 
-            SDL.SDL_DisableScreenSaver();
+            SDL.DisableScreenSaver();
 
             this.Window = _view = new SDLGameWindow(_game);
 
@@ -70,32 +70,32 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            SDL.SDL_ShowWindow(Window.Handle);
+            SDL.Window.Show(Window.Handle);
 
             while (true)
             {
-                SDL.SDL_Event ev;
+                SDL.Event ev;
 
-                while (SDL.SDL_PollEvent(out ev) == 1)
+                while (SDL.PollEvent(out ev) == 1)
                 {
-                    if (ev.type == SDL.SDL_EventType.SDL_QUIT)
+                    if (ev.Type == SDL.EventType.Quit)
                         isExiting++;
-                    else if (ev.type == SDL.SDL_EventType.SDL_JOYDEVICEADDED)
-                        Joystick.AddDevice(ev.jdevice.which);
-                    else if (ev.type == SDL.SDL_EventType.SDL_JOYDEVICEREMOVED)
-                        Joystick.RemoveDevice(ev.jdevice.which);
-                    else if (ev.type == SDL.SDL_EventType.SDL_MOUSEWHEEL)
-                        Mouse.ScrollY += ev.wheel.y * 120;
-                    else if (ev.type == SDL.SDL_EventType.SDL_KEYDOWN)
+                    else if (ev.Type == SDL.EventType.JoyDeviceAdded)
+                        Joystick.AddDevice(ev.JoystickDevice.Which);
+                    else if (ev.Type == SDL.EventType.JoyDeviceRemoved)
+                        Joystick.RemoveDevice(ev.JoystickDevice.Which);
+                    else if (ev.Type == SDL.EventType.MouseWheel)
+                        Mouse.ScrollY += ev.Wheel.Y * 120;
+                    else if (ev.Type == SDL.EventType.KeyDown)
                     {
-                        var key = KeyboardUtil.ToXna(ev.key.keysym.sym);
+                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
 
                         if (!_keys.Contains(key))
                             _keys.Add(key);
                     }
-                    else if (ev.type == SDL.SDL_EventType.SDL_KEYUP)
+                    else if (ev.Type == SDL.EventType.KeyUp)
                     {
-                        var key = KeyboardUtil.ToXna(ev.key.keysym.sym);
+                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
                         _keys.Remove(key);
                     }
                 }
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework
 
                 Joystick.CloseDevices();
 
-                SDL.SDL_Quit();
+                SDL.Quit();
             }
 
             base.Dispose(disposing);

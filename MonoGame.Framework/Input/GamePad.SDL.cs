@@ -21,15 +21,15 @@ namespace Microsoft.Xna.Framework.Input
 
         private static Dictionary<int, GamePadInfo> gamepads = new Dictionary<int, GamePadInfo>();
 
-        private static SDL.SDL_HapticEffect HapticLeftRightEffect = new SDL.SDL_HapticEffect
+        private static SDL.Haptic.Effect HapticLeftRightEffect = new SDL.Haptic.Effect
         {
-            type = SDL.SDL_HAPTIC_LEFTRIGHT,
-            leftright = new SDL.SDL_HapticLeftRight
+            type = SDL.Haptic.EffectID.LeftRight,
+            leftright = new SDL.Haptic.LeftRight
             {
-                type = SDL.SDL_HAPTIC_LEFTRIGHT,
-                length = SDL.SDL_HAPTIC_INFINITY,
-                large_magnitude = ushort.MaxValue,
-                small_magnitude = ushort.MaxValue
+                Type = SDL.Haptic.EffectID.LeftRight,
+                Length = SDL.Haptic.Infinity,
+                LargeMagnitude = ushort.MaxValue,
+                SmallMagnitude = ushort.MaxValue
             }
         };
 
@@ -41,42 +41,42 @@ namespace Microsoft.Xna.Framework.Input
                 string line;
                 while ((line = reader.ReadLine()) != null)
                     if (!line.StartsWith("#") && !string.IsNullOrWhiteSpace(line))
-                        SDL.SDL_GameControllerAddMapping(line);
+                        SDL.GameController.AddMapping(line);
             }
         }
 
         internal static void AddDevice(int device_id, IntPtr jdevice)
         {
-            if (SDL.SDL_IsGameController(device_id) == 0)
+            if (SDL.GameController.IsGameController(device_id) == 0)
             {
                 var guide = "";
-                foreach (var b in SDL.SDL_JoystickGetGUID(jdevice).ToByteArray())
+                foreach (var b in SDL.Joystick.GetGUID(jdevice).ToByteArray())
                     guide += ((int)b).ToString("X2");
                 
-                SDL.SDL_GameControllerAddMapping(guide + ",Unknown Gamepad,a:b0,b:b1,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a2,righty:a3,start:b9,x:b2,y:b3,");
+                SDL.GameController.AddMapping(guide + ",Unknown Gamepad,a:b0,b:b1,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a2,righty:a3,start:b9,x:b2,y:b3,");
             }
 
             var gamepad = new GamePadInfo();
-            gamepad.Device = SDL.SDL_GameControllerOpen(device_id);
+            gamepad.Device = SDL.GameController.Open(device_id);
 
             gamepads.Add(device_id, gamepad);
 
-            if (SDL.SDL_JoystickIsHaptic(jdevice) != 0)
+            if (SDL.Haptic.IsHaptic(jdevice) != 0)
             {
-                gamepad.HapticDevice = SDL.SDL_HapticOpenFromJoystick(jdevice);
+                gamepad.HapticDevice = SDL.Haptic.OpenFromJoystick(jdevice);
 
-                if (SDL.SDL_HapticEffectSupported(gamepad.HapticDevice, ref HapticLeftRightEffect) == 1)
+                if (SDL.Haptic.EffectSupported(gamepad.HapticDevice, ref HapticLeftRightEffect) == 1)
                 {
-                    SDL.SDL_HapticNewEffect(gamepad.HapticDevice, ref HapticLeftRightEffect);
+                    SDL.Haptic.NewEffect(gamepad.HapticDevice, ref HapticLeftRightEffect);
                     gamepad.HapticType = 1;
                 }
-                else if (SDL.SDL_HapticRumbleSupported(gamepad.HapticDevice) == 1)
+                else if (SDL.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
                 {
-                    SDL.SDL_HapticRumbleInit(gamepad.HapticDevice);
+                    SDL.Haptic.RumbleInit(gamepad.HapticDevice);
                     gamepad.HapticType = 2;
                 }
                 else
-                    SDL.SDL_HapticClose(gamepad.HapticDevice);
+                    SDL.Haptic.Close(gamepad.HapticDevice);
             }
         }
 
@@ -88,8 +88,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void DisposeDevice(GamePadInfo info)
         {
-            SDL.SDL_HapticClose(info.HapticDevice);
-            SDL.SDL_GameControllerClose(info.Device);
+            SDL.Haptic.Close(info.HapticDevice);
+            SDL.GameController.Close(info.Device);
         }
 
         internal static void CloseDevices()
@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework.Input
             if (!gamepads.ContainsKey(index))
                 return new GamePadCapabilities();
 
-            if (SDL.SDL_GameControllerName(gamepads[index].Device) == "Unknown Gamepad")
+            if (SDL.GameController.GetName(gamepads[index].Device) == "Unknown Gamepad")
                 return new GamePadCapabilities
                 {
                     IsConnected = true
@@ -163,43 +163,43 @@ namespace Microsoft.Xna.Framework.Input
             var thumbSticks = 
                 new GamePadThumbSticks(
                     new Vector2(
-                        GetFromSDLAxis(SDL.SDL_GameControllerGetAxis(gdevice, SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX)),
-                        GetFromSDLAxis(SDL.SDL_GameControllerGetAxis(gdevice, SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY))
+                        GetFromSDLAxis(SDL.GameController.GetAxis(gdevice, SDL.GameController.Axis.LeftX)),
+                        GetFromSDLAxis(SDL.GameController.GetAxis(gdevice, SDL.GameController.Axis.LeftY))
                     ),
                     new Vector2(
-                        GetFromSDLAxis(SDL.SDL_GameControllerGetAxis(gdevice, SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX)),
-                        GetFromSDLAxis(SDL.SDL_GameControllerGetAxis(gdevice, SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY))
+                        GetFromSDLAxis(SDL.GameController.GetAxis(gdevice, SDL.GameController.Axis.RightX)),
+                        GetFromSDLAxis(SDL.GameController.GetAxis(gdevice, SDL.GameController.Axis.RightY))
                     ),
                     deadZoneMode
                 );
 
             var triggers = new GamePadTriggers(
-                GetFromSDLAxis(SDL.SDL_GameControllerGetAxis(gdevice, SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT)),
-                GetFromSDLAxis(SDL.SDL_GameControllerGetAxis(gdevice, SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERRIGHT))
+                GetFromSDLAxis(SDL.GameController.GetAxis(gdevice, SDL.GameController.Axis.TriggerLeft)),
+                GetFromSDLAxis(SDL.GameController.GetAxis(gdevice, SDL.GameController.Axis.TriggerRight))
             );
             
             var buttons = 
                 new GamePadButtons(
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A) == 1) ? Buttons.A : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_B) == 1) ? Buttons.B : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_BACK) == 1) ? Buttons.Back : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_GUIDE) == 1) ? Buttons.BigButton : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSHOULDER) == 1) ? Buttons.LeftShoulder : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) == 1) ? Buttons.RightShoulder : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSTICK) == 1) ? Buttons.LeftStick : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSTICK) == 1) ? Buttons.RightStick : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START) == 1) ? Buttons.Start : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_X) == 1) ? Buttons.X : 0) |
-                    ((SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_Y) == 1) ? Buttons.Y : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.A) == 1) ? Buttons.A : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.B) == 1) ? Buttons.B : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.Back) == 1) ? Buttons.Back : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.Guide) == 1) ? Buttons.BigButton : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.LeftShoulder) == 1) ? Buttons.LeftShoulder : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.RightShoulder) == 1) ? Buttons.RightShoulder : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.LeftStick) == 1) ? Buttons.LeftStick : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.RightStick) == 1) ? Buttons.RightStick : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.Start) == 1) ? Buttons.Start : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.X) == 1) ? Buttons.X : 0) |
+                    ((SDL.GameController.GetButton(gdevice, SDL.GameController.Button.Y) == 1) ? Buttons.Y : 0) |
                     0
                 );
 
             var dPad = 
                 new GamePadDPad(
-                    (SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_UP) == 1) ? ButtonState.Pressed : ButtonState.Released,
-                    (SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_DOWN) == 1) ? ButtonState.Pressed : ButtonState.Released,
-                    (SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_LEFT) == 1) ? ButtonState.Pressed : ButtonState.Released,
-                    (SDL.SDL_GameControllerGetButton(gdevice, SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_RIGHT) == 1) ? ButtonState.Pressed : ButtonState.Released
+                    (SDL.GameController.GetButton(gdevice, SDL.GameController.Button.DpadUp) == 1) ? ButtonState.Pressed : ButtonState.Released,
+                    (SDL.GameController.GetButton(gdevice, SDL.GameController.Button.DpadDown) == 1) ? ButtonState.Pressed : ButtonState.Released,
+                    (SDL.GameController.GetButton(gdevice, SDL.GameController.Button.DpadLeft) == 1) ? ButtonState.Pressed : ButtonState.Released,
+                    (SDL.GameController.GetButton(gdevice, SDL.GameController.Button.DpadRight) == 1) ? ButtonState.Pressed : ButtonState.Released
                 );
 
             return new GamePadState(thumbSticks, triggers, buttons, dPad);
@@ -216,17 +216,17 @@ namespace Microsoft.Xna.Framework.Input
                 return false;
 
             if (leftMotor <= 0.0f && rightMotor <= 0.0f)
-                SDL.SDL_HapticStopAll(gamepad.HapticDevice);
+                SDL.Haptic.StopAll(gamepad.HapticDevice);
             else if (gamepad.HapticType == 1)
             {
-                HapticLeftRightEffect.leftright.large_magnitude = (ushort)(65535f * leftMotor);
-                HapticLeftRightEffect.leftright.small_magnitude = (ushort)(65535f * rightMotor);
+                HapticLeftRightEffect.leftright.LargeMagnitude = (ushort)(65535f * leftMotor);
+                HapticLeftRightEffect.leftright.SmallMagnitude = (ushort)(65535f * rightMotor);
 
-                SDL.SDL_HapticUpdateEffect(gamepad.HapticDevice, 0, ref HapticLeftRightEffect);
-                SDL.SDL_HapticRunEffect(gamepad.HapticDevice, 0, 1);
+                SDL.Haptic.UpdateEffect(gamepad.HapticDevice, 0, ref HapticLeftRightEffect);
+                SDL.Haptic.RunEffect(gamepad.HapticDevice, 0, 1);
             }
             else if(gamepad.HapticType == 2)
-                SDL.SDL_HapticRumblePlay(gamepad.HapticDevice, Math.Max(leftMotor, rightMotor), SDL.SDL_HAPTIC_INFINITY);
+                SDL.Haptic.RumblePlay(gamepad.HapticDevice, Math.Max(leftMotor, rightMotor), SDL.Haptic.Infinity);
 
             return true;
         }
