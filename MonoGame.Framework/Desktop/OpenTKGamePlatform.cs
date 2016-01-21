@@ -95,6 +95,10 @@ namespace Microsoft.Xna.Framework
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
+            Toolkit.Init(new ToolkitOptions
+            {
+                EnableHighResolution = false
+            });
             _view = new OpenTKGameWindow(game);
             this.Window = _view;
 
