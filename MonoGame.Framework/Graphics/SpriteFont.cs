@@ -224,11 +224,9 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
+
                 if (c == '\r')
-                {
-                    hasCurrentGlyph = false;
                     continue;
-                }
 
                 if (c == '\n')
                 {
@@ -330,11 +328,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			for (var i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
+
                 if (c == '\r')
-                {
-                    hasCurrentGlyph = false;
                     continue;
-                }
 
                 if (c == '\n')
                 {
