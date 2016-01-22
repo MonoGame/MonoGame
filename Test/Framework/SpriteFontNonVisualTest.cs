@@ -33,6 +33,7 @@ namespace MonoGame.Tests.Framework
 
         [TestCase("Default", "The quick brown fox jumps over the lazy dog. 1234567890", 605, 21)]
         [TestCase("Default", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 275, 59)]
+        [TestCase("Default", "The quick brown fox jumps over the lazy dog.\r1234567890", 594, 21)]
         [TestCase("DataFont", "The quick brown fox jumps over the lazy dog. 1234567890", 417, 19)]
         [TestCase("DataFont", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 196, 53)]
         [TestCase("JingJing", "The quick brown fox jumps over the lazy dog. 1234567890", 918, 45)]
