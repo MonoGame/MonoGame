@@ -230,19 +230,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Gets the alpha range in a set of pixels.
         /// </summary>
-        /// <param name="pixelData">An array of full-colour 32-bit pixel data in RGBA or BGRA order.</param>
+        /// <param name="bitmap">A bitmap of full-colour floating point pixel data in RGBA or BGRA order.</param>
         /// <returns>A member of the AlphaRange enum to describe the range of alpha in the pixel data.</returns>
-        static AlphaRange CalculateAlphaRange(byte[] pixelData)
+		static AlphaRange CalculateAlphaRange(BitmapContent bitmap)
         {
-            AlphaRange result = AlphaRange.Opaque;
-            for (int i = 3; i < pixelData.Length; i += 4)
-            {
-                var value = pixelData[i];
-                if (value == 0)
-                    result = AlphaRange.Cutout;
-                else if (value < 255)
-                    return AlphaRange.Full;
-            }
+			AlphaRange result = AlphaRange.Opaque;
+			var pixelBitmap = bitmap as PixelBitmapContent<Vector4>;
+			if (pixelBitmap != null)
+			{
+				for (int y = 0; y < pixelBitmap.Height; ++y)
+                {
+                    var row = pixelBitmap.GetRow(y);
+                    foreach (var pixel in row)
+                    {
+                        if (pixel.W == 0.0)
+                            result = AlphaRange.Cutout;
+                        else if (pixel.W < 1.0)
+                            return AlphaRange.Full;
+                    }
+				}
+			}
             return result;
         }
 
@@ -291,7 +298,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     case TargetPlatform.MacOSX:
                     case TargetPlatform.NativeClient:
                         if (format != TextureProcessorOutputFormat.DxtCompressed)
-                            throw new PlatformNotSupportedException(format.ToString() + " platform only supports DXT texture compression");
+                            throw new PlatformNotSupportedException(platform.ToString() + " platform only supports DXT texture compression");
                         break;
                 }
             }
@@ -348,8 +355,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             var face = content.Faces[0][0];
 
-            var pixelData = face.GetPixelData();
-            var alphaRange = CalculateAlphaRange(pixelData);
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Opaque)
                 Compress(typeof(PvrtcRgb4BitmapContent), content, generateMipMaps);
@@ -359,18 +365,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool sharpAlpha)
         {
-            var texData = content.Faces[0][0];
+            var face = content.Faces[0][0];
 
             if (profile == GraphicsProfile.Reach)
             {
-                if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
+                if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
                     throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
             }
 
-            var pixelData = texData.GetPixelData();
-
             // Test the alpha channel to figure out if we have alpha.
-            var alphaRange = CalculateAlphaRange(pixelData);
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Opaque)
                 Compress(typeof(Dxt1BitmapContent), content, generateMipMaps);
@@ -423,8 +427,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         static void CompressAti(TextureContent content, bool generateMipMaps)
         {
 			var face = content.Faces[0][0];
-			var pixelData = face.GetPixelData();
-			var alphaRange = CalculateAlphaRange(pixelData);
+			var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
                 Compress(typeof(AtcExplicitBitmapContent), content, generateMipMaps);
@@ -435,9 +438,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         static void CompressEtc1(TextureContent content, bool generateMipMaps)
         {
             var face = content.Faces[0][0];
-
-            var pixelData = face.GetPixelData();
-            var alphaRange = CalculateAlphaRange(pixelData);
+            var alphaRange = CalculateAlphaRange(face);
 
             // Use BGRA4444 for textures with non-opaque alpha values
             if (alphaRange != AlphaRange.Opaque)
@@ -448,7 +449,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // https://code.google.com/p/libgdx/issues/detail?id=1310
                 // Since we already enforce POT for PVR and DXT in Reach, we will also enforce POT for ETC1
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("ETC1 compression require width and height must be powers of two.");
+                    throw new PipelineException("ETC1 compression require width and height must be powers of two due to hardware restrictions on some devices.");
                 Compress(typeof(Etc1BitmapContent), content, generateMipMaps);
             }
         }
@@ -456,9 +457,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         static void CompressColor16Bit(TextureContent content, bool generateMipMaps)
         {
             var face = content.Faces[0][0];
-
-            var pixelData = face.GetPixelData();
-            var alphaRange = CalculateAlphaRange(pixelData);
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Opaque)
                 Compress(typeof(PixelBitmapContent<Bgr565>), content, generateMipMaps);
