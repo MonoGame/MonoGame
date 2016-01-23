@@ -26,6 +26,7 @@ namespace Microsoft.Xna.Framework
         private readonly AndroidTouchEventManager _touchManager;
 
         public bool IsResuming { get; private set; }
+        public DisplayOrientation CurrentOrientation { get; set; }
         private bool _lostContext;
 #if !OUYA
         private bool backPressed;
@@ -37,6 +38,7 @@ namespace Microsoft.Xna.Framework
             _gameWindow = androidGameWindow;
 			_game = game;
             _touchManager = new AndroidTouchEventManager(androidGameWindow);
+            CurrentOrientation = DisplayOrientation.Unknown;
         }
 
         public bool TouchEnabled
@@ -93,7 +95,7 @@ namespace Microsoft.Xna.Framework
                     }
                 }
             }
-
+            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
             // When the game is resumed from a portrait orientation it may receive a portrait surface at first.
             // If the game does not support portrait we should ignore it because we will receive the landscape surface a moment later.
             if (width < height && (_game.graphicsDeviceManager.SupportedOrientations & DisplayOrientation.Portrait) == 0)
@@ -112,10 +114,17 @@ namespace Microsoft.Xna.Framework
             manager.ApplyChanges();
 
             SurfaceChanged(holder, format, width, height);
-            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
 
             if (_game.GraphicsDevice != null)
+            {
                 _game.graphicsDeviceManager.ResetClientBounds();
+
+                if (CurrentOrientation != _gameWindow.CurrentOrientation)
+                {
+                    Android.Util.Log.Debug("MonoGame", "CurrentOrientation = " + CurrentOrientation);
+                    _gameWindow.SetOrientation(CurrentOrientation, true);
+                }
+            }
         }
 
         void ISurfaceHolderCallback.SurfaceDestroyed(ISurfaceHolder holder)

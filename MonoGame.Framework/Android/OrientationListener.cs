@@ -32,9 +32,11 @@ namespace Microsoft.Xna.Framework
             // Only auto-rotate if target orientation is supported and not current
             AndroidGameWindow gameWindow = (AndroidGameWindow)Game.Instance.Window;
             if ((gameWindow.GetEffectiveSupportedOrientations() & disporientation) != 0 &&
-                disporientation != gameWindow.CurrentOrientation)
+                disporientation != gameWindow.GameView.CurrentOrientation)
             {
-                gameWindow.SetOrientation(disporientation, true);
+                Android.Util.Log.Debug("MonoGame", "OnOrientationChanged ( " + disporientation + " )");
+                gameWindow.GameView.CurrentOrientation = disporientation;
+                gameWindow.SetDisplayOrientation(disporientation);
             }
         }
     }
