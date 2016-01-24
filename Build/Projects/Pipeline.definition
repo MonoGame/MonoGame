@@ -273,6 +273,12 @@
     <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\DeleteDialog.GUI.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\DeleteDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Global.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -310,6 +316,12 @@
     <EmbeddedResource Include="Icons\Toolbar\Save.png">
       <LogicalName>Toolbar.Save.png</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Undo.png">
+      <LogicalName>Toolbar.Undo.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Redo.png">
+      <LogicalName>Toolbar.Redo.png</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Icons\Toolbar\NewItem.png">
       <LogicalName>Toolbar.NewItem.png</LogicalName>
     </EmbeddedResource>
@@ -330,6 +342,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Icons\Toolbar\Clean.png">
       <LogicalName>Toolbar.Clean.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\CancelBuild.png">
+      <LogicalName>Toolbar.CancelBuild.png</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Icons\Toolbar\FilterOutput.png">
       <LogicalName>Toolbar.FilterOutput.png</LogicalName>

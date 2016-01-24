@@ -490,7 +490,7 @@ namespace MonoGame.Tools.Pipeline
         /// </summary>
         private bool AskSaveProject()
         {
-            // If the project is not dirty 
+            // If the project is not dirty or open
             // then we can simply skip it.
             if (!ProjectDirty)
                 return true;
@@ -793,9 +793,23 @@ namespace MonoGame.Tools.Pipeline
             return ret;
         }
 
-        public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders)
+        public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete)
         {
-            var action = new ExcludeAction(this, items, folders);
+            if (delete)
+            {
+                var delitems = new List<string>();
+
+                foreach (var f in folders)
+                    delitems.Add(f.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
+
+                foreach (var i in items)
+                    delitems.Add(i.OriginalPath);
+
+                if (!View.ShowDeleteDialog(delitems.ToArray()))
+                    return;
+            }
+
+            var action = new ExcludeAction(this, items, folders, delete);
             if(action.Do())
                 _actionStack.Add(action);
         }
