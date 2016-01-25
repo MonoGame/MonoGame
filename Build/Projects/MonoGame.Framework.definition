@@ -271,6 +271,9 @@
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
     </Compile>
+	<Compile Include="Audio\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
       <Services>OpenALAudio</Services>
     </Compile>
@@ -1011,9 +1014,6 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
-    <Compile Include="Audio\OggStream.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
-    </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
