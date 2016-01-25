@@ -1011,7 +1011,7 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
-    <Compile Include="Utilities\OggStream.cs">
+    <Compile Include="Audio\OggStream.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
