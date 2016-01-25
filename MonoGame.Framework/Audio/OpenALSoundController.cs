@@ -29,9 +29,6 @@ namespace Microsoft.Xna.Framework.Audio
 {
     internal static class ALHelper
     {
-        public static readonly XRamExtension XRam = new XRamExtension();
-        public static readonly EffectsExtension Efx = new EffectsExtension();
-
         [System.Diagnostics.Conditional("DEBUG")]
         [System.Diagnostics.DebuggerHidden]
         public static void CheckError(string message = "", params object[] args)

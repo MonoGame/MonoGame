@@ -47,21 +47,21 @@ namespace Microsoft.Xna.Framework.Audio
             ALHelper.CheckError("Failed to generate buffers.");
             alSourceId = OpenALSoundController.GetInstance.ReserveSource();
 
-            if (ALHelper.XRam.IsInitialized)
+            if (OggStreamer.Instance.XRam.IsInitialized)
             {
-                ALHelper.XRam.SetBufferMode(BufferCount, ref alBufferIds[0], XRamExtension.XRamStorage.Hardware);
+                OggStreamer.Instance.XRam.SetBufferMode(BufferCount, ref alBufferIds[0], XRamExtension.XRamStorage.Hardware);
                 ALHelper.CheckError("Failed to activate Xram.");
             }
 
             Volume = 1;
 
-            if (ALHelper.Efx.IsInitialized)
+            if (OggStreamer.Instance.Efx.IsInitialized)
             {
-                alFilterId = ALHelper.Efx.GenFilter();
+                alFilterId = OggStreamer.Instance.Efx.GenFilter();
                 ALHelper.CheckError("Failed to generate Efx filter.");
-                ALHelper.Efx.Filter(alFilterId, EfxFilteri.FilterType, (int)EfxFilterType.Lowpass);
+                OggStreamer.Instance.Efx.Filter(alFilterId, EfxFilteri.FilterType, (int)EfxFilterType.Lowpass);
                 ALHelper.CheckError("Failed to set Efx filter type.");
-                ALHelper.Efx.Filter(alFilterId, EfxFilterf.LowpassGain, 1);
+                OggStreamer.Instance.Efx.Filter(alFilterId, EfxFilterf.LowpassGain, 1);
                 ALHelper.CheckError("Failed to set Efx filter value.");
                 LowPassHFGain = 1;
             }
@@ -193,11 +193,11 @@ namespace Microsoft.Xna.Framework.Audio
             get { return lowPassHfGain; }
             set
             {
-                if (ALHelper.Efx.IsInitialized)
+                if (OggStreamer.Instance.Efx.IsInitialized)
                 {
-                    ALHelper.Efx.Filter(alFilterId, EfxFilterf.LowpassGainHF, lowPassHfGain = value);
+                    OggStreamer.Instance.Efx.Filter(alFilterId, EfxFilterf.LowpassGainHF, lowPassHfGain = value);
                     ALHelper.CheckError("Failed to set Efx filter.");
-                    ALHelper.Efx.BindFilterToSource(alSourceId, alFilterId);
+                    OggStreamer.Instance.Efx.BindFilterToSource(alSourceId, alFilterId);
                     ALHelper.CheckError("Failed to bind Efx filter to source.");
                 }
             }
@@ -238,9 +238,9 @@ namespace Microsoft.Xna.Framework.Audio
             OpenALSoundController.GetInstance.RecycleSource(alSourceId);
             AL.DeleteBuffers(alBufferIds);
             ALHelper.CheckError("Failed to delete buffer.");
-            if (ALHelper.Efx.IsInitialized)
+            if (OggStreamer.Instance.Efx.IsInitialized)
             {
-                ALHelper.Efx.DeleteFilter(alFilterId);
+                OggStreamer.Instance.Efx.DeleteFilter(alFilterId);
                 ALHelper.CheckError("Failed to delete EFX filter.");
             }
             
@@ -316,6 +316,9 @@ namespace Microsoft.Xna.Framework.Audio
 
     internal class OggStreamer : IDisposable
     {
+        public readonly XRamExtension XRam = new XRamExtension();
+        public readonly EffectsExtension Efx = new EffectsExtension();
+
         const float DefaultUpdateRate = 10;
         const int DefaultBufferSize = 44100;
 
