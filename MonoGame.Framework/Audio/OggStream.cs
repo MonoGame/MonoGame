@@ -413,7 +413,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 AL.BufferData(bufferId, stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, castBuffer,
                     readSamples * sizeof(short), stream.Reader.SampleRate);
-                ALHelper.CheckError("Failed to fill buffer, readSamples = {0}, SampleRate = {1}, buffer.Length = {3}.", readSamples, stream.Reader.SampleRate, castBuffer.Length);
+                ALHelper.CheckError("Failed to fill buffer, readSamples = {0}, SampleRate = {1}, buffer.Length = {2}.", readSamples, stream.Reader.SampleRate, castBuffer.Length);
             }
             else
             {
