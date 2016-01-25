@@ -107,26 +107,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     return false;
             }
 
-            try
+            // Create the texture object in the PVR library
+            var sourceData = sourceBitmap.GetPixelData();
+            var rgba32F = (PixelFormat)0x2020202061626772; // static const PixelType PVRStandard32PixelType = PixelType('r', 'g', 'b', 'a', 32, 32, 32, 32);
+            using (var pvrTexture = PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
+                rgba32F, true, VariableType.Float, ColourSpace.lRGB))
             {
-                // Create the texture object in the PVR library
-                var sourceData = sourceBitmap.GetPixelData();
-                var rgba32F = (PixelFormat)0x2020202061626772; // static const PixelType PVRStandard32PixelType = PixelType('r', 'g', 'b', 'a', 32, 32, 32, 32);
-                PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
-                    rgba32F, true, VariableType.Float, ColourSpace.lRGB);
                 // Resize the bitmap if needed
                 if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
-                    PVRTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
+                    pvrTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
                 // On Linux, anything less than CompressorQuality.PVRTCHigh crashes in libpthread.so at the end of compression
-                PVRTexture.Transcode(targetFormat, VariableType.UnsignedByte, ColourSpace.lRGB, CompressorQuality.PVRTCHigh);
-                var texDataSize = PVRTexture.GetTextureDataSize(0);
+                pvrTexture.Transcode(targetFormat, VariableType.UnsignedByte, ColourSpace.lRGB, CompressorQuality.PVRTCHigh);
+                var texDataSize = pvrTexture.GetTextureDataSize(0);
                 var texData = new byte[texDataSize];
-                PVRTexture.GetTextureData(texData, texDataSize);
+                pvrTexture.GetTextureData(texData, texDataSize);
                 SetPixelData(texData);
-            }
-            finally
-            {
-                PVRTexture.DestroyTexture();
             }
             return true;
         }
