@@ -25,29 +25,11 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
-#if DESKTOPGL || ANGLE
-
-        // These platforms are only limited by memory.
-        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
-
-#elif MONOMAC
-
-        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
-        internal const int MAX_PLAYING_INSTANCES = 256;
-
-#elif IOS
-
-        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
-        internal const int MAX_PLAYING_INSTANCES = 32;
-
-#elif ANDROID
-
-        // Set to the same as OpenAL on iOS
-        internal const int MAX_PLAYING_INSTANCES = 32;
-
-#endif
+        internal const int MAX_PLAYING_INSTANCES = OpenALSoundController.MAX_NUMBER_OF_SOURCES;
 
         internal byte[] _data;
+
+        internal OALSoundBuffer SoundBuffer;
 
 		internal float Rate { get; set; }
 
@@ -152,7 +134,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-            return;
 
 #endif
 
@@ -170,6 +151,10 @@ namespace Microsoft.Xna.Framework.Audio
             _data = buffer;
 
 #endif
+
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -186,7 +171,6 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
             inst.InitializeSound();
-            inst.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
         #endregion
@@ -195,7 +179,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose(bool disposing)
         {
-            // A no-op for OpenAL
+            if (SoundBuffer != null)
+            {
+                SoundBuffer.Dispose();
+                SoundBuffer = null;
+            }
         }
 
         #endregion

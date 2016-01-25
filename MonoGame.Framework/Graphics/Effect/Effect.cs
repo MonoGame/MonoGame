@@ -6,10 +6,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-#if WINRT
-using System.Reflection;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
@@ -231,23 +227,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         #region Effect File Reader
-
-        internal static byte[] LoadEffectResource(string name)
-        {
-#if WINRT
-            var assembly = typeof(Effect).GetTypeInfo().Assembly;
-#else
-            var assembly = typeof(Effect).Assembly;
-#endif
-            var stream = assembly.GetManifestResourceStream(name);
-            using (var ms = new MemoryStream())
-            {
-                stream.CopyTo(ms);
-                return ms.ToArray();
-            }
-        }
-
-
 
 		private void ReadEffect (BinaryReader reader)
 		{

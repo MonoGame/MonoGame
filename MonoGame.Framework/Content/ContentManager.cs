@@ -43,15 +43,15 @@ namespace Microsoft.Xna.Framework.Content
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'u', // Ouya
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
 
-            // Old WindowsGL and Linux platform chars
-            'g',
-            'l',
+            // Legacy Platforms
+            'g', // WindowsGL
+            'l', // Linux
+            'u', // Ouya
         };
 
         private static void AddContentManager(ContentManager contentManager)
