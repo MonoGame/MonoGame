@@ -498,17 +498,10 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else if (compressedLz4)
                 {
-                    // Decompress to a byte[] because Windows 8 doesn't support MemoryStream.GetBuffer()
-                    var buffer = new byte[decompressedSize];
-                    using (var decoderStream = new Lz4DecoderStream(stream))
-                    {
-                        if (decoderStream.Read(buffer, 0, buffer.Length) != decompressedSize)
-                        {
-                            throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
-                        }
-                    }
-                    // Creating the MemoryStream with a byte[] shares the buffer so it doesn't allocate any more memory
-                    decompressedStream = new MemoryStream(buffer);
+                    var lz4Stream = new Lz4DecoderStream(stream);
+                    reader = new ContentReader(this, lz4Stream, this.graphicsDeviceService.GraphicsDevice,
+                                                            originalAssetName, version, recordDisposableObject);
+                    return reader;
                 }
 
                 reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
