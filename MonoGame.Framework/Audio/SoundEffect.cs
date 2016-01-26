@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Audio
         private string _name = string.Empty;
         
         private bool _isDisposed = false;
-        private readonly TimeSpan _duration = TimeSpan.Zero;
+        private TimeSpan _duration = TimeSpan.Zero;
 
         #endregion
 
