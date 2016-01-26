@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
-	static List<char> targetPlatformIdentifiers = new List<char>()
+        private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
@@ -43,16 +43,32 @@ namespace Microsoft.Xna.Framework.Content
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
 
-            // Legacy Platforms
-            'g', // WindowsGL
+            // NOTE: There are additional idenfiers for consoles that 
+            // are not defined in this repository.  Be sure to ask the
+            // console port maintainers to ensure no collisions occur.
+
+            
+            // Legacy identifiers... these could be reused in the
+            // future if we feel enough time has passed.
+
+            'p', // PlayStationMobile
+            'g', // Windows (OpenGL)
             'l', // Linux
             'u', // Ouya
         };
+
+
+        static partial void PlatformStaticInit();
+
+        static ContentManager()
+        {
+            // Allow any per-platform static initialization to occur.
+            PlatformStaticInit();
+        }
 
         private static void AddContentManager(ContentManager contentManager)
         {
