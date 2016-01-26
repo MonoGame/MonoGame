@@ -21,11 +21,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
-        {
-        }
-        
-        private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
         }
         

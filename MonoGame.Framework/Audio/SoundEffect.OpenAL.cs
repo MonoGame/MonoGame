@@ -125,45 +125,44 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
-        private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
+        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
-			Rate = (float)sampleRate;
-            Size = (int)buffer.Length;
+            Rate = (float)sampleRate;
+            Size = (int)count;
+            Format = channels == AudioChannels.Stereo ? ALFormat.Stereo16 : ALFormat.Mono16;
 
-#if OPENAL && !(MONOMAC || IOS)
-
-            _data = buffer;
-            Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-
-#endif
-
-#if MONOMAC || IOS
-
-            //buffer should contain 16-bit PCM wave data
-            short bitsPerSample = 16;
-
-            if ((int)channels <= 1)
-                Format = bitsPerSample == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
-            else
-                Format = bitsPerSample == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
-
-            _name = "";
-            _data = buffer;
-
-#endif
+            // Make our own copy of the data.
+            _data = new byte[count];
+            Array.Copy(buffer, offset, _data, 0, count);
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
             SoundBuffer.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
-        private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
         {
-            _duration = GetSampleDuration(buffer.Length, sampleRate, channels);
+            // We need to decode MSADPCM.
+            if (foramt == 2)
+            {
+                using (var stream = new MemoryStream(buffer))
+                using (var reader = new BinaryReader(stream))
+                {
+                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM(
+                        reader,
+                        (short)channels,
+                        (short)((blockAlignment / channels) - 22));
 
-            throw new NotImplementedException();
+                    format = 1;
+                }
+            }
+
+            if (format != 1)
+                throw new NotSupportedException("Unsupported wave format!");
+
+            PlatformInitializePCM(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
         }
-
+        
         #endregion
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
