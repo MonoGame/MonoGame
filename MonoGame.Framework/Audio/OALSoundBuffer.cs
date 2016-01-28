@@ -24,13 +24,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
             try
             {
-                var alError = AL.GetError();
                 AL.GenBuffers(1, out openALDataBuffer);
-                alError = AL.GetError();
-                if (alError != ALError.NoError)
-                {
-                    Console.WriteLine("Failed to generate OpenAL data buffer: ", AL.GetErrorString(alError));
-                }
+                ALHelper.CheckError("Failed to generate OpenAL data buffer.");
             }
             catch (DllNotFoundException e)
             {
@@ -60,6 +55,7 @@ namespace Microsoft.Xna.Framework.Audio
             dataSize = size;
             this.sampleRate = sampleRate;
             AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
+            ALHelper.CheckError("Failed to fill buffer.");
 
             int bits, channels;
 
@@ -106,7 +102,9 @@ namespace Microsoft.Xna.Framework.Audio
                 // Release unmanaged resources
                 if (AL.IsBuffer(openALDataBuffer))
                 {
+                    ALHelper.CheckError("Failed to fetch buffer state.");
                     AL.DeleteBuffers(1, ref openALDataBuffer);
+                    ALHelper.CheckError("Failed to delete buffer.");
                 }
 
                 _isDisposed = true;

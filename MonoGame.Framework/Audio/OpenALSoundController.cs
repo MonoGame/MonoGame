@@ -27,6 +27,23 @@ using AVFoundation;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    internal static class ALHelper
+    {
+        [System.Diagnostics.Conditional("DEBUG")]
+        [System.Diagnostics.DebuggerHidden]
+        public static void CheckError(string message = "", params object[] args)
+        {
+            ALError error;
+            if ((error = AL.GetError()) != ALError.NoError)
+            {
+                if (args != null && args.Length > 0)
+                    message = String.Format(message, args);
+                
+                throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
+            }
+        }
+    }
+
 	internal sealed class OpenALSoundController : IDisposable
     {
         private static OpenALSoundController _instance = null;
@@ -91,6 +108,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
+            ALHelper.CheckError("Failed to generate sources.");
 
             availableSourcesCollection = new List<int>(allSourcesArray);
 			inUseSourcesCollection = new List<int>();
@@ -347,7 +365,10 @@ namespace Microsoft.Xna.Framework.Audio
                             _oggstreamer.Dispose();
 #endif
                         for (int i = 0; i < allSourcesArray.Length; i++)
+                        {
                             AL.DeleteSource(allSourcesArray[i]);
+                            ALHelper.CheckError("Failed to delete source.");
+                        }
                         
                         CleanUpOpenAL();
                     }
@@ -403,6 +424,7 @@ namespace Microsoft.Xna.Framework.Audio
                 playingSourcesCollection.Add(inst.SourceId);
             }
             AL.SourcePlay(inst.SourceId);
+            ALHelper.CheckError("Failed to play source.");
 		}
 
         public void FreeSource(SoundEffectInstance inst)
@@ -445,6 +467,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
             int pos;
 			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
+            ALHelper.CheckError("Failed to set source offset.");
 			return pos;
 		}
 
@@ -468,6 +491,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     int sourceId = playingSourcesCollection[i];
                     state = AL.GetSourceState(sourceId);
+                    ALHelper.CheckError("Failed to get source state.");
                     if (state == ALSourceState.Stopped)
                     {
                         purgeMe.Add(sourceId);
@@ -480,6 +504,7 @@ namespace Microsoft.Xna.Framework.Audio
                 foreach (int sourceId in purgeMe)
                 {
                     AL.Source(sourceId, ALSourcei.Buffer, 0);
+                    ALHelper.CheckError("Failed to free source from buffer.");
                     inUseSourcesCollection.Remove(sourceId);
                     availableSourcesCollection.Add(sourceId);
                 }
