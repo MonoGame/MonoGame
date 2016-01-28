@@ -34,9 +34,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 // Which characters to include and its position inside the font
                 var glyphIndexes = new List<KeyValuePair<char, uint>>(options.Characters.Count);
+                var notFoundGlyphs = new List<char>(options.Characters.Count);
                 //Get the glyph index for each requested character
+                uint index;
                 foreach (var item in options.Characters)
-                    glyphIndexes.Add(new KeyValuePair<char, uint>(item, face.GetCharIndex(item)));
+                {
+                    index = face.GetCharIndex(item);
+                    if (index == 0)
+                        notFoundGlyphs.Add(item);
+                    else
+                        glyphIndexes.Add(new KeyValuePair<char, uint>(item, index));
+                }
                 var glyphList = new List<Glyph>();
                 // Load each glyph in the font get the max ascender and descender in the whole font,
                 // if the glyph is one of the requested characters prepare its data
@@ -50,21 +58,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                     var found = glyphIndexes.FindIndex(p => p.Value == i);
                     //Glyph 0 is the default glyph for the font and will be used for the requested characters not included in the font
-                    if (found != -1 && i != 0)
+                    if (found != -1)
                     {
                         face.Glyph.RenderGlyph(RenderMode.Normal);
                         glyphList.Add(RetrieveGlyphData(glyphIndexes[found].Key, face));
                         //glyphIndexes.RemoveAt(found);
                     }
                 }
-                glyphIndexes.RemoveAll(p => p.Value != 0);
                 //For each character not included in the font load the glyph with index 0
                 face.LoadGlyph(0, LoadFlags.Default, LoadTarget.Normal);
                 face.Glyph.RenderGlyph(RenderMode.Normal);
-                foreach (var character in glyphIndexes)
+                foreach (var character in notFoundGlyphs)
                 {
                     //var glyph = ImportGlyph(character.Key, face);
-                    var glyph = RetrieveGlyphData(character.Key, face);
+                    var glyph = RetrieveGlyphData(character, face);
                     glyphList.Add(glyph);
                 }
                 Glyphs = glyphList;
