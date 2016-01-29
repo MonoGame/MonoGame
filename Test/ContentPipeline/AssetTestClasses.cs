@@ -137,6 +137,16 @@ public class OptionalElements
 
     [ContentSerializer(Optional = true)]
     public string c = "c";
+
+    [ContentSerializer(Optional = true)]
+    public CullMode? d = null;
+
+    [ContentSerializer(Optional = true)]
+    public CullMode? e = CullMode.CullClockwiseFace;
+
+    public CullMode? f = CullMode.CullCounterClockwiseFace;
+
+    public CullMode g = CullMode.CullClockwiseFace;
 }
 #endregion
 

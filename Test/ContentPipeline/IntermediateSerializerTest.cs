@@ -175,7 +175,11 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 a = null,
                 b = null,
-                c = string.Empty
+                c = string.Empty,
+                d = null,
+                e = CullMode.CullClockwiseFace,
+                f = CullMode.CullCounterClockwiseFace,
+                g = CullMode.CullClockwiseFace
             });
         }
 
