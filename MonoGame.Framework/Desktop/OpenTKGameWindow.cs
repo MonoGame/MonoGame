@@ -285,23 +285,12 @@ namespace Microsoft.Xna.Framework
         private void UpdateWindowState()
         {
             // we should wait until window's not fullscreen to resize
-
             if (updateClientBounds)
             {
                 if (CurrentPlatform.OS == OS.Linux)
                     window.WindowBorder = WindowBorder.Resizable;
                 
                 updateClientBounds = false;
-
-                // when we resize, we also have to move the window to center of the screen here again
-                // to do this, we simply compare the old size to the target size
-                int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
-                int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
-                window.X = Math.Max(0, centerOffsetX + window.X);
-                window.Y = Math.Max(0, centerOffsetY + window.Y);
-
-                window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
-                                     targetBounds.Y, targetBounds.Width, targetBounds.Height);
                 
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
@@ -312,6 +301,17 @@ namespace Microsoft.Xna.Framework
                     windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
+
+                if (!Configuration.RunningOnSdl2)
+                {
+                    int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
+                    int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
+                    window.X = Math.Max(0, centerOffsetX + window.X);
+                    window.Y = Math.Max(0, centerOffsetY + window.Y);
+                }
+
+                window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
+                    targetBounds.Y, targetBounds.Width, targetBounds.Height);
 
                 // we need to create a small delay between resizing the window
                 // and changing the border to avoid OpenTK Linux bug
