@@ -42,11 +42,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void CalculateNormals(GeometryContent geom, bool overwriteExistingNormals)
         {
             // Look for an existing normals channel.
-            var channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
-            if (channel == null)
+            if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal()))
             {
                 // We don't have existing normals, so add a new channel.
-                channel = geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
+                geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
             }
             else
             {
@@ -56,6 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     return;
             }
 
+            var channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
             var positionIndices = geom.Vertices.PositionIndices;
             Debug.Assert(positionIndices.Count == channel.Count, "The position and channel sizes were different!");
 
@@ -349,9 +349,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return null;
         }
 
+        /// <summary>
+        /// Traverses a skeleton depth-first and builds a list of its bones.
+        /// </summary>
         public static IList<BoneContent> FlattenSkeleton(BoneContent skeleton)
         {
-            throw new NotImplementedException();
+            if (skeleton == null)
+                throw new ArgumentNullException("skeleton");
+
+            var results = new List<BoneContent>();
+            var work = new Stack<NodeContent>(new[] { skeleton });
+            while (work.Count > 0)
+            {
+                var top = work.Pop();
+                var bone = top as BoneContent;
+                if (bone != null)
+                    results.Add(bone);
+
+                for (var i = top.Children.Count - 1; i >= 0; i--)
+                    work.Push(top.Children[i]);
+            }
+
+            return results;
         }
 
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
@@ -401,9 +420,68 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        /// <summary>
+        /// Transforms the contents of a node and its descendants.
+        /// </summary>
+        /// <remarks>The node transforms themselves are unaffected.</remarks>
+        /// <param name="scene">The root node of the scene to transform.</param>
+        /// <param name="transform">The transform matrix to apply to the scene.</param>
         public static void TransformScene(NodeContent scene, Matrix transform)
         {
-            throw new NotImplementedException();
+            if (scene == null)
+                throw new ArgumentException("scene");
+
+            // If the transformation is an identity matrix, this is a no-op and
+            // we can save ourselves a bunch of work in the first place.
+            if (transform == Matrix.Identity)
+                return;
+
+            Matrix inverseTransform = Matrix.Invert(transform);
+
+            var work = new Stack<NodeContent>();
+            work.Push(scene);
+
+            while (work.Count > 0)
+            {
+                var node = work.Pop();
+                foreach (var child in node.Children)
+                    work.Push(child);
+
+                // Transform the mesh content.
+                var mesh = node as MeshContent;
+                if (mesh != null)
+                    mesh.TransformContents(ref transform);
+
+                // Transform local coordinate system using "similarity transform".
+                node.Transform = inverseTransform * node.Transform * transform;
+
+                // Transform animations.
+                foreach (var animationContent in node.Animations.Values)
+                    foreach (var animationChannel in animationContent.Channels.Values)
+                        for (int i = 0; i < animationChannel.Count; i++)
+                            animationChannel[i].Transform = inverseTransform * animationChannel[i].Transform * transform;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified transform is left-handed.
+        /// </summary>
+        /// <param name="xform">The transform.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="xform"/> is left-handed; otherwise,
+        /// <see langword="false"/> if <paramref name="xform"/> is right-handed.
+        /// </returns>
+        internal static bool IsLeftHanded(ref Matrix xform)
+        {
+            // Check sign of determinant of upper-left 3x3 matrix:
+            //   positive determinant ... right-handed
+            //   negative determinant ... left-handed
+
+            // Since XNA does not have a 3x3 matrix, use the "scalar triple product"
+            // (see http://en.wikipedia.org/wiki/Triple_product) to calculate the
+            // determinant.
+            float d = Vector3.Dot(xform.Right, Vector3.Cross(xform.Forward, xform.Up));
+            return d < 0.0f;
         }
     }
 }

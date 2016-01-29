@@ -79,7 +79,7 @@ using Microsoft.Xna.Framework;
 
 using MonoGame.Tests.Components;
 
-#if IPHONE
+#if IOS
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 #endif
@@ -90,7 +90,9 @@ namespace MonoGame.Tests {
 
 		public TestGameBase ()
 		{
+#if XNA
             Content.RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#endif
 			Services.AddService<IFrameInfoSource> (this);
 			SuppressExtraUpdatesAndDraws = true;
 		}
@@ -174,16 +176,17 @@ namespace MonoGame.Tests {
 				// does, all future windows that are created are
 				// instantly killed.  So, we manually absorb any
 				// WM_QUIT that exists.
-				AbsorbQuitMessage ();
+				if (_isExiting)
+					AbsorbQuitMessage ();
 			}
-#elif IPHONE || ANDROID
+#elif IOS || ANDROID
 			RunOnMainThreadAndWait();
 #else
 			base.Run (GameRunBehavior.Synchronous);
 #endif
 		}
 
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 		private void RunOnMainThreadAndWait()
 		{
 			var exitEvent = new ManualResetEvent(false);
@@ -206,7 +209,7 @@ namespace MonoGame.Tests {
 		}
 #endif
 
-#if IPHONE
+#if IOS
 		private void InvokeRunOnMainThread()
 		{
 			Exception ex = null;
@@ -268,6 +271,24 @@ namespace MonoGame.Tests {
 			SafeRaise (DrawWith);
 		}
 
+        protected void DoExit()
+        {
+#if XNA
+            Exit();
+#else
+            // NOTE: We avoid Game.Exit() here as we marked it
+            // obsolute on platforms that disallow exit in 
+            // shipping games.
+            //
+            // We however need it here to halt the app after we
+            // complete running all the unit tests.  So we do the
+            // next best thing can call the interal platform code
+            // directly which produces the same result.
+            Platform.Exit();
+            SuppressDraw();
+#endif
+        }
+
 		private void EvaluateExitCondition ()
 		{
 			if (_isExiting || ExitCondition == null)
@@ -275,7 +296,7 @@ namespace MonoGame.Tests {
 
 			if (ExitCondition (_frameInfo)) {
 				_isExiting = true;
-				Exit ();
+				DoExit();
 			}
 		}
 
@@ -302,7 +323,7 @@ namespace MonoGame.Tests {
 
 		const uint WM_QUIT = 0x12;
 
-		private static void AbsorbQuitMessage ()
+		protected static void AbsorbQuitMessage ()
 		{
 			NativeMessage msg;
 			if (!PeekMessage (out msg, IntPtr.Zero, 0, 0, 0))
@@ -310,7 +331,7 @@ namespace MonoGame.Tests {
 
 			do {
 				int result = GetMessage (out msg, IntPtr.Zero, 0, 0);
-				if (result == -1)
+				if (result == -1 || result == 0)
 					return;
 			} while (msg.msg != WM_QUIT);
 		}

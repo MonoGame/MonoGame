@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using System.ComponentModel;
 using System.Linq;
 using SharpFont;
 using System.Drawing.Imaging;
@@ -22,6 +23,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
     public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
+        [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
+        public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
+
+        public FontDescriptionProcessor()
+        {
+            this.TextureFormat = TextureProcessorOutputFormat.Compressed;
+        }
 
         public override SpriteFontContent Process(FontDescription input,
             ContentProcessorContext context)
@@ -30,21 +38,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			var fontName = input.FontName;
 
+#if WINDOWS || LINUX
 #if WINDOWS
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
-		        var fontDirectory = Path.Combine(windowsfolder,"Fonts");
+		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
 			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+#elif LINUX
+            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
+#endif
 			if (string.IsNullOrWhiteSpace(fontName)) {
 				fontName = input.FontName;
 #endif
 				
 			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
-			var directories = new string[] { directory, 
-				"/Library/Fonts",
+
+			List<string> directories = new List<string>();
+			directories.Add(directory);
+			directories.Add("/Library/Fonts");
 #if WINDOWS
-				fontDirectory,
+			directories.Add(fontDirectory);
 #endif
-			};
 
 			foreach( var dir in directories) {
 				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
@@ -62,10 +75,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					directory = dir;
 					break;
 				}
-			}
+            }
 
-			fontName = Path.Combine (directory, fontName);
-#if WINDOWS
+            fontName = Path.Combine (directory, fontName);
+
+#if WINDOWS || LINUX
 			}
 #endif
 
@@ -75,7 +89,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					throw new Exception(string.Format("Could not load {0}", fontName));
 				}
 				var lineSpacing = 0f;
-				var glyphs = ImportFont(input, out lineSpacing, context, fontName);
+				int yOffsetMin = 0;
+				var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontName);
 
 				// Optimize.
 				foreach (Glyph glyph in glyphs)
@@ -83,32 +98,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-				Bitmap outputBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
+			    var compressed = TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed;
+                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, compressed, compressed);
 
-				//outputBitmap.Save ("/Users/Jimmy/Desktop/Cocos2D-XNAImages/fontglyphs.png");
+				//systemBitmap.Save ("fontglyphs.png");
 
 				// Adjust line and character spacing.
 				lineSpacing += input.Spacing;
+				output.VerticalLineSpacing = (int)lineSpacing;
 
-				foreach (Glyph glyph in glyphs)
+				foreach (var glyph in glyphs)
 				{
-					glyph.XAdvance += input.Spacing;
-					if (!output.CharacterMap.Contains(glyph.Character))
-						output.CharacterMap.Add(glyph.Character);
-					output.Glyphs.Add(new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
-                    output.Cropping.Add(new Rectangle(0, (int)(glyph.YOffset + glyphs.Select(x => x.YOffset).Max()), glyph.Subrect.Width, glyph.Subrect.Height));
-					ABCFloat abc = glyph.CharacterWidths;
-					output.Kerning.Add(new Vector3(abc.A, abc.B, abc.C));
+                    output.CharacterMap.Add(glyph.Character);
+
+					var texRect = new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height);
+					output.Glyphs.Add(texRect);
+
+					var cropping = new Rectangle(0, (int)(glyph.YOffset - yOffsetMin), (int)glyph.XAdvance, output.VerticalLineSpacing);
+					output.Cropping.Add(cropping);
+
+					// Set the optional character kerning.
+					if (input.UseKerning)
+						output.Kerning.Add(new Vector3(glyph.CharacterWidths.A, glyph.CharacterWidths.B, glyph.CharacterWidths.C));
+					else
+						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
 				}
 
-//				outputBitmap.Save("/Users/Jimmy/Desktop/Cocos2D-XNAImages/test.png");
-				output.Texture._bitmap = outputBitmap;
+                output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
+			    systemBitmap.Dispose();
 
-				var bitmapContent = new PixelBitmapContent<Color>(outputBitmap.Width, outputBitmap.Height);
-				bitmapContent.SetPixelData(outputBitmap.GetData());
-				output.Texture.Faces.Add(new MipmapChain(bitmapContent));
-
-            	GraphicsUtil.CompressTexture(output.Texture, context, false, false);
+                if (compressed)
+                {
+                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
+                }
 			}
 			catch(Exception ex) {
 				context.Logger.LogImportantMessage("{0}", ex.ToString());
@@ -117,7 +139,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return output;
         }
 
-		static Glyph[] ImportFont(FontDescription options, out float lineSpacing, ContentProcessorContext context, string fontName)
+		static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out int yOffsetMin, ContentProcessorContext context, string fontName)
 		{
 			// Which importer knows how to read this source font?
 			IFontImporter importer;
@@ -126,7 +148,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
 			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
-			context.Logger.LogMessage ("Building Font {0}", fontName);
 
 			//			if (BitmapFileExtensions.Contains(fileExtension))
 			//			{
@@ -148,6 +169,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			importer.Import(options, fontName);
 
 			lineSpacing = importer.LineSpacing;
+			yOffsetMin = importer.YOffsetMin;
 
 			// Get all glyphs
 			var glyphs = new List<Glyph>(importer.Glyphs);
@@ -195,6 +217,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 			return String.Empty;
 		}
+#endif
+
+#if LINUX
+        string FindFontFileFromFontName(string fontname, string style)
+        {
+            string s, e;
+            ExternalTool.Run("/bin/bash", string.Format ("-c \"fc-match -f '%{{file}}:%{{family}}\\n' '{0}:style={1}'\"", fontname, style), out s, out e);
+            s = s.Trim();
+
+            var split = s.Split (':');
+            //check font family, fontconfig might return a fallback
+            if (split [1].Contains (",")) { //this file defines multiple family names
+                var families = split [1].Split (',');
+                foreach (var f in families) {
+                    if (f.ToLowerInvariant () == fontname.ToLowerInvariant ())
+                        return split [0];
+                }
+                //didn't find it
+                return String.Empty;
+            } else {
+                if (split [1].ToLowerInvariant () != fontname.ToLowerInvariant ())
+                    return String.Empty;
+            }
+            return split [0];
+        }
 #endif
     }
 }

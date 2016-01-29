@@ -41,6 +41,14 @@ using System.Resources;
 // Mark the assembly as CLS compliant so it can be safely used in other .NET languages
 [assembly:CLSCompliant(true)]
 
+// Allow the content pipeline assembly to access 
+// some of our internal helper methods that it needs.
+[assembly: InternalsVisibleTo("MonoGame.Framework.Content.Pipeline")]
+[assembly: InternalsVisibleTo("MonoGame.Framework.Net")]
+
+//Tests projects need access too
+[assembly: InternalsVisibleTo("MonoGameTests")]
+
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
@@ -49,18 +57,11 @@ using System.Resources;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("81119db2-82a6-45fb-a366-63a08437b485")]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-
-[assembly: AssemblyVersion("3.1.2.0")]
-[assembly: AssemblyFileVersion("3.1.2.0")]
-
+// This was needed in WinRT releases to inform the system that we
+// don't need to load any language specific resources.
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
+
+// Version information for the assembly which is automatically 
+// set by our automated build process.
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]

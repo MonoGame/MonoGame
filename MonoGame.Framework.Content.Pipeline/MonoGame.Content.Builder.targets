@@ -1,0 +1,88 @@
+<!--
+  MonoGame - Copyright (C) The MonoGame Team
+  This file is subject to the terms and conditions defined in
+  file 'LICENSE.txt', which is part of this source code package.
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Add MonoGameContentReference to item type selection in Visual Studio -->
+  <ItemGroup>
+    <AvailableItemName Include="MonoGameContentReference" />
+  </ItemGroup>
+
+  <!-- Get all Mono Game Content References and store them in a list -->
+  <ItemGroup>
+    <ContentReferences Include="@(MonoGameContentReference)"/>
+  </ItemGroup>
+
+  <!-- This disables the IDE feature that skips executing msbuild in some build situations. --> 
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+  <Target Name="Prepare">
+
+    <PropertyGroup>
+
+      <ContentRootDirectory>Content</ContentRootDirectory>
+      <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
+      <ParentIntermediateDir>$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
+
+      <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
+
+      <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
+
+    </PropertyGroup>
+
+    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, RaspberryPi, Android, Ouya, NativeClient, PlayStation4, or PlayStationMobile."
+       Condition="	'$(MonoGamePlatform)' != 'Windows' And
+			'$(MonoGamePlatform)' != 'iOS' And       
+			'$(MonoGamePlatform)' != 'Android' And       
+			'$(MonoGamePlatform)' != 'Linux' And       
+			'$(MonoGamePlatform)' != 'MacOSX' And       
+			'$(MonoGamePlatform)' != 'WindowsStoreApp' And       
+			'$(MonoGamePlatform)' != 'NativeClient' And       
+			'$(MonoGamePlatform)' != 'Ouya' And       
+			'$(MonoGamePlatform)' != 'PlayStationMobile' And       
+			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
+			'$(MonoGamePlatform)' != 'RaspberryPi' And       
+			'$(MonoGamePlatform)' != 'PlayStation4' And       
+			'$(MonoGamePlatform)' != 'WindowsGL'" />
+
+    <Error
+        Text="The MonoGame content builder executable could not be located at '$(MonoGameContentBuilderExe)'!"
+        Condition="!Exists('$(MonoGameContentBuilderExe)')"
+      />
+
+    <MakeDir Directories="$(ParentIntermediateDir)"/>
+    <MakeDir Directories="$(ParentOutputDir)"/>
+
+  </Target>
+
+  <Target Name="BuildContent"
+        BeforeTargets="PreBuildEvent;Rebuild"
+        DependsOnTargets="Prepare">
+
+    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
+          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
+
+    <ItemGroup>
+
+      <ExtraContent Include="$(ParentOutputDir)\**\*.*" />
+
+      <Content Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) != 'Android'">
+        <Link>$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+
+      <AndroidAsset Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) == 'Android'">
+        <Link>Assets\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AndroidAsset>
+
+    </ItemGroup>
+
+  </Target>
+
+</Project>

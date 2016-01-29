@@ -1,0 +1,1349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,Web">
+
+  <!--
+    Using Protobuild in your own project?  ProjectGuids are only in use here
+    for backwards compatibility with existing users of MonoGame, and are not
+    required for new projects.
+
+    See https://protobuild.readthedocs.org/en/latest/faq.html#project-guids-faq
+  -->
+  <ProjectGuids>
+  	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
+  	<Platform Name="Angle">ECF3C8B9-0AAC-4C32-B184-FAE88F6244B5</Platform>
+  	<Platform Name="iOS">DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47</Platform>
+  	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
+  	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
+  	<Platform Name="Ouya">8BEA875D-66D2-4A5F-B137-83D262A3851D</Platform>
+  	<Platform Name="PSMobile">EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9</Platform>
+  	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
+  	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
+  	<Platform Name="WindowsGL">6D75E618-19CA-4C51-9546-F10965FBC0B8</Platform>
+  	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
+    <Platform Name="WindowsPhone81">6522B7E9-25A5-4250-B164-42CC2C4ECCAD</Platform>
+    <Platform Name="WindowsUAP">09C41A48-7BF3-4A46-9EB8-CE95B4C27CA9</Platform>
+  </ProjectGuids>
+
+  <!-- Common assembly references -->
+  <References>
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+
+    <!-- See FrameworkReferences.definition for the platform specific references -->
+    <Reference Include="FrameworkReferences" />
+  </References>
+
+  <Properties>
+
+    <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
+
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+	<RemoveXnaAssembliesOnWP8>false</RemoveXnaAssembliesOnWP8>
+    <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+
+    <CustomDefinitions>
+      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;OPENAL</Platform>
+      <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
+      <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL</Platform>
+      <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL</Platform>
+      <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA;OPENAL</Platform>
+      <Platform Name="PSMobile">PSM</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
+      <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
+      <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
+      <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
+      <Platform Name="WindowsUAP">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
+      <Platform Name="Web">TRACE;WEB</Platform>
+    </CustomDefinitions>
+
+  </Properties>
+
+  <Dependencies>
+    <Uses Name="ANGLEGraphics">
+      <Platforms>Angle</Platforms>
+    </Uses>
+    <Uses Name="OpenGLGraphics">
+      <Platforms>iOS,WindowsGL,Ouya,Android</Platforms>
+    </Uses>
+    <Uses Name="DirectXGraphics">
+      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Uses>
+    <Uses Name="PSMGraphics">
+      <Platforms>PSMobile</Platforms>
+    </Uses>
+    <Uses Name="WebGraphics">
+      <Platforms>Web</Platforms>
+    </Uses>
+    <Uses Name="_XNADesignProvided">
+      <Platforms>Windows,WindowsGL,Linux,MacOS</Platforms>
+    </Uses>
+    <Uses Name="_FrameworkDispatcherProvided">
+      <Platforms>Windows,WindowsGL,MacOS</Platforms>
+    </Uses>
+    <Recommends Name="DirectXGraphics">
+      <Platforms>Windows</Platforms>
+    </Recommends>
+    <Recommends Name="OpenGLGraphics">
+      <Platforms>Linux,MacOS</Platforms>
+    </Recommends>
+  </Dependencies>
+
+  <Services>
+
+    <!-- Graphics APIs -->
+    <Service Name="ANGLEGraphics">
+      <RemoveDefine>DIRECTX;WINDOWS_MEDIA_SESSION;WINDOWS;MONOMAC;LINUX</RemoveDefine>
+      <AddDefine>OPENGL;OPENAL;GLES;ANGLE</AddDefine>
+      <Platforms>Windows,MacOS,Linux,Angle</Platforms>
+      <Conflicts>OpenGLGraphics,DirectXGraphics,PSMGraphics,WebGraphics</Conflicts>
+      <Requires>OpenALAudio,_GLCompatible</Requires>
+    </Service>
+    <Service Name="OpenGLGraphics">
+      <RemoveDefine>DIRECTX;WINDOWS_MEDIA_SESSION</RemoveDefine>
+      <AddDefine>OPENGL;OPENAL</AddDefine>
+      <Platforms>iOS,MacOS,Linux,Windows,WindowsGL,Ouya,Android</Platforms>
+      <Conflicts>ANGLEGraphics,DirectXGraphics,PSMGraphics,WebGraphics</Conflicts>
+      <Requires>OpenALAudio,_GLCompatible</Requires>
+    </Service>
+    <Service Name="DirectXGraphics">
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+      <Conflicts>ANGLEGraphics,OpenGLGraphics,PSMGraphics,WebGraphics</Conflicts>
+      <Requires>XAudioAudio</Requires>
+    </Service>
+    <Service Name="PSMGraphics">
+      <Platforms>PSMobile</Platforms>
+      <Conflicts>ANGLEGraphics,OpenGLGraphics,DirectXGraphics,WebGraphics</Conflicts>
+      <Requires>PSMAudio</Requires>
+    </Service>
+    <Service Name="WebGraphics">
+      <Platforms>Web</Platforms>
+      <Conflicts>ANGLEGraphics,OpenGLGraphics,DirectXGraphics,PSMGraphics</Conflicts>
+      <Requires>WebAudio</Requires>
+    </Service>
+
+    <!-- Audio APIs -->
+    <Service Name="OpenALAudio">
+      <Platforms>Angle,iOS,Linux,Windows,WindowsGL,MacOS,Android,Ouya</Platforms>
+      <Conflicts>XAudioAudio,PSMAudio,WebAudio</Conflicts>
+    </Service>
+    <Service Name="XAudioAudio">
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+      <Conflicts>OpenALAudio,PSMAudio,WebAudio</Conflicts>
+    </Service>
+    <Service Name="PSMAudio">
+      <Platforms>PSMobile</Platforms>
+      <Conflicts>OpenALAudio,XAudioAudio,WebAudio</Conflicts>
+    </Service>
+    <Service Name="WebAudio">
+      <Platforms>Web</Platforms>
+      <Conflicts>OpenALAudio,XAudioAudio,PSMAudio</Conflicts>
+    </Service>
+
+    <!-- Base supporting features -->
+    <Service Name="_GLCompatible">
+      <!-- Covers compatible GL implementations, such as ANGLE and OpenGL -->
+    </Service>
+    <Service Name="_XNADesignProvided">
+      <!-- Allows the Microsoft.Xna.Framework.Design framework to be present -->
+    </Service>
+    <Service Name="_FrameworkDispatcherProvided">
+      <!-- Allows the FrameworkDispatcher class to be present -->
+    </Service>
+
+  </Services>
+
+  <Files>
+
+    <Compile Include="Properties\AssemblyInfo.cs" />
+
+    <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>Tao.Sdl.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi-v7a\libopenal32.so">
+      <Platforms>Android,Ouya</Platforms>
+      <Link>libs\armeabi-v7a\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi\libopenal32.so">
+      <Platforms>Android,Ouya</Platforms>
+      <Link>libs\armeabi\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\x86\libopenal32.so">
+      <Platforms>Android,Ouya</Platforms>
+      <Link>libs\x86\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+
+    <!-- Microsoft.Xna.Framework -->
+    <Compile Include="BoundingBox.cs" />
+    <Compile Include="BoundingFrustum.cs" />
+    <Compile Include="BoundingSphere.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="ContainmentType.cs" />
+    <Compile Include="CurveContinuity.cs" />
+    <Compile Include="Curve.cs" />
+    <Compile Include="CurveKeyCollection.cs" />
+    <Compile Include="CurveKey.cs" />
+    <Compile Include="CurveLoopType.cs" />
+    <Compile Include="CurveTangent.cs" />
+    <Compile Include="DisplayOrientation.cs" />
+    <Compile Include="DrawableGameComponent.cs" />
+    <Compile Include="FrameworkDispatcher.cs">
+      <Platforms>_FrameworkDispatcherProvided</Platforms>
+    </Compile>
+    <Compile Include="GameComponentCollection.cs" />
+    <Compile Include="GameComponentCollectionEventArgs.cs" />
+    <Compile Include="GameComponent.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="GameServiceContainer.cs" />
+    <Compile Include="GameTime.cs" />
+    <Compile Include="GameTimer.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="GameTimerEventArgs.cs">
+      <Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="GameUpdateRequiredException.cs" />
+    <Compile Include="GameWindow.cs">
+		<ExcludePlatforms>MacOS</ExcludePlatforms>
+	</Compile>
+    <Compile Include="IDrawable.cs" />
+    <Compile Include="IGameComponent.cs" />
+    <Compile Include="IGraphicsDeviceManager.cs" />
+    <Compile Include="IUpdateable.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="Matrix.cs" />
+    <Compile Include="NamespaceDocs.cs" />
+    <Compile Include="PerformanceCounter.cs" />
+    <Compile Include="Plane.cs" />
+    <Compile Include="PlaneIntersectionType.cs" />
+    <Compile Include="PlayerIndex.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
+    <Compile Include="PrimaryThreadLoader.cs">
+      <Platforms>Android,MacOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Quaternion.cs" />
+    <Compile Include="Ray.cs" />
+    <Compile Include="Rectangle.cs" />
+    <Compile Include="ReusableItemList.cs" />
+    <Compile Include="SharedGraphicsDeviceManager.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="TextInputEventArgs.cs">
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Threading.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="Vector3.cs" />
+    <Compile Include="Vector4.cs" />
+
+
+    <!-- Microsoft.Xna.Framework.Audio -->
+    <Compile Include="Audio\AudioChannels.cs" />
+    <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\AudioLoader.cs">
+      <Platforms>Linux,WindowsGL,Angle,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Audio\AudioUtil.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web</Platforms>
+    </Compile>
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\OALSoundBuffer.cs">
+      <Services>OpenALAudio</Services>
+    </Compile>
+    <Compile Include="Audio\OpenALSoundController.cs">
+      <Services>OpenALAudio</Services>
+    </Compile>
+    <Compile Include="Audio\OpenALSupport.cs">
+      <Platforms>iOS,MacOS</Platforms>
+    </Compile>
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs">
+      <Services>OpenALAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffect.PSM.cs">
+      <Services>PSMAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffect.XAudio.cs">
+      <Services>XAudioAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffect.Web.cs">
+      <Services>WebAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs">
+      <Services>OpenALAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.PSM.cs">
+      <Services>PSMAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
+      <Services>XAudioAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.Web.cs">
+      <Services>WebAudio</Services>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstancePool.cs" />
+    <Compile Include="Audio\SoundState.cs" />
+
+
+    <!-- Microsoft.Xna.Framework.Audio Xact-->
+    <Compile Include="Audio\Xact\AudioCategory.cs" />
+    <Compile Include="Audio\Xact\AudioEngine.cs" />
+    <Compile Include="Audio\Xact\AudioStopOptions.cs" />
+    <Compile Include="Audio\Xact\ClipEvent.cs" />
+    <Compile Include="Audio\Xact\Cue.cs" />
+    <Compile Include="Audio\Xact\PlayWaveEvent.cs" />
+    <Compile Include="Audio\Xact\VolumeEvent.cs" />
+    <Compile Include="Audio\Xact\SoundBank.cs" />
+    <Compile Include="Audio\Xact\WaveBank.cs" />
+    <Compile Include="Audio\Xact\XactClip.cs" />
+    <Compile Include="Audio\Xact\XactHelpers.cs" />
+    <Compile Include="Audio\Xact\XactSound.cs" />
+
+
+    <!-- Microsoft.Xna.Framework.Content -->
+    <Compile Include="Content\ContentExtensions.cs" />
+    <Compile Include="Content\ContentLoadException.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\CharReader.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Content\ContentReaders\CurveReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
+    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs">
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EnumReader.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs">
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\Int16Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
+    <Compile Include="Content\ContentReaders\ListReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\NullableReader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\RectangleReader.cs" />
+    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
+    <Compile Include="Content\ContentReaders\SingleReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs">
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Content\ContentReaders\SongReader.cs" />
+    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
+    <Compile Include="Content\ContentReaders\StringReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture3DReader.cs">
+      <Platforms>Angle,Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Content\ContentReaders\TextureReader.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs"/>
+    <Compile Include="Content\ContentReaders\VideoReader.cs">
+      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Content\ContentSerializerCollectionItemNameAttribute.cs" />
+    <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\ContentSerializerRuntimeTypeAttribute.cs" />
+    <Compile Include="Content\ContentSerializerTypeVersionAttribute.cs" />
+    <Compile Include="Content\ContentTypeReader.cs" />
+    <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
+    <Compile Include="Content\ResourceContentManager.cs">
+      <Platforms>Angle,Android,iOS,Linux,Ouya,Windows,WindowsGL</Platforms>
+    </Compile>
+
+
+    <!-- Microsoft.Xna.Framework.Graphics -->
+    <Compile Include="Graphics\ClearOptions.cs" />
+    <Compile Include="Graphics\ColorWriteChannels.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Graphics\DeviceLostException.cs" />
+    <Compile Include="Graphics\DeviceNotResetException.cs" />
+    <Compile Include="GraphicsDeviceInformation.cs" />
+    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Graphics\DisplayModeCollection.cs" />
+    <Compile Include="Graphics\DisplayMode.cs" />
+    <Compile Include="Graphics\DxtUtil.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs">
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\Effect.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\EffectMaterial.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectParameter.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterType.cs" />
+    <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectTechnique.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs">
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\Effect\IEffectFog.cs" />
+    <Compile Include="Graphics\Effect\IEffectLights.cs" />
+    <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs">
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
+    <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsDevice.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Graphics\GraphicsProfile.cs" />
+    <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Graphics\IGraphicsDeviceService.cs" />
+    <Compile Include="Graphics\ImageEx.cs">
+      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\NoSuitableGraphicsDeviceException.cs" />
+    <Compile Include="Graphics\OcclusionQuery.cs">
+      <ExcludePlatforms>iOS,Android,Ouya</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\PackedVector\Alpha8.cs" />
+    <Compile Include="Graphics\PackedVector\Bgr565.cs" />
+    <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
+    <Compile Include="Graphics\PackedVector\Bgra5551.cs" />
+    <Compile Include="Graphics\PackedVector\Byte4.cs" />
+    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
+    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
+    <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
+    <Compile Include="Graphics\PackedVector\Rg32.cs" />
+    <Compile Include="Graphics\PackedVector\Rgba64.cs" />
+    <Compile Include="Graphics\PackedVector\Rgba1010102.cs" />
+    <Compile Include="Graphics\PackedVector\Short2.cs" />
+    <Compile Include="Graphics\PackedVector\Short4.cs" />
+    <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
+    <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Graphics\RenderTarget2D.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget2D.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget2D.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget2D.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget3D.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget3D.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetBinding.cs" />
+    <Compile Include="Graphics\RenderTargetCube.cs" />
+    <Compile Include="Graphics\RenderTargetUsage.cs" />
+    <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
+    <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
+    <Compile Include="Graphics\SamplerStateCollection.cs" />
+    <Compile Include="Graphics\SamplerStateCollection.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\SetDataOptions.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\Shader.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\Shader.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\Shader.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\Shader.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs">
+      <ExcludePlatforms>PSMobile</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\SpriteBatchItem.cs" />
+    <Compile Include="Graphics\SpriteEffects.cs" />
+    <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\SpriteSortMode.cs" />
+    <Compile Include="Graphics\States\Blend.cs" />
+    <Compile Include="Graphics\States\BlendFunction.cs" />
+    <Compile Include="Graphics\States\BlendState.cs" />
+    <Compile Include="Graphics\States\BlendState.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\BlendState.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\BlendState.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\BlendState.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\CompareFunction.cs" />
+    <Compile Include="Graphics\States\CullMode.cs" />
+    <Compile Include="Graphics\States\DepthFormat.cs" />
+    <Compile Include="Graphics\States\DepthStencilState.cs" />
+    <Compile Include="Graphics\States\DepthStencilState.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\DepthStencilState.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\DepthStencilState.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\DepthStencilState.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\FillMode.cs" />
+    <Compile Include="Graphics\States\RasterizerState.cs" />
+    <Compile Include="Graphics\States\RasterizerState.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\RasterizerState.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\RasterizerState.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\RasterizerState.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\States\SamplerState.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\SamplerState.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\SamplerState.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\States\StencilOperation.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TextureAddressMode.cs" />
+    <Compile Include="Graphics\States\TextureFilter.cs" />
+    <Compile Include="Graphics\SurfaceFormat.cs" />
+    <Compile Include="Graphics\SwapChainRenderTarget.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\Texture2D.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture2D.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture2D.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture2D.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.cs" />
+    <Compile Include="Graphics\Texture3D.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.cs" />
+    <Compile Include="Graphics\TextureCollection.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\Texture.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Texture.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\TextureCube.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCube.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCube.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\TextureCube.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\BufferUsage.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\IVertexType.cs" />
+    <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.PSM.cs">
+      <Services>PSMGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexElement.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
+    <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="Graphics\Viewport.cs" />
+
+
+    <!-- Microsoft.Xna.Framework.Input -->
+    <Compile Include="Input\Buttons.cs" />
+    <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePad.cs" />
+    <Compile Include="Input\GamePad.Default.cs">
+      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Ouya.cs">
+      <Platforms>Ouya</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.PSM.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.OpenTK.cs">
+      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Web.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.XInput.cs">
+      <Platforms>Windows8,Windows,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePadButtons.cs" />
+    <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadDeadZone.cs" />
+    <Compile Include="Input\GamePadDPad.cs" />
+    <Compile Include="Input\GamePadState.cs" />
+    <Compile Include="Input\GamePadThumbSticks.cs" />
+    <Compile Include="Input\GamePadTriggers.cs" />
+    <Compile Include="Input\GamePadType.cs" />
+    <Compile Include="Input\Joystick.cs" />
+    <Compile Include="Input\JoystickCapabilities.cs" />
+    <Compile Include="Input\JoystickHat.cs" />
+    <Compile Include="Input\JoystickState.cs" />
+    <Compile Include="Input\Joystick.Default.cs">
+      <Platforms>Android,Ouya,PSMobile,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,Web</Platforms>
+    </Compile>
+    <Compile Include="Input\Joystick.OpenTK.cs">
+      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.cs">
+		<ExcludePlatforms>PSMobile,Android,Ouya</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.cs">
+      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardInput.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Input\Keys.cs" />
+    <Compile Include="Input\KeyState.cs" />    
+    <Compile Include="Input\MessageBox.cs">
+      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\MessageBox.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\ThumbStickDefinition.cs" />
+    <Compile Include="Input\Touch\GestureSample.cs" />
+    <Compile Include="Input\Touch\GestureType.cs" />
+    <Compile Include="Input\Touch\TouchCollection.cs" />
+    <Compile Include="Input\Touch\TouchLocation.cs" />
+    <Compile Include="Input\Touch\TouchLocationState.cs" />
+    <Compile Include="Input\Touch\TouchPanel.cs" />
+    <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
+    <Compile Include="Input\Touch\TouchPanelState.cs" />
+    <Compile Include="Input\Touch\TouchQueue.cs">
+			<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+	</Compile>
+		
+    <Page Include="Themes\generic.xaml">
+			<Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+    </Page>
+
+    <!-- Microsoft.Xna.Framework.Media -->
+    <Compile Include="Media\Album.cs" />
+    <Compile Include="Media\AlbumCollection.cs" />
+    <Compile Include="Media\Artist.cs" />
+    <Compile Include="Media\Genre.cs" />
+    <Compile Include="Media\MediaLibrary.cs" />
+    <Compile Include="Media\MediaLibrary.Default.cs">
+      <ExcludePlatforms>iOS,Windows8,WindowsPhone,Android,Ouya,WindowsPhone81,WindowsUAP</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.Android.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaManagerState.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaPlayer.WME.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaPlayer.WMS.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaPlayer.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaPlayer.Default.cs">
+      <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,Web</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaQueue.cs" />
+    <Compile Include="Media\MediaSource.cs" />
+    <Compile Include="Media\MediaSourceType.cs" />
+    <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\MusicProperties.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Media\PlaylistCollection.cs">
+      <ExcludePlatforms>PSMobile</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\Playlist.cs">
+      <ExcludePlatforms>PSMobile</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\SongCollection.cs" />
+    <Compile Include="Media\Song.cs" />
+    <Compile Include="Media\Song.Default.cs">
+        <Platforms>Angle,WindowsGL,MacOS,Web</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.Android.cs">
+        <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.IOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.Tao.SDL.cs">
+        <Platforms>Linux</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.WMS.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoSoundtrackType.cs" />
+    <Compile Include="Media\Video.cs">
+      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\Video.IOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Video.MacOS.cs">
+        <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Video.Android.cs">
+        <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\Video.WMS.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.cs">
+      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.IOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.WME.cs">
+        <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.MacOS.cs">
+        <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.Android.cs">
+        <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.WMS.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+
+    <!-- Microsoft.Devices.Sensors -->
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs">
+      <Platforms>Android,iOS,Ouya</Platforms>
+    </Compile>
+
+
+    <!-- Microsoft.Xna.Framework.Storage -->
+    <Compile Include="Storage\StorageContainer.cs" />
+    <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="Storage\StorageDeviceHelper.cs">
+      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUAP,Linux</Platforms>
+    </Compile>
+
+
+    <!-- Utility Classes -->
+    <Compile Include="Utilities\AssemblyHelper.cs">
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Utilities\FileHelpers.cs" />
+    <Compile Include="Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
+    <Compile Include="Utilities\ZLibStream\ZlibStream.cs" />
+    <Compile Include="Utilities\Png\PngCommon.cs" />
+    <Compile Include="Utilities\Png\PngReader.cs" />
+    <Compile Include="Utilities\Png\PngWriter.cs" />
+
+
+    <!-- Android/OUYA Platform -->
+    <Compile Include="Android\AndroidCompatibility.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\AndroidGameActivity.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\AndroidGamePlatform.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\AndroidGameWindow.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\MonoGameAndroidGameView.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\Devices\Sensors\Accelerometer.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\Devices\Sensors\Compass.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\Input\Keyboard.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\IResumeManager.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\OrientationListener.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\ResumeManager.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\ScreenReciever.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+
+
+    <!-- Common Desktop Platform -->
+    <Compile Include="Desktop\OpenTKGamePlatform.cs">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Desktop\OpenTKGameWindow.cs">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardUtil.OpenTK.cs">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </Compile>
+
+
+    <!-- iOS Platform -->
+    <Compile Include="iOS\Devices\Sensors\Accelerometer.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\Devices\Sensors\Compass.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\iOSGamePlatform.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\iOSGameViewController.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\iOSGameView.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\iOSGameView_GLAbstraction.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\iOSGameView_Touch.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\iOSGameWindow.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="iOS\OrientationConverter.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+
+
+    <!-- MacOS Platform -->
+    <Compile Include="MacOS\GameWindow.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="MacOS\KeyUtil.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="MacOS\MacGameNSWindow.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="MacOS\MacGamePlatform.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+
+
+    <!-- PlayStation Mobile Platform -->
+    <Compile Include="PSSuite\Graphics\SpriteBatcher.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\Input\AccelerometerCapabilities.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\Input\Accelerometer.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\Input\AccelerometerState.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\Input\Keyboard.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\Input\Touch\GestureListener.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\PSSExtensions.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\PSSGamePlatform.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\PSSGameWindow.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="PSSuite\PSSHelper.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+
+
+    <!-- Windows 8 Platform -->
+    <Compile Include="Windows8\GameFrameworkViewSource.cs">
+      <Platforms>Windows8</Platforms>
+    </Compile>
+    <Compile Include="Windows8\InputEvents.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Windows8\MetroFrameworkView.cs">
+      <Platforms>Windows8</Platforms>
+    </Compile>
+    <Compile Include="Windows8\MetroGamePlatform.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Windows8\MetroGameWindow.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Windows8\MetroHelper.cs">
+      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Windows8\SharpDXHelper.cs">
+      <Platforms>Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="Windows8\XamlGame.cs">
+      <Platforms>Windows8,WindowsPhone81</Platforms>
+    </Compile>
+
+	  
+    <!-- Windows UAP Platform -->
+    <Compile Include="WindowsUAP\UAPGamePlatform.cs">
+      <Platforms>WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="WindowsUAP\UAPGameWindow.cs">
+      <Platforms>WindowsUAP</Platforms>
+    </Compile>
+    <Compile Include="WindowsUAP\XamlGame.cs">
+      <Platforms>WindowsUAP</Platforms>
+    </Compile>	  
+
+	  
+    <!-- Windows Desktop Platfom -->
+    <Compile Include="Windows\WinFormsGameForm.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\WinFormsGamePlatform.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\WinFormsGameWindow.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoSampleGrabber.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+
+
+	<!-- Windows Phone Platform -->
+    <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="WindowsPhone\DrawingSurfaceUpdateHandler.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="WindowsPhone\SurfaceUpdateHandler.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="WindowsPhone\WPGamePlatform.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="WindowsPhone\WPGameWindow.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="WindowsPhone\XamlGame.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+
+    <!-- Web Platform -->
+    <Compile Include="Web\WebGamePlatform.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Web\WebGameWindow.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Libraries\JSAPI.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Libraries\JSAPIAccess.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Content Include="Libraries\MonoGame.Web.js">
+      <Platforms>Web</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MonoGame.Framework.manifest.js">
+      <Platforms>Web</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <!-- Microsoft.Xna.Framework.Design -->
+    <Compile Include="Design\VectorConversion.cs">
+      <Services>_XNADesignProvided</Services>
+    </Compile>
+    <Compile Include="Design\Vector2TypeConverter.cs">
+      <Services>_XNADesignProvided</Services>
+    </Compile>
+    <Compile Include="Design\Vector3TypeConverter.cs">
+      <Services>_XNADesignProvided</Services>
+    </Compile>
+    <Compile Include="Design\Vector4TypeConverter.cs">
+      <Services>_XNADesignProvided</Services>
+    </Compile>
+
+    <!-- OpenGL Stock Effects -->
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
+      <Services>_GLCompatible</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo">
+      <Services>_GLCompatible</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo">
+      <Services>_GLCompatible</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo">
+      <Services>_GLCompatible</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo">
+      <Services>_GLCompatible</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo">
+      <Services>_GLCompatible</Services>
+    </EmbeddedResource>
+
+
+    <!-- DirectX Stock Effects -->
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo">
+      <Services>DirectXGraphics</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.dx11.mgfxo">
+      <Services>DirectXGraphics</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo">
+      <Services>DirectXGraphics</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo">
+      <Services>DirectXGraphics</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo">
+      <Services>DirectXGraphics</Services>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo">
+      <Services>DirectXGraphics</Services>
+    </EmbeddedResource>
+
+
+    <!-- PSM Stock Effects -->
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.fcg">
+      <Services>PSMGraphics</Services>
+    </EmbeddedShaderProgram>
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.vcg">
+      <Services>PSMGraphics</Services>
+    </EmbeddedShaderProgram>
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.fcg">
+      <Services>PSMGraphics</Services>
+    </EmbeddedShaderProgram>
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.vcg">
+      <Services>PSMGraphics</Services>
+    </EmbeddedShaderProgram>
+    <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.fcg">
+      <Services>PSMGraphics</Services>
+    </ShaderProgram>
+    <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.vcg">
+      <Services>PSMGraphics</Services>
+    </ShaderProgram>
+
+  </Files>
+</Project>

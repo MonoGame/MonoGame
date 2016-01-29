@@ -4,9 +4,12 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Graphics;
 using Nvidia.TextureTools;
+using WrapMode = System.Drawing.Drawing2D.WrapMode;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -75,31 +78,74 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     
     public static class GraphicsUtil
     {
-        public static byte[] GetData(this Bitmap bmp)
+        internal static Bitmap ToSystemBitmap(this BitmapContent bitmapContent)
+        {
+            var srcBmp = bitmapContent;
+            var srcData = srcBmp.GetPixelData();
+
+            var srcDataHandle = GCHandle.Alloc(srcData, GCHandleType.Pinned);
+            var srcDataPtr = (IntPtr)(srcDataHandle.AddrOfPinnedObject().ToInt64());
+
+            // stride must be aligned on a 32 bit boundary or 4 bytes
+            int stride = ((srcBmp.Width * 32 + 31) & ~31) >> 3;
+
+            var systemBitmap = new Bitmap(srcBmp.Width, srcBmp.Height, stride, PixelFormat.Format32bppArgb | PixelFormat.Alpha, srcDataPtr);
+            srcDataHandle.Free();
+
+            return systemBitmap;
+        }
+
+        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
+        {
+            // TODO: This should be refactored to use FreeImage 
+            // with a higher quality filter.
+
+            var destination = new Bitmap(newWidth, newHeight);
+
+            using (var source = content.Faces[0][0].ToSystemBitmap())
+            using (var graphics = System.Drawing.Graphics.FromImage(destination))
+            {
+                var imageAttr = new ImageAttributes();
+                imageAttr.SetWrapMode(WrapMode.TileFlipXY);
+
+                var destRect = new System.Drawing.Rectangle(0, 0, newWidth, newHeight);
+
+                graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
+                graphics.DrawImage(source, destRect, 0, 0, source.Width, source.Height, GraphicsUnit.Pixel, imageAttr);
+            }
+
+            content.Faces[0][0] = destination.ToXnaBitmap(false); //we dont want to flip colors twice            
+        }
+
+        public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap, bool flipColors)
         {
             // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
             // swizzle the channels later
-            System.Diagnostics.Debug.Assert(bmp.PixelFormat == PixelFormat.Format32bppArgb);
+            System.Diagnostics.Debug.Assert(systemBitmap.PixelFormat == PixelFormat.Format32bppArgb);
 
-            var bitmapData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+            var bitmapData = systemBitmap.LockBits(new System.Drawing.Rectangle(0, 0, systemBitmap.Width, systemBitmap.Height),
                                     ImageLockMode.ReadOnly,
-                                    bmp.PixelFormat);
+                                    systemBitmap.PixelFormat);
 
             var length = bitmapData.Stride * bitmapData.Height;
-            var output = new byte[length];
+            var pixelData = new byte[length];
 
             // Copy bitmap to byte[]
-            Marshal.Copy(bitmapData.Scan0, output, 0, length);
-            bmp.UnlockBits(bitmapData);
+            Marshal.Copy(bitmapData.Scan0, pixelData, 0, length);
+            systemBitmap.UnlockBits(bitmapData);
 
             // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
             // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
             // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RGBA.
             // Because of this we flip the R and B channels.
 
-            BGRAtoRGBA(output);
-  
-            return output;
+            if(flipColors)
+                BGRAtoRGBA(pixelData);
+
+            var xnaBitmap = new PixelBitmapContent<Color>(systemBitmap.Width, systemBitmap.Height);
+            xnaBitmap.SetPixelData(pixelData);
+
+            return xnaBitmap;
         }
 
         public static void BGRAtoRGBA(byte[] data)
@@ -155,13 +201,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(TextureContent content, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha)
+        public static void CompressTexture(GraphicsProfile profile, TextureContent content, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha, bool sharpAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
-            // Add more here as they become available.
+            //       Add more here as they become available.
             switch (context.TargetPlatform)
             {
                 case TargetPlatform.Windows:
+                case TargetPlatform.WindowsGL:
                 case TargetPlatform.WindowsPhone:
                 case TargetPlatform.WindowsPhone8:
                 case TargetPlatform.WindowsStoreApp:
@@ -171,11 +218,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
-					context.Logger.LogMessage ("Detected {0} using DXT Compression", context.TargetPlatform);
-				    CompressDxt(content, generateMipmaps);
+					context.Logger.LogMessage("Using DXT Compression");
+                    CompressDxt(profile, content, generateMipmaps, premultipliedAlpha, sharpAlpha);
 				    break;
                 case TargetPlatform.iOS:
-					context.Logger.LogMessage ("Detected {0} using PVRTC Compression", context.TargetPlatform);
+					context.Logger.LogMessage("Using PVRTC Compression");
                     CompressPvrtc(content, generateMipmaps, premultipliedAlpha);
                     break;
 
@@ -250,20 +297,41 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        private static void CompressDxt(TextureContent content, bool generateMipmaps)
+        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipmaps, bool premultipliedAlpha, bool sharpAlpha)
         {
             var texData = content.Faces[0][0];
 
-            if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
-                throw new PipelineException("DXT Compressed textures width and height must be powers of two.");
+            if (profile == GraphicsProfile.Reach)
+            {
+                if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
+                    throw new PipelineException("DXT Compressed textures width and height must be powers of two in GraphicsProfile.Reach.");                
+            }
+
+            var pixelData = texData.GetPixelData();
+
+            // Test the alpha channel to figure out if we have alpha.
+            var containsAlpha = false;
+            var containsFracAlpha = false;
+            for (var x = 3; x < pixelData.Length; x += 4)
+            {
+                if (pixelData[x] != 0xFF)
+                {
+                    containsAlpha = true;
+
+                    if (pixelData[x] != 0x0)
+                        containsFracAlpha = true;
+                }
+            }
 
             var _dxtCompressor = new Compressor();
             var inputOptions = new InputOptions();
-            inputOptions.SetAlphaMode(AlphaMode.Transparency);
+            if (containsAlpha)           
+                inputOptions.SetAlphaMode(premultipliedAlpha ? AlphaMode.Premultiplied : AlphaMode.Transparency);
+            else
+                inputOptions.SetAlphaMode(AlphaMode.None);
             inputOptions.SetTextureLayout(TextureType.Texture2D, texData.Width, texData.Height, 1);
 
-            var pixelData = texData.GetPixelData();
-            
+           
             // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
             // again here.
             GraphicsUtil.BGRAtoRGBA(pixelData);
@@ -272,55 +340,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             inputOptions.SetMipmapData(dataPtr, texData.Width, texData.Height, 1, 0, 0);
             inputOptions.SetMipmapGeneration(generateMipmaps);
+            inputOptions.SetGamma(1.0f, 1.0f);
 
-            var containsFracAlpha = ContainsFractionalAlpha(pixelData);
             var outputOptions = new OutputOptions();
             outputOptions.SetOutputHeader(false);
 
-            var outputFormat = containsFracAlpha ? Format.DXT5 : Format.DXT1;
+            var outputFormat = Format.DXT1;
+            if (containsFracAlpha)
+            {
+                if (sharpAlpha)
+                    outputFormat = Format.DXT3;
+                else
+                    outputFormat = Format.DXT5;
+            }
 
             var handler = new DxtDataHandler(content, outputFormat);
             outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
 
             var compressionOptions = new CompressionOptions();
             compressionOptions.SetFormat(outputFormat);
-            compressionOptions.SetQuality(Quality.Fastest);
+            compressionOptions.SetQuality(Quality.Normal);
 
             _dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
 
             dataHandle.Free();
-        }
-        
-        internal static bool ContainsFractionalAlpha(byte[] data)
-        {
-            for (var x = 3; x < data.Length; x += 4)
-            {
-                if (data[x] != 0x0 && data[x] != 0xFF)
-                    return true;
-            }
-
-            return false;
-        }
-
-        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
-        {
-            var resizedBmp = new Bitmap(newWidth, newHeight);
-
-            using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
-            {
-                graphics.DrawImage(content._bitmap, 0, 0, newWidth, newHeight);
-
-                content._bitmap.Dispose();
-                content._bitmap = resizedBmp;
-            }
-
-            var imageData = content._bitmap.GetData();
-
-            var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
-            bitmapContent.SetPixelData(imageData);
-
-            content.Faces.Clear();
-            content.Faces.Add(new MipmapChain(bitmapContent));
-        }
+        }       
     }
 }

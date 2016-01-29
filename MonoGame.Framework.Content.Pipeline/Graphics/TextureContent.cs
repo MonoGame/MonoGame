@@ -3,6 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 
@@ -14,7 +17,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public abstract class TextureContent : ContentItem, IDisposable
     {
         MipmapChainCollection faces;
-        internal Bitmap _bitmap;
 
         /// <summary>
         /// Collection of image faces that hold a single mipmap chain for a regular 2D texture, six chains for a cube map, or an arbitrary number for volume and array textures.
@@ -42,8 +44,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="newBitmapType">Type being converted to. The new type must be a subclass of BitmapContent, such as PixelBitmapContent or DxtBitmapContent.</param>
         public void ConvertBitmapType(Type newBitmapType)
         {
-            throw new NotImplementedException();
-        }
+            if (newBitmapType == null)
+                throw new ArgumentNullException("newBitmapType");
+
+            if (!newBitmapType.IsSubclassOf(typeof (BitmapContent)))
+                throw new ArgumentException(string.Format("Type '{0}' is not a subclass of BitmapContent.", newBitmapType));
+
+            if (newBitmapType.IsAbstract)
+                throw new ArgumentException(string.Format("Type '{0}' is abstract and cannot be allocated.", newBitmapType));
+
+            if (newBitmapType.ContainsGenericParameters)
+                throw new ArgumentException(string.Format("Type '{0}' contains generic parameters and cannot be allocated.", newBitmapType));
+
+            if (newBitmapType.GetConstructor(new Type[2] {typeof (int), typeof (int)}) == null)
+                throw new ArgumentException(string.Format("Type '{0} does not have a constructor with signature (int, int) and cannot be allocated.",
+                                                          newBitmapType));
+
+            foreach (var mipChain in faces)
+            {
+                for (var i = 0; i < mipChain.Count; i++)
+                {
+                    var src = mipChain[i];
+                    if (src.GetType() != newBitmapType)
+                    {
+                        var dst = (BitmapContent)Activator.CreateInstance(newBitmapType, new object[] {src.Width,src.Height});
+                        BitmapContent.Copy(src, dst);
+                        mipChain[i] = dst;
+                    }
+                }
+            }
+        }        
 
         /// <summary>
         /// Generates a full set of mipmaps for the texture.
@@ -51,22 +81,51 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
         public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
-            throw new NotImplementedException();
+            var imageAttr = new ImageAttributes();
+            imageAttr.SetWrapMode(WrapMode.TileFlipXY);
+
+            // If we already have mipmaps and we're not supposed to overwrite
+            // them then return without any generation.
+            if (!overwriteExistingMipmaps && faces.Any(f => f.Count > 1))
+                return;
+
+            // Generate the mips for each face.
+            foreach (var face in faces)
+            {
+                // Remove any existing mipmaps.
+                var faceBitmap = face[0];
+                face.Clear();
+                face.Add(faceBitmap);
+
+                int width = faceBitmap.Width, height = faceBitmap.Height;
+                while (width > 1 && height > 1)
+                {
+                    var systemBitmap = face[face.Count-1].ToSystemBitmap();
+                    width /= 2;
+                    height /= 2;
+
+                    var bitmap = new Bitmap(width,height);
+                    using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
+                    {
+                        var destRect = new System.Drawing.Rectangle(0, 0, width, height);
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
+                        graphics.DrawImage(systemBitmap, destRect, 0, 0, width * 2, height * 2, GraphicsUnit.Pixel, imageAttr);
+                    }
+
+                    face.Add(bitmap.ToXnaBitmap(false)); //we dont want to flip textures twice
+                    systemBitmap.Dispose();
+                }
+            }
         }
 
         /// <summary>
         /// Verifies that all contents of this texture are present, correct and match the capabilities of the device.
         /// </summary>
         /// <param name="targetProfile">The profile identifier that defines the capabilities of the device.</param>
-        public abstract void Validate(Nullable<GraphicsProfile> targetProfile);
+        public abstract void Validate(GraphicsProfile? targetProfile);
 
         public virtual void Dispose()
         {
-            if (_bitmap != null)
-            {
-                _bitmap.Dispose();
-                _bitmap = null;
-            }
         }
     }
 }

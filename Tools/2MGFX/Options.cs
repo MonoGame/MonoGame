@@ -8,10 +8,13 @@
         [Utilities.CommandLineParser.Required]
         public string OutputFile = string.Empty;
 
-        [Utilities.CommandLineParser.Name("DX11")]
-        public bool DX11Profile;
+        [Utilities.CommandLineParser.Name("Profile", "\t - Must be either DirectX_11, OpenGL, or PlayStation4")]
+        public ShaderProfile Profile = ShaderProfile.OpenGL;
 
         [Utilities.CommandLineParser.Name("DEBUG")]
         public bool Debug;
+
+        [Utilities.CommandLineParser.Name("Defines", "\t - Semicolon-delimited define assignments")]
+        public string Defines;
     }
 }

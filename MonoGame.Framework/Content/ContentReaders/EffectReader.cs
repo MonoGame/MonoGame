@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Content
 		
 		private static string TryFindAnyCased(string search, string[] arr, params string[] extensions)
 		{
-			return arr.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (search.ToLower() + ext)));
+			return arr.FirstOrDefault(s => extensions.Any(ext => s.ToLowerInvariant() == (search.ToLowerInvariant() + ext)));
 		}
 		
 		private static bool Contains(string search, string[] arr)

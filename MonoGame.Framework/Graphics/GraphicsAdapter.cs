@@ -1,42 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -46,7 +10,7 @@ using System.Collections.ObjectModel;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 #elif IOS
-using MonoTouch.UIKit;
+using UIKit;
 #elif ANDROID
 using Android.Views;
 #endif
@@ -55,8 +19,29 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class GraphicsAdapter : IDisposable
     {
-        private static ReadOnlyCollection<GraphicsAdapter> adapters;
-        
+        /// <summary>
+        /// Defines the driver type for graphics adapter. Usable only on DirectX platforms for now.
+        /// </summary>
+        public enum DriverType
+        {
+            /// <summary>
+            /// Hardware device been used for rendering. Maximum speed and performance.
+            /// </summary>
+            Hardware,
+            /// <summary>
+            /// Emulates the hardware device on CPU. Slowly, only for testing.
+            /// </summary>
+            Reference,
+            /// <summary>
+            /// Useful when <see cref="DriverType.Hardware"/> acceleration does not work.
+            /// </summary>
+            FastSoftware
+        }
+       
+        private static ReadOnlyCollection<GraphicsAdapter> _adapters;
+
+        private DisplayModeCollection _supportedDisplayModes;
+
         
 #if MONOMAC
 		private NSScreen _screen;
@@ -70,12 +55,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _screen = screen;
         }
-#elif ANDROID
-        private View _view;
-        internal GraphicsAdapter(View screen)
-        {
-            _view = screen;
-        }
 #else
         internal GraphicsAdapter()
         {
@@ -85,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Dispose()
         {
         }
-
+            
         public DisplayMode CurrentDisplayMode
         {
             get
@@ -105,10 +84,14 @@ namespace Microsoft.Xna.Framework.Graphics
                        60,
                        SurfaceFormat.Color);
 #elif ANDROID
-                return new DisplayMode(_view.Width, _view.Height, 60, SurfaceFormat.Color);
+                View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
+                return new DisplayMode(view.Width, view.Height, 60, SurfaceFormat.Color);
 #elif (WINDOWS && OPENGL) || LINUX
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
+#elif WINDOWS
+                var dc = System.Drawing.Graphics.FromHwnd(IntPtr.Zero).GetHdc();
+                return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), GetDeviceCaps(dc, VREFRESH), SurfaceFormat.Color);
 #else
                 return new DisplayMode(800, 600, 60, SurfaceFormat.Color);
 #endif
@@ -120,30 +103,55 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return Adapters[0]; }
         }
         
-        public static ReadOnlyCollection<GraphicsAdapter> Adapters {
-            get {
-                if (adapters == null) {
+        public static ReadOnlyCollection<GraphicsAdapter> Adapters 
+        {
+            get 
+            {
+                if (_adapters == null) 
+                {
 #if MONOMAC
                     GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
                     for (int i=0; i<NSScreen.Screens.Length; i++) {
                         tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
                     }
                     
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
+                    _adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
 #elif IOS
-					adapters = new ReadOnlyCollection<GraphicsAdapter>(
-						new GraphicsAdapter[] {new GraphicsAdapter(UIScreen.MainScreen)});
-#elif ANDROID
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] { new GraphicsAdapter(Game.Instance.Window) });
+					_adapters = new ReadOnlyCollection<GraphicsAdapter>(
+						new [] {new GraphicsAdapter(UIScreen.MainScreen)});
 #else
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(
-						new GraphicsAdapter[] {new GraphicsAdapter()});
+                    _adapters = new ReadOnlyCollection<GraphicsAdapter>(new[] {new GraphicsAdapter()});
 #endif
                 }
-                return adapters;
+
+                return _adapters;
             }
-        } 
-		
+        }
+
+        /// <summary>
+        /// Used to request creation of the reference graphics device, 
+        /// or the default hardware accelerated device (when set to false).
+        /// </summary>
+        /// <remarks>
+        /// This only works on DirectX platforms where a reference graphics
+        /// device is available and must be defined before the graphics device
+        /// is created. It defaults to false.
+        /// </remarks>
+        public static bool UseReferenceDevice
+        {
+            get { return UseDriverType==DriverType.Reference; }
+            set { UseDriverType = value ? DriverType.Reference : DriverType.Hardware; }
+        }
+
+        /// <summary>
+        /// Used to request creation of a specific kind of driver.
+        /// </summary>
+        /// <remarks>
+        /// These values only work on DirectX platforms and must be defined before the graphics device
+        /// is created. <see cref="DriverType.Hardware"/> by default.
+        /// </remarks>
+        public static DriverType UseDriverType { get; set; }
+
         /*
 		public bool QueryRenderTargetFormat(
 			GraphicsProfile graphicsProfile,
@@ -245,17 +253,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
         */
-
-        private DisplayModeCollection supportedDisplayModes = null;
-        
+       
         public DisplayModeCollection SupportedDisplayModes
         {
             get
             {
 
-                if (supportedDisplayModes == null)
+                if (_supportedDisplayModes == null)
                 {
-                    List<DisplayMode> modes = new List<DisplayMode>(new DisplayMode[] { CurrentDisplayMode, });
+                    var modes = new List<DisplayMode>(new[] { CurrentDisplayMode, });
+
 #if (WINDOWS && OPENGL) || LINUX
                     
 					//IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
@@ -302,10 +309,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
                         }
                     }
+#elif DIRECTX && !WINDOWS_PHONE
+                    var dxgiFactory = new SharpDX.DXGI.Factory1();
+                    var adapter = dxgiFactory.GetAdapter(0);
+                    var output = adapter.Outputs[0];
+                    var displayModes = output.GetDisplayModeList(SharpDX.DXGI.Format.R8G8B8A8_UNorm, 0);
+
+                    modes.Clear();
+                    foreach (var displayMode in displayModes)
+                    {
+                        int refreshRate = (int)Math.Round(displayMode.RefreshRate.Numerator / (float)displayMode.RefreshRate.Denominator);
+                        modes.Add(new DisplayMode(displayMode.Width, displayMode.Height, refreshRate, SurfaceFormat.Color));
+                    }
 #endif
-                    supportedDisplayModes = new DisplayModeCollection(modes);
+                    _supportedDisplayModes = new DisplayModeCollection(modes);
                 }
-                return supportedDisplayModes;
+
+                return _supportedDisplayModes;
             }
         }
 
@@ -318,6 +338,33 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
         */
+
+        /// <summary>
+        /// Gets a <see cref="System.Boolean"/> indicating whether
+        /// <see cref="GraphicsAdapter.CurrentDisplayMode"/> has a
+        /// Width:Height ratio corresponding to a widescreen <see cref="DisplayMode"/>.
+        /// Common widescreen modes include 16:9, 16:10 and 2:1.
+        /// </summary>
+        public bool IsWideScreen
+        {
+            get
+            {
+                // Common non-widescreen modes: 4:3, 5:4, 1:1
+                // Common widescreen modes: 16:9, 16:10, 2:1
+                // XNA does not appear to account for rotated displays on the desktop
+                const float limit = 4.0f / 3.0f;
+                var aspect = CurrentDisplayMode.AspectRatio;
+                return aspect > limit;
+            }
+        }
+
+#if WINDOWS && !OPENGL
+        [System.Runtime.InteropServices.DllImport("gdi32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
+
+        private const int HORZRES = 8;
+        private const int VERTRES = 10;
+        private const int VREFRESH = 116;
+#endif
     }
 }
-

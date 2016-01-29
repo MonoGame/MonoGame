@@ -11,11 +11,12 @@ namespace Microsoft.Devices.Sensors
 	{
 #if IOS
         [CLSCompliant(false)]
-        protected static readonly MonoTouch.CoreMotion.CMMotionManager motionManager = new MonoTouch.CoreMotion.CMMotionManager();
+        protected static readonly CoreMotion.CMMotionManager motionManager = new CoreMotion.CMMotionManager();
 #endif
         bool disposed;
 		private TimeSpan timeBetweenUpdates;
 	    private TSensorReading currentValue;
+        private SensorReadingEventArgs<TSensorReading> eventArgs = new SensorReadingEventArgs<TSensorReading>(default(TSensorReading));
 
 		public TSensorReading CurrentValue 
         {
@@ -23,8 +24,11 @@ namespace Microsoft.Devices.Sensors
 		    protected set
 		    {
 		        currentValue = value;
-		        if (this.CurrentValueChanged != null)
-		            this.CurrentValueChanged(this, new SensorReadingEventArgs<TSensorReading>(currentValue));
+                if (this.CurrentValueChanged != null)
+                {
+                    eventArgs.SensorReading = value;
+                    this.CurrentValueChanged(this, eventArgs);
+                }
 		    }
 		}
 		public bool IsDataValid { get; protected set; }

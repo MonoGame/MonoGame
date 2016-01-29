@@ -10,5 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		IEnumerable<Glyph> Glyphs { get; }
 
 		float LineSpacing { get; }
+
+		int YOffsetMin { get; }
 	}
 }

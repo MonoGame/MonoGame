@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </remarks>
     public class SwapChainRenderTarget : RenderTarget2D
     {
-        private readonly SwapChain _swapChain;
+        private SwapChain _swapChain;
 
         public PresentInterval PresentInterval;
 
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0);
 
             // Create a view interface on the rendertarget to use on bind.
-            _renderTargetView = new RenderTargetView(d3dDevice, backBuffer);
+            _renderTargetViews = new[] { new RenderTargetView(d3dDevice, backBuffer) };
 
             // Get the rendertarget dimensions for later.
             var backBufferDesc = backBuffer.Description;
@@ -163,6 +163,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                SharpDX.Utilities.Dispose(ref _swapChain);
+            }
+
+            base.Dispose(disposing);
+        }
+
     }
 
 #endif // WINDOWS && DIRECTX

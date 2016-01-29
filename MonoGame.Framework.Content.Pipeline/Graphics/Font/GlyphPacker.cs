@@ -66,7 +66,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 				BitmapUtils.CopyRect(sourceGlyph.Bitmap, sourceRegion, output, destinationRegion);
 
-				BitmapUtils.PadBorderPixels(output, destinationRegion);
+				// TODO: This causes artifacts around borders.
+				//BitmapUtils.PadBorderPixels(output, destinationRegion);
 
 				sourceGlyph.Bitmap = output;
 				sourceGlyph.Subrect = destinationRegion;

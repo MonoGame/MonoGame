@@ -30,11 +30,11 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Emit a discovery signal to a single known host
 		/// </summary>
-		public void DiscoverKnownPeer(IPEndPoint endpoint)
+		public void DiscoverKnownPeer(IPEndPoint endPoint)
 		{
 			NetOutgoingMessage om = CreateMessage(0);
 			om.m_messageType = NetMessageType.Discovery;
-			m_unsentUnconnectedMessages.Enqueue(new NetTuple<IPEndPoint, NetOutgoingMessage>(endpoint, om));
+			m_unsentUnconnectedMessages.Enqueue(new NetTuple<IPEndPoint, NetOutgoingMessage>(endPoint, om));
 		}
 
 		/// <summary>

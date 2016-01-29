@@ -1,10 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-
-#if WINRT && !WINDOWS_PHONE
 using Windows.UI.Xaml.Controls;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -15,10 +12,8 @@ namespace Microsoft.Xna.Framework
 
         static SharedGraphicsDeviceManager()
         {
-#if WINRT
             DefaultBackBufferWidth = 1024;
             DefaultBackBufferHeight = 768;
-#endif
         }
 
         private GameTimer _timer;
@@ -28,7 +23,6 @@ namespace Microsoft.Xna.Framework
             if (Current != null)
                 throw new InvalidOperationException("Only one device manager can be created per process!");
             
-#if WINRT
             GraphicsProfile = GraphicsProfile.HiDef;
 
             PreferredBackBufferFormat = SurfaceFormat.Color;
@@ -39,7 +33,7 @@ namespace Microsoft.Xna.Framework
             PresentationInterval = PresentInterval.One;
 
             SynchronizeWithVerticalRetrace = true;
-#endif
+
             Current = this;
         }
 
@@ -63,10 +57,13 @@ namespace Microsoft.Xna.Framework
 
         public bool SynchronizeWithVerticalRetrace { get; set; }
 
-#if WINRT && !WINDOWS_PHONE
-        [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
-#endif 
+#if WINDOWS_UAP
+		[CLSCompliant(false)]
+		public SwapChainPanel SwapChainPanel { get; set; }
+#else
+		[CLSCompliant(false)]
+        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
+#endif
 
         public event EventHandler<EventArgs> DeviceCreated;
 
@@ -90,7 +87,11 @@ namespace Microsoft.Xna.Framework
             presentationParameters.MultiSampleCount = MultiSampleCount;
             presentationParameters.PresentationInterval = PresentationInterval;
             presentationParameters.IsFullScreen = false;
-            presentationParameters.SwapChainPanel = SwapChainPanel;
+#if WINDOWS_UAP
+			presentationParameters.SwapChainPanel = this.SwapChainPanel;
+#else
+			presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
+#endif
 
             if (createDevice)
             {
