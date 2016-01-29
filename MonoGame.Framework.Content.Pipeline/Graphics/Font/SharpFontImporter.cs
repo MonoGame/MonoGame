@@ -62,7 +62,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     {
                         face.Glyph.RenderGlyph(RenderMode.Normal);
                         glyphList.Add(RetrieveGlyphData(glyphIndexes[found].Key, face));
-                        //glyphIndexes.RemoveAt(found);
                     }
                 }
                 //For each character not included in the font load the glyph with index 0
@@ -70,7 +69,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 face.Glyph.RenderGlyph(RenderMode.Normal);
                 foreach (var character in notFoundGlyphs)
                 {
-                    //var glyph = ImportGlyph(character.Key, face);
                     var glyph = RetrieveGlyphData(character, face);
                     glyphList.Add(glyph);
                 }
