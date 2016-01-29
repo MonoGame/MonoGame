@@ -215,47 +215,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			var width = 0.0f;
 			var finalLineHeight = (float)LineSpacing;
-			var fullLineCount = 0;
+
             var currentGlyph = Glyph.Empty;
 			var offset = Vector2.Zero;
-            var hasCurrentGlyph = false;
             var firstGlyphOfLine = true;
 
             for (var i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
+
                 if (c == '\r')
-                {
-                    hasCurrentGlyph = false;
                     continue;
-                }
 
                 if (c == '\n')
                 {
-                    fullLineCount++;
                     finalLineHeight = LineSpacing;
 
                     offset.X = 0;
-                    offset.Y = LineSpacing * fullLineCount;
-                    hasCurrentGlyph = false;
+                    offset.Y += LineSpacing;
                     firstGlyphOfLine = true;
                     continue;
-                }
-
-                if (hasCurrentGlyph) {
-                    offset.X += Spacing;
-                
-                    // The first character on a line might have a negative left side bearing.
-                    // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                    //  so that text does not hang off the left side of its rectangle.
-                    if (firstGlyphOfLine) {
-                        offset.X = Math.Max(offset.X + Math.Abs(currentGlyph.LeftSideBearing), 0);
-                        firstGlyphOfLine = false;
-                    } else {
-                        offset.X += currentGlyph.LeftSideBearing;
-                    }
-                    
-                    offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
                 }
 
                 if (!_glyphs.TryGetValue(c, out currentGlyph))
@@ -265,18 +244,31 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     currentGlyph = defaultGlyph.Value;
                 }
-                hasCurrentGlyph = true;
 
-                var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings + Spacing;
+                // The first character on a line might have a negative left side bearing.
+                // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
+                //  so that text does not hang off the left side of its rectangle.
+                if (firstGlyphOfLine) {
+                    offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
+                    firstGlyphOfLine = false;
+                } else {
+                    offset.X += Spacing + currentGlyph.LeftSideBearing;
+                }
+
+                offset.X += currentGlyph.Width;
+
+                var proposedWidth = offset.X + Math.Max(currentGlyph.RightSideBearing, 0);
                 if (proposedWidth > width)
                     width = proposedWidth;
+
+                offset.X += currentGlyph.RightSideBearing;
 
                 if (currentGlyph.Cropping.Height > finalLineHeight)
                     finalLineHeight = currentGlyph.Cropping.Height;
             }
 
             size.X = width;
-            size.Y = fullLineCount * LineSpacing + finalLineHeight;
+            size.Y = offset.Y + finalLineHeight;
 		}
 
         internal void DrawInto( SpriteBatch spriteBatch, ref CharacterSource text, Vector2 position, Color color,
@@ -326,29 +318,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var currentGlyph = Glyph.Empty;
             var offset = Vector2.Zero;
-            var hasCurrentGlyph = false;
             var firstGlyphOfLine = true;
 
 			for (var i = 0; i < text.Length; ++i)
             {
                 var c = text[i];
+
                 if (c == '\r')
-                {
-                    hasCurrentGlyph = false;
                     continue;
-                }
 
                 if (c == '\n')
                 {
                     offset.X = 0;
                     offset.Y += LineSpacing;
-                    hasCurrentGlyph = false;
                     firstGlyphOfLine = true;
                     continue;
-                }
-
-                if (hasCurrentGlyph) {
-                    offset.X += Spacing + currentGlyph.Width + currentGlyph.RightSideBearing;
                 }
 
                 if (!_glyphs.TryGetValue(c, out currentGlyph))
@@ -358,7 +342,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     currentGlyph = defaultGlyph.Value;
                 }
-                hasCurrentGlyph = true;
 
                 // The first character on a line might have a negative left side bearing.
                 // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
@@ -367,7 +350,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
                     firstGlyphOfLine = false;
                 } else {
-                    offset.X += currentGlyph.LeftSideBearing;
+                    offset.X += Spacing + currentGlyph.LeftSideBearing;
                 }
 
                 var p = offset;
@@ -389,6 +372,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				spriteBatch.DrawInternal(
                     _texture, destRect, currentGlyph.BoundsInTexture,
 					color, rotation, Vector2.Zero, effect, depth, false);
+
+                offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
 			}
 
 			// We need to flush if we're using Immediate sort mode.

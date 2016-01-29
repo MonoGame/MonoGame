@@ -407,7 +407,7 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
 
-#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+#if ((WINDOWS || WINDOWS_UAP) && DIRECTX) || DESKTOPGL
             ApplyChanges();
 #endif
         }

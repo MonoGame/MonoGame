@@ -271,6 +271,9 @@
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
     </Compile>
+	<Compile Include="Audio\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
       <Services>OpenALAudio</Services>
     </Compile>
@@ -433,6 +436,13 @@
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\Effect\EffectResource.cs" />
+    <Compile Include="Graphics\Effect\EffectResource.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\Effect\EffectResource.OpenGL.cs">
+      <Services>OpenGLGraphics,WebGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs">
@@ -1004,9 +1014,6 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
-    <Compile Include="Utilities\OggStream.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
-    </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />

@@ -11,6 +11,12 @@ namespace MonoGame.Tools.Pipeline
         [Builder.ObjectAttribute] Button open_button;
         [Builder.ObjectAttribute] Button save_button;
         [Builder.ObjectAttribute] Button build_button;
+        [Builder.ObjectAttribute] Button rebuild_button;
+        [Builder.ObjectAttribute] Button cancel_button;
+        [Builder.ObjectAttribute] ToggleButton filteroutput_button;
+
+        MenuButton open_menubutton;
+
         [Builder.ObjectAttribute] Menu menu2;
         #endif
 
@@ -85,6 +91,7 @@ namespace MonoGame.Tools.Pipeline
 		private global::MonoGame.Tools.Pipeline.PropertiesView propertiesview1;
 		
         BuildOutput buildOutput1;
+        TreeView treeview1;
 
         Toolbar toolBar1;
         ToolButton toolNew, toolOpen, toolSave, toolNewItem, toolNewFolder, toolAddItem, toolAddFolder, toolBuild, toolRebuild, toolClean;
@@ -294,6 +301,8 @@ namespace MonoGame.Tools.Pipeline
 			w8.Position = 2;
 			this.Add (this.vbox2);
 
+            treeview1 = new TreeView();
+
             #if GTK3
             if(Global.UseHeaderBar)
             {
@@ -312,11 +321,56 @@ namespace MonoGame.Tools.Pipeline
                 }
 
                 new_button.Clicked += OnNewActionActivated;
-                open_button.Clicked += OnOpenActionActivated;
                 save_button.Clicked += OnSaveActionActivated;
                 build_button.Clicked += OnBuildAction1Activated;
+                rebuild_button.Clicked += OnRebuildActionActivated;
+                cancel_button.Clicked += OnCancelBuildActionActivated;
+
+                filteroutput_button.ButtonReleaseEvent += ToggleFilterOutput;
+                filteroutput_button.Sensitive = true;
 
                 vbox2.Remove (menubar1);
+
+                open_menubutton = new MenuButton(open_button.Handle);
+                var popover = new Popover(open_menubutton);
+
+                var vbox = new VBox();
+                vbox.WidthRequest = 350;
+                vbox.HeightRequest = 300;
+
+                Gtk3Wrapper.gtk_tree_view_set_activate_on_single_click(treeview1.Handle, true);
+                treeview1.HeadersVisible = false;
+                treeview1.EnableGridLines = TreeViewGridLines.Horizontal;
+                treeview1.HoverSelection = true;
+                treeview1.RowActivated += delegate(object o, RowActivatedArgs args) {
+                    popover.Hide();
+
+                    TreeIter iter;
+                    if(!recentListStore.GetIter(out iter, args.Path))
+                        return;
+
+                    OpenProject(recentListStore.GetValue(iter, 1).ToString());
+                };
+
+                ScrolledWindow scroll1 = new ScrolledWindow();
+                scroll1.WidthRequest = 350;
+                scroll1.HeightRequest = 300;
+                scroll1.Add(treeview1);
+
+                vbox.PackStart(scroll1, true, true, 0);
+
+                var openButton = new Button("Open Other...");
+                openButton.Clicked += delegate(object sender, System.EventArgs e) {
+                    popover.Hide();
+                    OnOpenActionActivated(sender, e);
+                };
+                vbox.PackStart(openButton, false, true, 0);
+
+                vbox.ShowAll();
+
+                popover.Add(vbox);
+                open_menubutton.Popup = popover;
+
             }
             #endif
 
@@ -369,7 +423,7 @@ namespace MonoGame.Tools.Pipeline
             this.toolAddFolder.Clicked += OnAddFolderActionActivated;
 			this.DebugModeAction.Activated += new global::System.EventHandler (this.OnDebugModeActionActivated); 
             this.FilterOutputAction.Activated += OnFilterOutputActionActivated;
-            this.toolFilterOutput.Toggled += OnFilterOutputActionActivated;
+            this.toolFilterOutput.ButtonReleaseEvent += ToggleFilterOutput;
 			this.CancelBuildAction.Activated += new global::System.EventHandler (this.OnCancelBuildActionActivated);
 			this.SizeAllocated += MainWindow_SizeAllocated;
 		}
