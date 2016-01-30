@@ -24,8 +24,6 @@
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
     </CustomDefinitions>
 
-    <ForceArchitecture>x64</ForceArchitecture>
-
   </Properties>
 
   <Files>
