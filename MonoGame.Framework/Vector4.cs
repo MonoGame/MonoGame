@@ -941,22 +941,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector4 result)
         {
-            double xx = rotation.X + rotation.X;
-            double yy = rotation.Y + rotation.Y;
-            double zz = rotation.Z + rotation.Z;
-            double wxx = rotation.W * xx;
-            double wyy = rotation.W * yy;
-            double wzz = rotation.W * zz;
-            double xxx = rotation.X * xx;
-            double xyy = rotation.X * yy;
-            double xzz = rotation.X * zz;
-            double yyy = rotation.Y * yy;
-            double yzz = rotation.Y * zz;
-            double zzz = rotation.Z * zz;
-            result.X = (float)((double)value.X * (1.0 - yyy - zzz) + (double)value.Y * (xyy - wzz));
-            result.Y = (float)((double)value.X * (xyy + wzz) + (double)value.Y * (1.0 - xxx - zzz));
-            result.Z = (float)((double)value.X * (xzz - wyy) + (double)value.Y * (yzz + wxx));
-            result.W = 1f;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -981,22 +966,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector4 result)
         {
-            double xx = rotation.X + rotation.X;
-            double yy = rotation.Y + rotation.Y;
-            double zz = rotation.Z + rotation.Z;
-            double wxx = rotation.W * xx;
-            double wyy = rotation.W * yy;
-            double wzz = rotation.W * zz;
-            double xxx = rotation.X * xx;
-            double xyy = rotation.X * yy;
-            double xzz = rotation.X * zz;
-            double yyy = rotation.Y * yy;
-            double yzz = rotation.Y * zz;
-            double zzz = rotation.Z * zz;
-            result.X = (float)((double)value.X * (1.0 - yyy - zzz) + (double)value.Y * (xyy - wzz) + (double)value.Z * (xzz + wyy));
-            result.Y = (float)((double)value.X * (xyy + wzz) + (double)value.Y * (1.0 - xxx - zzz) + (double)value.Z * (yzz - wxx));
-            result.Z = (float)((double)value.X * (xzz - wyy) + (double)value.Y * (yzz + wxx) + (double)value.Z * (1.0 - xxx - yyy));
-            result.W = 1f;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -1025,22 +995,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector4 value, ref Quaternion rotation, out Vector4 result)
         {
-            double xx = rotation.X + rotation.X;
-            double yy = rotation.Y + rotation.Y;
-            double zz = rotation.Z + rotation.Z;
-            double wxx = rotation.W * xx;
-            double wyy = rotation.W * yy;
-            double wzz = rotation.W * zz;
-            double xxx = rotation.X * xx;
-            double xyy = rotation.X * yy;
-            double xzz = rotation.X * zz;
-            double yyy = rotation.Y * yy;
-            double yzz = rotation.Y * zz;
-            double zzz = rotation.Z * zz;
-            result.X = (float)((double)value.X * (1.0 - yyy - zzz) + (double)value.Y * (xyy - wzz) + (double)value.Z * (xzz + wyy));
-            result.Y = (float)((double)value.X * (xyy + wzz) + (double)value.Y * (1.0 - xxx - zzz) + (double)value.Z * (yzz - wxx));
-            result.Z = (float)((double)value.X * (xzz - wyy) + (double)value.Y * (yzz + wxx) + (double)value.Z * (1.0 - xxx - yyy));
-            result.W = value.W;
+            throw new NotImplementedException();
         }
 
         /// <summary>
