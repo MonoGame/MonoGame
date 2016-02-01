@@ -370,8 +370,13 @@ namespace Microsoft.Xna.Framework
             {
                 if (t == null && assembly != null)
                     window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-                else
-                    window.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico"));
+                else {
+                    using (var stream = Assembly.GetEntryAssembly().GetManifestResourceStream(string.Format("{0}.Icon.ico", Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace)) ?? 
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico")) {
+                        if (stream != null)
+                           window.Icon = new Icon(stream);
+                    }
+                }
             }
             catch { }
 

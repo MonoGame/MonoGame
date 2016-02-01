@@ -30,7 +30,8 @@
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
 				<File name="Program.cs" src="Common/Program.cs" />
-				<RawFile name="Icon.png" src="Common/Icon-md.png" />
+				<RawFile name="Icon.png" src="Common/Icon-md.png"/>
+				<RawFile name="Icon.ico" src="Common/Icon.ico" BuildAction="EmbeddedResource"/>
 				<Directory name="Properties">
 					<File name="AssemblyInfo.cs" src="Common/AssemblyInfo.cs" />
 				</Directory>

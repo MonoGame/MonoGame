@@ -18,6 +18,7 @@
     <Import file="templates/Common/Game1.cs" />
     <Import file="templates/Common/Icon-md.png" />
     <Import file="templates/Common/Icon-hd.png" />
+    <Import file="templates/Common/Icon.ico" />
     <Import file="templates/Common/Program.cs" />
     <Import file="templates/Common/Content.mgcb" />
     <Import file="templates/Common/OpenTK.dll.config" />
