@@ -27,8 +27,6 @@
       <Platform Name="Linux">TRACE;LINUX</Platform>
     </CustomDefinitions>
 
-    <ForceArchitecture>x64</ForceArchitecture>
-
   </Properties>
 
   <Files>
