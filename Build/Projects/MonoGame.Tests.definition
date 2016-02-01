@@ -135,6 +135,7 @@
     <Compile Include="Framework\Visual\EffectTest.cs" />
     <Compile Include="Framework\Visual\GraphicsDeviceTest.cs" />
     <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
+    <Compile Include="Framework\Visual\RenderTargetCubeTest.cs" />
     <Compile Include="Framework\Visual\SamplerStateTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Visual\Texture2DTest.cs" />
