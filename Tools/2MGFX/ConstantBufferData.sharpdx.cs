@@ -9,7 +9,7 @@ namespace TwoMGFX
     {
         public ConstantBufferData(SharpDX.D3DCompiler.ConstantBuffer cb)
         {
-            Name = cb.Description.Name ?? string.Empty;            
+            Name = string.Empty;
             Size = cb.Description.Size;
 
             ParameterIndex = new List<int>();

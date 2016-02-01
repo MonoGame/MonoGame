@@ -173,11 +173,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            return ((int[])Data)[0] != 0;
-#else
+#if OPENGL
             // MojoShader encodes even booleans into a float.
             return ((float[])Data)[0] != 0.0f;
+#else
+            return ((int[])Data)[0] != 0;
 #endif
         }
         
@@ -193,11 +193,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            return ((int[])Data)[0];
-#else
+#if OPENGL
             // MojoShader encodes integers into a float.
             return (int)((float[])Data)[0];
+#else
+            return ((int[])Data)[0];
 #endif
         }
         
@@ -411,14 +411,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            // We store the bool as an integer as that
-            // is what the constant buffers expect.
-            ((int[])Data)[0] = value ? 1 : 0;
-#else
+#if OPENGL
             // MojoShader encodes even booleans into a float.
             ((float[])Data)[0] = value ? 1 : 0;
+#else
+            ((int[])Data)[0] = value ? 1 : 0;
 #endif
+
             StateKey = unchecked(NextStateKey++);
 		}
 
@@ -434,11 +433,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Int32)
                 throw new InvalidCastException();
 
-#if DIRECTX
-            ((int[])Data)[0] = value;
-#else
+#if OPENGL
             // MojoShader encodes integers into a float.
             ((float[])Data)[0] = value;
+#else
+            ((int[])Data)[0] = value;
 #endif
             StateKey = unchecked(NextStateKey++);
 		}

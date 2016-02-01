@@ -12,7 +12,7 @@ namespace TwoMGFX
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 7;
+        private const int Version = 8;
 
         /// <summary>
         /// Writes the effect for loading later.
