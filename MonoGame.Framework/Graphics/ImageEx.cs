@@ -38,6 +38,7 @@ namespace System.Drawing
                 ia.SetColorMatrix(cm);
                 using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBmp))
                 {
+                    g.Clear(Color.Transparent);
                     g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
                 }
             }
