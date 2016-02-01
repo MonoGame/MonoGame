@@ -21,19 +21,30 @@ namespace MonoGame.Tests.Visual
                 var dataSize = size * size;
                 var renderTargetCube = new RenderTargetCube(Game.GraphicsDevice, size, false, SurfaceFormat.Color, DepthFormat.Depth16);
 
+                var colors = new[]
+                {
+                    Color.BlanchedAlmond,
+                    Color.BlueViolet,
+                    Color.DarkSeaGreen,
+                    Color.ForestGreen,
+                    Color.IndianRed,
+                    Color.LightGoldenrodYellow
+                };
+
                 for (var i = 0; i < 6; i++)
                 {
-                    var cubeMapFace = (CubeMapFace) i;
+                    Game.GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace) i);
+                    Game.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, colors[i], 1.0f, 0);
+                    Game.GraphicsDevice.SetRenderTarget(null, (CubeMapFace) i);
+                }
 
-                    Game.GraphicsDevice.SetRenderTarget(renderTargetCube, cubeMapFace);
-                    Game.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.BlanchedAlmond, 1.0f, 0);
-                    Game.GraphicsDevice.SetRenderTarget(null, cubeMapFace);
-
+                for (var i = 0; i < 6; i++)
+                {
                     var readData = new Color[dataSize];
-                    renderTargetCube.GetData(cubeMapFace, readData);
+                    renderTargetCube.GetData((CubeMapFace) i, readData);
 
                     for (var j = 0; j < dataSize; j++)
-                        Assert.AreEqual(Color.BlanchedAlmond, readData[j]);
+                        Assert.AreEqual(colors[i], readData[j]);
                 }
             };
             Game.Run();
