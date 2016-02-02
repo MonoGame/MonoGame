@@ -143,7 +143,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
 		{
-            return PlatformFromStream(graphicsDevice, stream);
+            try
+            {
+                return PlatformFromStream(graphicsDevice, stream);
+            }catch(Exception e)
+            {
+                throw new NotSupportedException("This image format is not supported", e);
+            }
         }
 
         public void SaveAsJpeg(Stream stream, int width, int height)
