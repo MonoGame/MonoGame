@@ -399,7 +399,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return streams.Remove(stream);
         }
 
-        public int FillBuffer(OggStream stream, int bufferId)
+        public bool FillBuffer(OggStream stream, int bufferId)
         {
             int readSamples;
             long readerPosition = 0;
@@ -409,26 +409,12 @@ namespace Microsoft.Xna.Framework.Audio
                 readSamples = stream.Reader.ReadSamples(readSampleBuffer, 0, BufferSize);
                 CastBuffer(readSampleBuffer, castBuffer, readSamples);
             }
-            if (readSamples > 0)
-            {
-                AL.BufferData(bufferId, stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, castBuffer,
-                    readSamples * sizeof(short), stream.Reader.SampleRate);
-                ALHelper.CheckError("Failed to fill buffer, readSamples = {0}, SampleRate = {1}, buffer.Length = {2}.", readSamples, stream.Reader.SampleRate, castBuffer.Length);
-            }
-            else
-            {
-                // this shouldn't be happening
-                // if ReadSamples() returns 0, it means that NVorbis failed
+            AL.BufferData(bufferId, stream.Reader.Channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16, castBuffer,
+                readSamples * sizeof(short), stream.Reader.SampleRate);
+            ALHelper.CheckError("Failed to fill buffer, readSamples = {0}, SampleRate = {1}, buffer.Length = {2}.", readSamples, stream.Reader.SampleRate, castBuffer.Length);
 
-                // let's try to reset the stream
-                stream.Close();
-                stream.Open();
-                stream.Reader.DecodedPosition = readerPosition;
 
-                return 2;
-            }            
-
-            return (readSamples != BufferSize ? 1 : 0);
+            return readSamples != BufferSize;
         }
         static void CastBuffer(float[] inBuffer, short[] outBuffer, int length)
         {
@@ -459,7 +445,7 @@ namespace Microsoft.Xna.Framework.Audio
                             if (!streams.Contains(stream))
                                 continue;
 
-                        int finished = 0;
+                        bool finished = false;
 
                         int queued;
                         AL.GetSource(stream.alSourceId, ALGetSourcei.BuffersQueued, out queued);
@@ -482,14 +468,10 @@ namespace Microsoft.Xna.Framework.Audio
                         int bufferFilled = 0;
                         for (int i = 0; i < tempBuffers.Length; i++)
                         {
-                            finished = FillBuffer(stream, tempBuffers[i]); // 0 = not finished, 1 = finished, 2 = NVorbis failed
-                            if (i < 2)
-                                bufferFilled++;
-                            else
-                                // if NVorbis failed, we skip the remaining buffers
-                                i = tempBuffers.Length;
+                            finished |= FillBuffer(stream, tempBuffers[i]);
+                            bufferFilled++;
 
-                            if (finished == 1)
+                            if (finished)
                             {
                                 if (stream.IsLooped)
                                 {
@@ -508,12 +490,12 @@ namespace Microsoft.Xna.Framework.Audio
                             }
                         }
 
-                        if (finished == 0 && bufferFilled > 0) // queue only successfully filled buffers
+                        if (bufferFilled > 0) // queue only successfully filled buffers
                         {
                             AL.SourceQueueBuffers(stream.alSourceId, bufferFilled, tempBuffers);
                             ALHelper.CheckError("Failed to queue buffers.");
                         }
-                        else if (!stream.IsLooped)
+                        if (finished && !stream.IsLooped)
                             continue;
                     }
 
