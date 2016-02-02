@@ -162,6 +162,9 @@ namespace Microsoft.Xna.Framework
 
             var prevBounds = ClientBounds;
 
+            SDL.Rectangle displayRect;
+            SDL.Display.GetBounds(SDL.Window.GetDisplayIndex(Handle), out displayRect);
+
             SDL.Window.SetSize(Handle, clientWidth, clientHeight);
 
             if (_willBeFullScreen != _isFullScreen)
@@ -170,15 +173,10 @@ namespace Microsoft.Xna.Framework
                 SDL.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
             }
 
-            if (!_willBeFullScreen && _isFullScreen)
-                SDL.Window.SetPosition(_handle, SDL.Window.PosCentered, SDL.Window.PosCentered);
-            else if (!_willBeFullScreen)
-            {
-                SDL.Window.SetPosition(Handle,
-                    Math.Max(prevBounds.X - ((IsBorderless || _isFullScreen) ? 0 : BorderX) + ((prevBounds.Width - clientWidth) / 2), 0),
-                    Math.Max(prevBounds.Y - ((IsBorderless || _isFullScreen) ? 0 : BorderY)  + ((prevBounds.Height - clientHeight) / 2), 0)
-                );
-            }
+            SDL.Window.SetPosition(Handle,
+                displayRect.X + Math.Max(prevBounds.X - ((IsBorderless || _isFullScreen) ? 0 : BorderX) + ((prevBounds.Width - clientWidth) / 2), 0),
+                displayRect.Y + Math.Max(prevBounds.Y - ((IsBorderless || _isFullScreen) ? 0 : BorderY)  + ((prevBounds.Height - clientHeight) / 2), 0)
+            );
 
             _isFullScreen = _willBeFullScreen;
             OnClientSizeChanged();
