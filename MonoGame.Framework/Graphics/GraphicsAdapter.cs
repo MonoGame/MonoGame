@@ -93,8 +93,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, SurfaceFormat.Color);
 #elif WINDOWS
-                var dc = System.Drawing.Graphics.FromHwnd(IntPtr.Zero).GetHdc();
-                return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), SurfaceFormat.Color);
+                using (var graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
+                {
+                    var dc = graphics.GetHdc();
+                    return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), SurfaceFormat.Color);
+                }
 #else
                 return new DisplayMode(800, 600, SurfaceFormat.Color);
 #endif
