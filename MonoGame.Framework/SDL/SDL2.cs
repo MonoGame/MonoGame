@@ -61,6 +61,14 @@ internal static class SDL
         public Joystick.DeviceEvent JoystickDevice;
     }
 
+    public struct Rectangle
+    {
+        public int X;
+        public int Y;
+        public int Width;
+        public int Height;
+    }
+
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_Init")]
     public static extern int Init(int flags);
 
@@ -144,6 +152,9 @@ internal static class SDL
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_DestroyWindow")]
         public static extern void Destroy(IntPtr window);
 
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")]
+        public static extern int GetDisplayIndex(IntPtr window);
+
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowPosition")]
         public static extern void GetPosition(IntPtr window, out int x, out int y);
 
@@ -167,6 +178,12 @@ internal static class SDL
 
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ShowWindow")]
         public static extern void Show(IntPtr window);
+    }
+
+    public static class Display
+    {
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayBounds")]
+        public static extern int GetBounds(int displayIndex, out Rectangle rect);
     }
 
     public static class Mouse
