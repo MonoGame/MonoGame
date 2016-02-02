@@ -294,59 +294,27 @@ namespace Microsoft.Xna.Framework.Content
 				}
 			}
 			
-			Stream stream = null;
-			try
-            {
-				//try load it traditionally
-				stream = OpenStream(assetName);
+			var stream = OpenStream(assetName);
 
-                // Try to load as XNB file
-                try
+            try
+            {
+                using (BinaryReader xnbReader = new BinaryReader(stream))
                 {
-                    using (BinaryReader xnbReader = new BinaryReader(stream))
+                    using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, recordDisposableObject))
                     {
-                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, recordDisposableObject))
-                        {
-                            result = reader.ReadAsset<T>();
-                            if (result is GraphicsResource)
-                                ((GraphicsResource)result).Name = originalAssetName;
-                        }
-                    }
-                }
-                finally
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
+                        result = reader.ReadAsset<T>();
+                        if (result is GraphicsResource)
+                            ((GraphicsResource)result).Name = originalAssetName;
                     }
                 }
             }
-            catch (ContentLoadException ex)
+            finally
             {
-				//MonoGame try to load as a non-content file
-
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
-                assetName = Normalize<T>(assetName);
-	
-				if (string.IsNullOrEmpty(assetName))
-				{
-					throw new ContentLoadException("Could not load " + originalAssetName + " asset as a non-content file!", ex);
-				}
-
-                result = ReadRawAsset<T>(assetName, originalAssetName);
-
-                // Because Raw Assets skip the ContentReader step, they need to have their
-                // disopsables recorded here. Doing it outside of this catch will 
-                // result in disposables being logged twice.
-                if (result is IDisposable)
+                if (stream != null)
                 {
-                    if (recordDisposableObject != null)
-                        recordDisposableObject(result as IDisposable);
-                    else
-                        disposableAssets.Add(result as IDisposable);
+                    stream.Dispose();
                 }
-			}
+            }
             
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
