@@ -96,7 +96,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 using (var graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
                 {
                     var dc = graphics.GetHdc();
-                    return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), SurfaceFormat.Color);
+                    int width = GetDeviceCaps(dc, HORZRES);
+                    int height = GetDeviceCaps(dc, VERTRES);
+                    graphics.ReleaseHdc(dc);
+                    return new DisplayMode(width, height, SurfaceFormat.Color);
                 }
 #else
                 return new DisplayMode(800, 600, SurfaceFormat.Color);
