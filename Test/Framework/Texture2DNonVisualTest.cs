@@ -38,7 +38,23 @@ namespace MonoGame.Tests.Framework
             {
                 Assert.DoesNotThrow(() => _texture = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream));
             }
+            Assert.NotNull(_texture);
+            try
+            {
+
+                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(filename);
+                System.Drawing.GraphicsUnit gu = System.Drawing.GraphicsUnit.Pixel;
+                System.Drawing.RectangleF rf = bitmap.GetBounds(ref gu);
+                Rectangle rt = _texture.Bounds;
+                Assert.AreEqual((int) rf.Bottom, rt.Bottom);
+                Assert.AreEqual((int) rf.Left, rt.Left);
+                Assert.AreEqual((int) rf.Right, rt.Right);
+                Assert.AreEqual((int) rf.Top, rt.Top);
+                bitmap.Dispose();
+            }//The dds file test case can't be checked with System.Drawing because it does not understand this format
+            catch { }
             _texture.Dispose();
+            _texture = null;
         }
 
         [TestCase("Assets/Textures/LogoOnly_64px.tga")]
