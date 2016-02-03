@@ -161,26 +161,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // again here.
             GraphicsUtil.BGRAtoRGBA(sourceData);
             var dataHandle = GCHandle.Alloc(sourceData, GCHandleType.Pinned);
-            var dataPtr = dataHandle.AddrOfPinnedObject();
+            try
+            {
+                var dataPtr = dataHandle.AddrOfPinnedObject();
 
-            inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
-            inputOptions.SetMipmapGeneration(false);
-            inputOptions.SetGamma(1.0f, 1.0f);
+                inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
+                inputOptions.SetMipmapGeneration(false);
+                inputOptions.SetGamma(1.0f, 1.0f);
 
-            var outputOptions = new OutputOptions();
-            outputOptions.SetOutputHeader(false);
+                var outputOptions = new OutputOptions();
+                outputOptions.SetOutputHeader(false);
 
-            var handler = new DxtDataHandler(this);
-            outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
+                var handler = new DxtDataHandler(this);
+                outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
 
-            var compressionOptions = new CompressionOptions();
-            compressionOptions.SetFormat(outputFormat);
-            compressionOptions.SetQuality(Quality.Normal);
+                var compressionOptions = new CompressionOptions();
+                compressionOptions.SetFormat(outputFormat);
+                compressionOptions.SetQuality(Quality.Normal);
 
-            dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
-
-            dataHandle.Free();
-
+                dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+            }
+            finally
+            {
+                dataHandle.Free ();
+            }
             return true;
         }
 

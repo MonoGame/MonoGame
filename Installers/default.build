@@ -68,6 +68,7 @@
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOS" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL" />
       <!-- Copy the Files over for the framework -->
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools">
          <fileset basedir="../Tools/Pipeline/bin/MacOS/AnyCPU/Release">
@@ -101,6 +102,11 @@
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
+                <include name="*.*"/>
+         </fileset>
+      </copy>
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL">
+         <fileset basedir="../MonoGame.Framework/bin/DesktopGL/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
@@ -156,7 +162,7 @@ fi
       <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvmath.so" tofile="Linux/tmp_deb/lib/libnvmath.so"/>
       <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvtt.so" tofile="Linux/tmp_deb/lib/libnvtt.so"/>
       <echo file="Linux/tmp_deb/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
-      <copy todir="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/Linux">
+      <copy todir="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/DesktopGL">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
@@ -173,7 +179,7 @@ fi
       <copy todir="Linux/tmp_run/Pipeline">
         <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
       </copy>
-      <copy todir="Linux/tmp_run/Assemblies/Linux">
+      <copy todir="Linux/tmp_run/Assemblies/DesktopGL">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>

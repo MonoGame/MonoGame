@@ -154,7 +154,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>Linux,MacOS</Platforms>
+      <Platforms>WindowsGL,Linux,MacOS</Platforms>
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -270,6 +270,9 @@
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
+    </Compile>
+	<Compile Include="Audio\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
       <Services>OpenALAudio</Services>
@@ -1011,9 +1014,6 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
-    <Compile Include="Utilities\OggStream.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
-    </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
