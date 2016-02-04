@@ -58,6 +58,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [TestCase("Assets/Textures/LogoOnly_64px.tga")]
+        [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
