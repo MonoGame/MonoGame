@@ -490,12 +490,12 @@ namespace Microsoft.Xna.Framework.Audio
                             }
                         }
 
-                        if (bufferFilled > 0) // queue only successfully filled buffers
+                        if (!finished && bufferFilled > 0) // queue only successfully filled buffers
                         {
                             AL.SourceQueueBuffers(stream.alSourceId, bufferFilled, tempBuffers);
                             ALHelper.CheckError("Failed to queue buffers.");
                         }
-                        if (finished && !stream.IsLooped)
+                        else if (!stream.IsLooped)
                             continue;
                     }
 
