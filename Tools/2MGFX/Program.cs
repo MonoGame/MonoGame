@@ -7,7 +7,7 @@ namespace TwoMGFX
     {
         public static int Main(string[] args)
         {
-            if (!Environment.Is64BitProcess)
+            if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
             {
                 Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
                 return -1;

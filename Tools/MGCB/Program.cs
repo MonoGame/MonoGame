@@ -17,7 +17,7 @@ namespace MGCB
             // to avoid any out of order console output.
             Console.SetError(Console.Out);
 
-            if (!Environment.Is64BitProcess)
+            if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
             {
                 Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
                 return -1;
