@@ -754,7 +754,7 @@
     <Content Include="Assets\Fonts\Lindsey.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Fonts\MotorWerk.xnb">
+    <Content Include="Assets\Fonts\Motorwerk.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Fonts\QuartzMS.xnb">
@@ -814,11 +814,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="Assets\Textures\Logo555.bmp">
+    <Content Include="Assets\Textures\logo555.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="Assets\Textures\Logo565.bmp">
+    <Content Include="Assets\Textures\logo565.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
