@@ -28,10 +28,8 @@
 				<Reference type="Gac" refto="System.Xml.Linq" />
 				<Reference type="Gac" refto="System.Drawing" />
 				<Reference type="Gac" refto="MonoMac" SpecificVersion="false" />
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.MacOS" version="3.3.0" targetFramework="net40" />
-			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
 				<File name="Main.cs" AddStandardHeader="True" src="Mac/Program.cs" />

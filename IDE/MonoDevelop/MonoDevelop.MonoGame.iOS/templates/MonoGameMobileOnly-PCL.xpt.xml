@@ -35,10 +35,8 @@
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
 				<Reference type="Gac" refto="Xamarin.iOS" />
 				<Reference type="Project" refto="${ProjectName}"/>
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.iOS" version="3.3.0" targetFramework="XamariniOS" />
-			</Packages>
 			<Files>
 				<File name="Main.cs" AddStandardHeader="True" src="Shared/Program.cs" />
 				<File name="Info.plist" AddStandardHeader="False" src="iOS/iOSInfo.plist" />
@@ -64,12 +62,10 @@
 				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
 				<Reference type="Gac" refto="Mono.Android" />
-				<Reference type="Gac" refto="OpenTK" />
+				<Reference type="Gac" refto="OpenTK-1.0" />
 				<Reference type="Project" refto="${ProjectName}"/>
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.Android" version="3.3.0" targetFramework="MonoAndroid" />
-			</Packages>
 			<Files>
 				<File name="Activity1.cs" src="Shared/Activity1.cs" />
 				<Directory name="Resources">

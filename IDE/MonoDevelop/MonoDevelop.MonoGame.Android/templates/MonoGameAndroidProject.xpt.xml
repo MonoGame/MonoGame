@@ -22,17 +22,15 @@
 				AndroidApplication="true"
 				AndroidResgenFile="Resources/Resource.designer.cs"
 				AndroidResgenClass="Resource"
-				TargetFrameworkVersion="MonoAndroid,Version=v4.4" />
+				TargetFrameworkVersion="MonoAndroid,Version=v5.0" />
 			<References>
 				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
 				<Reference type="Gac" refto="Mono.Android" />
-				<Reference type="Gac" refto="OpenTK" />
+				<Reference type="Gac" refto="OpenTK-1.0" />
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.Android" version="3.3.0" targetFramework="MonoAndroid" />
-			</Packages>
 			<Files>
 				<File name="Activity1.cs" src="Android/Activity1.cs" />
 				<File name="Game1.cs" src="Common/Game1.cs" />

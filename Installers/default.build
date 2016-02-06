@@ -71,6 +71,7 @@
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}">
          <fileset basedir="../MonoGame.Framework.Content.Pipeline">
                 <include name="MonoGame.Content.Builder.targets"/>
+                <include name="MonoGame.Common.props"/>
          </fileset>
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS">
@@ -99,10 +100,11 @@
          </fileset>
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL">
-         <fileset basedir="../MonoGame.Framework/bin/DesktopGL/AnyCPU/Release">
+         <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>
+      <copy file="./MacOS/Scripts/Framework/postinstall.in" tofile="./MacOS/Scripts/Framework/postinstall" />
       <echo append="true" file="./MacOS/Scripts/Framework/postinstall">
 if [ -d '/Library/Frameworks/MonoGame.framework/v3.0' ]
 then
@@ -120,7 +122,7 @@ chmod u+x /Library/Frameworks/MonoGame.framework/Current/Tools/ffprobe
 if [ -d '/Library/Frameworks/Mono.framework/External/xbuild' ]
 then
         ln -sf /Library/Frameworks/MonoGame.framework /Library/Frameworks/Mono.framework/External/xbuild/MonoGame
-fi      
+fi     
       </echo>      
       <exec program="pkgbuild" workingdir="." commandline=" --root ./root --identifier com.monogame.framework --version ${buildNumber} --scripts ${project::get-base-directory()}/MacOS/Scripts/Framework ${project::get-base-directory()}/MonoGame.framework.pkg" />
 
@@ -152,6 +154,7 @@ fi
       <copy file="Linux/Main/monogame-pipeline" tofile="Linux/tmp_deb/usr/bin/monogame-pipeline"/>
       <copy file="Linux/Main/monogame.svg" tofile="Linux/tmp_deb/usr/share/icons/hicolor/scalable/mimetypes/monogame.svg"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/MonoGame.Content.Builder.targets"/>
+      <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Common.props" tofile="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/MonoGame.Common.props"/>
       <echo file="Linux/tmp_deb/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
       <copy todir="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/DesktopGL">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
@@ -167,6 +170,7 @@ fi
       </copy>
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame.mpack" overwrite="true"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Content.Builder.targets"/>
+      <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Common.props" tofile="Linux/tmp_run/MonoGameSDK/MonoGame.Common.props"/>
       <copy todir="Linux/tmp_run/MonoGameSDK/Tools">
         <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
       </copy>
