@@ -1,0 +1,24 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>MonoGame Shared Project</Name>
+    <Description>Creates a MonoGame Shared Project to shared common code. This can be used to share most of your shared code, but you can also include platform specific code using #defines.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>1000</SortOrder>
+    <CreateInPlace>true</CreateInPlace>
+    <CreateNewFolder>false</CreateNewFolder>
+    <DefaultName>MonoGame.Shared</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <Icon>__TemplateIcon.png</Icon>
+    <PreviewImage>__PreviewImage.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="$projectname$.shproj" File="Shared.shproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$.projitems">Shared.projitems</ProjectItem>
+      <Folder Name="Content" TargetFolderName="Content">
+        <ProjectItem ReplaceParameters="false" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
+      </Folder>
+      <ProjectItem OpenInEditor="true" ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>
