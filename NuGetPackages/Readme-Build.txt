@@ -13,3 +13,4 @@ NuGet pack MonoGame.Framework.WindowsDX.nuspec -BasePath ..\MonoGame.Framework\b
 NuGet pack MonoGame.Framework.WindowsGL.nuspec -BasePath ..\MonoGame.Framework\bin -OutputDirectory packages
 NuGet pack MonoGame.Framework.WindowsPhone8.nuspec -BasePath ..\MonoGame.Framework\bin -OutputDirectory packages
 NuGet pack MonoGame.Framework.WindowsPhone81.nuspec -BasePath ..\MonoGame.Framework\bin -OutputDirectory packages
+NuGet pack MonoGame.Framework.DesktopGL.nuspec -BasePath ..\MonoGame.Framework\bin -OutputDirectory packages
