@@ -54,6 +54,8 @@
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
+    <Compile Include="Common\PipelineController.UpdateContentItemAction.cs" />
+    <Compile Include="Common\PipelineController.UpdateProjectAction.cs" />
     <Compile Include="Common\PipelineSettings.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
@@ -68,8 +70,6 @@
     <Compile Include="Common\PipelineProject.cs" />
     <Compile Include="Common\PipelineTypes.cs" />
     <Compile Include="Common\Extensions.cs" />
-
-    <Compile Include="Windows\UpdateAction.cs" />
 
     <!-- The Windows specific stuff -->
     <Compile Include="Windows\BuildIcons.cs">
