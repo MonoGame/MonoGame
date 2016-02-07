@@ -117,7 +117,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			try 
 			{
 			    if (TextureFormat != TextureProcessorOutputFormat.Color)
+				{
+					input.ConvertBitmapType(typeof(PixelBitmapContent<Vector4>));
                 	GraphicsUtil.CompressTexture(context.TargetProfile, input, TextureFormat, context, GenerateMipmaps, false);
+				}
                 else
                 {
                     input.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
