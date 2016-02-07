@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework
         private void OnResize(object sender, EventArgs e)
         {
             // Ignore resize events until intialization is complete
-            if (Game == null)
+            if (Game == null || Game.GraphicsDevice == null)
                 return;
 
             lock (window)
