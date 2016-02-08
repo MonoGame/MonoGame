@@ -26,6 +26,10 @@
 
       <mkdir dir="Windows/iOS" failonerror="false"/>
       <get src="${latestArtifactUrl}MonoGame.Framework/bin/iOS/iPhoneSimulator/Release/MonoGame.Framework.dll" dest="Windows/iOS/MonoGame.Framework.dll" failonerror="false"/>
+      <mkdir dir="Windows/Android" failonerror="false"/>
+      <get src="${latestArtifactUrl}MonoGame.Framework/bin/Android/AnyCPU/Release/MonoGame.Framework.dll" dest="Windows/Android/MonoGame.Framework.dll" failonerror="false"/>
+      <mkdir dir="Windows/OUYA" failonerror="false"/>
+      <get src="${latestArtifactUrl}MonoGame.Framework/bin/OUYA/AnyCPU/Release/MonoGame.Framework.dll" dest="Windows/OUYA/MonoGame.Framework.dll" failonerror="false"/>
     </if>
   </target>
 
