@@ -31,23 +31,6 @@ echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
 #automatic dependency installer
 ./Dependencies/dependencies.sh
 
-#setup nvtt libraries
-if [ ! -f /lib/libnvcore.so ]; then
-	ln $IDIR/libnvcore.so /lib/libnvcore.so
-fi
-
-if [ ! -f /lib/libnvimage.so ]; then
-	ln $IDIR/libnvimage.so /lib/libnvimage.so
-fi
-
-if [ ! -f /lib/libnvmath.so ]; then
-	ln $IDIR/libnvmath.so /lib/libnvmath.so
-fi
-
-if [ ! -f /lib/libnvtt.so ]; then
-	ln $IDIR/libnvtt.so /lib/libnvtt.so
-fi
-
 #check GLIBCXX_3.4.20 support
 if [ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]
 then
@@ -57,7 +40,7 @@ then
 	if [ ! $size -gt 0 ] 
 	then
 		echo "Your libstdc++.so.6 does not support GLIBCXX_3.4.20. Want to copy newer version of it?"
-		echo "Old version will be copied renamed to libstdc++.so.6.old"
+		echo "Old version will be renamed to libstdc++.so.6.old"
 		read -p "(Y, n): " choice
 	
 		case "$choice" in 
