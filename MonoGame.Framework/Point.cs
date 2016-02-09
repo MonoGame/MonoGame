@@ -92,6 +92,18 @@ namespace Microsoft.Xna.Framework
         #region Operators
 
         /// <summary>
+        /// Inverts values in the specified <see cref="Point"/>.
+        /// </summary>
+        /// <param name="value">Source <see cref="Point"/> on the right of the sub sign.</param>
+        /// <returns>Result of the inversion.</returns>
+        public static Point operator -(Point value)
+        {
+            value.X = -value.X;
+            value.Y = -value.Y;
+            return value;
+        }
+
+        /// <summary>
         /// Adds two points.
         /// </summary>
         /// <param name="value1">Source <see cref="Point"/> on the left of the add sign.</param>
