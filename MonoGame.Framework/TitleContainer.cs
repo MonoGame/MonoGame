@@ -4,68 +4,21 @@
 
 using System;
 using System.IO;
-#if WINRT
-using System.Threading.Tasks;
-#elif IOS
-using Foundation;
-using UIKit;
-#elif MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.Foundation;
-#else
-using Foundation;
-#endif
-#endif
 using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
-    public static class TitleContainer
+    public static partial class TitleContainer
     {
+        static partial void PlatformInit();
+
         static TitleContainer() 
         {
-#if WINDOWS || DESKTOPGL
-            Location = AppDomain.CurrentDomain.BaseDirectory;
-#elif WINRT
-            Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-#elif IOS || MONOMAC
-			Location = NSBundle.MainBundle.ResourcePath;
-#else
             Location = string.Empty;
-#endif
-
-#if IOS
-            SupportRetina = UIScreen.MainScreen.Scale >= 2.0f;
-            RetinaScale = (int)Math.Round(UIScreen.MainScreen.Scale);
-#endif
+            PlatformInit();
         }
 
         static internal string Location { get; private set; }
-#if IOS
-        static internal bool SupportRetina { get; private set; }
-        static internal int RetinaScale { get; private set; }
-#endif
-
-#if WINRT
-
-        private static async Task<Stream> OpenStreamAsync(string name)
-        {
-            var package = Windows.ApplicationModel.Package.Current;
-
-            try
-            {
-                var storageFile = await package.InstalledLocation.GetFileAsync(name);
-                var randomAccessStream = await storageFile.OpenReadAsync();
-                return randomAccessStream.AsStreamForRead();
-            }
-            catch (IOException)
-            {
-                // The file must not exist... return a null stream.
-                return null;
-            }
-        }
-
-#endif // WINRT
 
         /// <summary>
         /// Returns an open stream to an exsiting file in the title storage area.
@@ -81,34 +34,8 @@ namespace Microsoft.Xna.Framework
             if (Path.IsPathRooted(safeName))
                 throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.");
 
-#if WINRT
-            var stream = Task.Run( () => OpenStreamAsync(safeName).Result ).Result;
-            if (stream == null)
-                throw new FileNotFoundException(name);
-
-            return stream;
-#elif ANDROID
-            return Android.App.Application.Context.Assets.Open(safeName);
-#elif IOS
-            var absolutePath = Path.Combine(Location, safeName);
-            if (SupportRetina)
-            {
-                for (var scale = RetinaScale; scale >= 2; scale--)
-                {
-                    // Insert the @#x immediately prior to the extension. If this file exists
-                    // and we are on a Retina device, return this file instead.
-                    var absolutePathX = Path.Combine(Path.GetDirectoryName(absolutePath),
-                                                      Path.GetFileNameWithoutExtension(absolutePath)
-                                                      + "@" + scale + "x" + Path.GetExtension(absolutePath));
-                    if (File.Exists(absolutePathX))
-                        return File.OpenRead(absolutePathX);
-                }
-            }
-            return File.OpenRead(absolutePath);
-#else
-            var absolutePath = Path.Combine(Location, safeName);
-            return File.OpenRead(absolutePath);
-#endif
+            // Call the platform code to open the stream.
+            return PlatformOpenStream(name, safeName);
         }
 
         // TODO: This is just path normalization.  Remove this
