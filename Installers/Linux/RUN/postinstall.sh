@@ -7,7 +7,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Check previous versions
-if [ -f /bin/mgcb ]
+if type "mgcb" > /dev/null 2>&1
 then
 	echo "Please uninstall any previous versions of MonoGame SDK" 1>&2
 	exit 1
@@ -28,7 +28,7 @@ case "$choice2" in
 esac
 
 # MonoGame SDK installation
-echo "Installing SDK..."
+echo "Installing MonoGame SDK..."
 
 rm -rf "$IDIR"
 mkdir -p "$IDIR"
@@ -36,16 +36,14 @@ cp -rf "$DIR/MonoGameSDK/." "$IDIR" -R
 rm -rf "/opt/MonoGameSDK"
 ln -s "$IDIR" "/opt/MonoGameSDK"
 
+# Monogame Pipeline terminal commands
 echo "Creating launcher items..."
 
-# Monogame Pipeline terminal commands
-rm -f /bin/monogame-pipeline
-cp $DIR/Main/monogame-pipeline /bin/monogame-pipeline
-chmod +x /bin/monogame-pipeline
+cp $DIR/Main/monogame-pipeline /usr/bin/monogame-pipeline
+chmod +x /usr/bin/monogame-pipeline
 
-rm -f /bin/mgcb
-cp $DIR/Main/mgcb /bin/mgcb
-chmod +x /bin/mgcb
+cp $DIR/Main/mgcb /usr/bin/mgcb
+chmod +x /usr/bin/mgcb
 
 # MonoGame icon
 mkdir -p /usr/share/icons/hicolor/scalable/mimetypes
