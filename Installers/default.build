@@ -157,10 +157,6 @@ fi
       <copy file="Linux/Main/monogame-pipeline" tofile="Linux/tmp_deb/bin/monogame-pipeline"/>
       <copy file="Linux/Main/monogame.svg" tofile="Linux/tmp_deb/usr/share/icons/gnome/scalable/mimetypes/monogame.svg"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/MonoGame.Content.Builder.targets"/>
-      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvcore.so" tofile="Linux/tmp_deb/lib/libnvcore.so"/>
-      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvimage.so" tofile="Linux/tmp_deb/lib/libnvimage.so"/>
-      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvmath.so" tofile="Linux/tmp_deb/lib/libnvmath.so"/>
-      <copy file="Linux/tmp_deb/opt/monogame-pipeline/libnvtt.so" tofile="Linux/tmp_deb/lib/libnvtt.so"/>
       <echo file="Linux/tmp_deb/DEBIAN/control" append="true">version: ${buildNumber}&#xa;</echo>
       <copy todir="Linux/tmp_deb/usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/DesktopGL">
          <fileset basedir="../MonoGame.Framework/bin/Linux/AnyCPU/Release">
