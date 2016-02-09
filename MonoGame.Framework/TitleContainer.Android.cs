@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework
 {
     partial class TitleContainer
     {
-        private static Stream PlatformOpenStream(string name, string safeName)
+        private static Stream PlatformOpenStream(string safeName)
         {
             return Android.App.Application.Context.Assets.Open(safeName);
         }

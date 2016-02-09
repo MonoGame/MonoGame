@@ -325,7 +325,7 @@ namespace Microsoft.Xna.Framework.Content
             {
 				//MonoGame try to load as a non-content file
 
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
+                assetName = TitleContainer.NormalizeRelativePath(Path.Combine(RootDirectory, assetName));
 
                 assetName = Normalize<T>(assetName);
 	
@@ -628,7 +628,7 @@ namespace Microsoft.Xna.Framework.Content
 				// Try to reload as a non-xnb file.
                 // Just textures supported for now.
 
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
+                assetName = TitleContainer.NormalizeRelativePath(Path.Combine(RootDirectory, assetName));
 
                 assetName = Normalize<T>(assetName);
 

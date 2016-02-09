@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-        private static Stream PlatformOpenStream(string name, string safeName)
+        private static Stream PlatformOpenStream(string safeName)
         {
             var absolutePath = Path.Combine(Location, safeName);
             return File.OpenRead(absolutePath);

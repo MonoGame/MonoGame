@@ -32,13 +32,9 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private static Stream PlatformOpenStream(string name, string safeName)
+        private static Stream PlatformOpenStream(string safeName)
         {
-            var stream = Task.Run( () => OpenStreamAsync(safeName).Result ).Result;
-            if (stream == null)
-                throw new FileNotFoundException(name);
-
-            return stream;
+            return Task.Run(() => OpenStreamAsync(safeName).Result).Result;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework
         static internal int RetinaScale { get; private set; }
 #endif
 
-        private static Stream PlatformOpenStream(string name, string safeName)
+        private static Stream PlatformOpenStream(string safeName)
         {
 #if IOS
             var absolutePath = Path.Combine(Location, safeName);
