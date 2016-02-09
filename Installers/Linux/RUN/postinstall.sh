@@ -27,7 +27,7 @@ case "$choice2" in
 	sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack"
 esac
 
-# Pipeline Tool installation
+# MonoGame SDK installation
 echo "Installing SDK..."
 
 rm -rf "$IDIR"
@@ -48,16 +48,9 @@ cp $DIR/Main/mgcb /bin/mgcb
 chmod +x /bin/mgcb
 
 # MonoGame icon
-mkdir -p /usr/share/icons/gnome/scalable/mimetypes
-
-cp $DIR/Main/monogame.svg /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
-
-if [ -f /usr/share/icons/default/index.theme ]
-then
-	sudo gtk-update-icon-cache /usr/share/icons/default/ -f
-else
-	sudo gtk-update-icon-cache /usr/share/icons/gnome/ -f
-fi
+mkdir -p /usr/share/icons/hicolor/scalable/mimetypes
+cp $DIR/Main/monogame.svg /usr/share/icons/hicolor/scalable/mimetypes/monogame.svg
+gtk-update-icon-cache /usr/share/icons/hicolor/ -f
 
 # Application launcher
 rm -f /usr/share/applications/Monogame\ Pipeline.desktop
