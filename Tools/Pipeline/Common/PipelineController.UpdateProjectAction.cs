@@ -1,90 +1,22 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
+
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal class UpdateContentItemAction : IProjectAction
-    {
-        private readonly IView _view;
-        private readonly IController _con;
-        private ContentItemState _state;
-
-        public UpdateContentItemAction(IView view, IController con, ContentItem item, PropertyDescriptor property, object previousValue)
-        {
-            _view = view;
-            _con = con;
-
-            _state = ContentItemState.Get(item);
-
-            var name = property.Name;
-            var value = previousValue;
-
-            if (name == "Importer")
-            {
-                name = "ImporterName";
-                value = ((ImporterTypeDescription)value).TypeName;
-            }
-
-            if (name == "Processor")
-            {
-                name = "ProcessorName";
-                value = ((ProcessorTypeDescription)value).TypeName;
-            }
-
-            var field = _state.GetType().GetMember(name).SingleOrDefault() as FieldInfo;
-            if (field == null)
-            {
-                if (!_state.ProcessorParams.ContainsKey(name))
-                    throw new Exception();
-
-                _state.ProcessorParams[name] = value;
-            }
-            else
-            {
-                field.SetValue(_state, value);
-            }
-        }
-
-        public bool Do()
-        {
-            Toggle();
-            return true;
-        }
-
-        public bool Undo()
-        {
-            Toggle();
-            return true;
-        }
-
-        private void Toggle()
-        {
-            var item = (ContentItem)_con.GetItem(_state.SourceFile);
-            var state = ContentItemState.Get(item);
-            _state.Apply(item);
-            _state = state;
-
-            item.ResolveTypes();
-
-            _view.BeginTreeUpdate();
-            _view.UpdateProperties(item);
-            _view.UpdateTreeItem(item);
-            _view.EndTreeUpdate();
-        }
-    }
-
     internal class UpdateProjectAction : IProjectAction
     {
         private readonly IView _view;
         private readonly IController _con;
         private readonly bool _referencesChanged;
 
-        private ProjectState _state;        
+        private ProjectState _state;
 
         public UpdateProjectAction(IView view, IController con, PipelineProject item, PropertyDescriptor property, object previousValue)
         {
