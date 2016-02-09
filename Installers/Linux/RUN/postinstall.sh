@@ -17,40 +17,15 @@ fi
 DIR=$(pwd)
 IDIR="/opt/monogame-pipeline"
 
-if [ -d "$IDIR" ]
-then
-	rm -rf "$IDIR"
-fi
+rm -rf "$IDIR"
 
 mkdir "$IDIR"
 echo "Copying files..."
 
 cp "$DIR/Pipeline/." "$IDIR/" -R
-echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
 
 #automatic dependency installer
 ./Dependencies/dependencies.sh
-
-#check GLIBCXX_3.4.20 support
-if [ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]
-then
-	GREP=$(strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX_3.4.20)
-	size=${#GREP} 
-
-	if [ ! $size -gt 0 ] 
-	then
-		echo "Your libstdc++.so.6 does not support GLIBCXX_3.4.20. Want to copy newer version of it?"
-		echo "Old version will be renamed to libstdc++.so.6.old"
-		read -p "(Y, n): " choice
-	
-		case "$choice" in 
-			n|N ) ;;
-			*)
-			sudo mv /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.old
-			sudo cp $DIR/Main/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-		esac
-	fi
-fi
 
 #monodevelop addin
 read -p "Install monodevelop addin(Y, n): " choice2
@@ -61,50 +36,28 @@ case "$choice2" in
 esac
 
 #MonoGame.xbuild data
-if [ -d /usr/lib/mono/xbuild/MonoGame ]; then
-	rm -rf /usr/lib/mono/xbuild/MonoGame
-fi
+rm -rf /usr/lib/mono/xbuild/MonoGame
 
-mkdir /usr/lib/mono/xbuild/MonoGame
-mkdir /usr/lib/mono/xbuild/MonoGame/v3.0
-
-mkdir /usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/
+mkdir -p /usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/
 cp "$DIR/Assemblies/." /usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/ -R
 
 sudo ln -s /opt/monogame-pipeline /usr/lib/mono/xbuild/MonoGame/v3.0/Tools
-
 sudo cp $DIR/Main/MonoGame.Content.Builder.targets /usr/lib/mono/xbuild/MonoGame/v3.0/
-
-#fix permissions
-usr="$SUDO_USER"
-if [ -z "$usr" -a "$usr"==" " ]; then
-	usr="$USERNAME"
-fi
-sudo chown -R "$usr" "$IDIR/"
 
 echo "Creating launcher items..."
 
 #monogame pipeline terminal command
-if [ -f /bin/monogame-pipeline ]
-then
-	rm /bin/monogame-pipeline
-fi
+rm -f /bin/monogame-pipeline
 cp $DIR/Main/monogame-pipeline /bin/monogame-pipeline
 chmod +x /bin/monogame-pipeline
 
 #mgcb terminal command
-if [ -f /bin/mgcb ]
-then
-	rm /bin/mgcb
-fi
+rm -f /bin/mgcb
 cp $DIR/Main/mgcb /bin/mgcb
 chmod +x /bin/mgcb
 
 #application/mimetype icon
-if [ ! -d /usr/share/icons/gnome/scalable/mimetypes ]
-then
-	mkdir /usr/share/icons/gnome/scalable/mimetypes
-fi
+mkdir -p /usr/share/icons/gnome/scalable/mimetypes
 
 cp $DIR/Main/monogame.svg /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
 
@@ -116,10 +69,7 @@ else
 fi
 
 #application launcher
-if [ -f /usr/share/applications/Monogame\ Pipeline.desktop ]
-then
-	rm /usr/share/applications/Monogame\ Pipeline.desktop
-fi
+rm -f /usr/share/applications/Monogame\ Pipeline.desktop
 echo -e "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=Used to create platform specific .xnb files\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=true\nTerminal=false\nType=Application\nMimeType=text/mgcb;\nCategories=Development;" | sudo tee --append /usr/share/applications/Monogame\ Pipeline.desktop > /dev/null
 
 #mimetype
@@ -130,3 +80,4 @@ xdg-mime default "Monogame Pipeline.desktop" text/mgcb
 #uninstall script
 chmod +x $IDIR/uninstall.sh
 echo "To uninstall the pipeline please run $IDIR/uninstall.sh"
+

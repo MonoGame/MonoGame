@@ -143,6 +143,7 @@ fi
     <!-- Linux Installer -->
     <if test="${(os == 'Unix' or os == 'MacOS') and directory::exists('../Tools/Pipeline/bin/Linux/AnyCPU/Release')}">
       
+      <!-- .deb installer -->
       <delete dir="Linux/tmp_deb" failonerror="false"/>
       <mkdir dir="Linux/tmp_deb"/>
       <copy todir="Linux/tmp_deb/DEBIAN/">
@@ -164,6 +165,7 @@ fi
          </fileset>
       </copy>
 
+      <!-- .run installer -->
       <delete dir="Linux/tmp_run" failonerror="false"/>
       <mkdir dir="Linux/tmp_run"/>
       <copy todir="Linux/tmp_run/Main/">
@@ -171,7 +173,6 @@ fi
       </copy>
       <copy file="../IDE/MonoDevelop/MonoDevelop.MonoGame_${buildNumber}.mpack" tofile="Linux/tmp_run/Main/MonoDevelop.MonoGame.mpack" overwrite="true"/>
       <copy file="../MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets" tofile="Linux/tmp_run/Main/MonoGame.Content.Builder.targets"/>
-      <copy file="../ThirdParty/Dependencies/assimp/libstdc++.so.6" tofile="Linux/tmp_run/Main/libstdc++.so.6" />
       <copy todir="Linux/tmp_run/Pipeline">
         <fileset basedir="../Tools/Pipeline/bin/Linux/AnyCPU/Release"/>
       </copy>
