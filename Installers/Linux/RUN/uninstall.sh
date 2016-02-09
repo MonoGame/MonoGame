@@ -16,9 +16,7 @@ rm -rf /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
 #remove pipeline tool application launcher
 rm -rf /usr/share/applications/Monogame\ Pipeline.desktop
 
-#remove MonoGame xbuild data
+#remove MonoGame SDK
 rm -rf /usr/lib/mono/xbuild/MonoGame
-
-#remove pipeline tool
-rm -rf /opt/monogame-pipeline
+rm -rf /opt/MonoGameSDK
 
