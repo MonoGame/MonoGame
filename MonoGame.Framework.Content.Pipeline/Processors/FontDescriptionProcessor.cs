@@ -12,6 +12,7 @@ using SharpFont;
 using System.Runtime.InteropServices;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
+using System.Text.RegularExpressions;
 #if WINDOWS
 using Microsoft.Win32;
 #endif
@@ -40,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #if WINDOWS
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
 		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
-			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+			fontName = FindFontFileFromFontName(fontName, fontDirectory, input.Style);
 #elif LINUX
             fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
 #endif
@@ -199,16 +200,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 		}
 
 #if WINDOWS
-		string FindFontFileFromFontName (string fontName, string fontDirectory)
+		string FindFontFileFromFontName(string fontName, string fontDirectory, FontDescriptionStyle style)
 		{
-			var key = Registry.LocalMachine.OpenSubKey (@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
-			foreach (var font in key.GetValueNames ().OrderBy (x => x)) {
-				if (font.StartsWith (fontName, StringComparison.OrdinalIgnoreCase)) {
-					var fontPath = key.GetValue (font).ToString ();
-					return Path.IsPathRooted (fontPath) ? fontPath : Path.Combine (fontDirectory, fontPath);
+			var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
+			var fonts = key.GetValueNames().Where(k => k.StartsWith(fontName, StringComparison.OrdinalIgnoreCase));
+			if (style == FontDescriptionStyle.Regular)
+			{
+				fonts = fonts.Where(f => !Regex.IsMatch(f.Substring(fontName.Length), "Italic|Bold", RegexOptions.IgnoreCase));
+			}
+			else
+			{
+				if (style.HasFlag(FontDescriptionStyle.Bold))
+				{
+					fonts = fonts.Where(f => Regex.IsMatch(f.Substring(fontName.Length), "Bold", RegexOptions.IgnoreCase));
+				}
+				if (style.HasFlag(FontDescriptionStyle.Italic))
+				{
+					fonts = fonts.Where(f => Regex.IsMatch(f.Substring(fontName.Length), "Italic", RegexOptions.IgnoreCase));
 				}
 			}
-			return String.Empty;
+            if (fonts.Any())
+            {
+
+                //foreach (var font in key.GetValueNames ().OrderBy (x => x)) {
+                //	if (font.StartsWith (fontName, StringComparison.OrdinalIgnoreCase)) {
+                var fontPath = key.GetValue(fonts.First()).ToString();
+                return Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
+                //	}
+                //}
+            }
+            return String.Empty;
 		}
 #endif
 
