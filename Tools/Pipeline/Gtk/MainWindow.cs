@@ -182,15 +182,6 @@ namespace MonoGame.Tools.Pipeline
         {
             PipelineSettings.Default.Load ();
 
-            if (string.IsNullOrEmpty(OpenProjectPath))
-            {
-                var startupProject = PipelineSettings.Default.StartupProject;
-                if (!string.IsNullOrEmpty(startupProject) && System.IO.File.Exists(startupProject))                
-                    OpenProjectPath = startupProject;                
-            }
-
-            PipelineSettings.Default.StartupProject = null;
-
             if (!String.IsNullOrEmpty(OpenProjectPath)) {
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
@@ -536,7 +527,11 @@ namespace MonoGame.Tools.Pipeline
 
         public void ItemExistanceChanged(IProjectItem item)
         {
-            projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists, _controller.GetFullPath(item.OriginalPath));
+            Application.Invoke(
+                delegate {
+                    projectview1.RefreshItem(projectview1.GetBaseIter(), item.OriginalPath, item.Exists, _controller.GetFullPath(item.OriginalPath));
+                }
+            );
         }
 
 
