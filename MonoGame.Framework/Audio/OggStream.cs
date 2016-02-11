@@ -160,8 +160,11 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 OggStreamer.Instance.RemoveStream(this);
 
-                if (state != ALSourceState.Initial)
-                    Empty(); // force the queued buffers to be unqueued to avoid issues on Mac
+                lock (prepareMutex)
+                {
+                    if (state != ALSourceState.Initial)
+                        Empty(); // force the queued buffers to be unqueued to avoid issues on Mac
+                }
             }
             AL.Source(alSourceId, ALSourcei.Buffer, 0);
             ALHelper.CheckError("Failed to free source from buffers.");
