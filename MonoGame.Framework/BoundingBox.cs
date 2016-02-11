@@ -535,7 +535,7 @@ namespace Microsoft.Xna.Framework
             result = new SatIntersectionResult
             {
                 Intersects = true,
-                Separtion = shortestAxis * shortestOverlap
+                Separation = shortestAxis * shortestOverlap
             };
         }
 

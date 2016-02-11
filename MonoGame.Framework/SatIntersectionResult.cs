@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Oriented distance to separte the colliding shapes.
         /// </summary>
-        public Vector3 Separtion;
+        public Vector3 Separation;
 
         /// <summary>
         /// Default, when noiIntersection is present.

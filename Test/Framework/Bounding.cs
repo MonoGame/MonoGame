@@ -180,7 +180,7 @@ namespace MonoGame.Tests.Framework
 
             Assert.That(collisionResult, Is.Not.Null);
             Assert.That(collisionResult.Intersects, Is.EqualTo(hasCollision));
-            Assert.That(collisionResult.Separtion, Is.EqualTo(separation));
+            Assert.That(collisionResult.Separation, Is.EqualTo(separation));
         }
     }
 }
