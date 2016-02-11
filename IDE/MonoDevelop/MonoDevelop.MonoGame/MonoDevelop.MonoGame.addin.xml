@@ -136,7 +136,7 @@
     <PackageRepository path="packages" />
   </Extension>
   <Extension path="/MonoDevelop/Ide/FileFilters">
-    <FileFilter id="MGCB" insertbefore="AllFiles" _label="MonnoGame Content Build Files" extensions="*.mgcb" />
+    <FileFilter id="MGCB" insertbefore="AllFiles" _label="MonoGame Content Build Files" extensions="*.mgcb" />
   </Extension>
   <Extension path="/MonoDevelop/Core/MimeTypes">
     <MimeType id="text/x-mgcb" _description="MonoGame Content Build File" icon="monogame-project" isText="false">
