@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     {
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
-
+        String[] _SupportedFontExtensions=new string[] {".ttf",".otf",".ttc" };
         public FontDescriptionProcessor()
         {
             this.TextureFormat = TextureProcessorOutputFormat.Compressed;
@@ -35,52 +35,43 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             var output = new SpriteFontContent(input);
 
-			var fontName = input.FontName;
+			List<string> directories = new List<string>();
+			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
+			directories.Add(directory);
+			directories.Add("/Library/Fonts");
 
-#if WINDOWS || LINUX
+			string fontName = null;
+            
+
 #if WINDOWS
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
 		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
-			fontName = FindFontFileFromFontName(fontName, fontDirectory, input.Style);
+			directories.Add(fontDirectory);
+			fontName = FindFontFileFromFontName(input.FontName, fontDirectory, input.Style);
 #elif LINUX
-            fontName = FindFontFileFromFontName(fontName, input.Style.ToString());
+            fontName = FindFontFileFromFontName(input.FontName, input.Style.ToString());
 #endif
 			if (string.IsNullOrWhiteSpace(fontName)) {
-				fontName = input.FontName;
-#endif
-				
-			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
+				//fontName = input.FontName;
 
-			List<string> directories = new List<string>();
-			directories.Add(directory);
-			directories.Add("/Library/Fonts");
-#if WINDOWS
-			directories.Add(fontDirectory);
-#endif
-
-			foreach( var dir in directories) {
-				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
-					fontName += ".ttf";
-					directory = dir;
-					break;
-				}
-				if (File.Exists (Path.Combine(dir,fontName+".ttc"))) {
-					fontName += ".ttc";
-					directory = dir;
-					break;
-				}
-				if (File.Exists(Path.Combine(dir,fontName+".otf"))) {
-					fontName += ".otf";
-					directory = dir;
-					break;
-				}
+                bool found = false;
+                foreach (var dir in directories)
+                {
+                    foreach (var ext in _SupportedFontExtensions)
+                    {
+                        string filename = Path.Combine(dir, input.FontName + ext);
+                        if (File.Exists(filename))
+                        {
+                            fontName = filename;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        break;
+                }
             }
 
-            fontName = Path.Combine (directory, fontName);
-
-#if WINDOWS || LINUX
-			}
-#endif
 
 			context.Logger.LogMessage ("Building Font {0}", fontName);
 			try {
