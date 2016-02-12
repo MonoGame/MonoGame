@@ -22,7 +22,7 @@ This is an example of a project set to build with the 4.4 SDK and target 4.0 as 
 
 ### Xamarin Studio
 
-Xamarin Studio has the same settings in the propject options dialog. They are just in different places.
+Xamarin Studio has the same settings in the project options dialog. They are just in different places.
 
 `Target framework` on the `General` page is the equivalent of Visual Studio's `Compile using Android version`.
 
@@ -30,7 +30,7 @@ Xamarin Studio has the same settings in the propject options dialog. They are ju
 <img src="images/android_xs_target_framework.png"/>
 </p>
 
-On the `Application Application` page, you will find `Minimum Android version` (Visual Studio's `Minimum Android to target`) and `Target Android version` (same as Visual Studio).
+On the `Android Application` page, you will find `Minimum Android version` (Visual Studio's `Minimum Android to target`) and `Target Android version` (same as Visual Studio).
 
 <p align="center">
 <img src="images/android_xs_minimum_framework.png"/>
