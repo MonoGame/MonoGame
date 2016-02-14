@@ -24,7 +24,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     {
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
+        /// <summary>
+        /// Valid font extension
+        /// </summary>
         String[] _SupportedFontExtensions=new string[] {".ttf",".otf",".ttc" };
+        /// <summary>
+        /// Possible filename indicators of a bold font
+        /// </summary>
+        string[] _BoldFileNameTerminators=new string[] {"bd","b"};
+        /// <summary>
+        /// Possible filename indicators of an italic font
+        /// </summary>
+        string[] _ItalicFileNameTerminators=new string[] {"i"};
+
         public FontDescriptionProcessor()
         {
             this.TextureFormat = TextureProcessorOutputFormat.Compressed;
@@ -47,6 +59,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
 		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
 			directories.Add(fontDirectory);
+            var fontfilename = FindFontByFileName(input.FontName, directories, input.Style);
+
 			fontName = FindFontFileFromFontName(input.FontName, fontDirectory, input.Style);
 #elif LINUX
             fontName = FindFontFileFromFontName(input.FontName, input.Style.ToString());
@@ -189,39 +203,110 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			return glyphs.ToArray();
 		}
-
-#if WINDOWS
-		string FindFontFileFromFontName(string fontName, string fontDirectory, FontDescriptionStyle style)
-		{
-			var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
-			var fonts = key.GetValueNames().Where(k => k.StartsWith(fontName, StringComparison.OrdinalIgnoreCase));
-			if (style == FontDescriptionStyle.Regular)
-			{
-				fonts = fonts.Where(f => !Regex.IsMatch(f.Substring(fontName.Length), "Italic|Bold", RegexOptions.IgnoreCase));
-			}
-			else
-			{
-				if (style.HasFlag(FontDescriptionStyle.Bold))
-				{
-					fonts = fonts.Where(f => Regex.IsMatch(f.Substring(fontName.Length), "Bold", RegexOptions.IgnoreCase));
-				}
-				if (style.HasFlag(FontDescriptionStyle.Italic))
-				{
-					fonts = fonts.Where(f => Regex.IsMatch(f.Substring(fontName.Length), "Italic", RegexOptions.IgnoreCase));
-				}
-			}
-            if (fonts.Any())
+        /// <summary>
+        /// Retrieves the path to the font with the requested filename looking for variations for the style
+        /// </summary>
+        /// <param name="fontname">Filename of the font, without extension</param>
+        /// <param name="fontDirectories">List of possible folders that may contain the font</param>
+        /// <param name="style">Style of the font</param>
+        /// <returns>Full path to the found font file or null.
+        /// When selecting the file to return, the function returns the better matches the requested style.
+        /// If the requested style is bold and italic, but there's no file that has both styles,
+        /// the first option is returning the italic one, then the bold one, and finally the regular one</returns>
+        string FindFontByFileName(string fontname, List<string> fontDirectories, FontDescriptionStyle style)
+        {
+            var files = fontDirectories.Where(fd=>Directory.Exists(fd)).SelectMany<string, FileInfo>(fd => Directory.GetFiles(fd). //Get the filenames from each directory
+            Select<string, FileInfo>(f => new FileInfo(f))). //Convert them to fileInfo
+            Where(fi => _SupportedFontExtensions.Contains(fi.Extension.ToLowerInvariant())).//Exclude the ones with not supported formats
+            Where(fi=> fi.Name.StartsWith(fontname, StringComparison.OrdinalIgnoreCase));//Get the ones that begin with fontname
+            IEnumerable<FileInfo> boldCandidates=null;
+            IEnumerable<FileInfo> italicCandidates=null;
+            if (style.HasFlag(FontDescriptionStyle.Bold))
             {
-
-                //foreach (var font in key.GetValueNames ().OrderBy (x => x)) {
-                //	if (font.StartsWith (fontName, StringComparison.OrdinalIgnoreCase)) {
-                var fontPath = key.GetValue(fonts.First()).ToString();
-                return Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
-                //	}
-                //}
+                boldCandidates= files.Where(fi => 
+                _BoldFileNameTerminators.Any(bft => 
+                fi.Name.Substring(fontname.Length, fi.Name.Length - fontname.Length - fi.Extension.Length).ToLowerInvariant().Contains(bft)));
             }
-            return String.Empty;
-		}
+            if (style.HasFlag(FontDescriptionStyle.Italic))
+            {
+                italicCandidates=files.Where(fi =>
+                _ItalicFileNameTerminators.Any(ift =>
+                fi.Name.Substring(fontname.Length, fi.Name.Length - fontname.Length - fi.Extension.Length).ToLowerInvariant().Contains(ift)));
+            }
+            bool foundBoldCandidates = boldCandidates != null && boldCandidates.Any();
+            bool foundItalicCandidates = italicCandidates != null && italicCandidates.Any();
+            if (foundBoldCandidates && foundItalicCandidates)
+            {
+                var crossedCandidates = boldCandidates.Intersect(italicCandidates, new FileInfoComparer() );
+                if (crossedCandidates.Any())
+                {
+                    //Return the shortest candidate to avoid returning derivates of the font
+                    return crossedCandidates.OrderBy(cc => cc.Name.Length).First().FullName;
+                }
+            }
+            if (foundItalicCandidates)  
+            {
+                //If there's no font with italics and bold try to return the italic one as it is easier to render
+                //a faux bold from italics than the other way around
+                return italicCandidates.OrderBy(cc => cc.Name.Length).First().FullName;
+            }
+            if (foundBoldCandidates)
+            {
+                return boldCandidates.OrderBy(cc => cc.Name.Length).First().FullName;
+            }
+            if(files.Any())
+                return files.OrderBy(cc => cc.Name.Length).First().FullName;
+            return null;
+        }
+#if WINDOWS
+        /// <summary>
+        /// Searches the given font family name in the installed fonts register
+        /// </summary>
+        /// <param name="fontName">Name of the font family</param>
+        /// <param name="fontDirectory">System directory for fonts</param>
+        /// <param name="style">Style of the font to retrieve</param>
+        /// <returns>Full path to the found font, or null.
+        /// for italics and bold fonts, if there's no font with both styles this returns the italic one.
+        /// If there's no italic, the bold one, or the Regular if there's no bold one</returns>
+        string FindFontFileFromFontName(string fontName, string fontDirectory, FontDescriptionStyle style)
+        {
+            const string registrySuffix = " (TrueType)";
+
+            var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
+            var fonts = key.GetValueNames().Where(k => k.StartsWith(fontName, StringComparison.OrdinalIgnoreCase));
+            string fontKey = null;
+            if (style == FontDescriptionStyle.Regular)
+                fonts = fonts.Where(f => !Regex.IsMatch(f.Substring(fontName.Length), "Italic|Bold", RegexOptions.IgnoreCase));
+            else
+            {
+                IEnumerable<String> boldFonts = null;
+                IEnumerable<String> italicFonts = null;
+                if (style.HasFlag(FontDescriptionStyle.Bold))
+                    boldFonts = fonts.Where(f => Regex.IsMatch(f.Substring(fontName.Length), "Bold", RegexOptions.IgnoreCase));
+                if (style.HasFlag(FontDescriptionStyle.Italic))
+                    italicFonts = fonts.Where(f => Regex.IsMatch(f.Substring(fontName.Length), "Italic", RegexOptions.IgnoreCase));
+                bool foundBoldFonts = boldFonts != null && boldFonts.Any();
+                bool foundItalicFonts = italicFonts != null && italicFonts.Any();
+                if (foundBoldFonts && foundItalicFonts)
+                {
+                    var crossedFonts = boldFonts.Intersect(italicFonts);
+                    if (crossedFonts.Any())
+                        fontKey = crossedFonts.OrderBy(cf => cf.Contains(registrySuffix) ? cf.Length - registrySuffix.Length : cf.Length).First();
+                }
+                else if (foundItalicFonts)
+                    fontKey = italicFonts.OrderBy(i => i.Contains(registrySuffix) ? i.Length - registrySuffix.Length : i.Length).First();
+                else if (foundBoldFonts)
+                    fontKey = boldFonts.OrderBy(b => b.Contains(registrySuffix) ? b.Length - registrySuffix.Length : b.Length).First();
+            }
+            if (fontKey == null && fonts.Any())
+                fontKey = fonts.OrderBy(f => f.Contains(registrySuffix) ? f.Length - registrySuffix.Length : f.Length).First();
+            if (fontKey != null)
+            {
+                var fontPath = key.GetValue(fontKey).ToString();
+                return Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
+            }
+            return null;
+        }
 #endif
 
 #if LINUX
@@ -246,6 +331,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     return String.Empty;
             }
             return split [0];
+        }
+
+        private class FileInfoComparer : IEqualityComparer<FileInfo>
+        {
+            public bool Equals(FileInfo x, FileInfo y)
+            {
+               return x.FullName == y.FullName;
+            }
+
+            public int GetHashCode(FileInfo obj)
+            {
+                return obj.FullName.GetHashCode();
+            }
         }
 #endif
     }
