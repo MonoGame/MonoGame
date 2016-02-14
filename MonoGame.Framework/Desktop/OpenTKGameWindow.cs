@@ -375,6 +375,26 @@ namespace Microsoft.Xna.Framework
             // try to load it using Mono, it will cause a crash because of this.
             try
             {
+                // If we're running on a system where libgdiplus is not available, we must
+                // force an attempted load here.  When "new Icon" runs and fails here because
+                // of the failure to load the library, the object is still allocated.  Later on
+                // when the GC attempts to clean up the Icon object, that will attempt to load
+                // the library in it's finalizer and throw an exception.  As per the .NET documentation
+                // when a finalizer throws an exception, the application is immediately terminated
+                // with no recovery.
+                if (t != null)
+                {
+                    var drawingTypes = typeof(Icon).Assembly.GetTypes();
+                    foreach (var type in drawingTypes)
+                    {
+                        if (type.Name == "GDIPlus")
+                        {
+                            type.GetMethod("RunningOnUnix").Invoke(null, null);
+                            break;
+                        }
+                    }
+                }
+
                 if (t == null && assembly != null)
                     window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
                 else {
