@@ -8,8 +8,8 @@
   <if test="${environment::variable-exists('BUILD_NUMBER')}">
     <property name="buildNumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
   </if>
-  
-  <target name="checkos" description="check the operating system">
+
+  <target name="_checkos">
     <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
     <if test="${os == 'Unix'}">
       <if test="${directory::exists('/Applications') and directory::exists('/Library')}">
@@ -19,35 +19,28 @@
     <echo message="Detected : ${os}"/>
   </target>
 
-  <target name="download" description="Downloads iOS binaries">
-    <if test="${environment::variable-exists('MACBUILDJOB')}">
-      <property name="macbuildjob" value="${environment::get-variable('MACBUILDJOB')}"/>
-      <property name="latestArtifactUrl" value="http://build.monogame.net/job/${macbuildjob}/lastSuccessfulBuild/artifact/"/>
 
-      <mkdir dir="Windows/iOS" failonerror="false"/>
-      <get src="${latestArtifactUrl}MonoGame.Framework/bin/iOS/iPhoneSimulator/Release/MonoGame.Framework.dll" dest="Windows/iOS/MonoGame.Framework.dll" failonerror="false"/>
-    </if>
-  </target>
+  <target name="build" description="Build Installers" depends="_checkos">
 
 
-  <target name="build" description="Build Installers" depends="checkos">
+    <!-- Windows Installer -->
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('C:\Program Files (x86)\NSIS\makensis.exe')}">
-
         <echo append="false" file="Windows/header.nsh">
 !define FrameworkPath "${project::get-base-directory()}"
 !define VERSION "3.0"
 !define INSTALLERVERSION "${buildNumber}"
         </echo>
-        <call target="download"/>
-        <exec program="C:\Windows\system32\cmd.exe" commandline='/C rmdir /S /Q WindowsUniversal' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" failonerror='false' />
-		<exec program="C:\Windows\system32\cmd.exe" commandline='/C rename WindowsUAP WindowsUniversal' workingdir="${project::get-base-directory()}\..\MonoGame.Framework\bin" />
         <exec program="makensis" workingdir="Windows" basedir="C:\Program Files (x86)\NSIS">
 		      <arg value="MonoGame.nsi"/>
-		    </exec>
+        </exec>
       </if>
     </if>
+
+
+    <!-- Mac Installers -->
     <if test="${os == 'MacOS'}">
+
       <!-- Build Pipeline.Installer.pkg -->
       <delete failonerror="false">
          <fileset>
@@ -140,6 +133,7 @@ fi
       <delete file="./MacOS/Resources/LICENSE.html"/>
     </if>
 
+
     <!-- Linux Installer -->
     <if test="${(os == 'Unix' or os == 'MacOS') and directory::exists('../Tools/Pipeline/bin/Linux/AnyCPU/Release')}">
       
@@ -192,4 +186,5 @@ fi
     </if>
 
   </target>
+
 </project>
