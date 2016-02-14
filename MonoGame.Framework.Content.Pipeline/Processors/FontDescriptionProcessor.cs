@@ -333,6 +333,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return split [0];
         }
 
+#endif
         private class FileInfoComparer : IEqualityComparer<FileInfo>
         {
             public bool Equals(FileInfo x, FileInfo y)
@@ -345,6 +346,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 return obj.FullName.GetHashCode();
             }
         }
-#endif
     }
 }
