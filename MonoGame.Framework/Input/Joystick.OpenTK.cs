@@ -26,7 +26,11 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities 
             {
                 IsConnected = true,
+#if DESKTOPGL
+                Id = string.Empty,
+#else
                 Id = OpenTK.Input.Joystick.GetGuid(index).ToString(),
+#endif
                 AxisCount = cap.AxisCount,
                 ButtonCount = cap.ButtonCount,
                 HatCount = cap.HatCount
