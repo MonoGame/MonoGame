@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Storage
             var saved = StorageDevice.StorageRoot;
 #elif DESKTOPGL
             string saved = "";
-            if(CurrentPlatform.OS == OS.Linux)
+            if(CurrentPlatform.OS == OS.Linux || CurrentPlatform.OS == OS.MacOSX)
                 saved = StorageDevice.StorageRoot;
             else if(CurrentPlatform.OS == OS.Windows)
                 saved = Path.Combine(StorageDevice.StorageRoot, "SavedGames");

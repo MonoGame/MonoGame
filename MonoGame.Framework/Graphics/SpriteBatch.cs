@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.GraphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
-            _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _spriteEffect = new Effect(graphicsDevice, EffectResource.SpriteEffect.Bytecode);
             _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
@@ -402,19 +402,33 @@ namespace Microsoft.Xna.Framework.Graphics
 				_texCoordTL.X = temp;
 			}
 
-			item.Set (destinationRectangle.X,
-					destinationRectangle.Y, 
-					-origin.X, 
-					-origin.Y,
-					destinationRectangle.Z,
-					destinationRectangle.W,
-					(float)Math.Sin (rotation), 
-					(float)Math.Cos (rotation), 
-					color, 
-					_texCoordTL, 
-					_texCoordBR,
-                    depth);
-			
+		    if (rotation == 0f)
+		    {
+                item.Set(destinationRectangle.X - origin.X,
+                        destinationRectangle.Y - origin.Y,
+                        destinationRectangle.Z,
+                        destinationRectangle.W,
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        depth);
+            }
+            else
+		    {
+                item.Set(destinationRectangle.X,
+                        destinationRectangle.Y,
+                        -origin.X,
+                        -origin.Y,
+                        destinationRectangle.Z,
+                        destinationRectangle.W,
+                        (float)Math.Sin(rotation),
+                        (float)Math.Cos(rotation),
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        depth);
+            }
+
 			if (autoFlush)
 			{
 				FlushIfNeeded();

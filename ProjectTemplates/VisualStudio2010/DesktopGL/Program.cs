@@ -2,7 +2,6 @@
 
 namespace $safeprojectname$
 {
-#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -18,5 +17,4 @@ namespace $safeprojectname$
                 game.Run();
         }
     }
-#endif
 }

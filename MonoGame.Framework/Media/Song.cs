@@ -13,7 +13,6 @@ namespace Microsoft.Xna.Framework.Media
 		private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
-
         /// <summary>
         /// Gets the Album on which the Song appears.
         /// </summary>
@@ -39,6 +38,11 @@ namespace Microsoft.Xna.Framework.Media
         public Genre Genre
         {
             get { return PlatformGetGenre(); }
+        }
+        
+        public bool IsDisposed
+        {
+            get { return disposed; }
         }
 
 #if ANDROID || OPENAL || WEB || IOS

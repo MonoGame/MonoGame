@@ -188,6 +188,10 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(null, optional.a);
                 Assert.AreEqual(null, optional.b);
                 Assert.AreEqual(string.Empty, optional.c);
+                Assert.AreEqual(null, optional.d);
+                Assert.AreEqual(CullMode.CullClockwiseFace, optional.e);
+                Assert.AreEqual(CullMode.CullCounterClockwiseFace, optional.f);
+                Assert.AreEqual(CullMode.CullClockwiseFace, optional.g);
             });
         }
 

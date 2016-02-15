@@ -7,6 +7,12 @@ namespace TwoMGFX
     {
         public static int Main(string[] args)
         {
+            if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
+            {
+                Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
+                return -1;
+            }
+
             var options = new Options();
             var parser = new Utilities.CommandLineParser(options);
             parser.Title = "2MGFX - Converts Microsoft FX files to a compiled MonoGame Effect.";
