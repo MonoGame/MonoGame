@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <summary>
         /// Valid font extension
         /// </summary>
-        String[] _SupportedFontExtensions=new string[] {".ttf",".otf",".ttc" };
+        string[] _SupportedFontExtensions=new string[] {".ttf",".otf",".ttc" };
         /// <summary>
         /// Possible filename indicators of a bold font
         /// </summary>
@@ -59,6 +59,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
 		    var fontDirectory = Path.Combine(windowsfolder,"Fonts");
 			directories.Add(fontDirectory);
+            var fontfilefamily = FindFontByFontFamily(input.FontName, directories, input.Style);
             var fontfilename = FindFontByFileName(input.FontName, directories, input.Style);
 
 			fontName = FindFontFileFromFontName(input.FontName, fontDirectory, input.Style);
@@ -203,6 +204,46 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			return glyphs.ToArray();
 		}
+
+        string FindFontByFontFamily(string fontname, List<string> fontDirectories, FontDescriptionStyle style)
+        {
+            var files = fontDirectories.Where(fd => Directory.Exists(fd)).SelectMany<string, string>(fd =>
+            Directory.GetFiles(fd).Where(f =>
+            _SupportedFontExtensions.Any(e => f.Substring(f.Length - e.Length).Equals(e, StringComparison.OrdinalIgnoreCase))));
+            List<Tuple<string, int, StyleFlags>> candidates = new List<Tuple<string, int, StyleFlags>>();
+            SharpFont.Library lib = new Library();
+            foreach (var font in files)
+            {
+                Face face = lib.NewFace(font, 0);
+                if (face.FamilyName.Equals(fontname, StringComparison.OrdinalIgnoreCase))
+                {
+                    int faceCount = face.FaceCount;
+                    face.Dispose();
+                    for (int i = 0; i < faceCount; i++)
+                    {
+                        face = lib.NewFace(font, i);
+                        candidates.Add(new Tuple<string, int, StyleFlags>(font, i, face.StyleFlags));
+                        face.Dispose();
+                    }
+                }
+            }
+            lib.Dispose();
+            //StyleFlags requestedStyle = style.ToStyleFlags();
+            var boldCandidates = candidates.Where(c => c.Item3.HasFlag(StyleFlags.Bold));
+            var italicCandidates = candidates.Where(c => c.Item3.HasFlag(StyleFlags.Italic));
+            bool bold = style.HasFlag(FontDescriptionStyle.Bold) && boldCandidates.Any();
+            bool italic = style.HasFlag(FontDescriptionStyle.Italic) && italicCandidates.Any();
+            if (bold && italic)
+                return boldCandidates.Intersect(italicCandidates).FirstOrDefault().Item1;
+            if (italic)
+                return italicCandidates.FirstOrDefault().Item1;
+            if (bold)
+                return boldCandidates.FirstOrDefault().Item1;
+            if (candidates.Any())
+                return candidates.FirstOrDefault().Item1;
+            return null;
+        }
+
         /// <summary>
         /// Retrieves the path to the font with the requested filename looking for variations for the style
         /// </summary>
