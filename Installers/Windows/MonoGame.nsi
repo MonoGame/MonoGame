@@ -79,6 +79,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   ; Install the VS support files.
   SetOutPath ${MSBuildInstallDir}
   File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
+  File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Common.props'
 
   ; Install the MonoGame tools to a single shared folder.
   SetOutPath ${MSBuildInstallDir}\Tools
