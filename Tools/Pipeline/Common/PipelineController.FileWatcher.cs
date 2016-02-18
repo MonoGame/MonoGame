@@ -51,13 +51,13 @@ namespace MonoGame.Tools.Pipeline
 
                         foreach (var item in items)
                         {
+                            Thread.Sleep(100);
+
                             if (item.Exists == File.Exists(_controller.GetFullPath(item.OriginalPath)))
                                 continue;
 
                             item.Exists = !item.Exists;
                             _view.ItemExistanceChanged (item);
-
-                            Thread.Sleep(100);
                         }
                     }
                     catch 
