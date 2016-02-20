@@ -162,7 +162,7 @@
     <Compile Include="ContentPipeline\EffectProcessorTests.cs">
         <Platforms>Windows</Platforms>
     </Compile>
-	<Compile Include="ContentPipeline\EnumConformingTest.cs"> 
+	<Compile Include="ContentPipeline\PipelineEnumConformingTest.cs"> 
 		<Platforms>Windows,MacOS,Linux</Platforms>
 	</Compile>
     <Compile Include="ContentPipeline\FontDescriptionTests.cs">

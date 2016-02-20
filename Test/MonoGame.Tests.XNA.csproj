@@ -87,7 +87,7 @@
     <Compile Include="ContentPipeline\AssetTestClasses.cs" />
     <Compile Include="ContentPipeline\AssetTestUtility.cs" />
     <Compile Include="ContentPipeline\BitmapContentTests.cs" />
-	<Compile Include="ContentPipeline\EnumConformingTest.cs" />
+	<Compile Include="ContentPipeline\PipelineEnumConformingTest.cs" />
     <Compile Include="ContentPipeline\FontDescriptionTests.cs" />
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs" />
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs" />

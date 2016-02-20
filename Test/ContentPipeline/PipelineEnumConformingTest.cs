@@ -9,10 +9,10 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 namespace MonoGame.Tests.ContentPipeline
 {
     [TestFixture]
-    public class EnumConformingTest
+    public class PipelineEnumConformingTest
     {
         [Test]
-        public void ContainmentTypeEnum()
+        public void FontDescriptionStyleTest()
         {
             Assert.AreEqual(0, (int) FontDescriptionStyle.Regular);
             Assert.AreEqual(1, (int) FontDescriptionStyle.Bold);
