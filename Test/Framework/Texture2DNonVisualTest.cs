@@ -30,12 +30,14 @@ namespace MonoGame.Tests.Framework
 #endif
         }
 
+#if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
         [TestCase("Assets/Textures/LogoOnly_64px.dds")]
+        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+#endif
         [TestCase("Assets/Textures/LogoOnly_64px.gif")]
         [TestCase("Assets/Textures/LogoOnly_64px.jpg")]
         [TestCase("Assets/Textures/LogoOnly_64px.png")]
-        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
         public void FromStreamShouldWorkTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
@@ -61,13 +63,18 @@ namespace MonoGame.Tests.Framework
             _texture = null;
         }
 
+#if XNA
+        [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
+        [TestCase("Assets/Textures/LogoOnly_64px.dds")]
+        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
+#endif
         [TestCase("Assets/Textures/LogoOnly_64px.tga")]
         [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
             {
-                Assert.Throws<NotSupportedException>(() => _texture = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream));
+                Assert.Throws<InvalidOperationException>(() => _texture = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream));
             }
         }
         [TestFixtureTearDown]

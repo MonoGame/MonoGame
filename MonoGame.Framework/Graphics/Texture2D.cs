@@ -251,7 +251,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return PlatformFromStream(graphicsDevice, stream);
             }catch(Exception e)
             {
-                throw new NotSupportedException("This image format is not supported", e);
+                throw new InvalidOperationException("This image format is not supported", e);
             }
         }
         /// <summary>
