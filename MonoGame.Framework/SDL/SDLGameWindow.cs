@@ -100,6 +100,8 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        internal static GameWindow Instance;
+
         internal int BorderX, BorderY;
         internal bool _isFullScreen;
 
@@ -112,6 +114,8 @@ namespace Microsoft.Xna.Framework
         {
             this._game = game;
             this._screenDeviceName = "";
+
+            Instance = this;
         }
 
         internal void CreateWindow()
@@ -162,21 +166,29 @@ namespace Microsoft.Xna.Framework
 
             var prevBounds = ClientBounds;
 
+            var displayIndex = SDL.Window.GetDisplayIndex(Handle);
+
             SDL.Rectangle displayRect;
-            SDL.Display.GetBounds(SDL.Window.GetDisplayIndex(Handle), out displayRect);
-
-            SDL.Window.SetSize(Handle, clientWidth, clientHeight);
-
+            SDL.Display.GetBounds(displayIndex, out displayRect);
+            
             if (_willBeFullScreen != _isFullScreen)
             {
                 var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? SDL.Window.State.Fullscreen : SDL.Window.State.FullscreenDesktop;
                 SDL.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
             }
 
-            SDL.Window.SetPosition(Handle,
-                displayRect.X + Math.Max(prevBounds.X - ((IsBorderless || _isFullScreen) ? 0 : BorderX) + ((prevBounds.Width - clientWidth) / 2), 0),
-                displayRect.Y + Math.Max(prevBounds.Y - ((IsBorderless || _isFullScreen) ? 0 : BorderY)  + ((prevBounds.Height - clientHeight) / 2), 0)
-            );
+            SDL.Window.SetSize(Handle, clientWidth, clientHeight);
+
+            var centerX = Math.Max(prevBounds.X - ((IsBorderless || _isFullScreen) ? 0 : BorderX) + ((prevBounds.Width - clientWidth) / 2), 0);
+            var centerY = Math.Max(prevBounds.Y - ((IsBorderless || _isFullScreen) ? 0 : BorderY) + ((prevBounds.Height - clientHeight) / 2), 0);
+
+            if (_isFullScreen && !_willBeFullScreen)
+            {
+                centerX += displayRect.X;
+                centerY += displayRect.Y;
+            }
+            
+            SDL.Window.SetPosition(Handle, centerX, centerY);
 
             _isFullScreen = _willBeFullScreen;
             OnClientSizeChanged();
