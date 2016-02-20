@@ -182,8 +182,37 @@ internal static class SDL
 
     public static class Display
     {
+        public struct SDL_DisplayMode
+        {
+            public uint Format;
+            public int Width;
+            public int Height;
+            public int RefreshRate;
+            public IntPtr DriverData;
+        }
+
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayBounds")]
         public static extern int GetBounds(int displayIndex, out Rectangle rect);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayMode")]
+        public static extern int GetDisplayMode(int displayIndex, int modeIndex, out SDL_DisplayMode mode);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayName")]
+        private static extern IntPtr SDL_GetDisplayName(int index);
+
+        public static string GetDisplayName(int index)
+        {
+            return GetString(SDL_GetDisplayName(index));
+        }
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetNumDisplayModes")]
+        public static extern int GetNumDisplayModes(int displayIndex);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetNumVideoDisplays")]
+        public static extern int GetNumVideoDisplays();
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowDisplayIndex")]
+        public static extern int GetWindowDisplayIndex(IntPtr window);
     }
 
     public static class Mouse
