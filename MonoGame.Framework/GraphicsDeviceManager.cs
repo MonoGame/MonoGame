@@ -261,13 +261,15 @@ namespace Microsoft.Xna.Framework
             ((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
 
 #elif DESKTOPGL
+            var displayIndex = SDL.Window.GetDisplayIndex(SDLGameWindow.Instance.Handle);
+            var displayName = SDL.Display.GetDisplayName(displayIndex);
 
-        _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-        _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-        _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-        _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-        _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-        _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
+            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
             //Set the swap interval based on if vsync is desired or not.
             //See GetSwapInterval for more details
@@ -276,12 +278,12 @@ namespace Microsoft.Xna.Framework
                 swapInterval = _graphicsDevice.PresentationParameters.PresentationInterval.GetSwapInterval();
             else
                 swapInterval = 0;
-        _graphicsDevice.Context.SwapInterval = swapInterval;
+            _graphicsDevice.Context.SwapInterval = swapInterval;
 
-        _graphicsDevice.ApplyRenderTargets(null);
+            _graphicsDevice.ApplyRenderTargets(null);
 
             _game.Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
-            _game.Platform.EndScreenDeviceChange("", GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+            _game.Platform.EndScreenDeviceChange(displayName, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
 
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
