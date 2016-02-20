@@ -17,6 +17,9 @@ Note this is a Shared Project only, it will need to be referenced from another M
 		<Project name = "${ProjectName}" directory = "." type = "SharedAssetsProject">
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
+				<Directory name="Content">
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
+				</Directory>
 			</Files>
 		</Project>
 	</Combine>

@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework
         private void OnResize(object sender, EventArgs e)
         {
             // Ignore resize events until intialization is complete
-            if (Game == null)
+            if (Game == null || Game.GraphicsDevice == null)
                 return;
 
             lock (window)
@@ -287,6 +287,8 @@ namespace Microsoft.Xna.Framework
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds)
             {
+                var prevState = window.WindowState;
+
                 if (CurrentPlatform.OS == OS.Linux)
                     window.WindowBorder = WindowBorder.Resizable;
                 
@@ -302,7 +304,7 @@ namespace Microsoft.Xna.Framework
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
 
-                if (!Configuration.RunningOnSdl2)
+                if (!Configuration.RunningOnSdl2 && prevState != WindowState.Fullscreen)
                 {
                     int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
                     int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
@@ -325,7 +327,12 @@ namespace Microsoft.Xna.Framework
                     context.Update(window.WindowInfo);
 
                 if (!Window.Visible)
+                {
                     Window.Visible = true;
+
+                    // Bug in OpenTK, it doesn't always set state if window is not visible
+                    window.WindowState = windowState; 
+                }
             }
         }
 
@@ -370,8 +377,13 @@ namespace Microsoft.Xna.Framework
             {
                 if (t == null && assembly != null)
                     window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-                else
-                    window.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico"));
+                else {
+                    using (var stream = Assembly.GetEntryAssembly().GetManifestResourceStream(string.Format("{0}.Icon.ico", Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace)) ?? 
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico")) {
+                        if (stream != null)
+                           window.Icon = new Icon(stream);
+                    }
+                }
             }
             catch { }
 

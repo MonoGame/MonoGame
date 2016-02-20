@@ -22,7 +22,7 @@ This is an example of a project set to build with the 4.4 SDK and target 4.0 as 
 
 ### Xamarin Studio
 
-Xamarin Studio has the same settings in the propject options dialog. They are just in different places.
+Xamarin Studio has the same settings in the project options dialog. They are just in different places.
 
 `Target framework` on the `General` page is the equivalent of Visual Studio's `Compile using Android version`.
 
@@ -30,12 +30,31 @@ Xamarin Studio has the same settings in the propject options dialog. They are ju
 <img src="images/android_xs_target_framework.png"/>
 </p>
 
-On the `Application Application` page, you will find `Minimum Android version` (Visual Studio's `Minimum Android to target`) and `Target Android version` (same as Visual Studio).
+On the `Android Application` page, you will find `Minimum Android version` (Visual Studio's `Minimum Android to target`) and `Target Android version` (same as Visual Studio).
 
 <p align="center">
 <img src="images/android_xs_minimum_framework.png"/>
 </p>
 
+
+## Android Manifest Requirements
+
+### OpenGL ES 2.0 Support
+
+MonoGame uses OpenGL ES 2.0. Google requires the following to be added to AndroidManifest.xml in order for the Market to hide the game from devices that do not have support for OpenGL ES 2.0.
+
+
+```
+<!-- Tell the system this app requires OpenGL ES 2.0. -->
+<uses-feature android:glEsVersion="0x00020000" android:required="true" />
+```
+
+### Texture Compression
+
+The Market can also filter games by the types of texture compression they support. Add a  ```
+<supports-gl-texture> ``` node for each type of texture compression used in your game. See the [Android documentation](http://developer.android.com/guide/topics/manifest/supports-gl-texture-element.html) for further details on this node.
+
 ## References
 
 [Such Android API Levels, Much Confuse. Wow.](http://redth.codes/such-android-api-levels-much-confuse-wow/) is a blog post by Redth going into more detail about setting the Android versions in a Xamarin project.
+

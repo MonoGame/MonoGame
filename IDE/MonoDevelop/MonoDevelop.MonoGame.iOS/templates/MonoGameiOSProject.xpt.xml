@@ -24,10 +24,8 @@
 				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />	
 				<Reference type="Gac" refto="Xamarin.iOS" />
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.iOS" version="3.3.0" targetFramework="XamariniOS" />
-			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
 				<File name="Main.cs" AddStandardHeader="True" src="Common/Program.cs" />
