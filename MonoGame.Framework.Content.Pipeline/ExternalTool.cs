@@ -166,5 +166,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 #endif
         }
+
+        /// <summary>
+        /// Safely deletes the file if it exists.
+        /// </summary>
+        /// <param name="filePath">The path to the file to delete.</param>
+        public static void DeleteFile(string filePath)
+        {
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch (Exception)
+            {                    
+            }
+        }
     }
 }
