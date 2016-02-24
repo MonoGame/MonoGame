@@ -98,10 +98,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			// Render the character.
             BitmapContent glyphBitmap = null;
 			var abc = new ABCFloat ();
+            int finalWidth = face.Glyph.Bitmap.Width;
+            int finalHeight = face.Glyph.Bitmap.Rows;
 			if (face.Glyph.Bitmap.Width > 0 && face.Glyph.Bitmap.Rows > 0)
             {
-                int finalWidth = face.Glyph.Bitmap.Width;
-                int finalHeight = face.Glyph.Bitmap.Rows;
 				byte[] gpixelAlphas = new byte[face.Glyph.Bitmap.Width * face.Glyph.Bitmap.Rows];
                 //if the character bitmap has 1bpp we have to expand the buffer data to get the 8bpp pixel data
                 //each byte in bitmap.bufferdata contains the value of to 8 pixels in the row
@@ -155,9 +155,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 glyphBitmap = new PixelBitmapContent<byte>(gHA, gVA);
 			}
 
-			abc.A = face.Glyph.Metrics.HorizontalBearingX >> 6;
-			abc.B = face.Glyph.Metrics.Width >> 6;
-			abc.C = (face.Glyph.Metrics.HorizontalAdvance >> 6) - (abc.A + abc.B);
+			abc.A += face.Glyph.Metrics.HorizontalBearingX >> 6;
+			abc.B += face.Glyph.Metrics.Width >> 6;
+            abc.C += (face.Glyph.Metrics.HorizontalAdvance >> 6) - (abc.A + abc.B) + finalWidth - face.Glyph.Bitmap.Width;
 
 			// Construct the output Glyph object.
 			return new Glyph(character, glyphBitmap)
@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             //byte[] baseData = (byte[]) bitmap.Clone();
             finalWidth = initialWidth + 2;
             charSize.A -= 1;
-            charSize.B += 2;
+            //charSize.B += 2;
             charSize.C -= 1;
 
             byte[] destination = new byte[finalWidth * height];
@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             //byte[] baseData = (byte[])bitmap.Clone();
             int displacement = height / 6; //Divided 3 and then by 2
             charSize.A -= displacement;
-            charSize.B += displacement * 2;
+           // charSize.B += displacement * 2;
             charSize.C -= displacement;
             finalWidth = initialWidth + height / 3;
             byte[] destination = new byte[finalWidth * height];
