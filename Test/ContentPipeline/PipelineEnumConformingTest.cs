@@ -11,12 +11,13 @@ namespace MonoGame.Tests.ContentPipeline
     [TestFixture]
     public class PipelineEnumConformingTest
     {
-        [Test]
-        public void FontDescriptionStyleTest()
+        [TestCase(0, FontDescriptionStyle.Regular)]
+        [TestCase(1, FontDescriptionStyle.Bold)]
+        [TestCase(2, FontDescriptionStyle.Italic)]
+        [TestCase(3, FontDescriptionStyle.Italic |FontDescriptionStyle.Bold)]
+        public void FontDescriptionStyleTest(int expected, FontDescriptionStyle style)
         {
-            Assert.AreEqual(0, (int) FontDescriptionStyle.Regular);
-            Assert.AreEqual(1, (int) FontDescriptionStyle.Bold);
-            Assert.AreEqual(2, (int) FontDescriptionStyle.Italic);
+            Assert.AreEqual(expected, (int) style);
         }
     }
 }
