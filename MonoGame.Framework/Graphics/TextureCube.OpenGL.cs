@@ -73,8 +73,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if OPENGL && (MONOMAC || DESKTOPGL)
             TextureTarget target = GetGLCubeFace(cubeMapFace);
-            GL.BindTexture(target, this.glTexture);
+            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+            GraphicsExtensions.CheckGLError();
             GL.GetTexImage<T>(target, 0, glFormat, glType, data);
+            GraphicsExtensions.CheckGLError();
 #else
             throw new NotImplementedException();
 #endif
