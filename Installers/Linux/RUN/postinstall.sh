@@ -36,6 +36,10 @@ cp -rf "$DIR/MonoGameSDK/." "$IDIR" -R
 rm -rf "/opt/MonoGameSDK"
 ln -s "$IDIR" "/opt/MonoGameSDK"
 
+# Fix Permissions
+chmod +x "$DIR/MonoGameSDK/Tools/ffmpeg"
+chmod +x "$DIR/MonoGameSDK/Tools/ffprobe"
+
 # Monogame Pipeline terminal commands
 echo "Creating launcher items..."
 
