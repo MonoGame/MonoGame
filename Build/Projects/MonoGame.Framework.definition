@@ -745,7 +745,6 @@
     <Compile Include="Graphics\Vertices\VertexInputLayout.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
