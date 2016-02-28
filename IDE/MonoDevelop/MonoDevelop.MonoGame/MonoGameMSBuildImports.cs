@@ -66,7 +66,7 @@ namespace MonoDevelop.MonoGame
 					manager.AddNamespace ("tns", schema);
 					var import = project.Document.CreateElement ("Import", schema);
 					import.SetAttribute ("Project", MonoGameCommonProps);
-					import.SetAttribute ("Conditon", string.Format ("Exists('{0}')", MonoGameCommonProps));
+					import.SetAttribute ("Condition", string.Format ("Exists('{0}')", MonoGameCommonProps));
 					project.Document.DocumentElement.InsertBefore (import, project.Document.DocumentElement.FirstChild);
 					needsSave = true;
 				}
