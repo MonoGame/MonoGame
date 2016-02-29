@@ -39,16 +39,8 @@
       <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/MonoDevelop.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MonoDevelop.MonoMac">
-      <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.MonoMac/MonoDevelop.MonoMac.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
       <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.DesignerSupport/MonoDevelop.DesignerSupport.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MonoDevelop.MacDev">
-      <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.MacDev/MonoDevelop.MacDev.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
