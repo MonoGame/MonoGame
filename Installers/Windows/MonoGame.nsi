@@ -152,10 +152,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   ; Install iOS Assemblies
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
   InstalliOSAssemblies:
-  SetOutPath '$INSTDIR\Assemblies\iOS\iPhone'
-  File '..\..\MonoGame.Framework\bin\iOS\iPhone\Release\*.dll'
-  File '..\..\MonoGame.Framework\bin\iOS\iPhone\Release\*.xml'
-  SetOutPath '$INSTDIR\Assemblies\iOS\iPhoneSimulator'
+  SetOutPath '$INSTDIR\Assemblies\iOS'
   File '..\..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\*.xml'
   SkipiOSAssemblies:
