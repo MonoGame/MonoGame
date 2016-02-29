@@ -149,12 +149,15 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\MonoGame.Framework\bin\WindowsUniversal\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\WindowsUniversal\AnyCPU\Release\*.xml'
 
-  ; Intall iOS Assemblies
+  ; Install iOS Assemblies
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
   InstalliOSAssemblies:
-  SetOutPath '$INSTDIR\Assemblies\iOS'
-  File /nonfatal 'iOS\*.dll'
-  ;File /nonfatal 'iOS\*.xml'  
+  SetOutPath '$INSTDIR\Assemblies\iOS\iPhone'
+  File '..\..\MonoGame.Framework\bin\iOS\iPhone\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\iOS\iPhone\Release\*.xml'
+  SetOutPath '$INSTDIR\Assemblies\iOS\iPhoneSimulator'
+  File '..\..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\*.xml'
   SkipiOSAssemblies:
 
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Desktop OpenGL' '' '$INSTDIR\Assemblies\DesktopGL'
