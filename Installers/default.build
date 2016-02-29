@@ -64,7 +64,7 @@
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA" />
-      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOS" />
+      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL" />
       <!-- Copy the Files over for the framework -->
@@ -94,7 +94,7 @@
                 <include name="*.*"/>
          </fileset>
       </copy>
-      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOS">
+      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX">
          <fileset basedir="../MonoGame.Framework/bin/MacOS/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
