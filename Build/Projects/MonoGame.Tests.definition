@@ -827,6 +827,9 @@
     <Content Include="Assets\Textures\rgbf.tif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Assets\Textures\RGBA16.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
   </Files>
 </Project>

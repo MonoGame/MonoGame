@@ -105,10 +105,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Create the Pixel bitmap content depending on the image type
             switch(imageType)
             {
-                case FREE_IMAGE_TYPE.FIT_BITMAP:
+                //case FREE_IMAGE_TYPE.FIT_BITMAP:
+                default:
                     face = new PixelBitmapContent<Color>(width, height);
                     break;
-
+                case FREE_IMAGE_TYPE.FIT_RGBA16:
+                    face = new PixelBitmapContent<Rgba64>(width, height);
+                    break;
                 case FREE_IMAGE_TYPE.FIT_RGBAF:
                     face = new PixelBitmapContent<Vector4>(width, height);
                     break;
@@ -154,6 +157,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         // Swap R and B channels to make it BGRA
                         SwitchRedAndBlueChannels(fBitmap);
                     }
+                    break;
+                //case FREE_IMAGE_TYPE.FIT_RGBA16:
+                //    SwitchRedAndBlueChannels(fBitmap);
+                //    break;
+                default:
+                    bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                    SwitchRedAndBlueChannels(bgra);
+                    FreeImage.UnloadEx(ref fBitmap);
+                    fBitmap = bgra;
                     break;
             }
 
