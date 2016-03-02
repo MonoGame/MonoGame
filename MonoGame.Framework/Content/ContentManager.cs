@@ -449,12 +449,11 @@ namespace Microsoft.Xna.Framework.Content
             // The next int32 is the length of the XNB file
             int xnbLength = xnbReader.ReadInt32();
 
-            ContentReader reader;
+            Stream decompressedStream = null;
             if (compressedLzx || compressedLz4)
             {
                 // Decompress the xnb
                 int decompressedSize = xnbReader.ReadInt32();
-                MemoryStream decompressedStream = null;
 
                 if (compressedLzx)
                 {
@@ -515,27 +514,17 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else if (compressedLz4)
                 {
-                    // Decompress to a byte[] because Windows 8 doesn't support MemoryStream.GetBuffer()
-                    var buffer = new byte[decompressedSize];
-                    using (var decoderStream = new Lz4DecoderStream(stream))
-                    {
-                        if (decoderStream.Read(buffer, 0, buffer.Length) != decompressedSize)
-                        {
-                            throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
-                        }
-                    }
-                    // Creating the MemoryStream with a byte[] shares the buffer so it doesn't allocate any more memory
-                    decompressedStream = new MemoryStream(buffer);
+                    decompressedStream = new Lz4DecoderStream(stream);
                 }
-
-                reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
             }
             else
             {
-                reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
+                decompressedStream = stream;
             }
+
+            var reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+                                                        originalAssetName, version, recordDisposableObject);
+            
             return reader;
         }
 
