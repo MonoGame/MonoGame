@@ -31,16 +31,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			var face = CreateFontFace(options, fontName);
             bool italice = options.Style.HasFlag(FontDescriptionStyle.Italic) && !face.StyleFlags.HasFlag(StyleFlags.Italic);
             bool embolden = options.Style.HasFlag(FontDescriptionStyle.Bold) && !face.StyleFlags.HasFlag(StyleFlags.Bold);
+            bool draw3Times = options.Size > 15;
 			try
             {
 					// Which characters do we want to include?
                     var characters = options.Characters;
 
 					var glyphList = new List<Glyph>();
-					// Rasterize each character in turn.
-					foreach (char character in characters)
+                //if (italice)
+                //{
+                //    FTMatrix matrix = new FTMatrix(0x10000, (int) (0.36 * 0x10000), 0, 0x10000);
+                //    face.SetTransform(matrix);
+                //}
+                    // Rasterize each character in turn.
+                    foreach (char character in characters)
 					{
-						var glyph = ImportGlyph(character, face, italice, embolden);
+                        var glyph = ImportGlyph(character, face, italice, embolden, draw3Times);
 						glyphList.Add(glyph);
 					}
 					Glyphs = glyphList;
@@ -89,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		}
 
 		// Rasterizes a single character glyph.
-		private Glyph ImportGlyph(char character, Face face, bool italice, bool embolden)
+		private Glyph ImportGlyph(char character, Face face, bool italice, bool embolden, bool draw3Times)
         {
 			uint glyphIndex = face.GetCharIndex(character);
 			face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
@@ -130,15 +136,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
                 else
                     Marshal.Copy(face.Glyph.Bitmap.Buffer, gpixelAlphas, 0, gpixelAlphas.Length);
-			// not sure about this at all
                 if (italice)
-                {
-                    //int displacement;
                     Italice(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref finalWidth);
-                    //glyph.CharacterWidths.A -= displacement;
-                }
                 if (embolden)
-                    Embolden(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref finalWidth);
+                    Embolden(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref finalWidth, ref finalHeight, draw3Times);
                 glyphBitmap = new PixelBitmapContent<byte>(finalWidth, finalHeight);
                 glyphBitmap.SetPixelData(gpixelAlphas);
                 
@@ -163,7 +164,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			return new Glyph(character, glyphBitmap)
 			{
 				XOffset = -(face.Glyph.Advance.X >> 6),
-				XAdvance = face.Glyph.Metrics.HorizontalAdvance >> 6,
+				XAdvance = abc.A+abc.B+abc.C,//face.Glyph.Metrics.HorizontalAdvance >> 6,
                 YOffset = -(face.Glyph.Metrics.HorizontalBearingY >> 6),
 				CharacterWidths = abc
 			};
@@ -193,49 +194,57 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     destination[startIndex + 7 - i] = byte.MinValue;
             }
     }
-        private void Embolden(ref byte[] bitmap, ref ABCFloat charSize, int initialWidth, int height, ref int finalWidth)
-        {
-            //byte[] baseData = (byte[]) bitmap.Clone();
-            finalWidth = initialWidth + 2;
-            charSize.A -= 1;
-            //charSize.B += 2;
-            charSize.C -= 1;
 
-            byte[] destination = new byte[finalWidth * height];
-            byte a, b;
+        private void Embolden(ref byte[] bitmap, ref ABCFloat charSize, int initialWidth, int height, ref int finalWidth, ref int finalHeight, bool draw3times)
+        {
+            finalWidth = initialWidth + (draw3times ? 2 : 1);
+            charSize.A -= 1;
+            charSize.C -= draw3times ? 2 : 1;
+            int kLimit = draw3times ? 1 : 0;
+            byte[] destination = new byte[finalWidth * finalHeight];
+            byte orig, dest;
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < initialWidth; j++)
                 {
-                    a = bitmap[initialWidth * i + j];
-                    for (int k = -1; k <= 1; k++)
+                    orig = bitmap[initialWidth * i + j];
+                    for (int k = -1; k <= kLimit; k++)
                     {
-                        b = destination[i * finalWidth + j + 1 + k];
-                        destination[i * finalWidth + j + 1 + k] = a + b > byte.MaxValue ? byte.MaxValue : (byte) (a + b);
+                        dest = destination[i * finalWidth + j + 1 + k];
+                        destination[i * finalWidth + j + 1 + k] = orig + dest > byte.MaxValue ? byte.MaxValue : (byte) (orig + dest);
                     }
                 }
             }
             bitmap = destination;
         }
+
         private void Italice(ref byte[] bitmap, ref ABCFloat charSize, int initialWidth, int height, ref int finalWidth)
         {
-            //byte[] baseData = (byte[])bitmap.Clone();
-            int displacement = height / 6; //Divided 3 and then by 2
-            charSize.A -= displacement;
-           // charSize.B += displacement * 2;
-            charSize.C -= displacement;
-            finalWidth = initialWidth + height / 3;
+            double displacement = Math.Tan(0.349066);//20 degrees converted to radians
+            finalWidth += (int) Math.Ceiling(displacement * height);
+            int extraWidth = finalWidth - initialWidth;
+            charSize.A -= extraWidth;
+            charSize.C -= extraWidth;
             byte[] destination = new byte[finalWidth * height];
-            displacement = 0;
-            for (int i = height - 1; i >= 0; i--)
+            double currentDisplacement = 0;
+            for (int row = height - 1; row >= 0; row--, currentDisplacement += displacement)
             {
+                double leftVal = Math.Ceiling(currentDisplacement) - currentDisplacement;
+                double rightVal = currentDisplacement - Math.Floor(currentDisplacement);
+                if (leftVal == 0 && rightVal == 0)
+                    leftVal = 1;
                 for (int j = 0; j < initialWidth; j++)
                 {
-                    destination[i * finalWidth + displacement + j] = bitmap[i * initialWidth + j];
-                }
-                if (i % 3 == 0)
-                {
-                    displacement++;
+                    int OrigPos = row * initialWidth + j;
+                    int DestPos = row * finalWidth + j + (int) Math.Floor(currentDisplacement);
+                    if (destination[DestPos] + bitmap[OrigPos] * leftVal > byte.MaxValue)
+                        destination[DestPos] = byte.MaxValue;
+                    else
+                        destination[DestPos] += (byte) (bitmap[OrigPos] * leftVal);
+                    if (destination[DestPos + 1] + bitmap[OrigPos] * rightVal > byte.MaxValue)
+                        destination[DestPos + 1] = byte.MaxValue;
+                    else
+                        destination[DestPos + 1] += (byte) (bitmap[OrigPos] * rightVal);
                 }
             }
             bitmap = destination;
