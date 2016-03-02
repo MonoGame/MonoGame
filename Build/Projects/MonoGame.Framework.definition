@@ -248,6 +248,21 @@
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,WindowsPhone,tvOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
+    <Compile Include="TitleContainer.Android.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.Desktop.cs">
+      <Platforms>Linux,WindowsGL,Angle</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.iOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.MacOS.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.WinRT.cs">
+      <Platforms>WindowsPhone,WindowsUniversal,Windows8,WindowsPhone81</Platforms>
+    </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
