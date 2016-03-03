@@ -43,6 +43,12 @@
     <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs">
       <Link>MonoGame.Framework\BoundingBox.cs</Link>
     </Compile>
+	<Compile Include="..\..\MonoGame.Framework\Line1D.cs">
+      <Link>MonoGame.Framework\Line1D.cs</Link>
+    </Compile>
+	<Compile Include="..\..\MonoGame.Framework\SatIntersectionResult.cs">
+      <Link>MonoGame.Framework\SatIntersectionResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\BoundingFrustum.cs">
       <Link>MonoGame.Framework\BoundingFrustum.cs</Link>
     </Compile>
