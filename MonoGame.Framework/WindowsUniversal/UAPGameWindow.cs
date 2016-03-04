@@ -241,8 +241,8 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            // NOTE: There is no concept of a window 
-            // title in a Metro application.
+            var appView = ApplicationView.GetForCurrentView();
+            appView.Title = title;
         }
 
         internal void SetCursor(bool visible)
