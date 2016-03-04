@@ -878,6 +878,13 @@
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\MouseCursor.cs" />
+    <Compile Include="Input\MouseCursor.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\MouseCursor.Default.cs">
+      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS,MacOS,Web</Platforms>
+    </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />

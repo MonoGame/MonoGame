@@ -90,6 +90,9 @@ internal static class Sdl
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PollEvent")]
     public static extern int PollEvent(out Event _event);
 
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
+    public static extern void FreeSurface(IntPtr surface);
+
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetError")]
     private static extern IntPtr SDL_GetError();
 
@@ -336,6 +339,22 @@ internal static class Sdl
             X2Mask = 1 << 4
         }
 
+        public enum SystemCursor
+        {
+            Arrow,
+            IBeam,
+            Wait,
+            Crosshair,
+            WaitArrow,
+            SizeNWSE,
+            SizeNESW,
+            SizeWE,
+            SizeNS,
+            SizeAll,
+            No,
+            Hand
+        }
+
         public struct WheelEvent
         {
             public EventType Type;
@@ -347,11 +366,33 @@ internal static class Sdl
             public uint Direction;
         }
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateColorCursor")]
+        private static extern IntPtr SDL_CreateColorCursor(IntPtr surface, int x, int y);
+
+        public static IntPtr CreateColorCursor(IntPtr surface, int x, int y)
+        {
+            return GetError(SDL_CreateColorCursor(surface, x, y));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateSystemCursor")]
+        private static extern IntPtr SDL_CreateSystemCursor(SystemCursor id);
+
+        public static IntPtr CreateSystemCursor(SystemCursor id)
+        {
+            return GetError(SDL_CreateSystemCursor(id));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeCursor")]
+        public static extern void FreeCursor(IntPtr cursor);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetGlobalMouseState")]
         public static extern Button GetGlobalState(out int x, out int y);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetMouseState")]
         public static extern Button GetState(out int x, out int y);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetCursor")]
+        public static extern void SetCursor(IntPtr cursor);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ShowCursor")]
         public static extern int ShowCursor(int toggle);

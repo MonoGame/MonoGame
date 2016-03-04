@@ -150,6 +150,7 @@ namespace Microsoft.Xna.Framework
                         var src = Sdl.RwFromMem(br.ReadBytes((int) stream.Length), (int) stream.Length);
                         var icon = Sdl.LoadBMP_RW(src, 1);
                         Sdl.Window.SetIcon(_handle, icon);
+                        Sdl.FreeSurface(icon);
                     }
             }
 

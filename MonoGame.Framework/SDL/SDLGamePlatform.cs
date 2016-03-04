@@ -59,11 +59,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public override bool BeforeRun()
+        public override void BeforeInitialize ()
         {
             _view.CreateWindow();
 
-            return base.BeforeRun();
+            base.BeforeInitialize ();
         }
 
         protected override void OnIsMouseVisibleChanged()

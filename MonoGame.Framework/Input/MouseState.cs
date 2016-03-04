@@ -57,8 +57,8 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Initializes a new instance of the MouseState.
         /// </summary>
-        /// <param name="x">Horizontal position of the mouse.</param>
-        /// <param name="y">Vertical position of the mouse.</param>
+        /// <param name="x">Horizontal position of the mouse in relation to the window.</param>
+        /// <param name="y">Vertical position of the mouse in relation to the window.</param>
         /// <param name="scrollWheel">Mouse scroll wheel's value.</param>
         /// <param name="leftButton">Left mouse button's state.</param>
         /// <param name="middleButton">Middle mouse button's state.</param>
@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Gets horizontal position of the cursor.
+        /// Gets horizontal position of the cursor in relation to the window.
         /// </summary>
 		public int X {
 			get {
@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Input
 		}
 
         /// <summary>
-        /// Gets vertical position of the cursor.
+        /// Gets vertical position of the cursor in relation to the window.
         /// </summary>
 		public int Y {
 			get {
@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Input
 			internal set {
 				_y = value;
 			}
-		}
+        }
 
         /// <summary>
         /// Gets cursor position.

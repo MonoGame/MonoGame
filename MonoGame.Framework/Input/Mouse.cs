@@ -112,11 +112,10 @@ namespace Microsoft.Xna.Framework.Input
             
             int x, y;
             
-            //var clientBounds = PrimaryWindow.ClientBounds;
-            var state = Sdl.Mouse.GetState(out x, out y); // once we have border and titlebar detection code, replace this with GlobalMouseState
+            var state = Sdl.Mouse.GetState(out x, out y);
             
-            window.MouseState.X = x; // - clientBounds.X;
-            window.MouseState.Y = y; // - clientBounds.Y;
+            window.MouseState.X = x;
+            window.MouseState.Y = y;
 
             window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
             window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
@@ -202,6 +201,17 @@ namespace Microsoft.Xna.Framework.Input
 #elif WEB
             PrimaryWindow.MouseState.X = x;
             PrimaryWindow.MouseState.Y = y;
+#endif
+        }
+
+        /// <summary>
+        /// Sets the cursor image to the specified MouseCursor.
+        /// </summary>
+        /// <param name="cursor">Mouse cursor to use for the cursor image.</param>
+        public static void SetCursor (MouseCursor cursor)
+        {
+#if DESKTOPGL
+            Sdl.Mouse.SetCursor (cursor.Handle);
 #endif
         }
 
