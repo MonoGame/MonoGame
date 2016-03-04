@@ -127,6 +127,9 @@ namespace Microsoft.Xna.Framework
             if (_resizable)
                 initflags |= Sdl.Window.State.Resizable;
 
+            if (_borderless)
+                initflags |= Sdl.Window.State.Boderless;
+
             Sdl.Window.Destroy(_handle);
             _handle = Sdl.Window.Create(title,
                 _display.X + _display.Width/2 - width/2,
