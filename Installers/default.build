@@ -124,6 +124,7 @@ ln -sf /Library/Frameworks/MonoGame.framework/v${buildNumber} /Library/Framework
 #fix permissions
 chmod +x /Library/Frameworks/MonoGame.framework/Current/Tools/ffmpeg
 chmod +x /Library/Frameworks/MonoGame.framework/Current/Tools/ffprobe
+mkdir -p /Library/Frameworks/Mono.framework/External/xbuild
 if [ -d '/Library/Frameworks/Mono.framework/External/xbuild' ]
 then
         ln -sf /Library/Frameworks/MonoGame.framework /Library/Frameworks/Mono.framework/External/xbuild/MonoGame
