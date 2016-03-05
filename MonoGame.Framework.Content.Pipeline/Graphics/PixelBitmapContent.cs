@@ -19,6 +19,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public PixelBitmapContent(int width, int height)
         {
+            if (!TryGetFormat(out _format))
+                throw new InvalidOperationException(string.Format("Color format \"{0}\" is not supported",typeof(T).ToString()));
             Height = height;
             Width = width;
 
@@ -27,7 +29,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             for (int y = 0; y < height; y++)
                 _pixelData[y] = new T[width];
 
-            TryGetFormat(out _format);
         }
 
         public override byte[] GetPixelData()
