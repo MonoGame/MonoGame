@@ -133,35 +133,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             FIBITMAP bgra;
             switch(imageType)
             {
-                //Bitmap files are expanded to 32 bits before switching channels
-                case FREE_IMAGE_TYPE.FIT_BITMAP:
-                    bgra = FreeImage.ConvertTo32Bits(fBitmap);
+                // RGBF are switched before adding an alpha channel.
+                case FREE_IMAGE_TYPE.FIT_RGBF:
+                    // Swap R and B channels to make it BGR, then add an alpha channel
+                    SwitchRedAndBlueChannels(fBitmap);
+                    bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
                     FreeImage.UnloadEx(ref fBitmap);
                     fBitmap = bgra;
-                    SwitchRedAndBlueChannels(fBitmap);
                     break;
 
-                //RGBF are switched before adding an alpha channel.
-                case FREE_IMAGE_TYPE.FIT_RGBF:
-                    {
-                        // Swap R and B channels to make it BGR, then add an alpha channel
-                        SwitchRedAndBlueChannels(fBitmap);
-                        bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
-                        FreeImage.UnloadEx(ref fBitmap);
-                        fBitmap = bgra;
-                    }
+                case FREE_IMAGE_TYPE.FIT_RGB16:
+                    // Swap R and B channels to make it BGR, then add an alpha channel
+                    SwitchRedAndBlueChannels(fBitmap);
+                    bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBA16, true);
+                    FreeImage.UnloadEx(ref fBitmap);
+                    fBitmap = bgra;
                     break;
 
                 case FREE_IMAGE_TYPE.FIT_RGBAF:
-                    {
-                        // Swap R and B channels to make it BGRA
-                        SwitchRedAndBlueChannels(fBitmap);
-                    }
+                case FREE_IMAGE_TYPE.FIT_RGBA16:
+                    // Swap R and B channels to make it BGRA
+                    SwitchRedAndBlueChannels(fBitmap);
                     break;
-                //case FREE_IMAGE_TYPE.FIT_RGBA16:
-                //    SwitchRedAndBlueChannels(fBitmap);
-                //    break;
+
                 default:
+                    // Bitmap and other formats are converted to 32-bit by default
                     bgra = FreeImage.ConvertTo32Bits(fBitmap);
                     SwitchRedAndBlueChannels(bgra);
                     FreeImage.UnloadEx(ref fBitmap);

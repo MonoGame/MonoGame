@@ -122,7 +122,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(content.Faces[0][0].Height, 240);
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
-            Assert.AreEqual(SurfaceFormat.Color, format);
+            Assert.AreEqual(SurfaceFormat.Rgba64, format);
             // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
             try
             {

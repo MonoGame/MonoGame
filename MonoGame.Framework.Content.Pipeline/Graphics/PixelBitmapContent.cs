@@ -96,6 +96,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 format = SurfaceFormat.Single;
             else if (typeof(T) == typeof(byte))
                 format = SurfaceFormat.Alpha8;
+            else if (typeof(T) == typeof(Rgba64))
+                format = SurfaceFormat.Rgba64;
+            else if (typeof(T) == typeof(Rgba1010102))
+                format = SurfaceFormat.Rgba1010102;
+            else if (typeof(T) == typeof(Rg32))
+                format = SurfaceFormat.Rg32;
+            else if (typeof(T) == typeof(Byte4))
+                format = SurfaceFormat.Color;
+            else if (typeof(T) == typeof(NormalizedByte2))
+                format = SurfaceFormat.NormalizedByte2;
+            else if (typeof(T) == typeof(NormalizedByte4))
+                format = SurfaceFormat.NormalizedByte4;
+            else if (typeof(T) == typeof(HalfSingle))
+                format = SurfaceFormat.HalfSingle;
+            else if (typeof(T) == typeof(HalfVector2))
+                format = SurfaceFormat.HalfVector2;
+            else if (typeof(T) == typeof(HalfVector4))
+                format = SurfaceFormat.HalfVector4;
             else
             {
                 format = SurfaceFormat.Color;
