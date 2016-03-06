@@ -16,6 +16,7 @@
   </References>
 
   <Properties>
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
@@ -30,7 +31,6 @@
   </Properties>
 
   <Files>
-    <Compile Include="Common\History.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\MGCB\CommandLineParser.cs">
@@ -53,11 +53,16 @@
     <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
+    <Compile Include="Common\PipelineController.FileWatcher.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
+    <Compile Include="Common\PipelineController.UpdateContentItemAction.cs" />
+    <Compile Include="Common\PipelineController.UpdateProjectAction.cs" />
+    <Compile Include="Common\PipelineSettings.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
+    <Compile Include="Common\OutputParser.cs" />
     <Compile Include="Common\PipelineProjectParser.cs" />
     <Compile Include="Common\Util.cs" />
     <Compile Include="Common\StringExtensions.cs" />
@@ -67,9 +72,10 @@
     <Compile Include="Common\PipelineTypes.cs" />
     <Compile Include="Common\Extensions.cs" />
 
-    <Compile Include="Windows\UpdateAction.cs" />
-
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\BuildIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\ContentIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -96,6 +102,14 @@
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\MultiSelectTreeview.cs">
+      <Platforms>Windows</Platforms>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\FilterOutputControl.cs">
+      <Platforms>Windows</Platforms>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\TabControlEx.cs">
       <Platforms>Windows</Platforms>
       <SubType>Component</SubType>
     </Compile>
@@ -208,6 +222,12 @@
     <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Widgets\BuildOutput.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Dialogs\AddItemDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -218,6 +238,12 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.GUI.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Stetic.cs">
@@ -265,72 +291,54 @@
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\folder_missing.png" />
     <EmbeddedResource Include="Icons\settings.png" />
+    
+    <!-- The resources for output filtering -->
+    <EmbeddedResource Include="Icons\build_begin_end.png" />
+    <EmbeddedResource Include="Icons\build_clean.png" />
+    <EmbeddedResource Include="Icons\build_fail.png" />
+    <EmbeddedResource Include="Icons\build_processing.png" />
+    <EmbeddedResource Include="Icons\build_skip.png" />
+    <EmbeddedResource Include="Icons\build_succeed.png" />
+    
+    <!-- The resources for toolbar -->
+    <EmbeddedResource Include="Icons\Toolbar\New.png">
+      <LogicalName>Toolbar.New.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Open.png">
+      <LogicalName>Toolbar.Open.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Save.png">
+      <LogicalName>Toolbar.Save.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\NewItem.png">
+      <LogicalName>Toolbar.NewItem.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\ExistingItem.png">
+      <LogicalName>Toolbar.ExistingItem.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\NewFolder.png">
+      <LogicalName>Toolbar.NewFolder.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\ExistingFolder.png">
+      <LogicalName>Toolbar.ExistingFolder.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Build.png">
+      <LogicalName>Toolbar.Build.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Rebuild.png">
+      <LogicalName>Toolbar.Rebuild.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Clean.png">
+      <LogicalName>Toolbar.Clean.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\FilterOutput.png">
+      <LogicalName>Toolbar.FilterOutput.png</LogicalName>
+    </EmbeddedResource>
+    
+    <!-- Linux specific resources -->
     <EmbeddedResource Include="Gtk\MainWindow.HeaderBar.glade">
       <Platforms>Linux</Platforms>
     </EmbeddedResource>
-
-    <!-- Copy config files to output directory -->
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\atk-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>atk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gdk-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>gdk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gio-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>gio-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\glib-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>glib-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\gtk-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>gtk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk3\pango-sharp.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>pango-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>atk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>gdk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>glade-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>glib-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>gtk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>pango-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
 
     <!-- Copy the template resources to the output -->
 	<None Include="Templates\Effect.png">

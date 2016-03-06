@@ -102,7 +102,14 @@ namespace Microsoft.Xna.Framework
 
         public override string ScreenDeviceName { get { return window.Title; } }
 
-        public override Rectangle ClientBounds { get { return clientBounds; } }
+        public override Rectangle ClientBounds 
+        { 
+            get 
+            {
+                var pos = window.PointToScreen(new System.Drawing.Point(0));
+                return new Rectangle(pos.X, pos.Y, clientBounds.Width, clientBounds.Height);
+            }
+        }
 
         // TODO: this is buggy on linux - report to opentk team
         public override bool AllowUserResizing
@@ -186,6 +193,10 @@ namespace Microsoft.Xna.Framework
 
         private void OpenTkGameWindow_Closing(object sender, CancelEventArgs e)
         {
+            //block the window from getting destroyed before we dispose of
+            //the resources, than we will destroy it
+            e.Cancel = true;
+
             Game.Exit();
         }
 
@@ -211,68 +222,89 @@ namespace Microsoft.Xna.Framework
         private void OnResize(object sender, EventArgs e)
         {
             // Ignore resize events until intialization is complete
-            if (Game == null)
+            if (Game == null || Game.GraphicsDevice == null)
                 return;
 
-            var winWidth = window.ClientRectangle.Width;
-            var winHeight = window.ClientRectangle.Height;
-            var winRect = new Rectangle(0, 0, winWidth, winHeight);
+            lock (window)
+            {
+                var winWidth = window.ClientRectangle.Width;
+                var winHeight = window.ClientRectangle.Height;
+                var winRect = new Rectangle(0, 0, winWidth, winHeight);
 
-            // If window size is zero, leave bounds unchanged
-            // OpenTK appears to set the window client size to 1x1 when minimizing
-            if (winWidth <= 1 || winHeight <= 1) 
-                return;
+                // If window size is zero, leave bounds unchanged
+                // OpenTK appears to set the window client size to 1x1 when minimizing
+                if (winWidth <= 1 || winHeight <= 1)
+                    return;
 
-            //If we've already got a pending change, do nothing
-            if (updateClientBounds)
-                return;
+                //If we've already got a pending change, do nothing
+                if (updateClientBounds)
+                    return;
             
-            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
 
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+                Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
 
-            clientBounds = winRect;
+                clientBounds = winRect;
 
-            OnClientSizeChanged();
+                OnClientSizeChanged();
+            }
         }
 
         internal void ProcessEvents()
         {
-            UpdateBorder();
-            Window.ProcessEvents();
-            UpdateWindowState();
-            HandleInput();
+            lock (window)
+            {
+                if (CurrentPlatform.OS == OS.Linux)
+                {
+                    if (updateborder == 1)
+                        UpdateBorder();
+
+                    if(updateborder > 0)
+                        updateborder--;
+                }
+
+                Window.ProcessEvents();
+                UpdateWindowState();
+                HandleInput();
+            }
         }
 
         private void UpdateBorder()
         {
-            if (updateborder == 1)
-            {
-                WindowBorder desired;
-                if (_isBorderless)
-                    desired = WindowBorder.Hidden;
-                else
-                    desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
-            
-                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
-                    window.WindowBorder = desired;
-            }
-
-            if(updateborder > 0)
-                updateborder--;
+            WindowBorder desired;
+            if (_isBorderless)
+                desired = WindowBorder.Hidden;
+            else
+                desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+        
+            if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                window.WindowBorder = desired;
         }
 
         private void UpdateWindowState()
         {
             // we should wait until window's not fullscreen to resize
-
             if (updateClientBounds)
             {
-                window.WindowBorder = WindowBorder.Resizable;
+                var prevState = window.WindowState;
+
+                if (CurrentPlatform.OS == OS.Linux)
+                    window.WindowBorder = WindowBorder.Resizable;
+                
                 updateClientBounds = false;
-                window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
-                                     targetBounds.Y, targetBounds.Width, targetBounds.Height);
+
+                if (CurrentPlatform.OS == OS.MacOSX)
+                {
+                    // on Mac We need to do this calculation first.
+                    int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
+                    int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
+                    window.X = Math.Max(0, centerOffsetX + window.X);
+                    window.Y = Math.Max(0, centerOffsetY + window.Y);
+
+                    window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
+                                       targetBounds.Y, targetBounds.Width, targetBounds.Height);
+                }
                 
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
@@ -283,14 +315,39 @@ namespace Microsoft.Xna.Framework
                     windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
+                
+                if (CurrentPlatform.OS != OS.MacOSX)
+                {
+                    if (!Configuration.RunningOnSdl2 && prevState != WindowState.Fullscreen)
+                    {
+                        int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
+                        int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
+                        window.X = Math.Max(0, centerOffsetX + window.X);
+                        window.Y = Math.Max(0, centerOffsetY + window.Y);
+                    }
+                    window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
+                        targetBounds.Y, targetBounds.Width, targetBounds.Height);
+                }
+
 
                 // we need to create a small delay between resizing the window
                 // and changing the border to avoid OpenTK Linux bug
-                updateborder = 2;
+                if (CurrentPlatform.OS == OS.Linux)
+                    updateborder = 2;
+                else
+                    UpdateBorder();
 
                 var context = GraphicsContext.CurrentContext;
                 if (context != null)
                     context.Update(window.WindowInfo);
+
+                if (!Window.Visible)
+                {
+                    Window.Visible = true;
+
+                    // Bug in OpenTK, it doesn't always set state if window is not visible
+                    window.WindowState = windowState; 
+                }
             }
         }
 
@@ -324,17 +381,26 @@ namespace Microsoft.Xna.Framework
 
             window.KeyPress += OnKeyPress;
 
-            //make sure that the game is not running on linux
-            //on Linux people may want to use mkbundle to
-            //create native Linux binaries
-            if (CurrentPlatform.OS != OS.Linux)
+            var assembly = Assembly.GetEntryAssembly();
+            var t = Type.GetType ("Mono.Runtime");
+
+            Title = assembly != null ? AssemblyHelper.GetDefaultWindowTitle() : "MonoGame Application";
+
+            // In case when DesktopGL dll is compiled using .Net, and you
+            // try to load it using Mono, it will cause a crash because of this.
+            try
             {
-                // Set the window icon.
-                var assembly = Assembly.GetEntryAssembly();
-                if (assembly != null)
+                if (t == null && assembly != null)
                     window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-                Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
+                else {
+                    using (var stream = Assembly.GetEntryAssembly().GetManifestResourceStream(string.Format("{0}.Icon.ico", Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace)) ?? 
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico")) {
+                        if (stream != null)
+                           window.Icon = new Icon(stream);
+                    }
+                }
             }
+            catch { }
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
@@ -399,8 +465,9 @@ namespace Microsoft.Xna.Framework
             {
                 if (disposing)
                 {
-                    // Dispose/release managed objects
-                    window.Dispose();
+                    // Disposing of window will cause a crash on Linux
+                    // tho it will get destroied anyway by not beeing updated
+                    window.Close();
                 }
                 // The window handle no longer exists
                 _windowHandle = IntPtr.Zero;

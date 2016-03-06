@@ -15,7 +15,7 @@
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
         <releaseNotes>Updated dev release - 10th December 2014 
 		Added support for Windows Phone 8.1 and Universal projects</releaseNotes>
-        <copyright>Copyright  2015</copyright>
+        <copyright>Copyright  2016</copyright>
         <language>en-US</language>
     </metadata>
     <files>

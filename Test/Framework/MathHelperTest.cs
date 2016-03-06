@@ -39,13 +39,28 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void DistanceLerp()
+        public void LerpTest()
         {
             Assert.AreEqual(MathHelper.Lerp(0f, 5f, .5f), 2.5f, "Lerp test failed on [0,5,.5]");
-            Assert.AreEqual(MathHelper.Lerp(-5f, 5f, 0.5f), 0f, "Distance test failed on [-5,5,0.5]");
-            Assert.AreEqual(MathHelper.Lerp(0f, 0f, 0.5f), 0f, "Distance test failed on [0,0,0.5]");
-            Assert.AreEqual(MathHelper.Lerp(-5f, -1f, 0.5f), -3f, "Distance test failed on [-5,-1, 0.5]");
+            Assert.AreEqual(MathHelper.Lerp(-5f, 5f, 0.5f), 0f, "Lerp test failed on [-5,5,0.5]");
+            Assert.AreEqual(MathHelper.Lerp(0f, 0f, 0.5f), 0f, "Lerp test failed on [0,0,0.5]");
+            Assert.AreEqual(MathHelper.Lerp(-5f, -1f, 0.5f), -3f, "Lerp test failed on [-5,-1, 0.5]");
+            // The following test checks for XNA compatibility. 
+            // Even though the calculation itself should return "1", the XNA implementaion returns 0 (presumably due to a efficiency/precision tradeoff).
+            Assert.AreEqual(MathHelper.Lerp(10000000000000000f, 1f, 1f), 0f, "Lerp test failed on [10000000000000000,1,1]");
         }
+
+#if !XNA
+        [Test]
+        public void LerpPreciseTest()
+        {
+            Assert.AreEqual(MathHelper.LerpPrecise(0f, 5f, .5f), 2.5f, "LerpPrecise test failed on [0,5,.5]");
+            Assert.AreEqual(MathHelper.LerpPrecise(-5f, 5f, 0.5f), 0f, "LerpPrecise test failed on [-5,5,0.5]");
+            Assert.AreEqual(MathHelper.LerpPrecise(0f, 0f, 0.5f), 0f, "LerpPrecise test failed on [0,0,0.5]");
+            Assert.AreEqual(MathHelper.LerpPrecise(-5f, -1f, 0.5f), -3f, "LerpPrecise test failed on [-5,-1, 0.5]");
+            Assert.AreEqual(MathHelper.LerpPrecise(10000000000000000f, 1f, 1f), 1, "LerpPrecise test failed on [10000000000000000,1,1]");
+        }
+#endif
 
         [Test]
         public void Min()

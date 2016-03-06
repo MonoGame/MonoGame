@@ -1,7 +1,0 @@
-Package: monogame-sdk
-Section: Development
-Architecture: amd64
-Depends: libgtk-3-0 (>= 3.0.0), mono-complete (>= 3.0.0), ttf-mscorefonts-installer (>= 1.0), monodevelop (>= 5.0)
-Maintainer: Harry <cra0zy@email.com>
-Description: MonoGame SDK
-MonoGame is an Open Source implementation of the Microsoft XNA 4 Framework.

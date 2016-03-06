@@ -4,7 +4,7 @@
 
 using System;
 using System.IO;
-using MonoGame.Utilities;
+using Microsoft.Xna.Framework.Audio;
 using OpenTK.Audio;
 
 namespace Microsoft.Xna.Framework.Media
@@ -31,38 +31,63 @@ namespace Microsoft.Xna.Framework.Media
 		
         void PlatformDispose(bool disposing)
         {
+            if (stream == null)
+                return;
+
             stream.Dispose();
+            stream = null;
         }
 
-        internal void Play()
+        internal void Play(TimeSpan? startPosition)
         {
+            if (stream == null)
+                return;
+
             stream.Play();
+            if (startPosition != null)
+                stream.SeekToPosition((TimeSpan)startPosition);
+
             _playCount++;
         }
 
         internal void Resume()
         {
+            if (stream == null)
+                return;
+
             stream.Resume();
         }
 
         internal void Pause()
         {
+            if (stream == null)
+                return;
+
             stream.Pause();
         }
 
         internal void Stop()
         {
+            if (stream == null)
+                return;
+
             stream.Stop();
             _playCount = 0;
         }
 
         internal float Volume
         {
-            get { return _volume; }
+            get
+            {
+                if (stream == null)
+                    return 0.0f;
+                return _volume; 
+            }
             set
             {
                 _volume = value;
-                stream.Volume = _volume;
+                if (stream != null)
+                    stream.Volume = _volume;
             }
         }
 
@@ -70,6 +95,8 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
+                if (stream == null)
+                    return TimeSpan.FromSeconds(0.0);
                 return stream.GetPosition();
             }
         }

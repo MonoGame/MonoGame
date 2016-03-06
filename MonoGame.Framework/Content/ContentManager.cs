@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
-	static List<char> targetPlatformIdentifiers = new List<char>()
+        private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
@@ -44,16 +44,32 @@ namespace Microsoft.Xna.Framework.Content
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'u', // Ouya
-            'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
 
-            // Old WindowsGL and Linux platform chars
-            'w',
-            'l',
+            // NOTE: There are additional idenfiers for consoles that 
+            // are not defined in this repository.  Be sure to ask the
+            // console port maintainers to ensure no collisions occur.
+
+            
+            // Legacy identifiers... these could be reused in the
+            // future if we feel enough time has passed.
+
+            'p', // PlayStationMobile
+            'g', // Windows (OpenGL)
+            'l', // Linux
+            'u', // Ouya
         };
+
+
+        static partial void PlatformStaticInit();
+
+        static ContentManager()
+        {
+            // Allow any per-platform static initialization to occur.
+            PlatformStaticInit();
+        }
 
         private static void AddContentManager(ContentManager contentManager)
         {
@@ -433,12 +449,11 @@ namespace Microsoft.Xna.Framework.Content
             // The next int32 is the length of the XNB file
             int xnbLength = xnbReader.ReadInt32();
 
-            ContentReader reader;
+            Stream decompressedStream = null;
             if (compressedLzx || compressedLz4)
             {
                 // Decompress the xnb
                 int decompressedSize = xnbReader.ReadInt32();
-                MemoryStream decompressedStream = null;
 
                 if (compressedLzx)
                 {
@@ -499,27 +514,17 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else if (compressedLz4)
                 {
-                    // Decompress to a byte[] because Windows 8 doesn't support MemoryStream.GetBuffer()
-                    var buffer = new byte[decompressedSize];
-                    using (var decoderStream = new Lz4DecoderStream(stream))
-                    {
-                        if (decoderStream.Read(buffer, 0, buffer.Length) != decompressedSize)
-                        {
-                            throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
-                        }
-                    }
-                    // Creating the MemoryStream with a byte[] shares the buffer so it doesn't allocate any more memory
-                    decompressedStream = new MemoryStream(buffer);
+                    decompressedStream = new Lz4DecoderStream(stream);
                 }
-
-                reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
             }
             else
             {
-                reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
+                decompressedStream = stream;
             }
+
+            var reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+                                                        originalAssetName, version, recordDisposableObject);
+            
             return reader;
         }
 

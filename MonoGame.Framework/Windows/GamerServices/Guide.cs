@@ -61,7 +61,7 @@ using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.System;
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
 using Microsoft.Xna.Framework.Input;
 #endif
 #else
@@ -84,13 +84,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
 	    private static readonly CoreDispatcher _dispatcher;
 #endif 
 
         static Guide()
         {
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
             _dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
 
 
@@ -167,10 +167,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             // Call the Microsoft implementation of BeginShowKeyboardInput using an alias.
             return MsXna_Guide.BeginShowKeyboardInput((MsXna_PlayerIndex)player, title, description, defaultText, callback, state, usePasswordMode);
-#else
+#elif !WINDOWS_UAP
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
 			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+#else
+            throw new NotImplementedException();
 #endif
 		}
 
@@ -180,14 +182,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             // Call the Microsoft implementation of BeginShowKeyboardInput using an alias.
             return MsXna_Guide.EndShowKeyboardInput(result);
-#else
+#elif !WINDOWS_UAP
 			ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
 			return ski.EndInvoke(result);		
+#else
+            throw new NotImplementedException();
 #endif
 		}
 
-		delegate Nullable<int> ShowMessageBoxDelegate( string title,
+        delegate Nullable<int> ShowMessageBoxDelegate(string title,
          string text,
          IEnumerable<string> buttons,
          int focusButton,
@@ -202,7 +206,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             int? result = null;
             IsVisible = true;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
 
             MessageDialog dialog = new MessageDialog(text, title);
             foreach (string button in buttons)
@@ -247,7 +251,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		        buttons, focusButton,
                 (MsXna_MessageBoxIcon)icon, 
                 callback, state);
-#else
+#elif !WINDOWS_UAP
             // TODO: GuideAlreadyVisibleException
             if (IsVisible)
                 throw new Exception("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
@@ -264,6 +268,25 @@ namespace Microsoft.Xna.Framework.GamerServices
             ShowMessageBoxDelegate smb = ShowMessageBox;
 
             return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);
+#else
+
+            var tcs = new TaskCompletionSource<int?>(state);
+            var task = Task.Run<int?>(() => ShowMessageBox(title, text, buttons, focusButton, icon));
+            task.ContinueWith(t =>
+            {
+                // Copy the task result into the returned task.
+                if (t.IsFaulted)
+                    tcs.TrySetException(t.Exception.InnerExceptions);
+                else if (t.IsCanceled)
+                    tcs.TrySetCanceled();
+                else
+                    tcs.TrySetResult(t.Result);
+
+                // Invoke the user callback if necessary.
+                if (callback != null)
+                    callback(tcs.Task);
+            });
+            return tcs.Task;
 #endif
         }
 
@@ -286,6 +309,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 
             // Call the Microsoft implementation of EndShowMessageBox using an alias.
             return MsXna_Guide.EndShowMessageBox(result);
+#elif WINDOWS_UAP
+            var x = (Task<int?>)result;
+            return  x.Result;
 #else
             return ((ShowMessageBoxDelegate)result.AsyncState).EndInvoke(result);
 #endif

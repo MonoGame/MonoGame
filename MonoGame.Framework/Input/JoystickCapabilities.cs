@@ -16,6 +16,12 @@ namespace Microsoft.Xna.Framework.Input
         public bool IsConnected { get; internal set; }
 
         /// <summary>
+        /// Gets the unique identifier of the joystick.
+        /// </summary>
+        /// <value>String representing the unique identifier of the joystick.</value>
+        public string Id { get; internal set; }
+
+        /// <summary>
         /// Gets the axis count.
         /// </summary>
         /// <value>The number of axes that the joystick possesses.</value>

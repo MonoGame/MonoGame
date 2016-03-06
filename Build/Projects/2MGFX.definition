@@ -13,6 +13,7 @@
 
   <Properties>
     
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
@@ -22,8 +23,6 @@
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
     </CustomDefinitions>
-
-    <ForceArchitecture>x64</ForceArchitecture>
 
   </Properties>
 
@@ -191,10 +190,6 @@
     <!-- The HLSL to GLSL conversion utility -->
     <Compile Include="MarshalHelper.cs" />
     <Compile Include="MojoShader.cs" />
-    <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
-      <Link>libmojoshader_64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
 
     <!-- The MGFX parser -->
     <None Include="MGFX.tpg" />

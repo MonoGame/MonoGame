@@ -1,0 +1,12 @@
+#!/bin/sh
+
+xdg-mime install /tmp/mgcb.xml --novendor
+xdg-mime default "Monogame Pipeline.desktop" text/mgcb
+sudo -H -u $SUDO_USER bash -c 'mdtool setup install -y /tmp/MonoDevelop.MonoGame.mpack'
+
+rm -rf /opt/MonoGameSDK
+ln -s /usr/lib/mono/xbuild/MonoGame/v3.0/Tools /opt/MonoGameSDK
+
+rm -f /usr/share/applications/Monogame\ Pipeline.desktop
+echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=Used to create platform specific .xnb files\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=true\nTerminal=false\nType=Application\nMimeType=text/mgcb;\nCategories=Development;" >> /usr/share/applications/Monogame\ Pipeline.desktop
+

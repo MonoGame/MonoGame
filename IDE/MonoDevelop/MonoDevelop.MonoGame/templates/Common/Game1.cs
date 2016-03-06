@@ -1,12 +1,9 @@
-﻿#region Using Statements
 using System;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Input;
-
-#endregion
 
 namespace ${Namespace}
 {
@@ -16,13 +13,12 @@ namespace ${Namespace}
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;		
+        SpriteBatch spriteBatch;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";	            
-			graphics.IsFullScreen = true;		
+            Content.RootDirectory = "Content";
         }
 
         /// <summary>
@@ -34,8 +30,8 @@ namespace ${Namespace}
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            
             base.Initialize();
-				
         }
 
         /// <summary>
@@ -58,14 +54,14 @@ namespace ${Namespace}
         protected override void Update(GameTime gameTime)
         {
             // For Mobile devices, this logic will close the Game when the Back button is pressed
-			// Exit() is obsolete on iOS
-			#if !__IOS__
-			if (GamePad.GetState (PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-				Keyboard.GetState().IsKeyDown(Keys.Escape)) {
-				Exit ();
-			}
-			#endif
-            // TODO: Add your update logic here			
+            // Exit() is obsolete on iOS
+            #if !__IOS__ &&  !__TVOS__
+            if (GamePad.GetState (PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) 
+                Exit ();
+            #endif
+            
+            // TODO: Add your update logic here
+            
             base.Update(gameTime);
         }
 
@@ -75,8 +71,8 @@ namespace ${Namespace}
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-           	graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-		
+            graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+            
             //TODO: Add your drawing code here
             
             base.Draw(gameTime);

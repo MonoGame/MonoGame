@@ -209,7 +209,11 @@ namespace Microsoft.Xna.Framework
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
             MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
+#else
+            AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
+#endif
 #else
             Add(() =>
 #endif

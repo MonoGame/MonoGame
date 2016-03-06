@@ -26,7 +26,7 @@ struct VSOutput
     float2 texCoord		: TEXCOORD0;
 };
 
-VSOutput SpriteVertexShader(	float4 position	: SV_Position,
+VSOutput SpriteVertexShader(	float4 position	: POSITION0,
 								float4 color	: COLOR0,
 								float2 texCoord	: TEXCOORD0)
 {
