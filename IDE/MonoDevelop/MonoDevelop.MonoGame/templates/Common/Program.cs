@@ -20,13 +20,16 @@ namespace ${Namespace}
     static class Program
     #endif
     {
-        internal static void RunGame() 
-        {
-            using (var game = new Game1())
-            {
-                game.Run();
-            }
-        }
+		private static Game1 game;
+
+		internal static void RunGame() 
+		{
+			game = new Game1();
+			game.Run();
+			#if !__IOS__  && !__TVOS__
+			game.Dispose ();
+			#endif
+		}
             
         /// <summary>
         /// The main entry point for the application.
