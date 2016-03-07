@@ -75,7 +75,7 @@ RequestExecutionLevel admin
 ; The stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
   SectionIn RO
-  
+
   ; Install the VS support files.
   SetOutPath ${MSBuildInstallDir}
   File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
@@ -211,9 +211,11 @@ SectionEnd
 
 Section "Visual Studio 2010 Templates" VS2010
 
-  IfFileExists `$vs2010templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    SetOutPath "$vs2010templates\Visual C#\MonoGame"
+    SetOutPath "$1\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
@@ -224,9 +226,11 @@ SectionEnd
 
 Section "Visual Studio 2012 Templates" VS2012
 
-  IfFileExists `$vs2012templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    SetOutPath "$vs2012templates\Visual C#\MonoGame"
+    SetOutPath "$1\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
@@ -238,9 +242,11 @@ SectionEnd
 
 Section "Visual Studio 2013 Templates" VS2013
 
-  IfFileExists `$vs2013templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    SetOutPath "$vs2013templates\Visual C#\MonoGame"
+    SetOutPath "$1\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
@@ -252,9 +258,11 @@ SectionEnd
 
 Section "Visual Studio 2015 Templates" VS2015
 
-  IfFileExists `$vs2015templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  IfFileExists "$1\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
-    SetOutPath "$vs2015templates\Visual C#\MonoGame"
+    SetOutPath "$1\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     File /r '..\..\ProjectTemplates\VisualStudio2015\*.zip'
     GOTO EndTemplates
@@ -307,36 +315,36 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function checkVS2010
-Var /GLOBAL vs2010templates
-ReadRegStr $vs2010templates HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
-IfFileExists `$vs2010templates\Visual C#\*.*` end disable
+ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $1 $1
+IfFileExists "$1\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2010} $0
   end:
 FunctionEnd
  
 Function checkVS2012
-Var /GLOBAL vs2012templates
-ReadRegStr $vs2012templates HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
-IfFileExists `$vs2012templates\Visual C#\*.*` end disable
+ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $1 $1
+IfFileExists "$1\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2012} $0
   end:
 FunctionEnd
 
 Function checkVS2013
-Var /GLOBAL vs2013templates
-ReadRegStr $vs2013templates HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
-IfFileExists `$vs2013templates\Visual C#\*.*` end disable
+ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $1 $1
+IfFileExists "$1\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2013} $0
   end:
 FunctionEnd
 
 Function checkVS2015
-Var /GLOBAL vs2015templates
-ReadRegStr $vs2015templates HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
-IfFileExists `$vs2015templates\Visual C#\*.*` end disable
+ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $1 $1
+IfFileExists "$1\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2015} $0
   end:
@@ -405,10 +413,18 @@ Section "Uninstall"
   RMDir /r "$0\AddIns\MonoDevelop.MonoGame"
   ${EndIf}
   
-  RMDir /r "$vs2010templates\Visual C#\MonoGame"
-  RMDir /r "$vs2012templates\Visual C#\MonoGame"
-  RMDir /r "$vs2013templates\Visual C#\MonoGame"
-  RMDir /r "$vs2015templates\Visual C#\MonoGame"
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
+  ReadRegStr $1 HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
+  ExpandEnvStrings $1 $1
+  RMDir /r "$1\Visual C#\MonoGame"
   RMDir /r "${MSBuildInstallDir}"
   RMDir /r "$SMPROGRAMS\${APPNAME}"
 
