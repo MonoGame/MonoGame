@@ -309,6 +309,7 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
 Function checkVS2010
 Var /GLOBAL vs2010templates
 ReadRegStr $vs2010templates HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $vs2010templates $vs2010templates
 IfFileExists `$vs2010templates\Visual C#\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2010} $0
@@ -318,6 +319,7 @@ FunctionEnd
 Function checkVS2012
 Var /GLOBAL vs2012templates
 ReadRegStr $vs2012templates HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $vs2012templates $vs2012templates
 IfFileExists `$vs2012templates\Visual C#\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2012} $0
@@ -327,6 +329,7 @@ FunctionEnd
 Function checkVS2013
 Var /GLOBAL vs2013templates
 ReadRegStr $vs2013templates HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $vs2013templates $vs2013templates
 IfFileExists `$vs2013templates\Visual C#\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2013} $0
@@ -336,6 +339,7 @@ FunctionEnd
 Function checkVS2015
 Var /GLOBAL vs2015templates
 ReadRegStr $vs2015templates HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
+ExpandEnvStrings $vs2015templates $vs2015templates
 IfFileExists `$vs2015templates\Visual C#\*.*` end disable
   disable:
 	 SectionSetFlags ${VS2015} $0
