@@ -183,12 +183,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         if (rect.HasValue)
                         {
-                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glFormat, data.Length - startBytes, dataPtr);
+                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glFormat, elementCount - startBytes, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                         else
                         {
-                            GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
+                            GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, elementCount - startBytes, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                     }
