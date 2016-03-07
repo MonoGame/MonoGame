@@ -111,12 +111,14 @@ namespace Microsoft.Xna.Framework.Input
 =======
             
             int x, y;
-            
-            var state = Sdl.Mouse.GetState(out x, out y);
-            
-            window.MouseState.X = x;
-            window.MouseState.Y = y;
+            int wx, wy;
 
+            var state = Sdl.Mouse.GetGlobalState (out x, out y);
+            Sdl.Window.GetPosition (window.Handle, out wx, out wy);
+
+            window.MouseState.X = x - wx;
+            window.MouseState.Y = y - wy;
+            
             window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
             window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
             window.MouseState.RightButton = (state.HasFlag(Sdl.Mouse.Button.Right)) ? ButtonState.Pressed : ButtonState.Released;
