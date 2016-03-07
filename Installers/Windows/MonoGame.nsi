@@ -77,7 +77,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SectionIn RO
   
   LogSet on
-  
+   
   ; Install the VS support files.
   SetOutPath ${MSBuildInstallDir}
   File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
