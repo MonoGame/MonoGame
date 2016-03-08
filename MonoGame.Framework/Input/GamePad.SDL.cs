@@ -96,6 +96,8 @@ namespace Microsoft.Xna.Framework.Input
         {
             foreach (var entry in Gamepads)
                 DisposeDevice(entry.Value);
+
+            Gamepads.Clear ();
         }
 
         private static int PlatformGetMaxNumberOfGamePads()
