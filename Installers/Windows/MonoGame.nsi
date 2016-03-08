@@ -25,8 +25,6 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
 
-LogSet on
-
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
 
@@ -77,6 +75,8 @@ RequestExecutionLevel admin
 ; The stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
   SectionIn RO
+
+  LogSet on
   
   ; Install the VS support files.
   SetOutPath ${MSBuildInstallDir}
