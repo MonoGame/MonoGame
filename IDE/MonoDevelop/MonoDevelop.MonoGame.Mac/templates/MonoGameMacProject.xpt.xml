@@ -31,7 +31,7 @@
 				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
 			<Packages>
-				<Package ID="MonoGame.Framework" Version="3.4.0.459" f="net40" />
+				<Package ID="MonoGame.Framework.MacOS" Version="3.4.0.459" targetFramework="net40" />
 			</Packages>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
