@@ -119,6 +119,10 @@ namespace Microsoft.Xna.Framework
                     {
                         if (ev.Window.EventID == Sdl.Window.EventId.Resized)
                             _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
+                            IsActive = true;
+                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
+                            IsActive = false;
                     }
                 }
 
