@@ -76,8 +76,6 @@ RequestExecutionLevel admin
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
   SectionIn RO
 
-  LogSet on
-  
   ; Install the VS support files.
   SetOutPath ${MSBuildInstallDir}
   File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
@@ -213,7 +211,7 @@ SectionEnd
 
 Section "Visual Studio 2010 Templates" VS2010
 
-  IfFileExists `$vs2010templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  IfFileExists "$vs2010templates\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$vs2010templates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
@@ -226,7 +224,7 @@ SectionEnd
 
 Section "Visual Studio 2012 Templates" VS2012
 
-  IfFileExists `$vs2012templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  IfFileExists "$vs2012templates\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$vs2012templates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
@@ -240,7 +238,7 @@ SectionEnd
 
 Section "Visual Studio 2013 Templates" VS2013
 
-  IfFileExists `$vs2013templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  IfFileExists "$vs2013templates\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$vs2013templates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
@@ -254,7 +252,9 @@ SectionEnd
 
 Section "Visual Studio 2015 Templates" VS2015
 
-  IfFileExists `$vs2015templates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  MessageBox MB_OK "$vs2015templates\Visual C#\*.*"
+  
+  IfFileExists "$vs2015templates\Visual C#\*.*" InstallTemplates CannotInstallTemplates
   InstallTemplates:
     SetOutPath "$vs2015templates\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
@@ -312,7 +312,7 @@ Function checkVS2010
 Var /GLOBAL vs2010templates
 ReadRegStr $vs2010templates HKCU "SOFTWARE\Microsoft\VisualStudio\10.0" "UserProjectTemplatesLocation"
 ExpandEnvStrings $vs2010templates $vs2010templates
-IfFileExists `$vs2010templates\Visual C#\*.*` end disable
+IfFileExists "$vs2010templates\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2010} $0
   end:
@@ -322,7 +322,7 @@ Function checkVS2012
 Var /GLOBAL vs2012templates
 ReadRegStr $vs2012templates HKCU "SOFTWARE\Microsoft\VisualStudio\11.0" "UserProjectTemplatesLocation"
 ExpandEnvStrings $vs2012templates $vs2012templates
-IfFileExists `$vs2012templates\Visual C#\*.*` end disable
+IfFileExists "$vs2012templates\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2012} $0
   end:
@@ -332,7 +332,7 @@ Function checkVS2013
 Var /GLOBAL vs2013templates
 ReadRegStr $vs2013templates HKCU "SOFTWARE\Microsoft\VisualStudio\12.0" "UserProjectTemplatesLocation"
 ExpandEnvStrings $vs2013templates $vs2013templates
-IfFileExists `$vs2013templates\Visual C#\*.*` end disable
+IfFileExists "$vs2013templates\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2013} $0
   end:
@@ -342,7 +342,7 @@ Function checkVS2015
 Var /GLOBAL vs2015templates
 ReadRegStr $vs2015templates HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
 ExpandEnvStrings $vs2015templates $vs2015templates
-IfFileExists `$vs2015templates\Visual C#\*.*` end disable
+IfFileExists "$vs2015templates\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2015} $0
   end:
