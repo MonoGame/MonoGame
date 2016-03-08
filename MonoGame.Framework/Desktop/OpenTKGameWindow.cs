@@ -1,117 +1,25 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-XnaTouch - Copyright © 2009 The XnaTouch Team
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-using MonoGame.Utilities;
-
-
-#endregion License
-
-#region Using Statements
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
+
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
+using MonoGame.Utilities;
+
 using OpenTK;
 using OpenTK.Graphics;
-
-
-#endregion Using Statements
 
 namespace Microsoft.Xna.Framework
 {
     class OpenTKGameWindow : GameWindow, IDisposable
     {
-        private bool _isResizable;
-        private bool _isBorderless;
-
-		//private DisplayOrientation _currentOrientation;
-        private IntPtr _windowHandle;
-        private INativeWindow window;
-
-        protected Game game;
-        private List<Microsoft.Xna.Framework.Input.Keys> keys;
-		//private OpenTK.Graphics.GraphicsContext backgroundContext;
-
-        // we need this variables to make changes beetween threads
-        private WindowState windowState;
-        private Rectangle clientBounds;
-        private Rectangle targetBounds;
-        private bool updateClientBounds;
-        private int updateborder = 0;
-        bool disposed;
-
-        #region Internal Properties
-
-        internal Game Game 
-        {
-            get { return game; }
-            set
-            {
-                if (game != value)
-                {
-                    game = value;                   
-                }
-            }
-        }
-
-        internal INativeWindow Window { get { return window; } }
-
-        #endregion
-
-        #region Public Properties
-
-        public override IntPtr Handle { get { return _windowHandle; } }
-
-        public override string ScreenDeviceName { get { return window.Title; } }
-
-        public override Rectangle ClientBounds 
-        { 
-            get 
-            {
-                var pos = window.PointToScreen(new System.Drawing.Point(0));
-                return new Rectangle(pos.X, pos.Y, clientBounds.Width, clientBounds.Height);
-            }
-        }
-
-        // TODO: this is buggy on linux - report to opentk team
         public override bool AllowUserResizing
         {
             get { return _isResizable; }
@@ -121,38 +29,51 @@ namespace Microsoft.Xna.Framework
                     _isResizable = value;
                 else
                     return;
+                
                 if (_isBorderless)
                     return;
-                window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+                
+                Window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
             }
+        }
+
+        public override Rectangle ClientBounds 
+        { 
+            get 
+            {
+                var bounds = Window.ClientRectangle;
+                return new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+            }
+        }
+
+        public override Point Position
+        {
+            get { return new Point(Window.Location.X,Window.Location.Y); }
+            set { Window.Location = new System.Drawing.Point(value.X,value.Y); }
         }
 
         public override DisplayOrientation CurrentOrientation
         {
-            get { return DisplayOrientation.LandscapeLeft; }
-        }
-#if DESKTOPGL
-        public override Microsoft.Xna.Framework.Point Position
-        {
-            get { return new Microsoft.Xna.Framework.Point(window.Location.X,window.Location.Y); }
-            set { window.Location = new System.Drawing.Point(value.X,value.Y); }
+            get
+            {
+                return DisplayOrientation.LandscapeLeft; 
+            }
         }
 
-        public override System.Drawing.Icon Icon
+        public override IntPtr Handle 
         {
             get
             {
-                return window.Icon;
-            }
-            set
-            {
-                window.Icon = value;
+                return Window.WindowInfo.Handle;
             }
         }
-#endif
-        protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
+
+        public override string ScreenDeviceName
         {
-            // Do nothing.  Desktop platforms don't do orientation.
+            get
+            {
+                return _screenDeviceName;
+            }
         }
 
         public override bool IsBorderless
@@ -160,226 +81,57 @@ namespace Microsoft.Xna.Framework
             get { return _isBorderless; }
             set
             {
-                if (_isBorderless != value)
-                    _isBorderless = value;
-                else
+                if (_isBorderless == value)
                     return;
+                    
+                _isBorderless = value;
+                
                 if (_isBorderless)
-                {
-                    window.WindowBorder = WindowBorder.Hidden;
-                }
+                    Window.WindowBorder = WindowBorder.Hidden;
                 else
-                    window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+                    Window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
             }
         }
 
-        #endregion
+#if DESKTOPGL
+        public override Icon Icon
+        {
+            get
+            {
+                return Window.Icon;
+            }
+            set
+            {
+                Window.Icon = value;
+            }
+        }
+#endif
+
+        internal INativeWindow Window;
+
+        private bool _willBeFullScreen, _isFullscreen;
+        private bool _isResizable, _isBorderless;
+        private string _screenDeviceName;
+
+        private Game _game;
+        private List<Keys> _keys;
+
+        private bool disposed;
 
         public OpenTKGameWindow(Game game)
         {
-            Initialize(game);
-        }
-
-        ~OpenTKGameWindow()
-        {
-            Dispose(false);
-        }
-
-        #region Restricted Methods
-
-        #region OpenTK GameWindow Methods
-
-        #region Delegates
-
-        private void OpenTkGameWindow_Closing(object sender, CancelEventArgs e)
-        {
-            //block the window from getting destroyed before we dispose of
-            //the resources, than we will destroy it
-            e.Cancel = true;
-
-            Game.Exit();
-        }
-
-        private void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-        {
-            Keys xnaKey = KeyboardUtil.ToXna(e.Key);
-            if (keys.Contains(xnaKey)) keys.Remove(xnaKey);
-        }
-        
-        private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-        {
-            if (_allowAltF4 && e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
-            {
-                window.Close();
-                return;
-            }
-            Keys xnaKey = KeyboardUtil.ToXna(e.Key);
-            if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
-        }
-
-        #endregion
-
-        private void OnResize(object sender, EventArgs e)
-        {
-            // Ignore resize events until intialization is complete
-            if (Game == null || Game.GraphicsDevice == null)
-                return;
-
-            lock (window)
-            {
-                var winWidth = window.ClientRectangle.Width;
-                var winHeight = window.ClientRectangle.Height;
-                var winRect = new Rectangle(0, 0, winWidth, winHeight);
-
-                // If window size is zero, leave bounds unchanged
-                // OpenTK appears to set the window client size to 1x1 when minimizing
-                if (winWidth <= 1 || winHeight <= 1)
-                    return;
-
-                //If we've already got a pending change, do nothing
-                if (updateClientBounds)
-                    return;
-            
-                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
-
-                Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
-
-                clientBounds = winRect;
-
-                OnClientSizeChanged();
-            }
-        }
-
-        internal void ProcessEvents()
-        {
-            lock (window)
-            {
-                if (CurrentPlatform.OS == OS.Linux)
-                {
-                    if (updateborder == 1)
-                        UpdateBorder();
-
-                    if(updateborder > 0)
-                        updateborder--;
-                }
-
-                Window.ProcessEvents();
-                UpdateWindowState();
-                HandleInput();
-            }
-        }
-
-        private void UpdateBorder()
-        {
-            WindowBorder desired;
-            if (_isBorderless)
-                desired = WindowBorder.Hidden;
-            else
-                desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
-        
-            if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
-                window.WindowBorder = desired;
-        }
-
-        private void UpdateWindowState()
-        {
-            // we should wait until window's not fullscreen to resize
-            if (updateClientBounds)
-            {
-                var prevState = window.WindowState;
-
-                if (CurrentPlatform.OS == OS.Linux)
-                    window.WindowBorder = WindowBorder.Resizable;
-                
-                updateClientBounds = false;
-
-                if (CurrentPlatform.OS == OS.MacOSX)
-                {
-                    // on Mac We need to do this calculation first.
-                    int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
-                    int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
-                    window.X = Math.Max(0, centerOffsetX + window.X);
-                    window.Y = Math.Max(0, centerOffsetY + window.Y);
-
-                    window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
-                                       targetBounds.Y, targetBounds.Width, targetBounds.Height);
-                }
-                
-                // if the window-state is set from the outside (maximized button pressed) we have to update it here.
-                // if it was set from the inside (.IsFullScreen changed), we have to change the window.
-                // this code might not cover all corner cases
-                // window was maximized
-                if ((windowState == WindowState.Normal && window.WindowState == WindowState.Maximized) ||
-                    (windowState == WindowState.Maximized && window.WindowState == WindowState.Normal))
-                    windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
-                else
-                    window.WindowState = windowState; // usually fullscreen-stuff is set from the code
-                
-                if (CurrentPlatform.OS != OS.MacOSX)
-                {
-                    if (!Configuration.RunningOnSdl2 && prevState != WindowState.Fullscreen)
-                    {
-                        int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
-                        int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
-                        window.X = Math.Max(0, centerOffsetX + window.X);
-                        window.Y = Math.Max(0, centerOffsetY + window.Y);
-                    }
-                    window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
-                        targetBounds.Y, targetBounds.Width, targetBounds.Height);
-                }
-
-
-                // we need to create a small delay between resizing the window
-                // and changing the border to avoid OpenTK Linux bug
-                if (CurrentPlatform.OS == OS.Linux)
-                    updateborder = 2;
-                else
-                    UpdateBorder();
-
-                var context = GraphicsContext.CurrentContext;
-                if (context != null)
-                    context.Update(window.WindowInfo);
-
-                if (!Window.Visible)
-                {
-                    Window.Visible = true;
-
-                    // Bug in OpenTK, it doesn't always set state if window is not visible
-                    window.WindowState = windowState; 
-                }
-            }
-        }
-
-        private void HandleInput()
-        {
-            // mouse doesn't need to be treated here, Mouse class does it alone
-
-            // keyboard
-            Keyboard.SetKeys(keys);
-        }
-
-        private void OnKeyPress(object sender, KeyPressEventArgs e)
-        {
-            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
-        }
-        
-        #endregion
-
-        private void Initialize(Game game)
-        {
-            Game = game;
-
             GraphicsContext.ShareContexts = true;
 
-            window = new NativeWindow();
-            window.WindowBorder = WindowBorder.Resizable;
-            window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
-            window.Resize += OnResize;
-            window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+            _game = game;
+            _screenDeviceName = "";
 
-            window.KeyPress += OnKeyPress;
+            Window = new NativeWindow();
+            Window.WindowBorder = WindowBorder.Fixed;
+            Window.Closing += OnClose;
+            Window.Resize += OnResize;
+            Window.KeyDown += OnKeyDown;
+            Window.KeyUp += OnKeyUp;
+            Window.KeyPress += OnKeyPress;
 
             var assembly = Assembly.GetEntryAssembly();
             var t = Type.GetType ("Mono.Runtime");
@@ -391,67 +143,139 @@ namespace Microsoft.Xna.Framework
             try
             {
                 if (t == null && assembly != null)
-                    window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+                    Window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
                 else {
                     using (var stream = Assembly.GetEntryAssembly().GetManifestResourceStream(string.Format("{0}.Icon.ico", Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace)) ?? 
-                            Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico")) {
+                        Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico")) {
                         if (stream != null)
-                           window.Icon = new Icon(stream);
+                            Window.Icon = new Icon(stream);
                     }
                 }
             }
             catch { }
 
-            updateClientBounds = false;
-            clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
-                                         window.ClientRectangle.Width, window.ClientRectangle.Height);
-            windowState = window.WindowState;            
+            _keys = new List<Keys>();
 
-            _windowHandle = window.WindowInfo.Handle;
-
-            keys = new List<Keys>();
-
-            // mouse
-            // TODO review this when opentk 1.1 is released
-#if DESKTOPGL || ANGLE
             Mouse.setWindows(this);
-#else
-            Mouse.UpdateMouseInfo(window.Mouse);
-#endif
+            SetCursorVisible(false);
+        }
 
-            // Default no resizing
-            AllowUserResizing = false;
+        ~OpenTKGameWindow()
+        {
+            Dispose(false);
+        }
 
-            // Default mouse cursor hidden 
-            SetMouseVisible(false);
+        private void OnResize(object sender, EventArgs e)
+        {
+            if (_game == null || _game.GraphicsDevice == null || _isFullscreen)
+                return;
+
+            var winWidth = Window.Width;
+            var winHeight = Window.Height;
+
+            // If window size is zero, leave bounds unchanged
+            // OpenTK appears to set the window client size to 1x1 when minimizing
+            if (winWidth <= 1 || winHeight <= 1)
+                return;
+
+            _game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
+            _game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
+
+            _game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
+
+            OnClientSizeChanged();
+        }
+
+        private void OnClose(object sender, CancelEventArgs e)
+        {
+            e.Cancel = true;
+            _game.Exit();
+        }
+
+        public void SetCursorVisible(bool visible)
+        {
+            Window.Cursor = visible ? MouseCursor.Default : MouseCursor.Empty;
+        }
+
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
+        {
+            _willBeFullScreen = willBeFullScreen;
+        }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+            _screenDeviceName = screenDeviceName;
+
+            if (!Window.Visible)
+            {
+                Window.ClientSize = new Size(clientWidth, clientHeight);
+                Window.Visible = true;
+            }
+
+            if (_willBeFullScreen != _isFullscreen)
+            {
+                if (_willBeFullScreen && _game.graphicsDeviceManager.HardwareModeSwitch)
+                {
+                    DisplayDevice.Default.ChangeResolution(clientWidth, clientHeight, 
+                        DisplayDevice.Default.BitsPerPixel, DisplayDevice.Default.RefreshRate);
+                }
+
+                Window.WindowState = _willBeFullScreen ? WindowState.Fullscreen : WindowState.Normal;
+
+                if (!_willBeFullScreen && _game.graphicsDeviceManager.HardwareModeSwitch)
+                    DisplayDevice.Default.RestoreResolution();
+            }
+
+            if (Window.WindowState != WindowState.Fullscreen)
+                Window.ClientSize = new Size(clientWidth, clientHeight);
+
+            var context = GraphicsContext.CurrentContext;
+            if (context != null)
+                context.Update(Window.WindowInfo);
+
+            _isFullscreen = _willBeFullScreen;
+            OnClientSizeChanged();
+        }
+
+        protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
+        {
+            // Do nothing. Desktop platforms don't do orientation.
         }
 
         protected override void SetTitle(string title)
         {
-            window.Title = title;            
+            Window.Title = title;            
         }
 
-        internal void ToggleFullScreen()
+        internal void ProcessEvents()
         {
-            if (windowState == WindowState.Fullscreen)
-                windowState = WindowState.Normal;
-            else
-                windowState = WindowState.Fullscreen;
-            updateClientBounds = true;
+            Window.ProcessEvents();
+
+            Keyboard.SetKeys(_keys);
         }
 
-        internal void ChangeClientBounds(Rectangle clientBounds)
+        private void OnKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            if (this.clientBounds != clientBounds)
+            if (_allowAltF4 && e.Key == OpenTK.Input.Key.F4 && _keys.Contains(Keys.LeftAlt))
             {
-                updateClientBounds = true;
-                targetBounds = clientBounds;
+                Window.Close();
+                return;
             }
+
+            var xnaKey = KeyboardUtil.ToXna(e.Key);
+            if (!_keys.Contains(xnaKey)) _keys.Add(xnaKey);
         }
 
-        #endregion
+        private void OnKeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
+        {
+            var xnaKey = KeyboardUtil.ToXna(e.Key);
+            if (_keys.Contains(xnaKey)) _keys.Remove(xnaKey);
+        }
 
-        #region Public Methods
+        private void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
+        }
 
         public void Dispose()
         {
@@ -463,34 +287,17 @@ namespace Microsoft.Xna.Framework
         {
             if (!disposed)
             {
+                if (_isFullscreen)
+                    DisplayDevice.Default.RestoreResolution();
+
                 if (disposing)
                 {
-                    // Disposing of window will cause a crash on Linux
-                    // tho it will get destroied anyway by not beeing updated
-                    window.Close();
+                    Window.Dispose();
+                    Window = null;
                 }
-                // The window handle no longer exists
-                _windowHandle = IntPtr.Zero;
 
                 disposed = true;
             }
         }
-
-        public override void BeginScreenDeviceChange(bool willBeFullScreen)
-        {
-        }
-
-        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
-        {
-
-        }
-
-        public void SetMouseVisible(bool visible)
-        {
-            window.Cursor = visible ? MouseCursor.Default : MouseCursor.Empty;
-        }
-
-        #endregion
     }
 }
-
