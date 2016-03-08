@@ -342,6 +342,7 @@ Function checkVS2015
 Var /GLOBAL vs2015templates
 ReadRegStr $vs2015templates HKCU "SOFTWARE\Microsoft\VisualStudio\14.0" "UserProjectTemplatesLocation"
 ExpandEnvStrings $vs2015templates $vs2015templates
+MessageBox MB_OK "$vs2015templates\Visual C#\*.*"
 IfFileExists "$vs2015templates\Visual C#\*.*" end disable
   disable:
 	 SectionSetFlags ${VS2015} $0
