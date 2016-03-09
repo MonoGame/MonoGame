@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// No button.
         /// </summary>
-        None = 0,
+        None = 3,
         
         /// <summary>
         /// Directional pad up.
