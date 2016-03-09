@@ -77,6 +77,14 @@ namespace Microsoft.Xna.Framework
         {
             get { return (this.Y + this.Height); }
         }
+        
+        public Point Center
+	{
+		get 
+		{ 
+			return new Point( (this.X + this.Width) / 2,(this.Y + this.Height) / 2 ); 
+		}
+	}
 
         #endregion Public Properties
 
@@ -137,17 +145,7 @@ namespace Microsoft.Xna.Framework
             X += offsetX;
             Y += offsetY;
         }
-		
-		public Point Center
-		{
-			get 
-			{ 
-				return new Point( (this.X + this.Width) / 2,(this.Y + this.Height) / 2 ); 
-			}
-		}
-
-
-
+	
 
         public void Inflate(int horizontalValue, int verticalValue)
         {
