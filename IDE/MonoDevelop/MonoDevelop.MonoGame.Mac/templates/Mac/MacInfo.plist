@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>${AppIdentifier}</string>
+	<string>project.MonoGame.${Namespace}</string>
 	<key>CFBundleName</key>
-	<string>${AppName}</string>
+	<string>${Namespace}</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSMinimumSystemVersion</key>

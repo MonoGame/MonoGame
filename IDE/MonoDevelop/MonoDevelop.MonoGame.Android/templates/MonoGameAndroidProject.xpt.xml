@@ -50,7 +50,7 @@
 					<File name="AndroidManifest.xml" src="Android/AndroidManifest.xml" />
 				</Directory>
 				<Directory name="Content">
-					<File name="Content.mgcb" src="Common/Content.mgcb"/>
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 				</Directory>
 				<Directory name="Assets">
 					<RawFile name="AboutAssets.txt" src="Android/AboutAssets.txt" />

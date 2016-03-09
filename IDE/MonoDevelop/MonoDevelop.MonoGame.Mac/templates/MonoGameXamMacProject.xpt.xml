@@ -1,11 +1,11 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <Template>
 	<TemplateConfiguration>
-		<_Name>MonoGame Mac Application (Xamarin.Mac)</_Name>
+		<_Name>MonoGame Mac Application (Xamarin.Mac Classic)</_Name>
 		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
-		<_Description>Creates a MonoGame Application for Mac OS. This application uses Xamarin.Mac and is suitable for the Apple Store.</_Description>
+		<_Description>Creates a MonoGame Application for Mac OS. This application uses Xamarin.Mac Classic API</_Description>
 	</TemplateConfiguration>
 	
 	<Actions>
@@ -17,24 +17,25 @@
 			<StartupProject>${ProjectName}</StartupProject>
 		</Options>
 		
-		<Project name = "${ProjectName}" directory = "." type = "XamMac2">
-			<Options TargetFrameworkVersion="v4.5" />
+		<Project name = "${ProjectName}" directory = "." type = "XamMac">
+			<Options />
 			<References>
 				<Reference type="Gac" refto="System" />
 				<Reference type="Gac" refto="System.Xml" />
 				<Reference type="Gac" refto="System.Core" />
 				<Reference type="Gac" refto="System.Xml.Linq" />
 				<Reference type="Gac" refto="System.Drawing" />
-				<Reference type="Gac" refto="Xamarin.Mac"/>
+				<Reference type="Gac" refto="XamMac" SpecificVersion="false"/>
 				<Reference type="Package" refto="MonoGame.Framework" />
 				<Reference type="Package" refto="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4" SpecificVersion="true" />
 				<Reference type="Package" refto="NVorbis" />
 			</References>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
-				<File name="Main.cs" AddStandardHeader="True" src="Mac/XamMac2Program.cs" />
-				<File name="Info.plist" AddStandardHeader="False" src="Mac/MacInfo.plist" />
+				<File name="Main.cs" AddStandardHeader="True" src="Mac/XamMacProgram.cs" />
+				<File name="MainMenu.xib" AddStandardHeader="False" src="Mac/MainMenu.xib" />
 				<RawFile name="Icon.ico" src="Common/Icon.ico" BuildAction="EmbeddedResource"/>
+				<File name="Info.plist" AddStandardHeader="False" src="Mac/MacInfo.plist" />
 				<Directory name="Content">
 					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 				</Directory>
@@ -45,3 +46,4 @@
 		</Project>
 	</Combine>
 </Template>
+

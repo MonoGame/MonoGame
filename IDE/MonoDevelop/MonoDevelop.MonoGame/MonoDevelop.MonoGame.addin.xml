@@ -37,9 +37,12 @@
     <!-- Mac Templates -->
     <Import file="templates/MonoGameMacProject.xpt.xml" />
     <Import file="templates/MonoGameOSXProject.xpt.xml" />
+    <Import file="templates/MonoGameXamMacProject.xpt.xml" />
     <Import file="templates/Mac/MacInfo.plist" />
     <Import file="templates/Mac/MainMenu.xib" />
     <Import file="templates/Mac/Program.cs" />
+    <Import file="templates/Mac/XamMac2Program.cs" />
+    <Import file="templates/Mac/XamMacProgram.cs" />
     <!-- iOS Templates -->
     <Import file="templates/MonoGameiOSProject.xpt.xml" />
     <Import file="templates/iOS/iOSDefault.png" />
@@ -147,12 +150,10 @@
   <Extension path="/MonoDevelop/Ide/DisplayBindings">
     <DisplayBinding id="MonoGamePipeline" insertbefore="DefaultDisplayBinding" class="MonoDevelop.MonoGame.PipelineDisplayBinding" />
   </Extension>
-  <!-- Disabled in favour of MSBuild .targets integration -->
-  <!--
+  <!-- We still need this for MonoMac and Xamarin Mac Classic support -->
   <Extension path="/MonoDevelop/ProjectModel/ProjectServiceExtensions">
     <Class class="MonoDevelop.MonoGame.MonoGameBuildExtension" />
   </Extension>
-  -->
   <Module>
     <Runtime>
       <Import assembly="MonoDevelop.MonoGame.Android.dll" />
@@ -197,7 +198,8 @@
     </Dependencies>
     <Extension path="/MonoDevelop/Ide/ProjectTemplates">
       <ProjectTemplate id="MonoGameForMonoMacProject" file="templates/MonoGameMacProject.xpt.xml" />
-      <ProjectTemplate id="MonoGameForXamMacProject" file="templates/MonoGameOSXProject.xpt.xml" />
+      <ProjectTemplate id="MonoGameForXamMac2Project" file="templates/MonoGameOSXProject.xpt.xml" />
+      <ProjectTemplate id="MonoGameForXamMacProject" file="templates/MonoGameXamMacProject.xpt.xml" />
     </Extension>
   </Module>
 </Addin>
