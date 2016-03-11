@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework
                     else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
                         Joystick.RemoveDevice(ev.JoystickDevice.Which);
                     else if (ev.Type == Sdl.EventType.MouseWheel)
-                        Mouse.ScrollY += ev.Wheel.Y*120;
+                        Mouse.ScrollY += ev.Wheel.Y * 120;
                     else if (ev.Type == Sdl.EventType.KeyDown)
                     {
                         var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);

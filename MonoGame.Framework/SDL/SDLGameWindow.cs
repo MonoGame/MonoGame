@@ -32,15 +32,7 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.GetSize(Handle, out w, out h);
 
                 if (!IsFullScreen)
-                {
                     Sdl.Window.GetPosition(Handle, out x, out y);
-
-                    if (!IsBorderless)
-                    {
-                        x += BorderX;
-                        y += BorderY;
-                    }
-                }
 
                 return new Rectangle(x, y, w, h);
             }
@@ -86,8 +78,6 @@ namespace Microsoft.Xna.Framework
         }
 
         public static GameWindow Instance;
-
-        public int BorderX, BorderY;
         public bool IsFullScreen;
 
         private readonly Game _game;
@@ -156,8 +146,6 @@ namespace Microsoft.Xna.Framework
 
             SetCursorVisible(_mouseVisible);
 
-            // TODO, per platform border size detection
-
             _init = true;
         }
 
@@ -212,7 +200,7 @@ namespace Microsoft.Xna.Framework
             if (_willBeFullScreen != IsFullScreen)
             {
                 // SDL.Window.State.Fullscreen is causing a freeze after state switch, using only DESKTOP temporary
-                // var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? SDL.Window.State.Fullscreen : SDL.Window.State.FullscreenDesktop;
+                // var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
                 Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? Sdl.Window.State.FullscreenDesktop : 0);
             }
 
@@ -226,14 +214,8 @@ namespace Microsoft.Xna.Framework
                 _game.GraphicsDevice.Viewport = new Viewport(0, 0, displayRect.Width, displayRect.Height);
             }
 
-            var centerX =
-                Math.Max(
-                    prevBounds.X - ((IsBorderless || IsFullScreen) ? 0 : BorderX) + ((prevBounds.Width - clientWidth)/2),
-                    0);
-            var centerY =
-                Math.Max(
-                    prevBounds.Y - ((IsBorderless || IsFullScreen) ? 0 : BorderY) +
-                    ((prevBounds.Height - clientHeight)/2), 0);
+            var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0);
+            var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0);
 
             if (IsFullScreen && !_willBeFullScreen)
             {
