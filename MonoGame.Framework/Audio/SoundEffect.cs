@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             _duration = GetSampleDuration(count, sampleRate, channels);
 
-            PlatformInitialize(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
+            PlatformInitialize(buffer, offset, count, sampleRate, channels, loopStart);
         }
 
         #endregion
