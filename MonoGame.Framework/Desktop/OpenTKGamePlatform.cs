@@ -80,6 +80,8 @@ using Microsoft.Xna.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 
+using MonoGame.Utilities;
+
 namespace Microsoft.Xna.Framework
 {
     class OpenTKGamePlatform : GamePlatform
@@ -95,6 +97,9 @@ namespace Microsoft.Xna.Framework
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
+            if (CurrentPlatform.OS == OS.Linux)
+                Toolkit.Init(new ToolkitOptions { Backend = PlatformBackend.PreferNative });
+
             _view = new OpenTKGameWindow(game);
             this.Window = _view;
 
