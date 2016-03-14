@@ -126,7 +126,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public void ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string saveToFile)
         {
             var temporarySource = Path.GetTempFileName();
-            var temporaryIntermediate = Path.GetTempFileName();
             var temporaryOutput = Path.GetTempFileName();
             try
             {
@@ -138,7 +137,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 string ffmpegCodecName, ffmpegMuxerName;
                 int format;
-                bool isWav = false;
                 switch (formatType)
                 {
                     case ConversionFormat.Adpcm:
@@ -146,14 +144,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         ffmpegCodecName = "adpcm_ms";
                         ffmpegMuxerName = "wav";
                         format = 0x0002; /* WAVE_FORMAT_ADPCM */
-                        isWav = true;
                         break;
                     case ConversionFormat.Pcm:
                         // PCM signed 16-bit little-endian
                         ffmpegCodecName = "pcm_s16le";
                         ffmpegMuxerName = "wav";
                         format = 0x0001; /* WAVE_FORMAT_PCM */
-                        isWav = true;
                         break;
                     case ConversionFormat.WindowsMedia:
                         // Windows Media Audio 2
@@ -169,7 +165,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         ffmpegCodecName = "adpcm_ima_wav";
                         ffmpegMuxerName = "wav";
                         format = 0x0011; /* WAVE_FORMAT_IMA_ADPCM */
-                        isWav = true;
                         break;
                     case ConversionFormat.Aac:
                         // AAC (Advanced Audio Coding)
