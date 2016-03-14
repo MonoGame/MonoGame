@@ -140,10 +140,20 @@ namespace Microsoft.Xna.Framework.Input
 #elif DESKTOPGL || ANGLE
 
             var state = OpenTK.Input.Mouse.GetCursorState();
-            var clientBounds = window.ClientBounds;
-            
-            window.MouseState.X = state.X - clientBounds.X;
-            window.MouseState.Y = state.Y - clientBounds.Y;
+
+            // SDL2 backend doesn't support mouse coordinates outside the window, but GetCursorState uses the window client top/left as the origin.
+            // Native backend does support mouse coordinates outside the window, but GetCursorState uses the screen top/left as the origin.
+            if (OpenTK.Configuration.RunningOnSdl2)
+            {
+                window.MouseState.X = state.X;
+                window.MouseState.Y = state.Y;
+            }
+            else
+            {
+                var clientBounds = window.ClientBounds;
+                window.MouseState.X = state.X - clientBounds.X;
+                window.MouseState.Y = state.Y - clientBounds.Y;
+            }
 
             window.MouseState.LeftButton = (ButtonState)state.LeftButton;
             window.MouseState.RightButton = (ButtonState)state.RightButton;
