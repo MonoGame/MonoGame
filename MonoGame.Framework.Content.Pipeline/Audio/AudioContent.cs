@@ -270,16 +270,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 // Calculate blockAlign.
                 switch (formatType)
                 {
+                    case ConversionFormat.Adpcm:
+                    case ConversionFormat.ImaAdpcm:
                     case ConversionFormat.Pcm:
                         // Block alignment value is the number of bytes in an atomic unit (that is, a block) of audio for a particular format. For Pulse Code Modulation (PCM) formats, the formula for calculating block alignment is as follows: 
                         //  •   Block Alignment = Bytes per Sample x Number of Channels
                         // For example, the block alignment value for 16-bit PCM format mono audio is 2 (2 bytes per sample x 1 channel). For 16-bit PCM format stereo audio, the block alignment value is 4.
                         // https://msdn.microsoft.com/en-us/library/system.speech.audioformat.speechaudioformatinfo.blockalign(v=vs.110).aspx
-                        blockAlign = (bitsPerSample / 8) * channelCount;
                         // Get the raw PCM from the output WAV file
                         using (var reader = new BinaryReader(new MemoryStream(rawData)))
                         {
-                            data = GetRawPcm(reader).ToList();
+                            data = GetRawWavData(reader, ref blockAlign).ToList();
                         }
                         break;
                     default:
@@ -322,7 +323,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             }
         }
 
-        private static byte[] GetRawPcm(BinaryReader reader)
+        // Borrowed from AudioLoader to get the raw data from the WAV
+        private static byte[] GetRawWavData(BinaryReader reader, ref int blockAlign)
         {
             byte[] audioData;
 
@@ -356,13 +358,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             int num_channels = reader.ReadInt16(); // 4
             int sample_rate = reader.ReadInt32();  // 8
             reader.ReadInt32();    // 12, byte_rate
-            reader.ReadInt16();  // 14, block_align
+            blockAlign = reader.ReadInt16();  // 14, block_align
             int bits_per_sample = reader.ReadInt16(); // 16
-
-            if (audio_format != 1)
-            {
-                throw new NotSupportedException("Wave compression is not supported.");
-            }
 
             // reads residual bytes
             if (format_chunk_size > 16)
