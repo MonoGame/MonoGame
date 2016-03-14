@@ -139,33 +139,34 @@ namespace Microsoft.Xna.Framework.Audio
         {
             CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
                             DataStream.Create(buffer, true, false),
-                            0, 
-                            buffer.Length);
+                            0);
         }
 
+        // steve@dunnhq.com - the loopLength isn't needed by the code but is needed for compilation on other platforms as
+        // other implementations in this partial class have this parameter and we can't change the signature in just one place.
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
                             DataStream.Create(buffer, true, false, offset),
-                            loopStart, 
-                            loopLength);
+                            loopStart);
         }
 
         private void PlatformLoadAudioStream(Stream s)
         {
             var soundStream = new SoundStream(s);
             var dataStream = soundStream.ToDataStream();
-            var sampleLength = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
+
             CreateBuffers(  soundStream.Format,
                             dataStream,
-                            0,
-                            sampleLength);
+                            0);
         }
 
-        private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)
+        private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart)
         {
             _format = format;
             _dataStream = dataStream;
+
+            int sampleLength = (int)(dataStream.Length / (format.Channels * format.BitsPerSample / 8));
 
             _buffer = new AudioBuffer
             {
@@ -173,7 +174,7 @@ namespace Microsoft.Xna.Framework.Audio
                 AudioBytes = (int)_dataStream.Length,
                 Flags = BufferFlags.EndOfStream,
                 PlayBegin = loopStart,
-                PlayLength = loopLength,
+                PlayLength = sampleLength,
                 Context = new IntPtr(42),
             };
 
@@ -183,7 +184,7 @@ namespace Microsoft.Xna.Framework.Audio
                 AudioBytes = (int)_dataStream.Length,
                 Flags = BufferFlags.EndOfStream,
                 LoopBegin = loopStart,
-                LoopLength = loopLength,
+                LoopLength = sampleLength,
                 LoopCount = AudioBuffer.LoopInfinite,
                 Context = new IntPtr(42),
             };
