@@ -191,6 +191,16 @@ namespace Microsoft.Xna.Framework.Content
 			}
 		}
 
+        public virtual IEnumerable<string> ListAssets(string directory)
+        {
+            var files = TitleContainer.GetFiles(Path.Combine(RootDirectory, directory), "*.xnb");
+            for (int i = 0; i < files.Count; i++)
+            {
+                files[i] = files[i].Replace(RootDirectory + Path.DirectorySeparatorChar, "");
+            }
+            return files;
+        }
+
 		public virtual T Load<T>(string assetName)
 		{
             if (string.IsNullOrEmpty(assetName))
