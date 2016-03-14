@@ -199,28 +199,26 @@ namespace Microsoft.Xna.Framework
 
             if (_willBeFullScreen != IsFullScreen)
             {
-                // SDL.Window.State.Fullscreen is causing a freeze after state switch, using only DESKTOP temporary
-                // var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
-                Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? Sdl.Window.State.FullscreenDesktop : 0);
+                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
+                Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
             }
 
             if (!_willBeFullScreen)
                 Sdl.Window.SetSize(Handle, clientWidth, clientHeight);
-            else
-            {
-                _game.GraphicsDevice.PresentationParameters.BackBufferWidth = displayRect.Width;
-                _game.GraphicsDevice.PresentationParameters.BackBufferHeight = displayRect.Height;
-
-                _game.GraphicsDevice.Viewport = new Viewport(0, 0, displayRect.Width, displayRect.Height);
-            }
 
             var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0);
             var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0);
 
             if (IsFullScreen && !_willBeFullScreen)
             {
-                centerX += displayRect.X;
-                centerY += displayRect.Y;
+                // We need to get the display information again in case
+                // the resolution of it was changed.
+                Sdl.Display.GetBounds (displayIndex, out displayRect);
+
+                // This centering only occurs when exiting fullscreen
+                // so it should center the window on the current display.
+                centerX = displayRect.X + displayRect.Width / 2 - clientWidth / 2;
+                centerY = displayRect.Y + displayRect.Height / 2 - clientHeight / 2;
             }
 
             // If this window is resizable, there is a bug in SDL where
