@@ -126,6 +126,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public void ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string saveToFile)
         {
             var temporarySource = Path.GetTempFileName();
+            var temporaryIntermediate = Path.GetTempFileName();
             var temporaryOutput = Path.GetTempFileName();
             try
             {
@@ -137,6 +138,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 string ffmpegCodecName, ffmpegMuxerName;
                 int format;
+                bool isWav = false;
                 switch (formatType)
                 {
                     case ConversionFormat.Adpcm:
@@ -144,12 +146,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         ffmpegCodecName = "adpcm_ms";
                         ffmpegMuxerName = "wav";
                         format = 0x0002; /* WAVE_FORMAT_ADPCM */
+                        isWav = true;
                         break;
                     case ConversionFormat.Pcm:
                         // PCM signed 16-bit little-endian
                         ffmpegCodecName = "pcm_s16le";
-                        ffmpegMuxerName = "s16le";
+                        ffmpegMuxerName = "wav";//"s16le";
                         format = 0x0001; /* WAVE_FORMAT_PCM */
+                        isWav = true;
                         break;
                     case ConversionFormat.WindowsMedia:
                         // Windows Media Audio 2
@@ -165,6 +169,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         ffmpegCodecName = "adpcm_ima_wav";
                         ffmpegMuxerName = "wav";
                         format = 0x0011; /* WAVE_FORMAT_IMA_ADPCM */
+                        isWav = true;
                         break;
                     case ConversionFormat.Aac:
                         // AAC (Advanced Audio Coding)
@@ -225,7 +230,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 string ffprobeStdout, ffprobeStderr;
                 var ffprobeExitCode = ExternalTool.Run(
                     "ffprobe",
-                    string.Format("-i \"{0}\" -show_entries streams -v quiet -of flat", temporarySource),
+                    string.Format("-i \"{0}\" -show_entries streams -v quiet -of flat", temporaryOutput),
                     out ffprobeStdout,
                     out ffprobeStderr);
                 if (ffprobeExitCode != 0)
@@ -275,13 +280,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         // For example, the block alignment value for 16-bit PCM format mono audio is 2 (2 bytes per sample x 1 channel). For 16-bit PCM format stereo audio, the block alignment value is 4.
                         // https://msdn.microsoft.com/en-us/library/system.speech.audioformat.speechaudioformatinfo.blockalign(v=vs.110).aspx
                         blockAlign = (bitsPerSample / 8) * channelCount;
+                        // Get the raw PCM from the output file
+                        using (var reader = new BinaryReader(new MemoryStream(rawData)))
+                        {
+                            data = GetRawPcm(reader).ToList();
+                        }
                         break;
                     default:
                         // blockAlign is not available from ffprobe (and may or may not
                         // be relevant for non-PCM formats anyway)
                         break;
                 }
-
 
                 this.duration = TimeSpan.FromSeconds(durationInSeconds);
                 this.format = new AudioFormat(
@@ -315,6 +324,71 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 fs.Read(data, 0, data.Length);
                 this.data = data.ToList();
             }
+        }
+
+        private static byte[] GetRawPcm(BinaryReader reader)
+        {
+            byte[] audioData;
+
+            //header
+            string signature = new string(reader.ReadChars(4));
+            if (signature != "RIFF")
+            {
+                throw new NotSupportedException("Specified stream is not a wave file.");
+            }
+
+            reader.ReadInt32(); // riff_chunck_size
+
+            string wformat = new string(reader.ReadChars(4));
+            if (wformat != "WAVE")
+            {
+                throw new NotSupportedException("Specified stream is not a wave file.");
+            }
+
+            // WAVE header
+            string format_signature = new string(reader.ReadChars(4));
+            while (format_signature != "fmt ")
+            {
+                reader.ReadBytes(reader.ReadInt32());
+                format_signature = new string(reader.ReadChars(4));
+            }
+
+            int format_chunk_size = reader.ReadInt32();
+
+            // total bytes read: tbp
+            int audio_format = reader.ReadInt16(); // 2
+            int num_channels = reader.ReadInt16(); // 4
+            int sample_rate = reader.ReadInt32();  // 8
+            reader.ReadInt32();    // 12, byte_rate
+            reader.ReadInt16();  // 14, block_align
+            int bits_per_sample = reader.ReadInt16(); // 16
+
+            if (audio_format != 1)
+            {
+                throw new NotSupportedException("Wave compression is not supported.");
+            }
+
+            // reads residual bytes
+            if (format_chunk_size > 16)
+                reader.ReadBytes(format_chunk_size - 16);
+
+            string data_signature = new string(reader.ReadChars(4));
+
+            while (data_signature.ToLowerInvariant() != "data")
+            {
+                reader.ReadBytes(reader.ReadInt32());
+                data_signature = new string(reader.ReadChars(4));
+            }
+
+            if (data_signature != "data")
+            {
+                throw new NotSupportedException("Specified wave file is not supported.");
+            }
+
+            int data_chunk_size = reader.ReadInt32();
+            audioData = reader.ReadBytes(data_chunk_size);
+
+            return audioData;
         }
 	}
 }
