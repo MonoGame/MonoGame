@@ -33,7 +33,7 @@
 					<File name="AssemblyInfo.cs" src="Common/AssemblyInfo.cs" />
 				</Directory>
 				<Directory name="Content">
-					<File name="Content.mgcb" src="Common/Content.mgcb"/>
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference" />
 				</Directory>
 			</Files>
 		</Project>

@@ -43,7 +43,7 @@
 				<RawFile name="Default.png" src="iOS/iOSDefault.png" />
 				<RawFile name="GameThumbnail.png" src="iOS/iOSGameThumbnail.png" />
 				<Directory name="Content">
-					<File name="Content.mgcb" src="Common/Content.mgcb"/>
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 				</Directory>
 				<Directory name="Properties">
 					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="Common/AssemblyInfo.cs" />
@@ -86,7 +86,7 @@
 				<Directory name="Assets">
 					<RawFile name="AboutAssets.txt" src="Android/AboutAssets.txt" />
 					<Directory name="Content">
-						<File name="Content.mgcb" src="Common/Content.mgcb"/>
+						<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 					</Directory>
 				</Directory>
 			</Files>
