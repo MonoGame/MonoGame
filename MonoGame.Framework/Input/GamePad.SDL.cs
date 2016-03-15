@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Input
             {
                 var guide = Sdl.Joystick.GetGUID(jdevice)
                     .ToByteArray()
-                    .Aggregate("", (current, b) => current + ((int) b).ToString("X2"));
+                    .Aggregate("", (current, b) => current + ((int)b).ToString("X2"));
                 Sdl.GameController.AddMapping(guide + ",Unknown Gamepad,a:b0,b:b1,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a2,righty:a3,start:b9,x:b2,y:b3,");
             }
 
@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Input
             foreach (var entry in Gamepads)
                 DisposeDevice(entry.Value);
 
-            Gamepads.Clear ();
+            Gamepads.Clear();
         }
 
         private static int PlatformGetMaxNumberOfGamePads()
@@ -150,9 +150,9 @@ namespace Microsoft.Xna.Framework.Input
         {
             // SDL Axis ranges from -32768 to 32767, so we need to divide with different numbers depending on if it's positive
             if (axis < 0)
-                return axis/32768f;
+                return axis / 32768f;
 
-            return axis/32767f;
+            return axis / 32767f;
         }
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
@@ -162,15 +162,16 @@ namespace Microsoft.Xna.Framework.Input
 
             var gdevice = Gamepads[index].Device;
 
+            // Y gamepad axis is rotate between SDL and XNA
             var thumbSticks =
                 new GamePadThumbSticks(
                     new Vector2(
                         GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.LeftX)),
-                        GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.LeftY))
+                        GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.LeftY)) * -1f
                     ),
                     new Vector2(
                         GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.RightX)),
-                        GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.RightY))
+                        GetFromSdlAxis(Sdl.GameController.GetAxis(gdevice, Sdl.GameController.Axis.RightY)) * -1f
                     ),
                     deadZoneMode
                 );
@@ -199,7 +200,7 @@ namespace Microsoft.Xna.Framework.Input
             var dPad =
                 new GamePadDPad(
                     (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadUp) == 1) ? ButtonState.Pressed : ButtonState.Released,
-                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadDown) == 1) ? ButtonState.Pressed: ButtonState.Released,
+                    (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadDown) == 1) ? ButtonState.Pressed : ButtonState.Released,
                     (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadLeft) == 1) ? ButtonState.Pressed : ButtonState.Released,
                     (Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.DpadRight) == 1) ? ButtonState.Pressed : ButtonState.Released
                 );
@@ -221,8 +222,8 @@ namespace Microsoft.Xna.Framework.Input
                 Sdl.Haptic.StopAll(gamepad.HapticDevice);
             else if (gamepad.HapticType == 1)
             {
-                _hapticLeftRightEffect.leftright.LargeMagnitude = (ushort) (65535f*leftMotor);
-                _hapticLeftRightEffect.leftright.SmallMagnitude = (ushort) (65535f*rightMotor);
+                _hapticLeftRightEffect.leftright.LargeMagnitude = (ushort)(65535f * leftMotor);
+                _hapticLeftRightEffect.leftright.SmallMagnitude = (ushort)(65535f * rightMotor);
 
                 Sdl.Haptic.UpdateEffect(gamepad.HapticDevice, 0, ref _hapticLeftRightEffect);
                 Sdl.Haptic.RunEffect(gamepad.HapticDevice, 0, 1);
