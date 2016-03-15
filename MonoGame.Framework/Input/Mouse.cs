@@ -140,8 +140,8 @@ namespace Microsoft.Xna.Framework.Input
 #elif DESKTOPGL || ANGLE
 
             var state = OpenTK.Input.Mouse.GetCursorState();
+
             var clientBounds = window.ClientBounds;
-            
             window.MouseState.X = state.X - clientBounds.X;
             window.MouseState.Y = state.Y - clientBounds.Y;
 
