@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The preferred backend for OpenTK to use.
         /// </summary>
-        public static Backend PreferredBackend = Backend.Default;
+        public static Backend PreferredBackend = MonoGame.Utilities.CurrentPlatform.OS == OS.Linux ? Backend.Native : Backend.Default;
     }
 
     class OpenTKGamePlatform : GamePlatform
