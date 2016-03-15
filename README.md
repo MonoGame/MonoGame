@@ -34,11 +34,11 @@ We support a growing list of platforms across the desktop, mobile, and console s
 - Desktop PCs
  * Windows Store Apps (8, 8.1 and 10)
  * Windows (OpenGL & DirectX)
- * Linux
- * Mac OS X
+ * Linux (OpenGL)
+ * Mac OS X (OpenGL)
 - Mobile Devices
- * Android
- * iOS
+ * Android (OpenGL)
+ * iOS (OpenGL)
  * Windows Phone (8, 8.1 and 10)
 - Consoles (for registered developers)
  * PlayStation 4
@@ -61,9 +61,12 @@ If you are interested in contributing fixes or features to MonoGame, please read
 The full source code is available here from GitHub:
 
  * Clone the source: `git clone https://github.com/mono/MonoGame.git`
- * Setup the submodules: `git submodule init` and `git submodule update`
+ * Setup the submodules: 'git submodule update --init'
  * Run Protobuild.exe to generate project files and solutions.
    * If on Linux or Mac, run it with mono: `mono Protobuild.exe`
+ * You can generate solutions for platforms that are not buildable from the current OS with: 
+   * Windows: `.\Protobuild.exe --generate $PLATFORM`
+   * Linux or Mac: `mono Protobuild.exe --generate $PLATFORM`
  * Open the solution for your target platform to build the game framework.
  * Open the solution for your development platform for building the pipeline and content tools.
 
@@ -80,9 +83,6 @@ A high level breakdown of the components of the framework:
  * [Tools/MGCB](Tools/MGCB) is the command line tool for content processing.
  * [Tools/2MGFX](Tools/2MGFX) is the command line effect compiler tool.
  * The [Tools/Pipeline](Tools/Pipeline) tool is a GUI frontend for content processing.
-
-
-You can generate solutions for platforms that are not buildable from the current OS with: `mono Protobuild.exe --generate $PLATFORM`.
 
 
 ## Helpful Links
