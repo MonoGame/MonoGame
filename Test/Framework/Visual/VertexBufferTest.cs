@@ -116,6 +116,12 @@ namespace MonoGame.Tests.Visual
                 var savedDataBytes = ArrayUtil.ConvertFrom(savedData);
                 vertexBuffer.SetData(savedDataBytes);
 
+                if (dynamic)
+                {
+                    var dynamicVertexBuffer = vertexBuffer as DynamicVertexBuffer;
+                    dynamicVertexBuffer.SetData(savedDataBytes, 0, savedDataBytes.Length, SetDataOptions.None);
+                }
+
                 var readData = new VertexPositionTexture[4];
                 vertexBuffer.GetData(readData, 0, 4);
                 Assert.AreEqual(savedData, readData);

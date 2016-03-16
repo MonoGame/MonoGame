@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.Framework.WindowsUniversal</id>
+        <version>0.0.0.0</version>
+        <title>MonoGame.Framework.WindowsUniversal</title>
+        <authors>MonoGameTeam</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt#L2</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes></releaseNotes>
+        <copyright>Copyright  2016</copyright>
+        <language>en-US</language>
+        <references>
+            <reference file="MonoGame.Framework.dll" />
+        </references>
+	</metadata>
+    <files>
+        <file src="WindowsUniversal\AnyCPU\Release\Themes\generic.xbf" target="lib\netcore\MonoGame.Framework\Themes\generic.xbf" />
+        <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.dll" target="lib\netcore\MonoGame.Framework.dll" />
+        <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xml" target="lib\netcore\MonoGame.Framework.xml" />
+        <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.pri" target="lib\netcore\MonoGame.Framework.pri" />
+        <file src="WindowsUniversal\AnyCPU\Release\MonoGame.Framework.xr.xml" target="lib\netcore\MonoGame.Framework\MonoGame.Framework.xr.xml" />
+        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.Direct2D1.dll" target="lib\netcore\SharpDX.Direct2D1.dll" />
+        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.Direct3D11.dll" target="lib\netcore\SharpDX.Direct3D11.dll" />
+        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.dll" target="lib\netcore\SharpDX.dll" />
+        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\netcore\SharpDX.DXGI.dll" />
+        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\netcore\SharpDX.MediaFoundation.dll" />
+        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\netcore\SharpDX.XAudio2.dll" />
+        <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
+    </files>
+</package>

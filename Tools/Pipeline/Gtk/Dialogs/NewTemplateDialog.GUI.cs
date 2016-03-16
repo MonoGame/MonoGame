@@ -17,10 +17,6 @@ namespace MonoGame.Tools.Pipeline
 		private global::Gtk.Entry entry1;
 		
 		private global::Gtk.Label label2;
-		
-		private global::Gtk.Button buttonCancel;
-		
-		private global::Gtk.Button buttonOk;
 
 		protected virtual void Build ()
 		{
@@ -55,7 +51,6 @@ namespace MonoGame.Tools.Pipeline
 			this.GtkScrolledWindow.Add (this.treeview1);
 			this.vbox2.Add (this.GtkScrolledWindow);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.GtkScrolledWindow]));
-			w3.Position = 0;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
@@ -80,68 +75,61 @@ namespace MonoGame.Tools.Pipeline
 			w5.Position = 1;
 			this.vbox2.Add (this.hbox1);
 			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.hbox1]));
-			w6.Position = 1;
 			w6.Expand = false;
 			w6.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Only Letters, numbers, space and \"_\" are allowed.");
+
+            #if GTK3
+            if(Global.GtkMajorVersion == 3 && Global.GtkMinorVersion >= 8)
+                Gtk3Wrapper.gtk_widget_set_opacity(label2.Handle, 0.7);
+            #endif
+
 			this.vbox2.Add (this.label2);
 			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.label2]));
-			w7.Position = 2;
+
+            this.BorderWidth = 3;
+            this.vbox2.Spacing = 3;
+            w1.Spacing = 3;
+
+            if (Global.UseHeaderBar)
+            {
+                w3.Position = 2;
+                w6.Position = 0;
+                w7.Position = 1;
+            }
+            else
+            {
+                w3.Position = 0;
+                w6.Position = 1;
+                w7.Position = 2;
+            }
+
 			w7.Expand = false;
 			w7.Fill = false;
 			w1.Add (this.vbox2);
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(w1 [this.vbox2]));
 			w8.Position = 0;
-			// Internal child MonoGame.Tools.Pipeline.NewTemplateDialog.ActionArea
-            #if GTK2
-			global::Gtk.HButtonBox w9 = this.ActionArea;
-            #elif GTK3
-            global::Gtk.ButtonBox w9 = this.ActionArea;
-            #endif
-			w9.Name = "dialog1_ActionArea";
-			w9.Spacing = 10;
-			w9.BorderWidth = ((uint)(5));
-			w9.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonCancel = new global::Gtk.Button ();
-			this.buttonCancel.CanDefault = true;
-			this.buttonCancel.CanFocus = true;
-			this.buttonCancel.Name = "buttonCancel";
-			this.buttonCancel.UseStock = true;
-			this.buttonCancel.UseUnderline = true;
-			this.buttonCancel.Label = "gtk-cancel";
-			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w10 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w9 [this.buttonCancel]));
-			w10.Expand = false;
-			w10.Fill = false;
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonOk = new global::Gtk.Button ();
-			this.buttonOk.Sensitive = false;
-			this.buttonOk.CanDefault = true;
-			this.buttonOk.CanFocus = true;
-			this.buttonOk.Name = "buttonOk";
-			this.buttonOk.UseStock = true;
-			this.buttonOk.UseUnderline = true;
-			this.buttonOk.Label = "gtk-ok";
-			w9.Add (this.buttonOk);
-			global::Gtk.ButtonBox.ButtonBoxChild w11 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w9 [this.buttonOk]));
-			w11.Position = 1;
-			w11.Expand = false;
-			w11.Fill = false;
+
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 340;
-			this.DefaultHeight = 352;
-			this.label2.Hide ();
+            this.DefaultHeight = ((Global.UseHeaderBar) ? 32 : 0) + 352;
+            this.label2.Hide ();
+
+            #if GTK3
+            Gdk.Geometry geom = new Gdk.Geometry();
+            geom.MinWidth = this.DefaultWidth;
+            geom.MinHeight = 200;
+            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize);
+            #endif
+
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 			this.treeview1.CursorChanged += new global::System.EventHandler (this.OnTreeview1CursorChanged);
 			this.entry1.Changed += new global::System.EventHandler (this.OnEntry1Changed);
-			this.buttonOk.Clicked += new global::System.EventHandler (this.OnButtonOkClicked);
 		}
 	}
 }

@@ -67,7 +67,7 @@ namespace MonoGame.Framework
         static private ReaderWriterLockSlim _allWindowsReaderWriterLockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
 
-        private readonly WinFormsGamePlatform _platform;
+        private WinFormsGamePlatform _platform;
 
         private bool _isResizable;
 
@@ -93,8 +93,9 @@ namespace MonoGame.Framework
         {
             get
             {
-                var clientRect = _form.ClientRectangle;
-                return new Rectangle(clientRect.X, clientRect.Y, clientRect.Width, clientRect.Height);
+                var position = _form.PointToScreen(Point.Empty);
+                var size = _form.ClientSize;
+                return new Rectangle(position.X, position.Y, size.Width, size.Height);
             }
         }
 
@@ -458,8 +459,9 @@ namespace MonoGame.Framework
             try
             {
                 // Update the mouse state for each window.
-                foreach (var window in _allWindows.Where(w => w.Game == Game))
-                    window.UpdateMouseState();
+                foreach (var window in _allWindows)
+                    if (window.Game == Game)
+                        window.UpdateMouseState();
             }
             finally
             {
@@ -508,6 +510,11 @@ namespace MonoGame.Framework
                     _form = null;
                 }
             }
+            _platform = null;
+            Game = null;
+            Mouse.SetWindows(null);
+            Device.KeyboardInput -= OnRawKeyEvent;
+            Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.Remove);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

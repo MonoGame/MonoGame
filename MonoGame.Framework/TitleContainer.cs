@@ -10,11 +10,14 @@ using System.Threading.Tasks;
 using Foundation;
 using UIKit;
 #elif MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
-#elif PSM
-using Sce.PlayStation.Core;
+#else
+using Foundation;
+#endif
 #endif
 using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -22,14 +25,19 @@ namespace Microsoft.Xna.Framework
     {
         static TitleContainer() 
         {
-#if WINDOWS || LINUX
+#if WINDOWS || DESKTOPGL
+#if DESKTOPGL
+            // Check for the package Resources Folder first. This is where the assets
+            // will be bundled.
+            if (CurrentPlatform.OS == OS.MacOSX)
+                Location = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, "..", "Resources");
+            if (!Directory.Exists (Location))
+#endif
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
 #elif IOS || MONOMAC
 			Location = NSBundle.MainBundle.ResourcePath;
-#elif PSM
-			Location = "/Application";
 #else
             Location = string.Empty;
 #endif
@@ -88,7 +96,7 @@ namespace Microsoft.Xna.Framework
 
             return stream;
 #elif ANDROID
-            return Game.Activity.Assets.Open(safeName);
+            return Android.App.Application.Context.Assets.Open(safeName);
 #elif IOS
             var absolutePath = Path.Combine(Location, safeName);
             if (SupportRetina)

@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -55,8 +56,20 @@ namespace MonoGame.Tools.Pipeline
 
                 for (var i = 0; i < _files.Length; i++ )
                 {
+                    bool skipduplicate = false;
+
+                    switch (Environment.OSVersion.Platform) 
+                    {
+                        case PlatformID.Win32NT:
+                        case PlatformID.Win32S:
+                        case PlatformID.Win32Windows:
+                        case PlatformID.WinCE:
+                            skipduplicate = true;
+                            break;
+                    }
+
                     var f = _files[i];
-                    if (!parser.AddContent(f, true))
+                    if (!parser.AddContent(f, skipduplicate))
                         continue;
 
                     var item = _con._project.ContentItems.Last();

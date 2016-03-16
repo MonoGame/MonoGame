@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Utilities;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
 #else
 using OpenTK.Audio.OpenAL;
+using OpenTK.Audio;
 using OpenTK;
 #endif
 
@@ -20,12 +22,30 @@ using Android.Media;
 
 #if IOS
 using AudioToolbox;
+using AVFoundation;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    internal static class ALHelper
+    {
+        [System.Diagnostics.Conditional("DEBUG")]
+        [System.Diagnostics.DebuggerHidden]
+        public static void CheckError(string message = "", params object[] args)
+        {
+            ALError error;
+            if ((error = AL.GetError()) != ALError.NoError)
+            {
+                if (args != null && args.Length > 0)
+                    message = String.Format(message, args);
+                
+                throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
+            }
+        }
+    }
+
 	internal sealed class OpenALSoundController : IDisposable
-	{
+    {
         private static OpenALSoundController _instance = null;
         private IntPtr _device;
         private ContextHandle _context;
@@ -33,19 +53,43 @@ namespace Microsoft.Xna.Framework.Audio
 		//int[] buffers;
         private AlcError _lastOpenALError;
         private int[] allSourcesArray;
-        private const int MAX_NUMBER_OF_SOURCES = 32;
+#if DESKTOPGL || ANGLE
+
+        // MacOS & Linux shares a limit of 256.
+        internal const int MAX_NUMBER_OF_SOURCES = 256;
+
+#elif MONOMAC
+
+        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
+        internal const int MAX_NUMBER_OF_SOURCES = 256;
+
+#elif IOS
+
+        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
+        internal const int MAX_NUMBER_OF_SOURCES = 32;
+
+#elif ANDROID
+
+        // Set to the same as OpenAL on iOS
+        internal const int MAX_NUMBER_OF_SOURCES = 32;
+
+#endif
 #if MONOMAC || IOS
         private const double PREFERRED_MIX_RATE = 44100;
-#endif
-#if ANDROID
+#elif ANDROID
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
+#elif DESKTOPGL
+        #pragma warning disable 414
+        private static AudioContext _acontext;
+        #pragma warning restore 414
+        private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
-        private List<OALSoundBuffer> inUseSourcesCollection;
-        private List<OALSoundBuffer> playingSourcesCollection;
-        private List<OALSoundBuffer> purgeMe;
+        private List<int> inUseSourcesCollection;
+        private List<int> playingSourcesCollection;
+        private List<int> purgeMe;
         private bool _bSoundAvailable = false;
         private Exception _SoundInitException; // Here to bubble back up to the developer
         bool _isDisposed;
@@ -54,7 +98,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Sets up the hardware resources used by the controller.
         /// </summary>
 		private OpenALSoundController()
-		{
+        {
             if (!OpenSoundController())
             {
                 return;
@@ -64,11 +108,12 @@ namespace Microsoft.Xna.Framework.Audio
 
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
+            ALHelper.CheckError("Failed to generate sources.");
 
             availableSourcesCollection = new List<int>(allSourcesArray);
-			inUseSourcesCollection = new List<OALSoundBuffer>();
-			playingSourcesCollection = new List<OALSoundBuffer>();
-            purgeMe = new List<OALSoundBuffer>();
+			inUseSourcesCollection = new List<int>();
+			playingSourcesCollection = new List<int>();
+            purgeMe = new List<int>();
 		}
 
         ~OpenALSoundController()
@@ -85,9 +130,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>True if the sound controller was setup, and false if not.</returns>
         private bool OpenSoundController()
         {
-#if MONOMAC || IOS
+#if MONOMAC
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 #endif
+
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
@@ -177,24 +223,35 @@ namespace Microsoft.Xna.Framework.Audio
                     0
                 };
 #elif IOS
-                AudioSession.Initialize();
-
-                AudioSession.Interrupted += (sender, e) => {
-                    AudioSession.SetActive(false);
-                    Alc.MakeContextCurrent(ContextHandle.Zero);
-                    Alc.SuspendContext(_context);
+                EventHandler<AVAudioSessionInterruptionEventArgs> handler = delegate(object sender, AVAudioSessionInterruptionEventArgs e) {
+                    switch (e.InterruptionType) {
+                        case AVAudioSessionInterruptionType.Began:
+                            AVAudioSession.SharedInstance().SetActive(false);
+                            Alc.MakeContextCurrent(ContextHandle.Zero);
+                            Alc.SuspendContext(_context);
+                            break;
+                        case AVAudioSessionInterruptionType.Ended:
+                            AVAudioSession.SharedInstance().SetActive(true);
+                            Alc.MakeContextCurrent(_context);
+                            Alc.ProcessContext(_context);
+                            break;
+                    }
                 };
-                AudioSession.Resumed += (sender, e) => {
-                    AudioSession.SetActive(true);
-                    Alc.MakeContextCurrent(_context);
-                    Alc.ProcessContext(_context);
-                };
+                AVAudioSession.Notifications.ObserveInterruption(handler);
 
                 int[] attribute = new int[0];
-#else
+#elif !DESKTOPGL
                 int[] attribute = new int[0];
 #endif
+
+#if DESKTOPGL
+                _acontext = new AudioContext();
+                _context = Alc.GetCurrentContext();
+                _oggstreamer = new OggStreamer();
+#else
                 _context = Alc.CreateContext(_device, attribute);
+#endif
+
                 if (CheckALError("Could not create AL context"))
                 {
                     CleanUpOpenAL();
@@ -258,19 +315,29 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Destroys the AL context and closes the device, when they exist.
         /// </summary>
-		private void CleanUpOpenAL()
-		{
-			Alc.MakeContextCurrent (ContextHandle.Zero);
-			if (_context != ContextHandle.Zero) {
-				Alc.DestroyContext (_context);
-				_context = ContextHandle.Zero;
-			}
-			if (_device != IntPtr.Zero) {
-				Alc.CloseDevice (_device);
-				_device = IntPtr.Zero;
-			}
+        private void CleanUpOpenAL()
+        {
+            Alc.MakeContextCurrent(ContextHandle.Zero);
+#if DESKTOPGL
+            if (_acontext != null)
+            {
+                _acontext.Dispose();
+                _acontext = null;
+            }
+#else
+            if (_context != ContextHandle.Zero)
+            {
+                Alc.DestroyContext (_context);
+                _context = ContextHandle.Zero;
+            }
+            if (_device != IntPtr.Zero)
+            {
+                Alc.CloseDevice (_device);
+                _device = IntPtr.Zero;
+            }
+#endif
             _bSoundAvailable = false;
-		}
+        }
 
         /// <summary>
         /// Dispose of the OpenALSoundCOntroller.
@@ -292,7 +359,19 @@ namespace Microsoft.Xna.Framework.Audio
                 if (disposing)
                 {
                     if (_bSoundAvailable)
+                    {
+#if DESKTOPGL
+                        if(_oggstreamer != null)
+                            _oggstreamer.Dispose();
+#endif
+                        for (int i = 0; i < allSourcesArray.Length; i++)
+                        {
+                            AL.DeleteSource(allSourcesArray[i]);
+                            ALHelper.CheckError("Failed to delete source.");
+                        }
+                        
                         CleanUpOpenAL();
+                    }
                 }
                 _isDisposed = true;
             }
@@ -305,42 +384,36 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <param name="soundBuffer">The sound buffer you want to play</param>
         /// <returns>True if the buffer can be played, and false if not.</returns>
-		public bool ReserveSource (OALSoundBuffer soundBuffer)
+		public int ReserveSource()
 		{
             if (!CheckInitState())
             {
-                return(false);
+                throw new InstancePlayLimitException();
             }
             int sourceNumber;
-			if (availableSourcesCollection.Count == 0) {
-
-				soundBuffer.SourceId = 0;
-				return false;
+			if (availableSourcesCollection.Count == 0)
+            {
+                throw new InstancePlayLimitException();
 			}
 			
-
 			sourceNumber = availableSourcesCollection.First ();
-			soundBuffer.SourceId = sourceNumber;
-			inUseSourcesCollection.Add (soundBuffer);
-
+            inUseSourcesCollection.Add(sourceNumber);
 			availableSourcesCollection.Remove (sourceNumber);
 
-			//sourceId = sourceNumber;
-			return true;
+            return sourceNumber;
 		}
 
-		public void RecycleSource (OALSoundBuffer soundBuffer)
+        public void RecycleSource(int sourceId)
 		{
             if (!CheckInitState())
             {
                 return;
             }
-            inUseSourcesCollection.Remove(soundBuffer);
-			availableSourcesCollection.Add (soundBuffer.SourceId);
-			soundBuffer.RecycleSoundBuffer();
+            inUseSourcesCollection.Remove(sourceId);
+            availableSourcesCollection.Add(sourceId);
 		}
 
-		public void PlaySound (OALSoundBuffer soundBuffer)
+        public void PlaySound(SoundEffectInstance inst)
         {
             if (!CheckInitState())
             {
@@ -348,59 +421,21 @@ namespace Microsoft.Xna.Framework.Audio
             }
             lock (playingSourcesCollection)
             {
-                playingSourcesCollection.Add (soundBuffer);
+                playingSourcesCollection.Add(inst.SourceId);
             }
-			AL.SourcePlay (soundBuffer.SourceId);
+            AL.SourcePlay(inst.SourceId);
+            ALHelper.CheckError("Failed to play source.");
 		}
 
-		public void StopSound (OALSoundBuffer soundBuffer)
+        public void FreeSource(SoundEffectInstance inst)
         {
-            if (!CheckInitState())
-            {
-                return;
-            }
-            AL.SourceStop(soundBuffer.SourceId);
-
-            AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
             lock (playingSourcesCollection) {
-                playingSourcesCollection.Remove (soundBuffer);
+                playingSourcesCollection.Remove(inst.SourceId);
             }
-            RecycleSource (soundBuffer);
-		}
-
-		public void PauseSound (OALSoundBuffer soundBuffer)
-		{
-            if (!CheckInitState())
-            {
-                return;
-            }
-            soundBuffer.Pause();
-		}
-
-        public void ResumeSound(OALSoundBuffer soundBuffer)
-        {
-            if (!CheckInitState())
-            {
-                return;
-            }
-            soundBuffer.Resume();
-        }
-
-		public bool IsState (OALSoundBuffer soundBuffer, int state)
-		{
-            if (!CheckInitState())
-            {
-                return (false);
-            }
-            int sourceState;
-
-			AL.GetSource (soundBuffer.SourceId, ALGetSourcei.SourceState, out sourceState);
-
-			if (state == sourceState) {
-				return true;
-			}
-
-			return false;
+            RecycleSource(inst.SourceId);
+            inst.SourceId = 0;
+            inst.HasSourceId = false;
+            inst.SoundState = SoundState.Stopped;
 		}
 
         /// <summary>
@@ -409,7 +444,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// inside of NoAudioHardwareException.
         /// </summary>
         /// <returns>True if the controller was initialized, false if not.</returns>
-        private bool CheckInitState()
+        internal bool CheckInitState()
         {
             if (!_bSoundAvailable)
             {
@@ -432,6 +467,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
             int pos;
 			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
+            ALHelper.CheckError("Failed to set source offset.");
 			return pos;
 		}
 
@@ -453,57 +489,70 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 for (int i = playingSourcesCollection.Count - 1; i >= 0; --i)
                 {
-                    var soundBuffer = playingSourcesCollection[i];
-                    state = AL.GetSourceState(soundBuffer.SourceId);
+                    int sourceId = playingSourcesCollection[i];
+                    state = AL.GetSourceState(sourceId);
+                    ALHelper.CheckError("Failed to get source state.");
                     if (state == ALSourceState.Stopped)
                     {
-                        purgeMe.Add(soundBuffer);
+                        purgeMe.Add(sourceId);
                         playingSourcesCollection.RemoveAt(i);
                     }
                 }
             }
             lock (purgeMe)
             {
-                foreach (var soundBuffer in purgeMe)
+                foreach (int sourceId in purgeMe)
                 {
-                    AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, 0);
-                    RecycleSource(soundBuffer);
+                    AL.Source(sourceId, ALSourcei.Buffer, 0);
+                    ALHelper.CheckError("Failed to free source from buffer.");
+                    inUseSourcesCollection.Remove(sourceId);
+                    availableSourcesCollection.Add(sourceId);
                 }
                 purgeMe.Clear();
             }
         }
 
 #if ANDROID
+        const string Lib = "openal32.dll";
+        const CallingConvention Style = CallingConvention.Cdecl;
+
+        [DllImport(Lib, EntryPoint = "alcDevicePauseSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDevicePauseSOFT(IntPtr device);
+
+        [DllImport(Lib, EntryPoint = "alcDeviceResumeSOFT", ExactSpelling = true, CallingConvention = Style)]
+        unsafe static extern void alcDeviceResumeSOFT(IntPtr device);
+
         void Activity_Paused(object sender, EventArgs e)
         {
             // Pause all currently playing sounds. The internal pause count in OALSoundBuffer
             // will take care of sounds that were already paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Pause();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Pause();
+            //            }
+            alcDevicePauseSOFT(_device);
         }
 
         void Activity_Resumed(object sender, EventArgs e)
         {
             // Resume all sounds that were playing when the activity was paused. The internal
             // pause count in OALSoundBuffer will take care of sounds that were previously paused.
-            lock (playingSourcesCollection)
-            {
-                foreach (var source in playingSourcesCollection)
-                    source.Resume();
-            }
+            //            lock (playingSourcesCollection)
+            //            {
+            //                foreach (var source in playingSourcesCollection)
+            //                    source.Resume();
+            //            }
+            alcDeviceResumeSOFT(_device);
         }
 #endif
 
-#if MONOMAC || IOS
+#if MONOMAC
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 
 		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]
 		static extern void alcMacOSXMixerOutputRate (double rate); // caution
 #endif
-
-	}
+    }
 }
 

@@ -27,10 +27,6 @@ namespace MonoGame.Tools.Pipeline
 		private global::Gtk.ScrolledWindow GtkScrolledWindow2;
 		
 		private global::Gtk.TreeView treeview1;
-		
-		private global::Gtk.Button buttonCancel;
-		
-		private global::Gtk.Button buttonOk;
 
 		protected virtual void Build ()
 		{
@@ -144,52 +140,24 @@ namespace MonoGame.Tools.Pipeline
 			w1.Add (this.hpaned1);
 			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(w1 [this.hpaned1]));
 			w13.Position = 0;
-			// Internal child MonoGame.Tools.Pipeline.CollectionEditorDialog.ActionArea
-            #if GTK2
-			global::Gtk.HButtonBox w14 = this.ActionArea;
-            #elif GTK3
-            global::Gtk.ButtonBox w14 = this.ActionArea;
-            #endif
-			w14.Name = "dialog1_ActionArea";
-			w14.Spacing = 10;
-			w14.BorderWidth = ((uint)(5));
-			w14.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonCancel = new global::Gtk.Button ();
-			this.buttonCancel.CanDefault = true;
-			this.buttonCancel.CanFocus = true;
-			this.buttonCancel.Name = "buttonCancel";
-			this.buttonCancel.UseStock = true;
-			this.buttonCancel.UseUnderline = true;
-			this.buttonCancel.Label = "gtk-cancel";
-			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w15 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w14 [this.buttonCancel]));
-			w15.Expand = false;
-			w15.Fill = false;
-			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonOk = new global::Gtk.Button ();
-			this.buttonOk.CanDefault = true;
-			this.buttonOk.CanFocus = true;
-			this.buttonOk.Name = "buttonOk";
-			this.buttonOk.UseStock = true;
-			this.buttonOk.UseUnderline = true;
-			this.buttonOk.Label = "gtk-ok";
-			w14.Add (this.buttonOk);
-			global::Gtk.ButtonBox.ButtonBoxChild w16 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w14 [this.buttonOk]));
-			w16.Position = 1;
-			w16.Expand = false;
-			w16.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 800;
-			this.DefaultHeight = 397;
+            this.DefaultHeight = 397;
+
+            #if GTK3
+            Gdk.Geometry geom = new Gdk.Geometry();
+            geom.MinWidth = this.DefaultWidth;
+            geom.MinHeight = 200;
+            this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize);
+            #endif
+
 			this.Show ();
 			this.Response += new global::Gtk.ResponseHandler (this.OnResponse);
 			this.filechooserwidget1.FileActivated += new global::System.EventHandler (this.AddFileEvent);
 			this.button9.Clicked += new global::System.EventHandler (this.AddFileEvent);
 			this.button10.Clicked += new global::System.EventHandler (this.RemoveFileEvent);
-			this.buttonOk.Clicked += new global::System.EventHandler (this.OnButtonOkClicked);
 		}
 	}
 }

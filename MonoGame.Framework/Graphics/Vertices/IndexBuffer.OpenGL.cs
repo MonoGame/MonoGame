@@ -8,14 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
-#if WINDOWS || LINUX
+#if DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenTK.Graphics.OpenGL;
 #endif
 

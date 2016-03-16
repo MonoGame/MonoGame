@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.AVFoundation;
@@ -13,7 +13,7 @@ using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
-#if IOS
+#if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
 using AVFoundation;
@@ -25,9 +25,13 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
+        internal const int MAX_PLAYING_INSTANCES = OpenALSoundController.MAX_NUMBER_OF_SOURCES;
+
         internal byte[] _data;
 
-		internal float Rate { get; set; }
+        internal OALSoundBuffer SoundBuffer;
+
+        internal float Rate { get; set; }
 
         internal int Size { get; set; }
 
@@ -130,7 +134,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-            return;
 
 #endif
 
@@ -148,6 +151,9 @@ namespace Microsoft.Xna.Framework.Audio
             _data = buffer;
 
 #endif
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -164,7 +170,6 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
             inst.InitializeSound();
-            inst.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
         #endregion
@@ -173,7 +178,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose(bool disposing)
         {
-            // A no-op for OpenAL
+            if (SoundBuffer != null)
+            {
+                SoundBuffer.Dispose();
+                SoundBuffer = null;
+            }
         }
 
         #endregion

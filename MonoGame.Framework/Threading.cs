@@ -51,7 +51,7 @@ using OpenTK.Graphics.ES11;
 #else
 using OpenTK.Graphics.ES20;
 #endif
-#elif WINDOWS || LINUX || ANGLE
+#elif DESKTOPGL || ANGLE
 using OpenTK.Graphics;
 using OpenTK.Platform;
 using OpenTK;
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework
         //static Mutex actionsMutex = new Mutex();
 #elif IOS
         public static EAGLContext BackgroundContext;
-#elif WINDOWS || LINUX || ANGLE
+#elif WINDOWS || DESKTOPGL || ANGLE
         public static IGraphicsContext BackgroundContext;
         public static IWindowInfo WindowInfo;
 #endif
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif WINDOWS || LINUX || ANGLE
+#elif WINDOWS || DESKTOPGL || ANGLE
             lock (BackgroundContext)
             {
                 // Make the context current on this thread
@@ -209,7 +209,11 @@ namespace Microsoft.Xna.Framework
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
             MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
+#else
+            AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
+#endif
 #else
             Add(() =>
 #endif

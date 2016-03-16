@@ -18,7 +18,6 @@
     <Platform Name="Linux">758CB33D-6EBD-41EA-BB0C-55B1C97A325F</Platform>
     <Platform Name="MacOS">5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130</Platform>
     <Platform Name="Ouya">565129E0-4EE5-4F6F-B403-C3484C9740BE</Platform>
-    <Platform Name="PSMobile">167676EE-E2D5-440A-BB2B-EFBD02BC8493</Platform>
     <Platform Name="Windows">AE483C29-042E-4226-BA52-D247CE7676DA</Platform>
     <Platform Name="WindowsGL">AE483C29-042E-4226-BA52-D247CE7676DA</Platform>
   </ProjectGuids>
@@ -28,6 +27,8 @@
   </References>
 
   <Properties>
+    <LangVersion>Default</LangVersion>
+    <WarningLevel>0</WarningLevel>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <CustomDefinitions>
     <!-- 
@@ -39,10 +40,10 @@
       <Platform Name="Linux">TRACE;UNITY_4_5</Platform>
       <Platform Name="MacOS">TRACE;MONOMAC;UNITY_4_5</Platform>
       <Platform Name="Ouya">ANDROID;UNITY_4_5</Platform>
-      <Platform Name="PSMobile">PSM;UNITY_4_5</Platform>
       <Platform Name="Windows">TRACE;UNITY_4_5</Platform>
       <Platform Name="WindowsGL">TRACE;UNITY_4_5</Platform>
     </CustomDefinitions>
+
   </Properties>
 
    <Files>

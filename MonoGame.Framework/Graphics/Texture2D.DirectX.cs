@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 #endif
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
@@ -127,6 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var d3dContext = GraphicsDevice._d3dContext;
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
+            {
                 lock (d3dContext)
                 {
                     int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
@@ -148,35 +149,41 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
 
                     // Copy the data to the array.
-                    SharpDX.DataStream stream;
-                    var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
-
-                    var elementSize = _format.GetSize();
-                    var rowSize = elementSize * elementsInRow;
-                    if (rowSize == databox.RowPitch)
-                        stream.ReadRange(data, startIndex, elementCount);
-                    else
+                    SharpDX.DataStream stream = null;
+                    try
                     {
-                        // Some drivers may add pitch to rows.
-                        // We need to copy each row separatly and skip trailing zeros.
-                        stream.Seek(startIndex, SeekOrigin.Begin);
+                        var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
 
-                        int elementSizeInByte = Marshal.SizeOf(typeof(T));
-                        for (var row = 0; row < rows; row++)
+                        var elementSize = _format.GetSize();
+                        var rowSize = elementSize * elementsInRow;
+                        if (rowSize == databox.RowPitch)
+                            stream.ReadRange(data, startIndex, elementCount);
+                        else
                         {
-                            int i;
-                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
-                                data[i] = stream.Read<T>();
+                            // Some drivers may add pitch to rows.
+                            // We need to copy each row separatly and skip trailing zeros.
+                            stream.Seek(startIndex, SeekOrigin.Begin);
 
-                            if (i >= elementCount)
-                                break;
+                            int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                            for (var row = 0; row < rows; row++)
+                            {
+                                int i;
+                                for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                    data[i] = stream.Read<T>();
 
-                            stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
+                                if (i >= elementCount)
+                                    break;
+
+                                stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
+                            }
                         }
                     }
-
-                    stream.Dispose();
+                    finally
+                    {
+                        SharpDX.Utilities.Dispose( ref stream);
+                    }
                 }
+            }
         }
 
         private int CalculateSubresourceIndex(int arraySlice, int level)
@@ -231,7 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
             SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
 #endif
 #if WINDOWS_PHONE
@@ -240,12 +247,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GetData(pixelData);
 
             //We Must convert from BGRA to RGBA
-            ConvertToRGBA(height, width, pixelData);
+            ConvertToRGBA(Height, Width, pixelData);
 
             var waitEvent = new ManualResetEventSlim(false);
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                var bitmap = new WriteableBitmap(width, height);
+                var bitmap = new WriteableBitmap(Width, Height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
                 waitEvent.Set();
@@ -253,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             waitEvent.Wait();
 #endif
-#if !WINDOWS_STOREAPP && !WINDOWS_PHONE
+#if !WINDOWS_STOREAPP && !WINDOWS_PHONE && !WINDOWS_UAP
             throw new NotImplementedException();
 #endif
         }
@@ -284,8 +291,7 @@ namespace Microsoft.Xna.Framework.Graphics
             pngWriter.Write(this, stream);
         }
 
-#if WINDOWS_STOREAPP
-
+#if WINDOWS_STOREAPP || WINDOWS_UAP
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {
             var pixelData = new byte[Width * Height * GraphicsExtensions.GetSize(Format)];

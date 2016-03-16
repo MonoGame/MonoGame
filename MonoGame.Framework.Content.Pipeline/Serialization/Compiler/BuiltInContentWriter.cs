@@ -15,16 +15,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         private List<ContentTypeWriter> _genericTypes;
 
-        protected override void Initialize(ContentCompiler compiler)
+        /// <inheritdoc/>
+        internal override void OnAddedToContentWriter(ContentWriter output)
         {
-            base.Initialize(compiler);
+            base.OnAddedToContentWriter(output);
 
             if (TargetType.IsGenericType)
             {
                 _genericTypes = new List<ContentTypeWriter>();
                 var arguments = TargetType.GetGenericArguments();
                 foreach (var arg in arguments)
-                    _genericTypes.Add(compiler.GetTypeWriter(arg));
+                    _genericTypes.Add(output.GetTypeWriter(arg));
             }
         }
 

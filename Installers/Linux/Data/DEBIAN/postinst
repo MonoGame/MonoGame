@@ -1,9 +1,0 @@
-#!/bin/sh
-xdg-mime install /opt/monogame-pipeline/mgcb.xml --novendor
-
-if [ -f /usr/share/applications/Monogame\ Pipeline.desktop ]
-then
-	rm /usr/share/applications/Monogame\ Pipeline.desktop
-fi
-echo "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=false\nTerminal=false\nType=Application\nMimeType=text/mgcb;\nCategories=Development;" >> /usr/share/applications/Monogame\ Pipeline.desktop
-

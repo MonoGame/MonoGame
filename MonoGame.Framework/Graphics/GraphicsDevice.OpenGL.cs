@@ -8,11 +8,16 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
+#else
+using OpenTK.Graphics.OpenGL;
+using GLPrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;
+#endif
 #endif
 
-#if WINDOWS || LINUX
+#if DESKTOPGL
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
@@ -34,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
         internal IGraphicsContext Context { get; private set; }
 #endif
 
@@ -90,7 +95,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
             var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
 
@@ -193,6 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!string.IsNullOrEmpty(extstring))
             {
                 extensions.AddRange(extstring.Split(' '));
+#if DEBUG
 #if ANDROID
                 Android.Util.Log.Debug("MonoGame", "Supported extensions:");
 #else
@@ -203,6 +209,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Android.Util.Log.Debug("MonoGame", extension);
 #else
                     System.Diagnostics.Debug.WriteLine(extension);
+#endif
 #endif
             }
 
@@ -241,6 +248,9 @@ namespace Microsoft.Xna.Framework.Graphics
             this.BlendState.PlatformApplyState(this, true);
             this.DepthStencilState.PlatformApplyState(this, true);
             this.RasterizerState.PlatformApplyState(this, true);            
+
+            // TODO: Add support for multiple vertex buffers (SetVertexBuffers).
+            _maxVertexBufferSlots = 1;
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -326,7 +336,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsDevice.AddDisposeAction(() =>
                                             {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
                 Context.Dispose();
                 Context = null;
 
@@ -364,7 +374,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformPresent()
         {
-#if WINDOWS || LINUX || ANGLE
+#if DESKTOPGL || ANGLE
             Context.SwapBuffers();
 #endif
             GraphicsExtensions.CheckGLError();
@@ -815,13 +825,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 _indexBufferDirty = false;
             }
 
-            if (_vertexBufferDirty)
+            if (_vertexBuffersDirty)
             {
-                if (_vertexBuffer != null)
+                if (_vertexBuffers.Count > 0)
                 {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffers.Get(0).VertexBuffer.vbo);
                     GraphicsExtensions.CheckGLError();
                 }
+                _vertexBuffersDirty = false;
             }
 
             if (_vertexShader == null)
@@ -832,6 +843,23 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexShaderDirty || _pixelShaderDirty)
             {
                 ActivateShaderProgram();
+
+                if (_vertexShaderDirty)
+                {
+                    unchecked
+                    {
+                        _graphicsMetrics._vertexShaderCount++;
+                    }
+                }
+
+                if (_pixelShaderDirty)
+                {
+                    unchecked
+                    {
+                        _graphicsMetrics._pixelShaderCount++;
+                    }
+                }
+
                 _vertexShaderDirty = _pixelShaderDirty = false;
             }
 
@@ -853,9 +881,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);
-			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
+            var vertexDeclaration = _vertexBuffers.Get(0).VertexBuffer.VertexDeclaration;
+            var vertexOffset = (IntPtr)(vertexDeclaration.VertexStride * baseVertex);
 
-			_vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
+            vertexDeclaration.Apply(_vertexShader, vertexOffset);
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -873,7 +902,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            _vertexBuffersDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -896,7 +925,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             ApplyState(true);
 
-            _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
+            _vertexBuffers.Get(0).VertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -913,7 +942,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            _vertexBuffersDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -946,7 +975,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            _vertexBuffersDirty = _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -968,6 +997,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // Release the handles.
             ibHandle.Free();
             vbHandle.Free();
+        }
+
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        {
+            throw new NotImplementedException("GraphicsDevice.DrawInstancedPrimitives is not yet implemented for OpenGL.");
         }
 
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)

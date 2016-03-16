@@ -4,9 +4,14 @@ using System;
 using System.Collections.Generic;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
-#elif WINDOWS || LINUX
+#else
+using OpenTK.Graphics.OpenGL;
+using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
+#endif
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 
@@ -88,13 +93,13 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!_programCache.ContainsKey(key))
             {
                 // the key does not exist so we need to link the programs
-                Link(vertexShader, pixelShader);
+                _programCache.Add(key, Link(vertexShader, pixelShader));
             }
 
             return _programCache[key];
-        }        
+        }
 
-        private void Link(Shader vertexShader, Shader pixelShader)
+        private ShaderProgram Link(Shader vertexShader, Shader pixelShader)
         {
             // NOTE: No need to worry about background threads here
             // as this is only called at draw time when we're in the
@@ -138,9 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("Unable to link effect program");
             }
 
-            ShaderProgram shaderProgram = new ShaderProgram(program);
-
-            _programCache.Add(vertexShader.HashKey | pixelShader.HashKey, shaderProgram);
+            return new ShaderProgram(program);
         }
 
 

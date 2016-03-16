@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformSetup()
         {
-            JSAPIAccess.Instance.GraphicsDevicePlatformSetup();
+            
         }
 
         private void PlatformInitialize()
@@ -27,8 +27,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            // TODO: This is just a test at the moment.
-            JSAPIAccess.Instance.GraphicsDevicePlatformClear();
+            WebGL.gl.enable(WebGL.gl.DEPTH_TEST);
+            WebGL.gl.depthFunc(WebGL.gl.LEQUAL);
+            WebGL.gl.clearColor(color.X, color.Y, color.Z, color.W);
+            WebGL.gl.clear(WebGL.gl.COLOR_BUFFER_BIT | WebGL.gl.DEPTH_BUFFER_BIT);
         }
 
         private void PlatformDispose()
@@ -82,6 +84,10 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        {
+        }
+
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
         {
         }
 

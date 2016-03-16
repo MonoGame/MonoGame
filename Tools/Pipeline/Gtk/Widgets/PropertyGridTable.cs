@@ -146,8 +146,7 @@ namespace MonoGame.Tools.Pipeline
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new CollectionEditorDialog(model.GetValue(iter, 14).ToString(), window);
-                    dialog.TransientFor = window;
+                    var dialog = new CollectionEditorDialog(window, model.GetValue(iter, 14).ToString());
                     if(dialog.Run() == (int)ResponseType.Ok)
                     {
                         int id = Convert.ToInt32(model.GetValue(iter, 11));
@@ -181,10 +180,73 @@ namespace MonoGame.Tools.Pipeline
                 TreeIter iter;
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
+                    
+                    var col = new Microsoft.Xna.Framework.Color ();
+                    int response = (int)ResponseType.Reject;
 
-                    var dialog = new ColorPickerDialog(model.GetValue(iter, 15).ToString());
-                    dialog.TransientFor = window;
-                    if(dialog.Run() == (int)ResponseType.Ok)
+                    if(Global.GtkMajorVersion < 3 || (Global.GtkMajorVersion == 3 && Global.GtkMinorVersion < 3))
+                    {
+                        var dialog = new ColorSelectionDialog("Color Chooser");
+                        dialog.TransientFor = window;
+                        dialog.ColorSelection.HasPalette = true;
+                        dialog.ColorSelection.HasOpacityControl = true;
+
+                        try
+                        {
+                            string[] cvalues = model.GetValue(iter, 15).ToString().Replace (":", " ").Replace("}", " ").Split (' ');
+
+                            byte red = (byte)Convert.ToInt16 (cvalues [1]);
+                            byte green = (byte)Convert.ToInt16 (cvalues [3]);
+                            byte blue = (byte)Convert.ToInt16 (cvalues [5]);
+                            int alpha = Convert.ToInt32(cvalues [7]);
+
+                            dialog.ColorSelection.CurrentColor = new Gdk.Color (red, green, blue);
+                            dialog.ColorSelection.CurrentAlpha = (ushort)(alpha * 257);
+                        }
+                        catch { }
+
+                        response = dialog.Run();
+
+                        col.R = (byte)Convert.ToInt32(dialog.ColorSelection.CurrentColor.Red);
+                        col.G = (byte)Convert.ToInt32(dialog.ColorSelection.CurrentColor.Green);
+                        col.B = (byte)Convert.ToInt32(dialog.ColorSelection.CurrentColor.Blue);
+                        col.A = (byte)(dialog.ColorSelection.CurrentAlpha / 257);
+
+                        dialog.Destroy();
+                    }
+                    else
+                    {
+                        #if LINUX
+                        Gdk.RGBA rgba = new Gdk.RGBA();
+
+                        try
+                        {
+                            string[] cvalues = model.GetValue(iter, 15).ToString().Replace (":", " ").Replace("}", " ").Split (' ');
+                            rgba.Parse("rgba(" + cvalues [1] + "," + cvalues [3] + "," + cvalues [5] + "," + cvalues [7] + ")");
+                        }
+                        catch { }
+
+                        var dialog = new ColorChooserDialog(window, "Color Chooser");
+                        dialog.ColorChooser.CurrentRgba = rgba;
+                        response = (int)dialog.Run();
+
+                        rgba = dialog.ColorChooser.CurrentRgba;
+                        dialog.Destroy();
+
+                        string[] split = rgba.ToString().Split('(', ')')[1].Split(',');
+
+                        col.R = (byte)Convert.ToInt32(split[0]);
+                        col.G = (byte)Convert.ToInt32(split[1]);
+                        col.B = (byte)Convert.ToInt32(split[2]);
+
+                        if(split.Length == 4)
+                            col.A = (byte)Convert.ToInt32(double.Parse(split[3]) * 255);
+                        else
+                            col.A = 255;
+                        #endif
+                    }
+
+                    if(response == (int)ResponseType.Ok)
                     {
                         int id = Convert.ToInt32(model.GetValue(iter, 11));
 
@@ -194,9 +256,9 @@ namespace MonoGame.Tools.Pipeline
                             {
                                 if(eitems[i].eventHandler != null)
                                 {
-                                    var fwidget = new FalseWidget(dialog.data);
+                                    var fwidget = new FalseWidget(col.ToString ());
                                     eitems[i].eventHandler(fwidget, EventArgs.Empty);
-                                    model.SetValue(iter, 15, dialog.data);
+                                    model.SetValue(iter, 15, col.ToString ());
                                     break;
                                 }
                             }
@@ -257,43 +319,26 @@ namespace MonoGame.Tools.Pipeline
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new FileChooserDialog("Add Content Folder",
-                        window,
-                        FileChooserAction.SelectFolder,
-                        "Cancel", ResponseType.Cancel,
-                        "Open", ResponseType.Accept);
-                    dialog.SetCurrentFolder (window._controller.GetFullPath(model.GetValue(iter, 17).ToString()));
-
-                    int responseid = dialog.Run();
-                    string fileName = dialog.Filename;
+                    var dialog = new CustomFolderDialog(window, model.GetValue(iter, 17).ToString());
+                    var responseid = dialog.Run();
+                    var fileName = dialog.FileName;
                     dialog.Destroy();
 
-                    if(responseid == (int)ResponseType.Accept)
+                    if(responseid != (int)ResponseType.Ok)
+                        return;
+
+                    int id = Convert.ToInt32(model.GetValue(iter, 11));
+
+                    for(int i = 0;i < eitems.Count;i++)
                     {
-                        int id = Convert.ToInt32(model.GetValue(iter, 11));
+                        if(eitems[i].id != id || eitems[i].eventHandler == null)
+                            continue;
 
-                        for(int i = 0;i < eitems.Count;i++)
-                        {
-                            if(eitems[i].id == id)
-                            {
-                                if(eitems[i].eventHandler != null)
-                                {
-                                    string pl = ((PipelineController)window._controller).ProjectLocation;
-                                    if (!pl.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-                                        pl += System.IO.Path.DirectorySeparatorChar;
+                        var fwidget = new FalseWidget(fileName);
+                        eitems[i].eventHandler(fwidget, EventArgs.Empty);
+                        model.SetValue(iter, 17, fileName);
 
-                                    Uri folderUri = new Uri(pl);
-                                    Uri pathUri = new Uri(fileName);
-
-                                    string newpath = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
-
-                                    var fwidget = new FalseWidget(newpath);
-                                    eitems[i].eventHandler(fwidget, EventArgs.Empty);
-                                    model.SetValue(iter, 17, newpath);
-                                    break;
-                                }
-                            }
-                        }
+                        break;
                     }
                 }
             };

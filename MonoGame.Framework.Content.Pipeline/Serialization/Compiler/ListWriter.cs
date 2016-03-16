@@ -13,17 +13,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     [ContentTypeWriter]
     class ListWriter<T> : BuiltInContentWriter<List<T>>
     {
-        ContentTypeWriter elementWriter;
+        ContentTypeWriter _elementWriter;
 
-        /// <summary>
-        /// Initialize the writer.
-        /// </summary>
-        /// <param name="compiler">Compiler instance calling this writer.</param>
-        protected override void Initialize(ContentCompiler compiler)
+        /// <inheritdoc/>
+        internal override void OnAddedToContentWriter(ContentWriter output)
         {
-            base.Initialize(compiler);
-            
-            elementWriter = compiler.GetTypeWriter(typeof(T));
+            base.OnAddedToContentWriter(output);
+
+            _elementWriter = output.GetTypeWriter(typeof(T));
         }
 
         public override bool CanDeserializeIntoExistingObject
@@ -40,10 +37,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             if (value == null)
                 throw new ArgumentNullException("value");
+
             output.Write(value.Count);
             foreach (var element in value)
             {
-                output.WriteObject(element, elementWriter);
+                output.WriteObject(element, _elementWriter);
             }
         }
     }

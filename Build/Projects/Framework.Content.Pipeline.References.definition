@@ -12,13 +12,34 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x32\SharpFont.dll" />
     <Binary
-      Name="ManagedPVRTC"
-      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
+      Name="FreeImageNET"
+      Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
+    <Binary
+      Name="ATI.TextureConverter"
+      Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\assimp\libassimp.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvcore.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvimage.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvmath.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\Linux\libnvtt.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\assimp\AssimpNet.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\Linux\x64\libfreeimage-3.17.0.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg" />
+    <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe" />
+    <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\Linux\x86\libPVRTexLibWrapper.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\Linux\x64\libPVRTexLibWrapper.so" />
+    <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config" />
   </Platform>
 
 
   <Platform Type="MacOS">
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
@@ -29,11 +50,31 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
-      Name="ManagedPVRTC"
-      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
-    <Binary
       Name="FreeImageNET"
       Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
+    <Binary
+      Name="ATI.TextureConverter"
+      Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\assimp\AssimpNet.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\assimp\libassimp.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" />
+    <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" />
+    <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\OSX\x86\libPVRTexLibWrapper.dylib" />
+    <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll.config" />
+    <NativeBinary Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll.config" />
   </Platform>
 
 
@@ -57,11 +98,22 @@
       Name="SharpFont"
       Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
-      Name="ManagedPVRTC"
-      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
-  <Binary
       Name="FreeImageNET"
-       Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
+      Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
+    <Binary
+      Name="PVRTexLibNET"
+      Path="ThirdParty\Dependencies\PVRTexLibNET\PVRTexLibNET.dll" />
+    <Binary
+      Name="ATI.TextureConverter"
+      Path="ThirdParty\Dependencies\ATI.TextureConverter\ATI.TextureConverter.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\assimp\Assimp64.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\SharpFont\x64\freetype6.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll" />
+    <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe" />
+    <NativeBinary Path="ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe" />
+    <NativeBinary Path="ThirdParty\Dependencies\PVRTexLibNET\Windows\x64\PVRTexLibWrapper.dll" />
   </Platform>
 	
 </ExternalProject>

@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Content
             string[] files = null;
             if (!filesInFolders.TryGetValue(path, out files))
             {
-                files = Game.Activity.Assets.List(path);
+                files = Android.App.Application.Context.Assets.List(path);
                 filesInFolders[path] = files;
             }
 

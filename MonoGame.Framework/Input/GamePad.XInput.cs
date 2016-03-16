@@ -10,6 +10,8 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
+        internal static bool Back;
+
         private static readonly SharpDX.XInput.Controller[] _controllers = new[]
         {
             new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One),
@@ -21,6 +23,11 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly bool[] _connected = new bool[4];
         private static readonly long[] _timeout = new long[4];
         private static readonly long TimeoutTicks = TimeSpan.FromSeconds(1).Ticks;
+
+        private static int PlatformGetMaxNumberOfGamePads()
+        {
+            return 4;
+        }
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
@@ -125,8 +132,8 @@ namespace Microsoft.Xna.Framework.Input
             ret.HasLeftVibrationMotor = hasForceFeedback && capabilities.Vibration.LeftMotorSpeed > 0;
             ret.HasRightVibrationMotor = hasForceFeedback && capabilities.Vibration.RightMotorSpeed > 0;
 #else
-            ret.HasLeftVibrationMotor = false;
-            ret.HasRightVibrationMotor = false;
+            ret.HasLeftVibrationMotor = (capabilities.Vibration.LeftMotorSpeed > 0);
+            ret.HasRightVibrationMotor = (capabilities.Vibration.RightMotorSpeed > 0);
 #endif
 
             // other
@@ -136,25 +143,42 @@ namespace Microsoft.Xna.Framework.Input
             return ret;
         }
 
+        private static GamePadState GetDefaultState()
+        {
+            var state = new GamePadState();
+            state.Buttons = new GamePadButtons(Back ? Buttons.Back : 0);
+            return state;
+        }
+
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
             if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
-                return new GamePadState();
+                return GetDefaultState();
+
+            int packetNumber = 0;
 
             // Try to get the controller state.
-            SharpDX.XInput.State xistate;
-            var controller = _controllers[index];
-            _connected[index] = controller.GetState(out xistate);
-            var gamepad = xistate.Gamepad;
+            var gamepad = new SharpDX.XInput.Gamepad();
+            try
+            {
+                SharpDX.XInput.State xistate;
+                var controller = _controllers[index];
+                _connected[index] = controller.GetState(out xistate);
+                packetNumber = xistate.PacketNumber;
+                gamepad = xistate.Gamepad;
+            }
+            catch (Exception ex)
+            {
+            }
 
             // If the device is disconnected retry it after the
             // timeout period has elapsed to avoid the overhead.
             if (!_connected[index])
             {
                 _timeout[index] = DateTime.UtcNow.Ticks + TimeoutTicks;
-                return new GamePadState();
+                return GetDefaultState();
             }
 
             var thumbSticks = new GamePadThumbSticks(
@@ -186,6 +210,8 @@ namespace Microsoft.Xna.Framework.Input
                 triggers: triggers,
                 buttons: buttons,
                 dPad: dpadState);
+
+            state.PacketNumber = packetNumber;
 
             return state;
         }
@@ -268,12 +294,15 @@ namespace Microsoft.Xna.Framework.Input
             if (rightTrigger >= SharpDX.XInput.Gamepad.TriggerThreshold)
                 ret |= Buttons.RightTrigger;
 
+            // Check for the hardware back button.
+            if (Back)
+                ret |= Buttons.Back;
+
             return new GamePadButtons(ret);
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-#if DIRECTX11_1
             if (!_connected[index])
                 return false;
 
@@ -285,9 +314,6 @@ namespace Microsoft.Xna.Framework.Input
             });
 
             return result == SharpDX.Result.Ok;
-#else
-            return false;
-#endif            
         }
     }
 }

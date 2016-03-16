@@ -40,8 +40,15 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
 using MonoMac.Foundation;
+using RectF = System.Drawing.RectangleF;
+#else
+using AppKit;
+using Foundation;
+using RectF = CoreGraphics.CGRect;
+#endif
 
 /// <summary>
 /// Mac game window.
@@ -53,7 +60,7 @@ namespace Microsoft.Xna.Framework
 	public class MacGameNSWindow : NSWindow
 	{
 		[Export ("initWithContentRect:styleMask:backing:defer:")]
-		public MacGameNSWindow (RectangleF rect, NSWindowStyle style, NSBackingStore backing, bool defer)
+        public MacGameNSWindow (RectF rect, NSWindowStyle style, NSBackingStore backing, bool defer)
 		: base (rect, style, backing, defer)
 		{}
 

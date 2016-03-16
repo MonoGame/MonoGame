@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.18.1 -->
+<interface>
+  <requires lib="gtk+" version="3.10"/>
+  <object class="GtkImage" id="build_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">emblem-system-symbolic</property>
+  </object>
+  <object class="GtkImage" id="rebuild_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">system-run-symbolic</property>
+  </object>
+  <object class="GtkImage" id="cancel_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">media-playback-stop-symbolic</property>
+  </object>
+  <object class="GtkImage" id="new_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">document-new-symbolic</property>
+  </object>
+  <object class="GtkImage" id="filteroutput_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">format-indent-more-symbolic</property>
+  </object>
+  <object class="GtkImage" id="menu_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">open-menu-symbolic</property>
+  </object>
+  <object class="GtkMenu" id="menu1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+  </object>
+  <object class="GtkMenu" id="menu2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+  </object>
+  <object class="GtkHeaderBar" id="headerbar">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="show_close_button">True</property>
+    <child>
+      <object class="GtkButton" id="build_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="can_default">True</property>
+        <property name="receives_default">False</property>
+        <property name="tooltip_text" translatable="yes">Build</property>
+        <property name="valign">center</property>
+        <property name="image">build_image</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkButton" id="rebuild_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="can_default">True</property>
+        <property name="receives_default">False</property>
+        <property name="tooltip_text" translatable="yes">Rebuild</property>
+        <property name="valign">center</property>
+        <property name="image">rebuild_image</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkButton" id="cancel_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="can_default">True</property>
+        <property name="receives_default">False</property>
+        <property name="tooltip_text" translatable="yes">Cancel</property>
+        <property name="valign">center</property>
+        <property name="image">cancel_image</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparator" id="separator1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkButton" id="new_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="can_default">True</property>
+        <property name="receives_default">False</property>
+        <property name="tooltip_text" translatable="yes">New</property>
+        <property name="valign">center</property>
+        <property name="image">new_image</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuButton" id="open_button">
+        <property name="label" translatable="yes">Open</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="can_default">True</property>
+        <property name="receives_default">False</property>
+        <property name="tooltip_text" translatable="yes">Open</property>
+        <!--property name="popup">menu1</property-->
+        <property name="valign">center</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuButton" id="gear_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="receives_default">False</property>
+        <property name="tooltip_text" translatable="yes">Menu</property>
+        <property name="valign">center</property>
+        <property name="image">menu_image</property>
+        <property name="popup">menu2</property>
+        <property name="use_popover">False</property>
+      </object>
+      <packing>
+        <property name="pack_type">end</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkToggleButton" id="filteroutput_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="receives_default">False</property>
+        <property name="tooltip_text" translatable="yes">Filter Output</property>
+        <property name="valign">center</property>
+        <property name="image">filteroutput_image</property>
+      </object>
+      <packing>
+        <property name="pack_type">end</property>
+        <property name="position">3</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkButton" id="save_button">
+        <property name="label" translatable="yes">Save</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="receives_default">True</property>
+        <property name="tooltip_text" translatable="yes">Save</property>
+      </object>
+      <packing>
+        <property name="pack_type">end</property>
+        <property name="position">4</property>
+      </packing>
+    </child>
+    <style>
+      <class name="titlebar"/>
+    </style>
+  </object>
+</interface>

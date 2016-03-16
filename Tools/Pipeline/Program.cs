@@ -25,7 +25,7 @@ namespace MonoGame.Tools.Pipeline
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            History.Default.Load();
+            PipelineSettings.Default.Load();
 
 			var view = new MainView();
             if (args != null && args.Length > 0)
@@ -40,6 +40,7 @@ namespace MonoGame.Tools.Pipeline
 #if LINUX || MONOMAC
 
 			Gtk.Application.Init ();
+            Global.Initalize ();
 			MainWindow win = new MainWindow ();
 			win.Show (); 
 			new PipelineController(win);

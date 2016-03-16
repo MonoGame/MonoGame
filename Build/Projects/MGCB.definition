@@ -14,6 +14,7 @@
 
   <Properties>
     
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
@@ -25,8 +26,6 @@
       <Platform Name="MacOS">TRACE;MONOMAC</Platform>
       <Platform Name="Linux">TRACE;LINUX</Platform>
     </CustomDefinitions>
-
-    <ForceArchitecture>x64</ForceArchitecture>
 
   </Properties>
 

@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         protected internal override void Write(ContentWriter output, SkinnedMaterialContent value)
         {
             output.WriteExternalReference(value.Textures.ContainsKey(SkinnedMaterialContent.TextureKey) ? value.Texture : null);
-            output.Write(value.WeightsPerVertex.GetValueOrDefault());
+            output.Write(value.WeightsPerVertex.GetValueOrDefault(4));
             output.Write(value.DiffuseColor.HasValue ? value.DiffuseColor.Value : Vector3.One);
             output.Write(value.EmissiveColor.HasValue ? value.EmissiveColor.Value : Vector3.Zero);
             output.Write(value.SpecularColor.HasValue ? value.SpecularColor.Value : Vector3.Zero);

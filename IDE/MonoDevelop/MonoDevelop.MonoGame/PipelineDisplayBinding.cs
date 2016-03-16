@@ -87,7 +87,7 @@ namespace MonoDevelop.MonoGame
 					process.StartInfo.Arguments = string.Format ("-b com.monogame.pipeline --args \"{0}\"", Path.GetFullPath (filename));
 				} else {
 					// figure out linix 
-					process.StartInfo.FileName = "/bin/monogame-pipeline";
+					process.StartInfo.FileName = "monogame-pipeline";
 					process.StartInfo.Arguments = string.Format ("\"{0}\"", filename);
 				}
 			}

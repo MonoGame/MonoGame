@@ -4,28 +4,36 @@
   <Platform Type="Linux">
     <Binary
       Name="gtk-sharp"
-      Path="ThirdParty\Dependencies\Gtk3\gtk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gtk-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="atk-sharp"
-      Path="ThirdParty\Dependencies\Gtk3\atk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\atk-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="gdk-sharp"
-      Path="ThirdParty\Dependencies\Gtk3\gdk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gdk-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="glade-sharp"
-      Path="ThirdParty\Dependencies\Gtk3\gio-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gio-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="glib-sharp"
-      Path="ThirdParty\Dependencies\Gtk3\glib-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\glib-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="gtk-dotnet"
-      Path="ThirdParty\Dependencies\Gtk3\gtk-dotnet.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gtk-dotnet.dll"
+      LocalCopy="False" />
     <Binary
       Name="pango-sharp"
-      Path="ThirdParty\Dependencies\Gtk3\pango-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\pango-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="Mono.Posix"
-      Path="ThirdParty\Dependencies\Gtk\Mono.Posix.dll" />
+      Path="ThirdParty\Dependencies\Gtk\Mono.Posix.dll"
+      LocalCopy="False" />
   </Platform>
 
   <Platform Type="MacOS">
