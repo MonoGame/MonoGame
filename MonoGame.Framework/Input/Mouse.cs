@@ -91,25 +91,6 @@ namespace Microsoft.Xna.Framework.Input
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 
 #elif DESKTOPGL || ANGLE
-<<<<<<< 3de0427aae6b8ee7db1511ba73387b404f7f5b75
-
-            var state = OpenTK.Input.Mouse.GetCursorState();
-
-            var clientBounds = window.ClientBounds;
-            window.MouseState.X = state.X - clientBounds.X;
-            window.MouseState.Y = state.Y - clientBounds.Y;
-
-            window.MouseState.LeftButton = (ButtonState)state.LeftButton;
-            window.MouseState.RightButton = (ButtonState)state.RightButton;
-            window.MouseState.MiddleButton = (ButtonState)state.MiddleButton;
-            window.MouseState.XButton1 = (ButtonState)state.XButton1;
-            window.MouseState.XButton2 = (ButtonState)state.XButton2;
-
-            // XNA uses the winapi convention of 1 click = 120 delta
-            // OpenTK scales 1 click = 1.0 delta, so make that match
-            window.MouseState.ScrollWheelValue = (int)(state.Scroll.Y * 120);
-=======
-            
             int x, y;
             int wx, wy;
 
@@ -126,7 +107,6 @@ namespace Microsoft.Xna.Framework.Input
             window.MouseState.XButton2 = (state.HasFlag(Sdl.Mouse.Button.X2Mask)) ? ButtonState.Pressed : ButtonState.Released;
 
             window.MouseState.ScrollWheelValue = ScrollY;
->>>>>>> [SDL] Base SDL Implementation
 #endif
 
             return window.MouseState;
