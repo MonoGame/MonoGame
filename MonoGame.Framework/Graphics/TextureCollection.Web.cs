@@ -10,17 +10,17 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         void PlatformInit()
         {
-            throw new NotImplementedException();
+            
         }
 
         void PlatformClear()
         {
-            throw new NotImplementedException();
+            
         }
 
         void PlatformSetTextures(GraphicsDevice device)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

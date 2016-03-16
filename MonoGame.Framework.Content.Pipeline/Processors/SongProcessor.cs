@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     targetFormat = ConversionFormat.WindowsMedia;
                     break;
 
-                case TargetPlatform.Linux:
+                case TargetPlatform.DesktopGL:
                     targetFormat = ConversionFormat.Vorbis;
                     break;
             }

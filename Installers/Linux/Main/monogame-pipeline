@@ -1,0 +1,2 @@
+#!/bin/bash
+mono /usr/lib/mono/xbuild/MonoGame/v3.0/Tools/Pipeline.exe "$@"

@@ -1,8 +1,8 @@
 
 #----------------------------- Global Properties ----------------------------#
 
-/outputDir:bin/Android
-/intermediateDir:obj/Android
+/outputDir:bin/$(Platform)
+/intermediateDir:obj/$(Platform)
 /platform:Android
 /config:
 /profile:Reach

@@ -3,15 +3,52 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace MonoGame.Tools.Pipeline
 {
 	public class MultiSelectTreeview : TreeView
-	{
+    {
+        [DllImport("user32.dll")]
+        private static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, int lParam);
 
-		#region Selected Node(s) Properties
+        #region Selected Node(s) Properties
 
-		private readonly List<TreeNode> _selectedNodes = null;		
+        private readonly List<TreeNode> _selectedNodes = null;
+
+        private Color _dragOverNodeForeColor = SystemColors.HighlightText;
+        private Color _dragOverNodeBackColor = SystemColors.Highlight;
+        private TreeNode _previousNode;
+
+        /// <summary>
+        /// The baskground colour of the node being dragged over.
+        /// </summary>
+        public Color DragOverNodeBackColor
+        {
+            get
+            {
+                return this._dragOverNodeBackColor;
+            }
+            set
+            {
+                this._dragOverNodeBackColor = value;
+            }
+        }
+
+        /// <summary>
+        /// The foreground colour of the node being dragged over.
+        /// </summary>
+        public Color DragOverNodeForeColor
+        {
+            get
+            {
+                return this._dragOverNodeForeColor;
+            }
+            set
+            {
+                this._dragOverNodeForeColor = value;
+            }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -180,9 +217,53 @@ namespace MonoGame.Tools.Pipeline
 			{
 				HandleException( ex );
 			}
-		}
+        }
 
-		protected override void OnItemDrag( ItemDragEventArgs e )
+        protected override void OnDragOver(DragEventArgs drgevent)
+        {
+            // Get the node from the mouse position, colour it
+            Point pt = this.PointToClient(new Point(drgevent.X, drgevent.Y));
+            TreeNode treeNode = this.GetNodeAt(pt);
+
+            // Change node color
+            if (this._previousNode != null && this._previousNode != treeNode)
+            {
+                this._previousNode.BackColor = SystemColors.HighlightText;
+                this._previousNode.ForeColor = SystemColors.ControlText;
+            }
+
+            if (treeNode != null && treeNode.BackColor != this._dragOverNodeBackColor)
+            {
+                treeNode.BackColor = this._dragOverNodeBackColor;
+                treeNode.ForeColor = this._dragOverNodeForeColor;
+            }
+
+            // Scrolling down/up
+            if (pt.Y + 10 > this.ClientSize.Height)
+                SendMessage(this.Handle, 277, (IntPtr)1, 0);
+            else if (pt.Y < this.Top + 10)
+                SendMessage(this.Handle, 277, (IntPtr)0, 0);
+
+            // Remember the target node, so we can set it back
+            this._previousNode = treeNode;
+
+            base.OnDragOver(drgevent);
+        }
+
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            // Restore node color
+            if (this._previousNode != null)
+            {
+                this._previousNode.BackColor = SystemColors.HighlightText;
+                this._previousNode.ForeColor = SystemColors.ControlText;
+                this._previousNode = null;
+            }
+
+            base.OnDragDrop(drgevent);
+        }
+
+        protected override void OnItemDrag( ItemDragEventArgs e )
 		{
 			// If the user drags a node and the node being dragged is NOT
 			// selected, then clear the active selection, select the

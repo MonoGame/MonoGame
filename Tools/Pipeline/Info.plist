@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
+<dict>	
+	<key>LSEnvironment</key>
+    	<dict>
+        	<key>MONO_MANAGED_WATCHER</key>
+        	<string>false</string>
+    	</dict>
 	<key>CFBundleName</key>
 	<string>Pipeline.MacOS</string>
 	<key>CFBundleVersion</key>

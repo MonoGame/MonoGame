@@ -41,8 +41,13 @@ purpose and non-infringement.
 #region Statement
 ﻿using System;
 
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+#else
+using Foundation;
+using AppKit;
+#endif
 
 #endregion Statement
 

@@ -4,6 +4,8 @@
 
 using System;
 
+#if !(MONOMAC && !PLATFORM_MACOS_LEGACY)
+
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
@@ -35,6 +37,11 @@ namespace Microsoft.Xna.Framework.Input
 
             prepDone = true;
             #endif
+        }
+
+        private static int PlatformGetMaxNumberOfGamePads()
+        {
+            return 16;
         }
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
@@ -135,3 +142,5 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
+
+#endif

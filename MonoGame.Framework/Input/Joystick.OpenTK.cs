@@ -4,6 +4,8 @@
 
 using System;
 
+#if !(MONOMAC && !PLATFORM_MACOS_LEGACY)
+
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class Joystick
@@ -24,6 +26,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities 
             {
                 IsConnected = true,
+                Id = OpenTK.Input.Joystick.GetGuid(index).ToString(),
                 AxisCount = cap.AxisCount,
                 ButtonCount = cap.ButtonCount,
                 HatCount = cap.HatCount
@@ -80,3 +83,5 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
+
+#endif

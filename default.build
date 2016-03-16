@@ -1,16 +1,24 @@
 <?xml version="1.0"?>
-<project name="MonoGame Build Script" default="build_installer" basedir=".">
-  <description>Default MonoGame Automated Build script</description>
+<project name="MonoGame Build Script" default="build" basedir=".">
+
+  <description>The MonoGame automated build script.</description>
+
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
-  <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
   <property name="msbuild12dir" value="C:\Program Files (x86)\MSBuild\12.0\Bin" />
   <property name="msbuild14dir" value="C:\Program Files (x86)\MSBuild\14.0\Bin" />
+  
+  <!-- Helper default target. -->
+  <target   name="build" 
+            description="Build, run tests, generate docs, and create installers." 
+            depends="build_code,run_tests,build_docs,build_installer" />
 
-  <!-- Temporary work around so that we don't need to change the targets on the build server -->
-  <target name="build" depends="build_code,run_tests,build_docs,build_installer" />
+  <!-- Some additional helper dependencies. -->
+  <target name="_default" depends="_checkos" />
+  <target name="_prebuild" depends="_default,_clean" />
 
-  <target name="checkos" description="check the operating system">
+  <!-- Do some OS checks required by the other steps. -->
+  <target name="_checkos">
     <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
     <if test="${os == 'Unix'}">
       <if test="${directory::exists('/Applications') and directory::exists('/Library')}">
@@ -23,38 +31,31 @@
     <echo message="Detected : ${os}"/>
   </target>
 
-  <target name="clean">
+  <!-- Clean the build output directories. -->
+  <target name="_clean">
     <delete dir="${project::get-base-directory()}\MonoGame.Framework\obj" />
     <delete dir="${project::get-base-directory()}\MonoGame.Framework.Content.Pipeline\obj" />
   </target>
-
-  <target name="build_code" description="Build all the projects." depends="checkos">
-
+  
+  <!-- Shortcut for building all valid target platforms -->
+  <target name="build_code" description="Build all the projects.">
     <call target="build_windows"/>
     <call target="build_windows8" />
     <call target="build_windowsphone" />
     <call target="build_windowsphone81" />
     <call target="build_windows10" />
-    <call target="build_psm" />
     <call target="build_web" />
     <call target="build_linux"/>
     <call target="build_android" />
     <call target="build_mac" />
     <call target="build_ios" />
-
   </target>
+ 
 
-  <target name="build_psm" description="Build Play Station Mobile" depends="clean">
-    <if test="${os == 'Win32NT'}">
-      <if test="${file::exists('C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin\mdtool.exe')}">
-        <exec program="Protobuild" commandline="-generate PSMobile" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.PSMobile.sln" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.PSMobile.sln" />
-      </if>
-    </if>
-  </target>
 
-  <target name="build_windows" description="Build Windows" depends="clean">
+  <!-- Build targets for the various platforms. -->
+
+  <target name="build_windows" description="Build Windows" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
@@ -73,7 +74,7 @@
     </if>
   </target>
 
-  <target name="build_linux" description="Build Linux" depends="clean">
+  <target name="build_linux" description="Build Linux" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Linux" />
       <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
@@ -84,9 +85,14 @@
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
     </if>
+    <if test="${os == 'MacOS'}">
+      <exec program="mono" commandline="Protobuild.exe -generate Linux" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.Linux.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.Linux.sln" />
+    </if>
   </target>
 
-  <target name="build_web" description="Build Web JSIL" depends="clean">
+  <target name="build_web" description="Build Web JSIL" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Web">
         <environment>
@@ -103,7 +109,7 @@
     </if>
   </target>
 
-  <target name="build_mac" description="Build MacOS" depends="clean">
+  <target name="build_mac" description="Build MacOS" depends="_prebuild">
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate MacOS" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.MacOS.sln" />
@@ -111,7 +117,7 @@
     </if>
   </target>
 
-  <target name="build_ios" description="Build iOS" depends="clean">
+  <target name="build_ios" description="Build iOS" depends="_prebuild">
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets') or file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/Xamarin.ObjcBinding.CSharp.targets')}">
         <exec program="mono" commandline="Protobuild.exe -generate iOS" />
@@ -121,7 +127,7 @@
     </if>
   </target>
 
-  <target name="build_android" description="Build Android" depends="clean">
+  <target name="build_android" description="Build Android" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('C:\Program Files (x86)\MSBuild\Novell\Novell.MonoDroid.CSharp.targets')}">
         <exec program="Protobuild" commandline="-generate Android" />
@@ -144,7 +150,7 @@
     </if>
   </target>
 
-  <target name="build_windows8" description="Build Windows 8" depends="clean">
+  <target name="build_windows8" description="Build Windows 8" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows8" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Clean /p:Configuration=Release" />
@@ -152,7 +158,7 @@
     </if>
   </target>
 
-  <target name="build_windowsphone" description="Build Windows Phone" depends="clean">
+  <target name="build_windowsphone" description="Build Windows Phone" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.0\Microsoft.Cpp.WindowsPhone.8.0.targets')}">
         <exec program="Protobuild" commandline="-generate WindowsPhone" />
@@ -164,7 +170,7 @@
     </if>
   </target>
 
-  <target name="build_windowsphone81" description="Build Windows Phone 8.1" depends="clean">
+  <target name="build_windowsphone81" description="Build Windows Phone 8.1" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.1\Microsoft.Cpp.WindowsPhone.8.1.targets')}">
         <exec program="Protobuild" commandline="-generate WindowsPhone81" />
@@ -174,39 +180,52 @@
     </if>
   </target>
 
-  <target name="build_windows10" description="Build Windows 10 UAP" depends="clean">
+  <target name="build_windows10" description="Build Windows 10 UAP" depends="_prebuild">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsXaml\v14.0\Microsoft.Windows.UI.Xaml.CSharp.targets')}">
-        <exec program="Protobuild" commandline="-generate WindowsUAP" />
-        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
-        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUAP.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="Protobuild" commandline="-generate WindowsUniversal" />
+
+        <!--
+            Currently MSBuild doesn't restore the nuget packages like buiding from the
+            IDE does.  So we have to do it ourselves using the recommended work around.
+        -->
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.WindowsUniversal.project.json -NonInteractive' />
+        <exec program="${nuget3path}\nuget.exe " commandline='restore MonoGame.Framework\MonoGame.Framework.Net.WindowsUniversal.project.json -NonInteractive' />
+
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="${msbuild14dir}\msbuild.exe " commandline='MonoGame.Framework.WindowsUniversal.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
+
       </if>
     </if>
   </target>
 
-  <target name="run_tests" description="Run all the tests" depends="build_code">
+
+  <!-- Run the unit tests... will fail if the code hasn't been built. -->
+  <target name="run_tests" description="Run all the tests" depends="_default">
     <nunit2 if="${os == 'Win32NT'}">
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
     </nunit2>
   </target>
 
-  <target name="build_docs" description="Build the documentation." depends="build_code,run_tests">
+
+  <!-- Generate the docs... will fail if the code hasn't been built. -->
+  <target name="build_docs" description="Build the documentation." depends="_default">
     <if test="${os == 'Win32NT'}">
       <delete dir="${project::get-base-directory()}\Documentation\Output" />
       <exec program="SharpDoc.exe" basedir="ThirdParty\Dependencies\SharpDoc" commandline="-config Documentation\config.xml" />
     </if>
   </target>
 
-  <target name="build_installer" description="Build the installers." depends="build_code,build_docs,run_tests">
 
+  <!-- Create the installers... will fail if the code hasn't been built. -->
+  <target name="build_installer" description="Build the installers." depends="_default">
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2015/default.build" target="build" />
     <nant buildfile="IDE/MonoDevelop/default.build" target="build" />
     <nant buildfile="Installers/default.build" target="build" />
-
   </target>
 
 </project>

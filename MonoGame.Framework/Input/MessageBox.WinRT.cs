@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Input
                         dialogResult = dialog.ShowAsync();
                         var result = await dialogResult;
                         if (!tcs.Task.IsCompleted)
-                            tcs.SetResult((int)result.Id);
+                            tcs.SetResult(result == null ? null : (int?)result.Id);
                     }
                     catch (TaskCanceledException)
                     {

@@ -67,9 +67,11 @@ purpose and non-infringement.
 #region Assembly Microsoft.Xna.Framework.Storage.dll, v4.0.30319
 // C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Storage.dll
 #endregion
+using MonoGame.Utilities;
 using Microsoft.Xna.Framework;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 #if WINRT
 using Windows.Storage;
@@ -237,16 +239,40 @@ namespace Microsoft.Xna.Framework.Storage
 		}
 		
 		private IAsyncResult OpenContainer (string displayName, AsyncCallback callback, object state)
-		{
-			try {
-				OpenContainerAsynchronous AsynchronousOpen = new OpenContainerAsynchronous (Open);
+        {
+
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
+            try
+            {
+                OpenContainerAsynchronous AsynchronousOpen = new OpenContainerAsynchronous(Open);
 #if WINRT
                 containerDelegate = AsynchronousOpen;
 #endif
-                return AsynchronousOpen.BeginInvoke (displayName, callback, state);
-			} finally {
-			}
-		}
+                return AsynchronousOpen.BeginInvoke(displayName, callback, state);
+            }
+            finally
+            {
+            }
+#else
+            var tcs = new TaskCompletionSource<StorageContainer>(state);
+            var task = Task.Run<StorageContainer>(() => Open(displayName));
+            task.ContinueWith(t =>
+            {
+                // Copy the task result into the returned task.
+                if (t.IsFaulted)
+                    tcs.TrySetException(t.Exception.InnerExceptions);
+                else if (t.IsCanceled)
+                    tcs.TrySetCanceled();
+                else
+                    tcs.TrySetResult(t.Result);
+
+                // Invoke the user callback if necessary.
+                if (callback != null)
+                    callback(tcs.Task);
+            });
+            return tcs.Task;
+#endif
+        }
 	
 		// Private method to handle the creation of the StorageDevice
 		private StorageContainer Open (string displayName) 
@@ -254,42 +280,43 @@ namespace Microsoft.Xna.Framework.Storage
 			storageContainer = new StorageContainer(this, displayName, this.player);
 			return storageContainer;
 		}
-		
-		//
-		// Summary:
-		//     Begins the process for displaying the storage device selector user interface,
-		//     and for specifying a callback implemented when the player chooses a device.
-		//     Reference page contains links to related code samples.
-		//
-		// Parameters:
-		//   callback:
-		//     An AsyncCallback that represents the method called when the player chooses
-		//     a device.
-		//
-		//   state:
-		//     A user-created object used to uniquely identify the request, or null.
-		public static IAsyncResult BeginShowSelector (AsyncCallback callback, object state)
-		{
-			return BeginShowSelector (0, 0, callback, state);
-		}
-		//
-		// Summary:
-		//     Begins the process for displaying the storage device selector user interface;
-		//     specifies the callback implemented when the player chooses a device. Reference
-		//     page contains links to related code samples.
-		//
-		// Parameters:
-		//   player:
-		//     The PlayerIndex that represents the player who requested the save operation.
-		//     On Windows, the only valid option is PlayerIndex.One.
-		//
-		//   callback:
-		//     An AsyncCallback that represents the method called when the player chooses
-		//     a device.
-		//
-		//   state:
-		//     A user-created object used to uniquely identify the request, or null.
-		public static IAsyncResult BeginShowSelector (PlayerIndex player, AsyncCallback callback, object state)
+
+        //
+        // Summary:
+        //     Begins the process for displaying the storage device selector user interface,
+        //     and for specifying a callback implemented when the player chooses a device.
+        //     Reference page contains links to related code samples.
+        //
+        // Parameters:
+        //   callback:
+        //     An AsyncCallback that represents the method called when the player chooses
+        //     a device.
+        //
+        //   state:
+        //     A user-created object used to uniquely identify the request, or null.
+        public static IAsyncResult BeginShowSelector (AsyncCallback callback, object state)
+        {
+        	return BeginShowSelector (0, 0, callback, state);
+        }
+
+        //
+        // Summary:
+        //     Begins the process for displaying the storage device selector user interface;
+        //     specifies the callback implemented when the player chooses a device. Reference
+        //     page contains links to related code samples.
+        //
+        // Parameters:
+        //   player:
+        //     The PlayerIndex that represents the player who requested the save operation.
+        //     On Windows, the only valid option is PlayerIndex.One.
+        //
+        //   callback:
+        //     An AsyncCallback that represents the method called when the player chooses
+        //     a device.
+        //
+        //   state:
+        //     A user-created object used to uniquely identify the request, or null.
+        public static IAsyncResult BeginShowSelector (PlayerIndex player, AsyncCallback callback, object state)
 		{
 			return BeginShowSelector (player, 0, 0, callback, state);
 		}
@@ -315,13 +342,33 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
-			var del = new ShowSelectorAsynchronousShowNoPlayer (Show);
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
+            var del = new ShowSelectorAsynchronousShowNoPlayer (Show);
 
 #if WINRT
             showDelegate = del;
 #endif
 			return del.BeginInvoke(sizeInBytes, directoryCount, callback, state);
-		}
+#else
+            var tcs = new TaskCompletionSource<StorageDevice>(state);
+            var task = Task.Run<StorageDevice>(() => Show (sizeInBytes, directoryCount));
+            task.ContinueWith(t =>
+            {
+                // Copy the task result into the returned task.
+                if (t.IsFaulted)
+                    tcs.TrySetException(t.Exception.InnerExceptions);
+                else if (t.IsCanceled)
+                    tcs.TrySetCanceled();
+                else
+                    tcs.TrySetResult(t.Result);
+
+                // Invoke the user callback if necessary.
+                if (callback != null)
+                    callback(tcs.Task);
+            });
+            return tcs.Task;
+#endif
+        }
 
 		
 		//
@@ -351,11 +398,31 @@ namespace Microsoft.Xna.Framework.Storage
 		//     A user-created object used to uniquely identify the request, or null.
 		public static IAsyncResult BeginShowSelector (PlayerIndex player, int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
-			var del = new ShowSelectorAsynchronousShow (Show);
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
+            var del = new ShowSelectorAsynchronousShow (Show);
 #if WINRT
             showDelegate = del;
 #endif
             return del.BeginInvoke(player, sizeInBytes, directoryCount, callback, state);
+#else
+            var tcs = new TaskCompletionSource<StorageDevice>(state);
+            var task = Task.Run<StorageDevice>(() => Show(player, sizeInBytes, directoryCount));
+            task.ContinueWith(t =>
+            {
+                // Copy the task result into the returned task.
+                if (t.IsFaulted)
+                    tcs.TrySetException(t.Exception.InnerExceptions);
+                else if (t.IsCanceled)
+                    tcs.TrySetCanceled();
+                else
+                    tcs.TrySetResult(t.Result);
+
+                // Invoke the user callback if necessary.
+                if (callback != null)
+                    callback(tcs.Task);
+            });
+            return tcs.Task;
+#endif
         }
 	
 		// Private method to handle the creation of the StorageDevice
@@ -364,12 +431,12 @@ namespace Microsoft.Xna.Framework.Storage
 			return new StorageDevice(player, sizeInBytes, directoryCount);
 		}
 
-		private static StorageDevice Show (int sizeInBytes, int directoryCount)
+        private static StorageDevice Show (int sizeInBytes, int directoryCount)
 		{
 			return new StorageDevice (null, sizeInBytes, directoryCount);
 		}
-		
-		/*
+
+        /*
 		//
 		//
 		// Parameters:
@@ -381,17 +448,20 @@ namespace Microsoft.Xna.Framework.Storage
 		}			
         */
 
-		//
-		// Summary:
-		//     Ends the process for opening a StorageContainer.
-		//
-		// Parameters:
-		//   result:
-		//     The IAsyncResult returned from BeginOpenContainer.
-		public StorageContainer EndOpenContainer (IAsyncResult result)
+        //
+        // Summary:
+        //     Ends the process for opening a StorageContainer.
+        //
+        // Parameters:
+        //   result:
+        //     The IAsyncResult returned from BeginOpenContainer.
+        public StorageContainer EndOpenContainer (IAsyncResult result)
 		{
-			StorageContainer returnValue = null;
-			try {
+
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
+            StorageContainer returnValue = null;
+            try
+            {
 #if WINRT
                 // AsyncResult does not exist in WinRT
                 var asyncResult = containerDelegate as OpenContainerAsynchronous;
@@ -405,30 +475,41 @@ namespace Microsoft.Xna.Framework.Storage
 				}
                 containerDelegate = null;
 #else
-				// Retrieve the delegate.
-				AsyncResult asyncResult = result as AsyncResult;
-				if (asyncResult != null)
-				{
-					var asyncDelegate = asyncResult.AsyncDelegate as OpenContainerAsynchronous;
+                // Retrieve the delegate.
+                AsyncResult asyncResult = result as AsyncResult;
+                if (asyncResult != null)
+                {
+                    var asyncDelegate = asyncResult.AsyncDelegate as OpenContainerAsynchronous;
 
-					// Wait for the WaitHandle to become signaled.
-					result.AsyncWaitHandle.WaitOne();
+                    // Wait for the WaitHandle to become signaled.
+                    result.AsyncWaitHandle.WaitOne();
 
-					// Call EndInvoke to retrieve the results.
-					if (asyncDelegate != null)
-						returnValue = asyncDelegate.EndInvoke(result);
-				}
+                    // Call EndInvoke to retrieve the results.
+                    if (asyncDelegate != null)
+                        returnValue = asyncDelegate.EndInvoke(result);
+                }
 #endif
             }
             finally
             {
-				// Close the wait handle.
-				result.AsyncWaitHandle.Dispose ();	 
-			}
-			
-			return returnValue;
+                // Close the wait handle.
+                result.AsyncWaitHandle.Dispose();
+            }
 
-		}			
+            return returnValue;
+#else
+            try
+            {
+                return ((Task<StorageContainer>)result).Result;
+            }
+            catch (AggregateException ex)
+            {
+                throw;
+            }
+#endif
+
+        }			
+
 		//
 		// Summary:
 		//     Ends the display of the storage selector user interface. Reference page contains
@@ -440,32 +521,48 @@ namespace Microsoft.Xna.Framework.Storage
 		public static StorageDevice EndShowSelector (IAsyncResult result) 
 		{
 
-			if (!result.IsCompleted) {
-				// Wait for the WaitHandle to become signaled.
-				try {
-					result.AsyncWaitHandle.WaitOne ();
-				} finally {
+#if !WINDOWS_PHONE81 && !ANDROID && !IOS && !NETFX_CORE && !WINDOWS_PHONE
+            if (!result.IsCompleted)
+            {
+                // Wait for the WaitHandle to become signaled.
+                try
+                {
+                    result.AsyncWaitHandle.WaitOne();
+                }
+                finally
+                {
 #if !WINRT
-					result.AsyncWaitHandle.Close ();
+                    result.AsyncWaitHandle.Close();
 #endif
-				}
-			}
+                }
+            }
 #if WINRT
             var del = showDelegate;
             showDelegate = null;
 #else
-			// Retrieve the delegate.
-			AsyncResult asyncResult = (AsyncResult)result;
+            // Retrieve the delegate.
+            AsyncResult asyncResult = (AsyncResult)result;
 
             var del = asyncResult.AsyncDelegate;
 #endif
 
-			if (del is ShowSelectorAsynchronousShow)
-				return (del as ShowSelectorAsynchronousShow).EndInvoke (result);
-			else if (del is ShowSelectorAsynchronousShowNoPlayer)
-				return (del as ShowSelectorAsynchronousShowNoPlayer).EndInvoke (result);
-			else
-				throw new ArgumentException ("result");
+            if (del is ShowSelectorAsynchronousShow)
+                return (del as ShowSelectorAsynchronousShow).EndInvoke(result);
+            else if (del is ShowSelectorAsynchronousShowNoPlayer)
+                return (del as ShowSelectorAsynchronousShowNoPlayer).EndInvoke(result);
+            else
+                throw new ArgumentException("result");
+#else
+            try
+            {
+                return ((Task<StorageDevice>)result).Result;
+            }
+            catch (AggregateException ex)
+            {
+                throw;
+            }
+#endif
+
 		}
 		
 		internal static string StorageRoot
@@ -473,18 +570,35 @@ namespace Microsoft.Xna.Framework.Storage
 			get {
 #if WINRT
                 return ApplicationData.Current.LocalFolder.Path; 
-#elif LINUX
-                string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-                if (String.IsNullOrEmpty(osConfigDir))
+#elif DESKTOPGL
+                if(CurrentPlatform.OS == OS.Linux)
                 {
-                    osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                    string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+                    if (String.IsNullOrEmpty(osConfigDir))
+                    {
+                        osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                        if (String.IsNullOrEmpty(osConfigDir))
+                        {
+                            return "."; // Oh well.
+                        }
+                        osConfigDir += "/.local/share";
+                    }
+                    return osConfigDir;
+                }
+                else if (CurrentPlatform.OS == OS.MacOSX)
+                {
+                    string osConfigDir = Environment.GetEnvironmentVariable("HOME");
                     if (String.IsNullOrEmpty(osConfigDir))
                     {
                         return "."; // Oh well.
                     }
-                    osConfigDir += "/.local/share";
+                    osConfigDir += "/Library/Application Support";
+                    return osConfigDir;
                 }
-                return osConfigDir;
+                else if(CurrentPlatform.OS == OS.Windows)
+                    return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                else
+                    throw new Exception("Unexpected platform!");
 #elif MONOMAC
                 string osConfigDir = Environment.GetEnvironmentVariable("HOME");
                 if (String.IsNullOrEmpty(osConfigDir))
@@ -493,8 +607,6 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 osConfigDir += "/Library/Application Support";
                 return osConfigDir;
-#elif PSM
-				return "/Documents/";
 #else
                 return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 #endif

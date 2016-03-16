@@ -8,6 +8,11 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static bool Back;
 
+        private static int PlatformGetMaxNumberOfGamePads()
+        {
+            return 1;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             GamePadCapabilities capabilities = new GamePadCapabilities();

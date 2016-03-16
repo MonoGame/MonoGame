@@ -253,7 +253,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ToStringTest()
         {
-            Assert.AreEqual("{X:-10 Y:10 Width:100 Height:1000}",new Rectangle(-10,10,100,1000).ToString());
+            StringAssert.IsMatch("{X:-10 Y:10 Width:100 Height:1000}",new Rectangle(-10,10,100,1000).ToString());
         }
     }
 }

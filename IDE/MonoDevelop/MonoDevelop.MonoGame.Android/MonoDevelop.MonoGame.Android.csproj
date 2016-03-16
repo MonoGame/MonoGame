@@ -55,6 +55,10 @@
       <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/Xamarin.Ide/Xamarin.Ide.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Xamarin.Ide.Insights">
+      <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop//AddIns/Xamarin.Ide.Insights/Xamarin.Ide.Insights.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

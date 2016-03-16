@@ -3,7 +3,8 @@
 *.DS_Store
 
 #Output Linux Installer
-Installers/Linux/InstallerData/
+Installers/Linux/tmp_deb/
+Installers/Linux/tmp_run/
 *.run
 *.deb
 
@@ -31,17 +32,26 @@ Installers/Linux/InstallerData/
 *.lib
 *.sbr
 *.sdf
+*.csproj.csdat
 ipch/
 obj/
 [Bb]in
 [Dd]ebug*/
 [Rr]elease*/
 Ankh.NoLoad
+.vs/
+project.lock.json
+/MonoGame.Framework/MonoGame.Framework.Net.WindowsUniversal.project.lock.json
+/MonoGame.Framework/MonoGame.Framework.WindowsUniversal.project.lock.json
+artifacts/
 
 #Tooling
 _ReSharper*/
 *.resharper
 [Tt]est[Rr]esult*
+
+#Visual Studio Rebracer extension, allows the user to automatically change the style configuration by project
+rebracer.xml
 
 #Subversion files
 .svn
@@ -81,3 +91,5 @@ Test/*.csproj
 
 #Zip files
 *.zip
+
+Installers/MacOS/Scripts/Framework/postinstall

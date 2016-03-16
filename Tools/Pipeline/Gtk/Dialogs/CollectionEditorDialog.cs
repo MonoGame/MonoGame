@@ -11,11 +11,17 @@ namespace MonoGame.Tools.Pipeline
 
         public string text = "";
 
-        public CollectionEditorDialog (string text, Window window)
+        public CollectionEditorDialog (Window parrent, string text) : base(Global.GetNewDialog(parrent.Handle))
         {
             Build();
 
-            this.controller = ((PipelineController)((MainWindow)window)._controller);
+            this.Title = Mono.Unix.Catalog.GetString ("Reference Editor");
+
+            this.AddButton("Ok", ResponseType.Ok);
+            this.AddButton("Cancel", ResponseType.Cancel);
+            this.DefaultResponse = ResponseType.Ok;
+
+            this.controller = ((PipelineController)((MainWindow)parrent)._controller);
 
             FileFilter filter = new FileFilter ();
             filter.AddPattern ("*.dll");
@@ -58,11 +64,6 @@ namespace MonoGame.Tools.Pipeline
 
         protected void OnResponse(object sender, EventArgs e)
         {
-            Destroy();
-        }
-
-        protected void OnButtonOkClicked (object sender, EventArgs e)
-        {
             var fnms = GetFileNames();
 
             foreach (string f in fnms)
@@ -72,7 +73,7 @@ namespace MonoGame.Tools.Pipeline
                 text += f;
             }
 
-            Respond(ResponseType.Ok);
+            Destroy();
         }
 
         private List<string> GetFileNames()

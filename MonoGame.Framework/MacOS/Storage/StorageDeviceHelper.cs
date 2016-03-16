@@ -40,7 +40,11 @@ purpose and non-infringement.
 
 using System;
 
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
+#else
+using Foundation;
+#endif
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -60,7 +64,7 @@ namespace Microsoft.Xna.Framework.Storage
 			if (fileManager == null) {
 
 				// Because this will run in a background thread we need to wrap it
-				using (var p = new MonoMac.Foundation.NSAutoreleasePool ()) {
+				using (var p = new NSAutoreleasePool ()) {
 					fileManager = NSFileManager.DefaultManager;
 					attributes = fileManager.GetFileSystemAttributes(path, out error);
 				}					
@@ -78,7 +82,7 @@ namespace Microsoft.Xna.Framework.Storage
 					path = value;
 					
 					// Because this will run in a background thread we need to wrap it
-					using (var p = new MonoMac.Foundation.NSAutoreleasePool ()) {
+					using (var p = new NSAutoreleasePool ()) {
 						attributes = fileManager.GetFileSystemAttributes(path, out error);
 					}					
 				}

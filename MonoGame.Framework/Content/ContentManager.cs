@@ -28,28 +28,48 @@ namespace Microsoft.Xna.Framework.Content
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
-		
+        private byte[] scratchBuffer;
+
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
-	static List<char> targetPlatformIdentifiers = new List<char>()
+        private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
             'm', // WindowsPhone
             'i', // iOS
             'a', // Android
-            'l', // Linux
+            'd', // DesktopGL
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'u', // Ouya
-            'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
+
+            // NOTE: There are additional idenfiers for consoles that 
+            // are not defined in this repository.  Be sure to ask the
+            // console port maintainers to ensure no collisions occur.
+
+            
+            // Legacy identifiers... these could be reused in the
+            // future if we feel enough time has passed.
+
+            'p', // PlayStationMobile
             'g', // Windows (OpenGL)
+            'l', // Linux
+            'u', // Ouya
         };
+
+
+        static partial void PlatformStaticInit();
+
+        static ContentManager()
+        {
+            // Allow any per-platform static initialization to occur.
+            PlatformStaticInit();
+        }
 
         private static void AddContentManager(ContentManager contentManager)
         {
@@ -219,7 +239,7 @@ namespace Microsoft.Xna.Framework.Content
                 // This is primarily for editor support. 
                 // Setting the RootDirectory to an absolute path is useful in editor
                 // situations, but TitleContainer can ONLY be passed relative paths.                
-#if LINUX || MONOMAC || WINDOWS
+#if DESKTOPGL || MONOMAC || WINDOWS
                 if (Path.IsPathRooted(assetPath))                
                     stream = File.OpenRead(assetPath);                
                 else
@@ -429,12 +449,11 @@ namespace Microsoft.Xna.Framework.Content
             // The next int32 is the length of the XNB file
             int xnbLength = xnbReader.ReadInt32();
 
-            ContentReader reader;
+            Stream decompressedStream = null;
             if (compressedLzx || compressedLz4)
             {
                 // Decompress the xnb
                 int decompressedSize = xnbReader.ReadInt32();
-                MemoryStream decompressedStream = null;
 
                 if (compressedLzx)
                 {
@@ -495,27 +514,17 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else if (compressedLz4)
                 {
-                    // Decompress to a byte[] because Windows 8 doesn't support MemoryStream.GetBuffer()
-                    var buffer = new byte[decompressedSize];
-                    using (var decoderStream = new Lz4DecoderStream(stream))
-                    {
-                        if (decoderStream.Read(buffer, 0, buffer.Length) != decompressedSize)
-                        {
-                            throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
-                        }
-                    }
-                    // Creating the MemoryStream with a byte[] shares the buffer so it doesn't allocate any more memory
-                    decompressedStream = new MemoryStream(buffer);
+                    decompressedStream = new Lz4DecoderStream(stream);
                 }
-
-                reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
             }
             else
             {
-                reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
+                decompressedStream = stream;
             }
+
+            var reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+                                                        originalAssetName, version, recordDisposableObject);
+            
             return reader;
         }
 
@@ -668,5 +677,13 @@ namespace Microsoft.Xna.Framework.Content
 				return this.serviceProvider;
 			}
 		}
+
+        internal byte[] GetScratchBuffer(int size)
+        {            
+            size = Math.Max(size, 1024 * 1024);
+            if (scratchBuffer == null || scratchBuffer.Length < size)
+                scratchBuffer = new byte[size];
+            return scratchBuffer;
+        }
 	}
 }

@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
 
-            Platform = GamePlatform.Create(this);
+            Platform = GamePlatform.PlatformCreate(this);
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
@@ -395,14 +395,27 @@ namespace Microsoft.Xna.Framework
                 break;
             case GameRunBehavior.Synchronous:
                 Platform.RunLoop();
+#if !DESKTOPGL
                 EndRun();
 				DoExiting();
+#endif
                 break;
             default:
                 throw new ArgumentException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
+
+#if DESKTOPGL
+        // This code is used so that the Window could stay alive
+        // while all the resources are getting destroyed
+        internal void ExitEverything()
+        {
+            EndRun();
+            DoExiting();
+            this.Dispose();
+        }
+#endif
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
@@ -1037,11 +1050,5 @@ namespace Microsoft.Xna.Framework
                 return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
             }
         }
-    }
-
-    public enum GameRunBehavior
-    {
-        Asynchronous,
-        Synchronous
     }
 }

@@ -42,14 +42,16 @@ purpose and non-infringement.
 // C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Storage.dll
 #endregion
 using Microsoft.Xna.Framework;
+using MonoGame.Utilities;
 using System;
 using System.IO;
-
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.Storage;
 using System.Linq;
 using Windows.Storage.Search;
+#endif
 
+#if WINDOWS_STOREAPP
 namespace System.IO
 {
     public enum FileMode
@@ -118,9 +120,17 @@ namespace Microsoft.Xna.Framework.Storage
 			// From the examples the root is based on MyDocuments folder
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 			var saved = "";
-#elif LINUX || MONOMAC
+#elif MONOMAC
             // We already have a SaveData folder on Mac/Linux.
             var saved = StorageDevice.StorageRoot;
+#elif DESKTOPGL
+            string saved = "";
+            if(CurrentPlatform.OS == OS.Linux || CurrentPlatform.OS == OS.MacOSX)
+                saved = StorageDevice.StorageRoot;
+            else if(CurrentPlatform.OS == OS.Windows)
+                saved = Path.Combine(StorageDevice.StorageRoot, "SavedGames");
+            else
+                throw new Exception("Unexpected platform!");
 #else
 			var root = StorageDevice.StorageRoot;
 			var saved = Path.Combine(root,"SavedGames");

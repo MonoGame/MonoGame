@@ -146,7 +146,8 @@ namespace MonoGame.Framework
         
         public override void Exit()
         {
-            _window.Dispose();
+            if (_window != null)
+                _window.Dispose();
             _window = null;
             Window = null;
         }
@@ -251,6 +252,7 @@ namespace MonoGame.Framework
                 }
                 Microsoft.Xna.Framework.Media.MediaManagerState.CheckShutdown();
             }
+            Keyboard.SetKeys(null);
 
             base.Dispose(disposing);
         }

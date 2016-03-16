@@ -1,11 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ModuleInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Module>
   <Name>MonoGame.Framework</Name>
-  <ModuleAssemblies />
   <DefaultAction>Generate</DefaultAction>
-  <SupportedPlatforms>Android,Angle,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,iOS,MacOS,Web</SupportedPlatforms>
-  <DefaultWindowsPlatforms>Android,Angle,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUAP,iOS</DefaultWindowsPlatforms>
-  <DefaultMacOSPlatforms>Angle,MacOS,iOS,WindowsGL,Android</DefaultMacOSPlatforms>
   <DefaultLinuxPlatforms>Angle,Linux,WindowsGL</DefaultLinuxPlatforms>
+  <DefaultMacOSPlatforms>Angle,MacOS,iOS,WindowsGL,Android,tvOS</DefaultMacOSPlatforms>
+  <DefaultWindowsPlatforms>Android,Angle,Linux,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</DefaultWindowsPlatforms>
+  <SupportedPlatforms>Android,Angle,Linux,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,MacOS,Web,tvOS</SupportedPlatforms>
   <DisableSynchronisation>true</DisableSynchronisation>
-</ModuleInfo>
+  <Packages>
+    <Package Uri="https-git://github.com/OutOfOrder/MonoKickstart.git" Folder="ThirdParty/Kickstart" GitRef="master" />
+    <Package Uri="https-git://github.com/Mono-Game/MonoGame.Dependencies.git" Folder="ThirdParty/Dependencies" GitRef="master" />
+  </Packages>
+  <FeatureSet>
+    <Feature>PackageManagement</Feature>
+  </FeatureSet>
+</Module>

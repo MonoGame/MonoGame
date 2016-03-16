@@ -3,18 +3,15 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
-using System.Drawing;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
     /// Provides a base class for all texture objects.
     /// </summary>
-    public abstract class TextureContent : ContentItem, IDisposable
+    public abstract class TextureContent : ContentItem
     {
         MipmapChainCollection faces;
 
@@ -67,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     var src = mipChain[i];
                     if (src.GetType() != newBitmapType)
                     {
-                        var dst = (BitmapContent)Activator.CreateInstance(newBitmapType, new object[] {src.Width,src.Height});
+                        var dst = (BitmapContent)Activator.CreateInstance(newBitmapType, new object[] { src.Width,src.Height });
                         BitmapContent.Copy(src, dst);
                         mipChain[i] = dst;
                     }
@@ -81,9 +78,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
         public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
-            var imageAttr = new ImageAttributes();
-            imageAttr.SetWrapMode(WrapMode.TileFlipXY);
-
             // If we already have mipmaps and we're not supposed to overwrite
             // them then return without any generation.
             if (!overwriteExistingMipmaps && faces.Any(f => f.Count > 1))
@@ -96,24 +90,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var faceBitmap = face[0];
                 face.Clear();
                 face.Add(faceBitmap);
-
-                int width = faceBitmap.Width, height = faceBitmap.Height;
+                var faceType = faceBitmap.GetType();
+                int width = faceBitmap.Width;
+                int height = faceBitmap.Height;
                 while (width > 1 && height > 1)
                 {
-                    var systemBitmap = face[face.Count-1].ToSystemBitmap();
                     width /= 2;
                     height /= 2;
 
-                    var bitmap = new Bitmap(width,height);
-                    using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
-                    {
-                        var destRect = new System.Drawing.Rectangle(0, 0, width, height);
-                        graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
-                        graphics.DrawImage(systemBitmap, destRect, 0, 0, width * 2, height * 2, GraphicsUnit.Pixel, imageAttr);
-                    }
-
-                    face.Add(bitmap.ToXnaBitmap(false)); //we dont want to flip textures twice
-                    systemBitmap.Dispose();
+                    var mip = (BitmapContent)Activator.CreateInstance(faceType, new object[] { width, height });
+                    BitmapContent.Copy(faceBitmap, mip);
+                    face.Add(mip);
                 }
             }
         }
@@ -123,9 +110,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="targetProfile">The profile identifier that defines the capabilities of the device.</param>
         public abstract void Validate(GraphicsProfile? targetProfile);
-
-        public virtual void Dispose()
-        {
-        }
     }
 }

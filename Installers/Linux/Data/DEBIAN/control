@@ -1,8 +1,0 @@
-Package: monogame-pipeline
-Version: 3.3-1
-Section: Development
-Architecture: amd64
-Depends: libgtk-3-0 (>= 3.0.0), mono-complete (>= 3.0.0)
-Maintainer: Harry <cra0zy@email.com>
-Description: MonoGame Pipeline Tool
- Used to create platform specific .xnb files
