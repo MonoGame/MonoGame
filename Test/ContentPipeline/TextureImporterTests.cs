@@ -1,14 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
+﻿using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using NUnit.Framework;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Microsoft.Xna.Framework.Graphics;
-using System.IO;
+using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -46,16 +40,19 @@ namespace MonoGame.Tests.ContentPipeline
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.bmp", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportBmpRGB555( )
         {
             ImportStandard("Assets/Textures/Logo555.bmp", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportBmpRGB565( )
         {
             ImportStandard("Assets/Textures/Logo565.bmp", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportBmp4bits( )
         {
@@ -97,6 +94,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color);
         }
+
         /// <summary>
         /// This test tries to load a tiff file encoded in rgbf, but freeimage seems to be failing to read files with this encoding
         /// Might be necessary to modify this test with future updates of freeimage.
@@ -109,6 +107,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.Throws(typeof(InvalidContentException), ( ) => ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Vector4));
             //ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Color);
         }
+
         [Test]
         public void ImportRGBA16Png()
         {
@@ -133,6 +132,7 @@ namespace MonoGame.Tests.ContentPipeline
             {
             }
         }
+
         [Test]
         public void ImportDdsCubemapDxt1()
         {
@@ -163,6 +163,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3);
         }
+
         [Test]
         public void ImportDdsMipMap()
         {
