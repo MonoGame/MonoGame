@@ -858,6 +858,11 @@ namespace MonoGame.Tools.Pipeline
 
                 // Ensure name is unique among files at this location?
                 _controller.NewItem(dlg.NameGiven, location, template);
+
+                if (_controller.ProjectDirty)
+                {
+                    _toolSave.Enabled = true;
+                }
             }
         }
 
