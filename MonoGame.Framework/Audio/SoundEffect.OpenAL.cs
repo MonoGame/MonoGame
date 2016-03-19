@@ -48,29 +48,9 @@ namespace Microsoft.Xna.Framework.Audio
             int freq;
 
             var stream = s;
-#if ANDROID
-            var needsDispose = false;
-            try
-            {
-                // If seek is not supported (usually an indicator of a stream opened into the AssetManager), then copy
-                // into a temporary MemoryStream.
-                if (!s.CanSeek)
-                {
-                    needsDispose = true;
-                    stream = new MemoryStream();
-                    s.CopyTo(stream);
-                    stream.Position = 0;
-                }
-#endif
-                buffer = AudioLoader.Load(stream, out format, out size, out freq);
-#if ANDROID
-            }
-            finally
-            {
-                if (needsDispose)
-                    stream.Dispose();
-            }
-#endif
+
+            buffer = AudioLoader.Load(stream, out format, out size, out freq);
+
             Format = format;
             Size = size;
             Rate = freq;
