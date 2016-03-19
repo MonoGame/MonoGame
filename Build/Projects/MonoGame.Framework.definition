@@ -43,7 +43,7 @@
       <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
       <Platform Name="tvOS">IOS;TVOS;GLES;OPENGL;OPENAL</Platform>
       <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;DESKTOPGL</Platform>
-      <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL</Platform>
+      <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;DESKTOPGL</Platform>
       <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA;OPENAL</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
