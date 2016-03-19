@@ -27,8 +27,6 @@ namespace Microsoft.Xna.Framework.Audio
     {
         internal const int MAX_PLAYING_INSTANCES = OpenALSoundController.MAX_NUMBER_OF_SOURCES;
 
-        internal byte[] _data;
-
         internal OALSoundBuffer SoundBuffer;
 
         internal float Rate { get; set; }
@@ -62,7 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
                     stream.Position = 0;
                 }
 #endif
-                _data = AudioLoader.Load(stream, out format, out size, out freq);
+                byte[] buffer = AudioLoader.Load(stream, out format, out size, out freq);
 #if ANDROID
             }
             finally
@@ -87,8 +85,8 @@ namespace Microsoft.Xna.Framework.Audio
                 afs.ParseBytes (audiodata, false);
                 Size = (int)afs.DataByteCount;
 
-                _data = new byte[afs.DataByteCount];
-                Array.Copy (audiodata, afs.DataOffset, _data, 0, afs.DataByteCount);
+                buffer = new byte[afs.DataByteCount];
+                Array.Copy (audiodata, afs.DataOffset, buffer, 0, afs.DataByteCount);
 
                 AudioStreamBasicDescription asbd = afs.DataFormat;
                 int channelsPerFrame = asbd.ChannelsPerFrame;
@@ -123,6 +121,9 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
 #endif
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
@@ -132,7 +133,6 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if OPENAL && !(MONOMAC || IOS)
 
-            _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
 
 #endif
@@ -148,12 +148,11 @@ namespace Microsoft.Xna.Framework.Audio
                 Format = bitsPerSample == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
 
             _name = "";
-            _data = buffer;
 
 #endif
             // bind buffer
             SoundBuffer = new OALSoundBuffer();
-            SoundBuffer.BindDataBuffer(_data, Format, Size, (int)Rate);
+            SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
