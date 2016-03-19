@@ -39,6 +39,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformLoadAudioStream(Stream s)
         {
+            byte[] buffer;
+
 #if OPENAL && !(MONOMAC || IOS)
             
             ALFormat format;
@@ -60,7 +62,7 @@ namespace Microsoft.Xna.Framework.Audio
                     stream.Position = 0;
                 }
 #endif
-                byte[] buffer = AudioLoader.Load(stream, out format, out size, out freq);
+                buffer = AudioLoader.Load(stream, out format, out size, out freq);
 #if ANDROID
             }
             finally
