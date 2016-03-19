@@ -33,6 +33,14 @@ namespace MonoGame.Tools.Pipeline
 
         public static MainView Form { get; private set; }
 
+        private string WindowTitle
+        {
+            get
+            {
+                return "MonoGame Pipeline - " + ((PipelineController)_controller).ProjectName;
+            }
+        }
+
         public MainView()
         {            
             InitializeComponent();
@@ -76,7 +84,10 @@ namespace MonoGame.Tools.Pipeline
             _controller = controller;
 
             var updateMenus = new Action(UpdateMenus);
+            var projectLoaded = new Action(ProjectLoaded);
+
             var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
+            var invokeProjectLoaded = new Action(() =>Invoke(projectLoaded));
 
             _controller.OnBuildStarted += delegate
             {
@@ -85,7 +96,7 @@ namespace MonoGame.Tools.Pipeline
             };
             _controller.OnBuildFinished += invokeUpdateMenus;
             _controller.OnProjectLoading += invokeUpdateMenus;
-            _controller.OnProjectLoaded += invokeUpdateMenus;
+            _controller.OnProjectLoaded += invokeProjectLoaded;
 
             var updateUndoRedo = new CanUndoRedoChanged(UpdateUndoRedo);
             var invokeUpdateUndoRedo = new CanUndoRedoChanged((u, r) => Invoke(updateUndoRedo, u, r));
@@ -805,7 +816,18 @@ namespace MonoGame.Tools.Pipeline
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();
         }
-        
+
+        private void ProjectLoaded()
+        {
+            UpdateMenus();
+            UpdateWindowTitle();
+        }
+
+        private void UpdateWindowTitle()
+        {
+            this.Text = WindowTitle;
+        }
+
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
         {
             _undoMenuItem.Enabled = canUndo;

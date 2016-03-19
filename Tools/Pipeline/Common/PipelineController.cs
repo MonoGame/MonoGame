@@ -938,5 +938,13 @@ namespace MonoGame.Tools.Pipeline
 
             return _project.Location + Path.DirectorySeparatorChar + filePath;
         }
+
+        public string ProjectName
+        {
+            get
+            {
+                return _project.Name;
+            }
+        }
     }
 }
