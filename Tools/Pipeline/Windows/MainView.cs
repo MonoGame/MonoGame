@@ -37,7 +37,14 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                return "MonoGame Pipeline - " + ((PipelineController)_controller).ProjectName;
+                if (string.IsNullOrEmpty(((PipelineController)_controller).ProjectName))
+                {
+                    return "MonoGame Pipeline";
+                }
+                else
+                {
+                    return "MonoGame Pipeline - " + ((PipelineController)_controller).ProjectName;
+                }                
             }
         }
 
