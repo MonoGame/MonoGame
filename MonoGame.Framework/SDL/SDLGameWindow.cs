@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework
 
             Instance = this;
 
-            _display = GetMouseDiaplay();
+            _display = GetMouseDisplay();
 
             // We need a dummy handle for GraphicDevice until our window gets created
             _handle = Sdl.Window.Create("", _display.X + _display.Width/4, _display.Y + _display.Height/4,
@@ -154,7 +154,7 @@ namespace Microsoft.Xna.Framework
             Dispose(false);
         }
 
-        private static Sdl.Rectangle GetMouseDiaplay()
+        private static Sdl.Rectangle GetMouseDisplay()
         {
             var rect = new Sdl.Rectangle();
 
