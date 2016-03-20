@@ -251,6 +251,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        private void OnMove(object sender, EventArgs e)
+        {
+            OnLocationChanged();
+        }
+
         internal void ProcessEvents()
         {
             lock (window)
@@ -378,6 +383,7 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+            window.Move += new EventHandler<EventArgs>(OnMove);
 
             window.KeyPress += OnKeyPress;
 

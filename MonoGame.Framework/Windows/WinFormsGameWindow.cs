@@ -195,6 +195,7 @@ namespace MonoGame.Framework
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
             _form.ClientSizeChanged += OnClientSizeChanged;
+            _form.LocationChanged += OnLocationChanged;
 
             _form.KeyPress += OnKeyPress;
 
@@ -401,6 +402,11 @@ namespace MonoGame.Framework
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
             OnClientSizeChanged();
+        }
+
+        private void OnLocationChanged(object sender, EventArgs eventArgs)
+        {
+            OnLocationChanged();
         }
 
         protected override void SetTitle(string title)

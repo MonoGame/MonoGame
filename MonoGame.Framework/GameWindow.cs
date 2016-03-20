@@ -8,15 +8,15 @@ using System;
 using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework {
-	public abstract class GameWindow {
-		#region Properties
+    public abstract class GameWindow {
+        #region Properties
 
-		[DefaultValue(false)]
-		public abstract bool AllowUserResizing { get; set; }
+        [DefaultValue(false)]
+        public abstract bool AllowUserResizing { get; set; }
 
-		public abstract Rectangle ClientBounds { get; }
+        public abstract Rectangle ClientBounds { get; }
 
-	    internal bool _allowAltF4 = true;
+        internal bool _allowAltF4 = true;
 
         /// <summary>
         /// Gets or sets a bool that enables usage of Alt+F4 for window closing on desktop platforms. Value is true by default.
@@ -35,13 +35,13 @@ namespace Microsoft.Xna.Framework {
         public abstract System.Drawing.Icon Icon { get; set; }
 #endif
 
-		public abstract DisplayOrientation CurrentOrientation { get; }
+        public abstract DisplayOrientation CurrentOrientation { get; }
 
-		public abstract IntPtr Handle { get; }
+        public abstract IntPtr Handle { get; }
 
-		public abstract string ScreenDeviceName { get; }
+        public abstract string ScreenDeviceName { get; }
 
-		private string _title;
+        private string _title;
         /// <summary>
         /// Gets or sets the title of the game window.
         /// </summary>
@@ -50,14 +50,14 @@ namespace Microsoft.Xna.Framework {
         /// set by using the DisplayName property found in the app manifest file.
         /// </remarks>
         public string Title {
-			get { return _title; }
-			set {
-				if (_title != value) {
-					SetTitle(value);
-					_title = value;
-				}
-			}
-		}
+            get { return _title; }
+            set {
+                if (_title != value) {
+                    SetTitle(value);
+                    _title = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Determines whether the border of the window is visible. Currently only supported on the WinDX and WinGL/Linux platforms.
@@ -78,88 +78,95 @@ namespace Microsoft.Xna.Framework {
         }
 
         internal MouseState MouseState;
-	    internal TouchPanelState TouchPanelState;
+        internal TouchPanelState TouchPanelState;
 
         protected GameWindow()
         {
             TouchPanelState = new TouchPanelState(this);
         }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Events
+        #region Events
 
-		public event EventHandler<EventArgs> ClientSizeChanged;
-		public event EventHandler<EventArgs> OrientationChanged;
-		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+        public event EventHandler<EventArgs> ClientSizeChanged;
+        public event EventHandler<EventArgs> OrientationChanged;
+        public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+        public event EventHandler<EventArgs> LocationChanged;
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
 
         /// <summary>
-		/// Use this event to retrieve text for objects like textbox's.
-		/// This event is not raised by noncharacter keys.
-		/// This event also supports key repeat.
-		/// For more information this event is based off:
-		/// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
-		/// </summary>
-		/// <remarks>
-		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
-		/// </remarks>
-		public event EventHandler<TextInputEventArgs> TextInput;
+        /// Use this event to retrieve text for objects like textbox's.
+        /// This event is not raised by noncharacter keys.
+        /// This event also supports key repeat.
+        /// For more information this event is based off:
+        /// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
+        /// </summary>
+        /// <remarks>
+        /// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
+        /// </remarks>
+        public event EventHandler<TextInputEventArgs> TextInput;
 #endif
 
-		#endregion Events
+        #endregion Events
 
-		public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
+        public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
 
-		public abstract void EndScreenDeviceChange (
-			string screenDeviceName, int clientWidth, int clientHeight);
+        public abstract void EndScreenDeviceChange (
+            string screenDeviceName, int clientWidth, int clientHeight);
 
-		public void EndScreenDeviceChange (string screenDeviceName)
-		{
-			EndScreenDeviceChange(screenDeviceName, ClientBounds.Width, ClientBounds.Height);
-		}
+        public void EndScreenDeviceChange (string screenDeviceName)
+        {
+            EndScreenDeviceChange(screenDeviceName, ClientBounds.Width, ClientBounds.Height);
+        }
 
-		protected void OnActivated ()
-		{
-		}
+        protected void OnActivated ()
+        {
+        }
 
-		protected void OnClientSizeChanged ()
-		{
-			if (ClientSizeChanged != null)
-				ClientSizeChanged (this, EventArgs.Empty);
-		}
+        protected void OnClientSizeChanged ()
+        {
+            if (ClientSizeChanged != null)
+                ClientSizeChanged (this, EventArgs.Empty);
+        }
 
-		protected void OnDeactivated ()
-		{
-		}
+        protected void OnLocationChanged()
+        {
+            if (LocationChanged != null)
+                LocationChanged(this, EventArgs.Empty);
+        }
+
+        protected void OnDeactivated ()
+        {
+        }
          
-		protected void OnOrientationChanged ()
-		{
-			if (OrientationChanged != null)
-				OrientationChanged (this, EventArgs.Empty);
-		}
+        protected void OnOrientationChanged ()
+        {
+            if (OrientationChanged != null)
+                OrientationChanged (this, EventArgs.Empty);
+        }
 
-		protected void OnPaint ()
-		{
-		}
+        protected void OnPaint ()
+        {
+        }
 
-		protected void OnScreenDeviceNameChanged ()
-		{
-			if (ScreenDeviceNameChanged != null)
-				ScreenDeviceNameChanged (this, EventArgs.Empty);
-		}
+        protected void OnScreenDeviceNameChanged ()
+        {
+            if (ScreenDeviceNameChanged != null)
+                ScreenDeviceNameChanged (this, EventArgs.Empty);
+        }
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
-		protected void OnTextInput(object sender, TextInputEventArgs e)
-		{
-			if (TextInput != null)
-				TextInput(sender, e);
-		}
+        protected void OnTextInput(object sender, TextInputEventArgs e)
+        {
+            if (TextInput != null)
+                TextInput(sender, e);
+        }
 #endif
 
-		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
-		protected abstract void SetTitle (string title);
+        protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
+        protected abstract void SetTitle (string title);
 
 #if DIRECTX && WINDOWS
         public static GameWindow Create(Game game, int width, int height)
