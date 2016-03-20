@@ -92,6 +92,7 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> ClientSizeChanged;
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+        public event EventHandler<EventArgs> LocationChanged;
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
 
@@ -129,6 +130,12 @@ namespace Microsoft.Xna.Framework {
 			if (ClientSizeChanged != null)
 				ClientSizeChanged (this, EventArgs.Empty);
 		}
+
+        protected void OnLocationChanged()
+        {
+            if (LocationChanged != null)
+                LocationChanged(this, EventArgs.Empty);
+        }
 
 		protected void OnDeactivated ()
 		{
