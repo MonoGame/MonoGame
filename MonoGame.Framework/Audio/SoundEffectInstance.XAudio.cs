@@ -141,6 +141,10 @@ namespace Microsoft.Xna.Framework.Audio
             var srcChannelCount = _effect._format.Channels;
             var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
 
+            // Do no panning if destination is mono
+            if (dstChannelCount < 2)
+                return;
+
             if (_panMatrix == null || _panMatrix.Length < dstChannelCount)
                 _panMatrix = new float[srcChannelCount * dstChannelCount];
 
@@ -183,9 +187,18 @@ namespace Microsoft.Xna.Framework.Audio
 
             // For now, only the front channels are routed,
             // as handling all the possible combinations of channel counts is out of scope of this fix.
-
-            _panMatrix[0] = lVal;
-            _panMatrix[srcChannelCount + 1] = rVal;
+            
+            if (srcChannelCount == 1)
+            {
+                // For mono sources, send a copy of the channel to front-right
+                _panMatrix[0] = lVal;
+                _panMatrix[srcChannelCount] = rVal;
+            }
+            else
+            {
+                _panMatrix[0] = lVal;
+                _panMatrix[srcChannelCount + 1] = rVal;
+            }
 
             _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
         }
