@@ -61,7 +61,7 @@ If you are interested in contributing fixes or features to MonoGame, please read
 The full source code is available here from GitHub:
 
  * Clone the source: `git clone https://github.com/mono/MonoGame.git`
- * Setup the submodules: 'git submodule update --init'
+ * Setup the submodules: `git submodule update --init`
  * Run Protobuild.exe to generate project files and solutions.
    * If on Linux or Mac, run it with mono: `mono Protobuild.exe`
  * You can generate solutions for platforms that are not buildable from the current OS with: 
