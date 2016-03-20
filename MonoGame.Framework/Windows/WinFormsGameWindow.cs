@@ -93,9 +93,9 @@ namespace MonoGame.Framework
         {
             get
             {
+                var clientRectangle = _form.ClientRectangle;
                 var position = _form.PointToScreen(Point.Empty);
-                var size = _form.ClientSize;
-                return new Rectangle(position.X, position.Y, size.Width, size.Height);
+                return new Rectangle(position.X, position.Y, clientRectangle.Width, clientRectangle.Height);
             }
         }
 
