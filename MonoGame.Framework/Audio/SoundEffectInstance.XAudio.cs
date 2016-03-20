@@ -142,11 +142,11 @@ namespace Microsoft.Xna.Framework.Audio
             var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
 
             if (_panMatrix == null || _panMatrix.Length < dstChannelCount)
-                _panMatrix = new float[Math.Max(dstChannelCount, 8)];
+                _panMatrix = new float[srcChannelCount * dstChannelCount];
 
-            // Default to full volume for all channels/destinations   
+            // Default to zero volume for all channels/destinations   
             for (var i = 0; i < _panMatrix.Length; i++)
-                _panMatrix[i] = 1.0f;
+                _panMatrix[i] = 0.0f;
 
             // From X3DAudio documentation:
             /*
@@ -175,45 +175,17 @@ namespace Microsoft.Xna.Framework.Audio
             //
             // Assuming it is correct to pan all channels which have a left/right component.
 
-            var lVal = 1.0f - _pan;
-            var rVal = 1.0f + _pan;
+            // This implements the so-called equal-power panning,
+            // dropping the volume at center so that it stays consistent across the range.
 
-            switch (SoundEffect.Speakers)
-            {
-                case Speakers.Stereo:
-                case Speakers.TwoPointOne:
-                case Speakers.Surround:
-                    _panMatrix[0] = lVal;
-                    _panMatrix[1] = rVal;
-                    break;
+            var lVal = (float)Math.Sin((1 - _pan) * MathHelper.PiOver4);
+            var rVal = (float)Math.Sin((1 + _pan) * MathHelper.PiOver4);
 
-                case Speakers.Quad:
-                    _panMatrix[0] = _panMatrix[2] = lVal;
-                    _panMatrix[1] = _panMatrix[3] = rVal;
-                    break;
+            // For now, only the front channels are routed,
+            // as handling all the possible combinations of channel counts is out of scope of this fix.
 
-                case Speakers.FourPointOne:
-                    _panMatrix[0] = _panMatrix[3] = lVal;
-                    _panMatrix[1] = _panMatrix[4] = rVal;
-                    break;
-
-                case Speakers.FivePointOne:
-                case Speakers.SevenPointOne:
-                case Speakers.FivePointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = rVal;
-                    break;
-
-                case Speakers.SevenPointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = _panMatrix[6] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = _panMatrix[7] = rVal;
-                    break;
-
-                case Speakers.Mono:
-                default:
-                    // don't do any panning here   
-                    break;
-            }
+            _panMatrix[0] = lVal;
+            _panMatrix[srcChannelCount + 1] = rVal;
 
             _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
         }

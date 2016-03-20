@@ -156,6 +156,11 @@ namespace Microsoft.Xna.Framework.Audio
             if (!_isXAct)
                 PlatformSetVolume(_volume * SoundEffect.MasterVolume);
 
+            // Call PlatformSetPan once to avoid abrupt volume changes when setting Pan,
+            // due to the implications of equal-power panning.
+
+            PlatformSetPan(_pan);
+
             PlatformPlay();
         }
 
