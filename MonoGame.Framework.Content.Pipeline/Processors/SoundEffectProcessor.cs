@@ -15,7 +15,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sound Effect - MonoGame")]
     public class SoundEffectProcessor : ContentProcessor<AudioContent, SoundEffectContent>
     {
+        int loopLength;
+        int loopStart;
         ConversionQuality quality = ConversionQuality.Best;
+
+        /// <summary>
+        /// Gets or sets the loop length, in samples.
+        /// </summary>
+        /// <value>The number of samples in the loop.</value>
+        public int LoopLength { get { return loopLength; } set { loopLength = value; } }
+
+        /// <summary>
+        /// Gets or sets the loop start, in samples.
+        /// </summary>
+        /// <value>The number of samples to the start of the loop.</value>
+        public int LoopStart { get { return loopStart; } set { loopStart = value; } }
 
         /// <summary>
         /// Gets or sets the target format quality of the audio content.
@@ -58,7 +72,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             input.ConvertFormat(targetFormat, quality, null);
 
-            return new SoundEffectContent(input.Format.NativeWaveFormat, input.Data, input.LoopStart, input.LoopLength, (int)input.Duration.TotalMilliseconds);
+            return new SoundEffectContent(input.Format.NativeWaveFormat, input.Data, loopStart >= 0 ? loopStart : input.LoopStart, loopLength >= 0 ? loopLength : input.LoopLength, (int)input.Duration.TotalMilliseconds);
         }
     }
 }
