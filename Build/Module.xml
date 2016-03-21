@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Module>
   <Name>MonoGame.Framework</Name>
   <DefaultAction>Generate</DefaultAction>
   <DefaultLinuxPlatforms>Angle,Linux,WindowsGL</DefaultLinuxPlatforms>
-  <DefaultMacOSPlatforms>Angle,MacOS,iOS,WindowsGL,Android,tvOS</DefaultMacOSPlatforms>
+  <DefaultMacOSPlatforms>Angle,MacOS,iOS,WindowsGL,Android,tvOS,Linux</DefaultMacOSPlatforms>
   <DefaultWindowsPlatforms>Android,Angle,Linux,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</DefaultWindowsPlatforms>
   <SupportedPlatforms>Android,Angle,Linux,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,MacOS,Web,tvOS</SupportedPlatforms>
   <DisableSynchronisation>true</DisableSynchronisation>
