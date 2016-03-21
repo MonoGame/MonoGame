@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             input.ConvertFormat(targetFormat, quality, null);
 
-            return new SoundEffectContent(input.Format.NativeWaveFormat, input.Data, loopStart >= 0 ? loopStart : input.LoopStart, loopLength >= 0 ? loopLength : input.LoopLength, (int)input.Duration.TotalMilliseconds);
+            return new SoundEffectContent(input.Format.NativeWaveFormat, input.Data, loopStart > 0 ? loopStart : input.LoopStart, loopLength > 0 ? loopLength : input.LoopLength, (int)input.Duration.TotalMilliseconds);
         }
     }
 }
