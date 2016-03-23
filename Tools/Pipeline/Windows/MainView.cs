@@ -858,6 +858,8 @@ namespace MonoGame.Tools.Pipeline
 
                 // Ensure name is unique among files at this location?
                 _controller.NewItem(dlg.NameGiven, location, template);
+
+                UpdateMenus();
             }
         }
 
