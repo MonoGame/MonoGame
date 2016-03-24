@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#if !NO_CONTENTPIPELINE
+
 using System;
 using System.Collections;
 using Microsoft.Xna.Framework;
@@ -536,7 +538,7 @@ class StructArrayNoElements
 
 namespace MonoGame.Tests.ContentPipeline
 {
-    #region Namespaces
+#region Namespaces
     public class NamespaceHelper
     {
         public bool Value;
@@ -577,9 +579,9 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
     }
-    #endregion
+#endregion
 
-    #region CustomFormatting
+#region CustomFormatting
     public class CustomFormatting<T, U>
     {
         public T A;
@@ -587,7 +589,7 @@ namespace MonoGame.Tests.ContentPipeline
         public string EmptyString;
         public U Rectangle;
     }
-    #endregion
+#endregion
 }
 
 namespace MonoGame.Tests.SomethingElse.ContentPipeline
@@ -597,3 +599,5 @@ namespace MonoGame.Tests.SomethingElse.ContentPipeline
         public bool Value;
     }
 }
+
+#endif

@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#if !NO_CONTENTPIPELINE
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -96,3 +98,5 @@ namespace MonoGame.Tests.ContentPipeline
         }
     }
 }
+
+#endif
