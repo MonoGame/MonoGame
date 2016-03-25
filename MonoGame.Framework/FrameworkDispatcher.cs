@@ -4,13 +4,21 @@
 
 namespace Microsoft.Xna.Framework
 {
-	public static class FrameworkDispatcher
-	{
-		public static void Update()
-		{
-			// "Updates the status of various framework components
-			// (such as power state and media), and raises related events"
-		}
-	}
+    /// <summary>
+    /// Helper class for processing internal framework events.
+    /// </summary>
+    /// <remarks>
+    /// If you use <see cref="Game"/> class, <see cref="Update()"/> is called automatically.
+    /// Otherwise you must call it as part of your game loop.
+    /// </remarks>
+    public static class FrameworkDispatcher
+    {
+        /// <summary>
+        /// Processes framework events.
+        /// </summary>
+        public static void Update()
+        {
+        }
+    }
 }
 
