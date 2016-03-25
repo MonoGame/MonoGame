@@ -76,9 +76,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         static SoundEffect()
         {
-            InitializeSoundEffect();
         }
 
+        /// <devdoc>
+        /// This is called by <see cref="FrameworkDispatcher.Initialize()"/>
+        /// to ensure that XAudio is initialized on main thread.
+        /// </devdoc>
         internal static void InitializeSoundEffect()
         {
             try

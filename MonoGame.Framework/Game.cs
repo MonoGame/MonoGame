@@ -70,6 +70,9 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
+            // Calling Update() for first time initializes some systems
+            FrameworkDispatcher.Update();
+
 #if WINDOWS_STOREAPP && !WINDOWS_PHONE81
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif
@@ -660,11 +663,7 @@ namespace Microsoft.Xna.Framework
             AssertNotDisposed();
             if (Platform.BeforeUpdate(gameTime))
             {
-                // Once per frame, we need to check currently 
-                // playing sounds to see if they've stopped,
-                // and return them back to the pool if so.
-                SoundEffectInstancePool.Update();
-
+                FrameworkDispatcher.Update();
                 Update(gameTime);
 
                 //The TouchPanel needs to know the time for when touches arrive
