@@ -61,7 +61,7 @@ namespace MonoGame.Tests.Framework
 
             sfx.Play();
             Assert.AreEqual(1, GetPlayingSoundCount());
-            Thread.Sleep(10); // Give the sound effect time to play
+            Thread.Sleep(25); // Give the sound effect time to play
 
             FrameworkDispatcher.Update();
             Assert.AreEqual(0, GetPlayingSoundCount());
