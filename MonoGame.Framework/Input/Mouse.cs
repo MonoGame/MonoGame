@@ -92,21 +92,25 @@ namespace Microsoft.Xna.Framework.Input
 
 #elif DESKTOPGL || ANGLE
             int x, y;
-            int wx, wy;
 
             var state = Sdl.Mouse.GetGlobalState (out x, out y);
-            Sdl.Window.GetPosition (window.Handle, out wx, out wy);
+            var clientBounds = window.ClientBounds;
 
-            window.MouseState.X = x - wx;
-            window.MouseState.Y = y - wy;
-            
-            window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
-            window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
-            window.MouseState.RightButton = (state.HasFlag(Sdl.Mouse.Button.Right)) ? ButtonState.Pressed : ButtonState.Released;
-            window.MouseState.XButton1 = (state.HasFlag(Sdl.Mouse.Button.X1Mask)) ? ButtonState.Pressed : ButtonState.Released;
-            window.MouseState.XButton2 = (state.HasFlag(Sdl.Mouse.Button.X2Mask)) ? ButtonState.Pressed : ButtonState.Released;
+            window.MouseState.X = x - clientBounds.X;
+            window.MouseState.Y = y - clientBounds.Y;
 
-            window.MouseState.ScrollWheelValue = ScrollY;
+            if (((SdlGameWindow)window)._game.IsActive &&
+                window.MouseState.X >= 0 && window.MouseState.Y >= 0 &&
+                window.MouseState.X < clientBounds.Width && window.MouseState.Y < clientBounds.Height)
+            {
+                window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.RightButton = (state.HasFlag(Sdl.Mouse.Button.Right)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.XButton1 = (state.HasFlag(Sdl.Mouse.Button.X1Mask)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.XButton2 = (state.HasFlag(Sdl.Mouse.Button.X2Mask)) ? ButtonState.Pressed : ButtonState.Released;
+
+                window.MouseState.ScrollWheelValue = ScrollY;
+            }
 #endif
 
             return window.MouseState;

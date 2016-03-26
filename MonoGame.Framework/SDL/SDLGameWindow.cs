@@ -30,9 +30,7 @@ namespace Microsoft.Xna.Framework
                 int x = 0, y = 0, w, h;
 
                 Sdl.Window.GetSize(Handle, out w, out h);
-
-                if (!IsFullScreen)
-                    Sdl.Window.GetPosition(Handle, out x, out y);
+                Sdl.Window.GetPosition(Handle, out x, out y);
 
                 return new Rectangle(x, y, w, h);
             }
@@ -80,7 +78,7 @@ namespace Microsoft.Xna.Framework
         public static GameWindow Instance;
         public bool IsFullScreen;
 
-        private readonly Game _game;
+        internal readonly Game _game;
         private IntPtr _handle;
         private bool _init, _disposed;
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible;
