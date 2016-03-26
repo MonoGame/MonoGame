@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 		static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out int yOffsetMin, ContentProcessorContext context, string fontName)
 		{
 			// Which importer knows how to read this source font?
-			IFontImporter importer;
+			SharpFontImporter importer;
 
 			var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
 			//var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
@@ -160,8 +160,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			// Import the source font data.
 			importer.Import(options, fontName);
-
-			lineSpacing = importer.LineSpacing;
+            context.Logger.Indent();
+            if (importer.Emboldened)
+            {
+                context.Logger.LogMessage("Bold effect simulated");
+            }
+            if (importer.Italiced)
+            {
+                context.Logger.LogMessage("Italic effect simulated");
+            }
+            context.Logger.Unindent();
+            lineSpacing = importer.LineSpacing;
 			yOffsetMin = importer.YOffsetMin;
 
 			// Get all glyphs
