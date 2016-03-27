@@ -36,9 +36,12 @@ namespace Microsoft.Xna.Framework.Input
         internal static bool BorderSet;
         internal static int ScrollY;
 
+        private static bool _getEvents;
+
         internal static void SetWindows(GameWindow window)
         {
             PrimaryWindow = window;
+            _getEvents = true;
         }
 
 #elif (WINDOWS && DIRECTX)
@@ -96,12 +99,7 @@ namespace Microsoft.Xna.Framework.Input
             var state = Sdl.Mouse.GetGlobalState (out x, out y);
             var clientBounds = window.ClientBounds;
 
-            window.MouseState.X = x - clientBounds.X;
-            window.MouseState.Y = y - clientBounds.Y;
-
-            if (((SdlGameWindow)window)._game.IsActive &&
-                window.MouseState.X >= 0 && window.MouseState.Y >= 0 &&
-                window.MouseState.X < clientBounds.Width && window.MouseState.Y < clientBounds.Height)
+            if (clientBounds.Contains(x, y) && ((SdlGameWindow)window)._game.IsActive && _getEvents)
             {
                 window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
                 window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
@@ -111,6 +109,11 @@ namespace Microsoft.Xna.Framework.Input
 
                 window.MouseState.ScrollWheelValue = ScrollY;
             }
+            else
+                _getEvents = !state.HasFlag(Sdl.Mouse.Button.Left) || window.MouseState.LeftButton == ButtonState.Pressed;
+
+            window.MouseState.X = x - clientBounds.X;
+            window.MouseState.Y = y - clientBounds.Y;
 #endif
 
             return window.MouseState;
