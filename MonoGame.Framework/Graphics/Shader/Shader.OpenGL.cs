@@ -37,20 +37,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private Attribute[] _attributes;
 
-        private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
+        private void PlatformConstruct(IShaderReader reader, bool isVertexShader, byte[] shaderBytecode)
         {
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(shaderBytecode);
 
-            var attributeCount = (int)reader.ReadByte();
+            var attributeCount = reader.GetAttributeCount();
             _attributes = new Attribute[attributeCount];
             for (var a = 0; a < attributeCount; a++)
             {
-                _attributes[a].name = reader.ReadString();
-                _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
-                _attributes[a].index = reader.ReadByte();
-                reader.ReadInt16(); //format, unused
+                _attributes[a].name = reader.GetAttributeName(a);
+                _attributes[a].usage = reader.GetAttributeUsage(a);
+                _attributes[a].index = reader.GetAttributeIndexInShader(a);
             }
         }
 
