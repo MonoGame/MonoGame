@@ -12,7 +12,7 @@ using OpenTK.Graphics.OpenGL;
 using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif WINRT
 
 #else

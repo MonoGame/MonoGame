@@ -9,8 +9,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif GLES
 #if ANGLE
 using OpenTK.Graphics;
@@ -28,19 +27,6 @@ namespace Microsoft.Xna.Framework.Graphics
     static class GraphicsExtensions
     {
 #if OPENGL
-        public static All OpenGL11(CullMode cull)
-        {
-            switch (cull)
-            {
-                case CullMode.CullClockwiseFace:
-                    return All.Cw;
-                case CullMode.CullCounterClockwiseFace:
-                    return All.Ccw;
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
         public static int OpenGLNumberOfElements(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -378,11 +364,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorSrc.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS || DESKTOPGL
-				return (BlendingFactorSrc)All.OneMinusSrcColor;
-#else
 				return BlendingFactorSrc.OneMinusSrcColor;
-#endif
 			case Blend.One:
 				return BlendingFactorSrc.One;
 			case Blend.SourceAlpha:
@@ -390,11 +372,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceAlphaSaturation:
 				return BlendingFactorSrc.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS || DESKTOPGL
-				return (BlendingFactorSrc)All.SrcColor;
-#else
 				return BlendingFactorSrc.SrcColor;
-#endif
 			case Blend.Zero:
 				return BlendingFactorSrc.Zero;
 			default:
@@ -417,11 +395,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorDest.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS
-				return (BlendingFactorDest)All.OneMinusSrcColor;
-#else
 				return BlendingFactorDest.OneMinusSrcColor;
-#endif
 			case Blend.One:
 				return BlendingFactorDest.One;
 			case Blend.SourceAlpha:
@@ -429,11 +403,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //			case Blend.SourceAlphaSaturation:
 //				return BlendingFactorDest.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS
-				return (BlendingFactorDest)All.SrcColor;
-#else
 				return BlendingFactorDest.SrcColor;
-#endif
 			case Blend.Zero:
 				return BlendingFactorDest.Zero;
 			default:
@@ -583,37 +553,37 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !IOS && !ANDROID && !ANGLE
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
-				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				glFormat = PixelFormat.CompressedTextureFormats;
 				break;
             case SurfaceFormat.Dxt1SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt1;
                 glInternalFormat = PixelInternalFormat.CompressedSrgbS3tcDxt1Ext;
-                glFormat = (PixelFormat) All.CompressedTextureFormats;
+                glFormat = PixelFormat.CompressedTextureFormats;
                 break;
             case SurfaceFormat.Dxt1a:
                 glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
-                glFormat = (PixelFormat)All.CompressedTextureFormats;
+                glFormat = PixelFormat.CompressedTextureFormats;
                 break;
             case SurfaceFormat.Dxt3:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
-				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				glFormat = PixelFormat.CompressedTextureFormats;
 				break;
             case SurfaceFormat.Dxt3SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt3;
                 glInternalFormat = PixelInternalFormat.CompressedSrgbAlphaS3tcDxt3Ext;
-                glFormat = (PixelFormat) All.CompressedTextureFormats;
+                glFormat = PixelFormat.CompressedTextureFormats;
                 break;
 			case SurfaceFormat.Dxt5:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
-				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				glFormat = PixelFormat.CompressedTextureFormats;
 				break;
             case SurfaceFormat.Dxt5SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt5;
                 glInternalFormat = PixelInternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
-                glFormat = (PixelFormat) All.CompressedTextureFormats;
+                glFormat = PixelFormat.CompressedTextureFormats;
                 break;
 			
 			case SurfaceFormat.Single:

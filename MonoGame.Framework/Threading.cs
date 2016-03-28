@@ -52,10 +52,7 @@ using OpenTK.Graphics.ES11;
 using OpenTK.Graphics.ES20;
 #endif
 #elif DESKTOPGL || ANGLE
-using OpenTK.Graphics;
-using OpenTK.Platform;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #endif
 #if WINDOWS_PHONE
 using System.Windows;

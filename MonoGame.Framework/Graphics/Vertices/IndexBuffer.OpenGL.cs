@@ -16,7 +16,7 @@ using OpenTK.Graphics.ES20;
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 #if DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

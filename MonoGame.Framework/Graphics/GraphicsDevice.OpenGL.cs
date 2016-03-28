@@ -18,9 +18,7 @@ using GLPrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;
 #endif
 
 #if DESKTOPGL
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
+using OpenGL;
 #endif
 
 #if ANGLE
@@ -96,7 +94,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetup()
         {
 #if DESKTOPGL || ANGLE
-            GraphicsMode mode = GraphicsMode.Default;
+
+            // TODO need to wrap this up into an IGraphicsContext maybe...
+            var context = Sdl.CreateContext (Game.Instance.Window.Handle);
+            Sdl.MakeCurrent (Game.Instance.Window.Handle, context);
+            /*GraphicsMode mode = GraphicsMode.Default;
             var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
 
             #if GLES
@@ -164,7 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.WindowInfo = wnd;
                 Threading.BackgroundContext.MakeCurrent(null);
             }
-            Context.MakeCurrent(wnd);
+            Context.MakeCurrent(wnd);*/
 #endif
 
             MaxTextureSlots = 16;
@@ -177,13 +179,11 @@ namespace Microsoft.Xna.Framework.Graphics
             
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
-
-            SpriteBatch.NeedsHalfPixelOffset = true;
-
 #if !GLES
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;
-			GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+            GraphicsExtensions.CheckGLError ();
 			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
@@ -313,7 +313,7 @@ namespace Microsoft.Xna.Framework.Graphics
  #if GLES
                     GL.ClearDepth (depth);
  #else
-                    GL.ClearDepth((double)depth);
+                    GL.ClearDepth(depth);
  #endif
                     GraphicsExtensions.CheckGLError();
                     _lastClearDepth = depth;
@@ -403,7 +403,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
             GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
-            GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
+            GL.DepthRange(value.MinDepth, value.MaxDepth);
 #endif
             GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
                 

@@ -12,7 +12,7 @@ using MonoMac.AVFoundation;
 using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
-using OpenTK.Audio.OpenAL;
+using OpenAL;
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;

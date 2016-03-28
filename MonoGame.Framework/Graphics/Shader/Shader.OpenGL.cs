@@ -12,7 +12,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var compiled = 0;
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
             GraphicsExtensions.CheckGLError();
-            if (compiled == (int)All.False)
+            if (compiled == (int)Bool.False)
             {
                 var log = GL.GetShaderInfoLog(_shaderHandle);
                 Console.WriteLine(log);

@@ -20,7 +20,7 @@ using OpenTK.Graphics.OpenGL;
 #endif
 
 #if (WINDOWS || DESKTOPGL) && !GLES
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 
 #endif
 
