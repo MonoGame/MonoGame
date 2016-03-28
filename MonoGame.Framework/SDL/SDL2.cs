@@ -224,6 +224,9 @@ internal static class Sdl
             return GetError(SDL_GetWindowDisplayIndex(window));
         }
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowFlags")]
+        public static extern State GetWindowFlags(IntPtr window);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowIcon")]
         public static extern void SetIcon(IntPtr window, IntPtr icon);
 
