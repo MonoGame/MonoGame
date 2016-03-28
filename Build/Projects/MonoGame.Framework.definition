@@ -291,6 +291,9 @@
 	<Compile Include="Audio\OggStream.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
+    <Compile Include="Audio\OpenAL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
       <Services>OpenALAudio</Services>
     </Compile>
@@ -525,6 +528,15 @@
     </Compile>
     <Compile Include="Graphics\OcclusionQuery.Null.cs">
       <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.Common.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Graphics\PackedVector\Alpha8.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
