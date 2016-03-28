@@ -12,7 +12,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
         private const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
 #else
-        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
+        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = TextureParameterName.TextureMaxAnisotropyExt;
         private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 #endif
 
@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureAddressMode.Wrap:
         return (int)TextureWrapMode.Repeat;
       case TextureAddressMode.Mirror:
-        return (int)All.MirroredRepeat;
+        return (int)TextureWrapMode.MirroredRepeat;
 #if !GLES
       case TextureAddressMode.Border:
         return (int)TextureWrapMode.ClampToBorder;

@@ -5,13 +5,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 
-#if MONOMAC && PLATFORM_MACOS_LEGACY
-using MonoMac.OpenAL;
-#else
-using OpenTK.Audio.OpenAL;
-using OpenTK.Audio;
-using OpenTK;
-#endif
+using OpenAL;
+using OpenGL;
 
 #if ANDROID
 using System.Globalization;
@@ -48,7 +43,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private static OpenALSoundController _instance = null;
         private IntPtr _device;
-        private ContextHandle _context;
+        private IntPtr _context;
 		//int outputSource;
 		//int[] buffers;
         private AlcError _lastOpenALError;
@@ -254,7 +249,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return(false);
                 }
 
-                if (_context != ContextHandle.Zero)
+                if (_context != IntPtr.Zero)
                 {
                     Alc.MakeContextCurrent(_context);
                     if (CheckALError("Could not make AL context current"))
@@ -313,7 +308,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         private void CleanUpOpenAL()
         {
-            Alc.MakeContextCurrent(ContextHandle.Zero);
+            Alc.MakeContextCurrent(IntPtr.Zero);
 #if DESKTOPGL
             if (_acontext != null)
             {

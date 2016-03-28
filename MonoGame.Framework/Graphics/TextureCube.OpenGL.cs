@@ -7,7 +7,7 @@ using System;
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 #elif DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 TextureTarget target = GetGLCubeFace((CubeMapFace)i);
 
-                if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+                if (glFormat == PixelFormat.CompressedTextureFormats)
                 {
                     throw new NotImplementedException();
                 }
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS || ANDROID
 				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)Bool.True);
 #endif
                 GraphicsExtensions.CheckGLError();
             }
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             TextureTarget target = GetGLCubeFace(face);
-            if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+            if (glFormat == PixelFormat.CompressedTextureFormats)
             {
                 throw new NotImplementedException();
             }
