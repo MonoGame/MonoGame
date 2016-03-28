@@ -13,8 +13,13 @@ Currently, on Windows, the tests can be run using NUnit and target
 either XNA or MonoGame.  On Mac OS X and Linux, the tests target
 MonoGame and are implemented in an executable assembly that can be run
 and debugged directly.  After execution using the custom test runner,
-and HTML report of the results will be loaded in your default browser,
+an HTML report of the results will be loaded in your default browser,
 and a log of stdout can be found in bin\$(Configuration)\stdout.txt.
+
+If the full XNA Framework is not installed, the XNA Content Pipeline tests
+fail to compile. Define NO_CONTENTPIPELINE compilation symbol in project
+properties to disable these tests and allow building the XNA tests. The
+remaining tests can be built against the XNA redistributable version.
 
 *Note: Currently there is no way to skip or select certain tests to run
 using the custom runner.  This functionality is coming soon.*

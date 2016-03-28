@@ -1,4 +1,10 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#if !NO_CONTENTPIPELINE
+
+using System;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
@@ -89,3 +95,5 @@ namespace MonoGame.Tests.ContentPipeline
         }
     }
 }
+
+#endif

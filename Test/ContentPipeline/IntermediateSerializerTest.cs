@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#if !NO_CONTENTPIPELINE
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,12 +35,12 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 public GraphicsDevice GraphicsDevice { get; private set; }
 
-                #pragma warning disable 67
+#pragma warning disable 67
                 public event EventHandler<EventArgs> DeviceCreated;
                 public event EventHandler<EventArgs> DeviceDisposing;
                 public event EventHandler<EventArgs> DeviceReset;
                 public event EventHandler<EventArgs> DeviceResetting;
-                #pragma warning restore 67
+#pragma warning restore 67
             }
 
             class FakeServiceProvider : IServiceProvider
@@ -496,3 +498,5 @@ namespace MonoGame.Tests.ContentPipeline
         }
     }
 }
+
+#endif

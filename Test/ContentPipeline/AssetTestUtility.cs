@@ -4,10 +4,12 @@
 
 using System;
 using System.IO;
-#if !WINDOWS || DIRECTX || XNA
+#if (!WINDOWS || DIRECTX || XNA) && !NO_CONTENTPIPELINE
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+#else
+using NUnit.Framework;
 #endif
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +19,7 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public static Effect CompileEffect(GraphicsDevice graphicsDevice, params string[] pathParts)
         {
-#if !WINDOWS || DIRECTX || XNA
+#if (!WINDOWS || DIRECTX || XNA) && !NO_CONTENTPIPELINE
             var effectProcessor = new EffectProcessor();
             var context = new TestProcessorContext(TargetPlatform.Windows, "notused.xnb");
             var effectPath = Paths.Effect(pathParts);
@@ -28,8 +30,9 @@ namespace MonoGame.Tests.ContentPipeline
             }, context);
 
             return new Effect(graphicsDevice, compiledEffect.GetEffectCode());
-#else // OpenGL
-            throw new NotImplementedException();
+#else // OpenGL or NO_CONTENTPIPELINE
+            Assert.Inconclusive("Content Pipeline support disabled");
+            return null; // This line is never actually reached, since the Assert throws an exception
 #endif
         }
     }
