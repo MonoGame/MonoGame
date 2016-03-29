@@ -95,9 +95,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if DESKTOPGL || ANGLE
 
-            // TODO need to wrap this up into an IGraphicsContext maybe...
-            var context = Sdl.GL.CreateContext (Game.Instance.Window.Handle);
-            Sdl.GL.MakeCurrent (Game.Instance.Window.Handle, context);
+            var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
+            Context = GL.CreateContext(windowInfo);
+            Context.MakeCurrent(windowInfo);
+
             /*GraphicsMode mode = GraphicsMode.Default;
             var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
 
@@ -167,6 +168,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.BackgroundContext.MakeCurrent(null);
             }
             Context.MakeCurrent(wnd);*/
+
+
 #endif
 
             MaxTextureSlots = 16;

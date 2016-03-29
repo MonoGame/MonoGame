@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Runtime.InteropServices;
 #if __IOS__
 using ObjCRuntime;
@@ -6,15 +10,6 @@ using ObjCRuntime;
 
 namespace OpenGL
 {
-    public interface IWindowInfo {
-    }
-    public interface IGraphicsContext {
-        int SwapInterval { get; set; }
-        void MakeCurrent(IWindowInfo info);
-        void Dispose ();
-        void SwapBuffers ();
-    }
-
     public enum BufferAccess {
         ReadOnly = 0x88B8,
     }
@@ -1288,7 +1283,10 @@ namespace OpenGL
 
         static partial void LoadPlatformEntryPoints();
 
-        static partial void CreateContext (ref IGraphicsContext context);
+        public static IGraphicsContext CreateContext(IWindowInfo info)
+        {
+            return PlatformCreateContext(info);
+        }
 
         /* Helper Functions */
 
