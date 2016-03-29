@@ -366,13 +366,27 @@ internal static class Sdl
             ContextReleaseBehaviour,
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
-        private static extern int SDL_GL_SetAttribute(Attribute attr, int value);
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_CreateContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_CreateContext(IntPtr window);
 
-        public static int SetAttribute(Attribute attr, int value)
+        public static IntPtr CreateContext(IntPtr window)
         {
-            return GetError(SDL_GL_SetAttribute(attr, value));
+            return GetError(SDL_GL_CreateContext(window));
         }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_DeleteContext", ExactSpelling = true)]
+        public static extern void DeleteContext(IntPtr context);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetCurrentContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_GetCurrentContext();
+
+        public static IntPtr GetCurrentContext()
+        {
+            return GetError(SDL_GL_GetCurrentContext());
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetSwapInterval", ExactSpelling = true)]
+        public static extern int GetSwapInterval();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_MakeCurrent", ExactSpelling = true)]
         private static extern int SDL_GL_MakeCurrent(IntPtr window, IntPtr context);
@@ -382,24 +396,19 @@ internal static class Sdl
             return GetError(SDL_GL_MakeCurrent(window, context));
         }
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
+        private static extern int SDL_GL_SetAttribute(Attribute attr, int value);
+
+        public static int SetAttribute(Attribute attr, int value)
+        {
+            return GetError(SDL_GL_SetAttribute(attr, value));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetSwapInterval", ExactSpelling = true)]
+        public static extern int SetSwapInterval(int interval);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SwapWindow", ExactSpelling = true)]
         public static extern void SwapWindow(IntPtr window);
-
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_CreateContext", ExactSpelling = true)]
-        private static extern IntPtr SDL_GL_CreateContext(IntPtr window);
-
-        public static IntPtr CreateContext(IntPtr window)
-        {
-            return GetError(SDL_GL_CreateContext(window));
-        }
-
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetCurrentContext", ExactSpelling = true)]
-        private static extern IntPtr SDL_GL_GetCurrentContext();
-
-        public static IntPtr GetCurrentContext()
-        {
-            return SDL_GL_GetCurrentContext();
-        }
     }
 
     public static class Mouse
