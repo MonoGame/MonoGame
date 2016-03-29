@@ -1313,6 +1313,7 @@ namespace OpenGL
             return Marshal.PtrToStringAnsi (GetStringInternal (name));
         }
 
+        [CLSCompliant(false)]
         public unsafe static void GetInteger (GetPName name, out int value)
         {
             fixed (int* ptr = &value) {
@@ -1324,7 +1325,7 @@ namespace OpenGL
         {
             fixed (int* ptr = &value)
             {
-                GetIntegeri_v (name, ptr);
+                GetIntegerv (name, ptr);
             }
         }
 
