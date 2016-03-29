@@ -151,50 +151,6 @@ internal static class Sdl
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetHint")]
     public static extern int SetHint(string name, string value);
 
-    public enum SDL_GLattr
-    {
-        RedSize,
-        GreenSize,
-        BlueSize,
-        AlphaSize,
-        BufferSize,
-        DoubleFuffer,
-        DepthSize,
-        StencilSize,
-        AccumRedSize,
-        AccumGreenSize,
-        AccumBlueSize,
-        AccumAlphaSize,
-        Stereo,
-        MultiSampleBuffers,
-        MultiSampleSamples,
-        AcceleratedVisual,
-        RetainedBacking,
-        ContextMajorVersion,
-        ContextMinorVersion,
-        ContextEgl,
-        ContextFlags,
-        ContextProfileMAsl,
-        ShareWithCurrentContext,
-        FramebufferSRGBCapable,
-        ContextReleaseBehaviour,
-    }
-
-    [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_MakeCurrent", ExactSpelling = true)]
-    public static extern int MakeCurrent (IntPtr window, IntPtr context);
-
-    [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SwapWindow", ExactSpelling = true)]
-    public static extern void SwapWindow (IntPtr window);
-
-    [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_CreateContext", ExactSpelling = true)]
-    public static extern IntPtr CreateContext (IntPtr window);
-
-    [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetCurrentContext", ExactSpelling = true)]
-    public static extern IntPtr GetCurrentContext ();
-
-    [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
-    public static extern int SDL_GL_SetAttribute (SDL_GLattr attr, int value);
-
     public static class Window
     {
         public const int PosUndefined = 0x1FFF0000;
@@ -376,6 +332,73 @@ internal static class Sdl
         public static int GetWindowDisplayIndex(IntPtr window)
         {
             return GetError(SDL_GetWindowDisplayIndex(window));
+        }
+    }
+
+    public static class GL
+    {
+        public enum Attribute
+        {
+            RedSize,
+            GreenSize,
+            BlueSize,
+            AlphaSize,
+            BufferSize,
+            DoubleFuffer,
+            DepthSize,
+            StencilSize,
+            AccumRedSize,
+            AccumGreenSize,
+            AccumBlueSize,
+            AccumAlphaSize,
+            Stereo,
+            MultiSampleBuffers,
+            MultiSampleSamples,
+            AcceleratedVisual,
+            RetainedBacking,
+            ContextMajorVersion,
+            ContextMinorVersion,
+            ContextEgl,
+            ContextFlags,
+            ContextProfileMAsl,
+            ShareWithCurrentContext,
+            FramebufferSRGBCapable,
+            ContextReleaseBehaviour,
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
+        private static extern int SDL_GL_SetAttribute(Attribute attr, int value);
+
+        public static int SetAttribute(Attribute attr, int value)
+        {
+            return GetError(SDL_GL_SetAttribute(attr, value));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_MakeCurrent", ExactSpelling = true)]
+        private static extern int SDL_GL_MakeCurrent(IntPtr window, IntPtr context);
+
+        public static int MakeCurrent(IntPtr window, IntPtr context)
+        {
+            return GetError(SDL_GL_MakeCurrent(window, context));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SwapWindow", ExactSpelling = true)]
+        public static extern void SwapWindow(IntPtr window);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_CreateContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_CreateContext(IntPtr window);
+
+        public static IntPtr CreateContext(IntPtr window)
+        {
+            return GetError(SDL_GL_CreateContext(window));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetCurrentContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_GetCurrentContext();
+
+        public static IntPtr GetCurrentContext()
+        {
+            return SDL_GL_GetCurrentContext();
         }
     }
 

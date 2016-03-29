@@ -126,14 +126,14 @@ namespace Microsoft.Xna.Framework
             Sdl.Window.Destroy(_handle);
 
             // TODO Need to get this data from the Presentation Parameters
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.RedSize, 8);
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.GreenSize, 8);
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.BlueSize, 8);
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.AlphaSize, 8);
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.DepthSize, 16);
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.DoubleFuffer, 1);
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.ContextMajorVersion, 2);
-            Sdl.SDL_GL_SetAttribute (Sdl.SDL_GLattr.ContextMinorVersion, 1);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.RedSize, 8);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.GreenSize, 8);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.BlueSize, 8);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.AlphaSize, 8);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 16);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleFuffer, 1);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMajorVersion, 2);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMinorVersion, 1);
             
             _handle = Sdl.Window.Create (title,
                 _winx - _width / 2, _winy - _height / 2,

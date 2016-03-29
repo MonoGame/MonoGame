@@ -96,8 +96,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL || ANGLE
 
             // TODO need to wrap this up into an IGraphicsContext maybe...
-            var context = Sdl.CreateContext (Game.Instance.Window.Handle);
-            Sdl.MakeCurrent (Game.Instance.Window.Handle, context);
+            var context = Sdl.GL.CreateContext (Game.Instance.Window.Handle);
+            Sdl.GL.MakeCurrent (Game.Instance.Window.Handle, context);
             /*GraphicsMode mode = GraphicsMode.Default;
             var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
 

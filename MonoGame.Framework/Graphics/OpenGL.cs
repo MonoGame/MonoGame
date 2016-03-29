@@ -1320,6 +1320,14 @@ namespace OpenGL
             }
         }
 
+        public unsafe static void GetInteger (int name, out int value)
+        {
+            fixed (int* ptr = &value)
+            {
+                GetIntegeri_v (name, ptr);
+            }
+        }
+
         public static void TexParameter(TextureTarget target, TextureParameterName name, float value)
         {
             TexParameterFloat(target, name, value);
