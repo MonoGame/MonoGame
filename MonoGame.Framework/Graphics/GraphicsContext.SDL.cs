@@ -10,6 +10,7 @@ namespace OpenGL
     {
         private IntPtr _context;
         private IntPtr _winHandle;
+        private bool _disposed;
 
         public int SwapInterval
         {
@@ -23,26 +24,44 @@ namespace OpenGL
             }
         }
 
+        public bool IsDisposed
+        {
+            get { return _disposed; }
+        }
+
         public GraphicsContext(IWindowInfo info)
         {
+            if (_disposed)
+                return;
+            
             SetWindowHandle(info);
             _context = Sdl.GL.CreateContext(_winHandle);
         }
 
         public void MakeCurrent(IWindowInfo info)
         {
+            if (_disposed)
+                return;
+            
             SetWindowHandle(info);
             Sdl.GL.MakeCurrent(_winHandle, _context);
         }
 
         public void SwapBuffers()
         {
+            if (_disposed)
+                return;
+            
             Sdl.GL.SwapWindow(_winHandle);
         }
 
         public void Dispose()
         {
+            if (_disposed)
+                return;
+            
             Sdl.GL.DeleteContext(_context);
+            _disposed = true;
         }
 
         private void SetWindowHandle(IWindowInfo info)
