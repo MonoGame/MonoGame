@@ -485,6 +485,7 @@
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
+    <Compile Include="Graphics\GraphicsContext.SDL.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDevice.DirectX.cs">
       <Services>DirectXGraphics</Services>
@@ -502,11 +503,13 @@
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Graphics\IGraphicsContext.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\ImageEx.cs">
       <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\IWindowInfo.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\Model.cs" />
@@ -796,8 +799,10 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Graphics\Viewport.cs" />
-
-
+    <Compile Include="Graphics\WindowInfo.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    
     <!-- Microsoft.Xna.Framework.Input -->
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
