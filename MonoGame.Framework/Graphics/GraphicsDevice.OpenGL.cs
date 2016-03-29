@@ -96,7 +96,22 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL || ANGLE
 
             var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
-            Context = GL.CreateContext(windowInfo);
+
+            if (Context == null || Context.IsDisposed)
+            {
+                Context = GL.CreateContext(windowInfo);
+            }
+
+            Context.MakeCurrent(windowInfo);
+            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
+
+            if (Threading.BackgroundContext == null)
+            {
+                Threading.BackgroundContext = GL.CreateContext(windowInfo);
+                Threading.WindowInfo = windowInfo;
+                Threading.BackgroundContext.MakeCurrent(null);
+            }
+
             Context.MakeCurrent(windowInfo);
 
             /*GraphicsMode mode = GraphicsMode.Default;

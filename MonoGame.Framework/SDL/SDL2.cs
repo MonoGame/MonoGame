@@ -389,12 +389,7 @@ internal static class Sdl
         public static extern int GetSwapInterval();
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_MakeCurrent", ExactSpelling = true)]
-        private static extern int SDL_GL_MakeCurrent(IntPtr window, IntPtr context);
-
-        public static int MakeCurrent(IntPtr window, IntPtr context)
-        {
-            return GetError(SDL_GL_MakeCurrent(window, context));
-        }
+        public static extern int MakeCurrent(IntPtr window, IntPtr context);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
         private static extern int SDL_GL_SetAttribute(Attribute attr, int value);
