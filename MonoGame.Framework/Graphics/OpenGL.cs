@@ -580,7 +580,7 @@ namespace OpenGL
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public unsafe delegate void GetIntegerDelegate(int param, [Out] int* data);
         [CLSCompliant (false)]
-        public static GetIntegerDelegate GetIntegeri_v;
+        public static GetIntegerDelegate GetIntegerv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
@@ -1179,7 +1179,7 @@ namespace OpenGL
             EnableVertexAttribArray = (EnableVertexAttribArrayDelegate)LoadEntryPoint<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
             DisableVertexAttribArray = (DisableVertexAttribArrayDelegte)LoadEntryPoint<DisableVertexAttribArrayDelegte>("glDisableVertexAttribArray");
             //MakeCurrent = (MakeCurrentDelegate)LoadEntryPoint<MakeCurrentDelegate>("glMakeCurrent");
-            GetIntegeri_v = (GetIntegerDelegate)LoadEntryPoint<GetIntegerDelegate>("glGetIntegeri_v");
+            GetIntegerv = (GetIntegerDelegate)LoadEntryPoint<GetIntegerDelegate>("glGetIntegerv");
             GetStringInternal = (GetStringDelegate)LoadEntryPoint<GetStringDelegate>("glGetString");
             ClearDepth = (ClearDepthDelegate)LoadEntryPoint<ClearDepthDelegate>("glClearDepth");
             DepthRange = (DepthRangeDelegate)LoadEntryPoint<DepthRangeDelegate>("glDepthRange");
@@ -1316,7 +1316,7 @@ namespace OpenGL
         public unsafe static void GetInteger (GetPName name, out int value)
         {
             fixed (int* ptr = &value) {
-                GetIntegeri_v ((int)name, ptr);
+                GetIntegerv ((int)name, ptr);
             }
         }
 
