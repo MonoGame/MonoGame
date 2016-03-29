@@ -280,7 +280,7 @@ namespace OpenGL
     }
 
     [Flags]
-    public enum ClearBufferMask : int
+    public enum ClearBufferMask
     {
         DepthBufferBit = 0x00000100,
         StencilBufferBit = 0x00000400,
