@@ -115,6 +115,7 @@ namespace MonoGame.Tests.ContentPipeline
             var importer = new TextureImporter();
             var context = new TestImporterContext(intermediateDirectory, outputDirectory);
             var content = importer.Import("Assets/Textures/RGBA16.png", context);
+            ulong expectedPixelValue = 5714832815570484476;
             Assert.NotNull(content);
             Assert.AreEqual(content.Faces.Count, 1);
             Assert.AreEqual(content.Faces[0].Count, 1);
@@ -123,6 +124,7 @@ namespace MonoGame.Tests.ContentPipeline
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
             Assert.AreEqual(SurfaceFormat.Rgba64, format);
+            Assert.AreEqual(expectedPixelValue, ((PixelBitmapContent<Rgba64>)content.Faces[0][0]).GetRow(1)[12].PackedValue);
             // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
             try
             {
@@ -173,7 +175,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.NotNull(content);
             Assert.AreEqual(content.Faces.Count, 1);
             CheckDdsFace(content, 0);
-            
+
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
             Assert.AreEqual(format, SurfaceFormat.Dxt3);
