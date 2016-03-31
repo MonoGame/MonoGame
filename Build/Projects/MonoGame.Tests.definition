@@ -108,6 +108,7 @@
 	<Compile Include="Framework\RectangleTest.cs" />
 	<Compile Include="Framework\SpriteFontNonVisualTest.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Framework\TitleContainerTest.cs" />
 	<Compile Include="Framework\Texture2DNonVisualTest.cs" />
     <Compile Include="Framework\TouchCollectionTest.cs" />
     <Compile Include="Framework\TouchLocationTest.cs" />
