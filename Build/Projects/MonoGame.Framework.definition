@@ -539,6 +539,15 @@
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
+	<Compile Include="Graphics\RenderTargetCube.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />

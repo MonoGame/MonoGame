@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -18,7 +18,7 @@ using OpenTK.Graphics.ES20;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public partial class RenderTarget2D
+    public partial class RenderTargetCube
     {
         int IRenderTarget.GLTexture
         {
@@ -36,22 +36,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         TextureTarget IRenderTarget.GetFramebufferTarget(RenderTargetBinding renderTargetBinding)
         {
-            return glTarget;
+            return TextureTarget.TextureCubeMapPositiveX + renderTargetBinding.ArraySlice;
         }
 
-        private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
-            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
+        private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
             Threading.BlockOnUIThread(() =>
             {
-                graphicsDevice.PlatformCreateRenderTarget(this, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
+                graphicsDevice.PlatformCreateRenderTarget(this, size, size, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
             });
-            
-            
-        }
-
-        private void PlatformGraphicsDeviceResetting()
-        {
         }
 
         protected override void Dispose(bool disposing)
