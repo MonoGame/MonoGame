@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Resize and recreate the missing indices for the index and vertex position color buffers.
         /// </summary>
         /// <param name="numBatchItems"></param>
-        private void EnsureArrayCapacity(int numBatchItems)
+        private unsafe void EnsureArrayCapacity(int numBatchItems)
         {
             int neededCapacity = 6 * numBatchItems;
             if (_index != null && neededCapacity <= _index.Length)
@@ -145,26 +145,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index.CopyTo(newIndex, 0);
                 start = _index.Length / 6;
             }
-            for (var i = start; i < numBatchItems; i++)
+            fixed (short* indexFixedPtr = newIndex)
             {
-                /*
-                 *  TL    TR
-                 *   0----1 0,1,2,3 = index offsets for vertex indices
-                 *   |   /| TL,TR,BL,BR are vertex references in SpriteBatchItem.
-                 *   |  / |
-                 *   | /  |
-                 *   |/   |
-                 *   2----3
-                 *  BL    BR
-                 */
-                // Triangle 1
-                newIndex[i * 6 + 0] = (short)(i * 4);
-                newIndex[i * 6 + 1] = (short)(i * 4 + 1);
-                newIndex[i * 6 + 2] = (short)(i * 4 + 2);
-                // Triangle 2
-                newIndex[i * 6 + 3] = (short)(i * 4 + 1);
-                newIndex[i * 6 + 4] = (short)(i * 4 + 3);
-                newIndex[i * 6 + 5] = (short)(i * 4 + 2);
+                var indexPtr = indexFixedPtr + (start * 6);
+                for (var i = start; i < numBatchItems; i++, indexPtr += 6)
+                {
+                    /*
+                     *  TL    TR
+                     *   0----1 0,1,2,3 = index offsets for vertex indices
+                     *   |   /| TL,TR,BL,BR are vertex references in SpriteBatchItem.
+                     *   |  / |
+                     *   | /  |
+                     *   |/   |
+                     *   2----3
+                     *  BL    BR
+                     */
+                    // Triangle 1
+                    *(indexPtr + 0) = (short)(i * 4);
+                    *(indexPtr + 1) = (short)(i * 4 + 1);
+                    *(indexPtr + 2) = (short)(i * 4 + 2);
+                    // Triangle 2
+                    *(indexPtr + 3) = (short)(i * 4 + 1);
+                    *(indexPtr + 4) = (short)(i * 4 + 3);
+                    *(indexPtr + 5) = (short)(i * 4 + 2);
+                }
             }
             _index = newIndex;
 
