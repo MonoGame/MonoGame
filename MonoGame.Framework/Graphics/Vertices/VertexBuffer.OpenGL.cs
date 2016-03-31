@@ -157,8 +157,21 @@ namespace Microsoft.Xna.Framework.Graphics
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
 
-            GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
-            GraphicsExtensions.CheckGLError();
+            int dataSize = Marshal.SizeOf(typeof(T));
+            if (dataSize == vertexStride)
+            {
+                GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr) offsetInBytes, (IntPtr) sizeInBytes, dataPtr);
+                GraphicsExtensions.CheckGLError();
+            }
+            else
+            {
+                for (int i = 0; i < elementCount; i++)
+                {
+                    GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes + i * vertexStride, (IntPtr)dataSize, dataPtr);
+                    GraphicsExtensions.CheckGLError();
+                    dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
+                }
+            }
 
             dataHandle.Free();
         }
