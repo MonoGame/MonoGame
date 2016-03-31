@@ -27,7 +27,8 @@ namespace System.Drawing
             }
             else
             {
-                newBmp = bmp;
+                // Need to clone so the call to Clear() below doesn't clear the source before trying to draw it to the target.
+                newBmp = (Image)bmp.Clone();
             }
         
             try

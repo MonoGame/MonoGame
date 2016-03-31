@@ -53,6 +53,7 @@
     <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
+    <Compile Include="Common\PipelineController.FileWatcher.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
     <Compile Include="Common\PipelineController.UpdateContentItemAction.cs" />
     <Compile Include="Common\PipelineController.UpdateProjectAction.cs" />

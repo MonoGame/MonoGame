@@ -136,6 +136,7 @@
       <!-- Covers compatible GL implementations, such as ANGLE and OpenGL -->
     </Service>
     <Service Name="_XNADesignProvided">
+      <AddDefine>XNADESIGNPROVIDED</AddDefine>
       <!-- Allows the Microsoft.Xna.Framework.Design framework to be present -->
     </Service>
     <Service Name="_FrameworkDispatcherProvided">
@@ -226,7 +227,6 @@
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="NamespaceDocs.cs" />
-    <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneIntersectionType.cs" />
     <Compile Include="PlayerIndex.cs" />
@@ -552,6 +552,15 @@
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
+	<Compile Include="Graphics\RenderTargetCube.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
@@ -738,7 +747,6 @@
     <Compile Include="Graphics\Vertices\VertexBufferBindings.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
@@ -757,7 +765,7 @@
     <Compile Include="Graphics\Vertices\VertexInputLayout.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPosition.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
