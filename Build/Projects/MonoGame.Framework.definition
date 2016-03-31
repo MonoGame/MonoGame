@@ -136,6 +136,7 @@
       <!-- Covers compatible GL implementations, such as ANGLE and OpenGL -->
     </Service>
     <Service Name="_XNADesignProvided">
+      <AddDefine>XNADESIGNPROVIDED</AddDefine>
       <!-- Allows the Microsoft.Xna.Framework.Design framework to be present -->
     </Service>
     <Service Name="_FrameworkDispatcherProvided">
