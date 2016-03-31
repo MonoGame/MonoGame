@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
         OutputParser outputParser;
 
         Uri folderUri;
+        bool textScroll, treeScroll;
 
         public BuildOutput()
         {
@@ -47,8 +48,6 @@ namespace MonoGame.Tools.Pipeline
             listStore = new TreeStore (typeof (Gdk.Pixbuf), typeof (string), typeof (string));
 
             treeview1.Model = listStore;
-
-            textView1.SizeAllocated += TextView1_SizeAllocated;
         }
 
         internal void SetBaseFolder(IController controller)
@@ -61,16 +60,37 @@ namespace MonoGame.Tools.Pipeline
             outputParser.Reset();
         }
 
+        private void Treeview1_SizeAllocated (object o, SizeAllocatedArgs args)
+        {
+            if (treeScroll)
+            {
+                var path = new TreePath((treeview1.Model.IterNChildren() - 1).ToString());
+                treeview1.ScrollToCell(path, null, false, 0, 0);
+            }
+        }
+
         private void TextView1_SizeAllocated (object o, SizeAllocatedArgs args)
         {
-            textView1.ScrollToIter(textView1.Buffer.EndIter, 0, false, 0, 0);
+            if (textScroll)
+                textView1.ScrollToIter(textView1.Buffer.EndIter, 0, false, 0, 0);
+        }
+
+        private void Treeview1_ScrollEvent (object o, ScrollEventArgs args)
+        {
+            treeScroll = false;
+        }
+
+        private void TextView1_ScrollEvent (object o, ScrollEventArgs args)
+        {
+            textScroll = false;
         }
 
         public void OutputAppend(string text)
         {
             lock (textView1.Buffer)
             {
-                textView1.Buffer.Text += text + "\r\n";
+                var iter = textView1.Buffer.EndIter;
+                textView1.Buffer.Insert(ref iter, text + Environment.NewLine);
             }
 
             if (string.IsNullOrWhiteSpace(text))
@@ -141,6 +161,8 @@ namespace MonoGame.Tools.Pipeline
                 textView1.Buffer.Text = "";
             }
 
+            textScroll = true;
+            treeScroll = true;
             listStore.Clear();
         }
     }

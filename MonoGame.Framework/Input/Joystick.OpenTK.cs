@@ -26,6 +26,7 @@ namespace Microsoft.Xna.Framework.Input
             return new JoystickCapabilities 
             {
                 IsConnected = true,
+                Id = OpenTK.Input.Joystick.GetGuid(index).ToString(),
                 AxisCount = cap.AxisCount,
                 ButtonCount = cap.ButtonCount,
                 HatCount = cap.HatCount

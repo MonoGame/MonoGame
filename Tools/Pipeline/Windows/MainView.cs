@@ -23,6 +23,7 @@ namespace MonoGame.Tools.Pipeline
 
         public static IController _controller;
         private ContentIcons _treeIcons;
+        private List<ContentItemState> _oldValues = new List<ContentItemState>();
 
         private bool _treeUpdating;
         private bool _treeSort;
@@ -160,27 +161,22 @@ namespace MonoGame.Tools.Pipeline
             if (args.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
 
-            // TODO: This is the multi-select case which needs to be handled somehow to support undo.
-            if (args.OldValue == null)
-                return;
+            var obj = _propertyGrid.SelectedObject as PipelineProjectProxy;
 
-            var obj = _propertyGrid.SelectedObject;
-
-            if (obj is ContentItem)
+            if (obj != null)
             {
-                var item = obj as ContentItem;
-                var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
-                _controller.AddAction(action);                
-                _controller.OnProjectModified();
-            }
-            else
-            {
-                var item = (PipelineProject)_controller.GetItem((obj as PipelineProjectProxy).OriginalPath);
+                var item = (PipelineProject)_controller.GetItem(obj.OriginalPath);
                 var action = new UpdateProjectAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
                 _controller.AddAction(action);
 
                 _controller.OnProjectModified();
-            }                
+            }
+            else
+            {
+                var action = new UpdateContentItemAction(this, _controller, _oldValues);
+                _controller.AddAction(action);                
+                _controller.OnProjectModified();
+            }
         }
 
         private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -340,6 +336,11 @@ namespace MonoGame.Tools.Pipeline
         public void ShowMessage(string message)
         {
             MessageBox.Show(this, message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public bool ShowDeleteDialog(string[] items)
+        {
+            throw new NotImplementedException();
         }
 
         public void BeginTreeUpdate()
@@ -666,9 +667,16 @@ namespace MonoGame.Tools.Pipeline
             _controller.Selection.Clear(this);
             _propertyGrid.SelectedObject = null;
 
+            _oldValues.Clear();
+
             foreach (var node in _treeView.SelectedNodes)
             {
-                _controller.Selection.Add(node.Tag as IProjectItem, this);
+                var item = node.Tag as IProjectItem;
+
+                if (item is ContentItem)
+                    _oldValues.Add(ContentItemState.Get(item as ContentItem));
+
+                _controller.Selection.Add(item, this);
             }
 
             _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
@@ -824,7 +832,7 @@ namespace MonoGame.Tools.Pipeline
                     dirs.Add(node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1));
             }
 
-            _controller.Exclude(items, dirs);      
+            _controller.Exclude(items, dirs, false);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -855,6 +863,8 @@ namespace MonoGame.Tools.Pipeline
 
                 // Ensure name is unique among files at this location?
                 _controller.NewItem(dlg.NameGiven, location, template);
+
+                UpdateMenus();
             }
         }
 

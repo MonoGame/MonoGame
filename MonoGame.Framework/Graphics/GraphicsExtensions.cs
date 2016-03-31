@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 2;
 
                 case VertexElementFormat.Short4:
-                    return 2;
+                    return 4;
 
                 case VertexElementFormat.NormalizedShort2:
                     return 2;

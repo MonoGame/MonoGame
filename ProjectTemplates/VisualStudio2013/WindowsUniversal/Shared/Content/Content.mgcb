@@ -1,8 +1,8 @@
 
 #----------------------------- Global Properties ----------------------------#
 
-/outputDir:bin/WindowsPhone8
-/intermediateDir:obj/WindowsPhone8
+/outputDir:bin/$(Platform)
+/intermediateDir:obj/$(Platform)
 /platform:WindowsPhone8
 /config:
 /profile:Reach
