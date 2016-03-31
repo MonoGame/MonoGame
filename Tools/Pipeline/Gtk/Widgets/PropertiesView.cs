@@ -99,7 +99,7 @@ namespace MonoGame.Tools.Pipeline
                         PropertyGridTable.EntryType.List ,(s,e) => { 
                             var lines = new List<string>();
 
-                            lines.AddRange(((string)((FalseWidget)s).newvalue).Replace("\r\n", "~").Split('~'));
+                        lines.AddRange(((string)((FalseWidget)s).newvalue).Split(System.IO.Path.PathSeparator));
 
                             foreach (object o in currentObjects) 
                                 p.SetValue(o, lines, null);
