@@ -258,7 +258,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
-            ((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
+            //((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
 
 #elif DESKTOPGL
             ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
