@@ -55,8 +55,10 @@ namespace Microsoft.Xna.Framework
 
 
         private bool _suppressDraw;
+
+        public Game() : this(new DefaultPlatformProvider()) { }
         
-        public Game()
+        public Game(IPlatformProvider platformProvider)
         {
             _instance = this;
 
@@ -65,7 +67,7 @@ namespace Microsoft.Xna.Framework
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
 
-            Platform = GamePlatform.PlatformCreate(this);
+            Platform = platformProvider.CreatePlatform(this);
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
