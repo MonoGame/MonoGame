@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework
         private bool _init, _disposed;
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible;
         private string _screenDeviceName;
-        private Sdl.Rectangle _display;
+        private int _winx, _winy;
 
         public SdlGameWindow(Game game)
         {
@@ -92,10 +92,18 @@ namespace Microsoft.Xna.Framework
 
             Instance = this;
 
-            _display = GetMouseDisplay();
+            _winx = Sdl.Window.PosUndefined;
+            _winy = Sdl.Window.PosUndefined;
+
+            if (Sdl.Patch >= 4)
+            {
+                var display = GetMouseDisplay();
+                _winx = display.X + display.Width / 2;
+                _winy = display.Y + display.Height / 2;
+            }
 
             // We need a dummy handle for GraphicDevice until our window gets created
-            _handle = Sdl.Window.Create("", _display.X + _display.Width/4, _display.Y + _display.Height/4,
+            _handle = Sdl.Window.Create("", _winx, _winy,
                 GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight,
                 Sdl.Window.State.Hidden);
         }
@@ -119,9 +127,8 @@ namespace Microsoft.Xna.Framework
                 initflags |= Sdl.Window.State.Boderless;
 
             Sdl.Window.Destroy(_handle);
-            _handle = Sdl.Window.Create(title,
-                _display.X + _display.Width/2 - width/2,
-                _display.Y + _display.Height/2 - height/2,
+            _handle = Sdl.Window.Create (title,
+                _winx - width / 2, _winy - height / 2,
                 width, height, initflags);
 
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
@@ -135,10 +142,14 @@ namespace Microsoft.Xna.Framework
                 if (stream != null)
                     using (var br = new BinaryReader(stream))
                     {
-                        var src = Sdl.RwFromMem(br.ReadBytes((int) stream.Length), (int) stream.Length);
-                        var icon = Sdl.LoadBMP_RW(src, 1);
-                        Sdl.Window.SetIcon(_handle, icon);
-                        Sdl.FreeSurface(icon);
+                        try
+                        {
+                            var src = Sdl.RwFromMem(br.ReadBytes((int)stream.Length), (int)stream.Length);
+                            var icon = Sdl.LoadBMP_RW(src, 1);
+                            Sdl.Window.SetIcon(_handle, icon);
+                            Sdl.FreeSurface(icon);
+                        }
+                        catch { }
                     }
             }
 

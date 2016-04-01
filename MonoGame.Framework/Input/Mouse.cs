@@ -94,7 +94,9 @@ namespace Microsoft.Xna.Framework.Input
             int x, y;
 
             var winFlags = Sdl.Window.GetWindowFlags(window.Handle);
-            var state = Sdl.Mouse.GetGlobalState (out x, out y);
+            var state = (Sdl.Patch > 4) ? // SDL 2.0.4 has a bug with Global Mouse
+                    Sdl.Mouse.GetGlobalState(out x, out y) :
+                    Sdl.Mouse.GetState(out x, out y);
             var clientBounds = window.ClientBounds;
 
             if (clientBounds.Contains(x, y) && winFlags.HasFlag(Sdl.Window.State.MouseFocus))
@@ -108,8 +110,8 @@ namespace Microsoft.Xna.Framework.Input
                 window.MouseState.ScrollWheelValue = ScrollY;
             }
 
-            window.MouseState.X = x - clientBounds.X;
-            window.MouseState.Y = y - clientBounds.Y;
+            window.MouseState.X = x - ((Sdl.Patch > 4) ? clientBounds.X : 0);
+            window.MouseState.Y = y - ((Sdl.Patch > 4) ? clientBounds.Y : 0);
 #endif
 
             return window.MouseState;

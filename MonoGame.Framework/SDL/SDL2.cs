@@ -10,6 +10,10 @@ internal static class Sdl
 {
     private const string NativeLibName = "SDL2.dll";
 
+    public static int Major;
+    public static int Minor;
+    public static int Patch;
+
     private static unsafe string GetString(IntPtr handle)
     {
         if (handle == IntPtr.Zero)
@@ -149,6 +153,7 @@ internal static class Sdl
 
     public static class Window
     {
+        public const int PosUndefined = 0x1FFF0000;
         public const int PosCentered = 0x2FFF0000;
 
         public enum EventId : byte

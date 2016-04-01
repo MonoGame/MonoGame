@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
@@ -33,10 +34,15 @@ namespace Microsoft.Xna.Framework
 
             Sdl.Version sversion;
             Sdl.GetVersion(out sversion);
-            var version = 100*sversion.Major + 10*sversion.Minor + sversion.Patch;
 
-            if (version < 204)
-                throw new Exception("SDL 2.0.4 or higher is needed.");
+            Sdl.Major = sversion.Major;
+            Sdl.Minor = sversion.Minor;
+            Sdl.Patch = sversion.Patch;
+
+            var version = 100 * Sdl.Major + 10 * Sdl.Minor + Sdl.Patch;
+
+            if (version <= 204)
+                Debug.WriteLine ("Please use SDL 2.0.5 or higher.");
 
             Sdl.Init((int) (
                 Sdl.InitFlags.Video |
