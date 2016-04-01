@@ -160,6 +160,7 @@ namespace MonoGame.Tools.Pipeline
                                     var fwidget = new FalseWidget(dialog.text);
                                     eitems[i].eventHandler(fwidget, EventArgs.Empty);
                                     model.SetValue(iter, 14, dialog.text);
+                                    model.SetValue(iter, 12, GetCollectionText(dialog.text));
                                     break;
                                 }
                             }
@@ -216,7 +217,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                     else
                     {
-                        #if LINUX
+                        #if GTK3
                         Gdk.RGBA rgba = new Gdk.RGBA();
 
                         try
@@ -319,43 +320,26 @@ namespace MonoGame.Tools.Pipeline
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new FileChooserDialog("Add Content Folder",
-                        window,
-                        FileChooserAction.SelectFolder,
-                        "Cancel", ResponseType.Cancel,
-                        "Open", ResponseType.Accept);
-                    dialog.SetCurrentFolder (window._controller.GetFullPath(model.GetValue(iter, 17).ToString()));
-
-                    int responseid = dialog.Run();
-                    string fileName = dialog.Filename;
+                    var dialog = new CustomFolderDialog(window, model.GetValue(iter, 17).ToString());
+                    var responseid = dialog.Run();
+                    var fileName = dialog.FileName;
                     dialog.Destroy();
 
-                    if(responseid == (int)ResponseType.Accept)
+                    if(responseid != (int)ResponseType.Ok)
+                        return;
+
+                    int id = Convert.ToInt32(model.GetValue(iter, 11));
+
+                    for(int i = 0;i < eitems.Count;i++)
                     {
-                        int id = Convert.ToInt32(model.GetValue(iter, 11));
+                        if(eitems[i].id != id || eitems[i].eventHandler == null)
+                            continue;
 
-                        for(int i = 0;i < eitems.Count;i++)
-                        {
-                            if(eitems[i].id == id)
-                            {
-                                if(eitems[i].eventHandler != null)
-                                {
-                                    string pl = ((PipelineController)window._controller).ProjectLocation;
-                                    if (!pl.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-                                        pl += System.IO.Path.DirectorySeparatorChar;
+                        var fwidget = new FalseWidget(fileName);
+                        eitems[i].eventHandler(fwidget, EventArgs.Empty);
+                        model.SetValue(iter, 17, fileName);
 
-                                    Uri folderUri = new Uri(pl);
-                                    Uri pathUri = new Uri(fileName);
-
-                                    string newpath = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
-
-                                    var fwidget = new FalseWidget(newpath);
-                                    eitems[i].eventHandler(fwidget, EventArgs.Empty);
-                                    model.SetValue(iter, 17, newpath);
-                                    break;
-                                }
-                            }
-                        }
+                        break;
                     }
                 }
             };
@@ -387,6 +371,16 @@ namespace MonoGame.Tools.Pipeline
             treeview1.Model = listStore;
         }
 
+        private string GetCollectionText(string data)
+        {
+            var ret = data.Split(Environment.NewLine[0]);
+
+            for (int i = 0; i < ret.Length; i++)
+                ret[i] = System.IO.Path.GetFileName(ret[i]);
+
+            return string.Join(Environment.NewLine, ret);
+        }
+
         TreeIter AddGroup(string name)
         {
             return listStore.AppendValues (name, true, "", false, "", false, false, null, "", false, false, "", "", false, "", "", false, "", false);
@@ -402,8 +396,8 @@ namespace MonoGame.Tools.Pipeline
         TreeIter AddPropertyCollectionBox(TreeIter iter, string id, string name, string data)
         {
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false) : 
-                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false);
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, GetCollectionText(data), true, data, "", false, "", false) : 
+                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, GetCollectionText(data), true, data, "", false, "", false);
         }
 
         TreeIter AddPropertyColorBox(TreeIter iter, string id, string name, string color)
@@ -573,7 +567,7 @@ namespace MonoGame.Tools.Pipeline
                 {
                     text = values[0];
                     for (int i = 1; i < values.Count; i++)
-                        text += "\r\n" + values[i];
+                        text += Environment.NewLine + values[i];
                 }
 
                 return AddPropertyCollectionBox(iter, eitem.id.ToString(), item.label, text);

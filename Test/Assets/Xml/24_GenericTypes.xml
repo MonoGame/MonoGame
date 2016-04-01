@@ -7,5 +7,10 @@
     <B>
       <Value>4.2</Value>
     </B>
+    <C>
+      <Value>
+        <Value>5</Value>
+      </Value>
+    </C>
   </Asset>
 </XnaContent>

@@ -4,55 +4,73 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
-
+    /// <summary>
+    /// Describes a sphere in 3D-space for bounding operations.
+    /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingSphere : IEquatable<BoundingSphere>
     {
         #region Public Fields
 
+        /// <summary>
+        /// The sphere center.
+        /// </summary>
         [DataMember]
         public Vector3 Center;
 
+        /// <summary>
+        /// The sphere radius.
+        /// </summary>
         [DataMember]
         public float Radius;
 
-        #endregion Public Fields
+        #endregion
 
+        #region Internal Properties
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    "Center( ", this.Center.DebugDisplayString, " )  \r\n",
+                    "Radius( ", this.Radius.ToString(), " )"
+                    );
+            }
+        }
+
+        #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// Constructs a bounding sphere with the specified center and radius.  
+        /// </summary>
+        /// <param name="center">The sphere center.</param>
+        /// <param name="radius">The sphere radius.</param>
         public BoundingSphere(Vector3 center, float radius)
         {
             this.Center = center;
             this.Radius = radius;
         }
 
-        #endregion Constructors
-
+        #endregion
 
         #region Public Methods
 
-        public BoundingSphere Transform(Matrix matrix)
-        {
-            BoundingSphere sphere = new BoundingSphere();
-            sphere.Center = Vector3.Transform(this.Center, matrix);
-            sphere.Radius = this.Radius * ((float)Math.Sqrt((double)Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13), Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23), ((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))));
-            return sphere;
-        }
+        #region Contains
 
-        public void Transform(ref Matrix matrix, out BoundingSphere result)
-        {
-            result.Center = Vector3.Transform(this.Center, matrix);
-            result.Radius = this.Radius * ((float)Math.Sqrt((double)Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13), Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23), ((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))));
-        }
-
+        /// <summary>
+        /// Test if a bounding box is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="box">The box for testing.</param>
+        /// <returns>The containment type.</returns>
         public ContainmentType Contains(BoundingBox box)
         {
             //check if all corner is in sphere
@@ -97,11 +115,21 @@ namespace Microsoft.Xna.Framework
             return ContainmentType.Disjoint;
         }
 
+        /// <summary>
+        /// Test if a bounding box is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="box">The box for testing.</param>
+        /// <param name="result">The containment type as an output parameter.</param>
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
             result = this.Contains(box);
         }
 
+        /// <summary>
+        /// Test if a frustum is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="frustum">The frustum for testing.</param>
+        /// <returns>The containment type.</returns>
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             //check if all corner is in sphere
@@ -130,6 +158,21 @@ namespace Microsoft.Xna.Framework
             return ContainmentType.Disjoint;
         }
 
+        /// <summary>
+        /// Test if a frustum is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="frustum">The frustum for testing.</param>
+        /// <param name="result">The containment type as an output parameter.</param>
+        public void Contains(ref BoundingFrustum frustum,out ContainmentType result)
+        {
+            result = this.Contains(frustum);
+        }
+
+        /// <summary>
+        /// Test if a sphere is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="sphere">The other sphere for testing.</param>
+        /// <returns>The containment type.</returns>
         public ContainmentType Contains(BoundingSphere sphere)
         {
             ContainmentType result;
@@ -137,6 +180,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Test if a sphere is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="sphere">The other sphere for testing.</param>
+        /// <param name="result">The containment type as an output parameter.</param>
         public void Contains(ref BoundingSphere sphere, out ContainmentType result)
         {
             float sqDistance;
@@ -152,6 +200,11 @@ namespace Microsoft.Xna.Framework
                 result = ContainmentType.Intersects;
         }
 
+        /// <summary>
+        /// Test if a point is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="point">The vector in 3D-space for testing.</param>
+        /// <returns>The containment type.</returns>
         public ContainmentType Contains(Vector3 point)
         {
             ContainmentType result;
@@ -159,6 +212,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Test if a point is fully inside, outside, or just intersecting the sphere.
+        /// </summary>
+        /// <param name="point">The vector in 3D-space for testing.</param>
+        /// <param name="result">The containment type as an output parameter.</param>
         public void Contains(ref Vector3 point, out ContainmentType result)
         {
             float sqRadius = Radius * Radius;
@@ -175,6 +233,15 @@ namespace Microsoft.Xna.Framework
                 result = ContainmentType.Intersects;
         }
 
+        #endregion
+
+        #region CreateFromBoundingBox
+
+        /// <summary>
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain a specified <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="box">The box to create the sphere from.</param>
+        /// <returns>The new <see cref="BoundingSphere"/>.</returns>
         public static BoundingSphere CreateFromBoundingBox(BoundingBox box)
         {
             BoundingSphere result;
@@ -182,6 +249,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain a specified <see cref="BoundingBox"/>.
+        /// </summary>
+        /// <param name="box">The box to create the sphere from.</param>
+        /// <param name="result">The new <see cref="BoundingSphere"/> as an output parameter.</param>
         public static void CreateFromBoundingBox(ref BoundingBox box, out BoundingSphere result)
         {
             // Find the center of the box.
@@ -195,11 +267,23 @@ namespace Microsoft.Xna.Framework
             result = new BoundingSphere(center, radius);
         }
 
+        #endregion
+
+        /// <summary>
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain a specified <see cref="BoundingFrustum"/>.
+        /// </summary>
+        /// <param name="frustum">The frustum to create the sphere from.</param>
+        /// <returns>The new <see cref="BoundingSphere"/>.</returns>
         public static BoundingSphere CreateFromFrustum(BoundingFrustum frustum)
         {
-            return BoundingSphere.CreateFromPoints(frustum.GetCorners());
+            return CreateFromPoints(frustum.GetCorners());
         }
 
+        /// <summary>
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain a specified list of points in 3D-space. 
+        /// </summary>
+        /// <param name="points">List of point to create the sphere from.</param>
+        /// <returns>The new <see cref="BoundingSphere"/>.</returns>
         public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
         {
             if (points == null )
@@ -281,6 +365,12 @@ namespace Microsoft.Xna.Framework
             return new BoundingSphere(center, radius);
         }
 
+        /// <summary>
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain two spheres.
+        /// </summary>
+        /// <param name="original">First sphere.</param>
+        /// <param name="additional">Second sphere.</param>
+        /// <returns>The new <see cref="BoundingSphere"/>.</returns>
         public static BoundingSphere CreateMerged(BoundingSphere original, BoundingSphere additional)
         {
             BoundingSphere result;
@@ -288,6 +378,12 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Creates the smallest <see cref="BoundingSphere"/> that can contain two spheres.
+        /// </summary>
+        /// <param name="original">First sphere.</param>
+        /// <param name="additional">Second sphere.</param>
+        /// <param name="result">The new <see cref="BoundingSphere"/> as an output parameter.</param>
         public static void CreateMerged(ref BoundingSphere original, ref BoundingSphere additional, out BoundingSphere result)
         {
             Vector3 ocenterToaCenter = Vector3.Subtract(additional.Center, original.Center);
@@ -315,11 +411,21 @@ namespace Microsoft.Xna.Framework
             result.Radius = (leftRadius + Rightradius) / 2;
         }
 
+        /// <summary>
+        /// Compares whether current instance is equal to specified <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="BoundingSphere"/> to compare.</param>
+        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(BoundingSphere other)
         {
             return this.Center == other.Center && this.Radius == other.Radius;
         }
 
+        /// <summary>
+        /// Compares whether current instance is equal to specified <see cref="Object"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="Object"/> to compare.</param>
+        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
             if (obj is BoundingSphere)
@@ -328,22 +434,40 @@ namespace Microsoft.Xna.Framework
             return false;
         }
 
+        /// <summary>
+        /// Gets the hash code of this <see cref="BoundingSphere"/>.
+        /// </summary>
+        /// <returns>Hash code of this <see cref="BoundingSphere"/>.</returns>
         public override int GetHashCode()
         {
             return this.Center.GetHashCode() + this.Radius.GetHashCode();
         }
 
+        #region Intersects
+
+        /// <summary>
+        /// Gets whether or not a specified <see cref="BoundingBox"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="box">The box for testing.</param>
+        /// <returns><c>true</c> if <see cref="BoundingBox"/> intersects with this sphere; <c>false</c> otherwise.</returns>
         public bool Intersects(BoundingBox box)
         {
 			return box.Intersects(this);
         }
 
+        /// <summary>
+        /// Gets whether or not a specified <see cref="BoundingBox"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="box">The box for testing.</param>
+        /// <param name="result"><c>true</c> if <see cref="BoundingBox"/> intersects with this sphere; <c>false</c> otherwise. As an output parameter.</param>
         public void Intersects(ref BoundingBox box, out bool result)
         {
             box.Intersects(ref this, out result);
         }
 
         /*
+        TODO : Make the public bool Intersects(BoundingFrustum frustum) overload
+
         public bool Intersects(BoundingFrustum frustum)
         {
             if (frustum == null)
@@ -351,8 +475,14 @@ namespace Microsoft.Xna.Framework
 
             throw new NotImplementedException();
         }
+
         */
 
+        /// <summary>
+        /// Gets whether or not the other <see cref="BoundingSphere"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="sphere">The other sphere for testing.</param>
+        /// <returns><c>true</c> if other <see cref="BoundingSphere"/> intersects with this sphere; <c>false</c> otherwise.</returns>
         public bool Intersects(BoundingSphere sphere)
         {
             bool result;
@@ -360,6 +490,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Gets whether or not the other <see cref="BoundingSphere"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="sphere">The other sphere for testing.</param>
+        /// <param name="result"><c>true</c> if other <see cref="BoundingSphere"/> intersects with this sphere; <c>false</c> otherwise. As an output parameter.</param>
         public void Intersects(ref BoundingSphere sphere, out bool result)
         {
             float sqDistance;
@@ -371,6 +506,11 @@ namespace Microsoft.Xna.Framework
                 result = true;
         }
 
+        /// <summary>
+        /// Gets whether or not a specified <see cref="Plane"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="plane">The plane for testing.</param>
+        /// <returns>Type of intersection.</returns>
         public PlaneIntersectionType Intersects(Plane plane)
         {
             var result = default(PlaneIntersectionType);
@@ -379,6 +519,11 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
+        /// <summary>
+        /// Gets whether or not a specified <see cref="Plane"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="plane">The plane for testing.</param>
+        /// <param name="result">Type of intersection as an output parameter.</param>
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
             var distance = default(float);
@@ -393,42 +538,92 @@ namespace Microsoft.Xna.Framework
                 result = PlaneIntersectionType.Intersecting;
         }
 
-        public Nullable<float> Intersects(Ray ray)
+        /// <summary>
+        /// Gets whether or not a specified <see cref="Ray"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="ray">The ray for testing.</param>
+        /// <returns>Distance of ray intersection or <c>null</c> if there is no intersection.</returns>
+        public float? Intersects(Ray ray)
         {
             return ray.Intersects(this);
         }
 
-        public void Intersects(ref Ray ray, out Nullable<float> result)
+        /// <summary>
+        /// Gets whether or not a specified <see cref="Ray"/> intersects with this sphere.
+        /// </summary>
+        /// <param name="ray">The ray for testing.</param>
+        /// <param name="result">Distance of ray intersection or <c>null</c> if there is no intersection as an output parameter.</param>
+        public void Intersects(ref Ray ray, out float? result)
         {
             ray.Intersects(ref this, out result);
         }
 
+        #endregion
+
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="BoundingSphere"/> in the format:
+        /// {Center:[<see cref="Center"/>] Radius:[<see cref="Radius"/>]}
+        /// </summary>
+        /// <returns>A <see cref="String"/> representation of this <see cref="BoundingSphere"/>.</returns>
+        public override string ToString()
+        {
+            return "{Center:" + this.Center + " Radius:" + this.Radius + "}";
+        }
+
+        #region Transform
+
+        /// <summary>
+        /// Creates a new <see cref="BoundingSphere"/> that contains a transformation of translation and scale from this sphere by the specified <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <returns>Transformed <see cref="BoundingSphere"/>.</returns>
+        public BoundingSphere Transform(Matrix matrix)
+        {
+            BoundingSphere sphere = new BoundingSphere();
+            sphere.Center = Vector3.Transform(this.Center, matrix);
+            sphere.Radius = this.Radius * ((float)Math.Sqrt((double)Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13), Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23), ((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))));
+            return sphere;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="BoundingSphere"/> that contains a transformation of translation and scale from this sphere by the specified <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="result">Transformed <see cref="BoundingSphere"/> as an output parameter.</param>
+        public void Transform(ref Matrix matrix, out BoundingSphere result)
+        {
+            result.Center = Vector3.Transform(this.Center, matrix);
+            result.Radius = this.Radius * ((float)Math.Sqrt((double)Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13), Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23), ((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))));
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Compares whether two <see cref="BoundingSphere"/> instances are equal.
+        /// </summary>
+        /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the equal sign.</param>
+        /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the equal sign.</param>
+        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public static bool operator == (BoundingSphere a, BoundingSphere b)
         {
             return a.Equals(b);
         }
 
+        /// <summary>
+        /// Compares whether two <see cref="BoundingSphere"/> instances are not equal.
+        /// </summary>
+        /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the not equal sign.</param>
+        /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the not equal sign.</param>
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator != (BoundingSphere a, BoundingSphere b)
         {
             return !a.Equals(b);
         }
 
-        internal string DebugDisplayString
-        {
-            get
-            {
-                return string.Concat(
-                    "Pos( ", this.Center.DebugDisplayString, " )  \r\n",
-                    "Radius( ", this.Radius.ToString(), " )"
-                    );
-            }
-        }
-
-        public override string ToString()
-        {
-            return "{{Center:" + this.Center.ToString() + " Radius:" + this.Radius.ToString() + "}}";
-        }
-
-        #endregion Public Methods
+        #endregion
     }
 }

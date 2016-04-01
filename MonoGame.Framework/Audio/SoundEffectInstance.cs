@@ -145,10 +145,10 @@ namespace Microsoft.Xna.Framework.Audio
             // if we're resuming from a paused state.
             if (State != SoundState.Paused)
             {
-                SoundEffectInstancePool.Remove(this);
-
                 if (!SoundEffectInstancePool.SoundsAvailable)
                     throw new InstancePlayLimitException();
+
+                SoundEffectInstancePool.Remove(this);
             }
             
             // For non-XAct sounds we need to be sure the latest

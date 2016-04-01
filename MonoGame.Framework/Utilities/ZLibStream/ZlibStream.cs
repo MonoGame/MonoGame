@@ -123,13 +123,12 @@ namespace MonoGame.Utilities
     /// </para>
     ///
     /// <para>
-    /// This class is similar to <see cref="DeflateStream"/>, except that it adds the
+    /// This class is similar to DeflateStream, except that it adds the
     /// RFC1950 header and trailer bytes to a compressed stream when compressing, or expects
     /// the RFC1950 header and trailer bytes when decompressing.  It is also similar to the
     /// <see cref="GZipStream"/>.
     /// </para>
     /// </remarks>
-    /// <seealso cref="DeflateStream" />
     /// <seealso cref="GZipStream" />
     public class ZlibStream : Stream
     {
@@ -7544,11 +7543,11 @@ namespace MonoGame.Utilities
 
         internal int SetDictionary(byte[] dictionary)
         {
-            int length = dictionary.Length;
-            int index = 0;
-
             if (dictionary == null || status != INIT_STATE)
                 throw new ZlibException("Stream error.");
+
+            int length = dictionary.Length;
+            int index = 0;
 
             _codec._Adler32 = Adler.Adler32(_codec._Adler32, dictionary, 0, dictionary.Length);
 

@@ -57,16 +57,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource(
-#if DIRECTX
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.dx11.mgfxo"
-#elif PSM
-            "MonoGame.Framework.PSMobile.PSSuite.Graphics.AlphaTestEffect.cgx" //FIXME: This shader is totally incomplete
-#else
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo"
-#endif
-        );
-
         #endregion
 
         #region Public Properties
@@ -271,7 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
         public AlphaTestEffect(GraphicsDevice device)
-            : base(device, Bytecode)
+            : base(device, EffectResource.AlphaTestEffect.Bytecode)
         {
             CacheEffectParameters();
         }

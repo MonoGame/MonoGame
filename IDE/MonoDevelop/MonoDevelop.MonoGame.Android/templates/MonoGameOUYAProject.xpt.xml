@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame for OUYA Application</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/app/games</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates an MonoGame for OUYA Project </_Description>
@@ -29,12 +29,9 @@
 				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
 				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
 				<Reference type="Gac" refto="Mono.Android" />
-				<Reference type="Gac" refto="OpenTK" />
+				<Reference type="Gac" refto="OpenTK-1.0" />
+				<Reference type="Package" refto="MonoGame.Framework" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.Ouya" version="3.3.0" targetFramework="MonoAndroid" />
-				<Package id="Ouya.Console.Api" version="1.0.13.1" targetFramework="MonoAndroid" />
-			</Packages>
 			<Files>
 				<File name="Activity1.cs" src="Android/Activity1.cs" />
 				<File name="Game1.cs" src="Common/Game1.cs" />
@@ -54,7 +51,7 @@
 					<File name="AndroidManifest.xml" src="Android/AndroidManifest.xml" />
 				</Directory>
 				<Directory name="Content">
-					<File name="Content.mgcb" src="Common/Content.mgcb"/>
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
 				</Directory>
 				<Directory name="Assets">
 					<RawFile name="AboutAssets.txt" src="Android/AboutAssets.txt" />

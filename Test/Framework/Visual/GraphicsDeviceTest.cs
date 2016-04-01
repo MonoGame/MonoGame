@@ -110,6 +110,186 @@ namespace MonoGame.Tests.Visual
             Game.Run();
         }
 
+        // This overload of DrawIndexedPrimitives is not supported on XNA.
+#if !XNA
+        [Test]
+        public void DrawIndexedPrimitivesParameterValidation2()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = new VertexBuffer(
+                    Game.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration,
+                    3, BufferUsage.None);
+                var indexBuffer = new IndexBuffer(
+                    Game.GraphicsDevice, IndexElementSize.SixteenBits, 
+                    3, BufferUsage.None);
+
+                // No vertex shader or pixel shader.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1));
+
+                new BasicEffect(Game.GraphicsDevice).CurrentTechnique.Passes[0].Apply();
+
+                // No vertexBuffer.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1));
+
+                Game.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+                // No indexBuffer.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1));
+
+                Game.GraphicsDevice.Indices = indexBuffer;
+
+                // Success - "normal" usage.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1));
+
+                // baseVertex too small / large.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, -1, 0, 1));
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 3, 0, 1));
+
+                // startIndex too small / large.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, -1, 1));
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 3, 1));
+
+                // primitiveCount too small / large.
+                Assert.Throws<ArgumentOutOfRangeException>(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 0));
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 2));
+
+                // startIndex + primitiveCount too large.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 1, 1));
+            };
+            Game.Run();
+        }
+#endif
+
+#if XNA || DIRECTX
+        [Test]
+        public void DrawInstancedPrimitivesParameterValidation()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = new VertexBuffer(
+                    Game.GraphicsDevice, VertexPositionColorTexture.VertexDeclaration,
+                    3, BufferUsage.None);
+
+                VertexDeclaration instanceVertexDeclaration = new VertexDeclaration
+                (
+                    new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 0),
+                    new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 1),
+                    new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 2),
+                    new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 3)
+                );
+                var instanceBuffer = new VertexBuffer(
+                    Game.GraphicsDevice, instanceVertexDeclaration,
+                    10, BufferUsage.None);
+
+                var indexBuffer = new IndexBuffer(Game.GraphicsDevice, IndexElementSize.SixteenBits, 3, BufferUsage.None);
+
+                // No vertex shader or pixel shader.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 1, 10));
+
+                var effect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "Instancing.fx");
+                effect.Techniques[0].Passes[0].Apply();
+
+                // No vertexBuffers.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 1, 10));
+
+                Game.GraphicsDevice.SetVertexBuffers(
+                    new VertexBufferBinding(vertexBuffer, 0, 0),
+                    new VertexBufferBinding(instanceBuffer, 0, 1));
+
+                // No indexBuffer.
+                Assert.Throws<InvalidOperationException>(() => Game.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 1, 10));
+
+                Game.GraphicsDevice.Indices = indexBuffer;
+
+                // Success - "normal" usage.
+                Assert.DoesNotThrow(() => Game.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 1, 10));
+
+                // primitiveCount too small / large.
+                Assert.Throws<ArgumentOutOfRangeException>(() => Game.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 0, 10));
+            };
+            Game.Run();
+        }
+
+        [Test]
+        public void DrawInstancedPrimitivesVisualTest()
+        {
+            VertexBuffer vertexBuffer = null;
+            IndexBuffer indexBuffer = null;
+            VertexBuffer instanceVertexBuffer = null;
+            Matrix[] worldTransforms = null;
+            EffectPass pass = null;
+
+            Game.LoadContentWith += (sender, e) =>
+            {
+                // Create vertex and index buffer for a quad.
+                var vertices = new[]
+                {
+                    new VertexPositionTexture(new Vector3(-1,  1, 0), new Vector2(0, 0)),
+                    new VertexPositionTexture(new Vector3( 1,  1, 0), new Vector2(1, 0)),
+                    new VertexPositionTexture(new Vector3(-1, -1, 0), new Vector2(0, 1)),
+                    new VertexPositionTexture(new Vector3( 1, -1, 0), new Vector2(1, 1)),
+                };
+                vertexBuffer = new VertexBuffer(
+                    Game.GraphicsDevice, VertexPositionTexture.VertexDeclaration,
+                    4, BufferUsage.None);
+                vertexBuffer.SetData(vertices);
+
+                var indices = new ushort[] { 0, 1, 2, 1, 3, 2 };
+                indexBuffer = new IndexBuffer(Game.GraphicsDevice, IndexElementSize.SixteenBits, 6, BufferUsage.None);
+                indexBuffer.SetData(indices);
+
+                // Create vertex buffer with instance data.
+                worldTransforms = new Matrix[8 * 4];
+                for (int i = 0; i < worldTransforms.Length; i++)
+                {
+                    worldTransforms[i] = Matrix.CreateScale(0.4f) *
+                        Matrix.CreateRotationZ(0.05f * i) *
+                        Matrix.CreateTranslation(-3.5f + (i % 8), -1.5f + (int)(i / 8), 0);
+                }
+                VertexDeclaration instanceVertexDeclaration = new VertexDeclaration
+                (
+                    new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 0),
+                    new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 1),
+                    new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 2),
+                    new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 3)
+                );
+                instanceVertexBuffer = new VertexBuffer(Game.GraphicsDevice, instanceVertexDeclaration, worldTransforms.Length, BufferUsage.None);
+                instanceVertexBuffer.SetData(worldTransforms);
+
+                var view = Matrix.CreateLookAt(new Vector3(0, 0, 6), new Vector3(0, 0, 0), Vector3.Up);
+                var projection = Matrix.CreatePerspectiveFieldOfView(
+                    MathHelper.PiOver4, Game.GraphicsDevice.Viewport.AspectRatio, 0.1f, 100);
+
+                var effect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "Instancing.fx");
+                effect.Parameters["View"].SetValue(view);
+                effect.Parameters["Projection"].SetValue(projection);
+                pass = effect.Techniques[0].Passes[0];
+            };
+
+            Game.DrawWith += (sender, e) =>
+            {
+                Game.GraphicsDevice.Clear(Color.CornflowerBlue);
+
+                Game.GraphicsDevice.SetVertexBuffers(
+                    new VertexBufferBinding(vertexBuffer, 0, 0),
+                    new VertexBufferBinding(instanceVertexBuffer, 0, 1));
+
+                Game.GraphicsDevice.Indices = indexBuffer;
+
+                pass.Apply();
+
+                Game.GraphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 6, 0, 2, worldTransforms.Length);
+            };
+
+            //Game.Run(until: frameInfo => false);
+
+            // There is a minor difference in the rasterization between XNA and DirectX. 
+            var similarity = 0.98f;
+            RunSingleFrameTest(similarity);
+        }
+#endif
+
         [Test]
         public void DrawUserPrimitivesParameterValidation()
         {

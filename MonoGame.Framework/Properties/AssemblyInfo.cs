@@ -14,16 +14,10 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for Android")]
 #elif WINDOWS_STOREAPP
 [assembly: AssemblyDescription("MonoGame for Windows Store")]
+#elif DESKTOPGL
+[assembly: AssemblyDescription("MonoGame for all OpenGL Desktop Platforms")]
 #elif WINDOWS
-#if DIRECTX
 [assembly: AssemblyDescription("MonoGame for Windows Desktop (DirectX)")]
-#else
-[assembly: AssemblyDescription("MonoGame for Windows Desktop (OpenGL)")]
-#endif
-#elif PSM
-[assembly: AssemblyDescription("MonoGame for PlayStation Mobile")]
-#elif LINUX
-[assembly: AssemblyDescription("MonoGame for Linux")]
 #elif MAC
 [assembly: AssemblyDescription("MonoGame for Mac OS X")]
 #elif IOS
@@ -34,7 +28,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MonoGame.Framework")]
-[assembly: AssemblyCopyright("Copyright © 2011-2013")]
+[assembly: AssemblyCopyright("Copyright © 2011-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

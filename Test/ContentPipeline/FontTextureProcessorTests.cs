@@ -88,6 +88,11 @@ namespace MonoGame.Tests.ContentPipeline
                     for (var x = 0; x < inRect.Width; ++x)
                         Assert.AreEqual(pixelData[(x + inRect.Left) + (y + inRect.Top) * face.Width], outFace.GetPixel(x + outRect.Left, y + outRect.Top).PackedValue);
             }
+            
+            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[0]);
+            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[1]);
+            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[2]);
+            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[3]);
         }
     }
 }

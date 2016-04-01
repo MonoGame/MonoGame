@@ -7,8 +7,12 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #endif
 

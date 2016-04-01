@@ -3,9 +3,14 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
-#elif WINDOWS || LINUX
+#else
+using OpenTK.Graphics.OpenGL;
+using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
+#endif
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
 #elif GLES

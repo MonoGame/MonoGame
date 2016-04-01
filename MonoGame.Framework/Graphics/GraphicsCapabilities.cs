@@ -6,7 +6,11 @@ using System;
 using System.Collections.Generic;
 #if OPENGL
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 #elif GLES
 using OpenTK.Graphics.ES20;
 #else
@@ -101,6 +105,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal bool SupportsDepthClamp { get; private set; }
 
+        internal bool SupportsVertexTextures { get; private set; }
+
         internal void Initialize(GraphicsDevice device)
         {
 			SupportsNonPowerOfTwo = GetNonPowerOfTwo(device);
@@ -183,6 +189,12 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
 #elif OPENGL
             SupportsDepthClamp = device._extensions.Contains("GL_ARB_depth_clamp");
+#endif
+
+#if DIRECTX
+            SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
+#elif OPENGL
+            SupportsVertexTextures = false; // For now, until we implement vertex textures in OpenGL.
 #endif
         }
 

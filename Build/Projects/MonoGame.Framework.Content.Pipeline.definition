@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework.Content.Pipeline" Path="MonoGame.Framework.Content.Pipeline" Type="Library" Platforms="Linux,MacOS,Windows">
 
   <!--
@@ -32,6 +32,7 @@
 
   <Properties>
     
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
 
     <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
@@ -79,6 +80,9 @@
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\AtcBitmapContent.cs" />
+    <Compile Include="Graphics\AtcExplicitBitmapContent.cs" />
+    <Compile Include="Graphics\AtcInterpolatedBitmapContent.cs" />
     <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
     <Compile Include="Graphics\Font\BitmapUtils.cs" />
@@ -95,6 +99,7 @@
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\EffectMaterialContent.cs" />
     <Compile Include="Graphics\EnvironmentMapMaterialContent.cs" />
+    <Compile Include="Graphics\Etc1BitmapContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
@@ -116,6 +121,10 @@
     <Compile Include="Graphics\PixelBitmapContent.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgb2BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgb4BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgba2BitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcRgba4BitmapContent.cs" />
     <Compile Include="Graphics\Font\SharpFontImporter.cs" />
     <Compile Include="Graphics\SkinnedMaterialContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
@@ -123,7 +132,6 @@
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureCubeContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
-    <Compile Include="Graphics\Font\TrueTypeImporter.cs" />
     <Compile Include="Graphics\VertexChannel.cs" />
     <Compile Include="Graphics\VertexChannelCollection.cs" />
     <Compile Include="Graphics\VertexChannelGeneric.cs" />
@@ -360,6 +368,7 @@
     <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\ExternalReferenceSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\GenericCollectionHelper.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
@@ -370,7 +379,7 @@
     <Compile Include="Serialization\Intermediate\NamedValueDictionarySerializer.cs" />    
     <Compile Include="Serialization\Intermediate\NamespaceAliasHelper.cs" />
     <Compile Include="Serialization\Intermediate\NonGenericIListSerializer.cs" />
-	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
@@ -399,6 +408,7 @@
     <Compile Include="ContentProcessor.cs" />
     <Compile Include="ContentProcessorAttribute.cs" />
     <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="DdsLoader.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="ExternalTool.cs" />
@@ -410,6 +420,7 @@
     <Compile Include="InvalidContentException.cs" />
     <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
+    <Compile Include="OggImporter.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
     <Compile Include="OpenAssetImporter.cs" />
     <Compile Include="PipelineComponentScanner.cs" />
@@ -426,192 +437,12 @@
     <Compile Include="XmlImporter.cs" />
 
 	<!-- Utility Classes -->
+    <Compile Include="Utilities\Vector4Converter.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32HC.Dirty.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64.Dirty.cs" />
     <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64HC.Dirty.cs" />
-
-    <!-- Windows Additional Binaries -->
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">
-      <Platforms>Windows</Platforms>
-      <Link>nvtt.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\x64\pvrtc.dll">
-      <Platforms>Windows</Platforms>
-      <Link>pvrtc.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\assimp\Assimp64.dll">
-      <Platforms>Windows</Platforms>
-      <Link>Assimp64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
-      <Platforms>Windows</Platforms>
-      <Link>libmojoshader_64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\freetype6.dll">
-      <Platforms>Windows</Platforms>
-      <Link>freetype6.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll">
-      <Platforms>Windows</Platforms>
-      <Link>FreeImage.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe">
-      <Platforms>Windows</Platforms>
-      <Link>ffmpeg.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe">
-      <Platforms>Windows</Platforms>
-      <Link>ffprobe.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
-    <!-- Linux Additional Binaries -->
-    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.so">
-      <Platforms>Linux</Platforms>
-      <Link>libassimp.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
-      <Platforms>Linux</Platforms>
-      <Link>libnvcore.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvimage.so">
-      <Platforms>Linux</Platforms>
-      <Link>libnvimage.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvmath.so">
-      <Platforms>Linux</Platforms>
-      <Link>libnvmath.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvtt.so">
-      <Platforms>Linux</Platforms>
-      <Link>libnvtt.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>Nvidia.TextureTools.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>SharpFont.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
-      <Platforms>Linux</Platforms>
-      <Link>AssimpNet.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg">
-      <Platforms>Linux</Platforms>
-      <Link>ffmpeg</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe">
-      <Platforms>Linux</Platforms>
-      <Link>ffprobe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
-    <!-- Mac Additional Binaries -->
-    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libnvcore.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libnvimage.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libnvmath.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libnvtt.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>Nvidia.TextureTools.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\MacOS\libpvrtc.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libpvrtc.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>ManagedPVRTC.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libfreetype.6.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libpng15.15.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>SharpFont.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>AssimpNet.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libassimp.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg">
-      <Platforms>MacOS</Platforms>
-      <Link>ffmpeg</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe">
-      <Platforms>MacOS</Platforms>
-      <Link>ffprobe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config">
-      <Platforms>MacOS</Platforms>
-      <Link>FreeImage.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libfreeimage.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimageplus.dylib">
-      <Platforms>MacOS</Platforms>
-      <Link>libfreeimageplus.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </Files>
 </Project>

@@ -20,6 +20,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="&quot;/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/XamarinStudio.exe&quot;" workingdir="/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/">
+        <EnvironmentVariables>
+          <Variable name="MONODEVELOP_DEV_ADDINS" value="${TargetDir}" />
+        </EnvironmentVariables>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -55,7 +64,10 @@
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="System.Xml" />
-    <Reference Include="Mono.Addins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
+    <Reference Include="Mono.Addins">
+      <HintPath>/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/Mono.Addins.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -65,6 +77,7 @@
     <Compile Include="MonoGameBuildExtension.cs" />
     <Compile Include="MonoGameConditions.cs" />
     <Compile Include="ContentItemTemplate.cs" />
+    <Compile Include="MonoGameMSBuildImports.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -174,10 +187,11 @@
       <Link>templates\Common\Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="templates\Common\Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MonoDevelop.MonoGame.addin.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="MonoDevelop.MonoGame.addin.xml" />
   </ItemGroup>
 </Project>

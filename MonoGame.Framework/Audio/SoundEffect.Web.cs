@@ -14,6 +14,9 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
+        // This platform is only limited by memory.
+        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
+
         private void PlatformLoadAudioStream(Stream s)
         {
         }

@@ -1,2 +1,0 @@
-#!/bin/bash
-mono /opt/monogame-pipeline/Pipeline.exe "$@"

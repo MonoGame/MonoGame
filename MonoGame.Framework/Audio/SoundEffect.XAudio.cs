@@ -14,6 +14,18 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
+#if WINDOWS || (WINRT && !WINDOWS_PHONE)
+
+        // These platforms are only limited by memory.
+        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
+
+#elif WINDOWS_PHONE
+
+        // Reference: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.instanceplaylimitexception.aspx
+        internal const int MAX_PLAYING_INSTANCES = 64;
+
+#endif
+
         #region Static Fields & Properties
 
         internal static XAudio2 Device { get; private set; }
@@ -123,7 +135,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
+        private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
             CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
                             DataStream.Create(buffer, true, false),
@@ -143,10 +155,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             var soundStream = new SoundStream(s);
             var dataStream = soundStream.ToDataStream();
+            var sampleLength = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
             CreateBuffers(  soundStream.Format,
                             dataStream,
                             0,
-                            (int)dataStream.Length);
+                            sampleLength);
         }
 
         private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)
@@ -178,11 +191,37 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            SourceVoice voice = null;
-            if (Device != null)
+            // If the instance came from the pool then it could
+            // already have a valid voice assigned.
+            var voice = inst._voice;
+
+            if (voice != null)
+            {
+                // TODO: This really shouldn't be here.  Instead we should fix the 
+                // SoundEffectInstancePool to internally to look for a compatible
+                // instance or return a new instance without a voice.
+                //
+                // For now we do the same test that the pool should be doing here.
+             
+                if (!ReferenceEquals(inst._format, _format))
+                {
+                    if (inst._format.Encoding != _format.Encoding ||
+                        inst._format.Channels != _format.Channels ||
+                        inst._format.SampleRate != _format.SampleRate ||
+                        inst._format.BitsPerSample != _format.BitsPerSample)
+                    {
+                        voice.DestroyVoice();
+                        voice.Dispose();
+                        voice = null;
+                    }
+                }
+            }
+
+            if (voice == null && Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             inst._voice = voice;
+            inst._format = _format;
         }
 
         #endregion
@@ -199,6 +238,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
+            SoundEffectInstancePool.Shutdown();
+
             if (MasterVoice != null)
             {
                 MasterVoice.DestroyVoice();

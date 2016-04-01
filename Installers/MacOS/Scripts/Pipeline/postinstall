@@ -1,5 +1,22 @@
 #!/bin/bash
+
+#fix permissions
+chmod +x /Applications/Pipeline.app/Contents/MacOS/Pipeline   
+chmod +x /Applications/Pipeline.app/Contents/MonoBundle/ffmpeg
+chmod +x /Applications/Pipeline.app/Contents/MonoBundle/ffprobe
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -v -f /Applications/Pipeline.app
+
 #mgcb terminal command
+if [ ! -d /usr/local/bin ]
+then
+	if [ ! -d /usr/local ]
+	then
+		mkdir /usr/local
+	fi
+        chgrp -R admin /usr/local
+	chmod -R 755 /usr/local
+	mkdir /usr/local/bin
+fi
 if [ -f /usr/local/bin/mgcb ]
 then
 	rm /usr/local//bin/mgcb

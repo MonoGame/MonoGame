@@ -25,6 +25,7 @@ namespace MonoGame.Tools.Pipeline
         public ContentIcons()
         {
             Icons = new ImageList();
+            Icons.ColorDepth = ColorDepth.Depth32Bit;
 
             var asm = Assembly.GetExecutingAssembly();
             Icons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));

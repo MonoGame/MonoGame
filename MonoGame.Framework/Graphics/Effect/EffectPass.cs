@@ -1,10 +1,5 @@
 using System.Diagnostics;
 
-#if PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
-
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPass
@@ -21,10 +16,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		public string Name { get; private set; }
 
         public EffectAnnotationCollection Annotations { get; private set; }
-
-#if PSM
-        internal ShaderProgram _shaderProgram;
-#endif
 
         internal EffectPass(    Effect effect, 
                                 string name,
@@ -67,9 +58,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
-#if PSM
-            _shaderProgram = cloneSource._shaderProgram;
-#endif
         }
 
         public void Apply()
@@ -131,24 +119,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.BlendState = _blendState;
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
-            
-#if PSM
-            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
-
-            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
-
-            float[] data;
-            if (_effect.Parameters["WorldViewProj"] != null) 
-                data = (float[])_effect.Parameters["WorldViewProj"].Data;
-            else
-                data = (float[])_effect.Parameters["MatrixTransform"].Data;
-            Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
-            matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
-            _shaderProgram.SetUniformValue(0, ref matrix4);
-            
-            if (_effect.Parameters["Texture0"].Data != null && _effect.Parameters["Texture0"].Data != null)
-                _effect.GraphicsDevice._graphics.SetTexture(0, ((Texture2D)_effect.Parameters["Texture0"].Data)._texture2D);
-#endif
         }
 
         private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)

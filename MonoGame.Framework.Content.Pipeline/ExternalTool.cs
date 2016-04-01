@@ -55,8 +55,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 RedirectStandardInput = true,
             };
 
-            EnsureExecutable(fullPath);
-
             using (var process = new Process())
             {
                 process.StartInfo = processInfo;
@@ -140,31 +138,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Ensures the specified executable has the executable bit set.  If the
-        /// executable doesn't have the executable bit set on Linux or Mac OS, then
-        /// Mono will refuse to execute it.
-        /// </summary>
-        /// <param name="path">The full path to the executable.</param>
-        private static void EnsureExecutable(string path)
-        {
-#if LINUX || MACOS
-            if(path == "/bin/bash")
-                return;
-
-            try
-            {
-                var p = Process.Start("chmod", "u+x '" + path + "'");
-                p.WaitForExit();
-            }
-            catch
-            {
-                // This platform may not have chmod in the path, in which case we can't
-                // do anything reasonable here.
-            }
-#endif
         }
     }
 }

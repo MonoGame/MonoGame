@@ -80,6 +80,9 @@ namespace MonoGame.Tests.Framework
             // Test clamping.
             Assert.AreEqual(Vector4.Zero, new Rgba64(Vector4.One * -1234.0f).ToVector4());
             Assert.AreEqual(Vector4.One, new Rgba64(Vector4.One * 1234.0f).ToVector4());
+
+            //Test data ordering
+            Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(((float) 0x1EB8) / 0xffff, ((float) 0x570A) / 0xffff, ((float) 0x8F5C) / 0xffff, ((float) 0xC7AD) /0xffff).PackedValue);
         }
 
         [Test]

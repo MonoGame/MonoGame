@@ -70,14 +70,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource(
-#if DIRECTX
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.dx11.mgfxo"
-#else
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.SkinnedEffect.ogl.mgfxo"
-#endif
-        );            
-
         #endregion
 
         #region Public Properties
@@ -389,7 +381,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new SkinnedEffect with default parameter settings.
         /// </summary>
         public SkinnedEffect(GraphicsDevice device)
-            : base(device, Bytecode)
+            : base(device, EffectResource.SkinnedEffect.Bytecode)
         {
             CacheEffectParameters(null);
 

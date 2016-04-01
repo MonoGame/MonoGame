@@ -69,8 +69,15 @@ non-infringement.
 using System;
 using System.Runtime.InteropServices;
 
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
 using MonoMac.Foundation;
+using PointF = System.Drawing.PointF;
+#else
+using AppKit;
+using Foundation;
+using PointF = CoreGraphics.CGPoint;
+#endif
 
 namespace Microsoft.Xna.Framework {
 	partial class MacGamePlatform {
@@ -122,7 +129,7 @@ namespace Microsoft.Xna.Framework {
 				// event in the queue.
 				application.PostEvent (NSEvent.OtherEvent (
 					NSEventType.ApplicationDefined,
-					System.Drawing.PointF.Empty,
+					PointF.Empty,
 					(NSEventModifierMask)0,
 					0, 0,
 					// HACK: Graphics context should be

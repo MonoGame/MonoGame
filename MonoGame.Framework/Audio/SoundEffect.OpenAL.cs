@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.AVFoundation;
@@ -13,7 +13,7 @@ using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
-#if IOS
+#if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
 using AVFoundation;
@@ -25,9 +25,11 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
-        internal byte[] _data;
+        internal const int MAX_PLAYING_INSTANCES = OpenALSoundController.MAX_NUMBER_OF_SOURCES;
 
-		internal float Rate { get; set; }
+        internal OALSoundBuffer SoundBuffer;
+
+        internal float Rate { get; set; }
 
         internal int Size { get; set; }
 
@@ -37,6 +39,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformLoadAudioStream(Stream s)
         {
+            byte[] buffer;
+
 #if OPENAL && !(MONOMAC || IOS)
             
             ALFormat format;
@@ -44,29 +48,9 @@ namespace Microsoft.Xna.Framework.Audio
             int freq;
 
             var stream = s;
-#if ANDROID
-            var needsDispose = false;
-            try
-            {
-                // If seek is not supported (usually an indicator of a stream opened into the AssetManager), then copy
-                // into a temporary MemoryStream.
-                if (!s.CanSeek)
-                {
-                    needsDispose = true;
-                    stream = new MemoryStream();
-                    s.CopyTo(stream);
-                    stream.Position = 0;
-                }
-#endif
-                _data = AudioLoader.Load(stream, out format, out size, out freq);
-#if ANDROID
-            }
-            finally
-            {
-                if (needsDispose)
-                    stream.Dispose();
-            }
-#endif
+
+            buffer = AudioLoader.Load(stream, out format, out size, out freq);
+
             Format = format;
             Size = size;
             Rate = freq;
@@ -83,8 +67,8 @@ namespace Microsoft.Xna.Framework.Audio
                 afs.ParseBytes (audiodata, false);
                 Size = (int)afs.DataByteCount;
 
-                _data = new byte[afs.DataByteCount];
-                Array.Copy (audiodata, afs.DataOffset, _data, 0, afs.DataByteCount);
+                buffer = new byte[afs.DataByteCount];
+                Array.Copy (audiodata, afs.DataOffset, buffer, 0, afs.DataByteCount);
 
                 AudioStreamBasicDescription asbd = afs.DataFormat;
                 int channelsPerFrame = asbd.ChannelsPerFrame;
@@ -119,6 +103,9 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
 #endif
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
@@ -128,9 +115,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if OPENAL && !(MONOMAC || IOS)
 
-            _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-            return;
 
 #endif
 
@@ -145,9 +130,11 @@ namespace Microsoft.Xna.Framework.Audio
                 Format = bitsPerSample == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
 
             _name = "";
-            _data = buffer;
 
 #endif
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer();
+            SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
@@ -164,7 +151,6 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
             inst.InitializeSound();
-            inst.BindDataBuffer(_data, Format, Size, (int)Rate);
         }
 
         #endregion
@@ -173,7 +159,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose(bool disposing)
         {
-            // A no-op for OpenAL
+            if (SoundBuffer != null)
+            {
+                SoundBuffer.Dispose();
+                SoundBuffer = null;
+            }
         }
 
         #endregion

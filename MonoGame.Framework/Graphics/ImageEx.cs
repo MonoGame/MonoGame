@@ -27,7 +27,8 @@ namespace System.Drawing
             }
             else
             {
-                newBmp = bmp;
+                // Need to clone so the call to Clear() below doesn't clear the source before trying to draw it to the target.
+                newBmp = (Image)bmp.Clone();
             }
         
             try
@@ -38,6 +39,7 @@ namespace System.Drawing
                 ia.SetColorMatrix(cm);
                 using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBmp))
                 {
+                    g.Clear(Color.Transparent);
                     g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
                 }
             }

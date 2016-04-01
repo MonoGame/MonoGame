@@ -37,6 +37,8 @@ namespace MonoGame.Tools.Pipeline
 
         void ShowMessage(string message);
 
+        bool ShowDeleteDialog(string[] items);
+
         void BeginTreeUpdate();
 
         void SetTreeRoot(IProjectItem item);
@@ -65,7 +67,7 @@ namespace MonoGame.Tools.Pipeline
 
         bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall);
 
-        bool CopyOrLinkFolder(string folder, out CopyAction action);
+        bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall);
         
         void OnTemplateDefined(ContentItemTemplate item);
 
