@@ -11,6 +11,7 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MGCB" />
+    <Reference Include="Eto.Forms" />
 
     <Reference Include="PipelineReferences" />
   </References>
@@ -71,6 +72,26 @@
     <Compile Include="Common\PipelineProject.cs" />
     <Compile Include="Common\PipelineTypes.cs" />
     <Compile Include="Common\Extensions.cs" />
+    
+    <!-- Eto.Forms GUI stuff -->
+	<Compile Include="Eto\Dialogs\DialogBase.cs" />
+	<Compile Include="Eto\Dialogs\DialogBase.eto.cs">
+      <DependentUpon>DialogBase.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Eto\Dialogs\EditDialog.cs" />
+	<Compile Include="Eto\Dialogs\EditDialog.eto.cs">
+      <DependentUpon>EditDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Eto\Global.cs" />
+	<Compile Include="Eto\Styles.Linux.cs">
+      <Platforms>Linux</Platforms>
+    </Compile>
+	<Compile Include="Eto\Styles.Mac.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+	<Compile Include="Eto\Styles.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
 
     <!-- The Windows specific stuff -->
     <Compile Include="Windows\BuildIcons.cs">
@@ -158,17 +179,6 @@
       <Platforms>Windows</Platforms>
       <DependentUpon>AddFolderDialog.cs</DependentUpon>
     </EmbeddedResource>
-	<Compile Include="Windows\TextEditDialog.cs">
-      <Platforms>Windows</Platforms>
-    </Compile> 
-	<Compile Include="Windows\TextEditDialog.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>TextEditDialog.cs</DependentUpon>
-    </Compile>
-	 <EmbeddedResource Include="Windows\TextEditDialog.resx">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>TextEditDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -234,9 +244,6 @@
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\TextEditorDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -268,9 +275,6 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\AddItemDialog.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\TextEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\DeleteDialog.GUI.cs">  
