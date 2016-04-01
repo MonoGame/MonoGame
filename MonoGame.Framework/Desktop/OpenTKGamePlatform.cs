@@ -207,9 +207,6 @@ namespace Microsoft.Xna.Framework
         {
             IsActive = _view.Window.Focused;
 
-            // Update our OpenAL sound buffer pools
-            if (soundControllerInstance != null)
-                soundControllerInstance.Update();
             return true;
         }
 
