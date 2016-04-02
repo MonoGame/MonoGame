@@ -188,6 +188,10 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(null, optional.a);
                 Assert.AreEqual(null, optional.b);
                 Assert.AreEqual(string.Empty, optional.c);
+                Assert.AreEqual(null, optional.d);
+                Assert.AreEqual(CullMode.CullClockwiseFace, optional.e);
+                Assert.AreEqual(CullMode.CullCounterClockwiseFace, optional.f);
+                Assert.AreEqual(CullMode.CullClockwiseFace, optional.g);
             });
         }
 
@@ -401,12 +405,12 @@ namespace MonoGame.Tests.ContentPipeline
             Deserialize<ExternalReferences>("17_ExternalReferences.xml", externalReferences =>
             {
                 Assert.NotNull(externalReferences.Texture);
-                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith("/Xml/grass.tga".Replace('/', Path.DirectorySeparatorChar)));
                 Assert.NotNull(externalReferences.Texture2);
-                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith("/Xml/grass.tga".Replace ('/', Path.DirectorySeparatorChar)));
                 Assert.AreNotSame(externalReferences.Texture, externalReferences.Texture2);
                 Assert.NotNull(externalReferences.Shader);
-                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.fx"));
+                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith("/Xml/foliage.fx".Replace ('/', Path.DirectorySeparatorChar)));
             });
         }
 

@@ -1036,6 +1036,17 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void PlatformResolveRenderTargets()
         {
             // Resolving MSAA render targets should be done here.
+
+            // Generate mipmaps.
+            for (var i = 0; i < _currentRenderTargetCount; i++)
+            {
+                var renderTargetBinding = _currentRenderTargetBindings[i];
+                if (renderTargetBinding.RenderTarget.LevelCount > 1)
+                {
+                    lock (_d3dContext)
+                        _d3dContext.GenerateMips(renderTargetBinding.RenderTarget.GetShaderResourceView());
+                }
+            }
         }
 
         private IRenderTarget PlatformApplyRenderTargets()

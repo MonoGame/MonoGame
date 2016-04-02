@@ -11,6 +11,8 @@ namespace Microsoft.Xna.Framework
 {
     class AndroidGamePlatform : GamePlatform
     {
+        OpenALSoundController soundControllerInstance = null;
+
         public AndroidGamePlatform(Game game)
             : base(game)
         {
@@ -23,6 +25,14 @@ namespace Microsoft.Xna.Framework
             Window = _gameWindow;
 
             MediaLibrary.Context = Game.Activity;
+            try
+            {
+                soundControllerInstance = OpenALSoundController.GetInstance;
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+            }
         }
 
         protected override void Dispose(bool disposing)

@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
+
 using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class CollectionEditorDialog : Gtk.Dialog
+    public partial class CollectionEditorDialog : Dialog
     {
-        TreeStore listStore;
-        PipelineController controller;
+        private string startLocation;
+        private FileFilter dllFilter;
+        private TreeStore listStore;
+        private PipelineController controller;
 
         public string text = "";
 
@@ -15,20 +18,13 @@ namespace MonoGame.Tools.Pipeline
         {
             Build();
 
-            this.Title = Mono.Unix.Catalog.GetString ("Reference Editor");
-
-            this.AddButton("Ok", ResponseType.Ok);
-            this.AddButton("Cancel", ResponseType.Cancel);
-            this.DefaultResponse = ResponseType.Ok;
-
             this.controller = ((PipelineController)((MainWindow)parrent)._controller);
 
-            FileFilter filter = new FileFilter ();
-            filter.AddPattern ("*.dll");
+            dllFilter = new FileFilter ();
+            dllFilter.Name = "Dll Files (*.dll)";
+            dllFilter.AddPattern ("*.dll");
 
-            filechooserwidget1.Filter = filter;
-            filechooserwidget1.SetCurrentFolder(controller.ProjectLocation);
-            filechooserwidget1.SelectMultiple = true;
+            startLocation = controller.ProjectLocation;
 
             var column = new TreeViewColumn ();
 
@@ -40,20 +36,20 @@ namespace MonoGame.Tools.Pipeline
             column.PackStart (textCell, false);
             column.PackStart (dataCell, false);
 
-            treeview1.AppendColumn (column);
+            treeView1.AppendColumn (column);
 
             column.AddAttribute (textCell, "markup", 0);
             column.AddAttribute (dataCell, "text", 1);
 
             listStore = new TreeStore (typeof (string), typeof (string));
 
-            treeview1.Model = listStore;
-            treeview1.Selection.Mode = SelectionMode.Multiple;
+            treeView1.Model = listStore;
+            treeView1.Selection.Mode = SelectionMode.Multiple;
 
-            string[] refs = text.Replace("\r\n", "~").Split('~');
+            var refs = text.Split(Environment.NewLine[0]);
 
             foreach (string reff in refs)
-                if (reff != "")
+                if (!string.IsNullOrWhiteSpace(reff))
                     AddValue(reff);
         }
 
@@ -78,36 +74,57 @@ namespace MonoGame.Tools.Pipeline
 
         private List<string> GetFileNames()
         {
-            List<string> ret = new List<string>();
+            var ret = new List<string>();
 
             TreeIter iter;
             if (listStore.GetIterFirst(out iter))
             {
-                ret.Add(treeview1.Model.GetValue(iter, 1).ToString());
+                ret.Add(treeView1.Model.GetValue(iter, 1).ToString());
 
                 while (listStore.IterNext(ref iter))
-                    ret.Add(treeview1.Model.GetValue(iter, 1).ToString());
+                    ret.Add(treeView1.Model.GetValue(iter, 1).ToString());
             }
 
             return ret;
         }
 
-        protected void AddFileEvent(object sender, EventArgs e)
+        private void SelectionChanged (object sender, EventArgs e)
         {
-            List<string> files = GetFileNames();
+            buttonRemove.Sensitive = (treeView1.Selection.GetSelectedRows().Length > 0);
+        }
 
-            string pl = controller.ProjectLocation;
+        private void AddFileEvent(object sender, EventArgs e)
+        {
+            var fileNames = new string[0];
+            var files = GetFileNames();
+
+            var pl = controller.ProjectLocation;
             if (!pl.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
                 pl += System.IO.Path.DirectorySeparatorChar;
-            Uri folderUri = new Uri(pl);
+            var folderUri = new Uri(pl);
 
-            if (filechooserwidget1.Filenames.Length > 0)
+            var fileChooser =
+                new FileChooserDialog("Select Reference File",
+                    this,
+                    FileChooserAction.Open,
+                    "Cancel", ResponseType.Cancel,
+                    "Open", ResponseType.Ok);
+
+            fileChooser.AddFilter (dllFilter);
+            fileChooser.SetCurrentFolder(startLocation);
+
+            if(fileChooser.Run() == (int)ResponseType.Ok)
+                fileNames = fileChooser.Filenames;
+            
+            fileChooser.Destroy();
+
+            if (fileNames.Length > 0)
             {
-                foreach (string floc in filechooserwidget1.Filenames)
+                foreach (string floc in fileNames)
                 {
                     if (System.IO.File.Exists(floc))
                     {
-                        Uri pathUri = new Uri(floc);
+                        var pathUri = new Uri(floc);
                         string fl = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
 
                         if (!files.Contains(fl))
@@ -117,14 +134,14 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        protected void RemoveFileEvent(object sender, EventArgs e)
+        private void RemoveFileEvent(object sender, EventArgs e)
         {
-            TreePath[] paths = treeview1.Selection.GetSelectedRows ();
+            var paths = treeView1.Selection.GetSelectedRows ();
 
             for (int i = paths.Length - 1; i >= 0; i--)
             {
                 TreeIter iter;
-                if (treeview1.Model.GetIter(out iter, paths[i]))
+                if (treeView1.Model.GetIter(out iter, paths[i]))
                     listStore.Remove(ref iter);
             }
         }

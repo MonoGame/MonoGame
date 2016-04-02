@@ -50,7 +50,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'u', // Ouya
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi

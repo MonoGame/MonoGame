@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using Windows.UI.Core;
@@ -241,8 +242,7 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            // NOTE: There is no concept of a window 
-            // title in a Metro application.
+            Debug.WriteLine("WARNING: GameWindow.Title has no effect under UWP.");
         }
 
         internal void SetCursor(bool visible)

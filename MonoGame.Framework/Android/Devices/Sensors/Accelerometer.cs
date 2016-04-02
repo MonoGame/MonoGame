@@ -45,7 +45,10 @@ namespace Microsoft.Devices.Sensors
                 if (IsDisposed)
                     throw new ObjectDisposedException(GetType().Name);
                 if (sensorManager == null)
+                {
                     Initialize();
+                    state = sensor != null ? SensorState.Initializing : SensorState.NotSupported;
+                }
                 return state;
             }
         }

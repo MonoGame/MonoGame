@@ -32,7 +32,6 @@
         <file src="WindowsUniversal\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\netcore\SharpDX.DXGI.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\netcore\SharpDX.MediaFoundation.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\netcore\SharpDX.XAudio2.dll" />
-        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.XInput.dll" target="lib\netcore\SharpDX.XInput.dll" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
 </package>

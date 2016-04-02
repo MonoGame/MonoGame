@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Describes a 3D-vector.
     /// </summary>
-#if WINDOWS
+#if XNADESIGNPROVIDED
     [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Vector3TypeConverter))]
 #endif
     [DataContract]

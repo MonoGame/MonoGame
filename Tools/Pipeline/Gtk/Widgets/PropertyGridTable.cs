@@ -160,6 +160,7 @@ namespace MonoGame.Tools.Pipeline
                                     var fwidget = new FalseWidget(dialog.text);
                                     eitems[i].eventHandler(fwidget, EventArgs.Empty);
                                     model.SetValue(iter, 14, dialog.text);
+                                    model.SetValue(iter, 12, GetCollectionText(dialog.text));
                                     break;
                                 }
                             }
@@ -216,7 +217,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                     else
                     {
-                        #if LINUX
+                        #if GTK3
                         Gdk.RGBA rgba = new Gdk.RGBA();
 
                         try
@@ -370,6 +371,16 @@ namespace MonoGame.Tools.Pipeline
             treeview1.Model = listStore;
         }
 
+        private string GetCollectionText(string data)
+        {
+            var ret = data.Split(Environment.NewLine[0]);
+
+            for (int i = 0; i < ret.Length; i++)
+                ret[i] = System.IO.Path.GetFileName(ret[i]);
+
+            return string.Join(Environment.NewLine, ret);
+        }
+
         TreeIter AddGroup(string name)
         {
             return listStore.AppendValues (name, true, "", false, "", false, false, null, "", false, false, "", "", false, "", "", false, "", false);
@@ -385,8 +396,8 @@ namespace MonoGame.Tools.Pipeline
         TreeIter AddPropertyCollectionBox(TreeIter iter, string id, string name, string data)
         {
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false) : 
-                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false);
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, GetCollectionText(data), true, data, "", false, "", false) : 
+                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, GetCollectionText(data), true, data, "", false, "", false);
         }
 
         TreeIter AddPropertyColorBox(TreeIter iter, string id, string name, string color)
@@ -556,7 +567,7 @@ namespace MonoGame.Tools.Pipeline
                 {
                     text = values[0];
                     for (int i = 1; i < values.Count; i++)
-                        text += "\r\n" + values[i];
+                        text += Environment.NewLine + values[i];
                 }
 
                 return AddPropertyCollectionBox(iter, eitem.id.ToString(), item.label, text);
