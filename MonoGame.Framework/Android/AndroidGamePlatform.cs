@@ -84,7 +84,8 @@ namespace Microsoft.Xna.Framework
         public override void BeforeInitialize()
         {
             var currentOrientation = AndroidCompatibility.GetAbsoluteOrientation();
-
+            Android.Util.Log.Debug("MonoGame", " BeforeInitialize currentOrientation = " + currentOrientation);
+            Android.Util.Log.Debug("MonoGame", " BeforeInitialize Game.Activity.Resources.Configuration.Orientation = " + Game.Activity.Resources.Configuration.Orientation);
             switch (Game.Activity.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:

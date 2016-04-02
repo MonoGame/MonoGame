@@ -156,11 +156,14 @@ namespace Microsoft.Xna.Framework
 
             DisplayOrientation oldOrientation = CurrentOrientation;
 
-            SetDisplayOrientation(newOrientation);
             TouchPanel.DisplayOrientation = newOrientation;
+            _currentOrientation = newOrientation;
 
-            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && _game.graphicsDeviceManager != null)
+            if (applyGraphicsChanges && oldOrientation != newOrientation && _game.graphicsDeviceManager != null)
+            {
                 _game.graphicsDeviceManager.ApplyChanges();
+            }
+            OnOrientationChanged();
         }
 
         public override string ScreenDeviceName 
@@ -229,81 +232,75 @@ namespace Microsoft.Xna.Framework
         }
 
         
-        private void SetDisplayOrientation(DisplayOrientation value)
+        internal void SetDisplayOrientation(DisplayOrientation value)
         {
-            if (value != _currentOrientation)
+            DisplayOrientation supported = GetEffectiveSupportedOrientations();
+            ScreenOrientation requestedOrientation = ScreenOrientation.Unspecified;
+            bool wasPortrait = _currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitDown;
+            bool requestPortrait = false;
+
+            bool didOrientationChange = false;
+            // Android 2.3 and above support reverse orientations
+            int sdkVer = (int)Android.OS.Build.VERSION.SdkInt;
+            if (sdkVer >= 10)
             {
-                DisplayOrientation supported = GetEffectiveSupportedOrientations();
-                ScreenOrientation requestedOrientation = ScreenOrientation.Unspecified;
-                bool wasPortrait = _currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitDown;
-                bool requestPortrait = false;
-
-                bool didOrientationChange = false;
-                // Android 2.3 and above support reverse orientations
-                int sdkVer = (int)Android.OS.Build.VERSION.SdkInt;
-                if (sdkVer >= 10)
+                // Check if the requested orientation is supported. Default means all are supported.
+                if ((supported & value) != 0)
                 {
-                    // Check if the requested orientation is supported. Default means all are supported.
-                    if ((supported & value) != 0)
+                    didOrientationChange = true;
+                    //_currentOrientation = value;
+                    switch (value)
                     {
-                        didOrientationChange = true;
-                        _currentOrientation = value;
-                        switch (value)
-                        {
-                            case DisplayOrientation.LandscapeLeft:
-                                requestedOrientation = (ScreenOrientation)ScreenOrientationAll.Landscape;
-                                requestPortrait = false;
-                                break;
-                            case DisplayOrientation.LandscapeRight:
-                                requestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReverseLandscape;
-                                requestPortrait = false;
-                                break;
-                            case DisplayOrientation.Portrait:
-                                requestedOrientation = (ScreenOrientation)ScreenOrientationAll.Portrait;
-                                requestPortrait = true;
-                                break;
-                            case DisplayOrientation.PortraitDown:
-                                requestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReversePortrait;
-                                requestPortrait = true;
-                                break;
-                        }
+                        case DisplayOrientation.LandscapeLeft:
+                            requestedOrientation = (ScreenOrientation)ScreenOrientationAll.Landscape;
+                            requestPortrait = false;
+                            break;
+                        case DisplayOrientation.LandscapeRight:
+                            requestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReverseLandscape;
+                            requestPortrait = false;
+                            break;
+                        case DisplayOrientation.Portrait:
+                            requestedOrientation = (ScreenOrientation)ScreenOrientationAll.Portrait;
+                            requestPortrait = true;
+                            break;
+                        case DisplayOrientation.PortraitDown:
+                            requestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReversePortrait;
+                            requestPortrait = true;
+                            break;
                     }
                 }
-                else
+            }
+            else
+            {
+                // Check if the requested orientation is either of the landscape orientations and any landscape orientation is supported.
+                if ((value == DisplayOrientation.LandscapeLeft || value == DisplayOrientation.LandscapeRight) &&
+                    ((supported & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0))
                 {
-                    // Check if the requested orientation is either of the landscape orientations and any landscape orientation is supported.
-                    if ((value == DisplayOrientation.LandscapeLeft || value == DisplayOrientation.LandscapeRight) &&
-                        ((supported & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0))
-                    {
-                        didOrientationChange = true;
-                        _currentOrientation = DisplayOrientation.LandscapeLeft;
-                        requestedOrientation = ScreenOrientation.Landscape;
-                        requestPortrait = false;
-                    }
-                    // Check if the requested orientation is either of the portrain orientations and any portrait orientation is supported.
-                    else if ((value == DisplayOrientation.Portrait || value == DisplayOrientation.PortraitDown) &&
-                            ((supported & (DisplayOrientation.Portrait | DisplayOrientation.PortraitDown)) != 0))
-                    {
-                        didOrientationChange = true;
-                        _currentOrientation = DisplayOrientation.Portrait;
-                        requestedOrientation = ScreenOrientation.Portrait;
-                        requestPortrait = true;
-                    }
+                    didOrientationChange = true;
+                    requestedOrientation = ScreenOrientation.Landscape;
+                    requestPortrait = false;
                 }
-
-                if (didOrientationChange)
+                // Check if the requested orientation is either of the portrain orientations and any portrait orientation is supported.
+                else if ((value == DisplayOrientation.Portrait || value == DisplayOrientation.PortraitDown) &&
+                        ((supported & (DisplayOrientation.Portrait | DisplayOrientation.PortraitDown)) != 0))
                 {
-                    // Android doesn't fire Released events for existing touches
-                    // so we need to clear them out.
-                    if (wasPortrait != requestPortrait)
-                    {
-                        TouchPanelState.ReleaseAllTouches();
-                    }
-
-                    Game.Activity.RequestedOrientation = requestedOrientation;
-
-                    OnOrientationChanged();
+                    didOrientationChange = true;
+                    requestedOrientation = ScreenOrientation.Portrait;
+                    requestPortrait = true;
                 }
+            }
+
+            if (didOrientationChange)
+            {
+                // Android doesn't fire Released events for existing touches
+                // so we need to clear them out.
+                if (wasPortrait != requestPortrait)
+                {
+                    TouchPanelState.ReleaseAllTouches();
+                }
+                Android.Util.Log.Debug("MonoGame", " Game.Activity.RequestedOrientation = " + Game.Activity.RequestedOrientation);
+                Android.Util.Log.Debug("MonoGame", " requestedOrientation = " + requestedOrientation);
+                Game.Activity.RequestedOrientation = requestedOrientation;
             }
         }
 

@@ -278,11 +278,6 @@ namespace Microsoft.Xna.Framework
 
 			_game.applyChanges(this);
 #else
-
-#if ANDROID
-            // Trigger a change in orientation in case the supported orientations have changed
-            ((AndroidGameWindow)_game.Window).SetOrientation(_game.Window.CurrentOrientation, false);
-#endif
             // Ensure the presentation parameter orientation and buffer size matches the window
             _graphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
 
