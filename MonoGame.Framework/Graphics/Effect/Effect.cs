@@ -6,10 +6,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-#if WINRT
-using System.Reflection;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
@@ -66,7 +62,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
 		}
 
-        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
+        public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
+            : this(graphicsDevice, effectCode, 0, effectCode.Length)
+        {
+        }
+
+
+        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
 		{
 			// By default we currently cache all unique byte streams
@@ -88,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// effects without any shared instance state.
  
             //Read the header
-            MGFXHeader header = ReadHeader(effectCode);
+            MGFXHeader header = ReadHeader(effectCode, index);
 			var effectKey = header.EffectKey;
 			int headerSize = header.HeaderSize;
 
@@ -97,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Effect cloneSource;
             if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
-                using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
+                using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
             	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
@@ -114,15 +116,14 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
         }
 
-        private MGFXHeader ReadHeader(byte[] effectCode)
+        private MGFXHeader ReadHeader(byte[] effectCode, int index)
         {
             MGFXHeader header;
-            int i=0;
-            header.Signature = BitConverter.ToInt32(effectCode, i); i += 4;
-            header.Version = (int)effectCode[i++];
-            header.Profile = (int)effectCode[i++];
-            header.EffectKey = BitConverter.ToInt32(effectCode, i); i += 4;
-            header.HeaderSize = i;
+            header.Signature = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.Version = (int)effectCode[index++];
+            header.Profile = (int)effectCode[index++];
+            header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.HeaderSize = index;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
                 throw new Exception("This does not appear to be a MonoGame MGFX file!");
@@ -231,23 +232,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         #region Effect File Reader
-
-        internal static byte[] LoadEffectResource(string name)
-        {
-#if WINRT
-            var assembly = typeof(Effect).GetTypeInfo().Assembly;
-#else
-            var assembly = typeof(Effect).Assembly;
-#endif
-            var stream = assembly.GetManifestResourceStream(name);
-            using (var ms = new MemoryStream())
-            {
-                stream.CopyTo(ms);
-                return ms.ToArray();
-            }
-        }
-
-
 
 		private void ReadEffect (BinaryReader reader)
 		{

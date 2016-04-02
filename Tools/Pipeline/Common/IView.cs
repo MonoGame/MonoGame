@@ -37,6 +37,8 @@ namespace MonoGame.Tools.Pipeline
 
         void ShowMessage(string message);
 
+        bool ShowDeleteDialog(string[] items);
+
         void BeginTreeUpdate();
 
         void SetTreeRoot(IProjectItem item);

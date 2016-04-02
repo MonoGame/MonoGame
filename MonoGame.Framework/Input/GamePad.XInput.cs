@@ -132,8 +132,8 @@ namespace Microsoft.Xna.Framework.Input
             ret.HasLeftVibrationMotor = hasForceFeedback && capabilities.Vibration.LeftMotorSpeed > 0;
             ret.HasRightVibrationMotor = hasForceFeedback && capabilities.Vibration.RightMotorSpeed > 0;
 #else
-            ret.HasLeftVibrationMotor = false;
-            ret.HasRightVibrationMotor = false;
+            ret.HasLeftVibrationMotor = (capabilities.Vibration.LeftMotorSpeed > 0);
+            ret.HasRightVibrationMotor = (capabilities.Vibration.RightMotorSpeed > 0);
 #endif
 
             // other

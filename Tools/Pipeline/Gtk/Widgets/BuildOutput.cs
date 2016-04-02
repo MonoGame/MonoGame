@@ -16,11 +16,16 @@ namespace MonoGame.Tools.Pipeline
         TreeIter tmpIter;
         TreeStore listStore;
 
+        OutputParser outputParser;
+
         Uri folderUri;
+        bool textScroll, treeScroll;
 
         public BuildOutput()
         {
             Build();
+
+            outputParser = new OutputParser();
 
             var column = new TreeViewColumn ();
 
@@ -43,8 +48,6 @@ namespace MonoGame.Tools.Pipeline
             listStore = new TreeStore (typeof (Gdk.Pixbuf), typeof (string), typeof (string));
 
             treeview1.Model = listStore;
-
-            textView1.SizeAllocated += TextView1_SizeAllocated;
         }
 
         internal void SetBaseFolder(IController controller)
@@ -53,50 +56,79 @@ namespace MonoGame.Tools.Pipeline
             if (!pl.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
                 pl += System.IO.Path.DirectorySeparatorChar;
             folderUri = new Uri(pl);
+
+            outputParser.Reset();
+        }
+
+        private void Treeview1_SizeAllocated (object o, SizeAllocatedArgs args)
+        {
+            if (treeScroll)
+            {
+                var path = new TreePath((treeview1.Model.IterNChildren() - 1).ToString());
+                treeview1.ScrollToCell(path, null, false, 0, 0);
+            }
         }
 
         private void TextView1_SizeAllocated (object o, SizeAllocatedArgs args)
         {
-            textView1.ScrollToIter(textView1.Buffer.EndIter, 0, false, 0, 0);
+            if (textScroll)
+                textView1.ScrollToIter(textView1.Buffer.EndIter, 0, false, 0, 0);
+        }
+
+        private void Treeview1_ScrollEvent (object o, ScrollEventArgs args)
+        {
+            treeScroll = false;
+        }
+
+        private void TextView1_ScrollEvent (object o, ScrollEventArgs args)
+        {
+            textScroll = false;
         }
 
         public void OutputAppend(string text)
         {
             lock (textView1.Buffer)
             {
-                textView1.Buffer.Text += text + "\r\n";
+                var iter = textView1.Buffer.EndIter;
+                textView1.Buffer.Insert(ref iter, text + Environment.NewLine);
             }
 
             if (string.IsNullOrWhiteSpace(text))
                 return;
 
-            if (text.StartsWith("Build "))
-                AddItem(icon_begin_end, text.Remove(text.Length - 1), "");
-            else if (text.StartsWith("Time "))
-            {
-                treeview1.Model.SetValue(tmpIter, 1, treeview1.Model.GetValue(tmpIter, 1) + ", " + text);
-            }
-            else if (text.StartsWith("Skipping"))
-            {
-                AddItem(icon_skip, "Skipping " + GetRelativePath(text.Substring(9)), "");
-                listStore.AppendValues(tmpIter, null, text.Substring(9), "");
-            }
-            else if (text.StartsWith("Cleaning"))
-            {
-                AddItem(icon_clean, "Cleaning " + GetRelativePath(text.Substring(9)), "");
-                listStore.AppendValues(tmpIter, null, text.Substring(9), "");
-            }
-            else if (text.StartsWith("/") && !text.Contains("error"))
-            {
-                AddItem(icon_processing, "Building " + GetRelativePath(text), "");
-                listStore.AppendValues(tmpIter, null, text, "");
-            }
-            else
-            {
-                if (text.ToLower().Contains("error") || (text.Contains("System") && text.Contains("Exception")))
-                    treeview1.Model.SetValue(tmpIter, 0, icon_fail);
+            outputParser.Parse(text);
+            text = text.TrimEnd(new[] { ' ','\n','\r','\t' });
 
-                listStore.AppendValues(tmpIter, null, text, "");
+            switch (outputParser.State)
+            {
+                case OutputState.BuildBegin:
+                    AddItem(icon_begin_end, text, "");
+                    break;
+                case OutputState.Cleaning:
+                    AddItem(icon_clean, "Cleaning " + GetRelativePath(outputParser.Filename), "");
+                    listStore.AppendValues(tmpIter, null, text, "");
+                    break;
+                case OutputState.Skipping:
+                    AddItem(icon_skip, "Skipping " + GetRelativePath(outputParser.Filename), "");
+                    listStore.AppendValues(tmpIter, null, text, "");
+                    break;
+                case OutputState.BuildAsset:
+                    AddItem(icon_processing, "Building " + GetRelativePath(outputParser.Filename), "");
+                    listStore.AppendValues(tmpIter, null, text, "");
+                    break;
+                case OutputState.BuildError:
+                    listStore.SetValue(tmpIter, 0, icon_fail);
+                    listStore.AppendValues(tmpIter, null, outputParser.ErrorMessage, "");
+                    break;
+                case OutputState.BuildErrorContinue:
+                    listStore.AppendValues(tmpIter, null, outputParser.ErrorMessage, "");
+                    break;
+                case OutputState.BuildEnd:
+                    AddItem(icon_begin_end, text, "");
+                    break;
+                case OutputState.BuildTime:
+                    listStore.SetValue(tmpIter, 1, listStore.GetValue(tmpIter, 1).ToString().TrimEnd(new[] { '.', ' ' }) + ", " + text);
+                    break;
             }
         }
 
@@ -111,8 +143,15 @@ namespace MonoGame.Tools.Pipeline
 
         private string GetRelativePath(string path)
         {
-            var pathUri = new Uri(path);
-            return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
+            try
+            {
+                var pathUri = new Uri(path);
+                return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', System.IO.Path.DirectorySeparatorChar));
+            }
+            catch
+            {
+                return path;
+            }
         }
 
         public void ClearOutput()
@@ -122,6 +161,8 @@ namespace MonoGame.Tools.Pipeline
                 textView1.Buffer.Text = "";
             }
 
+            textScroll = true;
+            treeScroll = true;
             listStore.Clear();
         }
     }

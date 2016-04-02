@@ -11,7 +11,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>project.MonoGame.${Namespace}</string>
 	<key>MinimumOSVersion</key>
-	<string>4.2</string>
+	<string>7.0</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
