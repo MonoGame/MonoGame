@@ -214,6 +214,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+
+        internal void OnPresentationChanged()
+        {
+            // Display orientation is always portrait on WP8
+            PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
+        }
+
 #endif
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 
@@ -551,6 +558,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _d2dContext.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
         }
 
+        internal void OnPresentationChanged()
+        {
+            CreateSizeDependentResources();
+            ApplyRenderTargets(null);
+        }
+
 #endif
 #if WINDOWS
 
@@ -817,7 +830,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 MaxDepth = 1.0f
             };
         }
-		
+
+        internal void OnPresentationChanged()
+        {
+            CreateSizeDependentResources();
+            ApplyRenderTargets(null);
+        }
+
 #endif // WINDOWS
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)

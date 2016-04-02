@@ -426,7 +426,15 @@
     <Compile Include="Graphics\DeviceLostException.cs" />
     <Compile Include="Graphics\DeviceNotResetException.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
-    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="GraphicsDeviceManager.cs">
+		<Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal,Web</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.WinRT.cs">
+		<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.Legacy.cs">
+		<Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsMetrics.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />

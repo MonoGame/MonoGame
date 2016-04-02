@@ -180,7 +180,17 @@ namespace Microsoft.Xna.Framework
             ApplicationView.GetForCurrentView().ExitFullScreenMode();
         }
 
-		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        internal override void OnPresentationChanged()
+        {
+            var presentationParameters = Game.GraphicsDevice.PresentationParameters;
+
+            if (presentationParameters.IsFullScreen)
+                EnterFullScreen();
+            else
+                ExitFullScreen();
+        }
+
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
         }
 
