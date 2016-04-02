@@ -16,6 +16,9 @@ namespace MonoGame.Tests.Framework
             // Test clamping.
             Assert.AreEqual(0x0, new Alpha8(-1234f).PackedValue);
             Assert.AreEqual(0xFF, new Alpha8(1234f).PackedValue);
+
+            //Test ordering
+            Assert.AreEqual(124, new Alpha8(124f / 0xff).PackedValue);
         }
 
         [Test]
@@ -32,6 +35,13 @@ namespace MonoGame.Tests.Framework
             // Test clamping.
             Assert.AreEqual(Vector4.Zero, new Bgra5551(Vector4.One * -1234.0f).ToVector4());
             Assert.AreEqual(Vector4.One, new Bgra5551(Vector4.One * 1234.0f).ToVector4());
+
+            //Test Ordering
+            float x = 0x1a;
+            float y = 0x16;
+            float z = 0xd;
+            float w = 0x1;
+            Assert.AreEqual(0xeacd, new Bgra5551(x / 0x1f, y / 0x1f, z / 0x1f, w).PackedValue);
         }
 
         [Test]
@@ -48,6 +58,11 @@ namespace MonoGame.Tests.Framework
             // Test clamping.
             Assert.AreEqual(Vector2.Zero, new Rg32(Vector2.One * -1234.0f).ToVector2());
             Assert.AreEqual(Vector2.One, new Rg32(Vector2.One * 1234.0f).ToVector2());
+
+            //Test Ordering
+            float x = 0xb6dc;
+            float y = 0xA59f;
+            Assert.AreEqual(0xa59fb6dc, new Rg32(x / 0xffff, y / 0xffff).PackedValue);
         }
 
         [Test]
@@ -64,6 +79,14 @@ namespace MonoGame.Tests.Framework
             // Test clamping.
             Assert.AreEqual(Vector4.Zero, new Rgba1010102(Vector4.One * -1234.0f).ToVector4());
             Assert.AreEqual(Vector4.One, new Rgba1010102(Vector4.One * 1234.0f).ToVector4());
+
+            //Test Ordering
+            float x = 0x2db;
+            float y = 0x36d;
+            float z = 0x3b7;
+            float w = 0x1;
+
+            Assert.AreEqual(0x7B7DB6DB, new Rgba1010102(x / 0x3ff, y / 0x3ff, z / 0x3ff, w / 3).PackedValue);
         }
 
         [Test]
@@ -82,7 +105,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(Vector4.One, new Rgba64(Vector4.One * 1234.0f).ToVector4());
 
             //Test data ordering
-            Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(((float) 0x1EB8) / 0xffff, ((float) 0x570A) / 0xffff, ((float) 0x8F5C) / 0xffff, ((float) 0xC7AD) /0xffff).PackedValue);
+            Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(((float) 0x1EB8) / 0xffff, ((float) 0x570A) / 0xffff, ((float) 0x8F5C) / 0xffff, ((float) 0xC7AD) / 0xffff).PackedValue);
         }
 
         [Test]
@@ -97,6 +120,13 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(-Vector4.One, new NormalizedByte4(-Vector4.One).ToVector4());
             Assert.AreEqual(Vector4.One, new NormalizedByte4(Vector4.One * 1234.0f).ToVector4());
             Assert.AreEqual(-Vector4.One, new NormalizedByte4(Vector4.One * -1234.0f).ToVector4());
+            //Test Ordering
+            float x = 0.1f;
+            float y = -0.3f;
+            float z = 0.5f;
+            float w = -0.7f;
+
+            Assert.AreEqual(0xA740DA0D, new NormalizedByte4(x, y, z, w).PackedValue);
         }
 
         [Test]
@@ -112,8 +142,14 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(Vector2.One, new NormalizedByte2(Vector2.One * 1234.0f).ToVector2());
             Assert.AreEqual(-Vector2.One, new NormalizedByte2(Vector2.One * -1234.0f).ToVector2());
 
-            Assert.AreEqual(new Vector4(1,1,0,1), ((IPackedVector)new NormalizedByte2(Vector2.One)).ToVector4());
-            Assert.AreEqual(new Vector4(0,0,0,1), ((IPackedVector)new NormalizedByte2(Vector2.Zero)).ToVector4());
+            Assert.AreEqual(new Vector4(1, 1, 0, 1), ((IPackedVector) new NormalizedByte2(Vector2.One)).ToVector4());
+            Assert.AreEqual(new Vector4(0, 0, 0, 1), ((IPackedVector) new NormalizedByte2(Vector2.Zero)).ToVector4());
+
+            //Test Ordering
+            float x = 0.1f;
+            float y = -0.3f;
+
+            Assert.AreEqual(0xda0d, new NormalizedByte2(x, y).PackedValue);
         }
 
         [Test]
@@ -128,6 +164,14 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(-Vector4.One, new NormalizedShort4(-Vector4.One).ToVector4());
             Assert.AreEqual(Vector4.One, new NormalizedShort4(Vector4.One * 1234.0f).ToVector4());
             Assert.AreEqual(-Vector4.One, new NormalizedShort4(Vector4.One * -1234.0f).ToVector4());
+
+            //Test Ordering
+            float x = 0.1f;
+            float y = -0.3f;
+            float z = 0.5f;
+            float w = -0.7f;
+
+            Assert.AreEqual(0xa6674000d99a0ccd, new NormalizedShort4(x, y, z, w).PackedValue);
         }
 
         [Test]
@@ -143,8 +187,13 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(Vector2.One, new NormalizedShort2(Vector2.One * 1234.0f).ToVector2());
             Assert.AreEqual(-Vector2.One, new NormalizedShort2(Vector2.One * -1234.0f).ToVector2());
 
-            Assert.AreEqual(new Vector4(1, 1, 0, 1), ((IPackedVector)new NormalizedShort2(Vector2.One)).ToVector4());
-            Assert.AreEqual(new Vector4(0, 0, 0, 1), ((IPackedVector)new NormalizedShort2(Vector2.Zero)).ToVector4());
+            Assert.AreEqual(new Vector4(1, 1, 0, 1), ((IPackedVector) new NormalizedShort2(Vector2.One)).ToVector4());
+            Assert.AreEqual(new Vector4(0, 0, 0, 1), ((IPackedVector) new NormalizedShort2(Vector2.Zero)).ToVector4());
+
+            //Test Ordering
+            float x = 0.35f;
+            float y = -0.2f;
+            Assert.AreEqual(0xE6672CCC, new NormalizedShort2(x, y).PackedValue);
         }
 
         [Test]
@@ -167,9 +216,15 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(Vector2.One * -0x8000, new Short2(Vector2.One * -1234567.0f).ToVector2());
 
             // Test ToVector4.
-            Assert.AreEqual(new Vector4(0x7FFF, 0x7FFF, 0, 1), ((IPackedVector)new Short2(Vector2.One * 0x7FFF)).ToVector4());
-            Assert.AreEqual(new Vector4(0, 0, 0, 1), ((IPackedVector)new Short2(Vector2.Zero)).ToVector4());
-            Assert.AreEqual(new Vector4(-0x8000, -0x8000, 0, 1), ((IPackedVector)new Short2(Vector2.One * -0x8000)).ToVector4());
+            Assert.AreEqual(new Vector4(0x7FFF, 0x7FFF, 0, 1), ((IPackedVector) new Short2(Vector2.One * 0x7FFF)).ToVector4());
+            Assert.AreEqual(new Vector4(0, 0, 0, 1), ((IPackedVector) new Short2(Vector2.Zero)).ToVector4());
+            Assert.AreEqual(new Vector4(-0x8000, -0x8000, 0, 1), ((IPackedVector) new Short2(Vector2.One * -0x8000)).ToVector4());
+
+            //Test ordering
+            float x = 0x2db1;
+            float y = 0x361d;
+            Assert.AreEqual(0x361d2db1, new Short2(x, y).PackedValue);
+
         }
 
         [Test]
@@ -192,6 +247,13 @@ namespace MonoGame.Tests.Framework
             // Test clamping.
             Assert.AreEqual(Vector4.One * 0x7FFF, new Short4(Vector4.One * 1234567.0f).ToVector4());
             Assert.AreEqual(Vector4.One * -0x8000, new Short4(Vector4.One * -1234567.0f).ToVector4());
+
+            //Test Ordering
+            float x = 0x2d1b;
+            float y = 0x316d;
+            float z = 0x73b7;
+            float w = 0x00c1;
+            Assert.AreEqual(0x00c173b7316d2d1b, new Short4(x, y, z, w).PackedValue);
         }
 
         [Test]
@@ -262,6 +324,13 @@ namespace MonoGame.Tests.Framework
             // Test clamping.
             Assert.AreEqual(Vector4.Zero, new Byte4(Vector4.One * -1234.0f).ToVector4());
             Assert.AreEqual(Vector4.One * 255, new Byte4(Vector4.One * 1234.0f).ToVector4());
+
+            //Test ordering
+            float x = 0x2d;
+            float y = 0x36;
+            float z = 0x7b;
+            float w = 0x1a;
+            Assert.AreEqual(0x1a7b362d, new Byte4(x, y, z, w).PackedValue);
         }
     }
 }
