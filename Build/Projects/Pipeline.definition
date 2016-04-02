@@ -11,8 +11,7 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MGCB" />
-    <Reference Include="Eto.Forms" />
-
+    
     <Reference Include="PipelineReferences" />
   </References>
 

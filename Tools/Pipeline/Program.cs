@@ -20,6 +20,9 @@ namespace MonoGame.Tools.Pipeline
             Styles.Load();
 
 #if WINDOWS
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+
             PipelineSettings.Default.Load();
 
 			var view = new MainView();

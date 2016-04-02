@@ -2,6 +2,9 @@
 <ExternalProject Name="PipelineReferences">
 
   <Platform Type="Linux">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.Gtk3" Path="ThirdParty\Dependencies\Eto\Eto.Gtk3.dll" />
+      
     <Binary
       Name="gtk-sharp"
       Path="ThirdParty\Dependencies\Gtk3\gtk-sharp.dll"
@@ -37,6 +40,9 @@
   </Platform>
 
   <Platform Type="MacOS">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.Gtk2" Path="ThirdParty\Dependencies\Eto\Eto.Gtk2.dll" />
+    
     <Reference Include="atk-sharp"/>
     <Reference Include="gdk-sharp"/>
     <Reference Include="glade-sharp"/>
@@ -48,6 +54,9 @@
   </Platform>
 
   <Platform Type="Windows">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.WinForms" Path="ThirdParty\Dependencies\Eto\Eto.WinForms.dll" />
+    
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
