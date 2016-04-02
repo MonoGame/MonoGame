@@ -137,6 +137,7 @@
     <Compile Include="Framework\Visual\EffectTest.cs" />
     <Compile Include="Framework\Visual\GraphicsDeviceTest.cs" />
     <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
+    <Compile Include="Framework\Visual\RenderTarget2DTest.cs" />
     <Compile Include="Framework\Visual\RenderTargetCubeTest.cs" />
     <Compile Include="Framework\Visual\SamplerStateTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
@@ -392,6 +393,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RenderTarget2D\GenerateMips.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SamplerState\VisualTestAddressModes.png">
