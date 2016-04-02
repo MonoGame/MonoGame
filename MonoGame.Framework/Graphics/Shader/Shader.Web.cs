@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal partial class Shader
     {
-        private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
+        private void PlatformConstruct(IShaderReader reader, bool isVertexShader, byte[] shaderBytecode)
         {
             throw new NotImplementedException();
         }
