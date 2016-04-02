@@ -338,6 +338,11 @@ namespace MonoGame.Tools.Pipeline
             MessageBox.Show(this, message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        public bool ShowDeleteDialog(string[] items)
+        {
+            throw new NotImplementedException();
+        }
+
         public void BeginTreeUpdate()
         {
             Debug.Assert(_treeUpdating == false, "Must finish previous tree update!");
@@ -827,7 +832,7 @@ namespace MonoGame.Tools.Pipeline
                     dirs.Add(node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1));
             }
 
-            _controller.Exclude(items, dirs);      
+            _controller.Exclude(items, dirs, false);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -858,6 +863,8 @@ namespace MonoGame.Tools.Pipeline
 
                 // Ensure name is unique among files at this location?
                 _controller.NewItem(dlg.NameGiven, location, template);
+
+                UpdateMenus();
             }
         }
 

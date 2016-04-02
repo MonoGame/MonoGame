@@ -47,7 +47,6 @@ using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
 using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 
 #endregion Using clause
 
@@ -229,16 +228,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers [0].IsSignedInToLive)) {
 
 			}
-		}
-
-		public static IAsyncResult BeginShowStorageDeviceSelector (AsyncCallback callback, object state)
-		{
-			return null;
-		}
-
-		public static StorageDevice EndShowStorageDeviceSelector (IAsyncResult result)
-		{
-			return null;
 		}
 
 		#region Properties

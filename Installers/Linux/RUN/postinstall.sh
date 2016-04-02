@@ -16,15 +16,17 @@ fi
 DIR=$(pwd)
 IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
 
-# Automatic dependency installer
-./Dependencies/dependencies.sh
-
-# MonoDevelop addin
-read -p "Install monodevelop addin(Y, n): " choice2
+# Show dependency list
+echo "Please make sure the following packages are installed:"
+echo " - monodevelop"
+echo " - libopenal-dev"
+echo " - referenceassemblies-pcl / mono-pcl"
+echo " - ttf-mscorefonts-installer / mscore-fonts"
+echo " - gtk-sharp3"
+read -p "Continue (Y, n): " choice2
 case "$choice2" in 
-	n|N ) ;;
-	*)
-	sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack"
+	n|N ) exit ;;
+	*) ;;
 esac
 
 # MonoGame SDK installation
@@ -35,6 +37,37 @@ mkdir -p "$IDIR"
 cp -rf "$DIR/MonoGameSDK/." "$IDIR" -R
 rm -rf "/opt/MonoGameSDK"
 ln -s "$IDIR" "/opt/MonoGameSDK"
+
+# Fix Permissions
+chmod +x "$IDIR/Tools/ffmpeg"
+chmod +x "$IDIR/Tools/ffprobe"
+
+# Rider stuff
+if type "rider" > /dev/null 2>&1
+then
+	FINDCOMMAND=$(type -a rider)
+	COMMAND=$(echo $FINDCOMMAND| cut -d' ' -f 3)
+	
+	FINDRIDER=$(cat $COMMAND | grep "RUN_PATH")
+	RIDER=$(echo $FINDRIDER| cut -d"'" -f 2)
+	
+	RIDERDIR=$(dirname $(dirname $RIDER))
+	RXBUILD="$RIDERDIR/lib/ReSharperHost/linux-x64/mono/lib/mono/xbuild/MonoGame"
+	
+	mkdir -p "$RXBUILD"
+	ln -s "$IDIR" "$RXBUILD/v3.0"
+fi
+
+# MonoDevelop addin
+if type "mdtool" > /dev/null 2>&1
+then
+	read -p "Install monodevelop addin(Y, n): " choice2
+	case "$choice2" in 
+		n|N ) ;;
+		*)
+		sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack"
+	esac
+fi
 
 # Monogame Pipeline terminal commands
 echo "Creating launcher items..."

@@ -23,10 +23,10 @@
 				<Reference type="Gac" refto="System" />
 				<Reference type="Gac" refto="System.Xml" />
 				<Reference type="Gac" refto="System.Core" />
+				<Reference type="Package" refto="MonoGame.Framework" />
+				<Reference type="Package" refto="OpenTK" />
+				<Reference type="Package" refto="NVorbis" />
 			</References>
-			<Packages>
-				<Package id="MonoGame.Framework.WindowsGL" version="3.3.0" targetFramework="net40" />
-			</Packages>
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
 				<File name="Program.cs" src="Common/Program.cs" />
@@ -36,13 +36,10 @@
 					<File name="AssemblyInfo.cs" src="Common/AssemblyInfo.cs" />
 				</Directory>
 				<Directory name="Content">
-					<File name="Content.mgcb" src="Common/Content.mgcb"/>
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference" />
 				</Directory>
 				<ContentFile>
 					<File name="OpenTK.dll.config" src="Common/OpenTK.dll.config" CopyToOutputDirectory="PreserveNewest" />
-				</ContentFile>
-				<ContentFile>
-					<File name="Tao.Sdl.dll.config" src="Common/Tao.Sdl.dll.config" CopyToOutputDirectory="PreserveNewest" />
 				</ContentFile>
 			</Files>
 		</Project>

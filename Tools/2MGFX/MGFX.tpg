@@ -408,19 +408,18 @@ Sampler_Register_Expression -> Colon Register OpenParenthesis Identifier (Comma 
 	return null;
 };
 
-Sampler_Declaration -> Sampler Identifier Sampler_Register_Expression* ((Equals SamplerState)? OpenBracket Sampler_State_Expression* CloseBracket Semicolon)?
+Sampler_Declaration_States -> (Equals SamplerState)? OpenBracket Sampler_State_Expression* CloseBracket;
+
+Sampler_Declaration -> Sampler Identifier Sampler_Register_Expression* Sampler_Declaration_States? Semicolon
 {
-	if ($OpenBracket == null)
-		return null;
-	
 	var sampler = new SamplerStateInfo();
 	sampler.Name = $Identifier as string;
 	
 	foreach (ParseNode node in Nodes)
 		node.Eval(tree, sampler);
-
+	
 	var shaderInfo = paramlist[0] as ShaderInfo;
 	shaderInfo.SamplerStates.Add(sampler.Name, sampler);
-
+	
 	return null;
 };
