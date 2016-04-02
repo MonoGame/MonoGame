@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.18.1 -->
 <interface>
-  <requires lib="gtk+" version="3.10"/>
+  <requires lib="gtk+" version="3.16"/>
+  <menu id="appmenu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Help</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_About</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Quit</attribute>
+      </item>
+    </section>
+  </menu>
   <object class="GtkImage" id="build_image">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -31,14 +44,6 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">open-menu-symbolic</property>
-  </object>
-  <object class="GtkMenu" id="menu1">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-  </object>
-  <object class="GtkMenu" id="menu2">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
   </object>
   <object class="GtkHeaderBar" id="headerbar">
     <property name="visible">True</property>
@@ -102,7 +107,6 @@
         <property name="can_default">True</property>
         <property name="receives_default">False</property>
         <property name="tooltip_text" translatable="yes">Open</property>
-        <!--property name="popup">menu1</property-->
         <property name="valign">center</property>
       </object>
     </child>
@@ -114,7 +118,6 @@
         <property name="tooltip_text" translatable="yes">Menu</property>
         <property name="valign">center</property>
         <property name="image">menu_image</property>
-        <property name="popup">menu2</property>
         <property name="use_popover">False</property>
       </object>
       <packing>
@@ -152,5 +155,97 @@
     <style>
       <class name="titlebar"/>
     </style>
+  </object>
+  <object class="GtkPopoverMenu" id="popovermenu1">
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="margin">10</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkModelButton" id="saveas_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Save As</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="undo_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Undo</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="redo_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Redo</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton">
+            <property name="visible">True</property>
+            <property name="menu-name">build</property>
+            <property name="text" translatable="yes">Build</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="close_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Close</property>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="submenu">main</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="margin">10</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkModelButton">
+            <property name="visible">True</property>
+            <property name="menu-name">main</property>
+            <property name="inverted">True</property>
+            <property name="text" translatable="yes">Build</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="clean_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Clean</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="debugmode_button">
+            <property name="visible">True</property>
+            <property name="text" translatable="yes">Debug Mode</property>
+            <property name="role">1</property>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="submenu">build</property>
+      </packing>
+    </child>
   </object>
 </interface>

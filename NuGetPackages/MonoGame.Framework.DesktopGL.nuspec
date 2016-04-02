@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.Framework.DesktopGL</id>
+        <version>0.0.0.0</version>
+        <title>MonoGame.Framework.DesktopGL</title>
+        <authors>MonoGameTeam</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt#L2</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes></releaseNotes>
+        <copyright>Copyright  2016</copyright>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="WindowsGL\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
+        <file src="WindowsGL\AnyCPU\Release\NVorbis.dll" target="lib\net40\NVorbis.dll" />
+        <file src="WindowsGL\AnyCPU\Release\OpenTK.dll" target="lib\net40\OpenTK.dll" />
+        <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
+    </files>
+</package>
