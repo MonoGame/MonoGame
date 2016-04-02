@@ -582,6 +582,18 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Allows the game to call <see cref="Game.Draw"/> multiple times per step, that is
+        /// it allows the game to render faster than the vertical refresh rate of the screen.
+        /// <para>
+        /// This is a separate option to <see cref="SynchronizeWithVerticalRetrace"/>, because
+        /// you may want to disable vsync, but still only call <see cref="Game.Draw"/> once.  For
+        /// this option to be useful, you need to set <see cref="SynchronizeWithVerticalRetrace"/>
+        /// to <c>false</c>.
+        /// </para>
+        /// </summary>
+        public bool RenderMultipleFramesPerStep { get; set; }
+
+        /// <summary>
         /// This method is used by MonoGame Android to adjust the game's drawn to area to fill
         /// as much of the screen as possible whilst retaining the aspect ratio inferred from
         /// aspectRatio = (PreferredBackBufferWidth / PreferredBackBufferHeight)
