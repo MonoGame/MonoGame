@@ -65,6 +65,7 @@
       <exec program="Protobuild" commandline="-generate WindowsGL" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.Framework.WindowsGL.sln /t:Build /p:Configuration=Release" />
+      <call target="build_portable"/>
     </if>
     <if test="${os == 'Unix'}">
       <exec program="mono" commandline="Protobuild.exe -generate Windows" />
@@ -74,6 +75,14 @@
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.WindowsGL.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.WindowsGL.sln" />
     </if>
+  </target>
+
+  <target name="build_portable" description="Build Portable" depends="_prebuild,build_windows">
+    <mkdir dir="MonoGame.Framework\bin\Portable\AnyCPU" />
+    <exec program="ThirdParty\Dependencies\Piranha\Piranha.exe " commandline='make-portable-skeleton -i MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll -o MonoGame.Framework\bin\Portable\AnyCPU\MonoGame.Framework.dll -p ".NETPortable,Version=v4.0,Profile=Profile96"' />
+    <exec program="ThirdParty\Dependencies\Piranha\Piranha.exe " commandline='make-portable-skeleton -i MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.Net.dll -o MonoGame.Framework\bin\Portable\AnyCPU\MonoGame.Framework.Net.dll -p ".NETPortable,Version=v4.0,Profile=Profile96"' />
+    <mkdir dir="MonoGame.Framework.Content.Pipeline\bin\Portable\AnyCPU" />
+    <exec program="ThirdParty\Dependencies\Piranha\Piranha.exe " commandline='make-portable-skeleton -i MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll -o MonoGame.Framework.Content.Pipeline\bin\Portable\AnyCPU\MonoGame.Framework.Content.Pipeline.dll -p ".NETPortable,Version=v4.0,Profile=Profile96"' />
   </target>
 
   <target name="build_linux" description="Build Linux" depends="_prebuild">
