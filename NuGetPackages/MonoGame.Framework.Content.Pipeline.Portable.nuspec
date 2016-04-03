@@ -16,7 +16,7 @@
         <copyright>Copyright 2016</copyright>
         <language>en-US</language>
         <references>
-            <reference file="MonoGame.Framework.Content.Pipeline.Portable.dll" />
+            <reference file="MonoGame.Framework.Content.Pipeline.dll" />
         </references>	
 	</metadata>
     <files>
