@@ -1,4 +1,5 @@
 using Gtk;
+using GLib;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -8,10 +9,20 @@ namespace MonoGame.Tools.Pipeline
         HeaderBar hbar;
 
         [Builder.ObjectAttribute] Button new_button;
-        [Builder.ObjectAttribute] Button open_button;
         [Builder.ObjectAttribute] Button save_button;
         [Builder.ObjectAttribute] Button build_button;
-        [Builder.ObjectAttribute] Menu menu2;
+        [Builder.ObjectAttribute] Button rebuild_button;
+        [Builder.ObjectAttribute] Button cancel_button;
+        [Builder.ObjectAttribute] Separator separator1;
+        [Builder.ObjectAttribute] ToggleButton filteroutput_button;
+        [Builder.ObjectAttribute] Button saveas_button;
+        [Builder.ObjectAttribute] Button undo_button;
+        [Builder.ObjectAttribute] Button redo_button;
+        [Builder.ObjectAttribute] Button close_button;
+        [Builder.ObjectAttribute] Button clean_button;
+
+        MenuButton open_button, gear_button;
+        ModalButton debugmode_button;
         #endif
 
 		private global::Gtk.UIManager UIManager;
@@ -40,7 +51,9 @@ namespace MonoGame.Tools.Pipeline
 		
 		private global::Gtk.Action RedoAction;
 
-		Action RenameAction;
+        Action RenameAction;
+
+        private global::Gtk.Action ExcludeAction;
 		
 		private global::Gtk.Action DeleteAction;
 		
@@ -85,6 +98,11 @@ namespace MonoGame.Tools.Pipeline
 		private global::MonoGame.Tools.Pipeline.PropertiesView propertiesview1;
 		
         BuildOutput buildOutput1;
+        TreeView treeview1;
+
+        Toolbar toolBar1;
+        ToolButton toolNew, toolOpen, toolSave, toolUndo, toolRedo, toolNewItem, toolNewFolder, toolAddItem, toolAddFolder, toolBuild, toolRebuild, toolClean, toolCancelBuild;
+        ToggleToolButton toolFilterOutput;
 
 		protected virtual void Build ()
 		{
@@ -131,7 +149,10 @@ namespace MonoGame.Tools.Pipeline
 			w1.Add (this.RedoAction, "<Control>y");
 			RenameAction = new Action ("RenameAction", global::Mono.Unix.Catalog.GetString ("Rename"), null, null);
 			RenameAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Rename");
-			w1.Add (RenameAction, null);
+            w1.Add (RenameAction, null);
+            this.ExcludeAction = new global::Gtk.Action ("ExcludeAction", global::Mono.Unix.Catalog.GetString ("Exclude from Project"), null, null);
+            this.ExcludeAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Exclude");
+            w1.Add (this.ExcludeAction, null);
             this.DeleteAction = new global::Gtk.Action ("DeleteAction", global::Mono.Unix.Catalog.GetString ("Delete"), null, "gtk-delete");
 			this.DeleteAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Delete");
 			w1.Add (this.DeleteAction, null);
@@ -190,10 +211,66 @@ namespace MonoGame.Tools.Pipeline
 			this.vbox2 = new global::Gtk.VBox ();
 			this.vbox2.Name = "vbox2";
 			// Container child vbox2.Gtk.Box+BoxChild
-            this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='OpenAction' action='OpenAction'/><menuitem name='OpenRecentAction' action='OpenRecentAction'/><menuitem name='CloseAction' action='CloseAction'/><separator/><menuitem name='ImportAction' action='ImportAction'/><separator/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><separator/><menuitem name='ExitAction' action='ExitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='UndoAction' action='UndoAction'/><menuitem name='RedoAction' action='RedoAction'/><separator/><menu name='AddAction' action='AddAction'><menuitem name='NewItemAction' action='NewItemAction'/><menuitem name='NewFolderAction' action='NewFolderAction'/><separator/><menuitem name='ExistingItemAction' action='ExistingItemAction'/><menuitem name='ExistingFolderAction' action='ExistingFolderAction'/></menu><separator/><menuitem name='RenameAction' action='RenameAction'/><menuitem name='DeleteAction' action='DeleteAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/><menuitem name='CancelBuildAction' action='CancelBuildAction'/><separator name='sep1'/><menuitem name='DebugModeAction' action='DebugModeAction'/><menuitem name='FilterOutputAction' action='FilterOutputAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='ViewHelpAction' action='ViewHelpAction'/><separator/><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
+            this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='OpenAction' action='OpenAction'/><menuitem name='OpenRecentAction' action='OpenRecentAction'/><menuitem name='CloseAction' action='CloseAction'/><separator/><menuitem name='ImportAction' action='ImportAction'/><separator/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><separator/><menuitem name='ExitAction' action='ExitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='UndoAction' action='UndoAction'/><menuitem name='RedoAction' action='RedoAction'/><separator/><menu name='AddAction' action='AddAction'><menuitem name='NewItemAction' action='NewItemAction'/><menuitem name='NewFolderAction' action='NewFolderAction'/><separator/><menuitem name='ExistingItemAction' action='ExistingItemAction'/><menuitem name='ExistingFolderAction' action='ExistingFolderAction'/></menu><separator/><menuitem name='ExcludeAction' action='ExcludeAction'/><separator/><menuitem name='RenameAction' action='RenameAction'/><menuitem name='DeleteAction' action='DeleteAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/><menuitem name='CancelBuildAction' action='CancelBuildAction'/><separator name='sep1'/><menuitem name='DebugModeAction' action='DebugModeAction'/><menuitem name='FilterOutputAction' action='FilterOutputAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='ViewHelpAction' action='ViewHelpAction'/><separator/><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
 			this.menubar1 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar1")));
 			this.menubar1.Name = "menubar1";
 			this.vbox2.Add (this.menubar1);
+
+            toolBar1 = new Toolbar();
+
+            toolNew = Global.GetToolButton(NewAction, "Toolbar.New.png");
+            toolBar1.Add(toolNew);
+
+            toolOpen = Global.GetToolButton(OpenAction, "Toolbar.Open.png");
+            toolBar1.Add(toolOpen);
+
+            toolSave = Global.GetToolButton(SaveAction, "Toolbar.Save.png");
+            toolBar1.Add(toolSave);
+
+            toolBar1.Add(new SeparatorToolItem());
+
+            toolUndo = Global.GetToolButton(UndoAction, "Toolbar.Undo.png");
+            toolBar1.Add(toolUndo);
+
+            toolRedo = Global.GetToolButton(RedoAction, "Toolbar.Redo.png");
+            toolBar1.Add(toolRedo);
+
+            toolBar1.Add(new SeparatorToolItem());
+
+            toolNewItem = Global.GetToolButton(NewItemAction, "Toolbar.NewItem.png");
+            toolBar1.Add(toolNewItem);
+
+            toolAddItem = Global.GetToolButton(ExistingItemAction, "Toolbar.ExistingItem.png");
+            toolBar1.Add(toolAddItem);
+
+            toolNewFolder = Global.GetToolButton(NewFolderAction, "Toolbar.NewFolder.png");
+            toolBar1.Add(toolNewFolder);
+
+            toolAddFolder = Global.GetToolButton(ExistingFolderAction, "Toolbar.ExistingFolder.png");
+            toolBar1.Add(toolAddFolder);
+
+            toolBar1.Add(new SeparatorToolItem());
+
+            toolBuild = Global.GetToolButton(BuildAction1, "Toolbar.Build.png");
+            toolBar1.Add(toolBuild);
+
+            toolRebuild = Global.GetToolButton(RebuildAction, "Toolbar.Rebuild.png");
+            toolBar1.Add(toolRebuild);
+
+            toolClean = Global.GetToolButton(CleanAction, "Toolbar.Clean.png");
+            toolBar1.Add(toolClean);
+
+            toolCancelBuild = Global.GetToolButton(CancelBuildAction, "Toolbar.CancelBuild.png");
+            toolBar1.Add(toolCancelBuild);
+
+            toolBar1.Add(new SeparatorToolItem());
+
+            toolFilterOutput = Global.GetToggleToolButton(FilterOutputAction, "Toolbar.FilterOutput.png");
+            toolBar1.Add(toolFilterOutput);
+
+            if (!Global.UseHeaderBar)
+                this.vbox2.PackStart(toolBar1, false, true, 0);
+
 			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.menubar1]));
 			w2.Position = 0;
 			w2.Expand = false;
@@ -230,34 +307,103 @@ namespace MonoGame.Tools.Pipeline
             this.hpaned1.Add (this.buildOutput1);
 			this.vbox2.Add (this.hpaned1);
 			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.hpaned1]));
-			w8.Position = 1;
+			w8.Position = 2;
 			this.Add (this.vbox2);
 
-            #if GTK3
+            treeview1 = new TreeView();
+
+#if GTK3
             if(Global.UseHeaderBar)
             {
-                Builder builder = new Builder(null, "MonoGame.Tools.Pipeline.Gtk.MainWindow.HeaderBar.glade", null);
+                vbox2.Remove (menubar1);
+
+                var builder = new Builder(null, "MonoGame.Tools.Pipeline.Gtk.MainWindow.HeaderBar.glade", null);
+
                 hbar = new HeaderBar(builder.GetObject("headerbar").Handle);
+                open_button = new MenuButton(builder.GetObject("open_button").Handle);
+                gear_button = new MenuButton(builder.GetObject("gear_button").Handle);
+                debugmode_button = new ModalButton(builder.GetObject("debugmode_button").Handle);
                 builder.Autoconnect(this);
 
                 hbar.AttachToWindow(this);
                 hbar.ShowCloseButton = true;
                 hbar.Show();
 
-                foreach(var o in menubar1.Children)
-                {
-                    menubar1.Remove(o);
-                    menu2.Insert(o, 4);
-                }
+                var gearpopover = new PopoverMenu(builder.GetObject("popovermenu1").Handle);
+                gearpopover.WidthRequest = 200;
 
-                new_button.Clicked += OnNewActionActivated;
-                open_button.Clicked += OnOpenActionActivated;
-                save_button.Clicked += OnSaveActionActivated;
-                build_button.Clicked += OnBuildAction1Activated;
+                gear_button.Popover = gearpopover;
 
-                vbox2.Remove (menubar1);
+                new_button.UseActionAppearance = false;
+                new_button.RelatedAction = NewAction;
+                save_button.UseActionAppearance = false;
+                save_button.RelatedAction = SaveAction;
+                build_button.UseActionAppearance = false;
+                build_button.RelatedAction = BuildAction1;
+                rebuild_button.UseActionAppearance = false;
+                rebuild_button.RelatedAction = RebuildAction;
+                cancel_button.UseActionAppearance = false;
+                cancel_button.RelatedAction = CancelBuildAction;
+                saveas_button.RelatedAction = SaveAsAction;
+                undo_button.RelatedAction = UndoAction;
+                redo_button.RelatedAction = RedoAction;
+                close_button.RelatedAction = CloseAction;
+                clean_button.RelatedAction = CleanAction;
+                debugmode_button.RelatedAction = DebugModeAction;
+                filteroutput_button.UseActionAppearance = false;
+                filteroutput_button.RelatedAction = FilterOutputAction;
+
+                var popover = new Popover(open_button);
+
+                var vbox = new VBox();
+                vbox.WidthRequest = 350;
+                vbox.HeightRequest = 300;
+
+                Gtk3Wrapper.gtk_tree_view_set_activate_on_single_click(treeview1.Handle, true);
+                treeview1.HeadersVisible = false;
+                treeview1.EnableGridLines = TreeViewGridLines.Horizontal;
+                treeview1.HoverSelection = true;
+                treeview1.RowActivated += delegate(object o, RowActivatedArgs args) {
+                    popover.Hide();
+
+                    TreeIter iter;
+                    if(!recentListStore.GetIter(out iter, args.Path))
+                        return;
+
+                    OpenProject(recentListStore.GetValue(iter, 1).ToString());
+                };
+
+                var scroll1 = new ScrolledWindow();
+                scroll1.WidthRequest = 350;
+                scroll1.HeightRequest = 300;
+                scroll1.Add(treeview1);
+
+                vbox.PackStart(scroll1, true, true, 0);
+
+                var hbox = new HBox();
+
+                var openButton = new Button("Open Other...");
+                openButton.Clicked += delegate(object sender, System.EventArgs e) {
+                    popover.Hide();
+                    OnOpenActionActivated(sender, e);
+                };
+                hbox.PackStart(openButton, true, true, 0);
+
+                var importButton = new Button("Import");
+                importButton.Clicked += delegate(object sender, System.EventArgs e) {
+                    popover.Hide();
+                    OnImportActionActivated(sender, e);
+                };
+                hbox.PackStart(importButton, false, true, 1);
+
+                vbox.PackStart(hbox, false, true, 1);
+
+                vbox.ShowAll();
+
+                popover.Add(vbox);
+                open_button.Popover = popover;
             }
-            #endif
+#endif
 
             this.Title = basetitle;
 
@@ -274,31 +420,32 @@ namespace MonoGame.Tools.Pipeline
             this.SetGeometryHints(this, geom, Gdk.WindowHints.MinSize);
             #endif
 
-			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
-			this.NewAction.Activated += new global::System.EventHandler (this.OnNewActionActivated);
-			this.OpenAction.Activated += new global::System.EventHandler (this.OnOpenActionActivated);
+            this.NewAction.Activated += new global::System.EventHandler (this.OnNewActionActivated);
+            this.OpenAction.Activated += new global::System.EventHandler (this.OnOpenActionActivated);
 			this.CloseAction.Activated += new global::System.EventHandler (this.OnCloseActionActivated);
 			this.ImportAction.Activated += new global::System.EventHandler (this.OnImportActionActivated);
-			this.SaveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
+            this.SaveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
 			this.SaveAsAction.Activated += new global::System.EventHandler (this.OnSaveAsActionActivated);
-			this.ExitAction.Activated += new global::System.EventHandler (this.OnExitActionActivated);
+            this.ExitAction.Activated += new global::System.EventHandler (this.OnExitActionActivated);
 			this.UndoAction.Activated += new global::System.EventHandler (this.OnUndoActionActivated);
-			this.RedoAction.Activated += new global::System.EventHandler (this.OnRedoActionActivated);
-			RenameAction.Activated += this.OnRenameActionActivated;
+            this.RedoAction.Activated += new global::System.EventHandler (this.OnRedoActionActivated);
+            ExcludeAction.Activated += this.OnExcludeActionActivated;
+            RenameAction.Activated += this.OnRenameActionActivated;
 			this.DeleteAction.Activated += new global::System.EventHandler (this.OnDeleteActionActivated);
 			this.BuildAction1.Activated += new global::System.EventHandler (this.OnBuildAction1Activated);
 			this.RebuildAction.Activated += new global::System.EventHandler (this.OnRebuildActionActivated);
 			this.CleanAction.Activated += new global::System.EventHandler (this.OnCleanActionActivated);
 			this.ViewHelpAction.Activated += new global::System.EventHandler (this.OnViewHelpActionActivated);
 			this.AboutAction.Activated += new global::System.EventHandler (this.OnAboutActionActivated);
-			this.NewItemAction.Activated += new global::System.EventHandler (this.OnNewItemActionActivated);
-			this.NewFolderAction.Activated += new global::System.EventHandler (this.OnNewFolderActionActivated);
+            this.NewItemAction.Activated += new global::System.EventHandler (this.OnNewItemActionActivated);
+            this.NewFolderAction.Activated += new global::System.EventHandler (this.OnNewFolderActionActivated);
 			this.ExistingItemAction.Activated += new global::System.EventHandler (this.OnAddItemActionActivated);
 			this.ExistingFolderAction.Activated += new global::System.EventHandler (this.OnAddFolderActionActivated);
 			this.DebugModeAction.Activated += new global::System.EventHandler (this.OnDebugModeActionActivated); 
             this.FilterOutputAction.Activated += OnFilterOutputActionActivated;
 			this.CancelBuildAction.Activated += new global::System.EventHandler (this.OnCancelBuildActionActivated);
+			this.SizeAllocated += MainWindow_SizeAllocated;
 		}
 	}
 }

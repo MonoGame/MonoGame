@@ -102,7 +102,14 @@ namespace Microsoft.Xna.Framework
 
         public override string ScreenDeviceName { get { return window.Title; } }
 
-        public override Rectangle ClientBounds { get { return clientBounds; } }
+        public override Rectangle ClientBounds 
+        { 
+            get 
+            {
+                var pos = window.PointToScreen(new System.Drawing.Point(0));
+                return new Rectangle(pos.X, pos.Y, clientBounds.Width, clientBounds.Height);
+            }
+        }
 
         // TODO: this is buggy on linux - report to opentk team
         public override bool AllowUserResizing
@@ -215,7 +222,7 @@ namespace Microsoft.Xna.Framework
         private void OnResize(object sender, EventArgs e)
         {
             // Ignore resize events until intialization is complete
-            if (Game == null)
+            if (Game == null || Game.GraphicsDevice == null)
                 return;
 
             lock (window)
@@ -248,7 +255,15 @@ namespace Microsoft.Xna.Framework
         {
             lock (window)
             {
-                UpdateBorder();
+                if (CurrentPlatform.OS == OS.Linux)
+                {
+                    if (updateborder == 1)
+                        UpdateBorder();
+
+                    if(updateborder > 0)
+                        updateborder--;
+                }
+
                 Window.ProcessEvents();
                 UpdateWindowState();
                 HandleInput();
@@ -257,32 +272,39 @@ namespace Microsoft.Xna.Framework
 
         private void UpdateBorder()
         {
-            if (updateborder == 1)
-            {
-                WindowBorder desired;
-                if (_isBorderless)
-                    desired = WindowBorder.Hidden;
-                else
-                    desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
-            
-                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
-                    window.WindowBorder = desired;
-            }
-
-            if(updateborder > 0)
-                updateborder--;
+            WindowBorder desired;
+            if (_isBorderless)
+                desired = WindowBorder.Hidden;
+            else
+                desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+        
+            if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
+                window.WindowBorder = desired;
         }
 
         private void UpdateWindowState()
         {
             // we should wait until window's not fullscreen to resize
-
             if (updateClientBounds)
             {
-                window.WindowBorder = WindowBorder.Resizable;
+                var prevState = window.WindowState;
+
+                if (CurrentPlatform.OS == OS.Linux)
+                    window.WindowBorder = WindowBorder.Resizable;
+                
                 updateClientBounds = false;
-                window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
-                                     targetBounds.Y, targetBounds.Width, targetBounds.Height);
+
+                if (CurrentPlatform.OS == OS.MacOSX)
+                {
+                    // on Mac We need to do this calculation first.
+                    int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
+                    int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
+                    window.X = Math.Max(0, centerOffsetX + window.X);
+                    window.Y = Math.Max(0, centerOffsetY + window.Y);
+
+                    window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
+                                       targetBounds.Y, targetBounds.Width, targetBounds.Height);
+                }
                 
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
@@ -293,14 +315,39 @@ namespace Microsoft.Xna.Framework
                     windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
+                
+                if (CurrentPlatform.OS != OS.MacOSX)
+                {
+                    if (!Configuration.RunningOnSdl2 && prevState != WindowState.Fullscreen)
+                    {
+                        int centerOffsetX = -(targetBounds.Width - window.ClientRectangle.Width) / 2;
+                        int centerOffsetY = -(targetBounds.Height - window.ClientRectangle.Height) / 2;
+                        window.X = Math.Max(0, centerOffsetX + window.X);
+                        window.Y = Math.Max(0, centerOffsetY + window.Y);
+                    }
+                    window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
+                        targetBounds.Y, targetBounds.Width, targetBounds.Height);
+                }
+
 
                 // we need to create a small delay between resizing the window
                 // and changing the border to avoid OpenTK Linux bug
-                updateborder = 2;
+                if (CurrentPlatform.OS == OS.Linux)
+                    updateborder = 2;
+                else
+                    UpdateBorder();
 
                 var context = GraphicsContext.CurrentContext;
                 if (context != null)
                     context.Update(window.WindowInfo);
+
+                if (!Window.Visible)
+                {
+                    Window.Visible = true;
+
+                    // Bug in OpenTK, it doesn't always set state if window is not visible
+                    window.WindowState = windowState; 
+                }
             }
         }
 
@@ -343,10 +390,35 @@ namespace Microsoft.Xna.Framework
             // try to load it using Mono, it will cause a crash because of this.
             try
             {
+                // If we're running on a system where libgdiplus is not available, we must
+                // force an attempted load here.  When "new Icon" runs and fails here because
+                // of the failure to load the library, the object is still allocated.  Later on
+                // when the GC attempts to clean up the Icon object, that will attempt to load
+                // the library in it's finalizer and throw an exception.  As per the .NET documentation
+                // when a finalizer throws an exception, the application is immediately terminated
+                // with no recovery.
+                if (t != null)
+                {
+                    var drawingTypes = typeof(Icon).Assembly.GetTypes();
+                    foreach (var type in drawingTypes)
+                    {
+                        if (type.Name == "GDIPlus")
+                        {
+                            type.GetMethod("RunningOnUnix").Invoke(null, null);
+                            break;
+                        }
+                    }
+                }
+
                 if (t == null && assembly != null)
                     window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-                else
-                    window.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico"));
+                else {
+                    using (var stream = Assembly.GetEntryAssembly().GetManifestResourceStream(string.Format("{0}.Icon.ico", Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace)) ?? 
+                            Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Xna.Framework.monogame.ico")) {
+                        if (stream != null)
+                           window.Icon = new Icon(stream);
+                    }
+                }
             }
             catch { }
 

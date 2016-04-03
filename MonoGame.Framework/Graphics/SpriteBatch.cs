@@ -33,6 +33,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		Vector2 _texCoordBR = new Vector2 (0,0);
         #endregion
 
+        internal static bool NeedsHalfPixelOffset;
+
         /// <summary>
         /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
@@ -48,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.GraphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
-            _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _spriteEffect = new Effect(graphicsDevice, EffectResource.SpriteEffect.Bytecode);
             _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
@@ -128,15 +130,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			var vp = gd.Viewport;
 
 		    Matrix projection;
+
             // Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
             // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
             // --> We get the correct matrix with near plane 0 and far plane -1.
             Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out projection);
-#if !DIRECTX
-            // GL requires a half pixel offset to match DX.
-            projection.M41 += -0.5f * projection.M11;
-            projection.M42 += -0.5f * projection.M22;
-#endif
+
+            // Some platforms require a half pixel offset to match DX.
+            if (NeedsHalfPixelOffset)
+            {
+                projection.M41 += -0.5f * projection.M11;
+                projection.M42 += -0.5f * projection.M22;
+            }
+
             Matrix.Multiply(ref _matrix, ref projection, out projection);
 
             _matrixTransform.SetValue(projection);
@@ -402,19 +408,33 @@ namespace Microsoft.Xna.Framework.Graphics
 				_texCoordTL.X = temp;
 			}
 
-			item.Set (destinationRectangle.X,
-					destinationRectangle.Y, 
-					-origin.X, 
-					-origin.Y,
-					destinationRectangle.Z,
-					destinationRectangle.W,
-					(float)Math.Sin (rotation), 
-					(float)Math.Cos (rotation), 
-					color, 
-					_texCoordTL, 
-					_texCoordBR,
-                    depth);
-			
+		    if (rotation == 0f)
+		    {
+                item.Set(destinationRectangle.X - origin.X,
+                        destinationRectangle.Y - origin.Y,
+                        destinationRectangle.Z,
+                        destinationRectangle.W,
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        depth);
+            }
+            else
+		    {
+                item.Set(destinationRectangle.X,
+                        destinationRectangle.Y,
+                        -origin.X,
+                        -origin.Y,
+                        destinationRectangle.Z,
+                        destinationRectangle.W,
+                        (float)Math.Sin(rotation),
+                        (float)Math.Cos(rotation),
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        depth);
+            }
+
 			if (autoFlush)
 			{
 				FlushIfNeeded();

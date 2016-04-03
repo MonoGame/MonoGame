@@ -106,7 +106,7 @@ namespace MonoGame.Tools.Pipeline
 
         void IncludeFolder(string initialDirectory);
 
-        void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders);        
+        void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete);
 
         void NewItem(string name, string location, ContentItemTemplate template);
 

@@ -76,8 +76,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var device = _effect.GraphicsDevice;
 
-#if OPENGL || DIRECTX
-
             if (_vertexShader != null)
             {
                 device.VertexShader = _vertexShader;
@@ -109,8 +107,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     device.SetConstantBuffer(ShaderStage.Pixel, c, cb);
                 }
             }
-
-#endif
 
             // Set the render states if we have some.
             if (_rasterizerState != null)

@@ -1,149 +1,98 @@
 #!/bin/sh
 
-#check installation priviledge
+# Check installation priviledge
 if [ "$(id -u)" != "0" ]; then
 	echo "Please make sure you are running this installer with sudo or as root." 1>&2
 	exit 1
 fi
 
-#check previous versions
-if [ -f /bin/mgcb ]
+# Check previous versions
+if type "mgcb" > /dev/null 2>&1
 then
 	echo "Please uninstall any previous versions of MonoGame SDK" 1>&2
 	exit 1
 fi
 
-#pipeline installation
 DIR=$(pwd)
-IDIR="/opt/monogame-pipeline"
+IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
 
-if [ -d "$IDIR" ]
-then
-	rm -rf "$IDIR"
-fi
-
-mkdir "$IDIR"
-echo "Copying files..."
-
-cp "$DIR/Pipeline/." "$IDIR/" -R
-echo "rm -rf $IDIR" >> $IDIR/uninstall.sh
-
-#automatic dependency installer
-./Dependencies/dependencies.sh
-
-#setup nvtt libraries
-if [ ! -f /lib/libnvcore.so ]; then
-	ln $IDIR/libnvcore.so /lib/libnvcore.so
-fi
-
-if [ ! -f /lib/libnvimage.so ]; then
-	ln $IDIR/libnvimage.so /lib/libnvimage.so
-fi
-
-if [ ! -f /lib/libnvmath.so ]; then
-	ln $IDIR/libnvmath.so /lib/libnvmath.so
-fi
-
-if [ ! -f /lib/libnvtt.so ]; then
-	ln $IDIR/libnvtt.so /lib/libnvtt.so
-fi
-
-#check GLIBCXX_3.4.20 support
-if [ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]
-then
-	GREP=$(strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX_3.4.20)
-	size=${#GREP} 
-
-	if [ ! $size -gt 0 ] 
-	then
-		echo "Your libstdc++.so.6 does not support GLIBCXX_3.4.20. Want to copy newer version of it?"
-		echo "Old version will be copied renamed to libstdc++.so.6.old"
-		read -p "(Y, n): " choice
-	
-		case "$choice" in 
-			n|N ) ;;
-			*)
-			sudo mv /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.old
-			sudo cp $DIR/Main/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-		esac
-	fi
-fi
-
-#monodevelop addin
-read -p "Install monodevelop addin(Y, n): " choice2
+# Show dependency list
+echo "Please make sure the following packages are installed:"
+echo " - monodevelop"
+echo " - libopenal-dev"
+echo " - referenceassemblies-pcl / mono-pcl"
+echo " - ttf-mscorefonts-installer / mscore-fonts"
+echo " - gtk-sharp3"
+read -p "Continue (Y, n): " choice2
 case "$choice2" in 
-	n|N ) ;;
-	*)
-	sudo -H -u $SUDO_USER bash -c "mdtool setup install $DIR/Main/MonoDevelop.MonoGame.mpack"
+	n|N ) exit ;;
+	*) ;;
 esac
 
-#MonoGame.xbuild data
-if [ -d /usr/lib/mono/xbuild/MonoGame ]; then
-	rm -rf /usr/lib/mono/xbuild/MonoGame
+# MonoGame SDK installation
+echo "Installing MonoGame SDK..."
+
+rm -rf "$IDIR"
+mkdir -p "$IDIR"
+cp -rf "$DIR/MonoGameSDK/." "$IDIR" -R
+rm -rf "/opt/MonoGameSDK"
+ln -s "$IDIR" "/opt/MonoGameSDK"
+
+# Fix Permissions
+chmod +x "$IDIR/Tools/ffmpeg"
+chmod +x "$IDIR/Tools/ffprobe"
+
+# Rider stuff
+if type "rider" > /dev/null 2>&1
+then
+	FINDCOMMAND=$(type -a rider)
+	COMMAND=$(echo $FINDCOMMAND| cut -d' ' -f 3)
+	
+	FINDRIDER=$(cat $COMMAND | grep "RUN_PATH")
+	RIDER=$(echo $FINDRIDER| cut -d"'" -f 2)
+	
+	RIDERDIR=$(dirname $(dirname $RIDER))
+	RXBUILD="$RIDERDIR/lib/ReSharperHost/linux-x64/mono/lib/mono/xbuild/MonoGame"
+	
+	mkdir -p "$RXBUILD"
+	ln -s "$IDIR" "$RXBUILD/v3.0"
 fi
 
-mkdir /usr/lib/mono/xbuild/MonoGame
-mkdir /usr/lib/mono/xbuild/MonoGame/v3.0
-
-mkdir /usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/
-cp "$DIR/Assemblies/." /usr/lib/mono/xbuild/MonoGame/v3.0/Assemblies/ -R
-
-sudo ln -s /opt/monogame-pipeline /usr/lib/mono/xbuild/MonoGame/v3.0/Tools
-
-sudo cp $DIR/Main/MonoGame.Content.Builder.targets /usr/lib/mono/xbuild/MonoGame/v3.0/
-
-#fix permissions
-usr="$SUDO_USER"
-if [ -z "$usr" -a "$usr"==" " ]; then
-	usr="$USERNAME"
+# MonoDevelop addin
+if type "mdtool" > /dev/null 2>&1
+then
+	read -p "Install monodevelop addin(Y, n): " choice2
+	case "$choice2" in 
+		n|N ) ;;
+		*)
+		sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack"
+	esac
 fi
-sudo chown -R "$usr" "$IDIR/"
 
+# Monogame Pipeline terminal commands
 echo "Creating launcher items..."
 
-#monogame pipeline terminal command
-if [ -f /bin/monogame-pipeline ]
-then
-	rm /bin/monogame-pipeline
-fi
-cp $DIR/Main/monogame-pipeline /bin/monogame-pipeline
-chmod +x /bin/monogame-pipeline
+cp $DIR/Main/monogame-pipeline /usr/bin/monogame-pipeline
+chmod +x /usr/bin/monogame-pipeline
 
-#mgcb terminal command
-if [ -f /bin/mgcb ]
-then
-	rm /bin/mgcb
-fi
-cp $DIR/Main/mgcb /bin/mgcb
-chmod +x /bin/mgcb
+cp $DIR/Main/mgcb /usr/bin/mgcb
+chmod +x /usr/bin/mgcb
 
-#application/mimetype icon
-if [ ! -d /usr/share/icons/gnome/scalable/mimetypes ]
-then
-	mkdir /usr/share/icons/gnome/scalable/mimetypes
-fi
+# MonoGame icon
+mkdir -p /usr/share/icons/hicolor/scalable/mimetypes
+cp $DIR/Main/monogame.svg /usr/share/icons/hicolor/scalable/mimetypes/monogame.svg
+gtk-update-icon-cache /usr/share/icons/hicolor/ -f
 
-cp $DIR/Main/monogame.svg /usr/share/icons/gnome/scalable/mimetypes/monogame.svg
-
-if [ -f /usr/share/icons/default/index.theme ]
-then
-	sudo gtk-update-icon-cache /usr/share/icons/default/ -f
-else
-	sudo gtk-update-icon-cache /usr/share/icons/gnome/ -f
-fi
-
-#application launcher
-if [ -f /usr/share/applications/Monogame\ Pipeline.desktop ]
-then
-	rm /usr/share/applications/Monogame\ Pipeline.desktop
-fi
+# Application launcher
+rm -f /usr/share/applications/Monogame\ Pipeline.desktop
 echo -e "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=Used to create platform specific .xnb files\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=true\nTerminal=false\nType=Application\nMimeType=text/mgcb;\nCategories=Development;" | sudo tee --append /usr/share/applications/Monogame\ Pipeline.desktop > /dev/null
 
-#mimetype
+# Mimetype
 echo "Adding mimetype..."
 xdg-mime install $DIR/Main/mgcb.xml --novendor
 xdg-mime default "Monogame Pipeline.desktop" text/mgcb
 
-#uninstall script
+# Uninstall script
 chmod +x $IDIR/uninstall.sh
 echo "To uninstall the pipeline please run $IDIR/uninstall.sh"
+

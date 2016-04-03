@@ -129,8 +129,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (d3dContext)
                 {
                     var dataBox = d3dContext.MapSubresource(_buffer, 0, mode, SharpDX.Direct3D11.MapFlags.None);
-                    SharpDX.Utilities.Write(IntPtr.Add(dataBox.DataPointer, offsetInBytes), data, startIndex,
-                                            elementCount);
+                    if (vertexStride == elementSizeInBytes)
+					{
+                        SharpDX.Utilities.Write(dataBox.DataPointer + offsetInBytes, data, startIndex, elementCount);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < elementCount; i++)
+                            SharpDX.Utilities.Write(dataBox.DataPointer + offsetInBytes + i * vertexStride, data, startIndex + i, 1);
+                    }
+
                     d3dContext.UnmapSubresource(_buffer, 0);
                 }
             }

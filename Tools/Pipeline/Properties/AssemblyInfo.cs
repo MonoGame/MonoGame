@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MonoGame Pipeline Tool")]
-[assembly: AssemblyCopyright("Copyright © MonoGameTeam 2014")]
+[assembly: AssemblyCopyright("Copyright © MonoGameTeam 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

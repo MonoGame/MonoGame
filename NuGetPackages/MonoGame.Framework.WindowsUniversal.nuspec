@@ -14,7 +14,7 @@
       The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
         <releaseNotes></releaseNotes>
-        <copyright>Copyright  2015</copyright>
+        <copyright>Copyright  2016</copyright>
         <language>en-US</language>
         <references>
             <reference file="MonoGame.Framework.dll" />
@@ -32,7 +32,6 @@
         <file src="WindowsUniversal\AnyCPU\Release\SharpDX.DXGI.dll" target="lib\netcore\SharpDX.DXGI.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\SharpDX.MediaFoundation.dll" target="lib\netcore\SharpDX.MediaFoundation.dll" />
         <file src="WindowsUniversal\AnyCPU\Release\SharpDX.XAudio2.dll" target="lib\netcore\SharpDX.XAudio2.dll" />
-        <file src="WindowsUniversal\AnyCPU\Release\SharpDX.XInput.dll" target="lib\netcore\SharpDX.XInput.dll" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
 </package>

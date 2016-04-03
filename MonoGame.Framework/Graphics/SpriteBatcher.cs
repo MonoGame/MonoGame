@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Resize and recreate the missing indices for the index and vertex position color buffers.
         /// </summary>
         /// <param name="numBatchItems"></param>
-        private void EnsureArrayCapacity(int numBatchItems)
+        private unsafe void EnsureArrayCapacity(int numBatchItems)
         {
             int neededCapacity = 6 * numBatchItems;
             if (_index != null && neededCapacity <= _index.Length)
@@ -145,26 +145,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 _index.CopyTo(newIndex, 0);
                 start = _index.Length / 6;
             }
-            for (var i = start; i < numBatchItems; i++)
+            fixed (short* indexFixedPtr = newIndex)
             {
-                /*
-                 *  TL    TR
-                 *   0----1 0,1,2,3 = index offsets for vertex indices
-                 *   |   /| TL,TR,BL,BR are vertex references in SpriteBatchItem.
-                 *   |  / |
-                 *   | /  |
-                 *   |/   |
-                 *   2----3
-                 *  BL    BR
-                 */
-                // Triangle 1
-                newIndex[i * 6 + 0] = (short)(i * 4);
-                newIndex[i * 6 + 1] = (short)(i * 4 + 1);
-                newIndex[i * 6 + 2] = (short)(i * 4 + 2);
-                // Triangle 2
-                newIndex[i * 6 + 3] = (short)(i * 4 + 1);
-                newIndex[i * 6 + 4] = (short)(i * 4 + 3);
-                newIndex[i * 6 + 5] = (short)(i * 4 + 2);
+                var indexPtr = indexFixedPtr + (start * 6);
+                for (var i = start; i < numBatchItems; i++, indexPtr += 6)
+                {
+                    /*
+                     *  TL    TR
+                     *   0----1 0,1,2,3 = index offsets for vertex indices
+                     *   |   /| TL,TR,BL,BR are vertex references in SpriteBatchItem.
+                     *   |  / |
+                     *   | /  |
+                     *   |/   |
+                     *   2----3
+                     *  BL    BR
+                     */
+                    // Triangle 1
+                    *(indexPtr + 0) = (short)(i * 4);
+                    *(indexPtr + 1) = (short)(i * 4 + 1);
+                    *(indexPtr + 2) = (short)(i * 4 + 2);
+                    // Triangle 2
+                    *(indexPtr + 3) = (short)(i * 4 + 1);
+                    *(indexPtr + 4) = (short)(i * 4 + 3);
+                    *(indexPtr + 5) = (short)(i * 4 + 2);
+                }
             }
             _index = newIndex;
 
@@ -177,7 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
         /// <param name="effect">The custom effect to apply to the drawn geometry</param>
-        public void DrawBatch(SpriteSortMode sortMode, Effect effect)
+        public unsafe void DrawBatch(SpriteSortMode sortMode, Effect effect)
 		{
 			// nothing to do
             if (_batchItemCount == 0)
@@ -216,29 +220,36 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     numBatchesToProcess = MaxBatchSize;
                 }
-                // Draw the batches
-                for(int i = 0; i < numBatchesToProcess; i++, batchIndex++) 
+                // Avoid the array checking overhead by using pointer indexing!
+                fixed (VertexPositionColorTexture* vertexArrayFixedPtr = _vertexArray)
                 {
-                    SpriteBatchItem item = _batchItemList[batchIndex];
-                    // if the texture changed, we need to flush and bind the new texture
-                    var shouldFlush = !ReferenceEquals(item.Texture, tex);
-                    if (shouldFlush)
+                    var vertexArrayPtr = vertexArrayFixedPtr;
+
+                    // Draw the batches
+                    for (int i = 0; i < numBatchesToProcess; i++, batchIndex++, index += 4, vertexArrayPtr += 4)
                     {
-                        FlushVertexArray(startIndex, index, effect, tex);
+                        SpriteBatchItem item = _batchItemList[batchIndex];
+                        // if the texture changed, we need to flush and bind the new texture
+                        var shouldFlush = !ReferenceEquals(item.Texture, tex);
+                        if (shouldFlush)
+                        {
+                            FlushVertexArray(startIndex, index, effect, tex);
 
-                        tex = item.Texture;
-                        startIndex = index = 0;
-                        _device.Textures[0] = tex;
+                            tex = item.Texture;
+                            startIndex = index = 0;
+                            vertexArrayPtr = vertexArrayFixedPtr;
+                            _device.Textures[0] = tex;
+                        }
+
+                        // store the SpriteBatchItem data in our vertexArray
+                        *(vertexArrayPtr+0) = item.vertexTL;
+                        *(vertexArrayPtr+1) = item.vertexTR;
+                        *(vertexArrayPtr+2) = item.vertexBL;
+                        *(vertexArrayPtr+3) = item.vertexBR;
+
+                        // Release the texture.
+                        item.Texture = null;
                     }
-
-                    // store the SpriteBatchItem data in our vertexArray
-                    _vertexArray[index++] = item.vertexTL;
-                    _vertexArray[index++] = item.vertexTR;
-                    _vertexArray[index++] = item.vertexBL;
-                    _vertexArray[index++] = item.vertexBR;
-
-                    // Release the texture.
-                    item.Texture = null;
                 }
                 // flush the remaining vertexArray data
                 FlushVertexArray(startIndex, index, effect, tex);

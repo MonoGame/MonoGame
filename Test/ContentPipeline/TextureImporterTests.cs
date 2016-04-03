@@ -1,14 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
+﻿using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using NUnit.Framework;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Microsoft.Xna.Framework.Graphics;
-using System.IO;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -17,9 +12,9 @@ namespace MonoGame.Tests.ContentPipeline
         const string intermediateDirectory = "TestObj";
         const string outputDirectory = "TestBin";
 
-        void ImportStandard(string filename)
+        void ImportStandard(string filename, SurfaceFormat expectedSurfaceFormat)
         {
-            var importer = new TextureImporter();
+            var importer = new TextureImporter( );
             var context = new TestImporterContext(intermediateDirectory, outputDirectory);
             var content = importer.Import(filename, context);
             Assert.NotNull(content);
@@ -29,7 +24,107 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(content.Faces[0][0].Height, 64);
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
-            Assert.AreEqual(format, SurfaceFormat.Color);
+            Assert.AreEqual(expectedSurfaceFormat, format);
+            // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
+            try
+            {
+                Directory.Delete(intermediateDirectory, true);
+                Directory.Delete(outputDirectory, true);
+            }
+            catch(DirectoryNotFoundException)
+            {
+            }
+        }
+
+        [Test]
+        public void ImportBmp( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.bmp", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportBmpRGB555( )
+        {
+            ImportStandard("Assets/Textures/Logo555.bmp", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportBmpRGB565( )
+        {
+            ImportStandard("Assets/Textures/Logo565.bmp", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportBmp4bits( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px-4bits.bmp", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportBmpMonochrome( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px-monochrome.bmp", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportGif( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.gif", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportJpg( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.jpg", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportPng( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.png", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportTga( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.tga", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportTif( )
+        {
+            ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color);
+        }
+
+        /// <summary>
+        /// This test tries to load a tiff file encoded in rgbf, but freeimage seems to be failing to read files with this encoding
+        /// Might be necessary to modify this test with future updates of freeimage.
+        /// 
+        /// Note that the image was created with Freeimage from a bitmap
+        /// </summary>
+        [Test]
+        public void ImportImageWithBadContent( )
+        {
+            Assert.Throws(typeof(InvalidContentException), ( ) => ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Vector4));
+            //ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Color);
+        }
+
+        [Test]
+        public void ImportRGBA16Png()
+        {
+            var importer = new TextureImporter();
+            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
+            var content = importer.Import("Assets/Textures/RGBA16.png", context);
+            ulong expectedPixelValue = 5714832815570484476;
+            Assert.NotNull(content);
+            Assert.AreEqual(content.Faces.Count, 1);
+            Assert.AreEqual(content.Faces[0].Count, 1);
+            Assert.AreEqual(content.Faces[0][0].Width, 126);
+            Assert.AreEqual(content.Faces[0][0].Height, 240);
+            SurfaceFormat format;
+            Assert.True(content.Faces[0][0].TryGetFormat(out format));
+            Assert.AreEqual(SurfaceFormat.Rgba64, format);
+            Assert.AreEqual(expectedPixelValue, ((PixelBitmapContent<Rgba64>)content.Faces[0][0]).GetRow(1)[12].PackedValue);
             // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
             try
             {
@@ -37,43 +132,8 @@ namespace MonoGame.Tests.ContentPipeline
                 Directory.Delete(outputDirectory, true);
             }
             catch (DirectoryNotFoundException)
-            { }
-        }
-
-        [Test]
-        public void ImportBmp()
-        {
-            ImportStandard("Assets/Textures/LogoOnly_64px.bmp");
-        }
-
-        [Test]
-        public void ImportGif()
-        {
-            ImportStandard("Assets/Textures/LogoOnly_64px.gif");
-        }
-
-        [Test]
-        public void ImportJpg()
-        {
-            ImportStandard("Assets/Textures/LogoOnly_64px.jpg");
-        }
-
-        [Test]
-        public void ImportPng()
-        {
-            ImportStandard("Assets/Textures/LogoOnly_64px.png");
-        }
-
-        [Test]
-        public void ImportTga()
-        {
-            ImportStandard("Assets/Textures/LogoOnly_64px.tga");
-        }
-
-        [Test]
-        public void ImportTif()
-        {
-            ImportStandard("Assets/Textures/LogoOnly_64px.tif");
+            {
+            }
         }
 
         [Test]
@@ -104,29 +164,9 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void ImportDds()
         {
-            //TODO if pull #4304 gets merged uncomment the following line and delete the rest
-            //ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3);
-            var importer = new TextureImporter();
-            var context = new TestImporterContext(intermediateDirectory, outputDirectory);
-            var content = importer.Import("Assets/Textures/LogoOnly_64px.dds", context);
-            Assert.NotNull(content);
-            Assert.AreEqual(content.Faces.Count, 1);
-            Assert.AreEqual(content.Faces[0].Count, 1);
-            Assert.AreEqual(content.Faces[0][0].Width, 64);
-            Assert.AreEqual(content.Faces[0][0].Height, 64);
-            SurfaceFormat format;
-            Assert.True(content.Faces[0][0].TryGetFormat(out format));
-            Assert.AreEqual(format, SurfaceFormat.Dxt3);
-            // Clean-up the directories it may have produced, ignoring DirectoryNotFound exceptions
-            try
-            {
-                Directory.Delete(intermediateDirectory, true);
-                Directory.Delete(outputDirectory, true);
-            }
-            catch(DirectoryNotFoundException)
-            {
-            }
+            ImportStandard("Assets/Textures/LogoOnly_64px.dds", SurfaceFormat.Dxt3);
         }
+
         [Test]
         public void ImportDdsMipMap()
         {
@@ -137,7 +177,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.NotNull(content);
             Assert.AreEqual(content.Faces.Count, 1);
             CheckDdsFace(content, 0);
-            
+
             SurfaceFormat format;
             Assert.True(content.Faces[0][0].TryGetFormat(out format));
             Assert.AreEqual(format, SurfaceFormat.Dxt3);
