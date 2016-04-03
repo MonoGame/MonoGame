@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
+#if MONOMAC && PLATFORM_MACOS_LEGACY
+using MonoMac.OpenAL;
+#elif OPENAL
 using OpenTK.Audio.OpenAL;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
