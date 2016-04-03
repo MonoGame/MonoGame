@@ -77,7 +77,7 @@
     </if>
   </target>
 
-  <target name="build_portable" description="Build Portable" depends="_prebuild,build_windows">
+  <target name="build_portable" description="Build Portable" depends="_prebuild">
     <mkdir dir="MonoGame.Framework\bin\Portable\AnyCPU" />
     <exec program="ThirdParty\Dependencies\Piranha\Piranha.exe " commandline='make-portable-skeleton -i MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll -o MonoGame.Framework\bin\Portable\AnyCPU\MonoGame.Framework.dll -p ".NETPortable,Version=v4.0,Profile=Profile96"' />
     <exec program="ThirdParty\Dependencies\Piranha\Piranha.exe " commandline='make-portable-skeleton -i MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.Net.dll -o MonoGame.Framework\bin\Portable\AnyCPU\MonoGame.Framework.Net.dll -p ".NETPortable,Version=v4.0,Profile=Profile96"' />
