@@ -20,7 +20,7 @@
         </references>	
 	</metadata>
     <files>
-        <file src="..\..\MonoGame.Framework.Content.Pipeline\bin\Portable\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll" target="lib\net40\MonoGame.Framework.Content.Pipeline.dll" />
+        <file src="..\..\MonoGame.Framework.Content.Pipeline\bin\Portable\AnyCPU\MonoGame.Framework.Content.Pipeline.dll" target="lib\net40\MonoGame.Framework.Content.Pipeline.dll" />
         <file src="..\..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml" target="lib\net40\MonoGame.Framework.Content.Pipeline.xml" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>

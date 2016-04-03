@@ -20,7 +20,7 @@
         </references>	
 	</metadata>
     <files>
-        <file src="Portable\AnyCPU\Release\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
         <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
         <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
