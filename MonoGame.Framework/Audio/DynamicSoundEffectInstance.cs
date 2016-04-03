@@ -71,9 +71,9 @@ namespace Microsoft.Xna.Framework.Audio
         public DynamicSoundEffectInstance(int sampleRate, AudioChannels channels)
         {
             if ((sampleRate < 8000) || (sampleRate > 48000))
-                throw new ArgumentOutOfRangeException(nameof(sampleRate));
+                throw new ArgumentOutOfRangeException("sampleRate");
             if ((channels != AudioChannels.Mono) && (channels != AudioChannels.Stereo))
-                throw new ArgumentOutOfRangeException(nameof(channels));
+                throw new ArgumentOutOfRangeException("channels");
 
             _sampleRate = sampleRate;
             _channels = channels;
