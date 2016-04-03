@@ -106,8 +106,8 @@ namespace Microsoft.Xna.Framework.Audio
             for (var x = 0; x < _playingInstances.Count;)
             {
                 inst = _playingInstances[x];
-
-                if (inst.State == SoundState.Stopped || inst.IsDisposed || inst._effect == null)
+                
+                if (inst.IsDisposed || inst.State == SoundState.Stopped || (inst._effect == null && !inst._isDynamic))
                 {
                     Add(inst);
                     continue;

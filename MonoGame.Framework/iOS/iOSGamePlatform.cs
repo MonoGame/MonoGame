@@ -246,6 +246,7 @@ namespace Microsoft.Xna.Framework
         {
     		// Update our OpenAL sound buffer pools
     		soundControllerInstance.Update();
+    		DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
 
             if (IsPlayingVideo)
                 return false;

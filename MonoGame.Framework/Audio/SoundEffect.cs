@@ -128,6 +128,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (sampleRate < 8000 || sampleRate > 48000)
                 throw new ArgumentOutOfRangeException();
+            if (sizeInBytes < 0)
+                throw new ArgumentException();
 
             // Reference: http://social.msdn.microsoft.com/Forums/windows/en-US/5a92be69-3b4e-4d92-b1d2-141ef0a50c91/how-to-calculate-duration-of-wave-file-from-its-size?forum=winforms
             var numChannels = (int)channels;
@@ -149,6 +151,8 @@ namespace Microsoft.Xna.Framework.Audio
         public static int GetSampleSizeInBytes(TimeSpan duration, int sampleRate, AudioChannels channels)
         {
             if (sampleRate < 8000 || sampleRate > 48000)
+                throw new ArgumentOutOfRangeException();
+            if (duration < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException();
 
             // Reference: http://social.msdn.microsoft.com/Forums/windows/en-US/5a92be69-3b4e-4d92-b1d2-141ef0a50c91/how-to-calculate-duration-of-wave-file-from-its-size?forum=winforms

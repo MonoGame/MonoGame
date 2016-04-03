@@ -72,6 +72,8 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;
             }
 
+            DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
+
             return true;
         }
 

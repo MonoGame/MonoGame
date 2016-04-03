@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Audio
 		internal int SourceId;
         int pauseCount;
         
-        private OpenALSoundController controller;
+        internal OpenALSoundController controller;
         
         internal bool HasSourceId = false;
 
