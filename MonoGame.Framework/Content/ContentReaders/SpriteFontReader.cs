@@ -40,13 +40,6 @@ namespace Microsoft.Xna.Framework.Content
         {
         }
 
-        static string[] supportedExtensions = new string[] { ".spritefont" };
-
-        internal static string Normalize(string fileName)
-        {
-            return Normalize(fileName, supportedExtensions);
-        }
-	
         protected internal override SpriteFont Read(ContentReader input, SpriteFont existingInstance)
         {
             if (existingInstance != null)
