@@ -442,6 +442,7 @@
     <Compile Include="Graphics\DxtUtil.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Graphics\Effect\BinaryEffectReader.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs">
 		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
@@ -471,6 +472,7 @@
     <Compile Include="Graphics\Effect\IEffectFog.cs" />
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
+    <Compile Include="Graphics\Effect\IEffectReader.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs">
 		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
@@ -583,6 +585,7 @@
       <Services>WebGraphics</Services>
     </Compile>
     <Compile Include="Graphics\SetDataOptions.cs" />
+    <Compile Include="Graphics\Shader\BinaryShaderReader.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.DirectX.cs">
@@ -594,6 +597,7 @@
     <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
+    <Compile Include="Graphics\Shader\IShaderReader.cs" />
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\Shader.DirectX.cs">
       <Services>DirectXGraphics</Services>
