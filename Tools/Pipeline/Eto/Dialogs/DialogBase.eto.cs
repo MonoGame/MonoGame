@@ -36,7 +36,12 @@ namespace MonoGame.Tools.Pipeline
         {
             layout1.BeginVertical();
             layout1.Add(content, true, true);
-            layout1.AddSeparateRow(null, DefaultButton, AbortButton);
+
+            if (Global.UseHeaderBar)
+                this.Style = "HeaderBar";
+            else
+                layout1.AddSeparateRow(null, DefaultButton, AbortButton);
+
             layout1.EndVertical();
         }
     }

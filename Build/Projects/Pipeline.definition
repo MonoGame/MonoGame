@@ -73,6 +73,10 @@
     <Compile Include="Common\Extensions.cs" />
     
     <!-- Eto.Forms GUI stuff -->
+	<Compile Include="Eto\Dialogs\AddItemDialog.cs" />
+	<Compile Include="Eto\Dialogs\AddItemDialog.eto.cs">
+      <DependentUpon>AddItemDialog.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Eto\Dialogs\DialogBase.cs" />
 	<Compile Include="Eto\Dialogs\DialogBase.eto.cs">
       <DependentUpon>DialogBase.cs</DependentUpon>
@@ -156,28 +160,6 @@
       <Platforms>Windows</Platforms>
       <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Windows\AddFileDialog.cs">
-      <Platforms>Windows</Platforms>
-    </Compile> 
-	<Compile Include="Windows\AddFileDialog.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>AddFileDialog.cs</DependentUpon>
-    </Compile>
-	 <EmbeddedResource Include="Windows\AddFileDialog.resx">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>AddFileDialog.cs</DependentUpon>
-    </EmbeddedResource>
-	<Compile Include="Windows\AddFolderDialog.cs">
-      <Platforms>Windows</Platforms>
-    </Compile> 
-	<Compile Include="Windows\AddFolderDialog.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>AddFolderDialog.cs</DependentUpon>
-    </Compile>
-	 <EmbeddedResource Include="Windows\AddFolderDialog.resx">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>AddFolderDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -237,9 +219,6 @@
     <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\AddItemDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -271,9 +250,6 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\AddItemDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\DeleteDialog.GUI.cs">  
