@@ -121,6 +121,7 @@ namespace MonoGame.Tests.Framework
             //Test data ordering
             Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(((float) 0x1EB8) / 0xffff, ((float) 0x570A) / 0xffff, ((float) 0x8F5C) / 0xffff, ((float) 0xC7AD) / 0xffff).PackedValue);
             Assert.AreEqual(0xC7AD8F5C570A1EB8, new Rgba64(0.12f, 0.34f, 0.56f, 0.78f).PackedValue);
+            Assert.AreEqual(0x73334CCC2666147B, new Rgba64(0.08f, 0.15f, 0.30f, 0.45f).PackedValue);
         }
 
         [Test]
@@ -141,6 +142,8 @@ namespace MonoGame.Tests.Framework
             float z = 0.5f;
             float w = -0.7f;
             Assert.AreEqual(0xA740DA0D, new NormalizedByte4(x, y, z, w).PackedValue);
+            Assert.AreEqual(958796544, new NormalizedByte4(0.0008f, 0.15f, 0.30f, 0.45f).PackedValue);
+
         }
 
         [Test]
@@ -185,6 +188,8 @@ namespace MonoGame.Tests.Framework
             float w = -0.7f;
 
             Assert.AreEqual(0xa6674000d99a0ccd, new NormalizedShort4(x, y, z, w).PackedValue);
+            Assert.AreEqual(4150390751449251866, new NormalizedShort4(0.0008f, 0.15f, 0.30f, 0.45f).PackedValue);
+
         }
 
         [Test]
@@ -278,6 +283,7 @@ namespace MonoGame.Tests.Framework
             z = 0.5f;
             w = -0.7f;
             Assert.AreEqual(18446462598732840960, new Short4(x, y, z, w).PackedValue);
+
         }
 
         [Test]
@@ -372,6 +378,57 @@ namespace MonoGame.Tests.Framework
             z = 0.5f;
             w = -0.7f;
             Assert.AreEqual(128, new Byte4(x, y, z, w).PackedValue);
+        }
+
+        [Test]
+        public void HalfSingle()
+        {
+            //Test limits
+            Assert.AreEqual(15360, new HalfSingle(1f).PackedValue);
+            Assert.AreEqual(0, new HalfSingle(0f).PackedValue);
+            Assert.AreEqual(48128, new HalfSingle(-1f).PackedValue);
+
+            //Test values
+            Assert.AreEqual(11878, new HalfSingle(0.1f).PackedValue);
+            Assert.AreEqual(46285, new HalfSingle(-0.3f).PackedValue);
+        }
+
+        [Test]
+        public void HalfVector2()
+        {
+            //Test PackedValue
+            Assert.AreEqual(0u, new HalfVector2(Vector2.Zero).PackedValue);
+            Assert.AreEqual(1006648320u, new HalfVector2(Vector2.One).PackedValue);
+            Assert.AreEqual(3033345638u, new HalfVector2(0.1f, -0.3f).PackedValue);
+
+            //Test ToVector2
+            Assert.AreEqual(Vector2.Zero, new HalfVector2(Vector2.Zero).ToVector2());
+            Assert.AreEqual(Vector2.One, new HalfVector2(Vector2.One).ToVector2());
+            Assert.AreEqual(Vector2.UnitX, new HalfVector2(Vector2.UnitX).ToVector2());
+            Assert.AreEqual(Vector2.UnitY, new HalfVector2(Vector2.UnitY).ToVector2());
+        }
+
+        [Test]
+        public void HalfVector4()
+        {
+            //Test PackedValue
+            Assert.AreEqual(0uL, new HalfVector4(Vector4.Zero).PackedValue);
+            Assert.AreEqual(4323521613979991040uL, new HalfVector4(Vector4.One).PackedValue);
+            Assert.AreEqual(13547034390470638592uL, new HalfVector4(-Vector4.One).PackedValue);
+            Assert.AreEqual(15360uL, new HalfVector4(Vector4.UnitX).PackedValue);
+            Assert.AreEqual(1006632960uL, new HalfVector4(Vector4.UnitY).PackedValue);
+            Assert.AreEqual(65970697666560uL, new HalfVector4(Vector4.UnitZ).PackedValue);
+            Assert.AreEqual(4323455642275676160uL, new HalfVector4(Vector4.UnitW).PackedValue);
+            Assert.AreEqual(4035285078724390502uL, new HalfVector4(0.1f, 0.3f, 0.4f, 0.5f).PackedValue);
+
+            //Test ToVector4
+            Assert.AreEqual(Vector4.Zero, new HalfVector4(Vector4.Zero).ToVector4());
+            Assert.AreEqual(Vector4.One, new HalfVector4(Vector4.One).ToVector4());
+            Assert.AreEqual(-Vector4.One, new HalfVector4(-Vector4.One).ToVector4());
+            Assert.AreEqual(Vector4.UnitX, new HalfVector4(Vector4.UnitX).ToVector4());
+            Assert.AreEqual(Vector4.UnitY, new HalfVector4(Vector4.UnitY).ToVector4());
+            Assert.AreEqual(Vector4.UnitZ, new HalfVector4(Vector4.UnitZ).ToVector4());
+            Assert.AreEqual(Vector4.UnitW, new HalfVector4(Vector4.UnitW).ToVector4());
         }
     }
 }
