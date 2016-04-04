@@ -296,16 +296,14 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
             // Try to load as XNB file
-            using (var stream = OpenStream(assetName))
+            var stream = OpenStream(assetName);
+            using (var xnbReader = new BinaryReader(stream))
             {
-                using (var xnbReader = new BinaryReader(stream))
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
                 {
-                    using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
-                    {
-                        result = reader.ReadAsset<T>();
-                        if (result is GraphicsResource)
-                            ((GraphicsResource)result).Name = originalAssetName;
-                    }
+                    result = reader.ReadAsset<T>();
+                    if (result is GraphicsResource)
+                        ((GraphicsResource)result).Name = originalAssetName;
                 }
             }
             
@@ -479,14 +477,12 @@ namespace Microsoft.Xna.Framework.Content
 				}
 			}
 
-            using (var stream = OpenStream(assetName))
+            var stream = OpenStream(assetName);
+            using (var xnbReader = new BinaryReader(stream))
             {
-                using (var xnbReader = new BinaryReader(stream, System.Text.Encoding.Default, true))
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null))
                 {
-                    using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null))
-                    {
-                        reader.ReadAsset<T>(currentAsset);
-                    }
+                    reader.ReadAsset<T>(currentAsset);
                 }
             }
 		}
