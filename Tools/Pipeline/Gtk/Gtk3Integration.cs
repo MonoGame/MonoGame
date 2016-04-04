@@ -5,9 +5,8 @@ using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public class Gtk3Wrapper
+    public partial class Gtk3Wrapper
     {
-        public const string gtklibpath = "libgtk-3.so.0";
         public const string giolibpath = "libgio-2.0.so.0";
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
@@ -20,9 +19,6 @@ namespace MonoGame.Tools.Pipeline
         public static extern void gtk_color_chooser_set_rgba (IntPtr chooser, double[] color);
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr gtk_header_bar_new ();
-
-        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void gtk_header_bar_set_subtitle (IntPtr handle, string text);
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
@@ -33,9 +29,6 @@ namespace MonoGame.Tools.Pipeline
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool gtk_header_bar_get_show_close_button (IntPtr handle);
-
-        [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gtk_window_set_titlebar (IntPtr window, IntPtr widget);
 
         [DllImport (gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int gtk_get_major_version ();

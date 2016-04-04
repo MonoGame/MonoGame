@@ -432,11 +432,11 @@ namespace MonoGame.Tools.Pipeline
             else if (ids [0] == ID_FOLDER) 
                 type = FileType.Folder;
 
-            TextEditorDialog dialog = new TextEditorDialog (window, "Rename", "New Name:", treeview1.Model.GetValue (iter [0], 1).ToString(), true);
+            var dialog = new EditDialog("Rename", "New name:", treeview1.Model.GetValue(iter[0], 1).ToString(), true);
 
-            if (dialog.Run() == (int)ResponseType.Ok)
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
             {
-                string newpath = System.IO.Path.GetDirectoryName(path[0]) + System.IO.Path.DirectorySeparatorChar + dialog.text;
+                string newpath = System.IO.Path.GetDirectoryName(path[0]) + System.IO.Path.DirectorySeparatorChar + dialog.Text;
                 window._controller.Move(new[] { path[0] }, new[] { newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath }, new[] { type });
             }
         }
