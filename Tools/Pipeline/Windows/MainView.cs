@@ -114,28 +114,6 @@ namespace MonoGame.Tools.Pipeline
             _outputWindow.ContextMenu = contextMenu;
         }
 
-        public void OnTemplateDefined(ContentItemTemplate template)
-        {
-            // Load icon
-            try
-            {
-                var iconPath = Path.Combine(Path.GetDirectoryName(template.TemplateFile), template.Icon);                
-                var iconName = Path.GetFileNameWithoutExtension(iconPath);
-
-                if (!EditorIcons.Templates.Images.ContainsKey(iconName))
-                {
-                    var iconImage = Image.FromFile(iconPath);
-                    EditorIcons.Templates.Images.Add(iconName, iconImage);
-                }
-
-                template.Icon = iconName;
-            }
-            catch (Exception)
-            {
-                template.Icon = "Default";
-            }
-        }
-
         private void OnSelectionModified(Selection selection, object sender)
         {
             if (sender == this)
@@ -855,15 +833,12 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnNewItemClick(object sender, System.EventArgs e)
         {
-            var dlg = new NewContentDialog(_controller.Templates, EditorIcons.Templates);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
+            var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
+            var dlg = new NewItemDialog(_controller.Templates.GetEnumerator(), location);
+
+            if (dlg.Run() == Eto.Forms.DialogResult.Ok)
             {
-                var template = dlg.Selected;
-                var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
-
-                // Ensure name is unique among files at this location?
-                _controller.NewItem(dlg.NameGiven, location, template);
-
+                _controller.NewItem(dlg.Name, location, dlg.Selected);
                 UpdateMenus();
             }
         }

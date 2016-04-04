@@ -930,8 +930,6 @@ namespace MonoGame.Tools.Pipeline
                 var fpath = Path.GetDirectoryName(f);
                 item.TemplateFile = Path.GetFullPath(Path.Combine(fpath, item.TemplateFile));
 
-                View.OnTemplateDefined(item);
-
                 _templateItems.Add(item);
             }
         }

@@ -30,9 +30,6 @@ namespace MonoGame.Tools.Pipeline
             layout1.AddRow(textBox1);
             
             label2 = new Label();
-            label2.Text = "The following characters are not allowed:";
-            for (int i = 0; i < Global.NotAllowedCharacters.Length; i++)
-                label2.Text += " " + Global.NotAllowedCharacters[i];
             layout1.AddRow(label2);
 
             layout1.EndVertical();

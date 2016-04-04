@@ -68,8 +68,6 @@ namespace MonoGame.Tools.Pipeline
         bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall);
 
         bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall);
-        
-        void OnTemplateDefined(ContentItemTemplate item);
 
         Process CreateProcess(string exe, string commands);
 

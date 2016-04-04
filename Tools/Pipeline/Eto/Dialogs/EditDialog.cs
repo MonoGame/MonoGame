@@ -12,12 +12,17 @@ namespace MonoGame.Tools.Pipeline
     {
         public string Text { get; private set; }
 
+        private string _errInvalidName;
         private bool _file;
 
         public EditDialog(string title, string label, string text, bool file)
         {
             InitializeComponent();
 
+            _errInvalidName = "The following characters are not allowed:";
+            for (int i = 0; i < Global.NotAllowedCharacters.Length; i++)
+                _errInvalidName += " " + Global.NotAllowedCharacters[i];
+            
             Title = title;
             label1.Text = label;
             textBox1.Text = text;
@@ -33,7 +38,6 @@ namespace MonoGame.Tools.Pipeline
             // We need to delay setting of text color because
             // GTK doesn't load text color during initialization
             label2.TextColor = new Color(label2.TextColor, 0.5f);
-            label2.Visible = false;
 
             var index = textBox1.Text.IndexOf('.');
             if (_file && index != -1)
@@ -48,7 +52,7 @@ namespace MonoGame.Tools.Pipeline
             var stringOk = Global.CheckString(textBox1.Text);
 
             DefaultButton.Enabled = (stringOk && (textBox1.Text != ""));
-            label2.Visible = !stringOk;
+            label2.Text = !stringOk ? _errInvalidName : "";
 
             Text = textBox1.Text;
         }
