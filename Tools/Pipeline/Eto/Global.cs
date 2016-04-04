@@ -2,28 +2,40 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.IO;
 
 namespace MonoGame.Tools.Pipeline
 {
     static partial class Global
     {
-        const string WindowsNotAllowedCharacters = "/?<>\\:*|\"";
-        const string LinuxNotAllowedCharacters = "/";
-        const string MacNotAllowedCharacters = ":";
+        public static string DesktopEnvironment { get; private set; }
+        public static bool UseHeaderBar { get; private set; }
+
+        static Global()
+        {
+#if LINUX
+            Global.DesktopEnvironment = Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP");
+            UseHeaderBar = Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16 && Global.DesktopEnvironment == "GNOME";
+#else
+            DesktopEnvironment = "OSX";
+#endif
+        }
 
         public static string NotAllowedCharacters
         {
             get
             {
-#if WINDOWS
-                return WindowsNotAllowedCharacters;
-#else
-                if (Global.DesktopEnvironment == "OSX")
-                    return MacNotAllowedCharacters;
-                else
-                    return LinuxNotAllowedCharacters;
-#endif
+                if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                {
+                    if (Global.DesktopEnvironment == "OSX")
+                        return ":";
+                    
+                    return "/";
+                }
+
+                return "/?<>\\:*|\"";
+
             }
         }
 

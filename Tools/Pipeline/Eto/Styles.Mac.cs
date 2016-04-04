@@ -4,6 +4,7 @@
 
 using System;
 using Eto;
+using Eto.GtkSharp.Forms.Controls;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -11,7 +12,7 @@ namespace MonoGame.Tools.Pipeline
     {
         public static void Load()
         {
-            
+            Style.Add<LabelHandler>("Wrap", h => h.Control.MaxWidthChars = 55);
         }
     }
 }

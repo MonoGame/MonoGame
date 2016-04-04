@@ -469,12 +469,12 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddItemDialog(this, file, exists, FileType.File);
+            var afd = new AddItemDialog (file, exists, FileType.File);
 
-            if (afd.Run() == (int)ResponseType.Ok)
+            if (afd.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = afd.responce;
-                applyforall = afd.applyforall;
+                action = afd.Responce;
+                applyforall = afd.ApplyForAll;
                 return true;
             }
 
@@ -485,12 +485,12 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddItemDialog(this, folder, exists, FileType.Folder);
+            var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
 
-            if (afd.Run() == (int)ResponseType.Ok)
+            if (afd.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = afd.responce;
+                action = afd.Responce;
                 return true;
             }
 
