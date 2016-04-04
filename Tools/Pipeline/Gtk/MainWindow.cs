@@ -16,28 +16,6 @@ namespace MonoGame.Tools.Pipeline
         TreeStore recentListStore;
 
         const string basetitle = "MonoGame Pipeline";
-        public static string LinuxNotAllowedCharacters = "/"; 
-        public static string MacNotAllowedCharacters = ":";
-
-        public static string NotAllowedCharacters
-        {
-            get
-            {
-                if (Global.DesktopEnvironment == "OSX")
-                    return MacNotAllowedCharacters;
-                else
-                    return LinuxNotAllowedCharacters;
-            }
-        }
-
-        public static bool CheckString(string s, string notallowedCharacters)
-        {
-            for (int i = 0; i < notallowedCharacters.Length; i++) 
-                if (s.Contains (notallowedCharacters.Substring (i, 1)))
-                    return false;
-
-            return true;
-        }
 
         public string OpenProjectPath;
         public IController _controller;
@@ -177,7 +155,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnShowEvent()
         {
-            PipelineSettings.Default.Load ();
+            PipelineSettings.Default.Load();
 
             if (!String.IsNullOrEmpty(OpenProjectPath)) {
                 _controller.OpenProject(OpenProjectPath);
@@ -197,6 +175,8 @@ namespace MonoGame.Tools.Pipeline
                 _controller.LaunchDebugger = DebugModeAction.Active = PipelineSettings.Default.DebugMode;
                 FilterOutputAction.Active = PipelineSettings.Default.FilterOutput;
             }
+
+            UpdateRecentProjectList();
         }
 
         private bool Maximized()
@@ -692,10 +672,10 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var ted = new TextEditorDialog(this, "New Folder", "Folder Name:", "", true);
-            if (ted.Run() != (int)ResponseType.Ok)
+            var dialog = new EditDialog("New Folder", "Folder name:", "Folder", true);
+            if (dialog.Run() != Eto.Forms.DialogResult.Ok)
                 return;
-            var foldername = ted.text;
+            var foldername = dialog.Text;
 
             expand = true;
             List<TreeIter> iters;

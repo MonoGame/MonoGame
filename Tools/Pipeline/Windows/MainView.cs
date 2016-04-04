@@ -899,9 +899,10 @@ namespace MonoGame.Tools.Pipeline
                     location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
             }
 
-            var dialog = new TextEditDialog("New Folder", "Folder Name:", "");
-            if (dialog.ShowDialog() == DialogResult.OK)
-                _controller.NewFolder(dialog.text, location);
+            var dialog = new EditDialog("New Folder", "Folder name:", "", true);
+
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
+                _controller.NewFolder(dialog.Text, location);
         }
 
         private void OnRedoClick(object sender, EventArgs e)
@@ -928,11 +929,11 @@ namespace MonoGame.Tools.Pipeline
             else
                 path = item.Name;
 
-            TextEditDialog dialog = new TextEditDialog("Rename", "New Name:", _treeView.SelectedNode.Text);
+            var dialog = new EditDialog("Rename", "New name:", _treeView.SelectedNode.Text, true);
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
             {
-                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.text;
+                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.Text;
                 _controller.Move(new [] { path }, new [] { newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath }, new[] { type });
             }
         }

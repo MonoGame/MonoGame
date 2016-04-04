@@ -74,7 +74,7 @@ namespace MonoGame.Tools.Pipeline
             TreeIter iter;
 
             if (entry1.Text != "") {
-                if (MainWindow.CheckString (entry1.Text, MainWindow.NotAllowedCharacters)) {
+                if (Global.CheckString (entry1.Text)) {
                     if (treeview1.Selection.GetSelected (out iter)) {
                         buttonOk.Sensitive = true;
                         label2.Visible = false;
@@ -93,7 +93,7 @@ namespace MonoGame.Tools.Pipeline
 
             if(label2.Visible)
             {
-                var chars = MainWindow.NotAllowedCharacters.ToCharArray();
+                var chars = Global.NotAllowedCharacters.ToCharArray();
                 string notallowedchars = chars[0].ToString();
 
                 for (int i = 1; i < chars.Length; i++)

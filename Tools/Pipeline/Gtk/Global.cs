@@ -5,7 +5,7 @@ using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public static class Global
+    static partial class Global
     {
         public static Application App;
 
