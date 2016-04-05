@@ -4,6 +4,7 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tests.Visual;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Framework
@@ -16,13 +17,8 @@ namespace MonoGame.Tests.Framework
         [SetUp]
         public void SetUp()
         {
-            _game = new TestGameBase();
-            var graphicsDeviceManager = new GraphicsDeviceManager(_game);
-#if XNA
-            graphicsDeviceManager.ApplyChanges();
-#else
-            graphicsDeviceManager.CreateDevice();
-#endif
+            _game = new VisualTestGame();
+            _game.Run((r) => r.DrawNumber > 0);
         }
 
         [TearDown]
