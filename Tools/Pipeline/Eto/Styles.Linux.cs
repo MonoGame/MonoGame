@@ -33,8 +33,10 @@ namespace MonoGame.Tools.Pipeline
         {
             Style.Add<DialogHandler>("HeaderBar", h =>
             {
+                var title = h.Title;
                 var headerBar = Gtk3Wrapper.gtk_header_bar_new();
                 Gtk3Wrapper.gtk_window_set_titlebar(h.Control.Handle, headerBar);
+                h.Title = title;
 
                 var defButton = (Gtk.Button)h.DefaultButton.ControlObject;
                 defButton.StyleContext.AddClass("suggested-action");

@@ -15,7 +15,7 @@ namespace MonoGame.Tools.Pipeline
         {
             InitializeComponent();
 
-            Title = "Add " + filetype + " Action";
+            Title = "Add " + filetype;
 
             label1.Text = "The file '" + fileloc + "' is outside of target directory. What would you like to do?";
 

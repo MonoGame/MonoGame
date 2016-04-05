@@ -507,11 +507,6 @@ namespace MonoGame.Tools.Pipeline
             return result == (int)ResponseType.Ok;
         }
 
-        public void OnTemplateDefined(ContentItemTemplate item)
-        {
-
-        }
-
         public void ItemExistanceChanged(IProjectItem item)
         {
             Application.Invoke(
@@ -622,30 +617,33 @@ namespace MonoGame.Tools.Pipeline
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
 
-            if (dialog.Run () == (int)ResponseType.Ok) {
+            List<TreeIter> iters;
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath(out iters, out ids);
 
-                List<TreeIter> iters;
-                List<string> ids;
-                string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
+            string location;
 
-                string location;
-
-                if (paths.Length == 1) {
-                    if (ids [0] == projectview1.ID_FOLDER)
-                        location = paths [0];
-                    else if (ids[0] == projectview1.ID_BASE)
-                        location = _controller.GetFullPath ("");
-                    else
-                        location = System.IO.Path.GetDirectoryName (paths [0]);
-                }
+            if (paths.Length == 1)
+            {
+                if (ids[0] == projectview1.ID_FOLDER)
+                    location = paths[0];
+                else if (ids[0] == projectview1.ID_BASE)
+                    location = _controller.GetFullPath("");
                 else
-                    location = _controller.GetFullPath ("");
+                    location = System.IO.Path.GetDirectoryName(paths[0]);
+            }
+            else
+                location = _controller.GetFullPath("");
 
-                _controller.NewItem(dialog.name, location, dialog.templateFile);
+            var dialog = new NewItemDialog(_controller.Templates.GetEnumerator(), _controller.GetFullPath(location));
+
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
+            {
+                _controller.NewItem(dialog.Name, location, dialog.Selected);
                 UpdateMenus();
             }
+
             expand = false;
         }
 

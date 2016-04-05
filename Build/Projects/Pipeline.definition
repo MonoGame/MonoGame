@@ -85,6 +85,10 @@
 	<Compile Include="Eto\Dialogs\EditDialog.eto.cs">
       <DependentUpon>EditDialog.cs</DependentUpon>
     </Compile>
+	<Compile Include="Eto\Dialogs\NewItemDialog.cs" />
+	<Compile Include="Eto\Dialogs\NewItemDialog.eto.cs">
+      <DependentUpon>NewItemDialog.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Eto\Global.cs" />
 	<Compile Include="Eto\Styles.Linux.cs">
       <Platforms>Linux</Platforms>
@@ -116,14 +120,6 @@
     <Compile Include="Windows\MainView.Designer.cs">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\NewContentDialog.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Windows\NewContentDialog.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>NewContentDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\MultiSelectTreeview.cs">
       <Platforms>Windows</Platforms>
@@ -195,10 +191,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Windows\NewContentDialog.resx">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>NewContentDialog.cs</DependentUpon>
-    </EmbeddedResource>
 
     <!-- The Gtk specific stuff -->
     <Compile Include="Gtk\MainWindow.cs">
@@ -219,9 +211,6 @@
     <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -235,9 +224,6 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\MainWindow.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\NewTemplateDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Widgets\ProjectView.GUI.cs">  
