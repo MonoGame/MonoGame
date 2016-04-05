@@ -204,9 +204,13 @@
 
   <!-- Run the unit tests... will fail if the code hasn't been built. -->
   <target name="run_tests" description="Run all the tests" depends="_default">
-    <nunit2 if="${os == 'Win32NT'}">
+    <property name="teamcity.dotnet.nant.nunit2.platform" value="x86" />
+    <nunit2 if="${os == 'Win32NT'}">	  
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\XNA\Release" />
       <test assemblyname="Test\bin\XNA\Release\MonoGameTests.XNA.exe" />
+    </nunit2>
+    <property name="teamcity.dotnet.nant.nunit2.platform" value="x64" />
+    <nunit2 if="${os == 'Win32NT'}">	  
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Debug" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Debug\MonoGameTests.exe" />
     </nunit2>
