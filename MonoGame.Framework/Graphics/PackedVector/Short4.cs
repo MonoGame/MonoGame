@@ -121,14 +121,14 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>The ulong containing the packed values.</returns>
         static ulong Pack(ref Vector4 vector)
         {
-            const float maxPos = 0x7FFF; // Largest two byte positive number 0xFFFF >> 1; 
+            const float maxPos = 0x7FFF; // Largest two byte positive number 0xFFFF >> 1;
             const float minNeg = ~(int)maxPos; // two's complement
 
             // clamp the value between min and max values
-            var word4 = ((ulong)MathHelper.Clamp(vector.X, minNeg, maxPos) & 0xFFFF) << 0x00;
-            var word3 = ((ulong)MathHelper.Clamp(vector.Y, minNeg, maxPos) & 0xFFFF) << 0x10;
-            var word2 = ((ulong)MathHelper.Clamp(vector.Z, minNeg, maxPos) & 0xFFFF) << 0x20;
-            var word1 = ((ulong)MathHelper.Clamp(vector.W, minNeg, maxPos) & 0xFFFF) << 0x30;
+            var word4 = ((ulong) Math.Round(MathHelper.Clamp(vector.X, minNeg, maxPos)) & 0xFFFF) << 0x00;
+            var word3 = ((ulong) Math.Round(MathHelper.Clamp(vector.Y, minNeg, maxPos)) & 0xFFFF) << 0x10;
+            var word2 = ((ulong) Math.Round(MathHelper.Clamp(vector.Z, minNeg, maxPos)) & 0xFFFF) << 0x20;
+            var word1 = ((ulong) Math.Round(MathHelper.Clamp(vector.W, minNeg, maxPos)) & 0xFFFF) << 0x30;
 
             return word4 | word3 | word2 | word1;
         }

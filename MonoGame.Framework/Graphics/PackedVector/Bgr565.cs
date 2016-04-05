@@ -15,9 +15,9 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static UInt16 Pack(float x, float y, float z)
         {
-            return (UInt16)((((int)(MathHelper.Clamp(x, 0, 1) * 31.0f) & 0x1F) << 11) |
-                (((int)(MathHelper.Clamp(y, 0, 1) * 63.0f) & 0x3F) << 5) |
-                ((int)(MathHelper.Clamp(z, 0, 1) * 31.0f) & 0x1F));
+            return (UInt16) ((((int) Math.Round(MathHelper.Clamp(x, 0, 1) * 31.0f) & 0x1F) << 11) |
+                (((int) Math.Round(MathHelper.Clamp(y, 0, 1) * 63.0f) & 0x3F) << 5) |
+                ((int) Math.Round(MathHelper.Clamp(z, 0, 1) * 31.0f) & 0x1F));
         }
 
         /// <summary>
