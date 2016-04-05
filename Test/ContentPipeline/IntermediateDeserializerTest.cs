@@ -32,10 +32,13 @@ namespace MonoGame.Tests.ContentPipeline
             class FakeGraphicsService : IGraphicsDeviceService
             {
                 public GraphicsDevice GraphicsDevice { get; private set; }
+
+                #pragma warning disable 67
                 public event EventHandler<EventArgs> DeviceCreated;
                 public event EventHandler<EventArgs> DeviceDisposing;
                 public event EventHandler<EventArgs> DeviceReset;
                 public event EventHandler<EventArgs> DeviceResetting;
+                #pragma warning restore 67
             }
 
             class FakeServiceProvider : IServiceProvider
@@ -185,6 +188,10 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(null, optional.a);
                 Assert.AreEqual(null, optional.b);
                 Assert.AreEqual(string.Empty, optional.c);
+                Assert.AreEqual(null, optional.d);
+                Assert.AreEqual(CullMode.CullClockwiseFace, optional.e);
+                Assert.AreEqual(CullMode.CullCounterClockwiseFace, optional.f);
+                Assert.AreEqual(CullMode.CullClockwiseFace, optional.g);
             });
         }
 
@@ -233,6 +240,9 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Color(0x91, 0x6B, 0x46, 0xFF), collections.ColorArray[1]);
                 Assert.AreEqual(new Color(0x91, 0x7B, 0x46, 0xFF), collections.ColorArray[2]);
                 Assert.AreEqual(new Color(0x88, 0x65, 0x43, 0xFF), collections.ColorArray[3]);
+
+                Assert.NotNull(collections.CustomItemList);
+                Assert.AreEqual(0, collections.CustomItemList.Count);
             });            
         }
 
@@ -395,12 +405,12 @@ namespace MonoGame.Tests.ContentPipeline
             Deserialize<ExternalReferences>("17_ExternalReferences.xml", externalReferences =>
             {
                 Assert.NotNull(externalReferences.Texture);
-                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith("/Xml/grass.tga".Replace('/', Path.DirectorySeparatorChar)));
                 Assert.NotNull(externalReferences.Texture2);
-                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith(@"\Xml\grass.tga"));
+                Assert.IsTrue(externalReferences.Texture2.Filename.EndsWith("/Xml/grass.tga".Replace ('/', Path.DirectorySeparatorChar)));
                 Assert.AreNotSame(externalReferences.Texture, externalReferences.Texture2);
                 Assert.NotNull(externalReferences.Shader);
-                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.fx"));
+                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith("/Xml/foliage.fx".Replace ('/', Path.DirectorySeparatorChar)));
             });
         }
 
@@ -484,7 +494,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void CustomFormatting()
         {
-            DeserializeCompileAndLoad<CustomFormatting>("21_CustomFormatting.xml", customFormatting =>
+            DeserializeCompileAndLoad<CustomFormatting<byte, Rectangle>>("21_CustomFormatting.xml", customFormatting =>
             {
                 Assert.AreEqual(1, customFormatting.A);
                 Assert.AreEqual(3, customFormatting.Vector2ListSpaced.Count);
@@ -492,6 +502,7 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(new Vector2(0, 6), customFormatting.Vector2ListSpaced[1]);
                 Assert.AreEqual(new Vector2(0, 7), customFormatting.Vector2ListSpaced[2]);
                 Assert.AreEqual(string.Empty, customFormatting.EmptyString);
+                Assert.AreEqual(new Rectangle(0, 0, 100, 100), customFormatting.Rectangle);
             });
         }
 
@@ -535,6 +546,51 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.AreEqual(3, genericTypes.A.Value);
                 Assert.IsNotNull(genericTypes.B);
                 Assert.AreEqual(4.2f, genericTypes.B.Value);
+                Assert.IsNotNull(genericTypes.C);
+                Assert.IsNotNull(genericTypes.C.Value);
+                Assert.AreEqual(5, genericTypes.C.Value.Value);
+            });
+        }
+
+        [Test]
+        public void StructArrayNoElements()
+        {
+            // Note that this does not contain a matching SerializeAndAssert test as Vector2ArrayNoElements
+            // will serialize to an empty Xml element which defeats the purpose of this test.
+            DeserializeCompileAndLoad<StructArrayNoElements>("25_StructArrayNoElements.xml", structArrayNoElems =>
+            {
+                Assert.IsNotNull(structArrayNoElems.Vector2ArrayNoElements);
+                Assert.AreEqual(0, structArrayNoElems.Vector2ArrayNoElements.Length);
+            });
+        }
+
+        [Test]
+        public void ChildCollections()
+        {
+            // ChildCollection is a ContentPipeline-only type, so we don't need to / shouldn't
+            // test running it through ContentCompiler.
+            Deserialize<ChildCollections>("26_ChildCollections.xml", childCollections =>
+            {
+                Assert.IsNotNull(childCollections.Children);
+                Assert.AreEqual(2, childCollections.Children.Count);
+                Assert.AreEqual(childCollections, childCollections.Children[0].Parent);
+                Assert.AreEqual("Foo", childCollections.Children[0].Name);
+                Assert.AreEqual(childCollections, childCollections.Children[1].Parent);
+                Assert.AreEqual("Bar", childCollections.Children[1].Name);
+            });
+        }
+
+        [Test]
+        public void Colors()
+        {
+            DeserializeCompileAndLoad<Colors>("27_Colors.xml", colors =>
+            {
+                Assert.AreEqual(colors.White, Color.White);
+                Assert.AreEqual(colors.Black, Color.Black);
+                Assert.AreEqual(colors.Transparent, Color.Transparent);
+                Assert.AreEqual(colors.Red, Color.Red);
+                Assert.AreEqual(colors.Green, Color.Green);
+                Assert.AreEqual(colors.Blue, Color.Blue);
             });
         }
     }

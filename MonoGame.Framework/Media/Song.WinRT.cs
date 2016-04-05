@@ -13,28 +13,24 @@ namespace Microsoft.Xna.Framework.Media
         private Album album;
         private Artist artist;
         private Genre genre;
-        private MusicProperties musicProperties;
+        
+		private MusicProperties musicProperties;
 
         [CLSCompliant(false)]
         public StorageFile StorageFile
         {
             get { return this.musicProperties.File; }
         }
-
-        private Song(Album album, Artist artist, Genre genre)
-        {
+        
+		internal Song(Album album, Artist artist, Genre genre, MusicProperties musicProperties)
+		{
             this.album = album;
             this.artist = artist;
             this.genre = genre;
-        }
-
-        internal Song(Album album, Artist artist, Genre genre, MusicProperties musicProperties)
-            : this(album, artist, genre)
-        {
             this.musicProperties = musicProperties;
-        }
+		}
 
-        private void PlatformInitialize(string fileName)
+		private void PlatformInitialize(string fileName)
         {
 
         }

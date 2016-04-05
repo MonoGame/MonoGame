@@ -187,6 +187,20 @@ namespace Microsoft.Xna.Framework
             this.Height = height;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Rectangle"/> struct, with the specified
+        /// location and size.
+        /// </summary>
+        /// <param name="location">The x and y coordinates of the top-left corner of the created <see cref="Rectangle"/>.</param>
+        /// <param name="size">The width and height of the created <see cref="Rectangle"/>.</param>
+        public Rectangle(Point location,Point size)
+        {
+            this.X = location.X;
+            this.Y = location.Y;
+            this.Width = size.X;
+            this.Height = size.Y;
+        }
+
         #endregion
 
         #region Operators
@@ -355,10 +369,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets whether or not a specified <see cref="Rectangle"/> intersects with this <see cref="Rectangle"/>.
+        /// Gets whether or not the other <see cref="Rectangle"/> intersects with this rectangle.
         /// </summary>
-        /// <param name="value">Other <see cref="Rectangle"/>.</param>
-        /// <returns><c>true</c> if other <see cref="Rectangle"/> intersects with this <see cref="Rectangle"/>; <c>false</c> otherwise.</returns>
+        /// <param name="value">The other rectangle for testing.</param>
+        /// <returns><c>true</c> if other <see cref="Rectangle"/> intersects with this rectangle; <c>false</c> otherwise.</returns>
         public bool Intersects(Rectangle value)
         {
             return value.Left < Right &&
@@ -369,10 +383,10 @@ namespace Microsoft.Xna.Framework
 
 
         /// <summary>
-        /// Gets whether or not a specified <see cref="Rectangle"/> intersects with this <see cref="Rectangle"/>.
+        /// Gets whether or not the other <see cref="Rectangle"/> intersects with this rectangle.
         /// </summary>
-        /// <param name="value">Other <see cref="Rectangle"/>.</param>
-        /// <param name="result"><c>true</c> if other <see cref="Rectangle"/> intersects with this <see cref="Rectangle"/>; <c>false</c> otherwise. As an output parameter.</param>
+        /// <param name="value">The other rectangle for testing.</param>
+        /// <param name="result"><c>true</c> if other <see cref="Rectangle"/> intersects with this rectangle; <c>false</c> otherwise. As an output parameter.</param>
         public void Intersects(ref Rectangle value, out bool result)
         {
             result = value.Left < Right &&

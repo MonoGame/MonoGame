@@ -94,6 +94,10 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Number, regex);
             Tokens.Add(TokenType.Number);
 
+            regex = new Regex(@"0x[0-9a-f]{6}([0-9a-f][0-9a-f])?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.HexColor, regex);
+            Tokens.Add(TokenType.HexColor);
+
             regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
             Patterns.Add(TokenType.Identifier, regex);
             Tokens.Add(TokenType.Identifier);
@@ -198,6 +202,10 @@ namespace TwoMGFX
             Patterns.Add(TokenType.AddressW, regex);
             Tokens.Add(TokenType.AddressW);
 
+            regex = new Regex(@"BorderColor", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.BorderColor, regex);
+            Tokens.Add(TokenType.BorderColor);
+
             regex = new Regex(@"MaxAnisotropy", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.MaxAnisotropy, regex);
             Tokens.Add(TokenType.MaxAnisotropy);
@@ -221,6 +229,10 @@ namespace TwoMGFX
             regex = new Regex(@"Mirror", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Mirror, regex);
             Tokens.Add(TokenType.Mirror);
+
+            regex = new Regex(@"Border", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Border, regex);
+            Tokens.Add(TokenType.Border);
 
             regex = new Regex(@"None", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.None, regex);
@@ -266,6 +278,10 @@ namespace TwoMGFX
             Patterns.Add(TokenType.ZWriteEnable, regex);
             Tokens.Add(TokenType.ZWriteEnable);
 
+            regex = new Regex(@"ZFunc", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.ZFunc, regex);
+            Tokens.Add(TokenType.ZFunc);
+
             regex = new Regex(@"DepthBias", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.DepthBias, regex);
             Tokens.Add(TokenType.DepthBias);
@@ -282,9 +298,109 @@ namespace TwoMGFX
             Patterns.Add(TokenType.MultiSampleAntiAlias, regex);
             Tokens.Add(TokenType.MultiSampleAntiAlias);
 
+            regex = new Regex(@"ScissorTestEnable", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.ScissorTestEnable, regex);
+            Tokens.Add(TokenType.ScissorTestEnable);
+
             regex = new Regex(@"SlopeScaleDepthBias", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.SlopeScaleDepthBias, regex);
             Tokens.Add(TokenType.SlopeScaleDepthBias);
+
+            regex = new Regex(@"StencilEnable", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilEnable, regex);
+            Tokens.Add(TokenType.StencilEnable);
+
+            regex = new Regex(@"StencilFail", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilFail, regex);
+            Tokens.Add(TokenType.StencilFail);
+
+            regex = new Regex(@"StencilFunc", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilFunc, regex);
+            Tokens.Add(TokenType.StencilFunc);
+
+            regex = new Regex(@"StencilMask", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilMask, regex);
+            Tokens.Add(TokenType.StencilMask);
+
+            regex = new Regex(@"StencilPass", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilPass, regex);
+            Tokens.Add(TokenType.StencilPass);
+
+            regex = new Regex(@"StencilRef", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilRef, regex);
+            Tokens.Add(TokenType.StencilRef);
+
+            regex = new Regex(@"StencilWriteMask", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilWriteMask, regex);
+            Tokens.Add(TokenType.StencilWriteMask);
+
+            regex = new Regex(@"StencilZFail", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.StencilZFail, regex);
+            Tokens.Add(TokenType.StencilZFail);
+
+            regex = new Regex(@"Never", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Never, regex);
+            Tokens.Add(TokenType.Never);
+
+            regex = new Regex(@"Less", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Less, regex);
+            Tokens.Add(TokenType.Less);
+
+            regex = new Regex(@"Equal", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Equal, regex);
+            Tokens.Add(TokenType.Equal);
+
+            regex = new Regex(@"LessEqual", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.LessEqual, regex);
+            Tokens.Add(TokenType.LessEqual);
+
+            regex = new Regex(@"Greater", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Greater, regex);
+            Tokens.Add(TokenType.Greater);
+
+            regex = new Regex(@"NotEqual", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.NotEqual, regex);
+            Tokens.Add(TokenType.NotEqual);
+
+            regex = new Regex(@"GreaterEqual", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.GreaterEqual, regex);
+            Tokens.Add(TokenType.GreaterEqual);
+
+            regex = new Regex(@"Always", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Always, regex);
+            Tokens.Add(TokenType.Always);
+
+            regex = new Regex(@"Keep", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Keep, regex);
+            Tokens.Add(TokenType.Keep);
+
+            regex = new Regex(@"Zero", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Zero, regex);
+            Tokens.Add(TokenType.Zero);
+
+            regex = new Regex(@"Replace", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Replace, regex);
+            Tokens.Add(TokenType.Replace);
+
+            regex = new Regex(@"IncrSat", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.IncrSat, regex);
+            Tokens.Add(TokenType.IncrSat);
+
+            regex = new Regex(@"DecrSat", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.DecrSat, regex);
+            Tokens.Add(TokenType.DecrSat);
+
+            regex = new Regex(@"Invert", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Invert, regex);
+            Tokens.Add(TokenType.Invert);
+
+            regex = new Regex(@"Incr", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Incr, regex);
+            Tokens.Add(TokenType.Incr);
+
+            regex = new Regex(@"Decr", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Decr, regex);
+            Tokens.Add(TokenType.Decr);
 
             regex = new Regex(@"Red", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Red, regex);
@@ -341,10 +457,6 @@ namespace TwoMGFX
             regex = new Regex(@"Max", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Max, regex);
             Tokens.Add(TokenType.Max);
-
-            regex = new Regex(@"Zero", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            Patterns.Add(TokenType.Zero, regex);
-            Tokens.Add(TokenType.Zero);
 
             regex = new Regex(@"One", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.One, regex);
@@ -592,135 +704,194 @@ namespace TwoMGFX
             BlendOp_Min= 37,
             BlendOp_Max= 38,
             BlendOps= 39,
-            Render_State_CullMode= 40,
-            Render_State_FillMode= 41,
-            Render_State_AlphaBlendEnable= 42,
-            Render_State_SrcBlend= 43,
-            Render_State_DestBlend= 44,
-            Render_State_BlendOp= 45,
-            Render_State_ColorWriteEnable= 46,
-            Render_State_DepthBias= 47,
-            Render_State_SlopeScaleDepthBias= 48,
-            Render_State_ZEnable= 49,
-            Render_State_ZWriteEnable= 50,
-            Render_State_MultiSampleAntiAlias= 51,
-            Render_State_Expression= 52,
-            Pass_Declaration= 53,
-            VertexShader_Pass_Expression= 54,
-            PixelShader_Pass_Expression= 55,
-            AddressMode_Clamp= 56,
-            AddressMode_Wrap= 57,
-            AddressMode_Mirror= 58,
-            AddressMode= 59,
-            TextureFilter_None= 60,
-            TextureFilter_Linear= 61,
-            TextureFilter_Point= 62,
-            TextureFilter_Anisotropic= 63,
-            TextureFilter= 64,
-            Sampler_State_Texture= 65,
-            Sampler_State_MinFilter= 66,
-            Sampler_State_MagFilter= 67,
-            Sampler_State_MipFilter= 68,
-            Sampler_State_Filter= 69,
-            Sampler_State_AddressU= 70,
-            Sampler_State_AddressV= 71,
-            Sampler_State_AddressW= 72,
-            Sampler_State_MaxMipLevel= 73,
-            Sampler_State_MaxAnisotropy= 74,
-            Sampler_State_MipLodBias= 75,
-            Sampler_State_Expression= 76,
-            Sampler_Register_Expression= 77,
-            Sampler_Declaration= 78,
+            CmpFunc_Never= 40,
+            CmpFunc_Less= 41,
+            CmpFunc_Equal= 42,
+            CmpFunc_LessEqual= 43,
+            CmpFunc_Greater= 44,
+            CmpFunc_NotEqual= 45,
+            CmpFunc_GreaterEqual= 46,
+            CmpFunc_Always= 47,
+            CmpFunc = 48,
+            StencilOp_Keep= 49,
+            StencilOp_Zero= 50,
+            StencilOp_Replace= 51,
+            StencilOp_IncrSat= 52,
+            StencilOp_DecrSat= 53,
+            StencilOp_Invert= 54,
+            StencilOp_Incr= 55,
+            StencilOp_Decr= 56,
+            StencilOp= 57,
+            Render_State_CullMode= 58,
+            Render_State_FillMode= 59,
+            Render_State_AlphaBlendEnable= 60,
+            Render_State_SrcBlend= 61,
+            Render_State_DestBlend= 62,
+            Render_State_BlendOp= 63,
+            Render_State_ColorWriteEnable= 64,
+            Render_State_DepthBias= 65,
+            Render_State_SlopeScaleDepthBias= 66,
+            Render_State_ZEnable= 67,
+            Render_State_ZWriteEnable= 68,
+            Render_State_ZFunc= 69,
+            Render_State_MultiSampleAntiAlias= 70,
+            Render_State_ScissorTestEnable= 71,
+            Render_State_StencilEnable= 72,
+            Render_State_StencilFail= 73,
+            Render_State_StencilFunc= 74,
+            Render_State_StencilMask= 75,
+            Render_State_StencilPass= 76,
+            Render_State_StencilRef= 77,
+            Render_State_StencilWriteMask= 78,
+            Render_State_StencilZFail= 79,
+            Render_State_Expression= 80,
+            Pass_Declaration= 81,
+            VertexShader_Pass_Expression= 82,
+            PixelShader_Pass_Expression= 83,
+            AddressMode_Clamp= 84,
+            AddressMode_Wrap= 85,
+            AddressMode_Mirror= 86,
+            AddressMode_Border= 87,
+            AddressMode= 88,
+            TextureFilter_None= 89,
+            TextureFilter_Linear= 90,
+            TextureFilter_Point= 91,
+            TextureFilter_Anisotropic= 92,
+            TextureFilter= 93,
+            Sampler_State_Texture= 94,
+            Sampler_State_MinFilter= 95,
+            Sampler_State_MagFilter= 96,
+            Sampler_State_MipFilter= 97,
+            Sampler_State_Filter= 98,
+            Sampler_State_AddressU= 99,
+            Sampler_State_AddressV= 100,
+            Sampler_State_AddressW= 101,
+            Sampler_State_BorderColor= 102,
+            Sampler_State_MaxMipLevel= 103,
+            Sampler_State_MaxAnisotropy= 104,
+            Sampler_State_MipLodBias= 105,
+            Sampler_State_Expression= 106,
+            Sampler_Register_Expression= 107,
+            Sampler_Declaration_States= 108,
+            Sampler_Declaration= 109,
 
             //Terminal tokens:
-            BlockComment= 79,
-            Comment = 80,
-            Whitespace= 81,
-            LinePragma= 82,
-            Pass    = 83,
-            Technique= 84,
-            Sampler = 85,
-            SamplerState= 86,
-            VertexShader= 87,
-            PixelShader= 88,
-            Register= 89,
-            Boolean = 90,
-            Number  = 91,
-            Identifier= 92,
-            OpenBracket= 93,
-            CloseBracket= 94,
-            Equals  = 95,
-            Colon   = 96,
-            Comma   = 97,
-            Semicolon= 98,
-            Or      = 99,
-            OpenParenthesis= 100,
-            CloseParenthesis= 101,
-            OpenSquareBracket= 102,
-            CloseSquareBracket= 103,
-            LessThan= 104,
-            GreaterThan= 105,
-            Compile = 106,
-            ShaderModel= 107,
-            Code    = 108,
-            EndOfFile= 109,
-            MinFilter= 110,
-            MagFilter= 111,
-            MipFilter= 112,
-            Filter  = 113,
-            Texture = 114,
-            AddressU= 115,
-            AddressV= 116,
-            AddressW= 117,
-            MaxAnisotropy= 118,
-            MaxMipLevel= 119,
-            MipLodBias= 120,
-            Clamp   = 121,
-            Wrap    = 122,
-            Mirror  = 123,
-            None    = 124,
-            Linear  = 125,
-            Point   = 126,
-            Anisotropic= 127,
-            AlphaBlendEnable= 128,
-            SrcBlend= 129,
-            DestBlend= 130,
-            BlendOp = 131,
-            ColorWriteEnable= 132,
-            ZEnable = 133,
-            ZWriteEnable= 134,
-            DepthBias= 135,
-            CullMode= 136,
-            FillMode= 137,
-            MultiSampleAntiAlias= 138,
-            SlopeScaleDepthBias= 139,
-            Red     = 140,
-            Green   = 141,
-            Blue    = 142,
-            Alpha   = 143,
-            All     = 144,
-            Cw      = 145,
-            Ccw     = 146,
-            Solid   = 147,
-            WireFrame= 148,
-            Add     = 149,
-            Subtract= 150,
-            RevSubtract= 151,
-            Min     = 152,
-            Max     = 153,
-            Zero    = 154,
-            One     = 155,
-            SrcColor= 156,
-            InvSrcColor= 157,
-            SrcAlpha= 158,
-            InvSrcAlpha= 159,
-            DestAlpha= 160,
-            InvDestAlpha= 161,
-            DestColor= 162,
-            InvDestColor= 163,
-            SrcAlphaSat= 164,
-            BlendFactor= 165,
-            InvBlendFactor= 166
+            BlockComment= 110,
+            Comment = 111,
+            Whitespace= 112,
+            LinePragma= 113,
+            Pass    = 114,
+            Technique= 115,
+            Sampler = 116,
+            SamplerState= 117,
+            VertexShader= 118,
+            PixelShader= 119,
+            Register= 120,
+            Boolean = 121,
+            Number  = 122,
+            HexColor= 123,
+            Identifier= 124,
+            OpenBracket= 125,
+            CloseBracket= 126,
+            Equals  = 127,
+            Colon   = 128,
+            Comma   = 129,
+            Semicolon= 130,
+            Or      = 131,
+            OpenParenthesis= 132,
+            CloseParenthesis= 133,
+            OpenSquareBracket= 134,
+            CloseSquareBracket= 135,
+            LessThan= 136,
+            GreaterThan= 137,
+            Compile = 138,
+            ShaderModel= 139,
+            Code    = 140,
+            EndOfFile= 141,
+            MinFilter= 142,
+            MagFilter= 143,
+            MipFilter= 144,
+            Filter  = 145,
+            Texture = 146,
+            AddressU= 147,
+            AddressV= 148,
+            AddressW= 149,
+            BorderColor= 150,
+            MaxAnisotropy= 151,
+            MaxMipLevel= 152,
+            MipLodBias= 153,
+            Clamp   = 154,
+            Wrap    = 155,
+            Mirror  = 156,
+            Border  = 157,
+            None    = 158,
+            Linear  = 159,
+            Point   = 160,
+            Anisotropic= 161,
+            AlphaBlendEnable= 162,
+            SrcBlend= 163,
+            DestBlend= 164,
+            BlendOp = 165,
+            ColorWriteEnable= 166,
+            ZEnable = 167,
+            ZWriteEnable= 168,
+            ZFunc   = 169,
+            DepthBias= 170,
+            CullMode= 171,
+            FillMode= 172,
+            MultiSampleAntiAlias= 173,
+            ScissorTestEnable= 174,
+            SlopeScaleDepthBias= 175,
+            StencilEnable= 176,
+            StencilFail= 177,
+            StencilFunc= 178,
+            StencilMask= 179,
+            StencilPass= 180,
+            StencilRef= 181,
+            StencilWriteMask= 182,
+            StencilZFail= 183,
+            Never   = 184,
+            Less    = 185,
+            Equal   = 186,
+            LessEqual= 187,
+            Greater = 188,
+            NotEqual= 189,
+            GreaterEqual= 190,
+            Always  = 191,
+            Keep    = 192,
+            Zero    = 193,
+            Replace = 194,
+            IncrSat = 195,
+            DecrSat = 196,
+            Invert  = 197,
+            Incr    = 198,
+            Decr    = 199,
+            Red     = 200,
+            Green   = 201,
+            Blue    = 202,
+            Alpha   = 203,
+            All     = 204,
+            Cw      = 205,
+            Ccw     = 206,
+            Solid   = 207,
+            WireFrame= 208,
+            Add     = 209,
+            Subtract= 210,
+            RevSubtract= 211,
+            Min     = 212,
+            Max     = 213,
+            One     = 214,
+            SrcColor= 215,
+            InvSrcColor= 216,
+            SrcAlpha= 217,
+            InvSrcAlpha= 218,
+            DestAlpha= 219,
+            InvDestAlpha= 220,
+            DestColor= 221,
+            InvDestColor= 222,
+            SrcAlphaSat= 223,
+            BlendFactor= 224,
+            InvBlendFactor= 225
     }
 
     public class Token

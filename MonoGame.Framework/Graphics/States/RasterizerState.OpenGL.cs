@@ -5,8 +5,12 @@
 using System;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -57,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-#if MONOMAC || WINDOWS || LINUX
+#if MONOMAC || WINDOWS || DESKTOPGL
 			if (FillMode == FillMode.Solid) 
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             else
@@ -91,6 +95,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 device._lastRasterizerState.DepthBias = this.DepthBias;
                 device._lastRasterizerState.SlopeScaleDepthBias = this.SlopeScaleDepthBias;
+            }
+
+            if (device.GraphicsCapabilities.SupportsDepthClamp &&
+                (force || this.DepthClipEnable != device._lastRasterizerState.DepthClipEnable))
+            {
+                if (!DepthClipEnable)
+                    GL.Enable((EnableCap) 0x864F); // should be EnableCap.DepthClamp, but not available in OpenTK.Graphics.ES20.EnableCap
+                else
+                    GL.Disable((EnableCap) 0x864F);
+                GraphicsExtensions.CheckGLError();
+                device._lastRasterizerState.DepthClipEnable = this.DepthClipEnable;
             }
 
             // TODO: Implement MultiSampleAntiAlias

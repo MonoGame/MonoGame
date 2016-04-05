@@ -6,9 +6,6 @@ using System;
 using System.IO;
 using System.Xml;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using System.Drawing;
-using System.Collections.Generic;
-using System.Xml.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline

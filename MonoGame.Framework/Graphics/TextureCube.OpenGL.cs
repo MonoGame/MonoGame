@@ -4,9 +4,9 @@
 
 using System;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
 
-            format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+            format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
             for (int i = 0; i < 6; i++)
             {
@@ -71,15 +71,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
-#if OPENGL && MONOMAC
+#if OPENGL && (MONOMAC || DESKTOPGL)
             TextureTarget target = GetGLCubeFace(cubeMapFace);
-            GL.BindTexture(target, this.glTexture);
-            // 4 bytes per pixel
-            if (data.Length < size * size * 4)
-                throw new ArgumentException("data");
-
-            GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
-                PixelType.UnsignedByte, data);
+            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+            GraphicsExtensions.CheckGLError();
+            GL.GetTexImage<T>(target, 0, glFormat, glType, data);
+            GraphicsExtensions.CheckGLError();
 #else
             throw new NotImplementedException();
 #endif

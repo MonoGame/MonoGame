@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame iPhone/iPad Application</_Name>
+		<Category>monogame/app/games</Category>
+		<Icon>monogame-project</Icon>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a MonoGame Application for the iPhone/iPad</_Description>
+	</TemplateConfiguration>
+	
+	<Actions>
+		<Open filename = "Game1.cs"/>
+	</Actions>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type = "XamarinIOS">
+			<Options />
+			<References>
+				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />	
+				<Reference type="Gac" refto="Xamarin.iOS" />
+				<Reference type="Package" refto="MonoGame.Framework" />
+			</References>
+			<Files>
+				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
+				<File name="Main.cs" AddStandardHeader="True" src="Common/Program.cs" />
+				<File name="Entitlements.plist" AddStandardHeader="False" src="iOS/Entitlements.plist.xml" />
+				<File name="Info.plist" AddStandardHeader="False" src="iOS/iOSInfo.plist" />
+				<RawFile name="Default.png" src="iOS/iOSDefault.png" />
+				<RawFile name="GameThumbnail.png" src="iOS/iOSGameThumbnail.png" />
+				<Directory name="Content">
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
+				</Directory>
+				<Directory name="Properties">
+					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="Common/AssemblyInfo.cs" />
+				</Directory>
+			</Files>
+		</Project>
+	</Combine>
+</Template>
+

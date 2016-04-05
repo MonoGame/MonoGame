@@ -13,7 +13,9 @@
 
   <Properties>
     
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
     <RootNamespace>TwoMGFX</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
@@ -21,8 +23,6 @@
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
     </CustomDefinitions>
-
-    <ForceArchitecture>x64</ForceArchitecture>
 
   </Properties>
 
@@ -130,6 +130,9 @@
     <Compile Include="..\..\MonoGame.Framework\Ray.cs">
       <Link>MonoGame.Framework\Ray.cs</Link>
     </Compile>
+	<Compile Include="..\..\MonoGame.Framework\Rectangle.cs">
+      <Link>MonoGame.Framework\Rectangle.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Vector2.cs">
       <Link>MonoGame.Framework\Vector2.cs</Link>
     </Compile>
@@ -162,7 +165,6 @@
     <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
 
     <!-- The core mgfx generation classes -->
-    <Compile Include="CompilerInclude.cs" />
     <Compile Include="ConstantBufferData.cs" />
     <Compile Include="ConstantBufferData.mojo.cs" />
     <Compile Include="ConstantBufferData.sharpdx.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="EffectObject.hlsl.cs" />
     <Compile Include="EffectObject.pssl.cs" />
     <Compile Include="EffectObject.writer.cs" />    
+    <Compile Include="IEffectCompilerOutput.cs" />
     <Compile Include="ShaderCompilerException.cs" />
     <Compile Include="ShaderData.cs" />
     <Compile Include="ShaderData.mojo.cs" />
@@ -187,10 +190,6 @@
     <!-- The HLSL to GLSL conversion utility -->
     <Compile Include="MarshalHelper.cs" />
     <Compile Include="MojoShader.cs" />
-    <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
-      <Link>libmojoshader_64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
 
     <!-- The MGFX parser -->
     <None Include="MGFX.tpg" />
@@ -198,6 +197,8 @@
     <Compile Include="ParseTree.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="ParseTreeTools.cs" />
-
+    
+    <!-- The MGFX preprocessor -->
+    <Compile Include="Preprocessor.cs" />
   </Files>
 </Project>

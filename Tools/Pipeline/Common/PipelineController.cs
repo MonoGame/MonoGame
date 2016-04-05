@@ -5,9 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using MGCB;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
@@ -16,9 +18,8 @@ namespace MonoGame.Tools.Pipeline
 {
     internal partial class PipelineController : IController
     {
-        private FileSystemWatcher watcher;
-
         private PipelineProject _project;
+        private FileWatcher _watcher;
 
         private Task _buildTask;
         private Process _buildProcess;
@@ -30,10 +31,13 @@ namespace MonoGame.Tools.Pipeline
             "",
 #if DEBUG
             "../../../../../MGCB/bin/Windows/AnyCPU/Debug",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Debug"),
 #else
             "../../../../../MGCB/bin/Windows/AnyCPU/Release",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../MGCB/bin/Windows/AnyCPU/Release"),
 #endif
             "../MGCB",
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../MGCB"),
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
         };
 
@@ -46,6 +50,16 @@ namespace MonoGame.Tools.Pipeline
 
         public bool LaunchDebugger { get; set; }
 
+        public string ProjectLocation 
+        {
+            get { return _project.Location; }
+        }
+
+        public string ProjectOutputDir
+        {
+            get { return _project.OutputDir; }
+        }
+        
         public bool ProjectOpen { get; private set; }
 
         public bool ProjectDirty { get; set; }
@@ -68,15 +82,16 @@ namespace MonoGame.Tools.Pipeline
 
         public event Action OnBuildFinished;
 
-        public PipelineController(IView view, PipelineProject project)
+        public PipelineController(IView view)
         {
             _actionStack = new ActionStack();
             Selection = new Selection();
 
             View = view;
             View.Attach(this);
-            _project = project;
             ProjectOpen = false;
+
+            _watcher = new FileWatcher(this, view);
 
             _templateItems = new List<ContentItemTemplate>();
             LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
@@ -86,6 +101,7 @@ namespace MonoGame.Tools.Pipeline
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
             ProjectDirty = true;
+            View.UpdateProperties(_project);
         }
 
         public void OnReferencesModified()
@@ -93,6 +109,7 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
             ProjectDirty = true;
             ResolveTypes();
+            View.UpdateProperties(_project);
         }
 
         public void OnItemModified(ContentItem contentItem)
@@ -206,7 +223,7 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
-#if SHIPPING
+#if !DEBUG
             try
 #endif
             {
@@ -222,28 +239,11 @@ namespace MonoGame.Tools.Pipeline
                 ProjectOpen = true;
                 ProjectDirty = false;
 
-                watcher = new FileSystemWatcher (Path.GetDirectoryName (projectFilePath));
-                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.FileName;
-                watcher.Filter = "*.*";
-                watcher.IncludeSubdirectories = true;
-                watcher.Created += delegate(object sender, FileSystemEventArgs e) {
-                    HandleCreated(e.FullPath);
-                };
-                watcher.Deleted += delegate(object sender, FileSystemEventArgs e) {
-                    HandleDeleted(e.FullPath);
-                };
-                watcher.Renamed += delegate(object sender, RenamedEventArgs e) {
-                    HandleDeleted(e.OldFullPath);
-                    HandleCreated(e.FullPath);
-                };
-
-                watcher.EnableRaisingEvents = true;
-
-                History.Default.AddProjectHistory(projectFilePath);
-                History.Default.StartupProject = projectFilePath;
-                History.Default.Save();
+                PipelineSettings.Default.AddProjectHistory(projectFilePath);
+                PipelineSettings.Default.StartupProject = projectFilePath;
+                PipelineSettings.Default.Save();
             }
-#if SHIPPING
+#if !DEBUG
             catch (Exception e)
             {
                 View.ShowError("Open Project", "Failed to open project!");
@@ -255,31 +255,8 @@ namespace MonoGame.Tools.Pipeline
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
-        }
 
-        void HandleCreated (string path)
-        {
-            SetExists (path, true);
-        }
-
-        void HandleDeleted (string path)
-        {
-            SetExists (path, false);
-        }
-
-        void SetExists(string path, bool exist)
-        {
-            if (_project != null) {
-                var projectDir = _project.Location + Path.DirectorySeparatorChar;
-
-                IProjectItem item = GetItem (PathHelper.GetRelativePath (projectDir, path));
-                if (item != null) {
-                    if (item.Exists == !exist) {
-                        item.Exists = exist;
-                        View.ItemExistanceChanged (item);
-                    }
-                }
-            }
+            _watcher.Run();
         }
 
         public void CloseProject()
@@ -292,10 +269,7 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            if (watcher != null) {
-                watcher.Dispose ();
-                watcher = null;
-            }
+            _watcher.Stop();
 
             ProjectOpen = false;
             ProjectDirty = false;
@@ -303,13 +277,40 @@ namespace MonoGame.Tools.Pipeline
             _actionStack.Clear();
             View.OutputClear();
 
-            History.Default.StartupProject = null;
-            History.Default.Save();
+            PipelineSettings.Default.StartupProject = null;
+            PipelineSettings.Default.Save();
 
             Selection.Clear(this);
             UpdateTree();
         }
 
+        public bool MoveProject(string newname)
+        {
+            string opath = _project.OriginalPath;
+            string ext = Path.GetExtension(opath);
+
+            try
+            {
+                File.Delete(_project.OriginalPath);
+            }
+            catch {
+                View.ShowError("Error", "Could not delete old project file.");
+                return false;
+            }
+
+            _project.OriginalPath = Path.GetDirectoryName(opath) + Path.DirectorySeparatorChar + newname + ext;
+            if (!SaveProject(false))
+            {
+                _project.OriginalPath = opath;
+                SaveProject(false);
+                View.ShowError("Error", "Could not save the new project file.");
+                return false;
+            }
+            View.SetTreeRoot(_project);
+
+            return true;
+        }
+        
         public bool SaveProject(bool saveAs)
         {
             // Do we need file name?
@@ -320,6 +321,7 @@ namespace MonoGame.Tools.Pipeline
                     return false;
 
                 _project.OriginalPath = newFilePath;
+				View.SetTreeRoot(_project);
             }
 
             // Do the save.
@@ -328,11 +330,11 @@ namespace MonoGame.Tools.Pipeline
             parser.SaveProject();
 
             // Note: This is where a project loaded via 'new project' or 'import project' 
-            //       get recorded into history because up until this point they did not
+            //       get recorded into PipelineSettings because up until this point they did not
             //       exist as files on disk.
-            History.Default.AddProjectHistory(_project.OriginalPath);
-            History.Default.StartupProject = _project.OriginalPath;
-            History.Default.Save();
+            PipelineSettings.Default.AddProjectHistory(_project.OriginalPath);
+            PipelineSettings.Default.StartupProject = _project.OriginalPath;
+            PipelineSettings.Default.Save();
 
             return true;
         }
@@ -416,7 +418,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private string FindMGCB()
-        {
+        {            
             foreach (var root in _mgcbSearchPaths)
             {
                 var mgcbPath = Path.Combine(root, "MGCB.exe");
@@ -438,6 +440,7 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
+                _buildProcess.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
                 _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
 
                 // Fire off the process.
@@ -487,7 +490,7 @@ namespace MonoGame.Tools.Pipeline
         /// </summary>
         private bool AskSaveProject()
         {
-            // If the project is not dirty 
+            // If the project is not dirty or open
             // then we can simply skip it.
             if (!ProjectDirty)
                 return true;
@@ -534,36 +537,310 @@ namespace MonoGame.Tools.Pipeline
 
             // Make sure we give the user a chance to
             // save the project if they need too.
-            return AskSaveProject();
+            var ret = AskSaveProject();
+
+            if (ret)
+                _watcher.Stop();
+
+            return ret;
         }
 
-        public void Include(string initialDirectory)
-        {       
+        public void DragDrop(string initialDirectory, string[] folders, string[] files)
+        {
             // Root the path to the project.
             if (!Path.IsPathRooted(initialDirectory))
                 initialDirectory = Path.Combine(_project.Location, initialDirectory);
+            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                initialDirectory += Path.DirectorySeparatorChar.ToString();
+
+            IncludeFolder(initialDirectory, folders);
+            Include(initialDirectory, files);
+        }
+
+        public void Include(string initialDirectory)
+        {
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                initialDirectory += Path.DirectorySeparatorChar.ToString();
 
             List<string> files;
             if (!View.ChooseContentFile(initialDirectory, out files))
                 return;
 
-            var action = new IncludeAction(this, files);
-            action.Do();
-            _actionStack.Add(action);  
+            Include(initialDirectory, files.ToArray());
         }
 
-        public void Exclude(IEnumerable<ContentItem> items)
+        private void Include(string initialDirectory, string[] f)
         {
-            var action = new ExcludeAction(this, items);
-            action.Do();
-            _actionStack.Add(action);
+            List<string> files = new List<string>();
+            files.AddRange(f);
+
+            List<string> sc = new List<string>(), dc = new List<string>();
+            int def = 0;
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                if (!files[i].StartsWith(initialDirectory))
+                {
+                    string newfile = Path.Combine(initialDirectory, Path.GetFileName(files[i]));
+                    int daction = def;
+
+                    if (daction == 1)
+                        if (File.Exists(newfile))
+                            daction = 2;
+
+                    if (daction == 0)
+                    {
+                        bool applyforall;
+                        CopyAction act;
+
+                        if (!View.CopyOrLinkFile(files[i], File.Exists(newfile), out act, out applyforall))
+                            return;
+
+                        daction = (int)act + 1;
+                        if (applyforall)
+                            def = daction;
+                    }
+
+                    if (daction == 1)
+                    {
+                        sc.Add(files[i]);
+                        dc.Add(newfile);
+                        files[i] = newfile;
+                    }
+                    else if (daction == 3)
+                    {
+                        files.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+
+            if (files.Count == 0)
+                return;
+
+            try
+            {
+                for (int i = 0; i < sc.Count; i++)
+                    File.Copy(sc[i], dc[i]);
+
+                var action = new IncludeAction(this, files);
+                if(action.Do())
+                    _actionStack.Add(action);  
+            }
+            catch
+            {
+                View.ShowError("Error While Copying Files", "An error occurred while the files were being copied, aborting.");
+            }
+        }
+
+        public void IncludeFolder(string initialDirectory)
+        {
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                initialDirectory += Path.DirectorySeparatorChar.ToString();
+
+            string folder;
+            if (!View.ChooseContentFolder(initialDirectory, out folder))
+                return;
+
+            IncludeFolder(initialDirectory, new []{ folder });
+        }
+
+        public void IncludeFolder(string initialDirectory, string[] dirs)
+        {
+            CopyAction caction = CopyAction.Copy;
+            bool applyforall = false;
+
+            List<string> ffiles = new List<string>();
+            List<string> ddirectories = new List<string>();
+
+            List<string> sc = new List<string>(), dc = new List<string>();
+
+            foreach (string fol in dirs)
+            {
+                List<string> files = new List<string>();
+                List<string> directories = new List<string>();
+
+                string folder = fol;
+
+                if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    folder += Path.DirectorySeparatorChar;
+
+                files.AddRange(GetFiles(folder));
+                directories.Add(folder);
+                directories.AddRange(GetDirectories(folder));
+
+                if (!folder.StartsWith(initialDirectory))
+                {
+                    string nd = folder.Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar);
+
+                    if (!applyforall)
+                    if (!View.CopyOrLinkFolder(folder, Directory.Exists(nd), out caction, out applyforall))
+                        return;
+
+                    if (caction == CopyAction.Copy)
+                    {
+                        for (int i = 0; i < directories.Count; i++)
+                            ddirectories.Add(directories[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
+
+                        for (int i = 0; i < files.Count; i++)
+                            ffiles.Add(files[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
+
+                        sc.Add(folder);
+                        dc.Add(nd);
+                    }
+                    else if (caction == CopyAction.Link)
+                    {
+                        string pl = _project.Location;
+                        if (!pl.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                            pl += Path.DirectorySeparatorChar;
+
+                        Uri folderUri = new Uri(pl);
+
+                        for (int i = 0; i < directories.Count; i++)
+                        {
+                            Uri pathUri = new Uri(directories[i]);
+                            ddirectories.Add(Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar)));
+                        }
+
+                        for (int i = 0; i < files.Count; i++)
+                        {
+                            Uri pathUri = new Uri(files[i]);
+                            ffiles.Add(Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar)));
+                        }
+                    }
+                }
+                else
+                {
+                    ddirectories.AddRange(directories);
+                    ffiles.AddRange(files);
+                }
+            }
+
+            try
+            {
+                for (int i = 0; i < sc.Count; i++)
+                    DirectoryCopy(sc[i], dc[i]);
+
+                var action2 = new IncludeAction(this, ffiles, ddirectories);
+                if (action2.Do())
+                    _actionStack.Add(action2);
+            }
+            catch
+            {
+                View.ShowError("Error While Copying Files", "An error occurred while the directories were being copied, aborting.");
+            }
+        }
+
+        private static void DirectoryCopy(string sourceDirName, string destDirName)
+        {
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            if (!Directory.Exists(destDirName))
+                Directory.CreateDirectory(destDirName);
+
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            foreach (DirectoryInfo subdir in dirs)
+            {
+                string temppath = Path.Combine(destDirName, subdir.Name);
+                DirectoryCopy(subdir.FullName, temppath);
+            }
+        }
+
+        public void Move (string[] paths, string[] newnames, FileType[] types)
+        {
+            var action = new MoveAction(this, paths, newnames, types);
+            if(action.Do())
+                _actionStack.Add(action);
+        }
+        
+        private List<string> GetFiles(string folder)
+        {
+            List<string> ret = new List<string>();
+
+            string[] directories = Directory.GetDirectories(folder);
+            foreach (string d in directories)
+                ret.AddRange(GetFiles(d));
+
+            ret.AddRange(Directory.GetFiles(folder));
+
+            return ret;
+        }
+
+        private List<string> GetDirectories(string folder)
+        {
+            List<string> ret = new List<string>();
+
+            string[] directories = Directory.GetDirectories(folder);
+            foreach (string d in directories)
+            {
+                ret.Add(d);
+                ret.AddRange(GetDirectories(d));
+            }
+
+            return ret;
+        }
+
+        public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete)
+        {
+            if (delete)
+            {
+                var delitems = new List<string>();
+
+                foreach (var f in folders)
+                    delitems.Add(f.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
+
+                foreach (var i in items)
+                    delitems.Add(i.OriginalPath);
+
+                if (!View.ShowDeleteDialog(delitems.ToArray()))
+                    return;
+            }
+
+            var action = new ExcludeAction(this, items, folders, delete);
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
             var action = new NewAction(this, name, location, template);
-            action.Do();
-            _actionStack.Add(action);
+            if(action.Do())
+                _actionStack.Add(action);
+        }
+
+        public void NewFolder(string name, string location)
+        {
+            string folder = Path.Combine(location, name);
+
+            if (!Path.IsPathRooted(folder))
+                folder = _project.Location + Path.DirectorySeparatorChar + folder;
+
+            try
+            {
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+            }
+            catch {
+                View.ShowError ("Error While Creating a Directory", "An error has occured while the directory: \"" + folder + "\" was beeing created, aborting...");
+                return;
+            }
+
+            var action = new IncludeAction(this, null, new List<string> { folder });
+            if(action.Do())
+                _actionStack.Add(action);
         }
 
         public void AddAction(IProjectAction action)
@@ -623,7 +900,7 @@ namespace MonoGame.Tools.Pipeline
                 View.UpdateProperties(i);
             }
 
-            LoadTemplates(_project.Location);
+            LoadTemplates(Path.Combine(_project.Location, "MGTemplates"));
         }
 
         private void LoadTemplates(string path)

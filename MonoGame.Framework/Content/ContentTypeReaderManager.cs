@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content
 #if WINRT
             _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
 #else
-            _assemblyName = Assembly.GetExecutingAssembly().FullName;
+            _assemblyName = typeof(ContentTypeReaderManager).Assembly.FullName;
 #endif
         }
 
@@ -115,10 +115,12 @@ namespace Microsoft.Xna.Framework.Content
 				var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
+                var hModelReader = new ModelReader();
+                var hInt32Reader = new Int32Reader();
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || IOS || MONOMAC || (WINDOWS && !OPENGL) || (WINRT && !WINDOWS_PHONE)
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || (WINRT && !WINDOWS_PHONE)
                 var hVideoReader = new VideoReader();
 #endif
             }

@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using System.IO;
+#if DIRECTX
+using System.Collections.Generic;
+using TwoMGFX;
+#endif
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -30,6 +34,49 @@ namespace MonoGame.Tests.ContentPipeline
                 throw new NotImplementedException();
             }
         }
+
+#if DIRECTX
+        [Test]
+        public void TestPreprocessor()
+        {
+            var effectFile = "Assets/Effects/PreprocessorTest.fx";
+            var effectCode = File.ReadAllText(effectFile);
+            var fullPath = Path.GetFullPath(effectFile);
+
+            // Preprocess.
+            var mgDependencies = new List<string>();
+            var mgPreprocessed = Preprocessor.Preprocess(effectCode, fullPath, new Dictionary<string, string>
+            {
+                { "TEST2", "1" }
+            }, mgDependencies, new TestEffectCompilerOutput());
+
+            Assert.That(mgDependencies, Has.Count.EqualTo(1));
+            Assert.That(Path.GetFileName(mgDependencies[0]), Is.EqualTo("PreprocessorInclude.fxh"));
+
+            Assert.That(mgPreprocessed, Is.Not.StringContaining("Foo"));
+            Assert.That(mgPreprocessed, Is.StringContaining("Bar"));
+            Assert.That(mgPreprocessed, Is.Not.StringContaining("Baz"));
+
+            Assert.That(mgPreprocessed, Is.StringContaining("FOO"));
+            Assert.That(mgPreprocessed, Is.Not.StringContaining("BAR"));
+
+            // Check that we can actually compile this file.
+            BuildEffect(effectFile, TargetPlatform.Windows);
+        }
+
+        private class TestEffectCompilerOutput : IEffectCompilerOutput
+        {
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Warning: {0}({1},{2}): {3}", file, line, column, message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Error: {0}({1},{2}): {3}", file, line, column, message);
+            }
+        }
+#endif
 
         [Test]
         [TestCase("Assets/Effects/ParserTest.fx")]

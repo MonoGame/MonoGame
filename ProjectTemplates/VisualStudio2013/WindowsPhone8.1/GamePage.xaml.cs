@@ -23,13 +23,11 @@ namespace $safeprojectname$
     public sealed partial class GamePage : SwapChainBackgroundPanel
     {
         readonly Game1 _game;
-        public GamePage()
-        {
-            this.InitializeComponent();
-        }
 
         public GamePage(string launchArguments)
         {
+            this.InitializeComponent();
+
             _game = XamlGame<Game1>.Create(launchArguments, Window.Current.CoreWindow, this);
         }
     }

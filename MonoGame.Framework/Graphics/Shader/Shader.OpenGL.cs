@@ -6,8 +6,12 @@ using System;
 using System.IO;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -23,31 +27,16 @@ namespace Microsoft.Xna.Framework.Graphics
         // We keep this around for recompiling on context lost and debugging.
         private string _glslCode;
 
-        private struct Attribute
+        private static int PlatformProfile()
         {
-            public VertexElementUsage usage;
-            public int index;
-            public string name;
-            public int location;
+            return 0;
         }
 
-        private Attribute[] _attributes;
-
-        private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
+        private void PlatformConstruct(bool isVertexShader, byte[] shaderBytecode)
         {
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(shaderBytecode);
-
-            var attributeCount = (int)reader.ReadByte();
-            _attributes = new Attribute[attributeCount];
-            for (var a = 0; a < attributeCount; a++)
-            {
-                _attributes[a].name = reader.ReadString();
-                _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
-                _attributes[a].index = reader.ReadByte();
-                reader.ReadInt16(); //format, unused
-            }
         }
 
         internal int GetShaderHandle()
@@ -86,19 +75,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void GetVertexAttributeLocations(int program)
         {
-            for (int i = 0; i < _attributes.Length; ++i)
+            for (int i = 0; i < Attributes.Length; ++i)
             {
-                _attributes[i].location = GL.GetAttribLocation(program, _attributes[i].name);
+                Attributes[i].location = GL.GetAttribLocation(program, Attributes[i].name);
                 GraphicsExtensions.CheckGLError();
             }
         }
 
         internal int GetAttribLocation(VertexElementUsage usage, int index)
         {
-            for (int i = 0; i < _attributes.Length; ++i)
+            for (int i = 0; i < Attributes.Length; ++i)
             {
-                if ((_attributes[i].usage == usage) && (_attributes[i].index == index))
-                    return _attributes[i].location;
+                if ((Attributes[i].usage == usage) && (Attributes[i].index == index))
+                    return Attributes[i].location;
             }
             return -1;
         }
@@ -133,20 +122,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void Dispose(bool disposing)
         {
-            if (!IsDisposed)
+            if (!IsDisposed && _shaderHandle != -1)
             {
                 Threading.BlockOnUIThread(() =>
-                {
-                    if (_shaderHandle != -1)
                     {
-                        if (GL.IsShader(_shaderHandle))
-                        {
-                            GL.DeleteShader(_shaderHandle);
-                            GraphicsExtensions.CheckGLError();
-                        }
+                        GL.DeleteShader(_shaderHandle);
+                        GraphicsExtensions.CheckGLError();
                         _shaderHandle = -1;
-                    }
-                });
+                    });
             }
 
             base.Dispose(disposing);

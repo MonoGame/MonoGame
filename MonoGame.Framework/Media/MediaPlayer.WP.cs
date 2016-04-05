@@ -214,8 +214,11 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
-        private static void PlatformPlaySong(Song song)
+        private static void PlatformPlaySong(Song song, TimeSpan? startPosition)
         {
+            if (startPosition.HasValue)
+                throw new Exception("startPosition not implemented on WindowsPhone"); //Should be able to implement for MediaElement, but not possible with MsMediaPlayer (XNA)
+
             if (song.InternalSong != null)
             {
                 playingInternal = true;

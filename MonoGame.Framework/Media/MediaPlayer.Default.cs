@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Media
             return _queue.ActiveSong.Position;
         }
 
-#if IOS || ANDROID
+#if (IOS && !TVOS) || ANDROID
         private static void PlatformSetPlayPosition(TimeSpan playPosition)
         {
             if (_queue.ActiveSong != null)
@@ -96,13 +96,7 @@ namespace Microsoft.Xna.Framework.Media
         private static bool PlatformGetGameHasControl()
         {
 #if IOS
-            bool isOtherAudioPlaying;
-            AVAudioSession avAudioSession = AVAudioSession.SharedInstance();
-            if (avAudioSession.RespondsToSelector(new ObjCRuntime.Selector("isOtherAudioPlaying")))
-                isOtherAudioPlaying = avAudioSession.OtherAudioPlaying; // iOS 6+
-            else
-                isOtherAudioPlaying = AudioSession.OtherAudioIsPlaying;
-            return !isOtherAudioPlaying;
+            return !AVAudioSession.SharedInstance().OtherAudioPlaying;
 #else
             // TODO: Fix me!
             return true;
@@ -118,7 +112,7 @@ namespace Microsoft.Xna.Framework.Media
             _queue.ActiveSong.Pause();
         }
 
-        private static void PlatformPlaySong(Song song)
+        private static void PlatformPlaySong(Song song, TimeSpan? startPosition)
         {
             if (_queue.ActiveSong == null)
                 return;
@@ -126,7 +120,7 @@ namespace Microsoft.Xna.Framework.Media
             song.SetEventHandler(OnSongFinishedPlaying);
 
             song.Volume = _isMuted ? 0.0f : _volume;
-            song.Play();
+            song.Play(startPosition);
         }
 
         private static void PlatformResume()

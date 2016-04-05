@@ -2,13 +2,34 @@
 <ExternalProject Name="FrameworkReferences">
 
   <Platform Type="iOS">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
   </Platform>
-
+  <Platform Type="tvOS">
+    <Reference Include="System.Core" />
+    <Reference Include="OpenTK-1.0" />
+  </Platform>
   <Platform Type="Linux">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Service Name="MonoGame.Framework/OpenGLGraphics">
+      <Reference Include="System.Drawing" />
+      <Binary
+        Name="NVorbis"
+        Path="ThirdParty/Dependencies/NVorbis/NVorbis.dll" />
+      <Binary
+        Name="OpenTK"
+        Path="ThirdParty/Dependencies/OpenTK.dll" />
+    </Service>
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Service Name="MonoGame.Framework/OpenGLGraphics">
+      <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
       <Binary
         Name="Tao.Sdl"
@@ -19,25 +40,17 @@
     </Service>
   </Platform>
 
-  <Platform Type="MacOS">
-    <Service Name="MonoGame.Framework/OpenGLGraphics">
-      <Reference Include="System.Core" />
-      <Reference Include="System.Drawing" />
-      <Binary
-        Name="Tao.Sdl"
-        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-    </Service>
-  </Platform>
-
   <Platform Type="Android">
-    <Reference Include="Mono.Android" />
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
   </Platform>
 
   <Platform Type="Ouya">
-    <Reference Include="Mono.Android" />
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
@@ -46,13 +59,10 @@
       Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
   </Platform>
 
-  <Platform Type="PSMobile">
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="Sce.PlayStation.Core" />
-  </Platform>
-
   <Platform Type="Windows">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Service Name="MonoGame.Framework/DirectXGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
@@ -94,15 +104,15 @@
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
       <Binary
-        Name="Tao.Sdl"
-        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-      <Binary
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
   </Platform>
 
   <Platform Type="Windows8">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.dll" />
@@ -127,6 +137,9 @@
   </Platform>
 
   <Platform Type="WindowsGL">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
@@ -135,8 +148,8 @@
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
       <Binary
-        Name="Tao.Sdl"
-        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
+        Name="NVorbis"
+        Path="ThirdParty/Dependencies/NVorbis/NVorbis.dll" />
       <Binary
         Name="OpenTK"
         Path="ThirdParty/Dependencies/OpenTK.dll" />
@@ -144,6 +157,9 @@
   </Platform>
 
   <Platform Type="WindowsPhone">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.dll" />
@@ -168,6 +184,9 @@
   </Platform>
   
   <Platform Type="WindowsPhone81">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+	
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />
@@ -190,8 +209,32 @@
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
   </Platform>
+	
+  <Platform Type="WindowsUniversal">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.dll" />
+    <Binary
+      Name="SharpDX.Direct2D1"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.Direct2D1.dll" />
+    <Binary
+      Name="SharpDX.Direct3D11"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.Direct3D11.dll" />
+    <Binary
+      Name="SharpDX.DXGI"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.DXGI.dll" />
+    <Binary
+      Name="SharpDX.MediaFoundation"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.MediaFoundation.dll" />
+    <Binary
+      Name="SharpDX.XAudio2"
+      Path="ThirdParty/Dependencies/SharpDX/Windows UAP/SharpDX.XAudio2.dll" />
+  </Platform>
+	
   <Platform Type="Web">
-    <Reference Include="JSIL.Meta" />
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="Microsoft.CSharp" />
   </Platform>
 
   <Service Name="MonoGame.Framework/ANGLEGraphics">
@@ -201,9 +244,6 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Binary
-      Name="Tao.Sdl"
-      Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
     <Binary
       Name="OpenTK"
       Path="ThirdParty/Dependencies/OpenTK.dll" />

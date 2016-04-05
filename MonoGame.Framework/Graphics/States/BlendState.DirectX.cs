@@ -38,13 +38,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
 
-            // NOTE: We make the assumption here that the caller has
-            // locked the d3dContext for us to use.
+			// NOTE: We make the assumption here that the caller has
+			// locked the d3dContext for us to use.
 
-            // Apply the state!
-            var blendFactor = new SharpDX.Color4(_blendFactor.R / 255.0f, _blendFactor.G / 255.0f, _blendFactor.B / 255.0f, _blendFactor.A / 255.0f);
-            device._d3dContext.OutputMerger.SetBlendState(_state, blendFactor);
-        }
+			// Apply the state!
+#if WINDOWS_UAP
+			device._d3dContext.OutputMerger.SetBlendState(_state,
+				new SharpDX.Mathematics.Interop.RawColor4(
+					_blendFactor.R / 255.0f,
+					_blendFactor.G / 255.0f,
+					_blendFactor.B / 255.0f,
+					_blendFactor.A / 255.0f));
+#else
+			device._d3dContext.OutputMerger.SetBlendState(_state, _blendFactor.ToColor4());
+#endif
+		}
 
         protected override void Dispose(bool disposing)
         {

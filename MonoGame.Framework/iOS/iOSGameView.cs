@@ -106,7 +106,9 @@ namespace Microsoft.Xna.Framework {
 
 		private void Initialize ()
 		{
+            #if !TVOS
 			MultipleTouchEnabled = true;
+            #endif
 			Opaque = true;
 		}
 
@@ -184,7 +186,7 @@ namespace Microsoft.Xna.Framework {
 				_glapi = new Gles11Api ();
 			}
 
-			__renderbuffergraphicsContext.MakeCurrent (null);
+			this.MakeCurrent();
 		}
 
 		private void DestroyContext ()
@@ -205,10 +207,7 @@ namespace Microsoft.Xna.Framework {
 
 		private void CreateFramebuffer ()
 		{
-			AssertNotDisposed ();
-			AssertValidContext ();
-
-			__renderbuffergraphicsContext.MakeCurrent (null);
+			this.MakeCurrent();
 			
 			// HACK:  GraphicsDevice itself should be calling
 			//        glViewport, so we shouldn't need to do it
@@ -311,25 +310,26 @@ namespace Microsoft.Xna.Framework {
 		//        normal call to Present in Game.Tick should cover
 		//        this.  For now, iOSGamePlatform will call Present
 		//        in the Draw/Update loop handler.
-		[Obsolete("Remove iOSGameView.Present once GraphicsDevice.Present fully expresses this")]
 		public void Present ()
 		{
-			AssertNotDisposed ();
-			AssertValidContext ();
+            AssertNotDisposed ();
+            AssertValidContext ();
 
-			__renderbuffergraphicsContext.MakeCurrent (null);
+            this.MakeCurrent();
             GL.BindRenderbuffer (All.Renderbuffer, this._colorbuffer);
             __renderbuffergraphicsContext.SwapBuffers();
 		}
 
-		// FIXME: This functionality belongs iMakeCurrentn GraphicsDevice.
-		[Obsolete("Move the functionality of iOSGameView.MakeCurrent into GraphicsDevice")]
+		// FIXME: This functionality belongs in GraphicsDevice.
 		public void MakeCurrent ()
 		{
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			__renderbuffergraphicsContext.MakeCurrent (null);
+            if (!__renderbuffergraphicsContext.IsCurrent)
+            {
+			    __renderbuffergraphicsContext.MakeCurrent (null);
+            }
 		}
 
 		public override void LayoutSubviews ()

@@ -27,13 +27,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformSetSamplers(GraphicsDevice device)
         {
+            if (_applyToVertexStage && !device.GraphicsCapabilities.SupportsVertexTextures)
+                return;
+
             // Skip out if nothing has changed.
             if (_d3dDirty == 0)
                 return;
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-            var pixelShaderStage = device._d3dContext.PixelShader;
+            SharpDX.Direct3D11.CommonShaderStage shaderStage;
+            if (_applyToVertexStage)
+	            shaderStage = device._d3dContext.VertexShader;
+            else
+	            shaderStage = device._d3dContext.PixelShader;
 
             for (var i = 0; i < _actualSamplers.Length; i++)
             {
@@ -46,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (sampler != null)
                     state = sampler.GetState(device);
 
-                pixelShaderStage.SetSampler(i, state);
+                shaderStage.SetSampler(i, state);
 
                 _d3dDirty &= ~mask;
                 if (_d3dDirty == 0)

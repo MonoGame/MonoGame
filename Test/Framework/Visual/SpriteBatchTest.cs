@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual {
@@ -291,23 +287,111 @@ namespace MonoGame.Tests.Visual {
         }
 
         [Test]
-        public void DrawWithTextureAlreadySet()
+        public void DrawWithCustomEffectAndTwoTextures()
         {
             Game.DrawWith += (sender, e) =>
             {
+                var customSpriteEffect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "CustomSpriteBatchEffect.fx");
                 var texture2 = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
 
-                Game.GraphicsDevice.Textures[0] = texture2;
-                Game.GraphicsDevice.Textures[1] = _texture;
+                customSpriteEffect.Parameters["SourceTexture"].SetValue(texture2);
+                customSpriteEffect.Parameters["OtherTexture"].SetValue(texture2);
 
-                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, null, null, null, customSpriteEffect);
                 _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
                 _spriteBatch.End();
 
                 Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
-                Assert.That(Game.GraphicsDevice.Textures[1], Is.SameAs(_texture));
+                Assert.That(Game.GraphicsDevice.Textures[1], Is.SameAs(texture2));
             };
             Game.Run();
         }
-	}
+
+        [Test]
+        public void DrawWithLayerDepth()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                 // Row 0, column 0: Deferred, no depth test.
+                _spriteBatch.Begin();
+                _spriteBatch.Draw(
+                    _texture, new Vector2(30, 30), null, Color.Red,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(40, 40), null, Color.Green,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(50, 50), null, Color.Blue,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(60, 60), null, Color.White,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+                _spriteBatch.End();
+
+                // Row 0, column 1: Deferred, with depth test.
+                _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, DepthStencilState.Default, null);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(130, 30), null, Color.Red,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(140, 40), null, Color.Green,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(150, 50), null, Color.Blue,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(160, 60), null, Color.White,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+                _spriteBatch.End();
+
+                // Row 1, column 0: BackToFront, no depth test.
+                _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.None, null);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(30, 130), null, Color.Red,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(40, 140), null, Color.Green,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(50, 150), null, Color.Blue,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(60, 160), null, Color.White,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+                _spriteBatch.End();
+
+                // Row 1, column 1: BackToFront, with depth test.
+                _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.Default, null);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(130, 130), null, Color.Red,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(140, 140), null, Color.Green,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(150, 150), null, Color.Blue,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+                _spriteBatch.Draw(
+                    _texture, new Vector2(160, 160), null, Color.White,
+                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+                _spriteBatch.End();
+            };
+
+            RunSingleFrameTest();
+        }
+
+        [Test]
+        public void Draw_many()
+        {
+            Game.DrawWith += (sender, e) => {
+                _spriteBatch.Begin();
+                for (int x = 0; x < 99; x++)
+                    for (int y = 0; y < 59; y++)
+                        _spriteBatch.Draw(_texture, new Rectangle(4+x*8, 4+y*8, 4, 4), Color.White);
+                _spriteBatch.End();
+            };
+
+            RunSingleFrameTest();
+        }
+    }
 }

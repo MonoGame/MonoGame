@@ -4,7 +4,7 @@
 
 using System;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
 #else
 using OpenTK.Audio.OpenAL;
@@ -18,21 +18,14 @@ namespace Microsoft.Xna.Framework.Audio
 		ALFormat openALFormat;
 		int dataSize;
 		int sampleRate;
-		private int _sourceId;
         bool _isDisposed;
-        internal int _pauseCount;
 
 		public OALSoundBuffer ()
 		{
             try
             {
-                var alError = AL.GetError();
                 AL.GenBuffers(1, out openALDataBuffer);
-                alError = AL.GetError();
-                if (alError != ALError.NoError)
-                {
-                    Console.WriteLine("Failed to generate OpenAL data buffer: ", AL.GetErrorString(alError));
-                }
+                ALHelper.CheckError("Failed to generate OpenAL data buffer.");
             }
             catch (DllNotFoundException e)
             {
@@ -62,6 +55,7 @@ namespace Microsoft.Xna.Framework.Audio
             dataSize = size;
             this.sampleRate = sampleRate;
             AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
+            ALHelper.CheckError("Failed to fill buffer.");
 
             int bits, channels;
 
@@ -91,20 +85,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         }
 
-        public void Pause()
-        {
-            if (_pauseCount == 0)
-                AL.SourcePause(_sourceId);
-            ++_pauseCount;
-        }
-
-        public void Resume()
-        {
-            --_pauseCount;
-            if (_pauseCount == 0)
-                AL.SourcePlay(_sourceId);
-        }
-
 		public void Dispose()
 		{
             Dispose(true);
@@ -122,37 +102,14 @@ namespace Microsoft.Xna.Framework.Audio
                 // Release unmanaged resources
                 if (AL.IsBuffer(openALDataBuffer))
                 {
+                    ALHelper.CheckError("Failed to fetch buffer state.");
                     AL.DeleteBuffers(1, ref openALDataBuffer);
+                    ALHelper.CheckError("Failed to delete buffer.");
                 }
 
                 _isDisposed = true;
             }
         }
-
-		public int SourceId
-		{
-			get {
-				return _sourceId;
-			}
-
-			set {
-				_sourceId = value;
-				if (Reserved != null)
-					Reserved(this, EventArgs.Empty);
-
-			}
-		}
-
-		public void RecycleSoundBuffer()
-		{
-			if (Recycled != null)
-				Recycled(this, EventArgs.Empty);
-		}
-
-		#region Events
-		public event EventHandler<EventArgs> Reserved;
-		public event EventHandler<EventArgs> Recycled;
-		#endregion
 	}
 }
 

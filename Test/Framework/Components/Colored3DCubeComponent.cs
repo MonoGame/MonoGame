@@ -80,6 +80,8 @@ namespace MonoGame.Tests.Components {
 
 		Matrix worldMatrix, viewMatrix, projectionMatrix;
 
+        public Vector3 CubePosition { get; set; }
+
 		public Colored3DCubeComponent (Game game) : base(game)
 		{
 		}
@@ -95,6 +97,7 @@ namespace MonoGame.Tests.Components {
 
 			worldMatrix *= Matrix.CreateRotationX (-0.05f * 30f);
 			worldMatrix *= Matrix.CreateRotationY (-0.05f * 20f);
+		    worldMatrix *= Matrix.CreateTranslation(CubePosition);
 
 			// Setup our basic effect
 			basicEffect = new BasicEffect (GraphicsDevice);
@@ -133,8 +136,7 @@ namespace MonoGame.Tests.Components {
 			foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes) {
                 pass.Apply();
 
-				GraphicsDevice.DrawIndexedPrimitives (PrimitiveType.TriangleList, 0, 0,
-					number_of_vertices, 0, number_of_indices / 3);
+				GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, number_of_vertices, 0, number_of_indices / 3);
 
 			}
 			base.Draw (gameTime);

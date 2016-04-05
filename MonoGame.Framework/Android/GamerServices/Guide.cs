@@ -50,7 +50,6 @@ using Android.Content;
 using Android.Views;
 using Android.Widget;
 using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 
 
 #endregion Using clause
@@ -340,16 +339,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 			
 			}
-		}
-
-		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
-		{
-			return null;
-		}
-
-		public static StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
-		{
-			return null;
 		}
 
 		#region Properties

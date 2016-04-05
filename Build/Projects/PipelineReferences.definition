@@ -2,33 +2,47 @@
 <ExternalProject Name="PipelineReferences">
 
   <Platform Type="Linux">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.Gtk3" Path="ThirdParty\Dependencies\Eto\Eto.Gtk3.dll" />
+      
     <Binary
       Name="gtk-sharp"
-      Path="ThirdParty\Dependencies\Gtk\gtk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gtk-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="atk-sharp"
-      Path="ThirdParty\Dependencies\Gtk\atk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\atk-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="gdk-sharp"
-      Path="ThirdParty\Dependencies\Gtk\gdk-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gdk-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="glade-sharp"
-      Path="ThirdParty\Dependencies\Gtk\glade-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gio-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="glib-sharp"
-      Path="ThirdParty\Dependencies\Gtk\glib-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\glib-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="gtk-dotnet"
-      Path="ThirdParty\Dependencies\Gtk\gtk-dotnet.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\gtk-dotnet.dll"
+      LocalCopy="False" />
     <Binary
       Name="pango-sharp"
-      Path="ThirdParty\Dependencies\Gtk\pango-sharp.dll" />
+      Path="ThirdParty\Dependencies\Gtk3\pango-sharp.dll"
+      LocalCopy="False" />
     <Binary
       Name="Mono.Posix"
-      Path="ThirdParty\Dependencies\Gtk\Mono.Posix.dll" />
+      Path="ThirdParty\Dependencies\Gtk\Mono.Posix.dll"
+      LocalCopy="False" />
   </Platform>
 
   <Platform Type="MacOS">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.Gtk2" Path="ThirdParty\Dependencies\Eto\Eto.Gtk2.dll" />
+    
     <Reference Include="atk-sharp"/>
     <Reference Include="gdk-sharp"/>
     <Reference Include="glade-sharp"/>
@@ -40,6 +54,9 @@
   </Platform>
 
   <Platform Type="Windows">
+    <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
+    <Binary Name="Eto.WinForms" Path="ThirdParty\Dependencies\Eto\Eto.WinForms.dll" />
+    
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />

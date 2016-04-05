@@ -355,9 +355,10 @@ namespace MonoGame.Tools.Pipeline
                 return null;
             }
 
+            var lowerFileExt = fileExtension.ToLowerInvariant();
             foreach (var i in Importers)
             {
-                if (i.FileExtensions.Contains(fileExtension))
+                if (i.FileExtensions.Any(e => e.ToLowerInvariant() == lowerFileExt))
                     return i;
             }
 
@@ -407,6 +408,9 @@ namespace MonoGame.Tools.Pipeline
                 try
 #endif
                 {
+                    if (!asm.ToString().Contains("MonoGame"))
+                        continue;
+
                     var types = asm.GetTypes();
                     ProcessTypes(types);
                 }

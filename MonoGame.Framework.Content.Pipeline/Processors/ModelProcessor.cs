@@ -151,6 +151,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var parts = new List<ModelMeshPartContent>();
             var vertexBuffer = new VertexBufferContent();
             var indexBuffer = new IndexCollection();
+			
+			if (GenerateTangentFrames)
+            {
+                context.Logger.LogMessage("Generating tangent frames.");
+                foreach (GeometryContent geom in mesh.Geometry)
+                {
+                    if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal(0)))
+                    {
+                        MeshHelper.CalculateNormals(geom, true);
+                    }
+
+                    if(!geom.Vertices.Channels.Contains(VertexChannelNames.Tangent(0)) ||
+                        !geom.Vertices.Channels.Contains(VertexChannelNames.Binormal(0)))
+                    {
+                        MeshHelper.CalculateTangentFrames(geom, VertexChannelNames.TextureCoordinate(0), VertexChannelNames.Tangent(0),
+                            VertexChannelNames.Binormal(0));
+                    }
+                }
+            }
 
             var startVertex = 0;
             foreach (var geometry in mesh.Geometry)
@@ -196,6 +215,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
             parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
             parameters.Add("TextureFormat", TextureFormat);
+            parameters.Add("DefaultEffect", DefaultEffect);
 
             return context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", parameters);
         }
@@ -291,10 +311,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Channels[VertexChannelNames.Weights] -> { Byte4 boneIndices, Color boneWeights }
             if (channel.Name.StartsWith(VertexChannelNames.Weights()))
                 ProcessWeightsChannel(geometry, vertexChannelIndex, _identity);
-
-            // Looks like XNA models usually put a default color channel in..
-            if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
-                geometry.Vertices.Channels.Add(VertexChannelNames.Color(0), Enumerable.Repeat(Color.White, geometry.Vertices.VertexCount));
         }
 
         private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex, ContentIdentity identity)

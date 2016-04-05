@@ -353,6 +353,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (!_isDisposed)
             {
+                SoundEffectInstancePool.StopPooledInstances(this);
                 PlatformDispose(disposing);
                 _isDisposed = true;
             }

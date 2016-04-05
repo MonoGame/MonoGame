@@ -1,10 +1,5 @@
 using System.Diagnostics;
 
-#if PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
-
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPass
@@ -18,15 +13,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly DepthStencilState _depthStencilState;
         private readonly RasterizerState _rasterizerState;
 
-        private ulong _stateKey;
-
 		public string Name { get; private set; }
 
         public EffectAnnotationCollection Annotations { get; private set; }
-
-#if PSM
-        internal ShaderProgram _shaderProgram;
-#endif
 
         internal EffectPass(    Effect effect, 
                                 string name,
@@ -69,9 +58,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
-#if PSM
-            _shaderProgram = cloneSource._shaderProgram;
-#endif
         }
 
         public void Apply()
@@ -90,17 +76,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var device = _effect.GraphicsDevice;
 
-#if OPENGL || DIRECTX
-
-            // If our state key becomes larger than the 
-            // next state key then the keys have rolled 
-            // over and we need to reset.
-            if (_stateKey > EffectParameter.NextStateKey)
-                _stateKey = 0;
-
             if (_vertexShader != null)
             {
                 device.VertexShader = _vertexShader;
+
+				// Update the texture parameters.
+                SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
 
                 // Update the constant buffers.
                 for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
@@ -116,26 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.PixelShader = _pixelShader;
 
                 // Update the texture parameters.
-                foreach (var sampler in _pixelShader.Samplers)
-                {
-                    var param = _effect.Parameters[sampler.parameter];
-                    var texture = param.Data as Texture;
-										
-                    // If there is no texture *explicitly* assigned then skip it
-                    // and leave whatever set directly on the device.
-                    // Each time an effect parameter value is set, param.StateKey
-                    // will be incremented. So if our stored _stateKey - which is the cached
-                    // value from the previous time Apply() was called - is less than the 
-                    // current value of param.StateKey, we know that this texture parameter 
-                    // has been explicitly set to a value since the previous time Apply()
-                    // was called.
-                    if (param.StateKey >= _stateKey)
-						device.Textures[sampler.textureSlot] = texture;
-
-                    // If there is a sampler state set it.
-                    if (sampler.state != null)
-                        device.SamplerStates[sampler.samplerSlot] = sampler.state;
-                }
+                SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
                 
                 // Update the constant buffers.
                 for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
@@ -146,12 +108,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            // Store current value of NextStateKey, so we can detect whether any texture
-            // parameter values are set between now and the next call to Apply().
-            _stateKey = EffectParameter.NextStateKey;
-
-#endif
-
             // Set the render states if we have some.
             if (_rasterizerState != null)
                 device.RasterizerState = _rasterizerState;
@@ -159,25 +115,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.BlendState = _blendState;
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
-            
-#if PSM
-            _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
-
-            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
-
-            float[] data;
-            if (_effect.Parameters["WorldViewProj"] != null) 
-                data = (float[])_effect.Parameters["WorldViewProj"].Data;
-            else
-                data = (float[])_effect.Parameters["MatrixTransform"].Data;
-            Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
-            matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
-            _shaderProgram.SetUniformValue(0, ref matrix4);
-            
-            if (_effect.Parameters["Texture0"].Data != null && _effect.Parameters["Texture0"].Data != null)
-                _effect.GraphicsDevice._graphics.SetTexture(0, ((Texture2D)_effect.Parameters["Texture0"].Data)._texture2D);
-#endif
         }
-		
+
+        private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
+        {
+            foreach (var sampler in shader.Samplers)
+            {
+                var param = _effect.Parameters[sampler.parameter];
+                var texture = param.Data as Texture;
+
+                textures[sampler.textureSlot] = texture;
+
+                // If there is a sampler state set it.
+                if (sampler.state != null)
+                    samplerStates[sampler.samplerSlot] = sampler.state;
+            }
+        }
     }
 }

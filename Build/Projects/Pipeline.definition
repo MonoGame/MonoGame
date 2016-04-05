@@ -11,30 +11,33 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MGCB" />
-
+    
     <Reference Include="PipelineReferences" />
   </References>
 
   <Properties>
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
+	<ApplicationManifest>app.manifest</ApplicationManifest>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;GTK</Platform>
-      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK2</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK3</Platform>
     </CustomDefinitions>
   </Properties>
 
   <Files>
-    <Compile Include="Common\History.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\MGCB\CommandLineParser.cs">
       <Link>Common\CommandLineParser.cs</Link>
     </Compile>
     <None Include="App.config" />
+    <None Include="app.manifest" />
 
     <Compile Include="Common\ActionStack.cs" />
     <Compile Include="Common\AssemblyAttributes.cs" />
@@ -44,15 +47,22 @@
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
     <Compile Include="Common\Selection.cs" />
+    <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
+    <Compile Include="Common\PipelineController.FileWatcher.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
+    <Compile Include="Common\PipelineController.UpdateContentItemAction.cs" />
+    <Compile Include="Common\PipelineController.UpdateProjectAction.cs" />
+    <Compile Include="Common\PipelineSettings.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
+    <Compile Include="Common\OutputParser.cs" />
     <Compile Include="Common\PipelineProjectParser.cs" />
     <Compile Include="Common\Util.cs" />
     <Compile Include="Common\StringExtensions.cs" />
@@ -61,10 +71,38 @@
     <Compile Include="Common\PipelineProject.cs" />
     <Compile Include="Common\PipelineTypes.cs" />
     <Compile Include="Common\Extensions.cs" />
-
-    <Compile Include="Windows\UpdateAction.cs" />
+    
+    <!-- Eto.Forms GUI stuff -->
+	<Compile Include="Eto\Dialogs\AddItemDialog.cs" />
+	<Compile Include="Eto\Dialogs\AddItemDialog.eto.cs">
+      <DependentUpon>AddItemDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Eto\Dialogs\DialogBase.cs" />
+	<Compile Include="Eto\Dialogs\DialogBase.eto.cs">
+      <DependentUpon>DialogBase.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Eto\Dialogs\EditDialog.cs" />
+	<Compile Include="Eto\Dialogs\EditDialog.eto.cs">
+      <DependentUpon>EditDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Eto\Global.cs" />
+	<Compile Include="Eto\Styles.Linux.cs">
+      <Platforms>Linux</Platforms>
+    </Compile>
+	<Compile Include="Eto\Styles.Mac.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+	<Compile Include="Eto\Styles.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
 
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\BuildIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\ContentIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\EditorIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -91,9 +129,13 @@
       <Platforms>Windows</Platforms>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Windows\AssemblyReferenceEditing.cs">
+    <Compile Include="Windows\Controls\FilterOutputControl.cs">
       <Platforms>Windows</Platforms>
-      <SubType>Form</SubType>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Controls\TabControlEx.cs">
+      <Platforms>Windows</Platforms>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Windows\PipelineProjectProxy.cs">
       <Platforms>Windows</Platforms>
@@ -111,6 +153,13 @@
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
+	<Compile Include="Windows\ReferenceDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\ReferenceDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -124,6 +173,10 @@
 	 <EmbeddedResource Include="Windows\AboutDialog.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="Windows\ReferenceDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
@@ -160,57 +213,60 @@
     <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\AboutDialog.cs">
+    <Compile Include="Gtk\Widgets\BuildOutput.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\ColorPickerDialog.cs">
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\generated.cs">
+    <Compile Include="Gtk\Dialogs\CustomFolderDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.MainWindow.cs">  
+    <Compile Include="Gtk\Stetic.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.NewTemplateDialog.cs">  
+    <Compile Include="Gtk\MainWindow.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ProjectView.cs">  
+    <Compile Include="Gtk\Dialogs\NewTemplateDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertiesView.cs">
+    <Compile Include="Gtk\Widgets\ProjectView.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.YesNoCancelDialog.cs">  
+    <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.CollectionEditorDialog.cs">  
+    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ColorPickerDialog.cs">  
+    <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertyGridTable.cs">  
+    <Compile Include="Gtk\Dialogs\DeleteDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AboutDialog.cs">  
+    <Compile Include="Gtk\Dialogs\DeleteDialog.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="IgeMacIntegration.cs">
+    <Compile Include="Gtk\Global.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\IgeMacIntegration.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <EmbeddedResource Include="gtk-gui\gui.stetic">
-      <Platforms>MacOS,Linux</Platforms>
-    </EmbeddedResource>
+    <Compile Include="Gtk\Gtk3Integration.cs">
+      <Platforms>Linux</Platforms>
+    </Compile>
 
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="App.ico" />
@@ -218,41 +274,82 @@
     <EmbeddedResource Include="Icons\missing.png" />
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />
+    <EmbeddedResource Include="Icons\folder_missing.png" />
     <EmbeddedResource Include="Icons\settings.png" />
-
-    <!-- Copy config files to output directory -->
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\atk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>atk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gdk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>gdk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glade-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>glade-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\glib-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>glib-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\gtk-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>gtk-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\ThirdParty\Dependencies\Gtk\pango-sharp.dll.config">
-      <Platforms>MacOS,Linux</Platforms>
-      <Link>pango-sharp.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    
+    <!-- The resources for output filtering -->
+    <EmbeddedResource Include="Icons\build_begin_end.png" />
+    <EmbeddedResource Include="Icons\build_clean.png" />
+    <EmbeddedResource Include="Icons\build_fail.png" />
+    <EmbeddedResource Include="Icons\build_processing.png" />
+    <EmbeddedResource Include="Icons\build_skip.png" />
+    <EmbeddedResource Include="Icons\build_succeed.png" />
+    
+    <!-- The resources for toolbar -->
+    <EmbeddedResource Include="Icons\Toolbar\New.png">
+      <LogicalName>Toolbar.New.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Open.png">
+      <LogicalName>Toolbar.Open.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Save.png">
+      <LogicalName>Toolbar.Save.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Undo.png">
+      <LogicalName>Toolbar.Undo.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Redo.png">
+      <LogicalName>Toolbar.Redo.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\NewItem.png">
+      <LogicalName>Toolbar.NewItem.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\ExistingItem.png">
+      <LogicalName>Toolbar.ExistingItem.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\NewFolder.png">
+      <LogicalName>Toolbar.NewFolder.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\ExistingFolder.png">
+      <LogicalName>Toolbar.ExistingFolder.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Build.png">
+      <LogicalName>Toolbar.Build.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Rebuild.png">
+      <LogicalName>Toolbar.Rebuild.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\Clean.png">
+      <LogicalName>Toolbar.Clean.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\CancelBuild.png">
+      <LogicalName>Toolbar.CancelBuild.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Toolbar\FilterOutput.png">
+      <LogicalName>Toolbar.FilterOutput.png</LogicalName>
+    </EmbeddedResource>
+    
+    <!-- Linux specific resources -->
+    <EmbeddedResource Include="Gtk\MainWindow.HeaderBar.glade">
+      <Platforms>Linux</Platforms>
+    </EmbeddedResource>
 
     <!-- Copy the template resources to the output -->
+	<None Include="Templates\Effect.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\Effect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="Templates\SpriteEffect.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Templates\Xml.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

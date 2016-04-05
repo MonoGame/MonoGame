@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Text;
 
@@ -8,7 +12,8 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
 	public class SpriteBatch : GraphicsResource
 	{
-	    readonly SpriteBatcher _batcher;
+        #region Private Fields
+        readonly SpriteBatcher _batcher;
 
 		SpriteSortMode _sortMode;
 		BlendState _blendState;
@@ -26,22 +31,26 @@ namespace Microsoft.Xna.Framework.Graphics
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
+        #endregion
+
+        internal static bool NeedsHalfPixelOffset;
 
         /// <summary>
-        /// Creates a new instance of <see cref="SpriteBatch"/> class.
+        /// Constructs a <see cref="SpriteBatch"/>.
         /// </summary>
         /// <param name="graphicsDevice">The <see cref="GraphicsDevice"/>, which will be used for sprite rendering.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="graphicsDevice"/> is null.</exception>
-		public SpriteBatch (GraphicsDevice graphicsDevice)
+        public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
-			if (graphicsDevice == null) {
-				throw new ArgumentException ("graphicsDevice");
+			if (graphicsDevice == null)
+            {
+				throw new ArgumentNullException ("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
 			}	
 
 			this.GraphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
-            _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _spriteEffect = new Effect(graphicsDevice, EffectResource.SpriteEffect.Bytecode);
             _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
@@ -105,10 +114,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (_sortMode != SpriteSortMode.Immediate)
 				Setup();
-#if PSM   
-            GraphicsDevice.BlendState = _blendState;
-            _blendState.PlatformApplyState(GraphicsDevice);
-#endif
             
             _batcher.DrawBatch(_sortMode, _effect);
         }
@@ -125,14 +130,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			var vp = gd.Viewport;
 
 		    Matrix projection;
-#if PSM || DIRECTX
-            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0, out projection);
-#else
-            // GL requires a half pixel offset to match DX.
-            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1, out projection);
-            projection.M41 += -0.5f * projection.M11;
-            projection.M42 += -0.5f * projection.M22;
-#endif
+
+            // Normal 3D cameras look into the -z direction (z = 1 is in font of z = 0). The
+            // sprite batch layer depth is the opposite (z = 0 is in front of z = 1).
+            // --> We get the correct matrix with near plane 0 and far plane -1.
+            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, -1, out projection);
+
+            // Some platforms require a half pixel offset to match DX.
+            if (NeedsHalfPixelOffset)
+            {
+                projection.M41 += -0.5f * projection.M11;
+                projection.M42 += -0.5f * projection.M22;
+            }
+
             Matrix.Multiply(ref _matrix, ref projection, out projection);
 
             _matrixTransform.SetValue(projection);
@@ -354,8 +364,24 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			var item = _batcher.CreateBatchItem();
 
-			item.Depth = depth;
 			item.Texture = texture;
+
+            // set SortKey based on SpriteSortMode.
+            switch ( _sortMode )
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = depth;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = -depth;
+                    break;
+            }
 
 			if (sourceRectangle.HasValue) {
 				_tempRect = sourceRectangle.Value;
@@ -382,18 +408,33 @@ namespace Microsoft.Xna.Framework.Graphics
 				_texCoordTL.X = temp;
 			}
 
-			item.Set (destinationRectangle.X,
-					destinationRectangle.Y, 
-					-origin.X, 
-					-origin.Y,
-					destinationRectangle.Z,
-					destinationRectangle.W,
-					(float)Math.Sin (rotation), 
-					(float)Math.Cos (rotation), 
-					color, 
-					_texCoordTL, 
-					_texCoordBR);			
-			
+		    if (rotation == 0f)
+		    {
+                item.Set(destinationRectangle.X - origin.X,
+                        destinationRectangle.Y - origin.Y,
+                        destinationRectangle.Z,
+                        destinationRectangle.W,
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        depth);
+            }
+            else
+		    {
+                item.Set(destinationRectangle.X,
+                        destinationRectangle.Y,
+                        -origin.X,
+                        -origin.Y,
+                        destinationRectangle.Z,
+                        destinationRectangle.W,
+                        (float)Math.Sin(rotation),
+                        (float)Math.Cos(rotation),
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        depth);
+            }
+
 			if (autoFlush)
 			{
 				FlushIfNeeded();

@@ -3,9 +3,14 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
-#elif WINDOWS || LINUX
+#else
+using OpenTK.Graphics.OpenGL;
+using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
+#endif
+#elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
 #elif GLES
@@ -37,36 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (force || this.DepthBufferFunction != device._lastDepthStencilState.DepthBufferFunction)
             {
-                DepthFunction func;
-                switch (DepthBufferFunction)
-                {
-                    default:
-                    case CompareFunction.Always:
-                        func = DepthFunction.Always;
-                        break;
-                    case CompareFunction.Equal:
-                        func = DepthFunction.Equal;
-                        break;
-                    case CompareFunction.Greater:
-                        func = DepthFunction.Greater;
-                        break;
-                    case CompareFunction.GreaterEqual:
-                        func = DepthFunction.Gequal;
-                        break;
-                    case CompareFunction.Less:
-                        func = DepthFunction.Less;
-                        break;
-                    case CompareFunction.LessEqual:
-                        func = DepthFunction.Lequal;
-                        break;
-                    case CompareFunction.Never:
-                        func = DepthFunction.Never;
-                        break;
-                    case CompareFunction.NotEqual:
-                        func = DepthFunction.Notequal;
-                        break;
-                }
-                GL.DepthFunc(func);
+                GL.DepthFunc(DepthBufferFunction.GetDepthFunction());
                 GraphicsExtensions.CheckGLError();
                 device._lastDepthStencilState.DepthBufferFunction = this.DepthBufferFunction;
             }

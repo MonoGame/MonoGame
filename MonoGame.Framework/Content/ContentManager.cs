@@ -28,28 +28,48 @@ namespace Microsoft.Xna.Framework.Content
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
-		
+        private byte[] scratchBuffer;
+
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
-	static List<char> targetPlatformIdentifiers = new List<char>()
+        private static readonly List<char> targetPlatformIdentifiers = new List<char>()
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
             'm', // WindowsPhone
             'i', // iOS
             'a', // Android
-            'l', // Linux
+            'd', // DesktopGL
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'u', // Ouya
-            'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
+
+            // NOTE: There are additional idenfiers for consoles that 
+            // are not defined in this repository.  Be sure to ask the
+            // console port maintainers to ensure no collisions occur.
+
+            
+            // Legacy identifiers... these could be reused in the
+            // future if we feel enough time has passed.
+
+            'p', // PlayStationMobile
             'g', // Windows (OpenGL)
+            'l', // Linux
+            'u', // Ouya
         };
+
+
+        static partial void PlatformStaticInit();
+
+        static ContentManager()
+        {
+            // Allow any per-platform static initialization to occur.
+            PlatformStaticInit();
+        }
 
         private static void AddContentManager(ContentManager contentManager)
         {
@@ -219,7 +239,7 @@ namespace Microsoft.Xna.Framework.Content
                 // This is primarily for editor support. 
                 // Setting the RootDirectory to an absolute path is useful in editor
                 // situations, but TitleContainer can ONLY be passed relative paths.                
-#if LINUX || MONOMAC || WINDOWS
+#if DESKTOPGL || MONOMAC || WINDOWS
                 if (Path.IsPathRooted(assetPath))                
                     stream = File.OpenRead(assetPath);                
                 else
@@ -275,59 +295,17 @@ namespace Microsoft.Xna.Framework.Content
 				}
 			}
 			
-			Stream stream = null;
-			try
+            // Try to load as XNB file
+            var stream = OpenStream(assetName);
+            using (var xnbReader = new BinaryReader(stream))
             {
-				//try load it traditionally
-				stream = OpenStream(assetName);
-
-                // Try to load as XNB file
-                try
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
                 {
-                    using (BinaryReader xnbReader = new BinaryReader(stream))
-                    {
-                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, recordDisposableObject))
-                        {
-                            result = reader.ReadAsset<T>();
-                            if (result is GraphicsResource)
-                                ((GraphicsResource)result).Name = originalAssetName;
-                        }
-                    }
-                }
-                finally
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                    }
+                    result = reader.ReadAsset<T>();
+                    if (result is GraphicsResource)
+                        ((GraphicsResource)result).Name = originalAssetName;
                 }
             }
-            catch (ContentLoadException ex)
-            {
-				//MonoGame try to load as a non-content file
-
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
-                assetName = Normalize<T>(assetName);
-	
-				if (string.IsNullOrEmpty(assetName))
-				{
-					throw new ContentLoadException("Could not load " + originalAssetName + " asset as a non-content file!", ex);
-				}
-
-                result = ReadRawAsset<T>(assetName, originalAssetName);
-
-                // Because Raw Assets skip the ContentReader step, they need to have their
-                // disopsables recorded here. Doing it outside of this catch will 
-                // result in disposables being logged twice.
-                if (result is IDisposable)
-                {
-                    if (recordDisposableObject != null)
-                        recordDisposableObject(result as IDisposable);
-                    else
-                        disposableAssets.Add(result as IDisposable);
-                }
-			}
             
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
@@ -335,74 +313,7 @@ namespace Microsoft.Xna.Framework.Content
 			return (T)result;
 		}
 
-        protected virtual string Normalize<T>(string assetName)
-        {
-            if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
-            {
-                return Texture2DReader.Normalize(assetName);
-            }
-            else if ((typeof(T) == typeof(SpriteFont)))
-            {
-                return SpriteFontReader.Normalize(assetName);
-            }
-#if !WINRT
-            else if ((typeof(T) == typeof(Song)))
-            {
-                return SongReader.Normalize(assetName);
-            }
-            else if ((typeof(T) == typeof(SoundEffect)))
-            {
-                return SoundEffectReader.Normalize(assetName);
-            }
-#endif
-            else if ((typeof(T) == typeof(Effect)))
-            {
-                return EffectReader.Normalize(assetName);
-            }
-            return null;
-        }
-
-        protected virtual object ReadRawAsset<T>(string assetName, string originalAssetName)
-        {
-            if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
-            {
-                using (Stream assetStream = TitleContainer.OpenStream(assetName))
-                {
-                    Texture2D texture = Texture2D.FromStream(
-                        graphicsDeviceService.GraphicsDevice, assetStream);
-                    texture.Name = originalAssetName;
-                    return texture;
-                }
-            }
-            else if ((typeof(T) == typeof(SpriteFont)))
-            {
-                //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
-                throw new NotImplementedException();
-            }
-#if !DIRECTX
-            else if ((typeof(T) == typeof(Song)))
-            {
-                return new Song(assetName);
-            }
-            else if ((typeof(T) == typeof(SoundEffect)))
-            {
-                using (Stream s = TitleContainer.OpenStream(assetName))
-                    return SoundEffect.FromStream(s);
-            }
-#endif
-            else if ((typeof(T) == typeof(Effect)))
-            {
-                using (Stream assetStream = TitleContainer.OpenStream(assetName))
-                {
-                    var data = new byte[assetStream.Length];
-                    assetStream.Read(data, 0, (int)assetStream.Length);
-                    return new Effect(this.graphicsDeviceService.GraphicsDevice, data);
-                }
-            }
-            return null;
-        }
-
-        private ContentReader GetContentReaderFromXnb(string originalAssetName, ref Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
+        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
         {
             // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
             byte x = xnbReader.ReadByte();
@@ -429,12 +340,11 @@ namespace Microsoft.Xna.Framework.Content
             // The next int32 is the length of the XNB file
             int xnbLength = xnbReader.ReadInt32();
 
-            ContentReader reader;
+            Stream decompressedStream = null;
             if (compressedLzx || compressedLz4)
             {
                 // Decompress the xnb
                 int decompressedSize = xnbReader.ReadInt32();
-                MemoryStream decompressedStream = null;
 
                 if (compressedLzx)
                 {
@@ -495,27 +405,17 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else if (compressedLz4)
                 {
-                    // Decompress to a byte[] because Windows 8 doesn't support MemoryStream.GetBuffer()
-                    var buffer = new byte[decompressedSize];
-                    using (var decoderStream = new Lz4DecoderStream(stream))
-                    {
-                        if (decoderStream.Read(buffer, 0, buffer.Length) != decompressedSize)
-                        {
-                            throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
-                        }
-                    }
-                    // Creating the MemoryStream with a byte[] shares the buffer so it doesn't allocate any more memory
-                    decompressedStream = new MemoryStream(buffer);
+                    decompressedStream = new Lz4DecoderStream(stream);
                 }
-
-                reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
             }
             else
             {
-                reader = new ContentReader(this, stream, this.graphicsDeviceService.GraphicsDevice,
-                                                            originalAssetName, version, recordDisposableObject);
+                decompressedStream = stream;
             }
+
+            var reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
+                                                        originalAssetName, version, recordDisposableObject);
+            
             return reader;
         }
 
@@ -546,7 +446,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (asset.Key == null)
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
                 var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
 #else
                 var methodInfo = typeof(ContentManager).GetMethod("ReloadAsset", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -576,58 +476,16 @@ namespace Microsoft.Xna.Framework.Content
 					throw new InvalidOperationException("No Graphics Device Service");
 				}
 			}
-			
-			Stream stream = null;
-			try
-			{
-                //try load it traditionally
-                stream = OpenStream(assetName);
 
-                // Try to load as XNB file
-                try
+            var stream = OpenStream(assetName);
+            using (var xnbReader = new BinaryReader(stream))
+            {
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, null))
                 {
-                    using (BinaryReader xnbReader = new BinaryReader(stream))
-                    {
-                        using (ContentReader reader = GetContentReaderFromXnb(assetName, ref stream, xnbReader, null))
-                        {
-                            reader.InitializeTypeReaders();
-                            reader.ReadObject<T>(currentAsset);
-                            reader.ReadSharedResources();
-                        }
-                    }
+                    reader.ReadAsset<T>(currentAsset);
                 }
-                finally
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                    }
-                }
-			}
-			catch (ContentLoadException)
-			{
-				// Try to reload as a non-xnb file.
-                // Just textures supported for now.
-
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
-                assetName = Normalize<T>(assetName);
-
-                ReloadRawAsset(currentAsset, assetName, originalAssetName);
             }
 		}
-
-        protected virtual void ReloadRawAsset<T>(T asset, string assetName, string originalAssetName)
-        {
-            if (asset is Texture2D)
-            {
-                using (Stream assetStream = TitleContainer.OpenStream(assetName))
-                {
-                    var textureAsset = asset as Texture2D;
-                    textureAsset.Reload(assetStream);
-                }
-            }
-        }
 
 		public virtual void Unload()
 		{
@@ -668,5 +526,13 @@ namespace Microsoft.Xna.Framework.Content
 				return this.serviceProvider;
 			}
 		}
+
+        internal byte[] GetScratchBuffer(int size)
+        {            
+            size = Math.Max(size, 1024 * 1024);
+            if (scratchBuffer == null || scratchBuffer.Length < size)
+                scratchBuffer = new byte[size];
+            return scratchBuffer;
+        }
 	}
 }

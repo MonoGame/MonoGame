@@ -64,8 +64,7 @@ namespace MonoGame.Tests.Components {
 			foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes) {
                 pass.Apply();
 
-				GraphicsDevice.DrawIndexedPrimitives (PrimitiveType.TriangleList, 0, 0,
-					number_of_vertices, 0, number_of_indices / 3);
+				GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, number_of_vertices, 0, number_of_indices / 3);
 			}
 
 			base.Draw (gameTime);

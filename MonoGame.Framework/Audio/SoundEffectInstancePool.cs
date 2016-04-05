@@ -8,39 +8,6 @@ namespace Microsoft.Xna.Framework.Audio
 {
     internal static class SoundEffectInstancePool
     {
-
-#if WINDOWS || (WINRT && !WINDOWS_PHONE) || LINUX || WEB || ANGLE
-
-        // These platforms are only limited by memory.
-        private const int MAX_PLAYING_INSTANCES = int.MaxValue;
-
-#elif MONOMAC
-
-        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
-        private const int MAX_PLAYING_INSTANCES = 256;
-
-#elif PSM
-
-        // Reference: http://community.eu.playstation.com/t5/Audio/Multiple-sound-effects/m-p/16681132/highlight/true#M49
-        private const int MAX_PLAYING_INSTANCES = 128;
-
-#elif WINDOWS_PHONE
-
-        // Reference: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.instanceplaylimitexception.aspx
-        private const int MAX_PLAYING_INSTANCES = 64;
-
-#elif IOS
-
-        // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
-        private const int MAX_PLAYING_INSTANCES = 32;
-
-#elif ANDROID
-
-        // Set to the same as OpenAL on iOS
-        internal const int MAX_PLAYING_INSTANCES = 32;
-
-#endif
-
         private static readonly List<SoundEffectInstance> _playingInstances;
         private static readonly List<SoundEffectInstance> _pooledInstances;
 
@@ -48,7 +15,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             // Reduce garbage generation by allocating enough capacity for
             // the maximum playing instances or at least some reasonable value.
-            var maxInstances = MAX_PLAYING_INSTANCES < 1024 ? MAX_PLAYING_INSTANCES : 1024;
+            var maxInstances = SoundEffect.MAX_PLAYING_INSTANCES < 1024 ? SoundEffect.MAX_PLAYING_INSTANCES : 1024;
             _playingInstances = new List<SoundEffectInstance>(maxInstances);
             _pooledInstances = new List<SoundEffectInstance>(maxInstances);
         }
@@ -61,7 +28,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                return _playingInstances.Count < MAX_PLAYING_INSTANCES;
+                return _playingInstances.Count < SoundEffect.MAX_PLAYING_INSTANCES;
             }
         }
 
@@ -145,13 +112,26 @@ namespace Microsoft.Xna.Framework.Audio
                     Add(inst);
                     continue;
                 }
-                else if (inst._effect.IsDisposed)
+
+                x++;
+            }
+        }
+
+        /// <summary>
+        /// Iterates the list of playing instances, stop them and return them to the pool if they are instances of the given SoundEffect.
+        /// </summary>
+        /// <param name="effect">The SoundEffect</param>
+        internal static void StopPooledInstances(SoundEffect effect)
+        {
+            SoundEffectInstance inst = null;
+
+            for (var x = 0; x < _playingInstances.Count;)
+            {
+                inst = _playingInstances[x];
+                if (inst._effect == effect)
                 {
+                    inst.Stop(true); // stop immediatly
                     Add(inst);
-                    // Instances created through SoundEffect.CreateInstance need to be disposed when
-                    // their owner SoundEffect is disposed.
-                    if (!inst._isPooled)
-                        inst.Dispose();
                     continue;
                 }
 
@@ -172,6 +152,25 @@ namespace Microsoft.Xna.Framework.Audio
                 // the sound with the current master volume.
                 inst.Volume = inst.Volume;
             }
+        }
+
+        internal static void Shutdown()
+        {
+            // We need to dispose all SoundEffectInstances before shutdown,
+            // so as to destroy all SourceVoice instances,
+            // before we can destroy our XAudio MasterVoice instance.
+            // Otherwise XAudio shutdown fails, causing intermittent crashes.
+            foreach (var inst in _playingInstances)
+            {
+                inst.Dispose();
+            }
+            _playingInstances.Clear();
+
+            foreach (var inst in _pooledInstances)
+            {
+                inst.Dispose();
+            }
+            _pooledInstances.Clear();
         }
     }
 }

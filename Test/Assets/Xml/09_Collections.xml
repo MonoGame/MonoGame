@@ -13,5 +13,7 @@
     </StringList>
     <IntArray>1 2 3 23 42</IntArray>
     <ColorArray>FF886542 FF916B46 FF917B46 FF886543</ColorArray>
+    <CustomItemList />
+    <CustomItemInheritedList />
   </Asset>
 </XnaContent>

@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -13,25 +14,62 @@ namespace MonoGame.Tools.Pipeline
         private class IncludeAction : IProjectAction
         {
             private readonly PipelineController _con;
+            private readonly string[] _folder;
             private readonly string[] _files;
 
-            public IncludeAction(PipelineController controller, IEnumerable<string> files)
+            public IncludeAction(PipelineController controller, IEnumerable<string> files) : this(controller, files, null)
             {
-                _con = controller;
-                _files = files.ToArray();
+                
             }
 
-            public void Do()
+            public IncludeAction(PipelineController controller, IEnumerable<string> files, IEnumerable<string> folders)
+            {
+                _con = controller;
+
+                _files = files == null ? new string[0] : files.ToArray();
+                _folder = folders == null ? new string[0] : folders.ToArray();
+
+                for (int i = 0; i < _folder.Length; i++)
+                {
+                    if (Path.IsPathRooted(_folder[i]))
+                    {
+                        string projectloc = controller._project.Location;
+                        if (_folder[i].Length >= projectloc.Length + 1)
+                            _folder[i] = _folder[i].Substring(projectloc.Length + 1);
+                    }
+
+                    if(_folder[i].EndsWith(Path.DirectorySeparatorChar.ToString()))
+                        _folder[i] = _folder[i].Remove(_folder[i].Length - 1);
+                }
+            }
+
+            public bool Do()
             {
                 var parser = new PipelineProjectParser(_con, _con._project);
                 _con.View.BeginTreeUpdate();
 
                 _con.Selection.Clear(_con);
 
+                foreach(string f in _folder)
+                    if(f != "")
+                        _con.View.AddTreeFolder(f);
+
                 for (var i = 0; i < _files.Length; i++ )
                 {
+                    bool skipduplicate = false;
+
+                    switch (Environment.OSVersion.Platform) 
+                    {
+                        case PlatformID.Win32NT:
+                        case PlatformID.Win32S:
+                        case PlatformID.Win32Windows:
+                        case PlatformID.WinCE:
+                            skipduplicate = true;
+                            break;
+                    }
+
                     var f = _files[i];
-                    if (!parser.AddContent(f, true))
+                    if (!parser.AddContent(f, skipduplicate))
                         continue;
 
                     var item = _con._project.ContentItems.Last();
@@ -46,9 +84,11 @@ namespace MonoGame.Tools.Pipeline
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
 
-            public void Undo()
+            public bool Undo()
             {
                 _con.View.BeginTreeUpdate();
 
@@ -59,6 +99,7 @@ namespace MonoGame.Tools.Pipeline
                         var item = _con._project.ContentItems[i];
                         if (item.OriginalPath == f)
                         {
+                            _con.View.RemoveTreeItem(item);
                             _con._project.ContentItems.Remove(item);
                             _con.Selection.Remove(item, _con);
                             break;
@@ -66,8 +107,14 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
 
+                foreach(string f in _folder)
+                    if(f != "")
+                        _con.View.RemoveTreeFolder(f);
+
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
+
+                return true;
             }
         }
     }

@@ -61,12 +61,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.WindowsStoreApp:
                     options.Profile = ShaderProfile.DirectX_11;
                     break;
-                case TargetPlatform.WindowsGL:
                 case TargetPlatform.iOS:
                 case TargetPlatform.Android:
-                case TargetPlatform.Linux:
+                case TargetPlatform.DesktopGL:
                 case TargetPlatform.MacOSX:
-                case TargetPlatform.Ouya:
                 case TargetPlatform.RaspberryPi:
                     options.Profile = ShaderProfile.OpenGL;
                     break;
@@ -82,12 +80,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             ShaderInfo shaderInfo;
             try
             {
-                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options, 
+                    new ContentPipelineEffectCompilerOutput(context));
 
                 // Add the include dependencies so that if they change
                 // it will trigger a rebuild of this effect.
                 foreach (var dep in shaderInfo.Dependencies)
                     context.AddDependency(dep);
+            }
+            catch (InvalidContentException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -138,6 +141,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             throw new NotImplementedException();
 #endif
         }
+
+#if WINDOWS
+        private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
+        {
+            private readonly ContentProcessorContext _context;
+
+            public ContentPipelineEffectCompilerOutput(ContentProcessorContext context)
+            {
+                _context = context;
+            }
+
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                _context.Logger.LogWarning(null, CreateContentIdentity(file, line, column), message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                throw new InvalidContentException(message, CreateContentIdentity(file, line, column));
+            }
+
+            private static ContentIdentity CreateContentIdentity(string file, int line, int column)
+            {
+                return new ContentIdentity(file, null, line + "," + column);
+            }
+        }
+#endif
 
         private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
         {

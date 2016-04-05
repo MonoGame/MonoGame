@@ -8,7 +8,7 @@ using Windows.UI.Popups;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public partial class MessageBox
+    public static partial class MessageBox
     {
         private static readonly CoreDispatcher dispatcher;
         private static TaskCompletionSource<int?> tcs;
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Input
                         dialogResult = dialog.ShowAsync();
                         var result = await dialogResult;
                         if (!tcs.Task.IsCompleted)
-                            tcs.SetResult((int)result.Id);
+                            tcs.SetResult(result == null ? null : (int?)result.Id);
                     }
                     catch (TaskCanceledException)
                     {

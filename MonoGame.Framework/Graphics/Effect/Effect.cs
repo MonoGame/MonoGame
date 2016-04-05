@@ -6,13 +6,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-#if PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
-#if WINRT
-using System.Reflection;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
@@ -32,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 6;
+            public const int MGFXVersion = 8;
 
             public int Signature;
             public int Version;
@@ -55,10 +48,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal Effect(GraphicsDevice graphicsDevice)
 		{
-			if (graphicsDevice == null)
-				throw new ArgumentNullException ("Graphics Device Cannot Be Null");
-
-			this.GraphicsDevice = graphicsDevice;
+            if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+            }
+            this.GraphicsDevice = graphicsDevice;
 		}
 			
 		protected Effect(Effect cloneSource)
@@ -68,7 +62,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
 		}
 
-        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
+        public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
+            : this(graphicsDevice, effectCode, 0, effectCode.Length)
+        {
+        }
+
+
+        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
 		{
 			// By default we currently cache all unique byte streams
@@ -89,22 +89,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			// shared constant buffers as 'new' should return unique
 			// effects without any shared instance state.
  
-#if PSM 
-			var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
-			int headerSize=0;
-#else
             //Read the header
-            MGFXHeader header = ReadHeader(effectCode);
+            MGFXHeader header = ReadHeader(effectCode, index);
 			var effectKey = header.EffectKey;
 			int headerSize = header.HeaderSize;
-#endif
 
             // First look for it in the cache.
             //
             Effect cloneSource;
             if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
-                using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
+                using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
             	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
@@ -121,15 +116,14 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
         }
 
-        private MGFXHeader ReadHeader(byte[] effectCode)
+        private MGFXHeader ReadHeader(byte[] effectCode, int index)
         {
             MGFXHeader header;
-            int i=0;
-            header.Signature = BitConverter.ToInt32(effectCode, i); i += 4;
-            header.Version = (int)effectCode[i++];
-            header.Profile = (int)effectCode[i++];
-            header.EffectKey = BitConverter.ToInt32(effectCode, i); i += 4;
-            header.HeaderSize = i;
+            header.Signature = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.Version = (int)effectCode[index++];
+            header.Profile = (int)effectCode[index++];
+            header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.HeaderSize = index;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
                 throw new Exception("This does not appear to be a MonoGame MGFX file!");
@@ -138,13 +132,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (header.Version > MGFXHeader.MGFXVersion)
                 throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
 
-#if DIRECTX
-            if (header.Profile != 1)
-#else
-			if (header.Profile != 0)
-#endif
-                throw new Exception("This MGFX effect was built for a different platform!");
-            
+            if (header.Profile != Shader.Profile)
+                throw new Exception("This MGFX effect was built for a different platform!");          
             
             return header;
         }
@@ -239,25 +228,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Effect File Reader
 
-        internal static byte[] LoadEffectResource(string name)
-        {
-#if WINRT
-            var assembly = typeof(Effect).GetTypeInfo().Assembly;
-#else
-            var assembly = typeof(Effect).Assembly;
-#endif
-            var stream = assembly.GetManifestResourceStream(name);
-            using (var ms = new MemoryStream())
-            {
-                stream.CopyTo(ms);
-                return ms.ToArray();
-            }
-        }
-
-
-
-#if !PSM
-
 		private void ReadEffect (BinaryReader reader)
 		{
 			// TODO: Maybe we should be reading in a string 
@@ -267,13 +237,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			var buffers = (int)reader.ReadByte ();
 			ConstantBuffers = new ConstantBuffer[buffers];
 			for (var c = 0; c < buffers; c++) 
-            {
-				
-#if OPENGL
-				string name = reader.ReadString ();               
-#else
-				string name = null;
-#endif
+            {				
+				var name = reader.ReadString ();               
 
 				// Create the backing system memory buffer.
 				var sizeInBytes = (int)reader.ReadInt16 ();
@@ -446,9 +411,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					{						
                         case EffectParameterType.Bool:
                         case EffectParameterType.Int32:
-#if DIRECTX
-                            // Under DirectX we properly store integers and booleans
-                            // in an integer type.
+#if !OPENGL
+                            // Under most platforms we properly store integers and 
+                            // booleans in an integer type.
                             //
                             // MojoShader on the otherhand stores everything in float
                             // types which is why this code is disabled under OpenGL.
@@ -490,78 +455,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return new EffectParameterCollection(parameters);
 		}
-#else //PSM
-		internal void ReadEffect(BinaryReader reader)
-		{
-			var effectPass = new EffectPass(this, "Pass", null, null, null, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
-			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
-			var shaderProgram = effectPass._shaderProgram;
-            
-            EffectParameter[] parametersArray = new EffectParameter[shaderProgram.UniformCount+4];
-			for (int i = 0; i < shaderProgram.UniformCount; i++)
-			{	
-                parametersArray[i]= EffectParameterForUniform(shaderProgram, i);
-			}
-			
-			#warning Hacks for BasicEffect as we don't have these parameters yet
-            parametersArray[shaderProgram.UniformCount] = new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
-                3, 1, "float3",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[3]);
-            parametersArray[shaderProgram.UniformCount+1] = new EffectParameter(
-                EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
-                1, 1, "float",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, 0.0f);
-            parametersArray[shaderProgram.UniformCount+2] = new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
-                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
-            parametersArray[shaderProgram.UniformCount+3] = new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
-                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
-
-            Parameters = new EffectParameterCollection(parametersArray);
-                       
-            EffectPass []effectsPassArray = new EffectPass[1];
-            effectsPassArray[0] = effectPass;
-            var effectPassCollection = new EffectPassCollection(effectsPassArray);            
-            
-            EffectTechnique []effectTechniqueArray = new EffectTechnique[1]; 
-            effectTechniqueArray[0] = new EffectTechnique(this, "Name", effectPassCollection, EffectAnnotationCollection.Empty);
-            Techniques = new EffectTechniqueCollection(effectTechniqueArray);
-            
-            ConstantBuffers = new ConstantBuffer[0];            
-            CurrentTechnique = Techniques[0];
-        }
-        
-        internal EffectParameter EffectParameterForUniform(ShaderProgram shaderProgram, int index)
-        {
-            //var b = shaderProgram.GetUniformBinding(i);
-            var name = shaderProgram.GetUniformName(index);
-            //var s = shaderProgram.GetUniformSize(i);
-            //var x = shaderProgram.GetUniformTexture(i);
-            var type = shaderProgram.GetUniformType(index);
-            
-            //EffectParameter.Semantic => COLOR0 / POSITION0 etc
-   
-            //FIXME: bufferOffset in below lines is 0 but should probably be something else
-            switch (type)
-            {
-            case ShaderUniformType.Float4x4:
-                return new EffectParameter(
-                    EffectParameterClass.Matrix, EffectParameterType.Single, name,
-                    4, 4, "float4x4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4 * 4]);
-            case ShaderUniformType.Float4:
-                return new EffectParameter(
-                    EffectParameterClass.Vector, EffectParameterType.Single, name,
-                    4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
-            case ShaderUniformType.Sampler2D:
-                return new EffectParameter(
-                    EffectParameterClass.Object, EffectParameterType.Texture2D, name,
-                    1, 1, "texture2d",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, null);
-            default:
-                throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
-            }
-        }
-        
-#endif
         #endregion // Effect File Reader
 	}
 }

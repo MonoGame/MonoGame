@@ -2,8 +2,11 @@
 [Tt]humbs.db
 *.DS_Store
 
-#Linux installer file
+#Output Linux Installer
+Installers/Linux/tmp_deb/
+Installers/Linux/tmp_run/
 *.run
+*.deb
 
 #Visual Studio files
 *.pidb
@@ -29,17 +32,26 @@
 *.lib
 *.sbr
 *.sdf
+*.csproj.csdat
 ipch/
 obj/
 [Bb]in
 [Dd]ebug*/
 [Rr]elease*/
 Ankh.NoLoad
+.vs/
+project.lock.json
+/MonoGame.Framework/MonoGame.Framework.Net.WindowsUniversal.project.lock.json
+/MonoGame.Framework/MonoGame.Framework.WindowsUniversal.project.lock.json
+artifacts/
 
 #Tooling
 _ReSharper*/
 *.resharper
 [Tt]est[Rr]esult*
+
+#Visual Studio Rebracer extension, allows the user to automatically change the style configuration by project
+rebracer.xml
 
 #Subversion files
 .svn
@@ -69,3 +81,15 @@ Test/*.csproj
 *.speccache
 *.ncrunchproject
 *.ncrunchsolution
+
+#Mac Package Files
+*.pkg
+*.mpack
+
+#Nuget Packages
+**/*.nupkg
+
+#Zip files
+*.zip
+
+Installers/MacOS/Scripts/Framework/postinstall

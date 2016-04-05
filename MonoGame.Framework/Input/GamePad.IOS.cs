@@ -6,6 +6,11 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
+        private static int PlatformGetMaxNumberOfGamePads()
+        {
+            return 0;
+        }
+
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             return new GamePadCapabilities { IsConnected = false };
@@ -13,7 +18,7 @@ namespace Microsoft.Xna.Framework.Input
                
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            return new GamePadState();
+            return new GamePadState() { IsConnected = false };
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)

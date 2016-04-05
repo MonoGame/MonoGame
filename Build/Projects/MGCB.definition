@@ -14,7 +14,9 @@
 
   <Properties>
     
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
+    <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
     <RootNamespace>MGCB</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
@@ -24,8 +26,6 @@
       <Platform Name="MacOS">TRACE;MONOMAC</Platform>
       <Platform Name="Linux">TRACE;LINUX</Platform>
     </CustomDefinitions>
-
-    <ForceArchitecture>x64</ForceArchitecture>
 
   </Properties>
 
