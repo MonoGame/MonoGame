@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:Microsoft.Xna.Framework.Media.Video">
+      <summary>Represents a video.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.Video.Duration">
+      <summary>Gets the duration of the Video.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.Video.FramesPerSecond">
+      <summary>Gets the frame rate of this video.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.Video.Height">
+      <summary>Gets the height of this video, in pixels.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.Video.VideoSoundtrackType">
+      <summary>Gets the VideoSoundtrackType for this video.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.Video.Width">
+      <summary>Gets the width of this video, in pixels.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Media.VideoPlayer">
+      <summary>Provides methods and properties to play back, pause, resume, and stop video. VideoPlayer also exposes repeat, volume, and play position information.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Media.VideoPlayer.#ctor">
+      <summary>Initializes a new instance of this class.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Media.VideoPlayer.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Media.VideoPlayer.GetTexture">
+      <summary>Retrieves a Texture2D containing the current frame of video being played.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.VideoPlayer.IsDisposed">
+      <summary>Gets a value that indicates whether the object is disposed.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.VideoPlayer.IsLooped">
+      <summary>Gets a value that indicates whether the player is playing video in a loop.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.VideoPlayer.IsMuted">
+      <summary>Gets or sets the muted setting for the video player.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Media.VideoPlayer.Pause">
+      <summary>Pauses the currently playing video.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Media.VideoPlayer.Play(Microsoft.Xna.Framework.Media.Video)">
+      <summary>Plays a Video.</summary>
+      <param name="video">Video to play.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.VideoPlayer.PlayPosition">
+      <summary>Gets the play position within the currently playing video.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Media.VideoPlayer.Resume">
+      <summary>Resumes a paused video.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.VideoPlayer.State">
+      <summary>Gets the media playback state, MediaState.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.Media.VideoPlayer.Stop">
+      <summary>Stops playing a video.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.VideoPlayer.Video">
+      <summary>Gets the Video that is currently playing.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.Media.VideoPlayer.Volume">
+      <summary>Gets or sets the video player volume.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.Media.VideoSoundtrackType">
+      <summary>Type of sounds in a video</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Media.VideoSoundtrackType.Dialog">
+      <summary>This video contains only dialog.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Media.VideoSoundtrackType.Music">
+      <summary>This video contains only music.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.Media.VideoSoundtrackType.MusicAndDialog">
+      <summary>This video contains music and dialog.</summary>
+    </member>
+  </members>
+</doc>
