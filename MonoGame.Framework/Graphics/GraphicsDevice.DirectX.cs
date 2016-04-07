@@ -703,13 +703,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     maxLevel /= 2;
                 }
 
-                var targetLevel = PresentationParameters.MultiSampleCount;
+                // Correct the MSAA level if it is too high.
                 if (PresentationParameters.MultiSampleCount > maxLevel)
-                {
-                    targetLevel = maxLevel;
-                }
+                    PresentationParameters.MultiSampleCount = maxLevel;
 
-                multisampleDesc.Count = targetLevel;
+                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
                 multisampleDesc.Quality = qualityLevels - 1;
             }
 
