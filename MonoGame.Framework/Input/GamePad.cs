@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Input
         public static GamePadCapabilities GetCapabilities(int index)
         {
             if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
-                throw new InvalidOperationException();
+                return new GamePadCapabilities();
 
             return PlatformGetCapabilities(index);
         }
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Input
         public static GamePadState GetState(int index, GamePadDeadZone deadZoneMode)
         {
             if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
-                throw new InvalidOperationException();
+                return GamePadState.Default;
             
             return PlatformGetState(index, deadZoneMode);
         }
@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Input
         public static bool SetVibration(int index, float leftMotor, float rightMotor)
         {
             if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())
-                throw new InvalidOperationException();
+                return false;
             
             return PlatformSetVibration(index, MathHelper.Clamp(leftMotor, 0.0f, 1.0f), MathHelper.Clamp(rightMotor, 0.0f, 1.0f));
         }

@@ -92,3 +92,4 @@ Test/*.csproj
 #Zip files
 *.zip
 
+Installers/MacOS/Scripts/Framework/postinstall

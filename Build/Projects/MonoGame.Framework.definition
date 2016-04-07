@@ -136,6 +136,7 @@
       <!-- Covers compatible GL implementations, such as ANGLE and OpenGL -->
     </Service>
     <Service Name="_XNADesignProvided">
+      <AddDefine>XNADESIGNPROVIDED</AddDefine>
       <!-- Allows the Microsoft.Xna.Framework.Design framework to be present -->
     </Service>
     <Service Name="_FrameworkDispatcherProvided">
@@ -154,7 +155,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>Linux,MacOS</Platforms>
+      <Platforms>WindowsGL,Linux,MacOS</Platforms>
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -226,7 +227,6 @@
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="NamespaceDocs.cs" />
-    <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneIntersectionType.cs" />
     <Compile Include="PlayerIndex.cs" />
@@ -249,6 +249,18 @@
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,WindowsPhone,tvOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
+    <Compile Include="TitleContainer.Android.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.Desktop.cs">
+      <Platforms>Angle,Linux,Windows,WindowsGL,Web</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.MacOS.cs">
+      <Platforms>iOS,tvOS,MacOS</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
@@ -270,6 +282,9 @@
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Services>OpenALAudio</Services>
+    </Compile>
+	<Compile Include="Audio\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
       <Services>OpenALAudio</Services>
@@ -411,7 +426,15 @@
     <Compile Include="Graphics\DeviceLostException.cs" />
     <Compile Include="Graphics\DeviceNotResetException.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
-    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="GraphicsDeviceManager.cs">
+		<Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal,Web</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.WinRT.cs">
+		<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.Legacy.cs">
+		<Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsMetrics.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
@@ -537,6 +560,15 @@
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
+	<Compile Include="Graphics\RenderTargetCube.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
@@ -723,7 +755,6 @@
     <Compile Include="Graphics\Vertices\VertexBufferBindings.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
@@ -742,7 +773,7 @@
     <Compile Include="Graphics\Vertices\VertexInputLayout.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPosition.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
@@ -995,14 +1026,6 @@
     </Compile>
 
 
-    <!-- Microsoft.Xna.Framework.Storage -->
-    <Compile Include="Storage\StorageContainer.cs" />
-    <Compile Include="Storage\StorageDevice.cs" />
-    <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUniversal,Linux,tvOS</Platforms>
-    </Compile>
-
-
     <!-- Utility Classes -->
     <Compile Include="Utilities\AssemblyHelper.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
@@ -1011,9 +1034,6 @@
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
-    <Compile Include="Utilities\OggStream.cs">
-      <Platforms>WindowsGL,Linux</Platforms>
-    </Compile>
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
@@ -1143,9 +1163,6 @@
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 

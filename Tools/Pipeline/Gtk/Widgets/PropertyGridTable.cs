@@ -27,7 +27,7 @@ namespace MonoGame.Tools.Pipeline
         }
     }
 
-    public class TreeItem
+    public class GtkTreeItem
     {
         public string group;
 
@@ -37,7 +37,7 @@ namespace MonoGame.Tools.Pipeline
         public EventHandler eventHandler;
         public Dictionary<string, object> comboItems;
 
-        public TreeItem(string label, object value, PropertyGridTable.EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null)
+        public GtkTreeItem(string label, object value, PropertyGridTable.EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null)
         {
             group = "";
 
@@ -57,8 +57,8 @@ namespace MonoGame.Tools.Pipeline
         TreeIter nulliter;
         TreeStore listStore;
 
-        List<TreeItem> items;
-        List<TreeItem> pitems;
+        List<GtkTreeItem> items;
+        List<GtkTreeItem> pitems;
         List<EventItem> eitems;
 
         public bool sortgroup;
@@ -72,8 +72,8 @@ namespace MonoGame.Tools.Pipeline
         {
             Build();
 
-            items = new List<TreeItem> ();
-            pitems = new List<TreeItem> ();
+            items = new List<GtkTreeItem> ();
+            pitems = new List<GtkTreeItem> ();
             eitems = new List<EventItem> ();
             nulliter = new TreeIter ();
             sortgroup = true;
@@ -160,6 +160,7 @@ namespace MonoGame.Tools.Pipeline
                                     var fwidget = new FalseWidget(dialog.text);
                                     eitems[i].eventHandler(fwidget, EventArgs.Empty);
                                     model.SetValue(iter, 14, dialog.text);
+                                    model.SetValue(iter, 12, GetCollectionText(dialog.text));
                                     break;
                                 }
                             }
@@ -216,7 +217,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                     else
                     {
-                        #if LINUX
+                        #if GTK3
                         Gdk.RGBA rgba = new Gdk.RGBA();
 
                         try
@@ -370,6 +371,16 @@ namespace MonoGame.Tools.Pipeline
             treeview1.Model = listStore;
         }
 
+        private string GetCollectionText(string data)
+        {
+            var ret = data.Split(Environment.NewLine[0]);
+
+            for (int i = 0; i < ret.Length; i++)
+                ret[i] = System.IO.Path.GetFileName(ret[i]);
+
+            return string.Join(Environment.NewLine, ret);
+        }
+
         TreeIter AddGroup(string name)
         {
             return listStore.AppendValues (name, true, "", false, "", false, false, null, "", false, false, "", "", false, "", "", false, "", false);
@@ -385,8 +396,8 @@ namespace MonoGame.Tools.Pipeline
         TreeIter AddPropertyCollectionBox(TreeIter iter, string id, string name, string data)
         {
             return !iter.Equals(nulliter) ? 
-                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false) : 
-                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, "Collection", true, data, "", false, "", false);
+                listStore.AppendValues(iter, "", false, name, true, "", false, false, null, "", false, false, id, GetCollectionText(data), true, data, "", false, "", false) : 
+                listStore.AppendValues("", false, name, true, "", false, false, null, "", false, false, id, GetCollectionText(data), true, data, "", false, "", false);
         }
 
         TreeIter AddPropertyColorBox(TreeIter iter, string id, string name, string color)
@@ -443,12 +454,12 @@ namespace MonoGame.Tools.Pipeline
 
         void SortGroup()
         {
-            var ilist = new List<List<TreeItem>> ();
+            var ilist = new List<List<GtkTreeItem>> ();
 
-            foreach (TreeItem item in items) {
+            foreach (GtkTreeItem item in items) {
                 bool added = false;
 
-                foreach (List<TreeItem> silist in ilist) {
+                foreach (List<GtkTreeItem> silist in ilist) {
                     if (silist [0].group == item.group) {
                         silist.Add (item);
                         added = true;
@@ -456,7 +467,7 @@ namespace MonoGame.Tools.Pipeline
                 }
 
                 if (!added) {
-                    var newlist = new List<TreeItem> ();
+                    var newlist = new List<GtkTreeItem> ();
                     newlist.Add (item);
                     ilist.Add (newlist);
                 }
@@ -465,8 +476,8 @@ namespace MonoGame.Tools.Pipeline
             ilist = ilist.OrderBy (o => o[0].group).ToList ();
 
             items.Clear ();
-            foreach (List<TreeItem> silist in ilist) 
-                foreach (TreeItem item in silist) 
+            foreach (List<GtkTreeItem> silist in ilist) 
+                foreach (GtkTreeItem item in silist) 
                     items.Add (item);
         }
 
@@ -483,7 +494,7 @@ namespace MonoGame.Tools.Pipeline
             string group = "";
             var groupiter = new TreeIter();
 
-            foreach (TreeItem item in items) {
+            foreach (GtkTreeItem item in items) {
                 TreeIter iter;
 
                 if (sortgroup) {
@@ -496,7 +507,7 @@ namespace MonoGame.Tools.Pipeline
                 iter = !sortgroup ? AddTreeItem(item, nulliter) : AddTreeItem(item, groupiter);
 
                 if (item.label == "Processor") 
-                    foreach (TreeItem pitem in pitems) 
+                    foreach (GtkTreeItem pitem in pitems) 
                         AddTreeItem (pitem, iter);
             }
 
@@ -506,7 +517,7 @@ namespace MonoGame.Tools.Pipeline
             treeview1.Columns[1].FixedWidth = Allocation.Width / 2 - 1;
         }
 
-        public TreeIter AddTreeItem(TreeItem item, TreeIter iter)
+        public TreeIter AddTreeItem(GtkTreeItem item, TreeIter iter)
         {
             var eitem = new EventItem (eitems.Count, item.eventHandler);
             eitems.Add (eitem);
@@ -556,7 +567,7 @@ namespace MonoGame.Tools.Pipeline
                 {
                     text = values[0];
                     for (int i = 1; i < values.Count; i++)
-                        text += "\r\n" + values[i];
+                        text += Environment.NewLine + values[i];
                 }
 
                 return AddPropertyCollectionBox(iter, eitem.id.ToString(), item.label, text);
@@ -584,7 +595,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddEntry(string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
 
-            var item = new TreeItem (label, value, type, eventHandler, comboItems);
+            var item = new GtkTreeItem (label, value, type, eventHandler, comboItems);
 
             if (item.label == "Name" || item.label == "Location")
                 item.group = "Common";
@@ -596,7 +607,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddProcEntry(string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
 
-            pitems.Add (new TreeItem (label, value, type, eventHandler, comboItems));
+            pitems.Add (new GtkTreeItem (label, value, type, eventHandler, comboItems));
         }
     }
 }

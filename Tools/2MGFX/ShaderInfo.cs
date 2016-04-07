@@ -81,9 +81,17 @@ namespace TwoMGFX
 
             // Evaluate the results of the parse tree.
             var result = tree.Eval() as ShaderInfo;
+
+            // Remove the samplers and techniques so that the shader compiler
+            // gets a clean file without any FX file syntax in it.
+            var cleanFile = newFile;
+            ParseTreeTools.WhitespaceNodes(TokenType.Technique_Declaration, tree.Nodes, ref cleanFile);
+            ParseTreeTools.WhitespaceNodes(TokenType.Sampler_Declaration_States, tree.Nodes, ref cleanFile);
+
+            // Setup the rest of the shader info.
             result.Dependencies = dependencies;
             result.FilePath = fullPath;
-            result.FileContent = newFile;
+            result.FileContent = cleanFile;
             if (!string.IsNullOrEmpty(options.OutputFile))
                 result.OutputFilePath = Path.GetFullPath(options.OutputFile);
             result.AdditionalOutputFiles = new List<string>();
@@ -102,24 +110,6 @@ namespace TwoMGFX
             // We must have at least one technique.
             if (result.Techniques.Count <= 0)
                 throw new Exception("The effect must contain at least one technique and pass!");
-
-            // Finally remove the techniques from the file.
-            //
-            // TODO: Do we really need to do this, or will the HLSL 
-            // compiler just ignore it as we compile shaders?
-            //
-			/*
-			var extra = 2;
-			var offset = 0;
-			foreach (var tech in result.Techniques)
-			{
-				// Remove the technique from the file.
-				newFile = newFile.Remove(tech.startPos + offset, tech.length + extra);
-				offset -= tech.length + extra;
-
-				techniques.Add(tech);
-			}
-			*/
 
 			result.Profile = options.Profile;
 			result.Debug = options.Debug;

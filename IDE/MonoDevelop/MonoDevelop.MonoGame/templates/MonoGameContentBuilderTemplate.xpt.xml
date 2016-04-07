@@ -9,6 +9,6 @@
 	</TemplateConfiguration>
 
 	<TemplateFiles>
-		<File name="${Name}.mgcb" src="Common/Content.mgcb" />
+		<File name="${Name}.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference" />
 	</TemplateFiles>
 </Template>

@@ -841,6 +841,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _vertexShader = value;
+                _vertexConstantBuffers.Clear();
                 _vertexShaderDirty = true;
             }
         }
@@ -855,6 +856,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _pixelShader = value;
+                _pixelConstantBuffers.Clear();
                 _pixelShaderDirty = true;
             }
         }

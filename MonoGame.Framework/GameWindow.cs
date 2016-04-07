@@ -42,7 +42,14 @@ namespace Microsoft.Xna.Framework {
 		public abstract string ScreenDeviceName { get; }
 
 		private string _title;
-		public string Title {
+        /// <summary>
+        /// Gets or sets the title of the game window.
+        /// </summary>
+        /// <remarks>
+        /// For Windows 8 and Windows 10 UWP this has no effect. For these platforms the title should be
+        /// set by using the DisplayName property found in the app manifest file.
+        /// </remarks>
+        public string Title {
 			get { return _title; }
 			set {
 				if (_title != value) {

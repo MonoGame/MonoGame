@@ -46,7 +46,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
+        private static int PlatformProfile()
+        {
+            return 1;
+        }
+
+        private void PlatformConstruct(bool isVertexShader, byte[] shaderBytecode)
         {
             // We need the bytecode later for allocating the
             // input layout from the vertex declaration.

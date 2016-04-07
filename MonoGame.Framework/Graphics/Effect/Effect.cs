@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 7;
+            public const int MGFXVersion = 8;
 
             public int Signature;
             public int Version;
@@ -62,7 +62,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
 		}
 
-        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode)
+        public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
+            : this(graphicsDevice, effectCode, 0, effectCode.Length)
+        {
+        }
+
+
+        public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
 		{
 			// By default we currently cache all unique byte streams
@@ -84,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// effects without any shared instance state.
  
             //Read the header
-            MGFXHeader header = ReadHeader(effectCode);
+            MGFXHeader header = ReadHeader(effectCode, index);
 			var effectKey = header.EffectKey;
 			int headerSize = header.HeaderSize;
 
@@ -93,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Effect cloneSource;
             if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
-                using (var stream = new MemoryStream(effectCode, headerSize, effectCode.Length - headerSize, false))
+                using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
             	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
@@ -110,15 +116,14 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
         }
 
-        private MGFXHeader ReadHeader(byte[] effectCode)
+        private MGFXHeader ReadHeader(byte[] effectCode, int index)
         {
             MGFXHeader header;
-            int i=0;
-            header.Signature = BitConverter.ToInt32(effectCode, i); i += 4;
-            header.Version = (int)effectCode[i++];
-            header.Profile = (int)effectCode[i++];
-            header.EffectKey = BitConverter.ToInt32(effectCode, i); i += 4;
-            header.HeaderSize = i;
+            header.Signature = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.Version = (int)effectCode[index++];
+            header.Profile = (int)effectCode[index++];
+            header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
+            header.HeaderSize = index;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
                 throw new Exception("This does not appear to be a MonoGame MGFX file!");
@@ -127,13 +132,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (header.Version > MGFXHeader.MGFXVersion)
                 throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
 
-#if DIRECTX
-            if (header.Profile != 1)
-#else
-			if (header.Profile != 0)
-#endif
-                throw new Exception("This MGFX effect was built for a different platform!");
-            
+            if (header.Profile != Shader.Profile)
+                throw new Exception("This MGFX effect was built for a different platform!");          
             
             return header;
         }
@@ -237,13 +237,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			var buffers = (int)reader.ReadByte ();
 			ConstantBuffers = new ConstantBuffer[buffers];
 			for (var c = 0; c < buffers; c++) 
-            {
-				
-#if OPENGL
-				string name = reader.ReadString ();               
-#else
-				string name = null;
-#endif
+            {				
+				var name = reader.ReadString ();               
 
 				// Create the backing system memory buffer.
 				var sizeInBytes = (int)reader.ReadInt16 ();
@@ -416,9 +411,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					{						
                         case EffectParameterType.Bool:
                         case EffectParameterType.Int32:
-#if DIRECTX
-                            // Under DirectX we properly store integers and booleans
-                            // in an integer type.
+#if !OPENGL
+                            // Under most platforms we properly store integers and 
+                            // booleans in an integer type.
                             //
                             // MojoShader on the otherhand stores everything in float
                             // types which is why this code is disabled under OpenGL.

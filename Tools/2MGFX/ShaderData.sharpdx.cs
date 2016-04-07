@@ -11,6 +11,7 @@ namespace TwoMGFX
             dxshader.IsVertexShader = isVertexShader;
             dxshader.SharedIndex = sharedIndex;
             dxshader.Bytecode = (byte[])byteCode.Clone();
+            dxshader._attributes = new Attribute[0];
 
             // Strip the bytecode we're gonna save!
             var stripFlags = SharpDX.D3DCompiler.StripFlags.CompilerStripReflectionData |
@@ -57,6 +58,7 @@ namespace TwoMGFX
 
                             var sampler = new Sampler
                             {
+                                samplerName = string.Empty,
                                 textureSlot = rdesc.BindPoint,
                                 samplerSlot = rdesc.BindPoint,
                                 parameterName = samplerName

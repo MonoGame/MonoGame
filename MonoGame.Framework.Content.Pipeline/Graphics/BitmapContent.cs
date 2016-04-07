@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 return height;
             }
-            set
+            protected set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException("height");
@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 return width;
             }
-            set
+            protected set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException("width");

@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Audio
             for (var x = 0; x < _playingInstances.Count;)
             {
                 inst = _playingInstances[x];
-                if (inst.State != SoundState.Stopped && inst._effect == effect)
+                if (inst._effect == effect)
                 {
                     inst.Stop(true); // stop immediatly
                     Add(inst);

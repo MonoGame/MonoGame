@@ -10,19 +10,8 @@ namespace Microsoft.Xna.Framework.Content
 {
 	internal class SoundEffectReader : ContentTypeReader<SoundEffect>
 	{
-#if ANDROID
-        static string[] supportedExtensions = new string[] { ".wav", ".mp3", ".ogg", ".mid" };
-#else
-        static string[] supportedExtensions = new string[] { ".wav", ".aiff", ".ac3", ".mp3" };
-#endif
-
-        internal static string Normalize(string fileName)
-        {
-            return Normalize(fileName, supportedExtensions);
-        }
-
-        protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
-        {         
+		protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
+		{         
             // XNB format for SoundEffect...
             //            
             // Byte [format size]	Format	WAVEFORMATEX structure

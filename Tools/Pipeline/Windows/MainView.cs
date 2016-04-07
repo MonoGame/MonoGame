@@ -23,6 +23,7 @@ namespace MonoGame.Tools.Pipeline
 
         public static IController _controller;
         private ContentIcons _treeIcons;
+        private List<ContentItemState> _oldValues = new List<ContentItemState>();
 
         private bool _treeUpdating;
         private bool _treeSort;
@@ -113,28 +114,6 @@ namespace MonoGame.Tools.Pipeline
             _outputWindow.ContextMenu = contextMenu;
         }
 
-        public void OnTemplateDefined(ContentItemTemplate template)
-        {
-            // Load icon
-            try
-            {
-                var iconPath = Path.Combine(Path.GetDirectoryName(template.TemplateFile), template.Icon);                
-                var iconName = Path.GetFileNameWithoutExtension(iconPath);
-
-                if (!EditorIcons.Templates.Images.ContainsKey(iconName))
-                {
-                    var iconImage = Image.FromFile(iconPath);
-                    EditorIcons.Templates.Images.Add(iconName, iconImage);
-                }
-
-                template.Icon = iconName;
-            }
-            catch (Exception)
-            {
-                template.Icon = "Default";
-            }
-        }
-
         private void OnSelectionModified(Selection selection, object sender)
         {
             if (sender == this)
@@ -160,27 +139,22 @@ namespace MonoGame.Tools.Pipeline
             if (args.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
 
-            // TODO: This is the multi-select case which needs to be handled somehow to support undo.
-            if (args.OldValue == null)
-                return;
+            var obj = _propertyGrid.SelectedObject as PipelineProjectProxy;
 
-            var obj = _propertyGrid.SelectedObject;
-
-            if (obj is ContentItem)
+            if (obj != null)
             {
-                var item = obj as ContentItem;
-                var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
-                _controller.AddAction(action);                
-                _controller.OnProjectModified();
-            }
-            else
-            {
-                var item = (PipelineProject)_controller.GetItem((obj as PipelineProjectProxy).OriginalPath);
+                var item = (PipelineProject)_controller.GetItem(obj.OriginalPath);
                 var action = new UpdateProjectAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
                 _controller.AddAction(action);
 
                 _controller.OnProjectModified();
-            }                
+            }
+            else
+            {
+                var action = new UpdateContentItemAction(this, _controller, _oldValues);
+                _controller.AddAction(action);                
+                _controller.OnProjectModified();
+            }
         }
 
         private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -340,6 +314,11 @@ namespace MonoGame.Tools.Pipeline
         public void ShowMessage(string message)
         {
             MessageBox.Show(this, message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public bool ShowDeleteDialog(string[] items)
+        {
+            throw new NotImplementedException();
         }
 
         public void BeginTreeUpdate()
@@ -666,9 +645,16 @@ namespace MonoGame.Tools.Pipeline
             _controller.Selection.Clear(this);
             _propertyGrid.SelectedObject = null;
 
+            _oldValues.Clear();
+
             foreach (var node in _treeView.SelectedNodes)
             {
-                _controller.Selection.Add(node.Tag as IProjectItem, this);
+                var item = node.Tag as IProjectItem;
+
+                if (item is ContentItem)
+                    _oldValues.Add(ContentItemState.Get(item as ContentItem));
+
+                _controller.Selection.Add(item, this);
             }
 
             _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
@@ -824,7 +810,7 @@ namespace MonoGame.Tools.Pipeline
                     dirs.Add(node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1));
             }
 
-            _controller.Exclude(items, dirs);      
+            _controller.Exclude(items, dirs, false);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -847,14 +833,13 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnNewItemClick(object sender, System.EventArgs e)
         {
-            var dlg = new NewContentDialog(_controller.Templates, EditorIcons.Templates);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                var template = dlg.Selected;
-                var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
+            var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
+            var dlg = new NewItemDialog(_controller.Templates.GetEnumerator(), location);
 
-                // Ensure name is unique among files at this location?
-                _controller.NewItem(dlg.NameGiven, location, template);
+            if (dlg.Run() == Eto.Forms.DialogResult.Ok)
+            {
+                _controller.NewItem(dlg.Name, location, dlg.Selected);
+                UpdateMenus();
             }
         }
 
@@ -889,9 +874,10 @@ namespace MonoGame.Tools.Pipeline
                     location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
             }
 
-            var dialog = new TextEditDialog("New Folder", "Folder Name:", "");
-            if (dialog.ShowDialog() == DialogResult.OK)
-                _controller.NewFolder(dialog.text, location);
+            var dialog = new EditDialog("New Folder", "Folder name:", "", true);
+
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
+                _controller.NewFolder(dialog.Text, location);
         }
 
         private void OnRedoClick(object sender, EventArgs e)
@@ -918,11 +904,11 @@ namespace MonoGame.Tools.Pipeline
             else
                 path = item.Name;
 
-            TextEditDialog dialog = new TextEditDialog("Rename", "New Name:", _treeView.SelectedNode.Text);
+            var dialog = new EditDialog("Rename", "New name:", _treeView.SelectedNode.Text, true);
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
             {
-                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.text;
+                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.Text;
                 _controller.Move(new [] { path }, new [] { newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath }, new[] { type });
             }
         }
@@ -1041,11 +1027,11 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            AddFileDialog afd = new AddFileDialog(file, exists);
-            if (afd.ShowDialog() == DialogResult.OK)
+            var afd = new AddItemDialog(file, exists, FileType.File);
+            if (afd.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = afd.responce;
-                applyforall = afd.applyforall;
+                action = afd.Responce;
+                applyforall = afd.ApplyForAll;
                 return true;
             }
 
@@ -1126,16 +1112,17 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
-            var dialog = new AddFolderDialog(folder);
-            applyforall = false;
+            var dialog = new AddItemDialog(folder, exists, FileType.Folder);
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = dialog.responce;
+                action = dialog.Responce;
+                applyforall = dialog.ApplyForAll;
                 return true;
             }
 
             action = CopyAction.Link;
+            applyforall = false;
             return false;
         }
 

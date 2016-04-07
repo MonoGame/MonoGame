@@ -73,6 +73,7 @@ namespace Microsoft.Xna.Framework.Audio
             // get AL's listener position
             float x, y, z;
             AL.GetListener(ALListener3f.Position, out x, out y, out z);
+            ALHelper.CheckError("Failed to get source position.");
 
             // get the emitter offset from origin
             Vector3 posOffset = emitter.Position - listener.Position;
@@ -86,7 +87,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             // set the position based on relative positon
             AL.Source(SourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
+            ALHelper.CheckError("Failed to set source position.");
             AL.Source(SourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
+            ALHelper.CheckError("Failed to Set source velocity.");
         }
 
         private void PlatformPause()
@@ -100,7 +103,10 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             if (pauseCount == 0)
+            {
                 AL.SourcePause(SourceId);
+                ALHelper.CheckError("Failed to pause source.");
+            }
             ++pauseCount;
             SoundState = SoundState.Paused;
         }
@@ -115,6 +121,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             int bufferId = _effect.SoundBuffer.OpenALDataBuffer;
             AL.Source(SourceId, ALSourcei.Buffer, bufferId);
+            ALHelper.CheckError("Failed to bind buffer to source.");
 
             // Send the position, gain, looping, pitch, and distance model to the OpenAL driver.
             if (!HasSourceId)
@@ -122,14 +129,19 @@ namespace Microsoft.Xna.Framework.Audio
 
 			// Distance Model
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
+            ALHelper.CheckError("Failed set source distance.");
 			// Pan
 			AL.Source (SourceId, ALSource3f.Position, _pan, 0, 0.1f);
+            ALHelper.CheckError("Failed to set source pan.");
 			// Volume
 			AL.Source (SourceId, ALSourcef.Gain, _alVolume);
+            ALHelper.CheckError("Failed to set source volume.");
 			// Looping
 			AL.Source (SourceId, ALSourceb.Looping, IsLooped);
+            ALHelper.CheckError("Failed to set source loop state.");
 			// Pitch
 			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
+            ALHelper.CheckError("Failed to set source pitch.");
 
             controller.PlaySound (this);
             //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
@@ -152,7 +164,10 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 --pauseCount;
                 if (pauseCount == 0)
+                {
                     AL.SourcePlay(SourceId);
+                    ALHelper.CheckError("Failed to play source.");
+                }
             }
             SoundState = SoundState.Playing;
         }
@@ -169,8 +184,10 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
                 AL.SourceStop(SourceId);
+                ALHelper.CheckError("Failed to stop source.");
 
                 AL.Source(SourceId, ALSourcei.Buffer, 0);
+                ALHelper.CheckError("Failed to free source from buffer.");
 
                 controller.FreeSource(this);
             }
@@ -180,9 +197,12 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetIsLooped(bool value)
         {
             _looped = value;
-            
+
             if (HasSourceId)
+            {
                 AL.Source(SourceId, ALSourceb.Looping, _looped);
+                ALHelper.CheckError("Failed to set source loop state.");
+            }
         }
 
         private bool PlatformGetIsLooped()
@@ -193,13 +213,19 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetPan(float value)
         {
             if (HasSourceId)
+            {
                 AL.Source(SourceId, ALSource3f.Position, value, 0.0f, 0.1f);
+                ALHelper.CheckError("Failed to set source pan.");
+            }
         }
 
         private void PlatformSetPitch(float value)
         {
             if (HasSourceId)
-                AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(value));
+            {
+                AL.Source(SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(value));
+                ALHelper.CheckError("Failed to set source pitch.");
+            }
         }
 
         private SoundState PlatformGetState()
@@ -208,6 +234,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return SoundState.Stopped;
             
             var alState = AL.GetSourceState(SourceId);
+            ALHelper.CheckError("Failed to get source state.");
 
             switch (alState)
             {
@@ -233,7 +260,10 @@ namespace Microsoft.Xna.Framework.Audio
             _alVolume = value;
 
             if (HasSourceId)
+            {
                 AL.Source(SourceId, ALSourcef.Gain, _alVolume);
+                ALHelper.CheckError("Failed to set source volume.");
+            }
         }
 
         private void PlatformDispose(bool disposing)
