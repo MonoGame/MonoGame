@@ -75,7 +75,9 @@ namespace Microsoft.Xna.Framework
             // Default to windowed mode... this is ignored on platforms that don't support it.
             _wantFullScreen = false;
 
-            GraphicsProfile = GraphicsDevice.GetHighestSupportedGraphicsProfile(null);
+            // XNA would read this from the manifest, but it would always default
+            // to reach unless changed.  So lets mimic that without the manifest bit.
+            GraphicsProfile = GraphicsProfile.Reach;
 
             // Let the plaform optionally overload construction defaults.
             PlatformConstruct();
@@ -193,6 +195,23 @@ namespace Microsoft.Xna.Framework
 
         partial void PlatformApplyChanges();
 
+        private void PreparePresentationParameters(PresentationParameters presentationParameters)
+        {
+            presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            presentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            presentationParameters.IsFullScreen = _wantFullScreen;
+            presentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate;
+            presentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
+            presentationParameters.DeviceWindowHandle = _game.Window.Handle;
+
+            // TODO: This isn't correct... we need to query the hardware
+            // to see what the max quality level supported is for the current
+            // device and back buffer format.
+            presentationParameters.MultiSampleCount = _preferMultiSampling ? 4 : 0;
+        }
+
         /// <summary>
         /// Applies any pending property changes to the graphics device.
         /// </summary>
@@ -204,14 +223,7 @@ namespace Microsoft.Xna.Framework
 
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
-            _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
-            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            PreparePresentationParameters(_graphicsDevice.PresentationParameters);
 
             // TOOD: Should this trigger some sort of device reset?
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
@@ -240,14 +252,7 @@ namespace Microsoft.Xna.Framework
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
             var presentationParameters = new PresentationParameters();
-            presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-            presentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-            presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-            presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-            presentationParameters.IsFullScreen = _wantFullScreen;
-            presentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            presentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
-            presentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            PreparePresentationParameters(presentationParameters);
 
             // Allow for any per-platform changes to the presentation.
             PlatformInitialize(presentationParameters);
