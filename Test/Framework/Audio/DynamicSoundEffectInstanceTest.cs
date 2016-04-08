@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
@@ -28,7 +29,7 @@ namespace MonoGame.Tests.Audio
 
             using (var instance = new DynamicSoundEffectInstance(8000, AudioChannels.Mono))
             {
-                instance.BufferNeeded += IncreaseBufferNeededEventCount;
+                instance.BufferNeeded += BufferNeededEventHandler;
                 instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.1f));
                 instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.1f));
                 instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.1f));
@@ -37,6 +38,53 @@ namespace MonoGame.Tests.Audio
                 instance.Play();
                 SleepWhileDispatching(350);
                 Assert.AreEqual(3, _bufferNeededEventCount - previousEventCount);
+
+                // The event is raised on the same thread as FrameworkDispatcher.Update() is called.
+                Assert.AreEqual(Thread.CurrentThread.ManagedThreadId, _bufferNeededEventThread);
+            }
+        }
+
+        [Test]
+        public void BufferNeeded_MultipleConsumed()
+        {
+            // Both buffers should be consumed by the time the event routine is called by XNA.
+            // This test verifies that each consumed buffer raises its own event.
+
+            using (var instance = new DynamicSoundEffectInstance(8000, AudioChannels.Mono))
+            {
+                instance.BufferNeeded += BufferNeededEventHandler;
+                instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.05f));
+                instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.05f));
+
+                var previousEventCount = _bufferNeededEventCount;
+                instance.Play();
+                
+                Thread.Sleep(125);
+                SleepWhileDispatching(10);
+
+                Assert.AreEqual(3, _bufferNeededEventCount - previousEventCount);
+            }
+        }
+
+        [Test]
+        public void BufferNeeded_MoreThanThree()
+        {
+            // No events are raised when a buffer is consumed and there are more than 3 buffers submitted.
+
+            using (var instance = new DynamicSoundEffectInstance(8000, AudioChannels.Mono))
+            {
+                instance.BufferNeeded += BufferNeededEventHandler;
+                instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.25f));
+                instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.25f));
+                instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.05f));
+                instance.SubmitBuffer(GenerateSineWave(880, 8000, 1, 0.05f));
+
+                var previousEventCount = _bufferNeededEventCount;
+                instance.Play();
+                
+                SleepWhileDispatching(300);
+
+                Assert.AreEqual(0, _bufferNeededEventCount - previousEventCount);
             }
         }
 
@@ -45,12 +93,15 @@ namespace MonoGame.Tests.Audio
         {
             using (var instance = new DynamicSoundEffectInstance(8000, AudioChannels.Mono))
             {
-                instance.BufferNeeded += IncreaseBufferNeededEventCount;
+                instance.BufferNeeded += BufferNeededEventHandler;
 
                 var previousEventCount = _bufferNeededEventCount;
                 instance.Play();
                 SleepWhileDispatching(20);
                 Assert.AreEqual(1, _bufferNeededEventCount - previousEventCount);
+
+                // The event is raised on the same thread as FrameworkDispatcher.Update() is called.
+                Assert.AreEqual(Thread.CurrentThread.ManagedThreadId, _bufferNeededEventThread);
             }
         }
 
@@ -59,7 +110,7 @@ namespace MonoGame.Tests.Audio
         {
             using (var instance = new DynamicSoundEffectInstance(8000, AudioChannels.Mono))
             {
-                instance.BufferNeeded += IncreaseBufferNeededEventCount;
+                instance.BufferNeeded += BufferNeededEventHandler;
                 instance.SubmitBuffer(GenerateSineWave(440, 8000, 1, 0.1f));
 
                 var previousEventCount = _bufferNeededEventCount;
@@ -69,10 +120,30 @@ namespace MonoGame.Tests.Audio
             }
         }
 
+        [Test]
+        public void BufferNeeded_Play_NoDispatcherCalled()
+        {
+            // No event is raised if FrameworkDispatcher.Update() is not called.
+
+            using (var instance = new DynamicSoundEffectInstance(8000, AudioChannels.Mono))
+            {
+                instance.BufferNeeded += BufferNeededEventHandler;
+
+                var previousEventCount = _bufferNeededEventCount;
+                instance.Play();
+
+                Thread.Sleep(20);
+
+                Assert.AreEqual(0, _bufferNeededEventCount - previousEventCount);
+            }
+        }
+
         static int _bufferNeededEventCount = 0;
-        private static void IncreaseBufferNeededEventCount(object sender, EventArgs e)
+        static int _bufferNeededEventThread = 0;
+        private static void BufferNeededEventHandler(object sender, EventArgs e)
         {
             _bufferNeededEventCount++;
+            _bufferNeededEventThread = Thread.CurrentThread.ManagedThreadId;
         }
 
         [Test]
@@ -324,7 +395,7 @@ namespace MonoGame.Tests.Audio
 #elif DESKTOPGL
                 DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
 #endif
-                System.Threading.Thread.Sleep(10);
+                Thread.Sleep(10);
             }
         }
 
