@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -134,6 +135,7 @@ namespace Microsoft.Xna.Framework.Audio
                 _state = SoundState.Playing;
 
                 CheckBufferCount();
+                DynamicSoundEffectInstanceManager.AddInstance(this);
             }
         }
 
@@ -193,6 +195,8 @@ namespace Microsoft.Xna.Framework.Audio
             
             if (immediate)
             {
+                DynamicSoundEffectInstanceManager.RemoveInstance(this);
+
                 PlatformStop();
                 _state = SoundState.Stopped;
 
@@ -275,11 +279,16 @@ namespace Microsoft.Xna.Framework.Audio
                 _buffersNeeded++;
         }
 
-        private void RaiseBufferNeeded()
+        internal void UpdateQueue()
         {
+            // Update the buffers
+            PlatformUpdateQueue();
+
+            // Raise the event
             if (BufferNeeded != null)
             {
-                for (var i = 0; i < _buffersNeeded; i++)
+                var eventCount = (_buffersNeeded < 3) ? _buffersNeeded : 3;
+                for (var i = 0; i < eventCount; i++)
                 {
                     BufferNeeded(this, EventArgs.Empty);
                 }
@@ -289,5 +298,60 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Handles the buffer events of all DynamicSoundEffectInstance instances.
+    /// </summary>
+    internal static class DynamicSoundEffectInstanceManager
+    {
+        private static List<WeakReference> _playingInstances;
+
+        static DynamicSoundEffectInstanceManager()
+        {
+            _playingInstances = new List<WeakReference>();
+        }
+
+        public static void AddInstance(DynamicSoundEffectInstance instance)
+        {
+            var weakRef = new WeakReference(instance);
+            _playingInstances.Add(weakRef);
+        }
+
+        public static void RemoveInstance(DynamicSoundEffectInstance instance)
+        {
+            for (int i = _playingInstances.Count - 1; i >= 0; i--)
+            {
+                if (_playingInstances[i].Target == instance)
+                {
+                    _playingInstances.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates buffer queues of the currently playing instances.
+        /// </summary>
+        /// <remarks>
+        /// XNA posts <see cref="DynamicSoundEffectInstance.BufferNeeded"/> events always on the main thread.
+        /// </remarks>
+        public static void UpdatePlayingInstances()
+        {
+            for (int i = _playingInstances.Count - 1; i >= 0; i--)
+            {
+                if (_playingInstances[i].IsAlive)
+                {
+                    var target = (DynamicSoundEffectInstance)_playingInstances[i].Target;
+                    if (!target.IsDisposed)
+                        target.UpdateQueue();
+                }
+                else
+                {
+                    // The instance has been disposed.
+                    _playingInstances.RemoveAt(i);
+                }
+            }
+        }
     }
 }

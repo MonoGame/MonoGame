@@ -392,7 +392,7 @@ namespace MonoGame.Tests.Audio
             {
 #if XNA
                 FrameworkDispatcher.Update();
-#elif DESKTOPGL
+#else
                 DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
 #endif
                 Thread.Sleep(10);

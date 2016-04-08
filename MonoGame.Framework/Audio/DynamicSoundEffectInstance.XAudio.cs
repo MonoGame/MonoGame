@@ -62,6 +62,11 @@ namespace Microsoft.Xna.Framework.Audio
             _queuedBuffers.Enqueue(audioBuffer);
         }
 
+        private void PlatformUpdateQueue()
+        {
+            // The XAudio implementation utilizes callbacks, so no work here.
+        }
+
         private void PlatformDispose(bool disposing)
         {
             if (disposing)

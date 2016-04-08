@@ -34,8 +34,6 @@ namespace Microsoft.Xna.Framework.Audio
             AL.GetError();
             AL.SourcePlay(SourceId);
             ALHelper.CheckError("Failed to play the source.");
-
-            DynamicSoundEffectInstanceManager.AddInstance(this);
         }
 
         private void PlatformPause()
@@ -54,8 +52,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformStop()
         {
-            DynamicSoundEffectInstanceManager.RemoveInstance(this);
-
             AL.GetError();
             AL.SourceStop(SourceId);
             ALHelper.CheckError("Failed to stop the source.");
@@ -124,7 +120,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal void UpdateQueue()
+        private void PlatformUpdateQueue()
         {
             // Get the completed buffers
             AL.GetError();
@@ -147,62 +143,6 @@ namespace Microsoft.Xna.Framework.Audio
             // Raise the event for each removed buffer, if needed
             for (int i = 0; i < numBuffers; i++)
                 CheckBufferCount();
-            RaiseBufferNeeded();
-        }
-    }
-
-    /// <summary>
-    /// Handles the buffer events of all DynamicSoundEffectInstance instances.
-    /// </summary>
-    internal static class DynamicSoundEffectInstanceManager
-    {
-        private static List<WeakReference> _playingInstances;
-
-        static DynamicSoundEffectInstanceManager()
-        {
-            _playingInstances = new List<WeakReference>();
-        }
-
-        public static void AddInstance(DynamicSoundEffectInstance instance)
-        {
-            var weakRef = new WeakReference(instance);
-            _playingInstances.Add(weakRef);
-        }
-
-        public static void RemoveInstance(DynamicSoundEffectInstance instance)
-        {
-            for (int i = _playingInstances.Count - 1; i >= 0; i--)
-            {
-                if (_playingInstances[i].Target == instance)
-                {
-                    _playingInstances.RemoveAt(i);
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Updates buffer queues of the currently playing instances.
-        /// </summary>
-        /// <remarks>
-        /// OpenAL does not implement callbacks as XAudio does, so this must be called periodically.
-        /// </remarks>
-        public static void UpdatePlayingInstances()
-        {
-            for (int i = _playingInstances.Count - 1; i >= 0; i--)
-            {
-                if (_playingInstances[i].IsAlive)
-                {
-                    var target = (DynamicSoundEffectInstance)_playingInstances[i].Target;
-                    if (!target.IsDisposed)
-                        target.UpdateQueue();
-                }
-                else
-                {
-                    // The instance has been disposed.
-                    _playingInstances.RemoveAt(i);
-                }
-            }
         }
     }
 }

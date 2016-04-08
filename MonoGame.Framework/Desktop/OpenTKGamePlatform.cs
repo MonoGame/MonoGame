@@ -211,9 +211,6 @@ namespace Microsoft.Xna.Framework
             if (soundControllerInstance != null)
                 soundControllerInstance.Update();
 
-            // Update DynamicSoundEffectInstance instances
-            DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
-
             return true;
         }
 
