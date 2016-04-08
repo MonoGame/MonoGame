@@ -16,28 +16,6 @@ namespace MonoGame.Tools.Pipeline
         TreeStore recentListStore;
 
         const string basetitle = "MonoGame Pipeline";
-        public static string LinuxNotAllowedCharacters = "/"; 
-        public static string MacNotAllowedCharacters = ":";
-
-        public static string NotAllowedCharacters
-        {
-            get
-            {
-                if (Global.DesktopEnvironment == "OSX")
-                    return MacNotAllowedCharacters;
-                else
-                    return LinuxNotAllowedCharacters;
-            }
-        }
-
-        public static bool CheckString(string s, string notallowedCharacters)
-        {
-            for (int i = 0; i < notallowedCharacters.Length; i++) 
-                if (s.Contains (notallowedCharacters.Substring (i, 1)))
-                    return false;
-
-            return true;
-        }
 
         public string OpenProjectPath;
         public IController _controller;
@@ -177,7 +155,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnShowEvent()
         {
-            PipelineSettings.Default.Load ();
+            PipelineSettings.Default.Load();
 
             if (!String.IsNullOrEmpty(OpenProjectPath)) {
                 _controller.OpenProject(OpenProjectPath);
@@ -197,6 +175,8 @@ namespace MonoGame.Tools.Pipeline
                 _controller.LaunchDebugger = DebugModeAction.Active = PipelineSettings.Default.DebugMode;
                 FilterOutputAction.Active = PipelineSettings.Default.FilterOutput;
             }
+
+            UpdateRecentProjectList();
         }
 
         private bool Maximized()
@@ -489,12 +469,12 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddItemDialog(this, file, exists, FileType.File);
+            var afd = new AddItemDialog (file, exists, FileType.File);
 
-            if (afd.Run() == (int)ResponseType.Ok)
+            if (afd.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = afd.responce;
-                applyforall = afd.applyforall;
+                action = afd.Responce;
+                applyforall = afd.ApplyForAll;
                 return true;
             }
 
@@ -505,12 +485,12 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
-            var afd = new AddItemDialog(this, folder, exists, FileType.Folder);
+            var afd = new AddItemDialog(folder, exists, FileType.Folder);
             applyforall = false;
 
-            if (afd.Run() == (int)ResponseType.Ok)
+            if (afd.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = afd.responce;
+                action = afd.Responce;
                 return true;
             }
 
@@ -525,11 +505,6 @@ namespace MonoGame.Tools.Pipeline
             dialog.Destroy();
 
             return result == (int)ResponseType.Ok;
-        }
-
-        public void OnTemplateDefined(ContentItemTemplate item)
-        {
-
         }
 
         public void ItemExistanceChanged(IProjectItem item)
@@ -642,30 +617,33 @@ namespace MonoGame.Tools.Pipeline
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
 
-            if (dialog.Run () == (int)ResponseType.Ok) {
+            List<TreeIter> iters;
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath(out iters, out ids);
 
-                List<TreeIter> iters;
-                List<string> ids;
-                string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
+            string location;
 
-                string location;
-
-                if (paths.Length == 1) {
-                    if (ids [0] == projectview1.ID_FOLDER)
-                        location = paths [0];
-                    else if (ids[0] == projectview1.ID_BASE)
-                        location = _controller.GetFullPath ("");
-                    else
-                        location = System.IO.Path.GetDirectoryName (paths [0]);
-                }
+            if (paths.Length == 1)
+            {
+                if (ids[0] == projectview1.ID_FOLDER)
+                    location = paths[0];
+                else if (ids[0] == projectview1.ID_BASE)
+                    location = _controller.GetFullPath("");
                 else
-                    location = _controller.GetFullPath ("");
+                    location = System.IO.Path.GetDirectoryName(paths[0]);
+            }
+            else
+                location = _controller.GetFullPath("");
 
-                _controller.NewItem(dialog.name, location, dialog.templateFile);
+            var dialog = new NewItemDialog(_controller.Templates.GetEnumerator(), _controller.GetFullPath(location));
+
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
+            {
+                _controller.NewItem(dialog.Name, location, dialog.Selected);
                 UpdateMenus();
             }
+
             expand = false;
         }
 
@@ -692,10 +670,10 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var ted = new TextEditorDialog(this, "New Folder", "Folder Name:", "", true);
-            if (ted.Run() != (int)ResponseType.Ok)
+            var dialog = new EditDialog("New Folder", "Folder name:", "Folder", true);
+            if (dialog.Run() != Eto.Forms.DialogResult.Ok)
                 return;
-            var foldername = ted.text;
+            var foldername = dialog.Text;
 
             expand = true;
             List<TreeIter> iters;

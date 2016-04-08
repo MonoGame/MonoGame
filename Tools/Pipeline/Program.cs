@@ -3,12 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-#if WINDOWS
-using System.Diagnostics;
-using System.Windows.Forms;
-#else
-using Gtk;
-#endif
+using Eto;
+using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -20,9 +16,12 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         static void Main(string [] args)
         {
+            var app = new Application (Platform.Detect);
+            Styles.Load();
+
 #if WINDOWS
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
             PipelineSettings.Default.Load();
 
@@ -34,20 +33,18 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var controller = new PipelineController(view);
-            Application.Run(view);
+            view.Show();
 #else
             Global.Initalize ();
-            Application.Init ();
 
             var win = new MainWindow ();
             new PipelineController(win);
 
-#if GTK3
-            if(Global.UseHeaderBar && Global.App != null)
-                Global.App.AddWindow(win);
-#endif
-
 #if LINUX
+               
+            if (Global.UseHeaderBar && Global.App != null)
+                Global.App.AddWindow(win);
+            
             if (args != null && args.Length > 0)
             {
             	var projectFilePath = string.Join(" ", args);
@@ -59,12 +56,11 @@ namespace MonoGame.Tools.Pipeline
             	win.OpenProjectPath = project;
             }
 #endif
-            
-            win.Show (); 
+            win.Show ();
             win.OnShowEvent ();
-            
-            Application.Run ();
 #endif
+
+            app.Run ();
         }
     }
 }

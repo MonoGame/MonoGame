@@ -114,28 +114,6 @@ namespace MonoGame.Tools.Pipeline
             _outputWindow.ContextMenu = contextMenu;
         }
 
-        public void OnTemplateDefined(ContentItemTemplate template)
-        {
-            // Load icon
-            try
-            {
-                var iconPath = Path.Combine(Path.GetDirectoryName(template.TemplateFile), template.Icon);                
-                var iconName = Path.GetFileNameWithoutExtension(iconPath);
-
-                if (!EditorIcons.Templates.Images.ContainsKey(iconName))
-                {
-                    var iconImage = Image.FromFile(iconPath);
-                    EditorIcons.Templates.Images.Add(iconName, iconImage);
-                }
-
-                template.Icon = iconName;
-            }
-            catch (Exception)
-            {
-                template.Icon = "Default";
-            }
-        }
-
         private void OnSelectionModified(Selection selection, object sender)
         {
             if (sender == this)
@@ -855,15 +833,12 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnNewItemClick(object sender, System.EventArgs e)
         {
-            var dlg = new NewContentDialog(_controller.Templates, EditorIcons.Templates);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
+            var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
+            var dlg = new NewItemDialog(_controller.Templates.GetEnumerator(), location);
+
+            if (dlg.Run() == Eto.Forms.DialogResult.Ok)
             {
-                var template = dlg.Selected;
-                var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
-
-                // Ensure name is unique among files at this location?
-                _controller.NewItem(dlg.NameGiven, location, template);
-
+                _controller.NewItem(dlg.Name, location, dlg.Selected);
                 UpdateMenus();
             }
         }
@@ -899,9 +874,10 @@ namespace MonoGame.Tools.Pipeline
                     location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
             }
 
-            var dialog = new TextEditDialog("New Folder", "Folder Name:", "");
-            if (dialog.ShowDialog() == DialogResult.OK)
-                _controller.NewFolder(dialog.text, location);
+            var dialog = new EditDialog("New Folder", "Folder name:", "", true);
+
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
+                _controller.NewFolder(dialog.Text, location);
         }
 
         private void OnRedoClick(object sender, EventArgs e)
@@ -928,11 +904,11 @@ namespace MonoGame.Tools.Pipeline
             else
                 path = item.Name;
 
-            TextEditDialog dialog = new TextEditDialog("Rename", "New Name:", _treeView.SelectedNode.Text);
+            var dialog = new EditDialog("Rename", "New name:", _treeView.SelectedNode.Text, true);
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
             {
-                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.text;
+                string newpath = System.IO.Path.GetDirectoryName(path) + System.IO.Path.DirectorySeparatorChar + dialog.Text;
                 _controller.Move(new [] { path }, new [] { newpath.StartsWith(System.IO.Path.DirectorySeparatorChar.ToString()) ? newpath.Substring(1) : newpath }, new[] { type });
             }
         }
@@ -1051,11 +1027,11 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
         {
-            AddFileDialog afd = new AddFileDialog(file, exists);
-            if (afd.ShowDialog() == DialogResult.OK)
+            var afd = new AddItemDialog(file, exists, FileType.File);
+            if (afd.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = afd.responce;
-                applyforall = afd.applyforall;
+                action = afd.Responce;
+                applyforall = afd.ApplyForAll;
                 return true;
             }
 
@@ -1136,16 +1112,17 @@ namespace MonoGame.Tools.Pipeline
 
         public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
         {
-            var dialog = new AddFolderDialog(folder);
-            applyforall = false;
+            var dialog = new AddItemDialog(folder, exists, FileType.Folder);
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
             {
-                action = dialog.responce;
+                action = dialog.Responce;
+                applyforall = dialog.ApplyForAll;
                 return true;
             }
 
             action = CopyAction.Link;
+            applyforall = false;
             return false;
         }
 

@@ -5,7 +5,7 @@ using Gtk;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public static class Global
+    static partial class Global
     {
         public static Application App;
 
@@ -13,30 +13,11 @@ namespace MonoGame.Tools.Pipeline
         public static uint GtkMajorVersion = 2;
         public static uint GtkMinorVersion = 24;
 
-        //indicates which desktop enviorment is currenlly in use
-        public static string DesktopEnvironment = "OSX";
-
-        public static bool UseHeaderBar;
-
         public static void Initalize()
         {
 #if GTK3
             GtkMajorVersion = Gtk.Global.MajorVersion;
             GtkMinorVersion = Gtk.Global.MinorVersion;
-
-            var proc = new Process ();
-            proc.StartInfo.FileName = "/bin/bash";
-            proc.StartInfo.Arguments = "-c \"echo $XDG_CURRENT_DESKTOP\"";
-            proc.StartInfo.UseShellExecute = false; 
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.Start ();
-
-            while (!proc.StandardOutput.EndOfStream) {
-                string line = proc.StandardOutput.ReadLine ();
-                DesktopEnvironment = line;
-            }
-
-            UseHeaderBar = Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16 && Global.DesktopEnvironment == "GNOME";
 
             if(UseHeaderBar)
             {
