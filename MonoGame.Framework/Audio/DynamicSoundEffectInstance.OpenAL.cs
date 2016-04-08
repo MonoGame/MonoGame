@@ -144,9 +144,10 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-            // Only raise the event if a buffer was removed
-            if (numBuffers > 0)
+            // Raise the event for each removed buffer, if needed
+            for (int i = 0; i < numBuffers; i++)
                 CheckBufferCount();
+            RaiseBufferNeeded();
         }
     }
 
