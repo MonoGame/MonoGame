@@ -146,8 +146,11 @@ namespace MonoGame.Tools.Pipeline
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new CollectionEditorDialog(window, model.GetValue(iter, 14).ToString());
-                    if(dialog.Run() == (int)ResponseType.Ok)
+                    var refs = model.GetValue(iter, 14).ToString();
+                    var array = string.IsNullOrWhiteSpace(refs) ? new string[0] : refs.Split(Environment.NewLine[0]);
+                    var dialog = new ReferenceDialog((PipelineController)window._controller, array);
+
+                    if(dialog.Run() == Eto.Forms.DialogResult.Ok)
                     {
                         int id = Convert.ToInt32(model.GetValue(iter, 11));
 
@@ -157,10 +160,12 @@ namespace MonoGame.Tools.Pipeline
                             {
                                 if(eitems[i].eventHandler != null)
                                 {
-                                    var fwidget = new FalseWidget(dialog.text);
+                                    var text = string.Join(Environment.NewLine[0].ToString(), dialog.References);
+
+                                    var fwidget = new FalseWidget(dialog.References);
                                     eitems[i].eventHandler(fwidget, EventArgs.Empty);
-                                    model.SetValue(iter, 14, dialog.text);
-                                    model.SetValue(iter, 12, GetCollectionText(dialog.text));
+                                    model.SetValue(iter, 14, text);
+                                    model.SetValue(iter, 12, GetCollectionText(text));
                                     break;
                                 }
                             }
