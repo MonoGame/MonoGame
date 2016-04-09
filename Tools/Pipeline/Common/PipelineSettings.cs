@@ -79,12 +79,28 @@ namespace MonoGame.Tools.Pipeline
 		{
             if (_isoStore.FileExists(SettingsPath))
             {
-                using (var isoStream = new IsolatedStorageFileStream(SettingsPath, FileMode.Open, _isoStore))
+                try
                 {
-                    using (var reader = new StreamReader(isoStream))
+                    using (var isoStream = new IsolatedStorageFileStream(SettingsPath, FileMode.Open, _isoStore))
                     {
-                        var serializer = new XmlSerializer(typeof(PipelineSettings));
-                        Default = (PipelineSettings)serializer.Deserialize(reader);
+                        using (var reader = new StreamReader(isoStream))
+                        {
+                            var serializer = new XmlSerializer(typeof(PipelineSettings));
+                            Default = (PipelineSettings)serializer.Deserialize(reader);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Output to the standard error stream because we don't have a log window yet
+                    Console.Error.WriteLine(SettingsPath + " could not be opened or file corrupted. Deleting file and using default settings.");
+                    try
+                    {
+                        _isoStore.DeleteFile(SettingsPath);
+                    }
+                    catch
+                    {
+                        Console.Error.WriteLine(SettingsPath + " could not be deleted.");
                     }
                 }
             }
