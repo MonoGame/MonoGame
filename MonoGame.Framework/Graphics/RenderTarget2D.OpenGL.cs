@@ -7,6 +7,7 @@
 using MonoMac.OpenGL;
 #else
 using OpenGL;
+using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
 using OpenTK.Graphics.OpenGL;
