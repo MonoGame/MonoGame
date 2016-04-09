@@ -664,7 +664,9 @@ namespace Microsoft.Xna.Framework
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
+#if DIRECTX || OPENGL
                 DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
+#endif
 
                 Update(gameTime);
 
