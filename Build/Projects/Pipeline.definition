@@ -89,6 +89,10 @@
 	<Compile Include="Eto\Dialogs\NewItemDialog.eto.cs">
       <DependentUpon>NewItemDialog.cs</DependentUpon>
     </Compile>
+	<Compile Include="Eto\Dialogs\ReferenceDialog.cs" />
+	<Compile Include="Eto\Dialogs\ReferenceDialog.eto.cs">
+      <DependentUpon>ReferenceDialog.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Eto\Global.cs" />
 	<Compile Include="Eto\Styles.Linux.cs">
       <Platforms>Linux</Platforms>
@@ -101,6 +105,9 @@
     </Compile>
 
     <!-- The Windows specific stuff -->
+	<Compile Include="Windows\AssemblyReferenceListEditor.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\BuildIcons.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -149,13 +156,6 @@
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Windows\ReferenceDialog.cs">
-      <Platforms>Windows</Platforms>
-    </Compile> 
-	<Compile Include="Windows\ReferenceDialog.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>ReferenceDialog.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -169,10 +169,6 @@
 	 <EmbeddedResource Include="Windows\AboutDialog.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>AboutDialog.cs</DependentUpon>
-    </EmbeddedResource>
-	 <EmbeddedResource Include="Windows\ReferenceDialog.resx">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
@@ -211,9 +207,6 @@
     <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
     <Compile Include="Gtk\Dialogs\CustomFolderDialog.GUI.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -230,9 +223,6 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.GUI.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
