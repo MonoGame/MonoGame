@@ -565,8 +565,12 @@ namespace MonoGame.Tools.Pipeline
             Include(initialDirectory, files);
         }
 
-        public void Include(string initialDirectory)
+        public void Include()
         {
+            FileType type;
+            string path, initialDirectory;
+            View.GetSelection(out type, out path, out initialDirectory);
+
             // Root the path to the project.
             if (!Path.IsPathRooted(initialDirectory))
                 initialDirectory = Path.Combine(_project.Location, initialDirectory);
@@ -644,8 +648,12 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void IncludeFolder(string initialDirectory)
+        public void IncludeFolder()
         {
+            FileType type;
+            string path, initialDirectory;
+            View.GetSelection(out type, out path, out initialDirectory);
+
             // Root the path to the project.
             if (!Path.IsPathRooted(initialDirectory))
                 initialDirectory = Path.Combine(_project.Location, initialDirectory);
@@ -811,16 +819,31 @@ namespace MonoGame.Tools.Pipeline
                 _actionStack.Add(action);
         }
 
-        public void NewItem(string name, string location, ContentItemTemplate template)
+        public void NewItem()
         {
-            var action = new NewAction(this, name, location, template);
+            FileType type;
+            string path, loc, name;
+            ContentItemTemplate template;
+
+            View.GetSelection(out type, out path, out loc);
+            if (!View.ChooseItemTemplate(loc, out template, out name))
+                return;
+
+            var action = new NewAction(this, name, loc, template);
             if(action.Do())
                 _actionStack.Add(action);
         }
 
-        public void NewFolder(string name, string location)
+        public void NewFolder()
         {
-            string folder = Path.Combine(location, name);
+            FileType type;
+            string path, loc, name;
+
+            if (!View.ShowEditDialog("New Folder", "Folder Name:", "", true, out name))
+                return;
+            View.GetSelection(out type, out path, out loc);
+
+            string folder = Path.Combine(loc, name);
 
             if (!Path.IsPathRooted(folder))
                 folder = _project.Location + Path.DirectorySeparatorChar + folder;
@@ -830,7 +853,8 @@ namespace MonoGame.Tools.Pipeline
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
             }
-            catch {
+            catch
+            {
                 View.ShowError ("Error While Creating a Directory", "An error has occured while the directory: \"" + folder + "\" was beeing created, aborting...");
                 return;
             }

@@ -104,15 +104,15 @@ namespace MonoGame.Tools.Pipeline
 
         void DragDrop(string initialDirectory, string[] folders, string[] files);
 
-        void Include(string initialDirectory);
+        void Include();
 
-        void IncludeFolder(string initialDirectory);
+        void IncludeFolder();
 
         void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete);
 
-        void NewItem(string name, string location, ContentItemTemplate template);
+        void NewItem();
 
-        void NewFolder(string name, string location);
+        void NewFolder();
 
         void Move (string[] paths, string[] newpaths, FileType[] types);
         
