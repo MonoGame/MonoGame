@@ -21,6 +21,8 @@ namespace MonoGame.Tools.Pipeline
 
         Selection Selection { get; }
 
+        string ProjectLocation { get; }
+
         /// <summary>
         /// True if there is a project.
         /// </summary>
@@ -132,8 +134,10 @@ namespace MonoGame.Tools.Pipeline
 
         void Redo();
 
-        #endregion        
+        #endregion
 
         string GetFullPath(string filePath);
+
+        string GetRelativePath(string filePath);
     }
 }

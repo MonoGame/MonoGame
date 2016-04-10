@@ -37,7 +37,7 @@ namespace MonoGame.Tools.Pipeline
 
         void ShowMessage(string message);
 
-        bool ShowDeleteDialog(string[] items);
+        bool ShowDeleteDialog(string[] folders, string[] files);
 
         void BeginTreeUpdate();
 

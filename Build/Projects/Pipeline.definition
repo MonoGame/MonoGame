@@ -77,6 +77,10 @@
 	<Compile Include="Eto\Dialogs\AddItemDialog.eto.cs">
       <DependentUpon>AddItemDialog.cs</DependentUpon>
     </Compile>
+	<Compile Include="Eto\Dialogs\DeleteDialog.cs" />
+	<Compile Include="Eto\Dialogs\DeleteDialog.eto.cs">
+      <DependentUpon>DeleteDialog.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Eto\Dialogs\DialogBase.cs" />
 	<Compile Include="Eto\Dialogs\DialogBase.eto.cs">
       <DependentUpon>DialogBase.cs</DependentUpon>
@@ -94,6 +98,18 @@
       <DependentUpon>ReferenceDialog.cs</DependentUpon>
     </Compile>
 	<Compile Include="Eto\Global.cs" />
+	<Compile Include="Eto\Global.Windows.cs">
+      <DependentUpon>Global.cs</DependentUpon>
+      <Platforms>Windows</Platforms>
+    </Compile>
+	<Compile Include="Eto\Global.Linux.cs">
+      <DependentUpon>Global.cs</DependentUpon>
+      <Platforms>Linux</Platforms>
+    </Compile>
+	<Compile Include="Eto\Global.Mac.cs">
+      <DependentUpon>Global.cs</DependentUpon>
+      <Platforms>MacOS</Platforms>
+    </Compile>
 	<Compile Include="Eto\Styles.Linux.cs">
       <Platforms>Linux</Platforms>
     </Compile>
@@ -226,12 +242,6 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\DeleteDialog.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\DeleteDialog.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Global.cs">

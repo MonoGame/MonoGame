@@ -4,6 +4,9 @@
 
 using System;
 using System.IO;
+using Eto;
+using Eto.Drawing;
+using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -11,6 +14,7 @@ namespace MonoGame.Tools.Pipeline
     {
         public static string DesktopEnvironment { get; private set; }
         public static bool UseHeaderBar { get; private set; }
+        public static bool Unix { get; private set; }
 
         static Global()
         {
@@ -20,6 +24,8 @@ namespace MonoGame.Tools.Pipeline
 #else
             DesktopEnvironment = "OSX";
 #endif
+
+            Unix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
         }
 
         public static string NotAllowedCharacters
@@ -48,6 +54,28 @@ namespace MonoGame.Tools.Pipeline
                     return false;
 
             return true;
+        }
+
+        public static Bitmap GetDirectoryIcon()
+        {
+            try
+            {
+                return PlatformGetDirectoryIcon();
+            }
+            catch { }
+
+            return Bitmap.FromResource("MonoGame.Tools.Pipeline.Icons.folder_open.png");
+        }
+
+        public static Bitmap GetFileIcon(string path)
+        {
+            try
+            {
+                return PlatformGetFileIcon(path);
+            }
+            catch { }
+
+            return Bitmap.FromResource("MonoGame.Tools.Pipeline.Icons.blueprint.png");
         }
     }
 }

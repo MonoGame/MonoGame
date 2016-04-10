@@ -26,17 +26,15 @@ namespace MonoGame.Tools.Pipeline
 
         public List<string> References { get; private set; }
 
-        private PipelineController _controller;
-        private Uri _dirUri;
+        private IController _controller;
         private FileDialogFilter _dllFileFilter, _allFileFilter;
         private SelectableFilterCollection<RefItem> _dataStore;
 
-        public ReferenceDialog(PipelineController controller, string[] refs)
+        public ReferenceDialog(IController controller, string[] refs)
         {
             InitializeComponent();
 
             _controller = controller;
-            _dirUri = new Uri(controller.ProjectLocation);
 
             _dllFileFilter = new FileDialogFilter("Dll Files (*.dll)", new[] { ".dll" });
             _allFileFilter = new FileDialogFilter("All Files (*.*)", new[] { ".*" });
@@ -56,7 +54,7 @@ namespace MonoGame.Tools.Pipeline
             grid1.DataStore = _dataStore = new SelectableFilterCollection<RefItem>(grid1);
 
             foreach (var rf in refs)
-                _dataStore.Add(new RefItem(Path.GetFileName(rf), GetAbsolute(rf)));
+                _dataStore.Add(new RefItem(Path.GetFileName(rf), _controller.GetFullPath(rf)));
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -65,19 +63,9 @@ namespace MonoGame.Tools.Pipeline
 
             var items = _dataStore.GetEnumerator();
             while(items.MoveNext())
-                References.Add(GetRelative(items.Current.Location));
+                References.Add(_controller.GetRelativePath(items.Current.Location));
             
             base.OnClosing(e);
-        }
-
-        private string GetRelative(string path)
-        {
-            return Uri.UnescapeDataString(_dirUri.MakeRelativeUri(new Uri(path)).ToString().Replace('/', Path.DirectorySeparatorChar));
-        }
-
-        private string GetAbsolute(string path)
-        {
-            return _controller.GetFullPath(path);
         }
 
         private void Grid1_SelectionChanged(object sender, EventArgs e)
@@ -88,7 +76,7 @@ namespace MonoGame.Tools.Pipeline
         private void ButtonAdd_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.Directory = _dirUri;
+            dialog.Directory = new Uri(_controller.ProjectLocation);
             dialog.MultiSelect = true;
             dialog.Filters.Add(_dllFileFilter);
             dialog.Filters.Add(_allFileFilter);
