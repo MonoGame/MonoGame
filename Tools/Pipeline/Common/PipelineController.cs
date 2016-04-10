@@ -52,7 +52,15 @@ namespace MonoGame.Tools.Pipeline
 
         public string ProjectLocation 
         {
-            get { return _project.Location; }
+            get
+            {
+                var ret = _project.Location;
+
+                if (!_project.Location.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    ret += Path.DirectorySeparatorChar;
+                
+                return ret; 
+            }
         }
 
         public string ProjectOutputDir
@@ -795,19 +803,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete)
         {
-            if (delete)
-            {
-                var delitems = new List<string>();
-
-                foreach (var f in folders)
-                    delitems.Add(f.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
-
-                foreach (var i in items)
-                    delitems.Add(i.OriginalPath);
-
-                if (!View.ShowDeleteDialog(delitems.ToArray()))
-                    return;
-            }
+            if (delete && !View.ShowDeleteDialog(folders.ToArray(), items.Select(x => x.OriginalPath).ToArray()))
+                return;
 
             var action = new ExcludeAction(this, items, folders, delete);
             if(action.Do())
@@ -949,6 +946,21 @@ namespace MonoGame.Tools.Pipeline
                 return filePath;
 
             return _project.Location + Path.DirectorySeparatorChar + filePath;
+        }
+
+        public string GetRelativePath(string path)
+        {
+            if (!ProjectOpen)
+                return path;
+
+            var dirUri = new Uri(ProjectLocation);
+            var fileUri = new Uri(path);
+            var relativeUri = dirUri.MakeRelativeUri(fileUri);
+
+            if (relativeUri == null)
+                return path;
+
+            return Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
         }
     }
 }

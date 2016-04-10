@@ -17,9 +17,9 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             Title = "Reference Editor";
+            Resizable = true;
             Width = 500;
             Height = 400;
-            Resizable = true;
 
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(4, 4);

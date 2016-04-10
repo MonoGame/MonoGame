@@ -14,8 +14,8 @@ namespace MonoGame.Tools.Pipeline
         private void InitializeComponent()
         {
             layout1 = new DynamicLayout();
-            layout1.DefaultSpacing = new Size(4, 4);
-            layout1.Padding = new Padding(2);
+            layout1.DefaultSpacing = new Size(8, 8);
+            layout1.Padding = new Padding(6);
 
             DefaultButton = new Button();
             DefaultButton.Text = "OK";
@@ -39,8 +39,10 @@ namespace MonoGame.Tools.Pipeline
 
             if (Global.UseHeaderBar)
                 this.Style = "HeaderBar";
+            else if(Global.Unix)
+                layout1.AddSeparateRow(null, AbortButton, DefaultButton);
             else
-                layout1.AddSeparateRow(null, DefaultButton, AbortButton);
+                layout1.AddSeparateRow (null, DefaultButton, AbortButton);
 
             layout1.EndVertical();
         }

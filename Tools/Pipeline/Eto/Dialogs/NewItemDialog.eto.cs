@@ -37,7 +37,6 @@ namespace MonoGame.Tools.Pipeline
             layout2.BeginHorizontal();
 
             textBox1 = new TextBox();
-            textBox1.Text = "file";
             layout2.Add(textBox1, true, true);
 
             labelExt = new Label();

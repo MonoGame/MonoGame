@@ -316,7 +316,7 @@ namespace MonoGame.Tools.Pipeline
             MessageBox.Show(this, message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public bool ShowDeleteDialog(string[] items)
+        public bool ShowDeleteDialog(string[] files, string[] folders)
         {
             throw new NotImplementedException();
         }

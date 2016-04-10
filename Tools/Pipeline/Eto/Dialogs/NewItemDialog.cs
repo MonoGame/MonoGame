@@ -45,6 +45,8 @@ namespace MonoGame.Tools.Pipeline
 
             if (list1.Items.Count > 0)
                 list1.SelectedIndex = 0;
+
+            textBox1.Text = "File";
         }
 
         protected override void OnShown(EventArgs e)

@@ -498,13 +498,10 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        public bool ShowDeleteDialog(string[] items)
+        public bool ShowDeleteDialog(string[] folders, string[] files)
         {
-            var dialog = new DeleteDialog(this, items);
-            var result = dialog.Run();
-            dialog.Destroy();
-
-            return result == (int)ResponseType.Ok;
+            var dialog = new DeleteDialog(_controller, folders, files);
+            return dialog.Run() == Eto.Forms.DialogResult.Ok;
         }
 
         public void ItemExistanceChanged(IProjectItem item)
