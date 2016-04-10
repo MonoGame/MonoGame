@@ -821,7 +821,7 @@ namespace MonoGame.Tools.Pipeline
         private void AboutMenuItemClick(object sender, EventArgs e)
         {
             var about = new AboutDialog();
-            about.Show();
+            about.Run();
         }
 
         private void OnAddItemClick(object sender, EventArgs e)
