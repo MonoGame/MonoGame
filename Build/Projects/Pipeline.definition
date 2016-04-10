@@ -40,7 +40,6 @@
     <None Include="app.manifest" />
 
     <Compile Include="Common\ActionStack.cs" />
-    <Compile Include="Common\AssemblyAttributes.cs" />
     <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />
     <Compile Include="Common\ContentItem.Processor.cs" />
@@ -73,6 +72,10 @@
     <Compile Include="Common\Extensions.cs" />
     
     <!-- Eto.Forms GUI stuff -->
+	<Compile Include="Eto\Dialogs\AboutDialog.cs" />
+	<Compile Include="Eto\Dialogs\AboutDialog.eto.cs">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Eto\Dialogs\AddItemDialog.cs" />
 	<Compile Include="Eto\Dialogs\AddItemDialog.eto.cs">
       <DependentUpon>AddItemDialog.cs</DependentUpon>
@@ -149,13 +152,6 @@
     <Compile Include="Windows\SortedEnumTypeConverter.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-	<Compile Include="Windows\AboutDialog.cs">
-      <Platforms>Windows</Platforms>
-    </Compile> 
-	<Compile Include="Windows\AboutDialog.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>AboutDialog.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -165,10 +161,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-	 <EmbeddedResource Include="Windows\AboutDialog.resx">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
@@ -246,6 +238,9 @@
 
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="App.ico" />
+    <EmbeddedResource Include="Icons\monogame.png">
+      <LogicalName>Icons.monogame.png</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Icons\blueprint.png" />
     <EmbeddedResource Include="Icons\missing.png" />
     <EmbeddedResource Include="Icons\folder_closed.png" />

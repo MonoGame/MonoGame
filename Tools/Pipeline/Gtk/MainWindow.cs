@@ -758,16 +758,7 @@ namespace MonoGame.Tools.Pipeline
         protected void OnAboutActionActivated (object sender, EventArgs e)
         {
             var adialog = new AboutDialog ();
-            adialog.TransientFor = this;
-            adialog.Logo = new Gdk.Pixbuf(null, "MonoGame.Tools.Pipeline.App.ico");
-            adialog.ProgramName = AssemblyAttributes.AssemblyProduct;
-            adialog.Version = AssemblyAttributes.AssemblyVersion;
-            adialog.Comments = AssemblyAttributes.AssemblyDescription;
-            adialog.Copyright = AssemblyAttributes.AssemblyCopyright;
-            adialog.Website = "http://www.monogame.net/";
-            adialog.WebsiteLabel = "MonoGame Website";
-            adialog.Run ();
-            adialog.Destroy ();
+            adialog.Run();
         }
 
         protected void OnDebugModeActionActivated (object sender, EventArgs e)
