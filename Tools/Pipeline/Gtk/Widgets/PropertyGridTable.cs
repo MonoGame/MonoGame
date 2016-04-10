@@ -325,12 +325,8 @@ namespace MonoGame.Tools.Pipeline
 
                 if (treeview1.Selection.GetSelected (out model, out iter)) {
 
-                    var dialog = new CustomFolderDialog(window, model.GetValue(iter, 17).ToString());
-                    var responseid = dialog.Run();
-                    var fileName = dialog.FileName;
-                    dialog.Destroy();
-
-                    if(responseid != (int)ResponseType.Ok)
+                    var dialog = new PathDialog(window._controller, model.GetValue(iter, 17).ToString());
+                    if(dialog.Run() != Eto.Forms.DialogResult.Ok)
                         return;
 
                     int id = Convert.ToInt32(model.GetValue(iter, 11));
@@ -340,9 +336,9 @@ namespace MonoGame.Tools.Pipeline
                         if(eitems[i].id != id || eitems[i].eventHandler == null)
                             continue;
 
-                        var fwidget = new FalseWidget(fileName);
+                        var fwidget = new FalseWidget(dialog.Path);
                         eitems[i].eventHandler(fwidget, EventArgs.Empty);
-                        model.SetValue(iter, 17, fileName);
+                        model.SetValue(iter, 17, dialog.Path);
 
                         break;
                     }

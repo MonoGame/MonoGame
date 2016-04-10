@@ -96,6 +96,10 @@
 	<Compile Include="Eto\Dialogs\NewItemDialog.eto.cs">
       <DependentUpon>NewItemDialog.cs</DependentUpon>
     </Compile>
+	<Compile Include="Eto\Dialogs\PathDialog.cs" />
+	<Compile Include="Eto\Dialogs\PathDialog.eto.cs">
+      <DependentUpon>PathDialog.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Eto\Dialogs\ReferenceDialog.cs" />
 	<Compile Include="Eto\Dialogs\ReferenceDialog.eto.cs">
       <DependentUpon>ReferenceDialog.cs</DependentUpon>
@@ -213,12 +217,6 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\CustomFolderDialog.GUI.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Dialogs\CustomFolderDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\Stetic.cs">
