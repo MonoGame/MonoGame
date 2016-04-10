@@ -13,7 +13,7 @@
         <description>This is the bait-and-switch PCL build of MonoGame.Framework.</description>
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
         <releaseNotes></releaseNotes>
-        <copyright>Copyright  2016</copyright>
+        <copyright>Copyright 2016</copyright>
         <language>en-US</language>
         <references>
             <reference file="MonoGame.Framework.dll" />
