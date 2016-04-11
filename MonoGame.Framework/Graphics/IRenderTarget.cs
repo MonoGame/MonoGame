@@ -40,6 +40,21 @@
 using SharpDX.Direct3D11;
 #endif
 
+#if MONOMAC
+#if PLATFORM_MACOS_LEGACY
+using MonoMac.OpenGL;
+#else
+using OpenGL;
+using OpenTK.Graphics.OpenGL;
+#endif
+#elif DESKTOPGL
+using OpenTK.Graphics.OpenGL;
+using System;
+using System.Collections.Generic;
+#elif GLES
+using OpenTK.Graphics.ES20;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
@@ -81,6 +96,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <returns>The <see cref="DepthStencilView"/>. Can be <see langword="null"/>.</returns>
         DepthStencilView GetDepthStencilView();
+#endif
+
+#if OPENGL
+        int GLTexture { get; }
+        TextureTarget GLTarget { get; }
+        int GLColorBuffer { get; set; }
+        int GLDepthBuffer { get; set; }
+        int GLStencilBuffer { get; set; }
+        int MultiSampleCount { get; }
+        int LevelCount { get; }
+
+        TextureTarget GetFramebufferTarget(RenderTargetBinding renderTargetBinding);
 #endif
     }
 }

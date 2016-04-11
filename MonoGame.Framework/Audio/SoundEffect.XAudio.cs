@@ -12,7 +12,7 @@ using SharpDX.X3DAudio;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffect : IDisposable
+    partial class SoundEffect
     {
 #if WINDOWS || (WINRT && !WINDOWS_PHONE)
 
@@ -135,19 +135,27 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
-        {
-            CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
-                            DataStream.Create(buffer, true, false),
-                            0, 
-                            buffer.Length);
-        }
-
-        private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
                             DataStream.Create(buffer, true, false, offset),
                             loopStart, 
+                            loopLength);
+        }
+
+        private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
+        {
+            WaveFormat waveFormat;
+            if (format == 1)
+                waveFormat = new WaveFormat(sampleRate, channels);
+            else if (format == 2)
+                waveFormat = new WaveFormatAdpcm(sampleRate, channels, blockAlignment);
+            else
+                throw new NotSupportedException("Unsupported wave format!");
+
+            CreateBuffers(  waveFormat,
+                            DataStream.Create(buffer, true, false),
+                            loopStart,
                             loopLength);
         }
 

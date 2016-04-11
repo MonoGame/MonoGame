@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // Create the byte array for the data
             byte[] bytes = new byte[((width * height * bpp - 1) / 8) + 1];
-            
+
             //Converts the pixel data to bytes, do not try to use this call to switch the color channels because that only works for 16bpp bitmaps
             FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
             // Create the Pixel bitmap content depending on the image type
@@ -152,8 +152,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 case FREE_IMAGE_TYPE.FIT_RGBAF:
                 case FREE_IMAGE_TYPE.FIT_RGBA16:
-                    // Swap R and B channels to make it BGRA
-                    SwitchRedAndBlueChannels(fBitmap);
+                    //Don't switch channels in this case or colors will be shown wrong
                     break;
 
                 default:

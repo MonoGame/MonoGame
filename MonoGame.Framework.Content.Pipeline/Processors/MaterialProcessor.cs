@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(true)]
         [DisplayName("Resize to Power of Two")]
         [Description("If enabled, the texture is resized to the next largest power of two, maximizing compatibility. Many graphics cards do not support texture sizes that are not a power of two.")]
-        public virtual bool ResizeTexturesToPowerOfTwo { get; set; }
+        public virtual bool ResizeTexturesToPowerOfTwo { get { return resizeTexturesToPowerOfTwo; } set { resizeTexturesToPowerOfTwo = value; } }
 
         /// <summary>
 		/// Specifies the texture format of output materials. Materials can either be left unchanged from the source asset, converted to a corresponding Color, or compressed using the appropriate DxtCompressed format.
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Color")]
         [DisplayName("Texture Format")]
         [Description("Specifies the SurfaceFormat type of processed textures. Textures can either remain unchanged from the source asset, converted to the Color format, or DXT compressed.")]
-        public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
+        public virtual TextureProcessorOutputFormat TextureFormat { get { return textureFormat; } set { textureFormat = value; } }
 
         /// <summary>
         /// Initializes a new instance of the MaterialProcessor class.
