@@ -155,6 +155,8 @@
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
+    <Compile Include="Framework\Audio\SoundEffectTest.cs" />
+
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>

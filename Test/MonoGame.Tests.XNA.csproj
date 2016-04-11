@@ -95,6 +95,7 @@
     <Compile Include="ContentPipeline\TestProcessorContext.cs" />
     <Compile Include="ContentPipeline\TextureContentTests.cs" />
     <Compile Include="ContentPipeline\TextureProcessorTests.cs" />
+    <Compile Include="Framework\Audio\SoundEffectTest.cs" />
     <Compile Include="Framework\ColorTest.cs" />
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
