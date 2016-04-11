@@ -20,10 +20,6 @@ namespace MonoGame.Tools.Pipeline
         public string OpenProjectPath;
         public IController _controller;
 
-        FileFilter MonoGameContentProjectFileFilter;
-        FileFilter XnaContentProjectFileFilter;
-        FileFilter AllFilesFilter;
-
         MenuItem treerebuild;
         MenuItem recentMenu;
         bool expand = false, startup = true;
@@ -59,17 +55,7 @@ namespace MonoGame.Tools.Pipeline
         {
             Build();
 
-            MonoGameContentProjectFileFilter = new FileFilter ();
-            MonoGameContentProjectFileFilter.Name = "MonoGame Content Build Projects (*.mgcb)";
-            MonoGameContentProjectFileFilter.AddPattern ("*.mgcb");
-
-            XnaContentProjectFileFilter = new FileFilter ();
-            XnaContentProjectFileFilter.Name = "XNA Content Projects (*.contentproj)";
-            XnaContentProjectFileFilter.AddPattern ("*.contentproj");
-
-            AllFilesFilter = new FileFilter ();
-            AllFilesFilter.Name = "All Files (*.*)";
-            AllFilesFilter.AddPattern ("*.*");
+            Init();
 
             var widgets = Global.UseHeaderBar ? new Widget[0] : menubar1.Children;
 
@@ -253,105 +239,6 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenus ();
         }
 
-        public AskResult AskSaveOrCancel ()
-        {
-            var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
-            dialog.Title = "Save";
-
-            dialog.AddButton("No", (int)ResponseType.No);
-            dialog.AddButton("Cancel", (int)ResponseType.Cancel);
-            dialog.AddButton("Save", (int)ResponseType.Yes);
-
-            var result = dialog.Run ();
-            dialog.Destroy ();
-
-            if (result == (int)ResponseType.Yes)
-                return AskResult.Yes;
-            else if (result == (int)ResponseType.No)
-                return AskResult.No;
-
-            return AskResult.Cancel;
-        }
-
-        public bool AskSaveName (ref string filePath, string title)
-        {
-            var filechooser =
-                new FileChooserDialog("Save MGCB Project As",
-                    this,
-                    FileChooserAction.Save,
-                    "Cancel", ResponseType.Cancel,
-                    "Save", ResponseType.Accept);
-
-            filechooser.AddFilter (MonoGameContentProjectFileFilter);
-            filechooser.AddFilter (AllFilesFilter);
-
-            if (title != null)
-                filechooser.Title = title;
-
-            var result = filechooser.Run() == (int)ResponseType.Accept;
-            filePath = filechooser.Filename;
-
-            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
-                filePath += ".mgcb";
-
-            filechooser.Destroy ();
-            return result;
-        }
-
-        public bool AskOpenProject (out string projectFilePath)
-        {
-            var filechooser =
-                new FileChooserDialog("Open MGCB Project",
-                    this,
-                    FileChooserAction.Open,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-
-            filechooser.AddFilter (MonoGameContentProjectFileFilter);
-            filechooser.AddFilter (AllFilesFilter);
-
-            var result = filechooser.Run() == (int)ResponseType.Accept;
-            projectFilePath = filechooser.Filename;
-            filechooser.Destroy ();
-
-            return result;
-        }
-
-        public bool AskImportProject (out string projectFilePath)
-        {
-            var filechooser =
-                new FileChooserDialog("Import XNA Content Project",
-                    this,
-                    FileChooserAction.Open,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-
-            filechooser.AddFilter (XnaContentProjectFileFilter);
-            filechooser.AddFilter (AllFilesFilter);
-
-            var result = filechooser.Run() == (int)ResponseType.Accept;
-            projectFilePath = filechooser.Filename;
-            filechooser.Destroy ();
-
-            return result;
-        }
-
-        public void ShowError (string title, string message)
-        {
-            var dialog = new MessageDialog (this, DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, message);
-            dialog.Title = title;
-            dialog.Run();
-            dialog.Destroy ();
-        }
-
-        public void ShowMessage (string message)
-        {
-            var dialog = new MessageDialog (this, DialogFlags.Modal, MessageType.Warning, ButtonsType.Ok, message);
-            dialog.Title = "Info";
-            dialog.Run();
-            dialog.Destroy ();
-        }
-
         public void BeginTreeUpdate ()
         {
 
@@ -427,83 +314,6 @@ namespace MonoGame.Tools.Pipeline
                 });
         }
 
-        public bool ChooseContentFile (string initialDirectory, out List<string> files)
-        {
-            var filechooser =
-                new FileChooserDialog("Add Content Files",
-                    this,
-                    FileChooserAction.Open,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-            filechooser.SelectMultiple = true;
-
-            filechooser.AddFilter (AllFilesFilter);
-            filechooser.SetCurrentFolder (initialDirectory);
-
-            bool result = filechooser.Run() == (int)ResponseType.Accept;
-
-            files = new List<string>();
-            files.AddRange (filechooser.Filenames);
-            filechooser.Destroy ();
-
-            return result;
-        }
-
-        public bool ChooseContentFolder (string initialDirectory, out string folder)
-        {
-            var folderchooser =
-                new FileChooserDialog("Add Content Folder",
-                    this,
-                    FileChooserAction.SelectFolder,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-
-            folderchooser.SetCurrentFolder (initialDirectory);
-            bool result = folderchooser.Run() == (int)ResponseType.Accept;
-
-            folder = folderchooser.Filename;
-            folderchooser.Destroy ();
-
-            return result;
-        }
-
-        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
-        {
-            var afd = new AddItemDialog (file, exists, FileType.File);
-
-            if (afd.Run() == Eto.Forms.DialogResult.Ok)
-            {
-                action = afd.Responce;
-                applyforall = afd.ApplyForAll;
-                return true;
-            }
-
-            action = CopyAction.Link;
-            applyforall = false;
-            return false;
-        }
-
-        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
-        {
-            var afd = new AddItemDialog(folder, exists, FileType.Folder);
-            applyforall = false;
-
-            if (afd.Run() == Eto.Forms.DialogResult.Ok)
-            {
-                action = afd.Responce;
-                return true;
-            }
-
-            action = CopyAction.Link;
-            return false;
-        }
-
-        public bool ShowDeleteDialog(string[] folders, string[] files)
-        {
-            var dialog = new DeleteDialog(_controller, folders, files);
-            return dialog.Run() == Eto.Forms.DialogResult.Ok;
-        }
-
         public void ItemExistanceChanged(IProjectItem item)
         {
             Application.Invoke(
@@ -513,54 +323,72 @@ namespace MonoGame.Tools.Pipeline
             );
         }
 
-
-#if MONOMAC || LINUX
-        string FindSystemMono ()
+        public bool GetSelection(out FileType type, out string path, out string location)
         {
-            // El Capitan Support. /usr/bin is now read only and /usr/local/bin is NOT included
-            // in $PATH for apps... only the shell. So we need to manaully find the full path to 
-            // the right location.
-            string[] pathsToCheck = new string[] {
-                "/usr/bin",
-                "/usr/local/bin",
-                "/Library/Frameworks/Mono.framework/Versions/Current/bin",
-            };
-            foreach (var path in pathsToCheck) {
-                if (System.IO.File.Exists (System.IO.Path.Combine (path, "mono")))
-                    return System.IO.Path.Combine (path, "mono");
-            }
-            OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
-            return "mono";
-        }
-#endif
+            List<TreeIter> iters;
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath(out iters, out ids);
 
-        public Process CreateProcess(string exe, string commands)
+            if (paths.Length != 1)
+            {
+                type = FileType.Base;
+                path = "";
+                location = "";
+                return false;
+            }
+
+            path = paths[0];
+            GetInfo(ids[0], paths[0], out type, out location);
+
+            return true;
+        }
+
+        public bool GetSelection(out FileType[] type, out string[] path, out string[] location)
         {
-            var _buildProcess = new Process();
-#if WINDOWS
-            _buildProcess.StartInfo.FileName = exe;
-            _buildProcess.StartInfo.Arguments = commands;
-#endif
-#if MONOMAC || LINUX
-            _buildProcess.StartInfo.FileName = FindSystemMono ();
-            if (_controller.LaunchDebugger) {
-                var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
-                port = !string.IsNullOrEmpty (port) ? port : "55555";
-                var monodebugger = string.Format ("--debug --debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:{0}",
-                    port);
-                _buildProcess.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monodebugger, exe, commands);
-                OutputAppend("************************************************");
-                OutputAppend("RUNNING MGCB IN DEBUG MODE!!!");
-                OutputAppend(string.Format ("Attach your Debugger to localhost:{0}", port));
-                OutputAppend("************************************************");
-            } else {
-                _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
-            }
-#endif
+            var types = new List<FileType>();
+            var locations = new List<string>();
 
-            return _buildProcess;
+            List<TreeIter> iters;
+            List<string> ids;
+            path = projectview1.GetSelectedTreePath(out iters, out ids);
+
+            for (int i = 0; i < path.Length; i++)
+            {
+                FileType tmp_type;
+                string tmp_loc;
+
+                GetInfo(ids[i], path[i], out tmp_type, out tmp_loc);
+
+                types.Add(tmp_type);
+                locations.Add(tmp_loc);
+            }
+
+            type = types.ToArray();
+            location = locations.ToArray();
+
+            return (path.Length > 0);
         }
+
 #endregion
+
+        private void GetInfo(string id, string path, out FileType type, out string location)
+        {
+            if (id == projectview1.ID_FOLDER)
+            {
+                type = FileType.Folder;
+                location = path;
+            }
+            else if (id == projectview1.ID_BASE)
+            {
+                type = FileType.Base;
+                location = "";
+            }
+            else
+            {
+                type = FileType.File;
+                location = System.IO.Path.GetDirectoryName(path);
+            }
+        }
 
         protected void OnNewActionActivated (object sender, EventArgs e)
         {
@@ -614,100 +442,31 @@ namespace MonoGame.Tools.Pipeline
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath(out iters, out ids);
-
-            string location;
-
-            if (paths.Length == 1)
-            {
-                if (ids[0] == projectview1.ID_FOLDER)
-                    location = paths[0];
-                else if (ids[0] == projectview1.ID_BASE)
-                    location = _controller.GetFullPath("");
-                else
-                    location = System.IO.Path.GetDirectoryName(paths[0]);
-            }
-            else
-                location = _controller.GetFullPath("");
-
-            var dialog = new NewItemDialog(_controller.Templates.GetEnumerator(), _controller.GetFullPath(location));
-
-            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
-            {
-                _controller.NewItem(dialog.Name, location, dialog.Selected);
-                UpdateMenus();
-            }
-
+            _controller.NewItem();
+            UpdateMenus();
             expand = false;
         }
 
         public void OnAddItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.Include (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.Include (_controller.GetFullPath (""));
-                else
-                    _controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.Include (_controller.GetFullPath (""));
+            _controller.Include();
             UpdateMenus();
             expand = false;
         }
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var dialog = new EditDialog("New Folder", "Folder name:", "Folder", true);
-            if (dialog.Run() != Eto.Forms.DialogResult.Ok)
-                return;
-            var foldername = dialog.Text;
-
             expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.NewFolder (foldername, paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.NewFolder (foldername, _controller.GetFullPath (""));
-                else
-                    _controller.NewFolder (foldername, System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.NewFolder (foldername, _controller.GetFullPath (""));
-
+            _controller.NewFolder();
+            UpdateMenus();
             expand = false;
         }
 
         public void OnAddFolderActionActivated(object sender, EventArgs e)
         {
             expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.IncludeFolder (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.IncludeFolder (_controller.GetFullPath (""));
-                else
-                    _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.IncludeFolder (_controller.GetFullPath (""));
+            _controller.IncludeFolder ();
             UpdateMenus();
             expand = false;
         }

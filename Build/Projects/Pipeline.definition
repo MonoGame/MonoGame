@@ -117,6 +117,7 @@
       <DependentUpon>Global.cs</DependentUpon>
       <Platforms>MacOS</Platforms>
     </Compile>
+	<Compile Include="Eto\MainWindow.cs" />
 	<Compile Include="Eto\Styles.Linux.cs">
       <Platforms>Linux</Platforms>
     </Compile>

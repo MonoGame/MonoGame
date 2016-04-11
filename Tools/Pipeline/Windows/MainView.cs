@@ -238,89 +238,6 @@ namespace MonoGame.Tools.Pipeline
             _openRecentMenuItem.Enabled = (_openRecentMenuItem.DropDownItems.Count >= 1);
         }
 
-        public AskResult AskSaveOrCancel()
-        {
-            var result = MessageBox.Show(
-                this,
-                "Do you want to save the project first?",
-                "Save Project",
-                MessageBoxButtons.YesNoCancel,
-                MessageBoxIcon.Exclamation,
-                MessageBoxDefaultButton.Button3);
-
-            if (result == DialogResult.Yes)
-                return AskResult.Yes;
-            if (result == DialogResult.No)
-                return AskResult.No;
-
-            return AskResult.Cancel;
-        }
-
-        public bool AskSaveName(ref string filePath, string title)
-        {
-            var dialog = new SaveFileDialog
-            {
-                Title = title,
-                RestoreDirectory = true,
-                InitialDirectory = Path.GetDirectoryName(filePath),
-                FileName = Path.GetFileName(filePath),
-                AddExtension = true,
-                CheckPathExists = true,
-                Filter = MonoGameContentProjectFileFilter,
-                FilterIndex = 2,                
-            };
-            var result = dialog.ShowDialog(this);
-            filePath = dialog.FileName;
-            return result != DialogResult.Cancel;
-        }
-
-        public bool AskOpenProject(out string projectFilePath)
-        {
-            var dialog = new OpenFileDialog()
-            {
-                RestoreDirectory = true,
-                AddExtension = true,
-                CheckPathExists = true,
-                CheckFileExists = true,
-                Filter = MonoGameContentProjectFileFilter,
-                FilterIndex = 2,
-            };
-            var result = dialog.ShowDialog(this);
-            projectFilePath = dialog.FileName;
-            return result != DialogResult.Cancel;
-        }
-
-        public bool AskImportProject(out string projectFilePath)
-        {
-            var dialog = new OpenFileDialog()
-            {
-                RestoreDirectory = true,
-                AddExtension = true,
-                CheckPathExists = true,
-                CheckFileExists = true,
-                Filter = XnaContentProjectFileFilter,
-                FilterIndex = 2,
-            };
-            var result = dialog.ShowDialog(this);
-            projectFilePath = dialog.FileName;
-            return result != DialogResult.Cancel;
-        }
-
-        public void ShowError(string title, string message)
-        {
-            MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
-        }
-
-        public void ShowMessage(string message)
-        {
-            MessageBox.Show(this, message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        public bool ShowDeleteDialog(string[] files, string[] folders)
-        {
-            throw new NotImplementedException();
-        }
-
         public void BeginTreeUpdate()
         {
             Debug.Assert(_treeUpdating == false, "Must finish previous tree update!");
@@ -508,43 +425,10 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public bool ChooseContentFile(string initialDirectory, out List<string> files)
-        {
-            var dlg = new OpenFileDialog()
-            {
-                RestoreDirectory = true,
-                AddExtension = true,
-                CheckPathExists = true,
-                CheckFileExists = true,
-                Filter = "All Files (*.*)|*.*",
-                InitialDirectory = initialDirectory,
-                Multiselect = true,
-                
-            };
-
-            var result = dlg.ShowDialog(this);
-            files = new List<string>();
-
-            if (result != DialogResult.OK)
-                return false;
-
-            files.AddRange(dlg.FileNames);
-
-            return true;
-        }
-
         public void OutputClear()
         {
             _outputWindow.Clear();
             _filterOutputWindow.Clear();
-        }
-
-        public Process CreateProcess(string exe, string commands)
-        {
-            var _buildProcess = new Process();
-            _buildProcess.StartInfo.FileName = exe;
-            _buildProcess.StartInfo.Arguments = commands;
-            return _buildProcess;
         }
 
         private void ExitMenuItemClick(object sender, System.EventArgs e)
@@ -826,58 +710,26 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnAddItemClick(object sender, EventArgs e)
         {
-            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
-            var item = node.Tag as IProjectItem;
-            _controller.Include(item.Location);
+            _controller.Include();
+            UpdateMenus();
         }
 
         private void OnNewItemClick(object sender, System.EventArgs e)
         {
-            var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
-            var dlg = new NewItemDialog(_controller.Templates.GetEnumerator(), location);
-
-            if (dlg.Run() == Eto.Forms.DialogResult.Ok)
-            {
-                _controller.NewItem(dlg.Name, location, dlg.Selected);
-                UpdateMenus();
-            }
+            _controller.NewItem();
+            UpdateMenus();
         }
 
         private void OnAddFolderClick(object sender, EventArgs e)
         {
-            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
-            string location = "";
-
-            if (node != null)
-            {
-                var item = node.Tag as IProjectItem;
-                if (item != null)
-                    location = item.Location;
-                else
-                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
-            }
-
-            _controller.IncludeFolder(location);
+            _controller.IncludeFolder();
+            UpdateMenus();
         }
 
         private void OnNewFolderClick(object sender, EventArgs e)
         {
-            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
-            string location = "";
-
-            if (node != null)
-            {
-                var item = node.Tag as IProjectItem;
-                if (item != null)
-                    location = item.Location;
-                else
-                    location = node.FullPath.Substring(_treeView.Nodes[0].Text.Length + 1);
-            }
-
-            var dialog = new EditDialog("New Folder", "Folder name:", "", true);
-
-            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
-                _controller.NewFolder(dialog.Text, location);
+            _controller.NewFolder();
+            UpdateMenus();
         }
 
         private void OnRedoClick(object sender, EventArgs e)
@@ -1025,21 +877,6 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
-        {
-            var afd = new AddItemDialog(file, exists, FileType.File);
-            if (afd.Run() == Eto.Forms.DialogResult.Ok)
-            {
-                action = afd.Responce;
-                applyforall = afd.ApplyForAll;
-                return true;
-            }
-
-            action = CopyAction.Skip;
-            applyforall = false;
-            return false;
-        }
-
         public void AddTreeFolder(string afolder)
         {
             Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
@@ -1094,36 +931,6 @@ namespace MonoGame.Tools.Pipeline
                 else
                     parent.Remove(found[0]);
             }
-        }
-
-        public bool ChooseContentFolder(string initialDirectory, out string folder)
-        {
-            var dialog = new FolderBrowserDialog();
-            dialog.SelectedPath = initialDirectory;
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                folder = dialog.SelectedPath;
-                return true;
-            }
-
-            folder = "";
-            return false;
-        }
-
-        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
-        {
-            var dialog = new AddItemDialog(folder, exists, FileType.Folder);
-
-            if (dialog.Run() == Eto.Forms.DialogResult.Ok)
-            {
-                action = dialog.Responce;
-                applyforall = dialog.ApplyForAll;
-                return true;
-            }
-
-            action = CopyAction.Link;
-            applyforall = false;
-            return false;
         }
 
         #region drag & drop
@@ -1213,6 +1020,52 @@ namespace MonoGame.Tools.Pipeline
         private void _toolFilterOutput_Click(object sender, EventArgs e)
         {
             _filterOutputMenuItem.Checked = !_filterOutputMenuItem.Checked;
+        }
+
+        public bool GetSelection(out FileType fileType, out string path, out string location)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            var item = (_treeView.SelectedNodes.Count() != 1) ? _treeView.Nodes[0].Tag : node.Tag;
+
+            if (item is ContentItem)
+                fileType = FileType.File;
+            else if (item is FolderItem)
+                fileType = FileType.Folder;
+            else
+                fileType = FileType.Base;
+
+            path = (fileType == FileType.Base) ? "" : (item as IProjectItem).OriginalPath;
+            location = (fileType == FileType.Base) ? "" : (item as IProjectItem).Location;
+
+            return _treeView.SelectedNodes.Count() == 1;
+        }
+
+        public bool GetSelection(out FileType[] fileType, out string[] path, out string[] location)
+        {
+            var types = new List<FileType>();
+            var paths = new List<string>();
+            var locations = new List<string>();
+
+            foreach (var node in _treeView.SelectedNodes)
+            {
+                var item = node.Tag;
+                FileType tmp_type = FileType.Base;
+
+                if (item is ContentItem)
+                    tmp_type = FileType.File;
+                else if (item is FolderItem)
+                    tmp_type = FileType.Folder;
+
+                types.Add(tmp_type);
+                paths.Add((tmp_type == FileType.Base) ? "" : (item as IProjectItem).OriginalPath);
+                locations.Add((tmp_type == FileType.Base) ? "" : (item as IProjectItem).Location);
+            }
+
+            fileType = types.ToArray();
+            path = paths.ToArray();
+            location = locations.ToArray();
+
+            return _treeView.SelectedNodes.Any();
         }
     }
 }
