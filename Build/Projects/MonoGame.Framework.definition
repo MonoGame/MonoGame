@@ -161,7 +161,7 @@
     </None>
     <None Include="SDL\MonoGame.Framework.dll.config">
       <Platforms>Linux</Platforms>
-      <Link>MonoGame.Framework.config</Link>
+      <Link>MonoGame.Framework.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
