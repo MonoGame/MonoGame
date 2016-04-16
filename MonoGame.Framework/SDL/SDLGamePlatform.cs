@@ -68,6 +68,7 @@ namespace Microsoft.Xna.Framework
         public override void BeforeInitialize ()
         {
             _view.CreateWindow();
+            SdlRunLoop();
 
             base.BeforeInitialize ();
         }
@@ -83,55 +84,7 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
-                Sdl.Event ev;
-
-                while (Sdl.PollEvent(out ev) == 1)
-                {
-                    if (ev.Type == Sdl.EventType.Quit)
-                        _isExiting++;
-                    else if (ev.Type == Sdl.EventType.JoyDeviceAdded)
-                        Joystick.AddDevice(ev.JoystickDevice.Which);
-                    else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                        Joystick.RemoveDevice(ev.JoystickDevice.Which);
-                    else if (ev.Type == Sdl.EventType.MouseWheel)
-                        Mouse.ScrollY += ev.Wheel.Y * 120;
-                    else if (ev.Type == Sdl.EventType.KeyDown)
-                    {
-                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-
-                        if (!_keys.Contains(key))
-                            _keys.Add(key);
-                    }
-                    else if (ev.Type == Sdl.EventType.KeyUp)
-                    {
-                        var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-                        _keys.Remove(key);
-                    }
-                    else if (ev.Type == Sdl.EventType.TextInput)
-                    {
-                        string text;
-                        unsafe
-                        {
-                            text = new string((char*) ev.Text.Text);
-                        }
-
-                        if (text.Length == 0)
-                            continue;
-
-                        foreach (var c in text)
-                            _view.CallTextInput(c);
-                    }
-                    else if (ev.Type == Sdl.EventType.WindowEvent)
-                    {
-                        if (ev.Window.EventID == Sdl.Window.EventId.Resized)
-                            _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
-                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
-                            IsActive = true;
-                        else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
-                            IsActive = false;
-                    }
-                }
-
+                SdlRunLoop();
                 Game.Tick();
 
                 if (_isExiting > 0)
@@ -139,6 +92,58 @@ namespace Microsoft.Xna.Framework
             }
 
             Dispose();
+        }
+
+        private void SdlRunLoop()
+        {
+            Sdl.Event ev;
+
+            while (Sdl.PollEvent(out ev) == 1)
+            {
+                if (ev.Type == Sdl.EventType.Quit)
+                    _isExiting++;
+                else if (ev.Type == Sdl.EventType.JoyDeviceAdded)
+                    Joystick.AddDevice(ev.JoystickDevice.Which);
+                else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
+                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
+                else if (ev.Type == Sdl.EventType.MouseWheel)
+                    Mouse.ScrollY += ev.Wheel.Y * 120;
+                else if (ev.Type == Sdl.EventType.KeyDown)
+                {
+                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+
+                    if (!_keys.Contains(key))
+                        _keys.Add(key);
+                }
+                else if (ev.Type == Sdl.EventType.KeyUp)
+                {
+                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                    _keys.Remove(key);
+                }
+                else if (ev.Type == Sdl.EventType.TextInput)
+                {
+                    string text;
+                    unsafe
+                    {
+                        text = new string((char*)ev.Text.Text);
+                    }
+
+                    if (text.Length == 0)
+                        continue;
+
+                    foreach (var c in text)
+                        _view.CallTextInput(c);
+                }
+                else if (ev.Type == Sdl.EventType.WindowEvent)
+                {
+                    if (ev.Window.EventID == Sdl.Window.EventId.Resized)
+                        _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
+                        IsActive = true;
+                    else if (ev.Window.EventID == Sdl.Window.EventId.FocusLost)
+                        IsActive = false;
+                }
+            }
         }
 
         public override void StartRunLoop()
