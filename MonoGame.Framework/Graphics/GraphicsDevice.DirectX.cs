@@ -684,32 +684,32 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
             }
 
-            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if (PresentationParameters.MultiSampleCount > 1)
-            {
-                //Find the maximum supported level coming down from 32, 16, 8, 4, 2, 1, 0
-                var maxLevel = 32;
-                while (maxLevel > 0)
-                {
-                    if (_d3dDevice.CheckMultisampleQualityLevels(Format.R32G32B32A32_Typeless, maxLevel) > 0)
-                        break;
-                    maxLevel /= 2;
-                }
-
-                var targetLevel = PresentationParameters.MultiSampleCount;
-                if (PresentationParameters.MultiSampleCount > maxLevel)
-                {
-                    targetLevel = maxLevel;
-                }
-
-                multisampleDesc.Count = targetLevel;
-                multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
-
             // Use BGRA for the swap chain.
             var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ?
                             SharpDX.DXGI.Format.B8G8R8A8_UNorm :
                             SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
+
+            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
+            if (PresentationParameters.MultiSampleCount > 1)
+            {
+                //Find the maximum supported level coming down from 32, 16, 8, 4, 2, 1, 0
+                var qualityLevels = 0;
+                var maxLevel = 32;
+                while (maxLevel > 0)
+                {
+                    qualityLevels = _d3dDevice.CheckMultisampleQualityLevels(format, maxLevel);
+                    if (qualityLevels > 0)
+                        break;
+                    maxLevel /= 2;
+                }
+
+                // Correct the MSAA level if it is too high.
+                if (PresentationParameters.MultiSampleCount > maxLevel)
+                    PresentationParameters.MultiSampleCount = maxLevel;
+
+                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
+                multisampleDesc.Quality = qualityLevels - 1;
+            }
 
             int vSyncFrameLatency = PresentationParameters.PresentationInterval.GetFrameLatency();
 

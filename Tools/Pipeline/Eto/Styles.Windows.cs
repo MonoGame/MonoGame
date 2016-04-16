@@ -17,6 +17,7 @@ namespace MonoGame.Tools.Pipeline
                 h.Control.BackgroundColor = System.Drawing.SystemColors.Window;
                 h.Control.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             });
+            Style.Add<LinkButtonHandler>("Center", h => h.Control.TextAlign = System.Drawing.ContentAlignment.MiddleCenter);
         }
     }
 }

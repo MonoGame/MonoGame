@@ -46,6 +46,8 @@ namespace MonoGame.Tools.Pipeline
             });
 
             Style.Add<LabelHandler>("Wrap", h => h.Control.MaxWidthChars = 55);
+
+            Style.Add<LinkButtonHandler>("Center", h => h.Control.SetAlignment(0.5f, 0.5f));
         }
     }
 }
