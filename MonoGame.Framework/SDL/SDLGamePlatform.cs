@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
-                    if (ev.Window.EventID == Sdl.Window.EventId.Resized)
+                    if (ev.Window.EventID == Sdl.Window.EventId.Resized || ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
                         _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
                     else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
                         IsActive = true;

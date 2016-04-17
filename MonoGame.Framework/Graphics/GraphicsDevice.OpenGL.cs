@@ -105,12 +105,12 @@ namespace Microsoft.Xna.Framework.Graphics
             Context.MakeCurrent(windowInfo);
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
-            if (Threading.BackgroundContext == null)
+            /*if (Threading.BackgroundContext == null)
             {
                 Threading.BackgroundContext = GL.CreateContext(windowInfo);
                 Threading.WindowInfo = windowInfo;
                 Threading.BackgroundContext.MakeCurrent(null);
-            }
+            }*/
 
             Context.MakeCurrent(windowInfo);
 
@@ -741,7 +741,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Activates the Current Vertex/Pixel shader pair into a program.         
         /// </summary>
-        private void ActivateShaderProgram()
+        private unsafe void ActivateShaderProgram()
         {
             // Lookup the shader program.
             var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
@@ -798,7 +798,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-            GL.Uniform4(posFixupLoc, 1, _posFixup);
+            fixed (float* floatPtr = _posFixup)
+            {
+                GL.Uniform4(posFixupLoc, 1, floatPtr);
+            }
             GraphicsExtensions.CheckGLError();
         }
 

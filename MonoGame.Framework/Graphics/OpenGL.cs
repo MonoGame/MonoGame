@@ -4,6 +4,10 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Runtime.CompilerServices;
+
+
 #if __IOS__
 using ObjCRuntime;
 #endif
@@ -34,10 +38,13 @@ namespace OpenGL
     }
 
     public enum ShaderParameter {
-        CompileStatus = 0x8B4F,
+        LogLength = 0x8B84,
+        CompileStatus = 0x8B81,
+        SourceLength = 0x8B88,
     }
 
     public enum GetProgramParameterName {
+        LogLength = 0x8B84,
         LinkStatus = 0x8B82,
     }
 
@@ -217,28 +224,39 @@ namespace OpenGL
     }
 
     public enum BlendingFactorSrc {
-        DstAlpha = 0x0304,
-        DstColor = 0x0306,
-        OneMinusDstAlpha = 0x0305,
-        OneMinusDstColor = 0x0307,
-        OneMinusSrcAlpha = 0x88FB,
-        OneMinusSrcColor = 0x88FA, //
-        One = 1,
-        SrcAlpha = 0x0302,
-        SrcAlphaSaturate = 0x0308,
-        SrcColor = 0x0301,
         Zero = 0,
+        SrcColor = 0x0300,
+        OneMinusSrcColor = 0x0301,
+        SrcAlpha = 0x0302,
+        OneMinusSrcAlpha = 0x0303,
+        DstAlpha = 0x0304,
+        OneMinusDstAlpha = 0x0305,
+        DstColor = 0x0306,
+        OneMinusDstColor = 0x0307,
+        SrcAlphaSaturate = 0x0308,
+        ConstantColor = 0x8001,
+        OneMinusConstantColor = 0x8002,
+        ConstantAlpha = 0x8003,
+        OneMinusConstantAlpha = 0x8004,
+        One = 1,
     }
 
     public enum BlendingFactorDest {
+        Zero = 0,
+        SrcColor = 0x0300,
+        OneMinusSrcColor = 0x0301,
+        SrcAlpha = 0x0302,
+        OneMinusSrcAlpha = 0x0303,
         DstAlpha = 0x0304,
         OneMinusDstAlpha = 0x0305,
-        OneMinusSrcAlpha = 0x88FB,
-        OneMinusSrcColor = 0x88FA,
+        DstColor = 0X0306,
+        OneMinusDstColor = 0x0307,
+        SrcAlphaSaturate = 0x0308,
+        ConstantColor = 0x8001,
+        OneMinusConstantColor = 0x8002,
+        ConstantAlpha = 0x8003,
+        OneMinusConstantAlpha = 0x8004,
         One = 1,
-        SrcAlpha = 0x0302,
-        Zero = 0,
-        SrcColor = 0x0301,
     }
 
     public enum DepthFunction {
@@ -438,10 +456,19 @@ namespace OpenGL
     public partial class ColorFormat {
         public ColorFormat(int r, int g, int b, int a)
         {
-
+            R = r;
+            G = g;
+            B = b;
+            A = a;
         }
+
+        public int R { get; private set; }
+        public int G { get; private set; }
+        public int B { get; private set; }
+        public int A { get; private set; }
     }
 
+    [CLSCompliant (false)]
     public partial class GL
     {
         public enum RenderApi
@@ -569,12 +596,10 @@ namespace OpenGL
         public delegate void MakeCurrentDelegate(IntPtr window);
         public static MakeCurrentDelegate MakeCurrent;
 
-        [CLSCompliant (false)]
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public unsafe delegate void GetIntegerDelegate(int param, [Out] int* data);
-        [CLSCompliant (false)]
         public static GetIntegerDelegate GetIntegerv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -694,14 +719,14 @@ namespace OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void Uniform4FloatArrayDelegate (int location, int size, float[] values);
-        public static Uniform4FloatArrayDelegate Uniform4FloatArray;
+        public unsafe delegate void Uniform4fvDelegate (int location, int size, float* values);
+        public static Uniform4fvDelegate Uniform4fv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void Uniform4FloatDelegate (int location, int size, float value);
-        public static Uniform4FloatDelegate Uniform4Float;
+        public delegate void Uniform1iDelegate (int location, int value);
+        public static Uniform1iDelegate Uniform1i;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
@@ -718,7 +743,7 @@ namespace OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void DrawElementsDelegate (GLPrimitiveType primitiveType, int coumt, DrawElementsType elementType, IntPtr offset);
+        public delegate void DrawElementsDelegate (GLPrimitiveType primitiveType, int count, DrawElementsType elementType, IntPtr offset);
         public static DrawElementsDelegate DrawElements;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -827,19 +852,19 @@ namespace OpenGL
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public delegate void TexParameterFloatDelegate (TextureTarget target, TextureParameterName name, float value);
-        public static TexParameterFloatDelegate TexParameterFloat;
+        public static TexParameterFloatDelegate TexParameterf;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void TexParameterFloatArrayDelegate (TextureTarget target, TextureParameterName name, float[] values);
-        public static TexParameterFloatArrayDelegate TexParameterFloatArray;
+        public unsafe delegate void TexParameterFloatArrayDelegate (TextureTarget target, TextureParameterName name, float* values);
+        public static TexParameterFloatArrayDelegate TexParameterfv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public delegate void TexParameterIntDelegate (TextureTarget target, TextureParameterName name, int value);
-        public static TexParameterIntDelegate TexParameterInt;
+        public static TexParameterIntDelegate TexParameteri;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
@@ -886,8 +911,8 @@ namespace OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void ShaderSourceDelegate(int shaderId, string code);
-        public static ShaderSourceDelegate ShaderSource;
+        public unsafe delegate void ShaderSourceDelegate(uint shaderId, int count, IntPtr code, int* length);
+        public static ShaderSourceDelegate ShaderSourceInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
@@ -898,14 +923,14 @@ namespace OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void GetShaderDelegate(int shaderId, ShaderParameter parameter, [Out] out int value);
-        public static GetShaderDelegate GetShader;
+        public unsafe delegate void GetShaderDelegate(uint shaderId, uint parameter, int* value);
+        public static GetShaderDelegate GetShaderiv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate string GetShaderInfoLogDelegate(int shaderId);
-        public static GetShaderInfoLogDelegate GetShaderInfoLog;
+        public delegate void GetShaderInfoLogDelegate(uint shader, int bufSize, IntPtr length, StringBuilder infoLog);
+        public static GetShaderInfoLogDelegate GetShaderInfoLogInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
@@ -964,14 +989,14 @@ namespace OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void GetProgramDelegate(int programId, GetProgramParameterName name, [Out] out int linked);
-        public static GetProgramDelegate GetProgram;
+        public unsafe delegate void GetProgramDelegate(int programId, uint name, int* linked);
+        public static GetProgramDelegate GetProgramiv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate string GetProgramInfoLogDelegate(int programId);
-        public static GetProgramInfoLogDelegate GetProgramInfoLog;
+        public delegate void GetProgramInfoLogDelegate(uint program, int bufSize, IntPtr length, StringBuilder infoLog);
+        public static GetProgramInfoLogDelegate GetProgramInfoLogInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
@@ -1142,10 +1167,12 @@ namespace OpenGL
         public delegate void BufferSubDataDelegate (BufferTarget target, IntPtr offset, IntPtr size, IntPtr data);
         public static BufferSubDataDelegate BufferSubData;
 
+        [CLSCompliant (false)]
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         public delegate void DeleteBuffersDelegate (int count, [In] [Out] ref uint buffer);
+        [CLSCompliant (false)]
         public static DeleteBuffersDelegate DeleteBuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -1167,9 +1194,9 @@ namespace OpenGL
                 Scissor = (ScissorDelegate)LoadEntryPoint<ScissorDelegate>("glScissor");
             GetError = (GetErrorDelegate)LoadEntryPoint<GetErrorDelegate>("glGetError");
 
-            TexParameterFloat = (TexParameterFloatDelegate)LoadEntryPoint<TexParameterFloatDelegate>("glTexParameterf");
-            TexParameterFloatArray = (TexParameterFloatArrayDelegate)LoadEntryPoint<TexParameterFloatArrayDelegate>("glTexParameterfv");
-            TexParameterInt = (TexParameterIntDelegate)LoadEntryPoint<TexParameterIntDelegate>("glTexParameteri");
+            TexParameterf = (TexParameterFloatDelegate)LoadEntryPoint<TexParameterFloatDelegate>("glTexParameterf");
+            TexParameterfv = (TexParameterFloatArrayDelegate)LoadEntryPoint<TexParameterFloatArrayDelegate>("glTexParameterfv");
+            TexParameteri = (TexParameterIntDelegate)LoadEntryPoint<TexParameterIntDelegate>("glTexParameteri");
 
             EnableVertexAttribArray = (EnableVertexAttribArrayDelegate)LoadEntryPoint<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
             DisableVertexAttribArray = (DisableVertexAttribArrayDelegte)LoadEntryPoint<DisableVertexAttribArrayDelegte>("glDisableVertexAttribArray");
@@ -1196,8 +1223,8 @@ namespace OpenGL
             DrawBuffers = (DrawBuffersDelegate)LoadEntryPoint<DrawBuffersDelegate>("glDrawBuffers");
             DrawElements = (DrawElementsDelegate)LoadEntryPoint<DrawElementsDelegate>("glDrawElements");
             DrawArrays = (DrawArraysDelegate)LoadEntryPoint<DrawArraysDelegate>("glDrawArrays");
-            Uniform4Float = (Uniform4FloatDelegate)LoadEntryPoint<Uniform4FloatDelegate>("glUniform4f");
-            Uniform4FloatArray = (Uniform4FloatArrayDelegate)LoadEntryPoint<Uniform4FloatArrayDelegate>("glUniform4fv");
+            Uniform1i = (Uniform1iDelegate)LoadEntryPoint<Uniform1iDelegate>("glUniform1i");
+            Uniform4fv = (Uniform4fvDelegate)LoadEntryPoint<Uniform4fvDelegate>("glUniform4fv");
 
             GenRenderbuffers = (GenRenderbuffersDelegate)LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffers");
             BindRenderbuffer = (BindRenderbufferDelegate)LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbuffer");
@@ -1225,10 +1252,10 @@ namespace OpenGL
 
             ActiveTexture = (ActiveTextureDelegate)LoadEntryPoint<ActiveTextureDelegate>("glActiveTexture");
             CreateShader = (CreateShaderDelegate)LoadEntryPoint<CreateShaderDelegate>("glCreateShader");
-            ShaderSource = (ShaderSourceDelegate)LoadEntryPoint<ShaderSourceDelegate>("glShaderSource");
+            ShaderSourceInternal = (ShaderSourceDelegate)LoadEntryPoint<ShaderSourceDelegate>("glShaderSource");
             CompileShader = (CompileShaderDelegate)LoadEntryPoint<CompileShaderDelegate>("glCompileShader");
-            GetShader = (GetShaderDelegate)LoadEntryPoint<GetShaderDelegate>("glGetShaderiv");
-            GetShaderInfoLog = (GetShaderInfoLogDelegate)LoadEntryPoint<GetShaderInfoLogDelegate>("glGetShaderInfoLog");
+            GetShaderiv = (GetShaderDelegate)LoadEntryPoint<GetShaderDelegate>("glGetShaderiv");
+            GetShaderInfoLogInternal = (GetShaderInfoLogDelegate)LoadEntryPoint<GetShaderInfoLogDelegate>("glGetShaderInfoLog");
             IsShader = (IsShaderDelegate)LoadEntryPoint<IsShaderDelegate>("glIsShader");
             DeleteShader = (DeleteShaderDelegate)LoadEntryPoint<DeleteShaderDelegate>("glDeleteShader");
             GetAttribLocation = (GetAttribLocationDelegate)LoadEntryPoint<GetAttribLocationDelegate>("glGetAttribLocation");
@@ -1238,9 +1265,10 @@ namespace OpenGL
             DeleteProgram = (DeleteProgramDelegate)LoadEntryPoint<DeleteProgramDelegate>("glDeleteProgram");
             CreateProgram = (CreateProgramDelegate)LoadEntryPoint<CreateProgramDelegate>("glCreateProgram");
             AttachShader = (AttachShaderDelegate)LoadEntryPoint<AttachShaderDelegate>("glAttachShader");
+            UseProgram = (UseProgramDelegate)LoadEntryPoint<UseProgramDelegate>("glUseProgram");
             LinkProgram = (LinkProgramDelegate)LoadEntryPoint<LinkProgramDelegate>("glLinkProgram");
-            GetProgram = (GetProgramDelegate)LoadEntryPoint<GetProgramDelegate>("glGetProgramivARB");
-            GetProgramInfoLog = (GetProgramInfoLogDelegate)LoadEntryPoint<GetProgramInfoLogDelegate>("glGetProgramInfoLog");
+            GetProgramiv = (GetProgramDelegate)LoadEntryPoint<GetProgramDelegate>("glGetProgramiv");
+            GetProgramInfoLogInternal = (GetProgramInfoLogDelegate)LoadEntryPoint<GetProgramInfoLogDelegate>("glGetProgramInfoLog");
             DetachShader = (DetachShaderDelegate)LoadEntryPoint<DetachShaderDelegate>("glDetachShader");
 
             BlendColor = (BlendColorDelegate)LoadEntryPoint<BlendColorDelegate>("glBlendColor");
@@ -1290,20 +1318,12 @@ namespace OpenGL
 
         /* Helper Functions */
 
-        public static void Uniform1 (int location, int value)
-        {
-        }
-
-        public static void Uniform4 (int location, int size, float[] values) {
-            Uniform4FloatArray(location, size, values);
-        }
-
-        public static void Uniform4 (int location, int size, float value) {
-            Uniform4Float(location, size, value);
+        public static void Uniform1 (int location, int value) {
+            Uniform1i(location, value);
         }
 
         public static unsafe void Uniform4 (int location, int size, float* value) {
-
+            Uniform4fv(location, size, value);
         }
 
         public unsafe static string GetString (StringName name)
@@ -1311,7 +1331,98 @@ namespace OpenGL
             return Marshal.PtrToStringAnsi (GetStringInternal (name));
         }
 
-        [CLSCompliant(false)]
+        protected static IntPtr MarshalStringArrayToPtr (string[] strings)
+        {
+            IntPtr intPtr = IntPtr.Zero;
+            if (strings != null && strings.Length != 0) {
+                intPtr = Marshal.AllocHGlobal (strings.Length * IntPtr.Size);
+                if (intPtr == IntPtr.Zero) {
+                    throw new OutOfMemoryException ();
+                }
+                int i = 0;
+                try {
+                    for (i = 0; i < strings.Length; i++) {
+                        IntPtr val = MarshalStringToPtr (strings [i]);
+                        Marshal.WriteIntPtr (intPtr, i * IntPtr.Size, val);
+                    }
+                }
+                catch (OutOfMemoryException) {
+                    for (i--; i >= 0; i--) {
+                        Marshal.FreeHGlobal (Marshal.ReadIntPtr (intPtr, i * IntPtr.Size));
+                    }
+                    Marshal.FreeHGlobal (intPtr);
+                    throw;
+                }
+            }
+            return intPtr;
+        }
+
+        protected unsafe static IntPtr MarshalStringToPtr (string str)
+        {
+            if (string.IsNullOrEmpty (str)) {
+                return IntPtr.Zero;
+            }
+            int num = Encoding.ASCII.GetMaxByteCount (str.Length) + 1;
+            IntPtr intPtr = Marshal.AllocHGlobal (num);
+            if (intPtr == IntPtr.Zero) {
+                throw new OutOfMemoryException ();
+            }
+            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2) {
+                int bytes = Encoding.ASCII.GetBytes (chars, str.Length, (byte*)((void*)intPtr), num);
+                Marshal.WriteByte (intPtr, bytes, 0);
+                return intPtr;
+            }
+        }
+
+        protected static void FreeStringArrayPtr (IntPtr ptr, int length)
+        {
+            for (int i = 0; i < length; i++) {
+                Marshal.FreeHGlobal (Marshal.ReadIntPtr (ptr, i * IntPtr.Size));
+            }
+            Marshal.FreeHGlobal (ptr);
+        }
+
+        public static string GetProgramInfoLog (int programId)
+        {
+            int length = 0;
+            GetProgram(programId, GetProgramParameterName.LogLength, out length);
+            var sb = new StringBuilder();
+            GetProgramInfoLogInternal ((uint)programId, length, IntPtr.Zero, sb);
+            return sb.ToString();
+        }
+            
+        public static string GetShaderInfoLog (int shaderId) {
+            int length = 0;
+            GetShader(shaderId, ShaderParameter.LogLength, out length);
+            var sb = new StringBuilder();
+            GetShaderInfoLogInternal ((uint)shaderId, length, IntPtr.Zero, sb);
+            return sb.ToString();
+        }
+            
+        public unsafe static void ShaderSource(int shaderId, string code)
+        {
+            int length = code.Length;
+            IntPtr intPtr = MarshalStringArrayToPtr (new string[] { code });
+            ShaderSourceInternal((uint)shaderId, 1, intPtr, &length);
+            FreeStringArrayPtr(intPtr, 1);
+        }
+
+        public unsafe static void GetShader (int shaderId, ShaderParameter name, out int result)
+        {
+            fixed (int* ptr = &result)
+            {
+                GetShaderiv((uint)shaderId, (uint)name, ptr);
+            }
+        }
+
+        public unsafe static void GetProgram(int programId, GetProgramParameterName name, out int result)
+        {
+            fixed (int* ptr = &result)
+            {
+                GetProgramiv((int)programId, (uint)name, ptr);
+            }
+        }
+
         public unsafe static void GetInteger (GetPName name, out int value)
         {
             fixed (int* ptr = &value) {
@@ -1329,17 +1440,20 @@ namespace OpenGL
 
         public static void TexParameter(TextureTarget target, TextureParameterName name, float value)
         {
-            TexParameterFloat(target, name, value);
+            TexParameterf(target, name, value);
         }
 
-        public static void TexParameter(TextureTarget target, TextureParameterName name, float[] values)
+        public unsafe static void TexParameter(TextureTarget target, TextureParameterName name, float[] values)
         {
-            TexParameterFloatArray(target, name, values);
+            fixed (float* ptr = &values[0])
+            {
+                TexParameterfv(target, name, ptr);
+            }
         }
 
         public static void TexParameter(TextureTarget target, TextureParameterName name, int value)
         {
-            TexParameterInt(target, name, value);
+            TexParameteri(target, name, value);
         }
 
         public static unsafe void GetTexImage<T>(TextureTarget target, int level, PixelFormat format, PixelType type, [In] [Out] T[] pixels) where T : struct
