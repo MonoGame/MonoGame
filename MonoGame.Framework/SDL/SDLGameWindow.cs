@@ -125,12 +125,32 @@ namespace Microsoft.Xna.Framework
 
             Sdl.Window.Destroy(_handle);
 
+            var surfaceFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat.GetColorFormat ();
+            var depthStencilFormat = _game.graphicsDeviceManager.PreferredDepthStencilFormat;
             // TODO Need to get this data from the Presentation Parameters
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.RedSize, 8);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.GreenSize, 8);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.BlueSize, 8);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.AlphaSize, 8);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 16);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.RedSize, surfaceFormat.R);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
+            switch (depthStencilFormat)
+            {
+                case DepthFormat.None:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 0);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth16:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 16);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth24:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 24);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth24Stencil8:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 24);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 8);
+                    break;
+            }
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleFuffer, 1);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMajorVersion, 2);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMinorVersion, 1);
@@ -142,6 +162,8 @@ namespace Microsoft.Xna.Framework
             OpenGL.GL.LoadEntryPoints();
 
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
+
+            Sdl.Window.SetTitle(Handle, title);
 
             using (
                 var stream =

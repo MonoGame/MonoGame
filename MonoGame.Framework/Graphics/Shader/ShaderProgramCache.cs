@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out linked);
             GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.GetProgram");
-            if (linked == 0)
+            if (linked == (int)Bool.False)
             {
                 var log = GL.GetProgramInfoLog(program);
                 Console.WriteLine(log);

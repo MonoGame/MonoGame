@@ -884,6 +884,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             var error = GL.GetError();
 #endif
+            //Console.WriteLine(error);
             if (error != ErrorCode.NoError)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
         }

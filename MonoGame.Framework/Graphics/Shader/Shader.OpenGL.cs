@@ -52,10 +52,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.CompileShader(_shaderHandle);
             GraphicsExtensions.CheckGLError();
-            var compiled = 0;
+            int compiled = 0;
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
             GraphicsExtensions.CheckGLError();
-            if (compiled == (int)Bool.False)
+            if (compiled != (int)Bool.True)
             {
                 var log = GL.GetShaderInfoLog(_shaderHandle);
                 Console.WriteLine(log);

@@ -92,7 +92,7 @@ internal static class Sdl
     public static extern void GetVersion(out Version version);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PollEvent")]
-    public static extern int PollEvent(out Event _event);
+    public static extern int PollEvent([Out] out Event _event);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
     public static extern void FreeSurface(IntPtr surface);
