@@ -158,10 +158,6 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-            // Update our OpenAL sound buffer pools
-            if (_soundControllerInstance != null)
-                _soundControllerInstance.Update();
-
             return true;
         }
 
