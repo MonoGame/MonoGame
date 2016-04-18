@@ -247,23 +247,6 @@ namespace Microsoft.Xna.Framework.Input
         [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
         internal static extern bool SetCursorPos(int X, int Y);
 
-        /// <summary>
-        /// Struct representing a point. 
-        /// (Suggestion : Make another class for mouse extensions)
-        /// </summary>
-        [StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-        internal struct POINT
-        {
-            public int X;
-            public int Y;
-
-            public System.Drawing.Point ToPoint()
-            {
-                return new System.Drawing.Point(X, Y);
-            }
-
-        }
-
 #elif MONOMAC
 #if PLATFORM_MACOS_LEGACY
         [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
