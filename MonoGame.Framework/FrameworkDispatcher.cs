@@ -31,10 +31,6 @@ namespace Microsoft.Xna.Framework
 
         private static void DoUpdate()
         {
-            // Update sound system
-#if OPENGL
-            OpenALSoundController.GetInstance.Update();
-#endif
             SoundEffectInstancePool.Update();
         }
 
