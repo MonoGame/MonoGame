@@ -88,8 +88,6 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
-        private List<int> playingSourcesCollection;
-        private List<int> purgeMe;
         private bool _bSoundAvailable = false;
         private Exception _SoundInitException; // Here to bubble back up to the developer
         bool _isDisposed;
@@ -112,8 +110,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             availableSourcesCollection = new List<int>(allSourcesArray);
 			inUseSourcesCollection = new List<int>();
-			playingSourcesCollection = new List<int>();
-            purgeMe = new List<int>();
 		}
 
         ~OpenALSoundController()
@@ -390,15 +386,20 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 throw new InstancePlayLimitException();
             }
+
             int sourceNumber;
-			if (availableSourcesCollection.Count == 0)
-            {
-                throw new InstancePlayLimitException();
-			}
-			
-			sourceNumber = availableSourcesCollection.First ();
-            inUseSourcesCollection.Add(sourceNumber);
-			availableSourcesCollection.Remove (sourceNumber);
+
+            lock (availableSourcesCollection)
+            {                
+                if (availableSourcesCollection.Count == 0)
+                {
+                    throw new InstancePlayLimitException();
+                }
+
+                sourceNumber = availableSourcesCollection.Last();
+                inUseSourcesCollection.Add(sourceNumber);
+                availableSourcesCollection.Remove(sourceNumber);
+            }
 
             return sourceNumber;
 		}
@@ -409,29 +410,16 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 return;
             }
-            inUseSourcesCollection.Remove(sourceId);
-            availableSourcesCollection.Add(sourceId);
-		}
 
-        public void PlaySound(SoundEffectInstance inst)
-        {
-            if (!CheckInitState())
+            lock (availableSourcesCollection)
             {
-                return;
+                inUseSourcesCollection.Remove(sourceId);
+                availableSourcesCollection.Add(sourceId);
             }
-            lock (playingSourcesCollection)
-            {
-                playingSourcesCollection.Add(inst.SourceId);
-            }
-            AL.SourcePlay(inst.SourceId);
-            ALHelper.CheckError("Failed to play source.");
 		}
 
         public void FreeSource(SoundEffectInstance inst)
         {
-            lock (playingSourcesCollection) {
-                playingSourcesCollection.Remove(inst.SourceId);
-            }
             RecycleSource(inst.SourceId);
             inst.SourceId = 0;
             inst.HasSourceId = false;
@@ -470,47 +458,6 @@ namespace Microsoft.Xna.Framework.Audio
             ALHelper.CheckError("Failed to set source offset.");
 			return pos;
 		}
-
-        /// <summary>
-        /// Called repeatedly, this method cleans up the state of the management lists. This method
-        /// will also lock on the playingSourcesCollection. Sources that are stopped will be recycled
-        /// using the RecycleSource method.
-        /// </summary>
-		public void Update()
-        {
-            if (!_bSoundAvailable)
-            {
-                //OK to ignore this here because the game can run without sound.
-                 return;
-            }
-
-            ALSourceState state;
-            lock (playingSourcesCollection)
-            {
-                for (int i = playingSourcesCollection.Count - 1; i >= 0; --i)
-                {
-                    int sourceId = playingSourcesCollection[i];
-                    state = AL.GetSourceState(sourceId);
-                    ALHelper.CheckError("Failed to get source state.");
-                    if (state == ALSourceState.Stopped)
-                    {
-                        purgeMe.Add(sourceId);
-                        playingSourcesCollection.RemoveAt(i);
-                    }
-                }
-            }
-            lock (purgeMe)
-            {
-                foreach (int sourceId in purgeMe)
-                {
-                    AL.Source(sourceId, ALSourcei.Buffer, 0);
-                    ALHelper.CheckError("Failed to free source from buffer.");
-                    inUseSourcesCollection.Remove(sourceId);
-                    availableSourcesCollection.Add(sourceId);
-                }
-                purgeMe.Clear();
-            }
-        }
 
 #if ANDROID
         const string Lib = "openal32.dll";

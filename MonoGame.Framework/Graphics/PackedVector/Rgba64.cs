@@ -7,7 +7,7 @@ using System;
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
 	/// <summary>
-    /// Packed vector type containing four 16-bit unsigned normalized values ranging from 0 to 1. 
+    /// Packed vector type containing four 16-bit unsigned normalized values ranging from 0 to 1.
 	/// </summary>
 	public struct Rgba64 : IPackedVector<ulong>, IEquatable<Rgba64>, IPackedVector
 	{
@@ -59,11 +59,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		public Vector4 ToVector4()
 		{
 			return new Vector4(
-				(float) (((packedValue >> 48) & 0xFFFF) / 65535.0f),
-				(float) (((packedValue >> 32) & 0xFFFF) / 65535.0f),
-				(float) (((packedValue >> 16) & 0xFFFF) / 65535.0f),
-				(float) ((packedValue & 0xFFFF) / 65535.0f)
-			);
+                (float) (((packedValue) & 0xFFFF) / 65535.0f),
+                (float) (((packedValue >> 16) & 0xFFFF) / 65535.0f),
+                (float) (((packedValue >> 32) & 0xFFFF) / 65535.0f),
+                (float) (((packedValue >> 48) & 0xFFFF) / 65535.0f)
+            );
 		}
 
 		/// <summary>
@@ -126,11 +126,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		private static ulong Pack(float x, float y, float z, float w)
 		{
 			return (ulong) (
-				(((int) (MathHelper.Clamp(x, 0, 1) * 65535.0f) & 0xFFFF) << 48) |
-				(((int) (MathHelper.Clamp(y, 0, 1) * 65535.0f) & 0xFFFF) << 32) |
-				(((int) (MathHelper.Clamp(z, 0, 1) * 65535.0f) & 0xFFFF) << 16) |
-				((int) (MathHelper.Clamp(w, 0, 1) * 65535.0f) & 0xFFFF)
-			);
+				(((ulong) Math.Round(MathHelper.Clamp(x, 0, 1) * 65535.0f) ) ) |
+				(((ulong) Math.Round(MathHelper.Clamp(y, 0, 1) * 65535.0f) ) << 16) |
+				(((ulong) Math.Round(MathHelper.Clamp(z, 0, 1) * 65535.0f) ) << 32) |
+                (((ulong) Math.Round(MathHelper.Clamp(w, 0, 1) * 65535.0f) ) << 48)
+            );
 		}
 	}
 }

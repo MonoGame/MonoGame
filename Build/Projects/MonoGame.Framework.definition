@@ -133,6 +133,7 @@
       <!-- Covers compatible GL implementations, such as ANGLE and OpenGL -->
     </Service>
     <Service Name="_XNADesignProvided">
+      <AddDefine>XNADESIGNPROVIDED</AddDefine>
       <!-- Allows the Microsoft.Xna.Framework.Design framework to be present -->
     </Service>
 
@@ -148,8 +149,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Platforms>MacOS, Linux</Platforms>
       <Link>OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SDL\MonoGame.Framework.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>MonoGame.Framework.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
@@ -240,6 +246,18 @@
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,WindowsPhone,tvOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
+    <Compile Include="TitleContainer.Android.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.Desktop.cs">
+      <Platforms>Angle,Linux,Windows,WindowsGL,Web</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.MacOS.cs">
+      <Platforms>iOS,tvOS,MacOS</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.WinRT.cs">
+      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
@@ -405,7 +423,15 @@
     <Compile Include="Graphics\DeviceLostException.cs" />
     <Compile Include="Graphics\DeviceNotResetException.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
-    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="GraphicsDeviceManager.cs">
+		<Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal,Web</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.WinRT.cs">
+		<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="GraphicsDeviceManager.Legacy.cs">
+		<Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsMetrics.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
@@ -531,6 +557,15 @@
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
+	<Compile Include="Graphics\RenderTargetCube.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.OpenGL.cs">
+      <Services>OpenGLGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetCube.Web.cs">
+      <Services>WebGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
@@ -748,7 +783,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>Android,MacOS,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -759,8 +794,8 @@
     <Compile Include="Input\GamePad.Ouya.cs">
       <Platforms>Ouya</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    <Compile Include="Input\GamePad.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.MacOS.cs">
       <Platforms>MacOS</Platforms>
@@ -787,10 +822,10 @@
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\JoystickState.cs" />
     <Compile Include="Input\Joystick.Default.cs">
-      <Platforms>Android,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
+      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="Input\Joystick.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    <Compile Include="Input\Joystick.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.MacOS.cs">
       <Platforms>MacOS</Platforms>
@@ -835,6 +870,13 @@
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\MouseCursor.cs" />
+    <Compile Include="Input\MouseCursor.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\MouseCursor.Default.cs">
+      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS,MacOS,Web</Platforms>
+    </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
@@ -988,14 +1030,6 @@
     </Compile>
 
 
-    <!-- Microsoft.Xna.Framework.Storage -->
-    <Compile Include="Storage\StorageContainer.cs" />
-    <Compile Include="Storage\StorageDevice.cs" />
-    <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81,WindowsUniversal,Linux,tvOS</Platforms>
-    </Compile>
-
-
     <!-- Utility Classes -->
     <Compile Include="Utilities\AssemblyHelper.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
@@ -1056,17 +1090,25 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\OpenTKGamePlatform.cs">
+    <Compile Include="SDL\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Desktop\OpenTKGameWindow.cs">
+    <Compile Include="SDL\SDLGameWindow.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardUtil.OpenTK.cs">
+    <Compile Include="SDL\SDL2.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardUtil.SDL.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-	 <EmbeddedResource Include="../Installers/monogame.ico">
+	 <EmbeddedResource Include="MonoGame.bmp">
+      <LogicalName>MonoGame.bmp</LogicalName>
       <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="SDL\gamecontrollerdb.txt">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>
 
 
@@ -1133,9 +1175,6 @@
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 

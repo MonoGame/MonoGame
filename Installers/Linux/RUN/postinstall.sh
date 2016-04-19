@@ -29,14 +29,6 @@ case "$choice2" in
 	*) ;;
 esac
 
-# MonoDevelop addin
-read -p "Install monodevelop addin(Y, n): " choice2
-case "$choice2" in 
-	n|N ) ;;
-	*)
-	sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack"
-esac
-
 # MonoGame SDK installation
 echo "Installing MonoGame SDK..."
 
@@ -49,6 +41,33 @@ ln -s "$IDIR" "/opt/MonoGameSDK"
 # Fix Permissions
 chmod +x "$IDIR/Tools/ffmpeg"
 chmod +x "$IDIR/Tools/ffprobe"
+
+# Rider stuff
+if type "rider" > /dev/null 2>&1
+then
+	FINDCOMMAND=$(type -a rider)
+	COMMAND=$(echo $FINDCOMMAND| cut -d' ' -f 3)
+	
+	FINDRIDER=$(cat $COMMAND | grep "RUN_PATH")
+	RIDER=$(echo $FINDRIDER| cut -d"'" -f 2)
+	
+	RIDERDIR=$(dirname $(dirname $RIDER))
+	RXBUILD="$RIDERDIR/lib/ReSharperHost/linux-x64/mono/lib/mono/xbuild/MonoGame"
+	
+	mkdir -p "$RXBUILD"
+	ln -s "$IDIR" "$RXBUILD/v3.0"
+fi
+
+# MonoDevelop addin
+if type "mdtool" > /dev/null 2>&1
+then
+	read -p "Install monodevelop addin(Y, n): " choice2
+	case "$choice2" in 
+		n|N ) ;;
+		*)
+		sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack"
+	esac
+fi
 
 # Monogame Pipeline terminal commands
 echo "Creating launcher items..."

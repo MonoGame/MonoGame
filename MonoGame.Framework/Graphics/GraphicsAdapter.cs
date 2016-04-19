@@ -90,8 +90,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
                 return new DisplayMode(view.Width, view.Height, SurfaceFormat.Color);
 #elif DESKTOPGL
+                var displayIndex = Sdl.Display.GetWindowDisplayIndex(SdlGameWindow.Instance.Handle);
 
-                return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, SurfaceFormat.Color);
+                Sdl.Display.Mode mode;
+                Sdl.Display.GetCurrentDisplayMode(displayIndex, out mode);
+
+                return new DisplayMode(mode.Width, mode.Height, SurfaceFormat.Color);
 #elif WINDOWS
                 using (var graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
                 {
@@ -282,51 +286,23 @@ namespace Microsoft.Xna.Framework.Graphics
                     var modes = new List<DisplayMode>(new[] { CurrentDisplayMode, });
 
 #if DESKTOPGL
+                    var displayCount = Sdl.Display.GetNumVideoDisplays();
+                    modes.Clear();
                     
-					//IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
-					var displays = new List<OpenTK.DisplayDevice>();
-
-					OpenTK.DisplayIndex[] displayIndices = {
-						OpenTK.DisplayIndex.First,
-						OpenTK.DisplayIndex.Second,
-						OpenTK.DisplayIndex.Third,
-						OpenTK.DisplayIndex.Fourth,
-						OpenTK.DisplayIndex.Fifth,
-						OpenTK.DisplayIndex.Sixth,
-					};
-
-					foreach(var displayIndex in displayIndices) 
-					{
-						var currentDisplay = OpenTK.DisplayDevice.GetDisplay(displayIndex);
-						if(currentDisplay!= null) displays.Add(currentDisplay);
-					}
-
-                    if (displays.Count > 0)
+                    for (int displayIndex = 0; displayIndex < displayCount;displayIndex++)
                     {
-                        modes.Clear();
-                        foreach (OpenTK.DisplayDevice display in displays)
-                        {
-                            foreach (OpenTK.DisplayResolution resolution in display.AvailableResolutions)
-                            {                                
-                                SurfaceFormat format = SurfaceFormat.Color;
-                                switch (resolution.BitsPerPixel)
-                                {
-                                    case 32: format = SurfaceFormat.Color; break;
-                                    case 16: format = SurfaceFormat.Bgr565; break;
-                                    case 8: format = SurfaceFormat.Bgr565; break;
-                                    default:
-                                        break;
-                                }
-                                // Just report the 32 bit surfaces for now
-                                // Need to decide what to do about other surface formats
-                                if (format == SurfaceFormat.Color)
-                                {
-                                    var displayMode = new DisplayMode(resolution.Width, resolution.Height, format);
-                                    if (!modes.Contains(displayMode))
-                                        modes.Add(displayMode);
-                                }
-                            }
+                        var modeCount = Sdl.Display.GetNumDisplayModes(displayIndex);
 
+                        for (int i = 0;i < modeCount;i++)
+                        {
+                            Sdl.Display.Mode mode;
+                            Sdl.Display.GetDisplayMode(displayIndex, i, out mode);
+
+                            // We are only using one format, Color
+                            // mode.Format gets the Color format from SDL
+                            var displayMode = new DisplayMode(mode.Width, mode.Height, SurfaceFormat.Color);
+                            if (!modes.Contains(displayMode))
+                                modes.Add(displayMode);
                         }
                     }
 #elif DIRECTX && !WINDOWS_PHONE

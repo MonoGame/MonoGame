@@ -16,35 +16,9 @@ namespace MonoGame.Tools.Pipeline
         TreeStore recentListStore;
 
         const string basetitle = "MonoGame Pipeline";
-        public static string LinuxNotAllowedCharacters = "/"; 
-        public static string MacNotAllowedCharacters = ":";
-
-        public static string NotAllowedCharacters
-        {
-            get
-            {
-                if (Global.DesktopEnvironment == "OSX")
-                    return MacNotAllowedCharacters;
-                else
-                    return LinuxNotAllowedCharacters;
-            }
-        }
-
-        public static bool CheckString(string s, string notallowedCharacters)
-        {
-            for (int i = 0; i < notallowedCharacters.Length; i++) 
-                if (s.Contains (notallowedCharacters.Substring (i, 1)))
-                    return false;
-
-            return true;
-        }
 
         public string OpenProjectPath;
         public IController _controller;
-
-        FileFilter MonoGameContentProjectFileFilter;
-        FileFilter XnaContentProjectFileFilter;
-        FileFilter AllFilesFilter;
 
         MenuItem treerebuild;
         MenuItem recentMenu;
@@ -65,6 +39,7 @@ namespace MonoGame.Tools.Pipeline
                     this.Title = System.IO.Path.GetFileName(projectview1.openedProject);
                     hbar.Subtitle = System.IO.Path.GetDirectoryName(projectview1.openedProject);
                 }
+
                 return;
             }
             #endif
@@ -80,23 +55,9 @@ namespace MonoGame.Tools.Pipeline
         {
             Build();
 
-            MonoGameContentProjectFileFilter = new FileFilter ();
-            MonoGameContentProjectFileFilter.Name = "MonoGame Content Build Projects (*.mgcb)";
-            MonoGameContentProjectFileFilter.AddPattern ("*.mgcb");
+            Init();
 
-            XnaContentProjectFileFilter = new FileFilter ();
-            XnaContentProjectFileFilter.Name = "XNA Content Projects (*.contentproj)";
-            XnaContentProjectFileFilter.AddPattern ("*.contentproj");
-
-            AllFilesFilter = new FileFilter ();
-            AllFilesFilter.Name = "All Files (*.*)";
-            AllFilesFilter.AddPattern ("*.*");
-
-            #if GTK3
-            Widget[] widgets = Global.UseHeaderBar ? menu2.Children : menubar1.Children;
-            #else
-            Widget[] widgets = menubar1.Children;
-            #endif
+            var widgets = Global.UseHeaderBar ? new Widget[0] : menubar1.Children;
 
             var column = new TreeViewColumn ();
 
@@ -180,7 +141,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OnShowEvent()
         {
-            PipelineSettings.Default.Load ();
+            PipelineSettings.Default.Load();
 
             if (!String.IsNullOrEmpty(OpenProjectPath)) {
                 _controller.OpenProject(OpenProjectPath);
@@ -198,20 +159,23 @@ namespace MonoGame.Tools.Pipeline
                 this.hpaned1.Position = PipelineSettings.Default.HSeparator;
 
                 _controller.LaunchDebugger = DebugModeAction.Active = PipelineSettings.Default.DebugMode;
-                FilterOutputAction.Active = toolFilterOutput.Active = PipelineSettings.Default.FilterOutput;
-
-#if GTK3
-                if(Global.UseHeaderBar)
-                    filteroutput_button.Active = FilterOutputAction.Active;
-#endif
+                FilterOutputAction.Active = PipelineSettings.Default.FilterOutput;
             }
+
+            UpdateRecentProjectList();
         }
 
         private bool Maximized()
         {
 #if GTK2
+            if (this.GdkWindow == null)
+                return false;
+
             return this.GdkWindow.State.HasFlag(Gdk.WindowState.Maximized);
 #elif GTK3
+            if (this.Window == null)
+                return false;
+            
             return this.Window.State.HasFlag(Gdk.WindowState.Maximized);
 #endif
         }
@@ -273,105 +237,6 @@ namespace MonoGame.Tools.Pipeline
 
             _controller.OnCanUndoRedoChanged += UpdateUndoRedo;
             UpdateMenus ();
-        }
-
-        public AskResult AskSaveOrCancel ()
-        {
-            var dialog = new MessageDialog(this, DialogFlags.Modal, MessageType.Question, ButtonsType.None, "Do you want to save the project first?");
-            dialog.Title = "Save";
-
-            dialog.AddButton("No", (int)ResponseType.No);
-            dialog.AddButton("Cancel", (int)ResponseType.Cancel);
-            dialog.AddButton("Save", (int)ResponseType.Yes);
-
-            var result = dialog.Run ();
-            dialog.Destroy ();
-
-            if (result == (int)ResponseType.Yes)
-                return AskResult.Yes;
-            else if (result == (int)ResponseType.No)
-                return AskResult.No;
-
-            return AskResult.Cancel;
-        }
-
-        public bool AskSaveName (ref string filePath, string title)
-        {
-            var filechooser =
-                new FileChooserDialog("Save MGCB Project As",
-                    this,
-                    FileChooserAction.Save,
-                    "Cancel", ResponseType.Cancel,
-                    "Save", ResponseType.Accept);
-
-            filechooser.AddFilter (MonoGameContentProjectFileFilter);
-            filechooser.AddFilter (AllFilesFilter);
-
-            if (title != null)
-                filechooser.Title = title;
-
-            var result = filechooser.Run() == (int)ResponseType.Accept;
-            filePath = filechooser.Filename;
-
-            if (filechooser.Filter == MonoGameContentProjectFileFilter && result && !filePath.EndsWith(".mgcb"))
-                filePath += ".mgcb";
-
-            filechooser.Destroy ();
-            return result;
-        }
-
-        public bool AskOpenProject (out string projectFilePath)
-        {
-            var filechooser =
-                new FileChooserDialog("Open MGCB Project",
-                    this,
-                    FileChooserAction.Open,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-
-            filechooser.AddFilter (MonoGameContentProjectFileFilter);
-            filechooser.AddFilter (AllFilesFilter);
-
-            var result = filechooser.Run() == (int)ResponseType.Accept;
-            projectFilePath = filechooser.Filename;
-            filechooser.Destroy ();
-
-            return result;
-        }
-
-        public bool AskImportProject (out string projectFilePath)
-        {
-            var filechooser =
-                new FileChooserDialog("Import XNA Content Project",
-                    this,
-                    FileChooserAction.Open,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-
-            filechooser.AddFilter (XnaContentProjectFileFilter);
-            filechooser.AddFilter (AllFilesFilter);
-
-            var result = filechooser.Run() == (int)ResponseType.Accept;
-            projectFilePath = filechooser.Filename;
-            filechooser.Destroy ();
-
-            return result;
-        }
-
-        public void ShowError (string title, string message)
-        {
-            var dialog = new MessageDialog (this, DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, message);
-            dialog.Title = title;
-            dialog.Run();
-            dialog.Destroy ();
-        }
-
-        public void ShowMessage (string message)
-        {
-            var dialog = new MessageDialog (this, DialogFlags.Modal, MessageType.Warning, ButtonsType.Ok, message);
-            dialog.Title = "Info";
-            dialog.Run();
-            dialog.Destroy ();
         }
 
         public void BeginTreeUpdate ()
@@ -449,82 +314,6 @@ namespace MonoGame.Tools.Pipeline
                 });
         }
 
-        public bool ChooseContentFile (string initialDirectory, out List<string> files)
-        {
-            var filechooser =
-                new FileChooserDialog("Add Content Files",
-                    this,
-                    FileChooserAction.Open,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-            filechooser.SelectMultiple = true;
-
-            filechooser.AddFilter (AllFilesFilter);
-            filechooser.SetCurrentFolder (initialDirectory);
-
-            bool result = filechooser.Run() == (int)ResponseType.Accept;
-
-            files = new List<string>();
-            files.AddRange (filechooser.Filenames);
-            filechooser.Destroy ();
-
-            return result;
-        }
-
-        public bool ChooseContentFolder (string initialDirectory, out string folder)
-        {
-            var folderchooser =
-                new FileChooserDialog("Add Content Folder",
-                    this,
-                    FileChooserAction.SelectFolder,
-                    "Cancel", ResponseType.Cancel,
-                    "Open", ResponseType.Accept);
-
-            folderchooser.SetCurrentFolder (initialDirectory);
-            bool result = folderchooser.Run() == (int)ResponseType.Accept;
-
-            folder = folderchooser.Filename;
-            folderchooser.Destroy ();
-
-            return result;
-        }
-
-        public bool CopyOrLinkFile(string file, bool exists, out CopyAction action, out bool applyforall)
-        {
-            var afd = new AddItemDialog(this, file, exists, FileType.File);
-
-            if (afd.Run() == (int)ResponseType.Ok)
-            {
-                action = afd.responce;
-                applyforall = afd.applyforall;
-                return true;
-            }
-
-            action = CopyAction.Link;
-            applyforall = false;
-            return false;
-        }
-
-        public bool CopyOrLinkFolder(string folder, bool exists, out CopyAction action, out bool applyforall)
-        {
-            var afd = new AddItemDialog(this, folder, exists, FileType.Folder);
-            applyforall = false;
-
-            if (afd.Run() == (int)ResponseType.Ok)
-            {
-                action = afd.responce;
-                return true;
-            }
-
-            action = CopyAction.Link;
-            return false;
-        }
-
-        public void OnTemplateDefined(ContentItemTemplate item)
-        {
-
-        }
-
         public void ItemExistanceChanged(IProjectItem item)
         {
             Application.Invoke(
@@ -534,54 +323,72 @@ namespace MonoGame.Tools.Pipeline
             );
         }
 
-
-#if MONOMAC || LINUX
-        string FindSystemMono ()
+        public bool GetSelection(out FileType type, out string path, out string location)
         {
-            // El Capitan Support. /usr/bin is now read only and /usr/local/bin is NOT included
-            // in $PATH for apps... only the shell. So we need to manaully find the full path to 
-            // the right location.
-            string[] pathsToCheck = new string[] {
-                "/usr/bin",
-                "/usr/local/bin",
-                "/Library/Frameworks/Mono.framework/Versions/Current/bin",
-            };
-            foreach (var path in pathsToCheck) {
-                if (System.IO.File.Exists (System.IO.Path.Combine (path, "mono")))
-                    return System.IO.Path.Combine (path, "mono");
-            }
-            OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
-            return "mono";
-        }
-#endif
+            List<TreeIter> iters;
+            List<string> ids;
+            string[] paths = projectview1.GetSelectedTreePath(out iters, out ids);
 
-        public Process CreateProcess(string exe, string commands)
+            if (paths.Length != 1)
+            {
+                type = FileType.Base;
+                path = "";
+                location = "";
+                return false;
+            }
+
+            path = paths[0];
+            GetInfo(ids[0], paths[0], out type, out location);
+
+            return true;
+        }
+
+        public bool GetSelection(out FileType[] type, out string[] path, out string[] location)
         {
-            var _buildProcess = new Process();
-#if WINDOWS
-            _buildProcess.StartInfo.FileName = exe;
-            _buildProcess.StartInfo.Arguments = commands;
-#endif
-#if MONOMAC || LINUX
-            _buildProcess.StartInfo.FileName = FindSystemMono ();
-            if (_controller.LaunchDebugger) {
-                var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
-                port = !string.IsNullOrEmpty (port) ? port : "55555";
-                var monodebugger = string.Format ("--debug --debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:{0}",
-                    port);
-                _buildProcess.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monodebugger, exe, commands);
-                OutputAppend("************************************************");
-                OutputAppend("RUNNING MGCB IN DEBUG MODE!!!");
-                OutputAppend(string.Format ("Attach your Debugger to localhost:{0}", port));
-                OutputAppend("************************************************");
-            } else {
-                _buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
-            }
-#endif
+            var types = new List<FileType>();
+            var locations = new List<string>();
 
-            return _buildProcess;
+            List<TreeIter> iters;
+            List<string> ids;
+            path = projectview1.GetSelectedTreePath(out iters, out ids);
+
+            for (int i = 0; i < path.Length; i++)
+            {
+                FileType tmp_type;
+                string tmp_loc;
+
+                GetInfo(ids[i], path[i], out tmp_type, out tmp_loc);
+
+                types.Add(tmp_type);
+                locations.Add(tmp_loc);
+            }
+
+            type = types.ToArray();
+            location = locations.ToArray();
+
+            return (path.Length > 0);
         }
+
 #endregion
+
+        private void GetInfo(string id, string path, out FileType type, out string location)
+        {
+            if (id == projectview1.ID_FOLDER)
+            {
+                type = FileType.Folder;
+                location = path;
+            }
+            else if (id == projectview1.ID_BASE)
+            {
+                type = FileType.Base;
+                location = "";
+            }
+            else
+            {
+                type = FileType.File;
+                location = System.IO.Path.GetDirectoryName(path);
+            }
+        }
 
         protected void OnNewActionActivated (object sender, EventArgs e)
         {
@@ -635,99 +442,39 @@ namespace MonoGame.Tools.Pipeline
         public void OnNewItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            var dialog = new NewTemplateDialog(this, _controller.Templates.GetEnumerator ());
-
-            if (dialog.Run () == (int)ResponseType.Ok) {
-
-                List<TreeIter> iters;
-                List<string> ids;
-                string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-                string location;
-
-                if (paths.Length == 1) {
-                    if (ids [0] == projectview1.ID_FOLDER)
-                        location = paths [0];
-                    else if (ids[0] == projectview1.ID_BASE)
-                        location = _controller.GetFullPath ("");
-                    else
-                        location = System.IO.Path.GetDirectoryName (paths [0]);
-                }
-                else
-                    location = _controller.GetFullPath ("");
-
-                _controller.NewItem(dialog.name, location, dialog.templateFile);
-                UpdateMenus();
-            }
+            _controller.NewItem();
+            UpdateMenus();
             expand = false;
         }
 
         public void OnAddItemActionActivated (object sender, EventArgs e)
         {
             expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.Include (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.Include (_controller.GetFullPath (""));
-                else
-                    _controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.Include (_controller.GetFullPath (""));
+            _controller.Include();
             UpdateMenus();
             expand = false;
         }
 
         public void OnNewFolderActionActivated(object sender, EventArgs e)
         {
-            var ted = new TextEditorDialog(this, "New Folder", "Folder Name:", "", true);
-            if (ted.Run() != (int)ResponseType.Ok)
-                return;
-            var foldername = ted.text;
-
             expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.NewFolder (foldername, paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.NewFolder (foldername, _controller.GetFullPath (""));
-                else
-                    _controller.NewFolder (foldername, System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.NewFolder (foldername, _controller.GetFullPath (""));
-
+            _controller.NewFolder();
+            UpdateMenus();
             expand = false;
         }
 
         public void OnAddFolderActionActivated(object sender, EventArgs e)
         {
             expand = true;
-            List<TreeIter> iters;
-            List<string> ids;
-            string[] paths = projectview1.GetSelectedTreePath (out iters, out ids);
-
-            if (paths.Length == 1) {
-                if (ids [0] == projectview1.ID_FOLDER)
-                    _controller.IncludeFolder (paths [0]);
-                else if (ids[0] == projectview1.ID_BASE)
-                    _controller.IncludeFolder (_controller.GetFullPath (""));
-                else
-                    _controller.IncludeFolder (System.IO.Path.GetDirectoryName (paths [0]));
-            }
-            else
-                _controller.IncludeFolder (_controller.GetFullPath (""));
+            _controller.IncludeFolder ();
             UpdateMenus();
             expand = false;
+        }
+
+        public void OnExcludeActionActivated (object sender, EventArgs e)
+        {
+            projectview1.Remove (false);
+            UpdateMenus();
         }
 
         public void OnRenameActionActivated (object sender, EventArgs e)
@@ -737,10 +484,10 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenus();
             expand = false;
         }
-        
+
         public void OnDeleteActionActivated (object sender, EventArgs e)
         {
-            projectview1.Remove ();
+            projectview1.Remove (true);
             UpdateMenus();
         }
 
@@ -767,37 +514,22 @@ namespace MonoGame.Tools.Pipeline
         protected void OnAboutActionActivated (object sender, EventArgs e)
         {
             var adialog = new AboutDialog ();
-            adialog.TransientFor = this;
-            adialog.Logo = new Gdk.Pixbuf(null, "MonoGame.Tools.Pipeline.App.ico");
-            adialog.ProgramName = AssemblyAttributes.AssemblyProduct;
-            adialog.Version = AssemblyAttributes.AssemblyVersion;
-            adialog.Comments = AssemblyAttributes.AssemblyDescription;
-            adialog.Copyright = AssemblyAttributes.AssemblyCopyright;
-            adialog.Website = "http://www.monogame.net/";
-            adialog.WebsiteLabel = "MonoGame Website";
-            adialog.Run ();
-            adialog.Destroy ();
+            adialog.Run();
         }
 
         protected void OnDebugModeActionActivated (object sender, EventArgs e)
         {
-            _controller.LaunchDebugger = this.DebugModeAction.Active;
+            _controller.LaunchDebugger = DebugModeAction.Active;
+
+#if GTK3
+            if(Global.UseHeaderBar)
+                debugmode_button.Active = DebugModeAction.Active;
+#endif
         }
 
         protected void OnFilterOutputActionActivated (object sender, EventArgs e)
         {
             buildOutput1.CurrentPage = FilterOutputAction.Active ? 0 : 1;
-            toolFilterOutput.Active = FilterOutputAction.Active;
-
-#if GTK3
-            if(Global.UseHeaderBar)
-                filteroutput_button.Active = FilterOutputAction.Active;
-#endif
-        }
-
-        protected void ToggleFilterOutput (object sender, EventArgs e)
-        {
-            FilterOutputAction.Active = !FilterOutputAction.Active;
         }
 
         protected void OnCancelBuildActionActivated (object sender, EventArgs e)
@@ -817,15 +549,13 @@ namespace MonoGame.Tools.Pipeline
             var somethingSelected = paths.Length > 0;
 
             // Update the state of all menu items.
-
-
             Application.Invoke(delegate
                 { 
-                    NewAction.Sensitive = toolNew.Sensitive = notBuilding;
-                    OpenAction.Sensitive = toolOpen.Sensitive = notBuilding;
+                    NewAction.Sensitive = notBuilding;
+                    OpenAction.Sensitive = notBuilding;
                     ImportAction.Sensitive = notBuilding;
 
-                    SaveAction.Sensitive = toolSave.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
+                    SaveAction.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
                     SaveAsAction.Sensitive = projectOpenAndNotBuilding;
                     CloseAction.Sensitive = projectOpenAndNotBuilding;
 
@@ -833,29 +563,34 @@ namespace MonoGame.Tools.Pipeline
 
                     AddAction.Sensitive = toolAddItem.Sensitive = toolAddFolder.Sensitive = 
                         toolNewItem.Sensitive = toolNewFolder.Sensitive = projectOpen;
-            
+                    
+                    ExcludeAction.Sensitive = somethingSelected;
+
                     RenameAction.Sensitive = paths.Length == 1;
-                    DeleteAction.Sensitive = projectOpen && somethingSelected;
+                    DeleteAction.Sensitive = somethingSelected;
 
                     BuildAction.Sensitive = projectOpen;
-                    BuildAction1.Sensitive = toolBuild.Sensitive = projectOpenAndNotBuilding;
+                    BuildAction1.Sensitive = projectOpenAndNotBuilding;
 
-                    treerebuild.Sensitive = RebuildAction.Sensitive = toolRebuild.Sensitive = projectOpenAndNotBuilding;
+                    treerebuild.Sensitive = RebuildAction.Sensitive = projectOpenAndNotBuilding;
                     RebuildAction.Sensitive = treerebuild.Sensitive;
 
                     CleanAction.Sensitive = toolClean.Sensitive = projectOpenAndNotBuilding;
                     CancelBuildAction.Sensitive = !notBuilding;
-                    CancelBuildAction.Visible = !notBuilding;
+
+                    toolBuild.Visible = notBuilding;
+                    toolRebuild.Visible = notBuilding;
+                    toolClean.Visible = notBuilding;
+                    toolCancelBuild.Visible = !notBuilding;
 
                     #if GTK3
                     if (Global.UseHeaderBar)
                     {
-                        new_button.Sensitive = NewAction.Sensitive;
                         open_button.Sensitive = OpenAction.Sensitive;
-                        save_button.Sensitive = SaveAction.Sensitive;
                         build_button.Visible = BuildAction1.Sensitive;
                         rebuild_button.Visible = RebuildAction.Sensitive;
                         cancel_button.Visible = CancelBuildAction.Sensitive;
+                        separator1.Visible = build_button.Visible || cancel_button.Visible;
                     }
                     #endif
 
@@ -875,10 +610,11 @@ namespace MonoGame.Tools.Pipeline
         public void UpdateRecentProjectList()
         {
             var m = new Menu ();
-            recentMenu.Submenu = null;
 
             if (Global.UseHeaderBar)
                 recentListStore.Clear();
+            else
+                recentMenu.Submenu = null;
 
             var projectList = PipelineSettings.Default.ProjectHistory.ToList();
 
@@ -886,13 +622,15 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (Global.UseHeaderBar)
                     recentListStore.InsertWithValues(0, "<b>" + System.IO.Path.GetFileName(project) + "</b>" + Environment.NewLine + System.IO.Path.GetDirectoryName(project), project);
-
-                var recentItem = new MenuItem(project);
-                recentItem.Activated += (sender, e) => OpenProject(project);
-                m.Insert (recentItem, 0);
+                else
+                {
+                    var recentItem = new MenuItem(project);
+                    recentItem.Activated += (sender, e) => OpenProject(project);
+                    m.Insert(recentItem, 0);
+                }
             }
             
-            if (projectList.Count > 0)
+            if (!Global.UseHeaderBar && projectList.Count > 0)
             {
                 m.Add(new SeparatorMenuItem());
                 var item = new MenuItem("Clear");

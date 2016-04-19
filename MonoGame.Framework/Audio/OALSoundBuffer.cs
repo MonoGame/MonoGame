@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Audio
                 alError = AL.GetError();
                 if (alError != ALError.NoError)
                 {
-                    Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
+                    Console.WriteLine("Failed to get buffer channels: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
                     Duration = -1;
                 }
                 else

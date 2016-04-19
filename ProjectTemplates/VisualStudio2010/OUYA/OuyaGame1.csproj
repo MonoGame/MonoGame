@@ -20,7 +20,7 @@
     <AndroidStoreUncompressedFileExtensions />
     <MandroidI18n />
     <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
-    <MonoGamePlatform>Ouya</MonoGamePlatform>
+    <MonoGamePlatform>Android</MonoGamePlatform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

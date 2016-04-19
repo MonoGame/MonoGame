@@ -1,42 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 
@@ -45,10 +9,7 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 #endif
 
-#if OPENGL
-#if DESKTOPGL
-using MouseInfo = OpenTK.Input.Mouse;
-#elif MONOMAC
+#if OPENGL && MONOMAC
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.Foundation;
 using MonoMac.AppKit;
@@ -56,7 +17,6 @@ using MonoMac.AppKit;
 using Foundation;
 using AppKit;
 using PointF = CoreGraphics.CGPoint;
-#endif
 #endif
 #endif
 
@@ -67,21 +27,18 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public static class Mouse
     {
-        internal static GameWindow PrimaryWindow = null;
+        internal static GameWindow PrimaryWindow;
 
         private static readonly MouseState _defaultState = new MouseState();
 
 #if DESKTOPGL || ANGLE
 
-        static OpenTK.INativeWindow Window;
+        internal static bool BorderSet;
+        internal static int ScrollY;
 
-        internal static void setWindows(GameWindow window)
+        internal static void SetWindows(GameWindow window)
         {
             PrimaryWindow = window;
-            if (window is OpenTKGameWindow)
-            {
-                Window = (window as OpenTKGameWindow).Window;
-            }
         }
 
 #elif (WINDOWS && DIRECTX)
@@ -106,13 +63,9 @@ namespace Microsoft.Xna.Framework.Input
             get
             { 
 #if DESKTOPGL || ANGLE
-                return Window.WindowInfo.Handle;
-#elif WINRT
-                return IntPtr.Zero; // WinRT platform does not create traditionally window, so returns IntPtr.Zero.
+                return PrimaryWindow.Handle;
 #elif(WINDOWS && DIRECTX)
-                return Window.Handle; 
-#elif MONOMAC
-                return IntPtr.Zero;
+                return Window.Handle;
 #else
                 return IntPtr.Zero;
 #endif
@@ -138,22 +91,27 @@ namespace Microsoft.Xna.Framework.Input
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 
 #elif DESKTOPGL || ANGLE
+            int x, y;
 
-            var state = OpenTK.Input.Mouse.GetCursorState();
-
+            var winFlags = Sdl.Window.GetWindowFlags(window.Handle);
+            var state = (Sdl.Patch > 4) ? // SDL 2.0.4 has a bug with Global Mouse
+                    Sdl.Mouse.GetGlobalState(out x, out y) :
+                    Sdl.Mouse.GetState(out x, out y);
             var clientBounds = window.ClientBounds;
-            window.MouseState.X = state.X - clientBounds.X;
-            window.MouseState.Y = state.Y - clientBounds.Y;
 
-            window.MouseState.LeftButton = (ButtonState)state.LeftButton;
-            window.MouseState.RightButton = (ButtonState)state.RightButton;
-            window.MouseState.MiddleButton = (ButtonState)state.MiddleButton;
-            window.MouseState.XButton1 = (ButtonState)state.XButton1;
-            window.MouseState.XButton2 = (ButtonState)state.XButton2;
+            if (clientBounds.Contains(x, y) && winFlags.HasFlag(Sdl.Window.State.MouseFocus))
+            {
+                window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.RightButton = (state.HasFlag(Sdl.Mouse.Button.Right)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.XButton1 = (state.HasFlag(Sdl.Mouse.Button.X1Mask)) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.XButton2 = (state.HasFlag(Sdl.Mouse.Button.X2Mask)) ? ButtonState.Pressed : ButtonState.Released;
 
-            // XNA uses the winapi convention of 1 click = 120 delta
-            // OpenTK scales 1 click = 1.0 delta, so make that match
-            window.MouseState.ScrollWheelValue = (int)(state.Scroll.Y * 120);
+                window.MouseState.ScrollWheelValue = ScrollY;
+            }
+
+            window.MouseState.X = x - ((Sdl.Patch > 4) ? clientBounds.X : 0);
+            window.MouseState.Y = y - ((Sdl.Patch > 4) ? clientBounds.Y : 0);
 #endif
 
             return window.MouseState;
@@ -195,7 +153,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             UpdateStatePosition(x, y);
 
-#if (WINDOWS && DIRECTX) || DESKTOPGL || ANGLE
+#if (WINDOWS && DIRECTX)
             // correcting the coordinate system
             // Only way to set the mouse position !!!
             var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
@@ -204,7 +162,7 @@ namespace Microsoft.Xna.Framework.Input
 #endif
 
 #if DESKTOPGL || ANGLE
-            OpenTK.Input.Mouse.SetPosition(pt.X, pt.Y);
+            Sdl.Mouse.WarpInWindow(PrimaryWindow.Handle, x, y);
 #elif WINDOWS
             SetCursorPos(pt.X, pt.Y);
 #elif MONOMAC
@@ -233,6 +191,17 @@ namespace Microsoft.Xna.Framework.Input
 #endif
         }
 
+        /// <summary>
+        /// Sets the cursor image to the specified MouseCursor.
+        /// </summary>
+        /// <param name="cursor">Mouse cursor to use for the cursor image.</param>
+        public static void SetCursor (MouseCursor cursor)
+        {
+#if DESKTOPGL
+            Sdl.Mouse.SetCursor (cursor.Handle);
+#endif
+        }
+
         #endregion Public methods
     
         private static void UpdateStatePosition(int x, int y)
@@ -246,23 +215,6 @@ namespace Microsoft.Xna.Framework.Input
         [DllImportAttribute("user32.dll", EntryPoint = "SetCursorPos")]
         [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
         internal static extern bool SetCursorPos(int X, int Y);
-
-        /// <summary>
-        /// Struct representing a point. 
-        /// (Suggestion : Make another class for mouse extensions)
-        /// </summary>
-        [StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-        internal struct POINT
-        {
-            public int X;
-            public int Y;
-
-            public System.Drawing.Point ToPoint()
-            {
-                return new System.Drawing.Point(X, Y);
-            }
-
-        }
 
 #elif MONOMAC
 #if PLATFORM_MACOS_LEGACY

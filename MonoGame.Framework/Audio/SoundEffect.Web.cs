@@ -21,14 +21,14 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
+        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
         }
-        
-        private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+
+        private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
         {
         }
-        
+
         private void PlatformSetupInstance(SoundEffectInstance instance)
         {
         }

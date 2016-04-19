@@ -497,6 +497,9 @@ namespace TwoMGFX
                 case TokenType.Sampler_Register_Expression:
                     Value = EvalSampler_Register_Expression(tree, paramlist);
                     break;
+                case TokenType.Sampler_Declaration_States:
+                    Value = EvalSampler_Declaration_States(tree, paramlist);
+                    break;
                 case TokenType.Sampler_Declaration:
                     Value = EvalSampler_Declaration(tree, paramlist);
                     break;
@@ -1086,20 +1089,24 @@ namespace TwoMGFX
             return null;
         }
 
+        protected virtual object EvalSampler_Declaration_States(ParseTree tree, params object[] paramlist)
+        {
+            foreach (var node in Nodes)
+                node.Eval(tree, paramlist);
+            return null;
+        }
+
         protected virtual object EvalSampler_Declaration(ParseTree tree, params object[] paramlist)
         {
-            if (this.GetValue(tree, TokenType.OpenBracket, 0) == null)
-        		return null;
-        	
-        	var sampler = new SamplerStateInfo();
+            var sampler = new SamplerStateInfo();
         	sampler.Name = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	
         	foreach (ParseNode node in Nodes)
         		node.Eval(tree, sampler);
-        
+        	
         	var shaderInfo = paramlist[0] as ShaderInfo;
         	shaderInfo.SamplerStates.Add(sampler.Name, sampler);
-        
+        	
         	return null;
         }
 

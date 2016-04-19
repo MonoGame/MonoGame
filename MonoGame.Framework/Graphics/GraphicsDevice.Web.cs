@@ -25,6 +25,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+        internal void OnPresentationChanged()
+        {
+        }
+
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
             WebGL.gl.enable(WebGL.gl.DEPTH_TEST);

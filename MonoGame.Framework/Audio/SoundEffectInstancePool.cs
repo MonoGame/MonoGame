@@ -97,10 +97,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         internal static void Update()
         {
-#if OPENAL
-            OpenALSoundController.GetInstance.Update();
-#endif
-
             SoundEffectInstance inst = null;
             // Cleanup instances which have finished playing.                    
             for (var x = 0; x < _playingInstances.Count;)
@@ -109,6 +105,9 @@ namespace Microsoft.Xna.Framework.Audio
 
                 if (inst.State == SoundState.Stopped || inst.IsDisposed || inst._effect == null)
                 {
+#if OPENAL
+                    inst.Stop(true); // force stopping it to free its AL source
+#endif
                     Add(inst);
                     continue;
                 }

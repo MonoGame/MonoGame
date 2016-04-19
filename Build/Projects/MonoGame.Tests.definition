@@ -109,6 +109,7 @@
 	<Compile Include="Framework\RectangleTest.cs" />
 	<Compile Include="Framework\SpriteFontNonVisualTest.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Framework\TitleContainerTest.cs" />
 	<Compile Include="Framework\Texture2DNonVisualTest.cs" />
     <Compile Include="Framework\TouchCollectionTest.cs" />
     <Compile Include="Framework\TouchLocationTest.cs" />
@@ -136,7 +137,10 @@
     <Compile Include="Framework\Visual\DepthStencilStateTest.cs" />
     <Compile Include="Framework\Visual\EffectTest.cs" />
     <Compile Include="Framework\Visual\GraphicsDeviceTest.cs" />
+    <Compile Include="Framework\Visual\GraphicsDeviceManagerTest.cs" />
     <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
+    <Compile Include="Framework\Visual\RenderTarget2DTest.cs" />
+    <Compile Include="Framework\Visual\RenderTargetCubeTest.cs" />
     <Compile Include="Framework\Visual\SamplerStateTest.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Visual\Texture2DTest.cs" />
@@ -152,6 +156,8 @@
     <Compile Include="Framework\Visual\OcclusionQueryTest.cs" />
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
+
+    <Compile Include="Framework\Audio\SoundEffectTest.cs" />
 
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
@@ -393,6 +399,9 @@
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_True_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\RenderTarget2D\GenerateMips.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\SamplerState\VisualTestAddressModes.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -532,6 +541,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	<Content Include="Assets\ReferenceImages\SpriteBatch\DrawWithLayerDepth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_many.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
@@ -810,6 +822,9 @@
     <Content Include="Assets\Textures\SampleCube64DXT1Mips.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Textures\Sunset.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 	<Content Include="Assets\Textures\LogoOnly_64px.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -817,11 +832,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="Assets\Textures\logo555.bmp">
+    <Content Include="Assets\Textures\Logo555.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Content Include="Assets\Textures\logo565.bmp">
+    <Content Include="Assets\Textures\Logo565.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

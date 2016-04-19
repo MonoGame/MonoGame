@@ -258,6 +258,14 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void OnIsMouseVisibleChanged() {}
 
+        /// <summary>
+        /// Used by the GraphicsDeviceManager to update the platform window
+        /// after the graphics device has changed the presentation.
+        /// </summary>
+        internal virtual void OnPresentationChanged()
+        {            
+        }
+
         #endregion Methods
 
         #region IDisposable implementation
