@@ -19,7 +19,7 @@ TrueType fonts may be installed on the system in use, or added to the project ma
 3- Find the line below: 
 
 ```
-<FontName>Arial<\FontName>
+<FontName>Arial</FontName>
 ```
 
 4- Replace the text between the tags with your selected .ttf font.
