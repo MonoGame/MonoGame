@@ -16,51 +16,25 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         static void Main(string [] args)
         {
-            var app = new Application (Platform.Detect);
+            var platform = Platform.Detect;
+
+            var app = new Application (platform);
             Styles.Load();
 
-#if WINDOWS
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-
-            PipelineSettings.Default.Load();
-
-			var view = new MainView();
-            if (args != null && args.Length > 0)
-            {
-                var projectFilePath = string.Join(" ", args);
-                view.OpenProjectPath = projectFilePath;
-            }
-
-            var controller = new PipelineController(view);
-            view.Show();
-#else
-            Global.Initalize ();
-
             var win = new MainWindow ();
-            new PipelineController(win);
+            var controller = PipelineController.Create(win);
 
-#if LINUX
-               
-            if (Global.UseHeaderBar && Global.App != null)
-                Global.App.AddWindow(win);
-            
-            if (args != null && args.Length > 0)
-            {
-            	var projectFilePath = string.Join(" ", args);
-            	win.OpenProjectPath = projectFilePath;
-            }
-#elif MONOMAC
-            var project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
-            if (!string.IsNullOrEmpty (project)) {
-            	win.OpenProjectPath = project;
-            }
-#endif
-            win.Show ();
-            win.OnShowEvent ();
-#endif
+            string project = null;
 
-            app.Run ();
+            if (Global.DesktopEnvironment == "OSX")
+                project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
+            else if (args != null && args.Length > 0)
+                project = string.Join(" ", args);
+
+            if (!string.IsNullOrEmpty(project))
+                controller.OpenProject(project);
+
+            app.Run (win);
         }
     }
 }
