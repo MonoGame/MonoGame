@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     }
                     else if (pixelFormat.dwRgbBitCount == 32)
                     {
-                        rbSwap = pixelFormat.dwBBitMask == 0xFF00;
+                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
                         return SurfaceFormat.Color;
                     }
                     throw new ContentLoadException("Unsupported RGBA pixel format");
@@ -303,6 +303,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         var content = CreateBitmapContent(format, w, h);
                         var byteCount = GetBitmapSize(format, w, h);
                         var bytes = reader.ReadBytes(byteCount);
+                        if (rbSwap)
+                        {
+                            switch (format)
+                            {
+                                case SurfaceFormat.Bgr565:
+                                    ByteSwapBGR565(bytes);
+                                    break;
+                                case SurfaceFormat.Bgra4444:
+                                    ByteSwapBGRA4444(bytes);
+                                    break;
+                                case SurfaceFormat.Bgra5551:
+                                    ByteSwapBGRA5551(bytes);
+                                    break;
+                                case SurfaceFormat.Color:
+                                    ByteSwapColor(bytes);
+                                    break;
+                            }
+                        }
                         content.SetPixelData(bytes);
                         mipMaps.Add(content);
                         w = MathHelper.Max(1, w / 2);
@@ -313,6 +331,49 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             return output;
+        }
+
+        static void ByteSwapColor(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 4)
+            {
+                byte r = bytes[i];
+                bytes[i] = bytes[i + 2];
+                bytes[i + 2] = r;
+            }
+        }
+
+        static void ByteSwapBGRA4444(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 2)
+            {
+                var r = bytes[i] & 0xF0;
+                var b = bytes[i + 1] & 0xF0;
+                bytes[i] = (byte)((bytes[i] & 0x0F) | b);
+                bytes[i + 1] = (byte)((bytes[i + 1] & 0x0F) | r);
+            }
+        }
+
+        static void ByteSwapBGRA5551(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 2)
+            {
+                var r = (bytes[i] & 0xF8) >> 3;
+                var b = (bytes[i + 1] & 0x3E) >> 1;
+                bytes[i] = (byte)((bytes[i] & 0x07) | (b << 3));
+                bytes[i + 1] = (byte)((bytes[i + 1] & 0xC1) | (r << 1));
+            }
+        }
+
+        static void ByteSwapBGR565(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 2)
+            {
+                var r = (bytes[i] & 0xF8) >> 3;
+                var b = bytes[i + 1] & 0x1F;
+                bytes[i] = (byte)((bytes[i] & 0x07) | (b << 3));
+                bytes[i + 1] = (byte)((bytes[i + 1] & 0xE0) | r);
+            }
         }
     }
 }

@@ -65,11 +65,12 @@ namespace Microsoft.Xna.Framework
                     return SharpDX.DXGI.Format.B5G6R5_UNorm;
                 case SurfaceFormat.Bgra5551:
                     return SharpDX.DXGI.Format.B5G5R5A1_UNorm;
-#if WINRT
                 case SurfaceFormat.Bgra4444:
+#if WINRT
                     return SharpDX.DXGI.Format.B4G4R4A4_UNorm;
+#else
+                    return (SharpDX.DXGI.Format)115;
 #endif
-
                 case SurfaceFormat.Dxt1:
                     return SharpDX.DXGI.Format.BC1_UNorm;
                 case SurfaceFormat.Dxt3:

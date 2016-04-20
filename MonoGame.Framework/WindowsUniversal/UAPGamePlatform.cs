@@ -24,7 +24,6 @@ namespace Microsoft.Xna.Framework
 {
     class UAPGamePlatform : GamePlatform
     {
-		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
 
         internal static readonly TouchQueue TouchQueue = new TouchQueue();
