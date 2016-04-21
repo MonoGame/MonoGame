@@ -30,7 +30,7 @@ namespace MonoGame.Framework
             _window = new WinFormsGameWindow(this);
             _window.KeyState = _keyState;
 
-            Mouse.SetWindows(_window._form);
+            Mouse.Window = _window._form;
 
             Window = _window;
         }
