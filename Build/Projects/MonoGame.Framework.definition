@@ -50,10 +50,10 @@
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
       <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
-	
+
     <FrameworkVersions>
 	  <Platform Name="Windows8">
 	    <Version>v4.5.1</Version>
@@ -832,7 +832,10 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Android.cs">
+      <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -908,7 +911,7 @@
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
-    <Compile Include="Input\KeyState.cs" />    
+    <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
@@ -956,7 +959,7 @@
     <Compile Include="Input\Touch\TouchQueue.cs">
 			<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
 	</Compile>
-		
+
     <Page Include="Themes\generic.xaml">
 			<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
 			<Generator>MSBuild:Compile</Generator>
@@ -1272,7 +1275,7 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
 
-	  
+
     <!-- Windows UAP Platform -->
     <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
       <Platforms>WindowsUniversal</Platforms>
@@ -1284,7 +1287,7 @@
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
 
-	  
+
     <!-- Windows Desktop Platfom -->
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>
