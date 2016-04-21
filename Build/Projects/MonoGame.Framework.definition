@@ -844,6 +844,15 @@
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>Android,Ouya</ExcludePlatforms>
     </Compile>
+    <Compile Include="Input\Keyboard.Default.cs">
+		<ExcludePlatforms>Android,Ouya,Windows,WindowsGL,Linux</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.SDL.cs">
+		<Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.Windows.cs">
+		<Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
