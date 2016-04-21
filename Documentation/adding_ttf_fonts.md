@@ -1,8 +1,8 @@
-MonoGame supports multiple methods of using different fonts.  The following is an explanation of how to use TrueType fonts.
+MonoGame supports multiple methods of using different fonts.  The following is an explanation on how to use TrueType fonts.
 
 #### Using TrueType Fonts with MonoGame
-To use a TrueType font, MonoGame requires 2 files: the TrueType font file, and a .spritefont file.
-TrueType fonts may be installed on the system in use, or added to the project manually in the same directory as the .spritefont file.
+To use a TrueType font in MonoGame, you require 2 files: the TrueType font file, and a .spritefont file.
+You can use TrueType fonts installed on the system, or add them to the project manually in the same directory as the .spritefont file.
 
 1. Create the .spritefont file.
 
@@ -22,8 +22,8 @@ TrueType fonts may be installed on the system in use, or added to the project ma
 <FontName>Arial</FontName>
 ```
 
-4- Replace the text between the tags with your selected .ttf font.
-If the font is installed on the system, just type the name of the font, without the file extension.
+4- Replace the text between the tags with the name of your TrueType font.
+If the font is installed on the system, the file extension ".ttf" does not need to be included.
 
 
 #### Usage Example
@@ -39,7 +39,7 @@ SpriteFont font;
 font = myGame.Content.Load<SpriteFont>("Fonts/myFont")
 ```
 
-3- Draw any text in the Draw function of your game. The example below uses a Vector2 to find the center of the text to be displayed, and places it in the center of the window with an other Vector2.
+3- Draw any text in the Draw function of your game. The example below uses a Vector2 to find the center of the text to be displayed, and places it in the center of the window using an other Vector2.
 
 ```
 spriteBatch.Begin();
