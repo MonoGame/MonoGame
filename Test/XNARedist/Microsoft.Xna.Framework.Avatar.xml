@@ -1,0 +1,577 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarAnimation">
+      <summary />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.#ctor(Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset)">
+      <summary>Creates a new instance of AvatarAnimation, and initializes it with the specified animation.</summary>
+      <param name="animationPreset">The specified standard animation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.BoneTransforms">
+      <summary>Gets the current position of the bones at the time specified by CurrentPosition.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.CurrentPosition">
+      <summary>Gets or sets the current time position in the animation.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.Dispose(System.Boolean)">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+      <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.Expression">
+      <summary>Gets the expression of the related animation at the current time position.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.Finalize">
+      <summary>Allows the avatar animation to attempt to free resources, and it performs other cleanup operations before garbage collection reclaims the animation.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.IsDisposed">
+      <summary>Gets the disposed state of the avatar animation.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.Length">
+      <summary>Gets the length of the current animation.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarAnimation.Update(System.TimeSpan,System.Boolean)">
+      <summary>Updates the current time position of the avatar animation.</summary>
+      <param name="elapsedAnimationTime">Elapsed time since the last animation frame. This value can be either a positive or negative time span. If the value is negative, animation playback is reversed.</param>
+      <param name="loop">true if the animation playback is to be looped; otherwise, false.</param>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset">
+      <summary>Defines standard animations for avatars.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Celebrate">
+      <summary>Gender-neutral, celebrating.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Clap">
+      <summary>Gender-neutral, applauding.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleAngry">
+      <summary>Female, angry.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleConfused">
+      <summary>Female, confused.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleCry">
+      <summary>Female, cry.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleIdleCheckNails">
+      <summary>Female, checking nails.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleIdleFixShoe">
+      <summary>Female, fixing shoe.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleIdleLookAround">
+      <summary>Female, looking around.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleIdleShiftWeight">
+      <summary>Female, shifting weight from one foot to another</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleLaugh">
+      <summary>Female, laughing.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleShocked">
+      <summary>Female, shocked or surprised.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.FemaleYawn">
+      <summary>Female, yawning.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleAngry">
+      <summary>Male, angry.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleConfused">
+      <summary>Male, confused.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleCry">
+      <summary>Male, crying.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleIdleCheckHand">
+      <summary>Male, checking hand.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleIdleLookAround">
+      <summary>Male, looking around.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleIdleShiftWeight">
+      <summary>Male, shifting weight from one foot to another.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleIdleStretch">
+      <summary>Male, stretching.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleLaugh">
+      <summary>Male, laughing.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleSurprised">
+      <summary>Male, surprised.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.MaleYawn">
+      <summary>Male, yawning.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand0">
+      <summary>Gender-neutral, standing, variation 0.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand1">
+      <summary>Gender-neutral, standing, variation 1.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand2">
+      <summary>Gender-neutral, standing, variation 2.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand3">
+      <summary>Gender-neutral, standing, variation 3.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand4">
+      <summary>Gender-neutral, standing, variation 4.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand5">
+      <summary>Gender-neutral, standing, variation 5.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand6">
+      <summary>Gender-neutral, standing, variation 6.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Stand7">
+      <summary>Gender-neutral, standing, variation 7.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarAnimationPreset.Wave">
+      <summary>Gender-neutral, waving.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarBodyType">
+      <summary>Defines the body type of the avatar.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBodyType.Female">
+      <summary>Female avatar.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBodyType.Male">
+      <summary>Male avatar.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarBone">
+      <summary>Defines a list of the useful bones of the avatar model.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.AnkleLeft">
+      <summary>Left ankle</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.AnkleRight">
+      <summary>Right ankle</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.BackLower">
+      <summary>Lower back</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.BackUpper">
+      <summary>Upper back</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.CollarLeft">
+      <summary>Left collar</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.CollarRight">
+      <summary>Right collar</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.ElbowLeft">
+      <summary>Left elbow</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.ElbowRight">
+      <summary>Right elbow</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerIndex2Left">
+      <summary>Left index finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerIndex2Right">
+      <summary>Right index finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerIndex3Left">
+      <summary>Left index finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerIndex3Right">
+      <summary>Right index finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerIndexLeft">
+      <summary>Left index finger, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerIndexRight">
+      <summary>Right index finger, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerMiddle2Left">
+      <summary>Left middle finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerMiddle2Right">
+      <summary>Right middle finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerMiddle3Left">
+      <summary>Left middle finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerMiddle3Right">
+      <summary>Right middle finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerMiddleLeft">
+      <summary>Left middle finger, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerMiddleRight">
+      <summary>Right middle finger, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerRing2Left">
+      <summary>Left ring finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerRing2Right">
+      <summary>Right ring finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerRing3Left">
+      <summary>Left ring finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerRing3Right">
+      <summary>Right ring finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerRingLeft">
+      <summary>Left ring finger, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerRingRight">
+      <summary>Right ring finger, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerSmall2Left">
+      <summary>Left pinky finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerSmall2Right">
+      <summary>Right pinky finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerSmall3Left">
+      <summary>Left pinky finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerSmall3Right">
+      <summary>Right pinky finger, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerSmallLeft">
+      <summary>Left pinky finger, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerSmallRight">
+      <summary>Right pinky finger, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerThumb2Left">
+      <summary>Left thumb, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerThumb2Right">
+      <summary>Right thumb, 2nd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerThumb3Left">
+      <summary>Left thumb, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerThumb3Right">
+      <summary>Right thumb, 3rd joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerThumbLeft">
+      <summary>Left thumb, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.FingerThumbRight">
+      <summary>Right thumb, 1st joint</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.Head">
+      <summary>Head</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.HipLeft">
+      <summary>Left hip</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.HipRight">
+      <summary>Right hip</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.KneeLeft">
+      <summary>Left knee</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.KneeRight">
+      <summary>Right knee</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.Neck">
+      <summary>Neck</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.PropLeft">
+      <summary>A separate object held in the left hand.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.PropRight">
+      <summary>A separate object held in the right hand.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.Root">
+      <summary>Root bone of the avatar skeleton</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.ShoulderLeft">
+      <summary>Left shoulder</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.ShoulderRight">
+      <summary>Right shoulder</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.SpecialLeft">
+      <summary>A special bone located near the left hand of the avatar model.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.SpecialRight">
+      <summary>A special bone located near the right hand of the avatar model.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.ToeLeft">
+      <summary>Left toe</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.ToeRight">
+      <summary>Right toe</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.WristLeft">
+      <summary>Left wrist</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarBone.WristRight">
+      <summary>Right wrist</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarDescription">
+      <summary>Provides access to the methods and properties of the description data for an avatar.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarDescription.#ctor(System.Byte[])">
+      <summary>Creates a new instance of AvatarDescription using an existing data buffer.</summary>
+      <param name="data">Existing buffer used to store the information of the newly-created avatar. Use the buffer specified by the Description property of a valid AvatarDescription object. Common scenarios include the recreation of random avatars that were created earlier or when avatar decription data is sent over a network to all signed-in gamers. Once that data is received, local avatar descriptions and renderers are created for each remote gamer avatar. Results are undefined if buffers from other sources are used.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarDescription.BeginGetFromGamer(Microsoft.Xna.Framework.GamerServices.Gamer,System.AsyncCallback,System.Object)">
+      <summary>Begins the process of getting a AvatarDescription object for a specified gamertag.</summary>
+      <param name="gamer">Gamer to request the AvatarDescription for.</param>
+      <param name="callback">The method to be called once the asynchronous operation has finished.</param>
+      <param name="state">State of the asynchronous operation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarDescription.BodyType">
+      <summary>Gets the body type of the avatar based on the description data.</summary>
+    </member>
+    <member name="E:Microsoft.Xna.Framework.GamerServices.AvatarDescription.Changed">
+      <summary>Occurs when a gamer's avatar changes.</summary>
+      <param name="" />
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarDescription.CreateRandom">
+      <summary>Creates an avatar of random gender, features, and clothing.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarDescription.CreateRandom(Microsoft.Xna.Framework.GamerServices.AvatarBodyType)">
+      <summary>Creates an avatar of the specified body type with random features and clothing.</summary>
+      <param name="bodyType">Body type of the randomly-created avatar.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarDescription.Description">
+      <summary>Internal description buffer of the avatar, stored as a byte buffer.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarDescription.EndGetFromGamer(System.IAsyncResult)">
+      <summary>Ends the process of getting an AvatarDescription object for a specified gamertag.</summary>
+      <param name="result">An IAsyncResult used to track the progress of the operation.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarDescription.Height">
+      <summary>Height of the avatar, from the feet to the top of the head.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarDescription.IsValid">
+      <summary>Determines whether the internal data buffer is valid.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarExpression">
+      <summary>Contains the various components of the avatar's face, such as the left and right eyebrows.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarExpression.LeftEye">
+      <summary>Gets or sets the current texture for the avatar's left eye.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarExpression.LeftEyebrow">
+      <summary>Gets or sets the current texture for the avatar's left eye.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarExpression.Mouth">
+      <summary>Gets or sets the current texture for the avatar's mouth.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarExpression.RightEye">
+      <summary>Gets or sets the current texture for the avatar's right eye.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarExpression.RightEyebrow">
+      <summary>Gets or sets the current texture for the avatar's right eyebrow.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarEye">
+      <summary>Defines the standard animation textures for an avatar's eyes.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Angry">
+      <summary>Angry eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Blink">
+      <summary>Blinking eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Confused">
+      <summary>Confused eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Happy">
+      <summary>Happy eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Laughing">
+      <summary>Laughing eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.LookDown">
+      <summary>Looking down eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.LookLeft">
+      <summary>Looking left position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.LookRight">
+      <summary>Looking right eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.LookUp">
+      <summary>Looking up eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Neutral">
+      <summary>Neutral eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Sad">
+      <summary>Sad eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Shocked">
+      <summary>Shocked eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Sleeping">
+      <summary>Sleeping eye position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEye.Yawning">
+      <summary>Yawning eye position.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarEyebrow">
+      <summary>Defines the standard animation textures for an avatar's eyebrows.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEyebrow.Angry">
+      <summary>Angry eyebrow position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEyebrow.Confused">
+      <summary>Confused eyebrow position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEyebrow.Neutral">
+      <summary>Neutral eyebrow position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEyebrow.Raised">
+      <summary>Raised eyebrow position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarEyebrow.Sad">
+      <summary>Sad eyebrow position.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarMouth">
+      <summary>Defines the standard animation textures for an avatar's mouth.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.Angry">
+      <summary>Angry mouth position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.Confused">
+      <summary>Confused mouth position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.Happy">
+      <summary>Happy mouth position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.Laughing">
+      <summary>Laughing mouth position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.Neutral">
+      <summary>Neutral mouth position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.PhoneticAi">
+      <summary>Phonetic "ai" mouth position (for lip sync).</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.PhoneticDth">
+      <summary>Phonetic "dth" mouth position (for lip sync).</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.PhoneticEe">
+      <summary>Phonetic "ee" mouth position (for lip sync).</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.PhoneticFv">
+      <summary>Phonetic "fv" mouth position (for lip sync).</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.PhoneticL">
+      <summary>Phonetic "l" mouth position (for lip sync).</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.PhoneticO">
+      <summary>Phonetic "o" mouth position (for lip sync).</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.PhoneticW">
+      <summary>Phonetic "w" mouth position (for lip sync).</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.Sad">
+      <summary>Sad mouth position.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarMouth.Shocked">
+      <summary>Shocked mouth position.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarRenderer">
+      <summary>Provides properties and methods for rendering a standard avatar.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.#ctor(Microsoft.Xna.Framework.GamerServices.AvatarDescription)">
+      <summary>Creates a new instance of AvatarRenderer with the specified description.</summary>
+      <param name="avatarDescription">Description of the avatar to be rendered.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.#ctor(Microsoft.Xna.Framework.GamerServices.AvatarDescription,System.Boolean)">
+      <summary />
+      <param name="avatarDescription">Description of the avatar to be rendered.</param>
+      <param name="useLoadingEffect">true if the standard effect is to be used during loading; otherwise, false.</param>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.AmbientLightColor">
+      <summary>Gets or sets the color of the ambient light used by the avatar renderer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.BindPose">
+      <summary />
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.BoneCount">
+      <summary>Number of bones in the avatar model.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.Dispose">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.Dispose(System.Boolean)">
+      <summary>Immediately releases the unmanaged resources used by this object.</summary>
+      <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.Draw(Microsoft.Xna.Framework.GamerServices.IAvatarAnimation)">
+      <summary />
+      <param name="animation">The animation to draw.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.Draw(System.Collections.Generic.IList{Microsoft.Xna.Framework.Matrix},Microsoft.Xna.Framework.GamerServices.AvatarExpression)">
+      <summary>Draws the avatar to the current render target.</summary>
+      <param name="bones">Collection of current bone transforms for the avatar. The transforms are in local bone space relative to their parent.</param>
+      <param name="expression">Current expression textures for the avatar.</param>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.Finalize">
+      <summary>Allows the avatar renderer to attempt to free resources and perform other cleanup operations before garbage collection reclaims the renderer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.IsDisposed">
+      <summary>Gets the disposed state of the avatar renderer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.LightColor">
+      <summary>Gets or sets the color of the directional light used by the avatar renderer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.LightDirection">
+      <summary>Gets or sets the direction of the directional light used by the avatar renderer.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.ParentBones">
+      <summary>Collection of the parent indices for each bone in the related BindPose collection.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.Projection">
+      <summary>Gets or sets the projection matrix for the avatar.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.State">
+      <summary>Gets the state of the avatar.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.View">
+      <summary>Gets or sets the view matrix for the avatar.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.AvatarRenderer.World">
+      <summary>Gets or sets the world matrix for the avatar.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.AvatarRendererState">
+      <summary>Indicates avatar state.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarRendererState.Loading">
+      <summary>The avatar is still loading required assets.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarRendererState.Ready">
+      <summary>Loading is complete.</summary>
+    </member>
+    <member name="F:Microsoft.Xna.Framework.GamerServices.AvatarRendererState.Unavailable">
+      <summary>The avatar is unavailable.</summary>
+    </member>
+    <member name="T:Microsoft.Xna.Framework.GamerServices.IAvatarAnimation">
+      <summary>Provides methods and properties for animating an avatar using custom animations. Allows for easier integration between custom animations and built-in animations.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.IAvatarAnimation.BoneTransforms">
+      <summary>Gets the current position of the bones at the time specified by CurrentPosition.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.IAvatarAnimation.CurrentPosition">
+      <summary>Gets or sets the current time position in the animation.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.IAvatarAnimation.Expression">
+      <summary>Gets the expression of the related animation at the current time position.</summary>
+    </member>
+    <member name="P:Microsoft.Xna.Framework.GamerServices.IAvatarAnimation.Length">
+      <summary>Gets the length of the current animation.</summary>
+    </member>
+    <member name="M:Microsoft.Xna.Framework.GamerServices.IAvatarAnimation.Update(System.TimeSpan,System.Boolean)">
+      <summary>Updates the current time position of the avatar animation.</summary>
+      <param name="elapsedAnimationTime">Elapsed time since the last animation frame. This value can be a positive or a negative time span. If the value is negative, animation playback is reversed.</param>
+      <param name="loop">true if animation playback is to be looped; otherwise, false.</param>
+    </member>
+  </members>
+</doc>

@@ -76,7 +76,7 @@ using System.Text;
 using System.Threading;
 
 using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.Components;
 
 #if IOS
@@ -90,6 +90,9 @@ namespace MonoGame.Tests {
 
 		public TestGameBase ()
 		{
+            // We do all the tests using the reference device to
+            // avoid driver glitches and get consistant rendering.
+            GraphicsAdapter.UseReferenceDevice = true;
 #if XNA
             Content.RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #endif
