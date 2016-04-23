@@ -6,15 +6,11 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ProjectControl : Scrollable
+    partial class ProjectControl : TreeView
     {
-        TreeView treeView1;
-
         private void InitializeComponent()
         {
-            treeView1 = new TreeView();
-
-            Content = treeView1;
+            
         }
     }
 }

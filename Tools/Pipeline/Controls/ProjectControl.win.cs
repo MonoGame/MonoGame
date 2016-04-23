@@ -156,7 +156,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void Init()
         {
-            _treeView = treeView1.ControlObject as TreeView;
+            _treeView = ControlObject as TreeView;
 
             _selectedNodes = new List<TreeNode>();
             _treeView.SelectedNode = null;

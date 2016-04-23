@@ -9,7 +9,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ProjectControl : Scrollable
+    partial class ProjectControl : TreeView
     {
         private Icon _iconRoot;
         private TreeItem _treeBase, _treeRoot;
@@ -22,9 +22,9 @@ namespace MonoGame.Tools.Pipeline
 
             _iconRoot = Icon.FromResource("TreeView.Root.png");
 
-            treeView1.DataStore = _treeBase = new TreeItem();
-            treeView1.Expanded += TreeView1_SaveExpanded;
-            treeView1.Collapsed += TreeView1_SaveExpanded;
+            DataStore = _treeBase = new TreeItem();
+            Expanded += TreeView1_SaveExpanded;
+            Collapsed += TreeView1_SaveExpanded;
 
             Init();
         }
@@ -44,9 +44,9 @@ namespace MonoGame.Tools.Pipeline
         {
             if (item == null)
             {
-                treeView1.DataStore = _treeBase = new TreeItem();
+                DataStore = _treeBase = new TreeItem();
                 _rootExists = false;
-                treeView1.ContextMenu = null;
+                ContextMenu = null;
                 return;
             }
 
@@ -63,8 +63,8 @@ namespace MonoGame.Tools.Pipeline
             _treeRoot.Tag = item;
             _treeRoot.Expanded = true;
 
-            treeView1.RefreshItem(_treeRoot);
-            treeView1.ContextMenu = _contextMenu;
+            RefreshItem(_treeRoot);
+            ContextMenu = _contextMenu;
         }
 
         public void AddItem(IProjectItem citem)
@@ -88,7 +88,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 var parrent = titem.Parent as TreeItem;
                 parrent.Children.Remove(titem);
-                treeView1.RefreshItem(parrent);
+                RefreshItem(parrent);
             }
         }
 
@@ -103,7 +103,7 @@ namespace MonoGame.Tools.Pipeline
                 if (item.ExpandToThis)
                 {
                     parrent.Expanded = true;
-                    treeView1.RefreshItem(parrent);
+                    RefreshItem(parrent);
                     item.ExpandToThis = false;
                 }
 
@@ -111,7 +111,7 @@ namespace MonoGame.Tools.Pipeline
 
                 if (item.SelectThis)
                 {
-                    treeView1.SelectedItem = titem;
+                    SelectedItem = titem;
                     item.SelectThis = false;
                 }
                 else
@@ -145,7 +145,7 @@ namespace MonoGame.Tools.Pipeline
                 titem.Image = Global.GetFileIcon(MainWindow.Controller.GetFullPath(item.OriginalPath), exists);
 
             var parrent = titem.Parent as TreeItem;
-            treeView1.RefreshItem(parrent);
+            RefreshItem(parrent);
             SetExists(parrent, exists);
         }
 
@@ -227,7 +227,7 @@ namespace MonoGame.Tools.Pipeline
             ret.Tag = item;
 
             root.Children.Insert(pos, ret);
-            treeView1.RefreshItem(root);
+            RefreshItem(root);
 
             return ret;
         }

@@ -16,7 +16,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void Init()
         {
-            _gtkTreeView = (treeView1.ControlObject as Gtk.ScrolledWindow).Children[0] as Gtk.TreeView;
+            _gtkTreeView = (ControlObject as Gtk.ScrolledWindow).Children[0] as Gtk.TreeView;
             _gtkTreeView.Selection.Mode = Gtk.SelectionMode.Multiple;
 
             _gtkTreeView.ButtonPressEvent += TreeView_ButtonPressEvent;
@@ -42,7 +42,7 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var path in paths)
             {
-                var item = (treeView1.Handler as TreeViewHandler).GetItem(path) as TreeItem;
+                var item = (Handler as TreeViewHandler).GetItem(path) as TreeItem;
                 items.Add(item.Tag as IProjectItem);
             }
 

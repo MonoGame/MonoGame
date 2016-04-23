@@ -12,27 +12,27 @@ namespace MonoGame.Tools.Pipeline
     {
         private void Init()
         {
-            treeView1.SelectionChanged += TreeView1_SelectionChanged;
+            SelectionChanged += TreeView1_SelectionChanged;
         }
 
         private void TreeView1_SelectionChanged(object sender, EventArgs e)
         {
             var selectedItems = new List<IProjectItem>();
 
-            if (treeView1.SelectedItem != null)
-                selectedItems.Add((treeView1.SelectedItem as TreeItem).Tag as IProjectItem);
+            if (SelectedItem != null)
+                selectedItems.Add((SelectedItem as TreeItem).Tag as IProjectItem);
 
             MainWindow.Controller.SelectionChanged(selectedItems);
         }
 
         private ITreeItem GetSelected()
         {
-            return treeView1.SelectedItem;
+            return SelectedItem;
         }
 
         private void SetSelected(ITreeItem item)
         {
-            treeView1.SelectedItem = item;
+            SelectedItem = item;
         }
     }
 }
