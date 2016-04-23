@@ -11,19 +11,12 @@ namespace MonoGame.Tools.Pipeline
 {
     static partial class Global
     {
-        public static string DesktopEnvironment { get; private set; }
+        public static bool Linux { get; private set; }
         public static bool UseHeaderBar { get; private set; }
         public static bool Unix { get; private set; }
 
         static Global()
         {
-#if LINUX
-            Global.DesktopEnvironment = Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP");
-            UseHeaderBar = Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16 && Global.DesktopEnvironment == "GNOME";
-#else
-            DesktopEnvironment = "OSX";
-#endif
-
             Unix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
 
             PlatformInit();
@@ -33,13 +26,8 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-                {
-                    if (Global.DesktopEnvironment == "OSX")
-                        return ":";
-                    
-                    return "/";
-                }
+                if (Global.Unix)
+                    return Global.Linux ? "/" : ":";
 
                 return "/?<>\\:*|\"";
             }

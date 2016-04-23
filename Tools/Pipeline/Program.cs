@@ -14,19 +14,19 @@ namespace MonoGame.Tools.Pipeline
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string [] args)
+        static void Main(string[] args)
         {
             var platform = Platform.Detect;
 
-            var app = new Application (platform);
+            var app = new Application(platform);
             Styles.Load();
 
-            var win = new MainWindow ();
+            var win = new MainWindow();
             var controller = PipelineController.Create(win);
 
             string project = null;
 
-            if (Global.DesktopEnvironment == "OSX")
+            if (Global.Unix && !Global.Linux)
                 project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
             else if (args != null && args.Length > 0)
                 project = string.Join(" ", args);
@@ -34,7 +34,7 @@ namespace MonoGame.Tools.Pipeline
             if (!string.IsNullOrEmpty(project))
                 controller.OpenProject(project);
 
-            app.Run (win);
+            app.Run(win);
         }
     }
 }

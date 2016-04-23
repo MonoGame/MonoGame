@@ -24,15 +24,20 @@ namespace MonoGame.Tools.Pipeline
 
         [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr gtk_app_chooser_dialog_new(IntPtr parrent, int flags, IntPtr file);
+
+        [DllImport(gtklibpath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool gtk_application_prefers_app_menu(IntPtr application);
     }
 
     static partial class Global
     {
         private static IconTheme _theme;
         private static Gdk.Pixbuf _iconMissing;
+        private static Gtk.Application _app;
 
         private static void PlatformInit()
         {
+            Linux = true;
             _theme = IconTheme.Default;
 
             try
@@ -42,6 +47,14 @@ namespace MonoGame.Tools.Pipeline
             catch
             {
                 _iconMissing = new Gdk.Pixbuf(null, "TreeView.Missing.png");
+            }
+
+            if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
+            {
+                _app = new Gtk.Application("MonoGame.Pipeline.Tool", GLib.ApplicationFlags.None);
+                _app.Register(GLib.Cancellable.Current);
+
+                UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(_app.Handle);
             }
         }
 
