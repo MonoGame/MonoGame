@@ -12,19 +12,44 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class ProjectControl
     {
-        Gtk.TreeView _gtkTreeView;
+        private Gtk.ScrolledWindow _scrolledWindow;
+        private Gtk.TreeView _gtkTreeView;
+        private double _scrollVertical, _scrollHorizontal;
+        private bool _scroll;
 
         private void Init()
         {
-            _gtkTreeView = (ControlObject as Gtk.ScrolledWindow).Children[0] as Gtk.TreeView;
-            _gtkTreeView.Selection.Mode = Gtk.SelectionMode.Multiple;
+            _scrollVertical = 0;
+            _scrollHorizontal = 0;
+            _scroll = false;
 
+            _scrolledWindow = ControlObject as Gtk.ScrolledWindow;
+            _gtkTreeView = _scrolledWindow.Children[0] as Gtk.TreeView;
+
+            _gtkTreeView.Selection.Mode = Gtk.SelectionMode.Multiple;
             _gtkTreeView.ButtonPressEvent += TreeView_ButtonPressEvent;
             _gtkTreeView.Selection.Changed += Selection_Changed;
+            _gtkTreeView.MapEvent += _scrolledWindow_ScrollChild;
+            _scrolledWindow.SizeAllocated += _scrolledWindow_ScrollChild;
+        }
+
+        private void _scrolledWindow_ScrollChild(object o, EventArgs args)
+        {
+            if (_scroll)
+            {
+                _scrolledWindow.Vadjustment.Value = _scrollVertical;
+                _scrolledWindow.Hadjustment.Value = _scrollHorizontal;
+
+                _scroll = false;
+            }
         }
 
         private Gtk.TreePath[] GetSelected()
         {
+            _scrollVertical = _scrolledWindow.Vadjustment.Value;
+            _scrollHorizontal = _scrolledWindow.Hadjustment.Value;
+            _scroll = true;
+
             return _gtkTreeView.Selection.GetSelectedRows();
         }
 
