@@ -878,6 +878,18 @@
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\Mouse.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.MacOS.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.Default.cs">
+      <ExcludePlatforms>WindowsGL,Linux,Windows,MacOS</ExcludePlatforms>
+    </Compile>
     <Compile Include="Input\MouseCursor.cs" />
     <Compile Include="Input\MouseCursor.SDL.cs">
       <Platforms>Linux,WindowsGL</Platforms>

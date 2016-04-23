@@ -477,7 +477,7 @@ namespace MonoGame.Framework
             }
             _platform = null;
             Game = null;
-            Mouse.SetWindows(null);
+            Mouse.Window = null;
             Device.KeyboardInput -= OnRawKeyEvent;
             Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.Remove);
         }
