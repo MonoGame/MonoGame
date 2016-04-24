@@ -18,10 +18,15 @@ namespace Microsoft.Xna.Framework.Input
             return 4;
         }
 
+        private static int PlatformGetMaxNumberOfGamePads ()
+        {
+            return PlatformGetMaxIndex ();
+        }
+
         static bool IndexIsUsed (GCControllerPlayerIndex index)
         {
             foreach (var ctrl in GCController.Controllers)
-                if (ctrl.PlayerIndex==index) return true;
+                if (ctrl.PlayerIndex==(int)index) return true;
 
             return false;
         }
@@ -31,11 +36,11 @@ namespace Microsoft.Xna.Framework.Input
                 return;
             foreach (var controller in GCController.Controllers)
             {
-                if (controller.PlayerIndex == index)
+                if (controller.PlayerIndex == (int)index)
                     break;
-                if (controller.PlayerIndex == GCControllerPlayerIndex.Unset)
+                if (controller.PlayerIndex == (int)GCControllerPlayerIndex.Unset)
                 {
-                    controller.PlayerIndex = index;
+                    controller.PlayerIndex = (int)index;
                     break;
                 }
             }
@@ -51,7 +56,7 @@ namespace Microsoft.Xna.Framework.Input
             {
                 if (controller == null)
                     continue;
-                if (controller.PlayerIndex == ind)
+                if (controller.PlayerIndex == (int)ind)
                     return GetCapabilities(controller);
             }
             return new GamePadCapabilities { IsConnected = false };
@@ -76,7 +81,7 @@ namespace Microsoft.Xna.Framework.Input
                 if (controller == null)
                     continue;
 
-                if (controller.PlayerIndex != ind)
+                if (controller.PlayerIndex != (int)ind)
                     continue;
 
                 connected = true;
