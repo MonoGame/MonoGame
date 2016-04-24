@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>MonoGame.Framework.Content.Pipeline.Portable</id>
-        <version>0.0.0.0</version>
+        <version>$version$</version>
         <title>MonoGame.Framework.Content.Pipeline.Portable</title>
         <authors>MonoGameTeam</authors>
         <owners>MonoGameTeam</owners>
@@ -18,10 +18,12 @@
         <references>
             <reference file="MonoGame.Framework.Content.Pipeline.dll" />
         </references>	
+        <dependencies>
+            <dependency id="MonoGame.Framework.Portable" version="$version$" />
+        </dependencies>
 	</metadata>
     <files>
         <file src="..\..\MonoGame.Framework.Content.Pipeline\bin\Portable\AnyCPU\MonoGame.Framework.Content.Pipeline.dll" target="lib\net40\MonoGame.Framework.Content.Pipeline.dll" />
         <file src="..\..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml" target="lib\net40\MonoGame.Framework.Content.Pipeline.xml" />
-        <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
     </files>
 </package>
