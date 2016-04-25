@@ -588,9 +588,20 @@ namespace MonoGame.Tools.Pipeline
             Include(initialDirectory, files);
         }
 
+        private string GetCurrentPath()
+        {
+            if (SelectedItem is DirectoryItem)
+                return SelectedItem.OriginalPath;
+
+            if (SelectedItem is ContentItem)
+                return SelectedItem.Location;
+
+            return _project.Location;
+        }
+
         public void Include()
         {
-            var path = GetFullPath(SelectedItem == null ? _project.Location : SelectedItem.OriginalPath);
+            var path = GetFullPath(GetCurrentPath());
 
             List<string> files;
             if (!View.ChooseContentFile(path, out files))
@@ -665,7 +676,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void IncludeFolder()
         {
-            var path = GetFullPath(SelectedItem == null ? _project.Location : SelectedItem.OriginalPath);
+            var path = GetFullPath(GetCurrentPath());
 
             string folder;
             if (!View.ChooseContentFolder(path, out folder))
@@ -830,7 +841,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void NewItem()
         {
-            var path = GetFullPath(SelectedItem == null ? _project.OriginalPath : SelectedItem.OriginalPath);
+            var path = GetFullPath(GetCurrentPath());
 
             string name;
             ContentItemTemplate template;
@@ -849,7 +860,7 @@ namespace MonoGame.Tools.Pipeline
             if (!View.ShowEditDialog("New Folder", "Folder Name:", "", true, out name))
                 return;
 
-            string folder = Path.Combine(GetFullPath(SelectedItem == null ? _project.OriginalPath : SelectedItem.OriginalPath), name);
+            string folder = Path.Combine(GetFullPath(GetCurrentPath()), name);
 
             if (!Path.IsPathRooted(folder))
                 folder = _project.Location + Path.DirectorySeparatorChar + folder;
