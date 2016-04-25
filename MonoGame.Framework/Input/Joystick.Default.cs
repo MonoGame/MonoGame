@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#if !MONOMAC || PLATFORM_MACOS_LEGACY
+
 using System;
 
 namespace Microsoft.Xna.Framework.Input
@@ -31,3 +33,6 @@ namespace Microsoft.Xna.Framework.Input
         }
     }
 }
+
+#endif
+
