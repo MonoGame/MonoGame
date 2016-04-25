@@ -791,7 +791,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,MacOS,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -834,9 +834,6 @@
     </Compile>
     <Compile Include="Input\Joystick.SDL.cs">
       <Platforms>Linux,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Input\Joystick.MacOS.cs">
-      <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.Web.cs">
       <Platforms>Web</Platforms>
