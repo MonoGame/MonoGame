@@ -77,6 +77,7 @@ namespace MonoGame.Tools.Pipeline
             References = new List<string>();
             OutputDir = "bin";
             IntermediateDir = "obj";
+            Exists = true;
         }
     }
 }

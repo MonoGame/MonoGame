@@ -1079,15 +1079,19 @@ namespace MonoGame.Tools.Pipeline
         {
             var oneselected = SelectedItems.Count == 1;
             var somethingselected = SelectedItems.Count > 0;
+            var exists = true;
 
-            info.OpenItem = oneselected && SelectedItem is ContentItem;
-            info.OpenItemWith = oneselected && !(SelectedItem is DirectoryItem);
-            info.OpenItemLocation = oneselected;
-            info.Add = (oneselected && !(SelectedItem is ContentItem)) || !somethingselected && ProjectOpen;
-            info.Exclude = somethingselected && !SelectedItems.Contains(_project);
-            info.Rename = oneselected;
-            info.Delete = info.Exclude;
-            info.RebuildItem = somethingselected;
+            foreach (var item in SelectedItems)
+                exists &= item.Exists;
+
+            info.OpenItem = exists && oneselected && SelectedItem is ContentItem;
+            info.OpenItemWith = exists && oneselected && !(SelectedItem is DirectoryItem);
+            info.OpenItemLocation = exists && oneselected;
+            info.Add = (exists && oneselected && !(SelectedItem is ContentItem)) || !somethingselected && ProjectOpen;
+            info.Exclude = exists && somethingselected && !SelectedItems.Contains(_project);
+            info.Rename = exists && oneselected;
+            info.Delete = exists && info.Exclude;
+            info.RebuildItem = exists && somethingselected;
         }
     }
 }

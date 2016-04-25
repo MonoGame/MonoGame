@@ -390,6 +390,8 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmOpenItem, ref sep);
             AddContextMenu(cmOpenItemWith, ref sep);
             AddContextMenu(cmAdd, ref sep);
+            if (sep && !info.Exclude)
+                sep = false;
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
