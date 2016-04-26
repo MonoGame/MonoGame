@@ -145,7 +145,7 @@ namespace MonoGame.Tools.Pipeline
         }
     };
 
-    internal class PipelineTypes
+    public class PipelineTypes
     {
         [DebuggerDisplay("ImporterInfo: {Type.Name}")]
         private struct ImporterInfo
@@ -426,9 +426,16 @@ namespace MonoGame.Tools.Pipeline
             {
                 try
                 {                    
-                    var a = Assembly.LoadFrom(path);
-                    var types = a.GetTypes();
-                    ProcessTypes(types);
+                    // Only load in Assemblies that haven't already been loaded in.
+                    var reflectedAss = Assembly.ReflectionOnlyLoadFrom(path);
+                    bool found = assemblies.Any(ass => ass.FullName == reflectedAss.FullName);
+
+                    if (!found)
+                    {
+                        var a = Assembly.LoadFrom(path);
+                        var types = a.GetTypes();
+                        ProcessTypes(types);
+                    }
                 }
                 catch 
                 {
