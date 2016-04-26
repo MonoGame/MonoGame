@@ -1309,7 +1309,13 @@
     <Compile Include="Design\Vector4TypeConverter.cs">
       <Services>_XNADesignProvided</Services>
     </Compile>
-
+	<Compile Include="Design\ColorTypeConverter.cs">
+      <Services>_XNADesignProvided</Services>
+    </Compile>
+	<Compile Include="Design\PointTypeConverter.cs">
+      <Services>_XNADesignProvided</Services>
+    </Compile>	
+	
     <!-- OpenGL Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
       <Services>_GLCompatible</Services>
