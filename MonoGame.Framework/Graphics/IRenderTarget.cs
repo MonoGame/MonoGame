@@ -40,19 +40,8 @@
 using SharpDX.Direct3D11;
 #endif
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#else
+#if OPENGL
 using OpenGL;
-using OpenTK.Graphics.OpenGL;
-#endif
-#elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
-using System;
-using System.Collections.Generic;
-#elif GLES
-using OpenTK.Graphics.ES20;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
