@@ -1,4 +1,9 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
+using System.Runtime.InteropServices;
 
 namespace OpenAL
 {
@@ -69,22 +74,134 @@ namespace OpenAL
         InverseDistanceClamped = 0xD002,
     }
 
-    public partial class AL
+    public enum AlcError
     {
-        public static ALError GetError(IntPtr device) { return ALError.NoError; }
-        public static ALError GetError() { return ALError.NoError; }
-        public static void GenBuffers(int count, out int buffer) { buffer = 0; }
-        public static int[] GenBuffers(int count) { return null; }
-        public static void DeleteBuffers(int count, ref int buffer) { }
-        public static void DeleteBuffers(int[] buffers) { }
+        NoError = 0,
+    }
+
+    public enum EfxFilteri
+    {
+        FilterType = 0x8001,
+    }
+
+    public enum EfxFilterf
+    {
+        LowpassGain = 0x0001,
+        LowpassGainHF = 0x0002,
+    }
+
+    public enum EfxFilterType
+    {
+        Lowpass = 0x0001,
+    }
+
+    public class AL
+    {
+        public const string NativeLibName = "libopenal.so.1";
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteBuffers")]
+        public static extern void BufferData(uint bid, ALFormat format, IntPtr data, int size, int freq);
+
+        public static void BufferData(int bid, ALFormat format, byte[] data, int size, int freq)
+        {
+            var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            BufferData((uint)bid, format, handle.AddrOfPinnedObject(), size, freq);
+            handle.Free();
+        }
+
+        public static void BufferData(int bid, ALFormat format, short[] data, int size, int freq)
+        {
+            var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            BufferData((uint)bid, format, handle.AddrOfPinnedObject(), size, freq);
+            handle.Free();
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteBuffers")]
+        public static extern void DeleteBuffers(int n, ref int[] buffers);
+
+        public static void DeleteBuffers(int[] buffers)
+        {
+            DeleteBuffers(buffers.Length, ref buffers);
+        }
+
+        public static void DeleteBuffers(int n, ref int buffer)
+        {
+            var buffers = new[] { buffer };
+            DeleteBuffers(n, ref buffers);
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetBufferi")]
+        public static extern void GetBufferi(int bid, ALGetBufferi param, out int value);
+
+        public static void GetBuffer(int bid, ALGetBufferi param, out int value)
+        {
+            GetBufferi(bid, param, out value);
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGenBuffers")]
+        public static extern void GenBuffers(int count, out int[] buffers);
+
+        public static void GenBuffers(int count, out int buffer)
+        {
+            int[] ret;
+            GenBuffers(count, out ret);
+            buffer = ret[0];
+        }
+
+        public static int[] GenBuffers(int count)
+        {
+            int[] ret;
+            GenBuffers(count, out ret);
+            return ret;
+        }
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGenSources")]
+        public static extern void GenSources(int n, out uint sources);
+
+
+        public static void GenSources(int[] sources)
+        {
+            uint[] temp = new uint[sources.Length];
+            GenSources(temp.Length, out temp[0]);
+            for (int i = 0; i < temp.Length; i++)
+            {
+                sources[i] = (int)temp[i];
+            }
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetError")]
+        public static extern ALError GetError();
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alIsBuffer")]
+        public static extern bool IsBuffer(uint buffer);
+
+        public static bool IsBuffer(int buffer)
+        {
+            return IsBuffer((uint)buffer);
+        }
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourcePause")]
+        public static extern void SourcePause(uint source);
+
+        public static void SourcePause(int source)
+        {
+            SourcePause((uint)source);
+        }
+
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourcePlay")]
+        public static extern void SourcePlay(uint source);
+
+        public static void SourcePlay(int source)
+        {
+            SourcePlay((uint)source);
+        }
+
         public static string GetErrorString(ALError errorCode) { return ""; }
-        public static void BufferData(int buffer, ALFormat format, byte[] data, int dataSize, int sampleRate) { }
-        public static void BufferData(int buffer, ALFormat format, short[] data, int dataSize, int sampleRate) { }
-        public static void GetBuffer(int buffer, ALGetBufferi i, out int b) { b = 0; }
-        public static void SourcePause(int source) { }
-        public static void SourcePlay(int source) { }
-        public static bool IsBuffer(int buffer) { return false; }
-        public static void GenSources(int[] sources) { }
         public static void DeleteSource(int source) { }
         public static void SourceStop(int sourceId) { }
         public static void Source(int sourceId, ALSourceb i, bool a) { }
@@ -102,22 +219,11 @@ namespace OpenAL
         public static int[] SourceUnqueueBuffers(int sourceId, int processed) { return null; }
         public static int[] SourceUnqueueBuffers(int sourceId, int processed, int[] salvaged) { return null; }
         public static void SourceQueueBuffers(int sourceId, int filled, int[] buffers) { }
-
-        public static void LoadEntryPoints()
-        {
-            LoadPlatformEntryPoints();
-        }
-
-        static partial void LoadPlatformEntryPoints();
-    }
-
-    public enum AlcError
-    {
-        NoError,
     }
 
     public partial class Alc
     {
+        public static IntPtr CreateContext(IntPtr device, int[] attributes) { return IntPtr.Zero; }
         public static AlcError GetError() { return AlcError.NoError; }
         public static AlcError GetError(IntPtr device) { return AlcError.NoError; }
         public static IntPtr GetCurrentContext() { return IntPtr.Zero; }
@@ -126,37 +232,16 @@ namespace OpenAL
         public static void CloseDevice(IntPtr device) { }
         public static IntPtr OpenDevice(string device) { return IntPtr.Zero; }
     }
-    public class AudioContext : IDisposable
-    {
-        public void Dispose() { }
-    }
 
     public class XRamExtension
     {
-
         public enum XRamStorage
         {
-            Hardware,
+            Hardware = 1,
         }
 
         public bool IsInitialized { get; set; }
         public void SetBufferMode(int i, ref int id, XRamStorage storage) { }
-    }
-
-    public enum EfxFilteri
-    {
-        FilterType,
-    }
-
-    public enum EfxFilterf
-    {
-        LowpassGain,
-        LowpassGainHF,
-    }
-
-    public enum EfxFilterType
-    {
-        Lowpass,
     }
 
     public class EffectsExtension

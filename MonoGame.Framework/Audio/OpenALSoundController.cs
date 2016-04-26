@@ -76,9 +76,6 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
 #elif DESKTOPGL
-        #pragma warning disable 414
-        private static AudioContext _acontext;
-        #pragma warning restore 414
         private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
@@ -231,16 +228,14 @@ namespace Microsoft.Xna.Framework.Audio
                 AVAudioSession.Notifications.ObserveInterruption(handler);
 
                 int[] attribute = new int[0];
-#elif !DESKTOPGL
+#else
                 int[] attribute = new int[0];
 #endif
 
-#if DESKTOPGL
-                _acontext = new AudioContext();
-                _context = Alc.GetCurrentContext();
-                _oggstreamer = new OggStreamer();
-#else
                 _context = Alc.CreateContext(_device, attribute);
+
+#if DESKTOPGL
+                _oggstreamer = new OggStreamer();
 #endif
 
                 if (CheckALError("Could not create AL context"))
@@ -309,24 +304,18 @@ namespace Microsoft.Xna.Framework.Audio
         private void CleanUpOpenAL()
         {
             Alc.MakeContextCurrent(IntPtr.Zero);
-#if DESKTOPGL
-            if (_acontext != null)
-            {
-                _acontext.Dispose();
-                _acontext = null;
-            }
-#else
-            if (_context != ContextHandle.Zero)
+
+            if (_context != IntPtr.Zero)
             {
                 Alc.DestroyContext (_context);
-                _context = ContextHandle.Zero;
+                _context = IntPtr.Zero;
             }
             if (_device != IntPtr.Zero)
             {
                 Alc.CloseDevice (_device);
                 _device = IntPtr.Zero;
             }
-#endif
+
             _bSoundAvailable = false;
         }
 
