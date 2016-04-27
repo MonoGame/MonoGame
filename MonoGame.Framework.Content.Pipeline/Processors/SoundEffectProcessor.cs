@@ -49,14 +49,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     else
                     {
                         // TODO: For some reason this doesn't work on Windows
-                        // so we fallback to plain PCM and depend on the 
+                        // so we fallback to plain PCM and depend on the
                         // bitrate reduction only.
                         //targetFormat = ConversionFormat.Adpcm;
                     }
                     break;
             }
 
-            input.ConvertFormat(targetFormat, quality, null);
+            var finalQuality= input.ConvertFormat(targetFormat, quality, null);
+            if (quality != finalQuality)
+                context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", quality, finalQuality);
 
             return new SoundEffectContent(input.Format.NativeWaveFormat, input.Data, input.LoopStart, input.LoopLength, (int)input.Duration.TotalMilliseconds);
         }
