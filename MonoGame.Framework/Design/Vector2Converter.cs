@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 
 namespace Microsoft.Xna.Framework.Design
 {
-    public class PointTypeConverter : TypeConverter
+    public class Vector2Converter : MathTypeConverter
     {
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(int))
-                return true;
-            if (destinationType == typeof(Point))
+            if (VectorConversion.CanConvertTo(context, destinationType))
                 return true;
             if (destinationType == typeof(string))
                 return true;
@@ -23,42 +22,25 @@ namespace Microsoft.Xna.Framework.Design
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            try
+            var vec = (Vector2)value;
+
+            if (VectorConversion.CanConvertTo(context, destinationType))
             {
-                throw new Exception();
+                var vec4 = new Vector4(vec.X, vec.Y, 0.0f, 0.0f);
+                return VectorConversion.ConvertToFromVector4(context, culture, vec4, destinationType);
             }
-            catch (Exception ex)
-            {
-
-            }
-
-            var point = (Point)value;
-
-
-            if (destinationType == typeof(int))
-            {
-                return point.X;
-            }
-
-            if (destinationType == typeof(Point))
-            {
-                return point;
-            }
-
-
 
             if (destinationType == typeof(string))
             {
                 var terms = new string[2];
-                terms[0] = point.X.ToString(culture);
-                terms[1] = point.Y.ToString(culture);
+                terms[0] = vec.X.ToString("R", culture);
+                terms[1] = vec.Y.ToString("R", culture);
 
                 return string.Join(culture.TextInfo.ListSeparator + " ", terms);
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
         }
-
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -70,28 +52,18 @@ namespace Microsoft.Xna.Framework.Design
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            try
-            {
-                throw new Exception();
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-
             var sourceType = value.GetType();
-            var point = Point.Zero;
+            var vec = Vector2.Zero;
 
             if (sourceType == typeof(string))
             {
                 var str = (string)value;
                 var words = str.Split(culture.TextInfo.ListSeparator.ToCharArray());
 
-                point.X = int.Parse(words[0], culture);
-                point.Y = int.Parse(words[1], culture);
+                vec.X = float.Parse(words[0], culture);
+                vec.Y = float.Parse(words[1], culture);
 
-                return point;
+                return vec;
             }
 
             return base.ConvertFrom(context, culture, value);

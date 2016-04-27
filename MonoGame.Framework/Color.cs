@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
 #if XNADESIGNPROVIDED
-    [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.ColorTypeConverter))]
+    [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.ColorConverter))]
 #endif
     public struct Color : IEquatable<Color>
     {
