@@ -427,8 +427,8 @@ namespace MonoGame.Tools.Pipeline
                 try
                 {                    
                     // Only load in Assemblies that haven't already been loaded in.
-                    var reflectedAss = Assembly.ReflectionOnlyLoadFrom(path);
-                    bool found = assemblies.Any(ass => ass.FullName == reflectedAss.FullName);
+                    var reflectedAssembly = Assembly.ReflectionOnlyLoadFrom(path);
+                    bool found = assemblies.Any(assembly => assembly.FullName == reflectedAssembly.FullName);
 
                     if (!found)
                     {
