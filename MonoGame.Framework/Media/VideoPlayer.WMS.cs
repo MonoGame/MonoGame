@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
-using System.Threading;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX;
 using SharpDX.MediaFoundation;
@@ -17,7 +19,7 @@ namespace Microsoft.Xna.Framework.Media
 
         // HACK: Need SharpDX to fix this.
         private static Guid AudioStreamVolumeGuid;
-
+        private static Texture2D _texture;
         private static Callback _callback;
 
         private class Callback : IAsyncCallback
@@ -34,6 +36,7 @@ namespace Microsoft.Xna.Framework.Media
             }
 
             public IDisposable Shadow { get; set; }
+
             public void Invoke(AsyncResult asyncResultRef)
             {
                 var ev = _session.EndGetEvent(asyncResultRef);
@@ -42,6 +45,8 @@ namespace Microsoft.Xna.Framework.Media
 
                 if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
                     _player.OnTopologyReady();
+                else if (ev.TypeInfo == MediaEventTypes.EndOfPresentation)
+                    _player.OnPresentationEnded();
 
                 _session.BeginGetEvent(this, null);
             }
@@ -59,22 +64,38 @@ namespace Microsoft.Xna.Framework.Media
             MediaFactory.CreateMediaSession(null, out _session);
         }
 
+        private void CreateTexture()
+        {
+            if (_currentVideo == null)
+                return;
+
+            if (_texture != null)
+            {
+                // If the new video is different in size to the previous video, dispose of the current texture
+                if (_texture.Width != _currentVideo.Width || _texture.Height != _currentVideo.Height)
+                {
+                    _texture.Dispose();
+                    _texture = null;
+                }
+            }
+
+            if (_texture == null)
+                _texture = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
+        }
+
         private Texture2D PlatformGetTexture()
         {
-            var sampleGrabber = _currentVideo.SampleGrabber;
+            CreateTexture();
 
-            var texData = sampleGrabber.TextureData;
+            if (_currentVideo != null && State != MediaState.Stopped)
+            {
+                var sampleGrabber = _currentVideo.SampleGrabber;
+                var texData = sampleGrabber.TextureData;
+                if (texData != null)
+                    _texture.SetData(texData);
+            }
 
-            if (texData == null)
-                return null;
-
-            // TODO: This could likely be optimized if we held on to the SharpDX Surface/Texture data,
-            // and set it on an XNA one rather than constructing a new one every time this is called.
-            var retTex = new Texture2D(Game.Instance.GraphicsDevice, _currentVideo.Width, _currentVideo.Height, false, SurfaceFormat.Bgr32);
-            
-            retTex.SetData(texData);
-            
-            return retTex;
+            return _texture;
         }
 
         private void PlatformGetState(ref MediaState result)
@@ -119,6 +140,8 @@ namespace Microsoft.Xna.Framework.Media
                 }
                 _clock.Dispose();
             }
+
+            CreateTexture();
 
             //create the callback if it hasn't been created yet
             if (_callback == null)
@@ -182,7 +205,6 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformSetIsLooped()
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformSetIsMuted()
@@ -200,6 +222,14 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformDispose(bool disposing)
         {
+            if (disposing)
+            {
+                if (_texture != null)
+                {
+                    _texture.Dispose();
+                    _texture = null;
+                }
+            }
         }
 
         private void OnTopologyReady()
@@ -213,6 +243,18 @@ namespace Microsoft.Xna.Framework.Media
             _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
 
             SetChannelVolumes();
+        }
+
+        private void OnPresentationEnded()
+        {
+            if (_isLooped)
+            {
+                PlatformPlay();
+            }
+            else
+            {
+                Stop();
+            }
         }
     }
 }
