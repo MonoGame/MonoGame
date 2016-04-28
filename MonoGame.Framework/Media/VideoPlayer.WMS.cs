@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Media
         private Guid AudioStreamVolumeGuid;
         private Texture2D _texture;
         private Callback _callback;
-
+        private static Texture2D _texture;
         internal MediaSession Session { get { return _session; } }
 
         private class Callback : IAsyncCallback
