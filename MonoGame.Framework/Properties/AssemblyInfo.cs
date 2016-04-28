@@ -4,27 +4,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Resources;
 
-// General Information about an assembly is controlled through the following
+// Common information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-//[assembly: AssemblyTitle("MonoGame.Framework")]
-#if OUYA
-[assembly: AssemblyTitle("MonoGame for OUYA")]
-#elif ANDROID
-[assembly: AssemblyTitle("MonoGame for Android")]
-#elif WINDOWS_STOREAPP
-[assembly: AssemblyTitle("MonoGame for Windows Store")]
-#elif DESKTOPGL
-[assembly: AssemblyTitle("MonoGame for all OpenGL Desktop Platforms")]
-#elif WINDOWS
-[assembly: AssemblyTitle("MonoGame for Windows Desktop (DirectX)")]
-#elif MAC
-[assembly: AssemblyTitle("MonoGame for Mac OS X")]
-#elif IOS
-[assembly: AssemblyTitle("MonoGame for iOS")]
-#elif WINDOWS_PHONE
-[assembly: AssemblyTitle("MonoGame for Windows Phone 8")]
-#endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MonoGame Team")]
 [assembly: AssemblyProduct("MonoGame.Framework")]
