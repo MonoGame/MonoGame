@@ -172,13 +172,16 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.WindowsPhone.cs">
-        <Platforms>WindowsPhone81</Platforms>
+        <Platforms>WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.WindowsStore.cs">
         <Platforms>Windows8</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.UniversalWindowsPlatform.cs">
         <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Web.cs">
+        <Platforms>Web</Platforms>
     </Compile>
 
     <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
