@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class UpdatePropertyAction : IProjectAction
+    public class UpdatePropertyAction : IProjectAction
     {
         private readonly IView _view;
         private readonly List<object> _objects;

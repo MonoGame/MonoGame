@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class CellText : CellBase
+    public class CellText : CellBase
     {
         public CellText(string category, string name, object value, EventHandler eventHandler, bool editable) : base(category, name, value, eventHandler)
         {

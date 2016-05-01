@@ -4,7 +4,7 @@
 
 namespace MonoGame.Tools.Pipeline
 {
-    interface IProjectAction
+    public interface IProjectAction
     {
         bool Do();
         bool Undo();

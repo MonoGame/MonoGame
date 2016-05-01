@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class CellCombo : CellBase
+    public class CellCombo : CellBase
     {
         private object _type;
 

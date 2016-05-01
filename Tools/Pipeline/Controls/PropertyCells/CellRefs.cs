@@ -8,7 +8,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class CellRefs : CellBase
+    public class CellRefs : CellBase
     {
         public CellRefs(string category, string name, object value, EventHandler eventHandler) : base(category, name, value, eventHandler)
         {
@@ -20,7 +20,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override void Edit(Control control)
         {
-            var dialog = new ReferenceDialog(MainWindow.Controller, (Value as List<string>).ToArray());
+            var dialog = new ReferenceDialog(PipelineController.Instance, (Value as List<string>).ToArray());
             if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)
                 _eventHandler(dialog.References, EventArgs.Empty);
         }

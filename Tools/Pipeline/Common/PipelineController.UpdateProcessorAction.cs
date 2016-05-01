@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class UpdateProcessorAction : IProjectAction
+    public class UpdateProcessorAction : IProjectAction
     {
         private readonly IView _view;
         private readonly List<ContentItem> _objects;

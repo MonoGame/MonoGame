@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace MonoGame.Tools.Pipeline
 {
-    enum AskResult
+    public enum AskResult
     {
         Yes,
         No,
@@ -22,7 +22,7 @@ namespace MonoGame.Tools.Pipeline
         Skip
     }
 
-    interface IView
+    public interface IView
     {
         void Attach(IController controller);
 

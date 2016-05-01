@@ -12,7 +12,7 @@ namespace MonoGame.Tools.Pipeline
         void OnItemModified(ContentItem item);
     }
 
-    interface IController : IContentItemObserver
+    public interface IController : IContentItemObserver
     {
         /// <summary>
         /// Types of content which can be created and added to a project. 

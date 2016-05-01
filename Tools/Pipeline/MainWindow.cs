@@ -15,7 +15,6 @@ namespace MonoGame.Tools.Pipeline
         private const string TitleBase = "MonoGame Pipeline Tools";
 
         public static MainWindow Instance;
-        public static IController Controller;
 
         private ContextMenu _contextMenu;
         private FileDialogFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
@@ -41,7 +40,7 @@ namespace MonoGame.Tools.Pipeline
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            e.Cancel = !Controller.Exit();
+            e.Cancel = !PipelineController.Instance.Exit();
             base.OnClosing(e);
         }
 
@@ -53,7 +52,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ShowContextMenu()
         {
-            if (Controller.ProjectOpen)
+            if (PipelineController.Instance.ProjectOpen)
                 _contextMenu.Show(projectControl);
         }
 
@@ -61,8 +60,6 @@ namespace MonoGame.Tools.Pipeline
 
         public void Attach(IController controller)
         {
-            Controller = controller;
-
             cmdFilterOutput.Checked = PipelineSettings.Default.FilterOutput;
             CmdFilterOutput_Executed(this, EventArgs.Empty);
 
@@ -172,7 +169,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateProperties()
         {
-            propertyGridControl.SetObjects(Controller.SelectedItems);
+            propertyGridControl.SetObjects(PipelineController.Instance.SelectedItems);
         }
 
         public void OutputAppend(string text)
@@ -187,7 +184,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
-            var dialog = new DeleteDialog(Controller, items);
+            var dialog = new DeleteDialog(PipelineController.Instance, items);
             return dialog.Run(this) == Eto.Forms.DialogResult.Ok;
         }
 
@@ -230,7 +227,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool ChooseItemTemplate(string folder, out ContentItemTemplate template, out string name)
         {
-            var dialog = new NewItemDialog(Controller.Templates.GetEnumerator(), folder);
+            var dialog = new NewItemDialog(PipelineController.Instance.Templates.GetEnumerator(), folder);
             var result = dialog.Run(this) == DialogResult.Ok;
 
             template = dialog.Selected;
@@ -292,7 +289,7 @@ namespace MonoGame.Tools.Pipeline
 
                 proc.StartInfo.FileName = monoLoc;
 
-                if (Controller.LaunchDebugger)
+                if (PipelineController.Instance.LaunchDebugger)
                 {
                     var port = Environment.GetEnvironmentVariable("MONO_DEBUGGER_PORT");
                     port = !string.IsNullOrEmpty(port) ? port : "55555";
@@ -319,11 +316,11 @@ namespace MonoGame.Tools.Pipeline
 
             var title = TitleBase;
 
-            if (Controller.ProjectOpen)
+            if (PipelineController.Instance.ProjectOpen)
             {
-                title += " - " + Path.GetFileName(Controller.ProjectItem.OriginalPath);
+                title += " - " + Path.GetFileName(PipelineController.Instance.ProjectItem.OriginalPath);
 
-                if (Controller.ProjectDirty)
+                if (PipelineController.Instance.ProjectDirty)
                     title += "*";
             }
 
@@ -431,7 +428,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = new ButtonMenuItem();
                 item.Text = recent;
-                item.Click += (sender, e) => Controller.OpenProject(recent);
+                item.Click += (sender, e) => PipelineController.Instance.OpenProject(recent);
 
                 menuRecent.Items.Insert(0, item);
             }
@@ -441,7 +438,7 @@ namespace MonoGame.Tools.Pipeline
                 menuRecent.Items.Add(new SeparatorMenuItem());
                 var clearItem = new ButtonMenuItem();
                 clearItem.Text = "Clear";
-                clearItem.Click += (sender, e) => Controller.ClearRecentList();
+                clearItem.Click += (sender, e) => PipelineController.Instance.ClearRecentList();
                 menuRecent.Items.Add(clearItem);
             }
         }
@@ -452,32 +449,32 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdNew_Executed(object sender, EventArgs e)
         {
-            Controller.NewProject();
+            PipelineController.Instance.NewProject();
         }
 
         private void CmdOpen_Executed(object sender, EventArgs e)
         {
-            Controller.OpenProject();
+            PipelineController.Instance.OpenProject();
         }
 
         private void CmdClose_Executed(object sender, EventArgs e)
         {
-            Controller.CloseProject();
+            PipelineController.Instance.CloseProject();
         }
 
         private void CmdImport_Executed(object sender, EventArgs e)
         {
-            Controller.ImportProject();
+            PipelineController.Instance.ImportProject();
         }
 
         private void CmdSave_Executed(object sender, EventArgs e)
         {
-            Controller.SaveProject(false);
+            PipelineController.Instance.SaveProject(false);
         }
 
         private void CmdSaveAs_Executed(object sender, EventArgs e)
         {
-            Controller.SaveProject(true);
+            PipelineController.Instance.SaveProject(true);
         }
 
         private void CmdExit_Executed(object sender, EventArgs e)
@@ -487,73 +484,73 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdUndo_Executed(object sender, EventArgs e)
         {
-            Controller.Undo();
+            PipelineController.Instance.Undo();
         }
 
         private void CmdRedo_Executed(object sender, EventArgs e)
         {
-            Controller.Redo();
+            PipelineController.Instance.Redo();
         }
 
         private void CmdExclude_Executed(object sender, EventArgs e)
         {
-            Controller.Exclude(false);
+            PipelineController.Instance.Exclude(false);
         }
 
         private void CmdRename_Executed(object sender, EventArgs e)
         {
-            Controller.Rename();
+            PipelineController.Instance.Rename();
         }
 
         private void CmdDelete_Executed(object sender, EventArgs e)
         {
-            Controller.Exclude(true);
+            PipelineController.Instance.Exclude(true);
         }
 
         private void CmdNewItem_Executed(object sender, EventArgs e)
         {
-            Controller.NewItem();
+            PipelineController.Instance.NewItem();
         }
 
         private void CmdNewFolder_Executed(object sender, EventArgs e)
         {
-            Controller.NewFolder();
+            PipelineController.Instance.NewFolder();
         }
 
         private void CmdExistingItem_Executed(object sender, EventArgs e)
         {
-            Controller.Include();
+            PipelineController.Instance.Include();
         }
 
         private void CmdExistingFolder_Executed(object sender, EventArgs e)
         {
-            Controller.IncludeFolder();
+            PipelineController.Instance.IncludeFolder();
         }
 
         private void CmdBuild_Executed(object sender, EventArgs e)
         {
-            Controller.Build(false);
+            PipelineController.Instance.Build(false);
         }
 
         private void CmdRebuild_Executed(object sender, EventArgs e)
         {
-            Controller.Build(true);
+            PipelineController.Instance.Build(true);
         }
 
         private void CmdClean_Executed(object sender, EventArgs e)
         {
-            Controller.Clean();
+            PipelineController.Instance.Clean();
         }
 
         private void CmdCancelBuild_Executed(object sender, EventArgs e)
         {
-            Controller.CancelBuild();
+            PipelineController.Instance.CancelBuild();
         }
 
         private void CmdDebugMode_Executed(object sender, EventArgs e)
         {
             PipelineSettings.Default.DebugMode = cmdDebugMode.Checked;
-            Controller.LaunchDebugger = cmdDebugMode.Checked;
+            PipelineController.Instance.LaunchDebugger = cmdDebugMode.Checked;
         }
 
         private void CmdFilterOutput_Executed(object sender, EventArgs e)
@@ -575,25 +572,25 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdOpenItem_Executed(object sender, EventArgs e)
         {
-            if (Controller.SelectedItem != null)
-                Process.Start(Controller.GetFullPath(Controller.SelectedItem.OriginalPath));
+            if (PipelineController.Instance.SelectedItem != null)
+                Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath));
         }
 
         private void CmdOpenItemWith_Executed(object sender, EventArgs e)
         {
-            if (Controller.SelectedItem != null)
-                Global.ShowOpenWithDialog(Controller.GetFullPath(Controller.SelectedItem.OriginalPath));
+            if (PipelineController.Instance.SelectedItem != null)
+                Global.ShowOpenWithDialog(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath));
         }
 
         private void CmdOpenItemLocation_Executed(object sender, EventArgs e)
         {
-            if (Controller.SelectedItem != null)
-                Process.Start(Controller.GetFullPath(Controller.SelectedItem.Location));
+            if (PipelineController.Instance.SelectedItem != null)
+                Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location));
         }
 
         private void CmdRebuildItem_Executed(object sender, EventArgs e)
         {
-            Controller.RebuildItems(Controller.SelectedItems.ToArray());
+            PipelineController.Instance.RebuildItems(PipelineController.Instance.SelectedItems.ToArray());
         }
 
         #endregion

@@ -60,15 +60,15 @@ namespace MonoGame.Tools.Pipeline
                     AddItem(_iconStartEnd, line);
                     break;
                 case OutputState.Cleaning:
-                    AddItem(_iconClean, "Cleaning " + MainWindow.Controller.GetRelativePath(_output.Filename));
+                    AddItem(_iconClean, "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.Skipping:
-                    AddItem(_iconSkip, "Skipping " + MainWindow.Controller.GetRelativePath(_output.Filename));
+                    AddItem(_iconSkip, "Skipping " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.BuildAsset:
-                    AddItem(_iconProcessing, "Building " + MainWindow.Controller.GetRelativePath(_output.Filename));
+                    AddItem(_iconProcessing, "Building " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.BuildError:

@@ -22,7 +22,7 @@ namespace MonoGame.Tools.Pipeline
             if (SelectedItem != null)
                 selectedItems.Add((SelectedItem as TreeItem).Tag as IProjectItem);
 
-            MainWindow.Controller.SelectionChanged(selectedItems);
+            PipelineController.Instance.SelectionChanged(selectedItems);
         }
 
         private ITreeItem GetSelected()

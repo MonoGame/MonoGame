@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class CellPath : CellBase
+    public class CellPath : CellBase
     {
         public CellPath(string category, string name, object value, EventHandler eventHandler) : base(category, name, value, eventHandler)
         {
@@ -17,7 +17,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override void Edit(Control control)
         {
-            var dialog = new PathDialog(MainWindow.Controller, Value.ToString());
+            var dialog = new PathDialog(PipelineController.Instance, Value.ToString());
             if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)
                 _eventHandler(dialog.Path, EventArgs.Empty);
         }

@@ -10,7 +10,7 @@ using System.ComponentModel;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class PropertyGridControl
+    public partial class PropertyGridControl
     {
         List<object> _objects;
 
@@ -95,7 +95,7 @@ namespace MonoGame.Tools.Pipeline
                 propertyTable.AddEntry(category, p.Name, value, p.GetValue(objects[0], null), (sender, e) =>
                 {
                     var action = new UpdatePropertyAction(MainWindow.Instance, objects, p, sender);
-                    MainWindow.Controller.AddAction(action);
+                    PipelineController.Instance.AddAction(action);
                     action.Do();
                 }, p.CanWrite);
 
@@ -121,7 +121,7 @@ namespace MonoGame.Tools.Pipeline
                 propertyTable.AddEntry("Processor Parameters", p.Name, value, objects[0].ProcessorParams[p.Name], (sender, e) =>
                 {
                     var action = new UpdateProcessorAction(MainWindow.Instance, objects.Cast<ContentItem>().ToList(), p.Name, sender);
-                    MainWindow.Controller.AddAction(action);
+                    PipelineController.Instance.AddAction(action);
                     action.Do();
                 }, true);
             }

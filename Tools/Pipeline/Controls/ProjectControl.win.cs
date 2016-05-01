@@ -692,7 +692,7 @@ namespace MonoGame.Tools.Pipeline
                 selected.Add(etoItem.Tag as IProjectItem);
             }
 
-            MainWindow.Controller.SelectionChanged(selected);
+            PipelineController.Instance.SelectionChanged(selected);
         }
 
         private void ClearSelectedNodes()

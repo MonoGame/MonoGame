@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController
+    public partial class PipelineController
     {        
         private class ExcludeAction : IProjectAction
         {

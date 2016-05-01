@@ -9,7 +9,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ProjectControl : TreeView
+    public partial class ProjectControl : TreeView
     {
         private Icon _iconRoot;
         private TreeItem _treeBase, _treeRoot;
@@ -142,7 +142,7 @@ namespace MonoGame.Tools.Pipeline
                 titem.Image = Global.GetDirectoryIcon(fex);
             }
             else
-                titem.Image = Global.GetFileIcon(MainWindow.Controller.GetFullPath(item.OriginalPath), exists);
+                titem.Image = Global.GetFileIcon(PipelineController.Instance.GetFullPath(item.OriginalPath), exists);
 
             var parrent = titem.Parent as TreeItem;
             RefreshItem(parrent);
@@ -221,7 +221,7 @@ namespace MonoGame.Tools.Pipeline
             if(item is DirectoryItem)
                 ret.Image = Global.GetDirectoryIcon(item.Exists);
             else
-                ret.Image = Global.GetFileIcon(MainWindow.Controller.GetFullPath(item.OriginalPath), item.Exists);
+                ret.Image = Global.GetFileIcon(PipelineController.Instance.GetFullPath(item.OriginalPath), item.Exists);
 
             ret.Text = item.Name;
             ret.Tag = item;

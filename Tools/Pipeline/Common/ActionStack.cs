@@ -10,7 +10,7 @@ namespace MonoGame.Tools.Pipeline
     /// <summary>
     /// Represents a stack of undo/redo-able actions.
     /// </summary>
-    class ActionStack
+    public class ActionStack
     {
         private readonly PipelineController _controller;
         private readonly List<IProjectAction> _undoStack;

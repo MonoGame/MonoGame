@@ -8,7 +8,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class CellColor : CellBase
+    public class CellColor : CellBase
     {
         private readonly Color color;
 

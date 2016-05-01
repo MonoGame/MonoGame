@@ -16,8 +16,10 @@ using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController : IController
+    public partial class PipelineController : IController
     {
+        public static PipelineController Instance;
+
         private PipelineProject _project;
         private FileWatcher _watcher;
 
@@ -98,6 +100,7 @@ namespace MonoGame.Tools.Pipeline
 
         private PipelineController(IView view)
         {
+            Instance = this;
             PipelineSettings.Default.Load();
 
             SelectedItems = new List<IProjectItem>();

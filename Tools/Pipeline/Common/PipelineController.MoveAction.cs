@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController
+    public partial class PipelineController
     {        
         private class MoveAction : IProjectAction
         {

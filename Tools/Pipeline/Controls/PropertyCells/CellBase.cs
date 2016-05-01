@@ -8,7 +8,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    class CellBase
+    public class CellBase
     {
         public string Category { get; set; }
         public object Value { get; set; }

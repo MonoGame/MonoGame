@@ -71,7 +71,7 @@ namespace MonoGame.Tools.Pipeline
                 items.Add(item.Tag as IProjectItem);
             }
 
-            MainWindow.Controller.SelectionChanged(items);
+            PipelineController.Instance.SelectionChanged(items);
         }
 
         [GLib.ConnectBefore]
