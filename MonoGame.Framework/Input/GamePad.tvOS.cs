@@ -13,14 +13,9 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static bool MenuPressed = false;
 
-        private static int PlatformGetMaxIndex()
-        {
-            return 4;
-        }
-
         private static int PlatformGetMaxNumberOfGamePads ()
         {
-            return PlatformGetMaxIndex ();
+            return 4;
         }
 
         static bool IndexIsUsed (GCControllerPlayerIndex index)
