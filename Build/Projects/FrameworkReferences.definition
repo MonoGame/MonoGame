@@ -8,6 +8,9 @@
     <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="tvOS">
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="OpenTK-1.0" />
   </Platform>
