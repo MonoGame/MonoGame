@@ -27,6 +27,7 @@ namespace MonoGame.Tools.Pipeline
 
         private bool _treeUpdating;
         private bool _treeSort;
+        private bool _projectLoading;
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -86,6 +87,9 @@ namespace MonoGame.Tools.Pipeline
             _controller.OnBuildFinished += invokeUpdateMenus;
             _controller.OnProjectLoading += invokeUpdateMenus;
             _controller.OnProjectLoaded += invokeUpdateMenus;
+
+            _controller.OnProjectLoading += OnProjectLoading;
+            _controller.OnProjectLoaded += OnProjectLoaded;
 
             var updateUndoRedo = new CanUndoRedoChanged(UpdateUndoRedo);
             var invokeUpdateUndoRedo = new CanUndoRedoChanged((u, r) => Invoke(updateUndoRedo, u, r));
@@ -316,7 +320,8 @@ namespace MonoGame.Tools.Pipeline
             node.ImageIndex = iconIdx;
             node.SelectedImageIndex = iconIdx;
 
-            _treeView.SelectedNode = node;
+            if (!_projectLoading)
+                _treeView.SelectedNode = node;
 
             root.Expand();
         }
@@ -671,6 +676,16 @@ namespace MonoGame.Tools.Pipeline
       
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
             UpdateRecentProjectList();
+        }
+
+        private void OnProjectLoading()
+        {
+            _projectLoading = true;
+        }
+
+        private void OnProjectLoaded()
+        {
+            _projectLoading = false;
         }
         
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
