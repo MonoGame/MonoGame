@@ -57,11 +57,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             // Setup the multisampling description.
+            var depthStencilViewDimension = DepthStencilViewDimension.Texture2DArray;
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (MultiSampleCount > 1)
             {
                 multisampleDesc.Count = MultiSampleCount;
                 multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
+                depthStencilViewDimension = DepthStencilViewDimension.Texture2DMultisampled;
             }
 
             // Create a descriptor for the depth/stencil buffer.
@@ -83,7 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     new DepthStencilViewDescription()
                     {
                         Format = SharpDXHelper.ToFormat(DepthStencilFormat),
-                        Dimension = DepthStencilViewDimension.Texture2D
+                        Dimension = depthStencilViewDimension
                     });
             }
         }
