@@ -17,6 +17,15 @@ namespace Microsoft.Xna.Framework.Graphics
             GenerateIfRequired();
         }
 
+        internal override Resource CreateTexture()
+        {
+            if (MultiSampleCount > 1)
+                return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice,
+                    GetTextureDescription(MultiSampleCount,
+                        (int) StandardMultisampleQualityLevels.StandardMultisamplePattern));
+            return base.CreateTexture();
+        }
+
         private void GenerateIfRequired()
         {
             if (_renderTargetViews != null)
