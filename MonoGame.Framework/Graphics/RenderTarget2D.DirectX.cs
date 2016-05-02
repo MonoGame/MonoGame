@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             // Setup the multisampling description.
-            var depthStencilViewDimension = DepthStencilViewDimension.Texture2DArray;
+            var depthStencilViewDimension = DepthStencilViewDimension.Texture2D;
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (MultiSampleCount > 1)
             {
