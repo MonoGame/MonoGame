@@ -306,15 +306,16 @@ namespace Microsoft.Xna.Framework.Audio
                 byte[] audiodata = reader.ReadBytes(wavebankentry.PlayRegion.Length);
                 
                 if (codec == MiniFormatTag_PCM) {
-                    
+
                     //write PCM data into a wav
 #if DIRECTX
-                    
+                    TimeSpan duration = SoundEffect.GetSampleDuration(audiodata.Length, rate, (AudioChannels)chans);
+
                     // TODO: Wouldn't storing a SoundEffectInstance like this
                     // result in the "parent" SoundEffect being garbage collected?
-                    
-					SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
-                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
+
+                    SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
+                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, duration, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
                         {
                             _format = waveFormat
                         };
