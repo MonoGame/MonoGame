@@ -76,13 +76,13 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="buffer">Buffer containing PCM or ADPCM wave data.</param>
         /// <param name="offset">Offset, in bytes, to the starting position of the audio data.</param>
         /// <param name="count">Amount, in bytes, of audio data.</param>
-        /// <param name="duration">Duration of the sound.</param>
+        /// <param name="sampleCount">Number of samples.</param>
         /// <param name="sampleRate">Sample rate, in Hertz (Hz)</param>
         /// <param name="channels">Number of channels (mono or stereo).</param>
         /// <param name="loopStart">The position, in samples, where the audio should begin looping.</param>
         /// <param name="loopLength">The duration, in samples, that audio should loop over.</param>
         /// <remarks>Use SoundEffect.GetSampleDuration() to convert time to samples.</remarks>
-        public SoundEffect(byte[] buffer, int offset, int count, TimeSpan duration, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        public SoundEffect(byte[] buffer, int offset, int count, int sampleCount, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             if (sampleRate < 8000 || sampleRate > 48000)
                 throw new ArgumentOutOfRangeException("sampleRate");
@@ -105,22 +105,20 @@ namespace Microsoft.Xna.Framework.Audio
             if (((ulong)count + (ulong)offset) > (ulong)buffer.Length)
                 throw new ArgumentException("Ensure that the offset+count region lines within the buffer.", "offset");
 
-            var totalSamples = (int)Math.Floor(duration.TotalSeconds * sampleRate);
-
             if (loopStart < 0)
                 throw new ArgumentException("The loopStart cannot be negative.", "loopStart");
-            if (loopStart > totalSamples)
+            if (loopStart > sampleCount)
                 throw new ArgumentException("The loopStart cannot be greater than the total number of samples.", "loopStart");
 
             if (loopLength == 0)
-                loopLength = totalSamples - loopStart;
+                loopLength = sampleCount - loopStart;
 
             if (loopLength < 0)
                 throw new ArgumentException("The loopLength cannot be negative.", "loopLength");
-            if (((ulong)loopStart + (ulong)loopLength) > (ulong)totalSamples)
+            if (((ulong)loopStart + (ulong)loopLength) > (ulong)sampleCount)
                 throw new ArgumentException("Ensure that the loopStart+loopLength region lies within the sample range.", "loopLength");
 
-            _duration = duration;
+            _duration = TimeSpan.FromSeconds((double)sampleCount/sampleRate);
 
             PlatformInitializePCM(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
         }

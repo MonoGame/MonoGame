@@ -309,13 +309,13 @@ namespace Microsoft.Xna.Framework.Audio
 
                     //write PCM data into a wav
 #if DIRECTX
-                    TimeSpan duration = SoundEffect.GetSampleDuration(audiodata.Length, rate, (AudioChannels)chans);
+                    int sampleCount = audiodata.Length / (chans * 16 / 8);
 
                     // TODO: Wouldn't storing a SoundEffectInstance like this
                     // result in the "parent" SoundEffect being garbage collected?
 
                     SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
-                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, duration, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
+                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, sampleCount, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
                         {
                             _format = waveFormat
                         };
