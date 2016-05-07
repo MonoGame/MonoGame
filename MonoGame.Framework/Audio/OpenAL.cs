@@ -97,10 +97,10 @@ namespace OpenAL
 
     public class AL
     {
-        public const string NativeLibName = "libopenal.so.1";
+        public const string NativeLibName = "openal32.dll";
 
         [CLSCompliant(false)]
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteBuffers")]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alBufferData")]
         public static extern void BufferData(uint bid, ALFormat format, IntPtr data, int size, int freq);
 
         public static void BufferData(int bid, ALFormat format, byte[] data, int size, int freq)
@@ -139,8 +139,18 @@ namespace OpenAL
             GetBufferi(bid, param, out value);
         }
 
+        [CLSCompliant(false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGenBuffers")]
-        public static extern void GenBuffers(int count, out int[] buffers);
+        public static unsafe extern void GenBuffers(int count, int* buffers);
+
+        internal unsafe static void GenBuffers (int count,out int[] buffers)
+        {
+            buffers = new int[count];
+            fixed (int* ptr = &buffers[0])
+            {
+                GenBuffers (count, ptr);
+            }
+        }
 
         public static void GenBuffers(int count, out int buffer)
         {
