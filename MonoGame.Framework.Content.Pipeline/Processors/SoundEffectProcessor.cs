@@ -51,8 +51,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     break;
             }
 
-            input.ConvertFormat(targetFormat, quality, null);
-            var finalQuality= input.ConvertFormat(targetFormat, quality, null);
+            var finalQuality = input.ConvertFormat(targetFormat, quality, null);
             if (quality != finalQuality)
                 context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", quality, finalQuality);
 

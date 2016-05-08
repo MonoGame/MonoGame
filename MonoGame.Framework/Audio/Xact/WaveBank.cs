@@ -309,13 +309,11 @@ namespace Microsoft.Xna.Framework.Audio
 
                     //write PCM data into a wav
 #if DIRECTX
-                    int sampleCount = audiodata.Length / (chans * 16 / 8);
-
                     // TODO: Wouldn't storing a SoundEffectInstance like this
                     // result in the "parent" SoundEffect being garbage collected?
 
                     SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
-                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, sampleCount, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
+                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
                         {
                             _format = waveFormat
                         };
@@ -387,7 +385,9 @@ namespace Microsoft.Xna.Framework.Audio
                 else if (codec == MiniFormatTag_ADPCM) 
                 {
 #if DIRECTX
-                    _sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans)
+                    // TODO not sure if this is the right way to calculate the duration
+                    int durationMs = 1000 * wavebankentry.LoopRegion.Length / rate;
+                    _sounds[current_entry] = new SoundEffect(audiodata, 0x0002 /*ADPCM*/, rate, chans, align, durationMs, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
                     {
                         _format = new SharpDX.Multimedia.WaveFormatAdpcm(rate, chans, align)
                     };
