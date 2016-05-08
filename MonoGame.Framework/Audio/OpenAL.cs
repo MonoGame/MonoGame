@@ -211,13 +211,39 @@ namespace OpenAL
             SourcePlay((uint)source);
         }
 
-        public static string GetErrorString(ALError errorCode) { return ""; }
-        public static void DeleteSource(int source) { }
-        public static void SourceStop(int sourceId) { }
-        public static void Source(int sourceId, ALSourceb i, bool a) { }
-        public static void Source(int sourceId, ALSourcei i, int a) { }
-        public static void Source(int sourceId, ALSourcef i, float a) { }
-        public static void Source(int sourceId, ALSource3f i, float x, float y, float z) { }
+        public static string GetErrorString(ALError errorCode)
+        {
+            return ""; 
+        }
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteSource")]
+        public static extern void DeleteSource (int source);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourceStop")]
+        public static extern void SourceStop (int sourceId);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourcei")]
+        internal static extern void Source (int sourceId, int i, int a);
+
+        public static void Source (int sourceId, ALSourcei i, int a)
+        {
+            Source (sourceId, (int)i, a);
+        }
+
+        public static void Source (int sourceId, ALSourceb i, bool a) {
+            Source (sourceId, (int)i, a ? 1 : 0);
+        }
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourcef")]
+        public static extern void Source (int sourceId, ALSourcef i, float a);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSource3f")]
+        public static extern void Source (int sourceId, ALSource3f i, float x, float y, float z);
         public static void GetSource(int sourceId, ALGetSourcei i, out int state) { state = 0; }
         public static ALSourceState GetSourceState(int sourceId) { return ALSourceState.Stopped; }
         public static void GetListener(ALListener3f listener, out float x, out float y, out float z)
@@ -233,14 +259,40 @@ namespace OpenAL
 
     public partial class Alc
     {
-        public static IntPtr CreateContext(IntPtr device, int[] attributes) { return IntPtr.Zero; }
-        public static AlcError GetError() { return AlcError.NoError; }
-        public static AlcError GetError(IntPtr device) { return AlcError.NoError; }
-        public static IntPtr GetCurrentContext() { return IntPtr.Zero; }
-        public static void MakeContextCurrent(IntPtr context) { }
-        public static void DestroyContext(IntPtr context) { }
-        public static void CloseDevice(IntPtr device) { }
-        public static IntPtr OpenDevice(string device) { return IntPtr.Zero; }
+        public const string NativeLibName = "openal32.dll";
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCreateContext")]
+        public static extern IntPtr CreateContext (IntPtr device, int [] attributes);
+
+        public static AlcError GetError()
+        {
+            return GetError (IntPtr.Zero);
+        }
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetError")]
+        public static extern AlcError GetError (IntPtr device);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetCurrentContext")]
+        public static extern IntPtr GetCurrentContext ();
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcMakeContextCurrent")]
+        public static extern void MakeContextCurrent (IntPtr context);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcDestroyContext")]
+        public static extern void DestroyContext (IntPtr context);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCloseDevice")]
+        public static extern void CloseDevice (IntPtr device);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcOpenDevice")]
+        public static extern IntPtr OpenDevice (string device);
     }
 
     public class XRamExtension
