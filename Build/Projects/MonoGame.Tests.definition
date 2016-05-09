@@ -167,7 +167,7 @@
     <Compile Include="Framework\Graphics\Texture3DTest.cs" />
     <Compile Include="Framework\Graphics\TextureCubeTest.cs" />
     <Compile Include="Framework\Graphics\VertexBufferTest.cs" />
-    <Compile Include="Framework\Visual\VideoTest.cs" />
+    <Compile Include="Framework\Visual\VideoTests.cs" />
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
     <Compile Include="Framework\Graphics\ShaderTest.cs" />
     <Compile Include="Framework\Graphics\SpriteBatchTest.cs" />
