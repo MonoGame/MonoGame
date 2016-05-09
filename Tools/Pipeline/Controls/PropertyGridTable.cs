@@ -80,7 +80,9 @@ namespace MonoGame.Tools.Pipeline
 
         public void AddEntry(string category, string name, object value, object type, EventHandler eventHandler = null, bool editable = true)
         {
-            if (type is Enum || type is Boolean || type is ImporterTypeDescription || type is ProcessorTypeDescription)
+            if (type is Boolean)
+                _cells.Add(new CellBool(category, name, value, type, eventHandler));
+            else if (type is Enum || type is ImporterTypeDescription || type is ProcessorTypeDescription)
                 _cells.Add(new CellCombo(category, name, value, type, eventHandler));
             else if (name.Contains("Dir"))
                 _cells.Add(new CellPath(category, name, value, eventHandler));

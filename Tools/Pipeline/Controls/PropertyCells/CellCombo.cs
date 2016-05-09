@@ -37,14 +37,6 @@ namespace MonoGame.Tools.Pipeline
                         combo.SelectedIndex = combo.Items.Count - 1;
                 }
             }
-            else if (_type is Boolean)
-            {
-                combo.Items.Add("True");
-                combo.Items.Add("False");
-
-                if (Value != null)
-                    combo.SelectedIndex = (bool)Value ? 0 : 1;
-            }
             else if (_type is ImporterTypeDescription)
             {
                 foreach (var v in PipelineTypes.Importers)
@@ -72,8 +64,6 @@ namespace MonoGame.Tools.Pipeline
 
             if (_type is Enum)
                 _eventHandler(Enum.Parse(Value.GetType(), combo.SelectedValue.ToString()), EventArgs.Empty);
-            else if (_type is Boolean)
-                _eventHandler(combo.SelectedIndex == 0, EventArgs.Empty);
             else if (_type is ImporterTypeDescription)
                 _eventHandler(PipelineTypes.Importers[combo.SelectedIndex], EventArgs.Empty);
             else
