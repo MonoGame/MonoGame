@@ -38,6 +38,8 @@ namespace Microsoft.Xna.Framework.Media
         private static Texture2D _texture;
         internal MediaSession Session { get { return _session; } }
 
+        internal MediaSession Session { get { return _session; } }
+
         private class Callback : IAsyncCallback
         {
             private VideoPlayer _player;
