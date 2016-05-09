@@ -60,6 +60,8 @@ namespace MonoGame.Tools.Pipeline
 
             Content = splitterHorizontal;
 
+            projectControl.MouseDoubleClick += CmdOpenItem_Executed;
+
             cmdNew.Executed += CmdNew_Executed;
             cmdOpen.Executed += CmdOpen_Executed;
             cmdClose.Executed += CmdClose_Executed;

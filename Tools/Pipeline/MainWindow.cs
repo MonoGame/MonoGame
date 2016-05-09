@@ -572,7 +572,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdOpenItem_Executed(object sender, EventArgs e)
         {
-            if (PipelineController.Instance.SelectedItem != null)
+            if (PipelineController.Instance.SelectedItem is ContentItem)
                 Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath));
         }
 
