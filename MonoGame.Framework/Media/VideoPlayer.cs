@@ -126,6 +126,11 @@ namespace Microsoft.Xna.Framework.Media
             PlatformInitialize();
         }
 
+        ~VideoPlayer()
+        {
+            Dispose(false);
+        }
+
         /// <summary>
         /// Retrieves a Texture2D containing the current frame of video being played.
         /// </summary>
@@ -296,6 +301,7 @@ namespace Microsoft.Xna.Framework.Media
                 PlatformDispose(disposing);
                 IsDisposed = true;
             }
+            _currentVideo = null;
         }
 
         #endregion
