@@ -122,15 +122,9 @@ namespace MonoGame.Tests
         }
 
         [Test]
-        public void MaximumGamePadCount_ShouldNotReturnNull_WhenGet()
+        public void MaximumGamePadCount_ShouldReturnBetween0And16() // test that number of gamepads is within a reasonable range
         {
-            Assert.IsNotNull(GamePad.MaximumGamePadCount);
-        }
-
-        [Test]
-        public void MaximumGamePadCount_ShouldReturnInt_WhenGet()
-        {
-            Assert.IsInstanceOf<int>(GamePad.MaximumGamePadCount);
+            Assert.IsTrue(GamePad.MaximumGamePadCount >= 0 && GamePad.MaximumGamePadCount <= 16);
         }
     }
 }
