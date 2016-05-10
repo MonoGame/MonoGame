@@ -158,14 +158,14 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             // Some drivers may add pitch to rows.
                             // We need to copy each row separatly and skip trailing zeros.
-                            stream.Seek(startIndex, SeekOrigin.Begin);
+                            stream.Seek(0, SeekOrigin.Begin);
 
                             int elementSizeInByte = Marshal.SizeOf(typeof(T));
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;
                                 for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
-                                    data[i] = stream.Read<T>();
+                                    data[i + startIndex] = stream.Read<T>();
 
                                 if (i >= elementCount)
                                     break;
