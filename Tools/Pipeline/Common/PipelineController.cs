@@ -400,7 +400,10 @@ namespace MonoGame.Tools.Pipeline
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
+            {
                 _buildTask.ContinueWith((e) => OnBuildFinished());
+                _buildTask.ContinueWith((e) => View.OutputAppend("Compiler Ended")); 
+            }
         }
 
         public void Clean()
@@ -422,7 +425,10 @@ namespace MonoGame.Tools.Pipeline
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());          
+            {
+                _buildTask.ContinueWith((e) => OnBuildFinished()); 
+                _buildTask.ContinueWith((e) => View.OutputAppend("Compiler Ended")); 
+            }
         }
 
         private string FindMGCB()
