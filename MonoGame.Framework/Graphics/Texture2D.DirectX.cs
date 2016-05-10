@@ -166,6 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 int i;
                                 for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
                                     data[i] = stream.Read<T>();
+                                    data[i + startIndex] = stream.Read<T>();
 
                                 if (i >= elementCount)
                                     break;
