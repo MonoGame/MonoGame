@@ -13,11 +13,23 @@ namespace OpenAL
         Mono16 = 0x1101,
         Stereo8 = 0x1102,
         Stereo16 = 0x1103,
+        MonoMSADPCM =0x1302,
+        StereoMSADPCM =0x1303,
     }
 
     public enum ALError
     {
         NoError = 0,
+        InvalidName = 0xA001,
+        InvalidEnum = 0xA002,
+        InvalidValue = 0xA003,
+        InvalidOperation = 0xA004,
+        OutOfMemory = 0xA005,
+    }
+
+    public enum ALBufferi
+    {
+        UnpackBlockAlignmentSoft = 0x200C,
     }
 
     public enum ALGetBufferi
@@ -131,6 +143,10 @@ namespace OpenAL
             DeleteBuffers(n, ref buffers);
         }
 
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alBufferi")]
+        public static extern void Bufferi (int buffer, ALBufferi param, int value);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetBufferi")]
         public static extern void GetBufferi(int bid, ALGetBufferi param, out int value);
 
@@ -168,13 +184,13 @@ namespace OpenAL
 
         [CLSCompliant(false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGenSources")]
-        public static extern void GenSources(int n, out uint sources);
+        public static extern void GenSources(int n, uint[] sources);
 
 
         public static void GenSources(int[] sources)
         {
             uint[] temp = new uint[sources.Length];
-            GenSources(temp.Length, out temp[0]);
+            GenSources(temp.Length, temp);
             for (int i = 0; i < temp.Length; i++)
             {
                 sources[i] = (int)temp[i];
@@ -213,7 +229,7 @@ namespace OpenAL
 
         public static string GetErrorString(ALError errorCode)
         {
-            return ""; 
+            return errorCode.ToString (); 
         }
 
         [CLSCompliant (false)]
@@ -244,17 +260,68 @@ namespace OpenAL
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSource3f")]
         public static extern void Source (int sourceId, ALSource3f i, float x, float y, float z);
-        public static void GetSource(int sourceId, ALGetSourcei i, out int state) { state = 0; }
-        public static ALSourceState GetSourceState(int sourceId) { return ALSourceState.Stopped; }
-        public static void GetListener(ALListener3f listener, out float x, out float y, out float z)
-        {
-            x = y = z = 0;
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetSourcei")]
+        public static extern void GetSource (int sourceId, ALGetSourcei i, out int state);
+
+        public static ALSourceState GetSourceState(int sourceId) {
+            int state = (int)ALSourceState.Stopped;
+            GetSource (sourceId, ALGetSourcei.SourceState, out state);
+            return (ALSourceState)state;
         }
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetListener3f")]
+        public static extern void GetListener (ALListener3f param, out float value1, out float value2, out float value3);
+
         public static void DistanceModel(ALDistanceModel model) { }
-        public static void SourceQueueBuffer(int sourceId, int bufferId) { }
-        public static int[] SourceUnqueueBuffers(int sourceId, int processed) { return null; }
-        public static int[] SourceUnqueueBuffers(int sourceId, int processed, int[] salvaged) { return null; }
-        public static void SourceQueueBuffers(int sourceId, int filled, int[] buffers) { }
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourceQueueBuffers")]
+        public unsafe static extern void SourceQueueBuffers (int sourceId, int numEntries, [In] int* buffers);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourceUnqueueBuffers")]
+        public unsafe static extern void SourceUnqueueBuffers (int sourceId, int numEntries, [In] int* salvaged);
+
+        [CLSCompliant (false)]
+        public unsafe static void SourceQueueBuffers (int sourceId, int numEntries, int [] buffers)
+        {
+            fixed (int* ptr = &buffers[0]) {
+                AL.SourceQueueBuffers (sourceId, numEntries, ptr);
+            }
+        }
+
+        public unsafe static void SourceQueueBuffer (int sourceId, int buffer)
+        {
+            AL.SourceQueueBuffers (sourceId, 1, &buffer);
+        }
+
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourceUnqueueBuffers")]
+        public static extern void SourceUnqueueBuffers (int sid, int numEntries, [Out] int [] bids);
+
+        public static unsafe int [] SourceUnqueueBuffers (int sourceId, int numEntries)
+        {
+            if (numEntries <= 0) {
+                throw new ArgumentOutOfRangeException ("numEntries", "Must be greater than zero.");
+            }
+            int [] array = new int [numEntries];
+            fixed (int* ptr = &array [0])
+            {
+                AL.SourceUnqueueBuffers (sourceId, numEntries, ptr);
+            }
+            return array;
+        }
+
+
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetString")]
+        private static extern IntPtr alGetString (IntPtr device, int p);
+
+        public static string GetString (IntPtr device, int p)
+        {
+            return Marshal.PtrToStringAnsi (alGetString (device, p));
+        }
     }
 
     public partial class Alc
@@ -293,6 +360,10 @@ namespace OpenAL
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcOpenDevice")]
         public static extern IntPtr OpenDevice (string device);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetString")]
+        public static extern IntPtr GetString (IntPtr device, int p);
     }
 
     public class XRamExtension
