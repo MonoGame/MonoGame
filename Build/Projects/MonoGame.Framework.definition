@@ -159,6 +159,11 @@
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="SDL\MonoGame.Framework.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>MonoGame.Framework.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi-v7a\libopenal32.so">
       <Platforms>Android,Ouya</Platforms>
@@ -204,7 +209,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GamePlatform.Mobile.cs">
-      <Platforms>Android,iOS,Ouya,WindowsPhone,WindowsPhone81,Web</Platforms>
+      <Platforms>Android,iOS,Ouya,WindowsPhone,WindowsPhone81,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
@@ -797,8 +802,8 @@
     <Compile Include="Input\GamePad.Ouya.cs">
       <Platforms>Ouya</Platforms>
     </Compile>
-    <Compile Include="Input\GamePad.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
+    <Compile Include="Input\GamePad.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.MacOS.cs">
       <Platforms>MacOS</Platforms>
@@ -825,19 +830,25 @@
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\JoystickState.cs" />
     <Compile Include="Input\Joystick.Default.cs">
-      <Platforms>Android,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
+      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
     </Compile>
-    <Compile Include="Input\Joystick.OpenTK.cs">
-      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Input\Joystick.MacOS.cs">
-      <Platforms>MacOS</Platforms>
+    <Compile Include="Input\Joystick.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.Web.cs">
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>Android,Ouya</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.Default.cs">
+		<ExcludePlatforms>Android,Ouya,Windows,WindowsGL,Linux</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.SDL.cs">
+		<Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.Windows.cs">
+		<Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
@@ -873,6 +884,25 @@
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\Mouse.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.MacOS.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.Default.cs">
+      <ExcludePlatforms>WindowsGL,Linux,Windows,MacOS</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\MouseCursor.cs" />
+    <Compile Include="Input\MouseCursor.SDL.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\MouseCursor.Default.cs">
+      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS,MacOS,Web</Platforms>
+    </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
@@ -1086,17 +1116,25 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\OpenTKGamePlatform.cs">
+    <Compile Include="SDL\SDLGamePlatform.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Desktop\OpenTKGameWindow.cs">
+    <Compile Include="SDL\SDLGameWindow.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Input\KeyboardUtil.OpenTK.cs">
+    <Compile Include="SDL\SDL2.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\KeyboardUtil.SDL.cs">
       <Platforms>Angle,Linux,WindowsGL</Platforms>
     </Compile>
-	 <EmbeddedResource Include="../Installers/monogame.ico">
+	 <EmbeddedResource Include="MonoGame.bmp">
+      <LogicalName>MonoGame.bmp</LogicalName>
       <Platforms>Angle,Linux,WindowsGL</Platforms>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="SDL\gamecontrollerdb.txt">
+      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>
 
 

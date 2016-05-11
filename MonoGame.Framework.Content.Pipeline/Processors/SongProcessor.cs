@@ -61,10 +61,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             Directory.CreateDirectory(Path.GetDirectoryName(songFileName));
 
             // Convert and write out the song media file.
-            input.ConvertFormat(targetFormat, quality, songFileName);
+            ConversionQuality finalQuality = input.ConvertFormat(targetFormat, quality, songFileName);
 
             // Let the pipeline know about the song file so it can clean things up.
             context.AddOutputFile(songFileName);
+            if (quality != finalQuality)
+                context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", quality, finalQuality);
 
             // Return the XNB song content.
             return new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);

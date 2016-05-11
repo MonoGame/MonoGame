@@ -50,6 +50,8 @@
     
     <topic id="External_Links" name="External Links" filename="links.md"/>
 
+    <topic id="Change_log" name="Change Log" filename="..\CHANGELOG.md"/>
+
     <!-- Special topic X:ClassLibrary to include generated class library references. No filename to setup as it is generated -->
     <topic id="X:ClassLibraryReference" page-id="api" name="Class Library Reference" index="100" on-url="true"/>
 

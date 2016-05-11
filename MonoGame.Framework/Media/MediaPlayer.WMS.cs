@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Media
 
                 switch (ev.TypeInfo)
                 {
-                    case MediaEventTypes.EndOfPresentation:
+                    case MediaEventTypes.SessionEnded:
                         _sessionState = SessionState.Ended;
                         OnSongFinishedPlaying(null, null);
                         break;

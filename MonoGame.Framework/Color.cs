@@ -1721,14 +1721,10 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Performs linear interpolation of <see cref="Color"/> using <see cref="MathHelper.LerpPrecise"/> on MathHelper.
-        /// Less efficient but more precise compared to <see cref="Color.Lerp"/>.
-        /// See remarks section of <see cref="MathHelper.LerpPrecise"/> on MathHelper for more info.
+        /// <see cref="Color.Lerp"/> should be used instead of this function.
         /// </summary>
-        /// <param name="value1">Source <see cref="Color"/>.</param>
-        /// <param name="value2">Destination <see cref="Color"/>.</param>
-        /// <param name="amount">Interpolation factor.</param>
         /// <returns>Interpolated <see cref="Color"/>.</returns>
+        [Obsolete("Color.Lerp should be used instead of this function.")]
         public static Color LerpPrecise(Color value1, Color value2, Single amount)
         {
             amount = MathHelper.Clamp(amount, 0, 1);

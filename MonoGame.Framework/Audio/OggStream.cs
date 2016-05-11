@@ -405,10 +405,8 @@ namespace Microsoft.Xna.Framework.Audio
         public bool FillBuffer(OggStream stream, int bufferId)
         {
             int readSamples;
-            long readerPosition = 0;
             lock (readMutex)
             {
-                readerPosition = stream.Reader.DecodedPosition;
                 readSamples = stream.Reader.ReadSamples(readSampleBuffer, 0, BufferSize);
                 CastBuffer(readSampleBuffer, castBuffer, readSamples);
             }

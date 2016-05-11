@@ -16,8 +16,10 @@ using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController : IController
+    public partial class PipelineController : IController
     {
+        public static PipelineController Instance;
+
         private PipelineProject _project;
         private FileWatcher _watcher;
 
@@ -46,19 +48,37 @@ namespace MonoGame.Tools.Pipeline
             get { return _templateItems; }
         }
 
-        public Selection Selection { get; private set; }
-
         public bool LaunchDebugger { get; set; }
 
-        public string ProjectLocation 
+        public PipelineProject ProjectItem
         {
-            get { return _project.Location; }
+            get
+            {
+                return _project;
+            }
+        }
+
+        public string ProjectLocation
+        {
+            get
+            {
+                var ret = _project.Location;
+
+                if (!_project.Location.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    ret += Path.DirectorySeparatorChar;
+                
+                return ret; 
+            }
         }
 
         public string ProjectOutputDir
         {
             get { return _project.OutputDir; }
         }
+
+        public List<IProjectItem> SelectedItems { get; private set; }
+
+        public IProjectItem SelectedItem { get; private set; }
         
         public bool ProjectOpen { get; private set; }
 
@@ -78,14 +98,13 @@ namespace MonoGame.Tools.Pipeline
 
         public event Action OnProjectLoaded;
 
-        public event Action OnBuildStarted;
-
-        public event Action OnBuildFinished;
-
-        public PipelineController(IView view)
+        private PipelineController(IView view)
         {
-            _actionStack = new ActionStack();
-            Selection = new Selection();
+            Instance = this;
+            PipelineSettings.Default.Load();
+
+            SelectedItems = new List<IProjectItem>();
+            _actionStack = new ActionStack(this);
 
             View = view;
             View.Attach(this);
@@ -95,13 +114,20 @@ namespace MonoGame.Tools.Pipeline
 
             _templateItems = new List<ContentItemTemplate>();
             LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
+            UpdateMenu();
+
+            view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+        }
+
+        public static PipelineController Create(IView view)
+        {
+            return new PipelineController(view);
         }
 
         public void OnProjectModified()
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
             ProjectDirty = true;
-            View.UpdateProperties(_project);
         }
 
         public void OnReferencesModified()
@@ -109,14 +135,12 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
             ProjectDirty = true;
             ResolveTypes();
-            View.UpdateProperties(_project);
         }
 
         public void OnItemModified(ContentItem contentItem)
         {
             Debug.Assert(ProjectOpen, "OnItemModified called with no project open?");
             ProjectDirty = true;
-            View.UpdateProperties(contentItem);
 
             View.BeginTreeUpdate();
             View.UpdateTreeItem(contentItem);
@@ -156,6 +180,8 @@ namespace MonoGame.Tools.Pipeline
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
+            
+            UpdateMenu();
         }
 
         public void ImportProject()
@@ -197,9 +223,12 @@ namespace MonoGame.Tools.Pipeline
 #endif
 
             UpdateTree();
+            View.UpdateTreeItem(_project);
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
+
+            UpdateMenu();
         }
 
         public void OpenProject()
@@ -223,9 +252,7 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
-#if !DEBUG
             try
-#endif
             {
                 _actionStack.Clear();
                 _project = new PipelineProject();
@@ -242,21 +269,30 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.AddProjectHistory(projectFilePath);
                 PipelineSettings.Default.StartupProject = projectFilePath;
                 PipelineSettings.Default.Save();
+                View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
             }
-#if !DEBUG
             catch (Exception e)
             {
                 View.ShowError("Open Project", "Failed to open project!");
                 return;
             }
-#endif
 
             UpdateTree();
+            View.UpdateTreeItem(_project);
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
 
             _watcher.Run();
+
+            UpdateMenu();
+        }
+
+        public void ClearRecentList()
+        {
+            PipelineSettings.Default.ProjectHistory.Clear();
+            PipelineSettings.Default.Save();
+            View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
         }
 
         public void CloseProject()
@@ -280,14 +316,16 @@ namespace MonoGame.Tools.Pipeline
             PipelineSettings.Default.StartupProject = null;
             PipelineSettings.Default.Save();
 
-            Selection.Clear(this);
             UpdateTree();
+            UpdateMenu();
         }
 
         public bool MoveProject(string newname)
         {
             string opath = _project.OriginalPath;
             string ext = Path.GetExtension(opath);
+
+            PipelineSettings.Default.ProjectHistory.Remove(opath);
 
             try
             {
@@ -335,6 +373,8 @@ namespace MonoGame.Tools.Pipeline
             PipelineSettings.Default.AddProjectHistory(_project.OriginalPath);
             PipelineSettings.Default.StartupProject = _project.OriginalPath;
             PipelineSettings.Default.Save();
+            View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
+            UpdateMenu();
 
             return true;
         }
@@ -347,7 +387,7 @@ namespace MonoGame.Tools.Pipeline
             BuildCommand(commands);
         }
 
-        public void RebuildItems(IEnumerable<IProjectItem> items)
+        public void RebuildItems(IProjectItem[] items)
         {
             // Make sure we save first!
             if (!AskSaveProject())
@@ -385,14 +425,12 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            if (OnBuildStarted != null)
-                OnBuildStarted();
-
             View.OutputClear();
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
-            if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());
+            _buildTask.ContinueWith((e) => View.Invoke(UpdateMenu));
+
+            UpdateMenu();
         }
 
         public void Clean()
@@ -403,9 +441,6 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            if (OnBuildStarted != null)
-                OnBuildStarted();
-
             View.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
@@ -413,8 +448,9 @@ namespace MonoGame.Tools.Pipeline
                 commands += " /launchdebugger";
 
             _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
-            if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());          
+            _buildTask.ContinueWith((e) => View.Invoke(UpdateMenu));
+
+            UpdateMenu();       
         }
 
         private string FindMGCB()
@@ -540,36 +576,41 @@ namespace MonoGame.Tools.Pipeline
             var ret = AskSaveProject();
 
             if (ret)
+            {
                 _watcher.Stop();
+                PipelineSettings.Default.Save();
+            }
 
             return ret;
         }
 
         public void DragDrop(string initialDirectory, string[] folders, string[] files)
         {
-            // Root the path to the project.
-            if (!Path.IsPathRooted(initialDirectory))
-                initialDirectory = Path.Combine(_project.Location, initialDirectory);
-            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                initialDirectory += Path.DirectorySeparatorChar.ToString();
-
+            initialDirectory = GetFullPath(initialDirectory);
             IncludeFolder(initialDirectory, folders);
             Include(initialDirectory, files);
         }
 
-        public void Include(string initialDirectory)
+        private string GetCurrentPath()
         {
-            // Root the path to the project.
-            if (!Path.IsPathRooted(initialDirectory))
-                initialDirectory = Path.Combine(_project.Location, initialDirectory);
-            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                initialDirectory += Path.DirectorySeparatorChar.ToString();
+            if (SelectedItem is DirectoryItem)
+                return SelectedItem.OriginalPath;
+
+            if (SelectedItem is ContentItem)
+                return SelectedItem.Location;
+
+            return _project.Location;
+        }
+
+        public void Include()
+        {
+            var path = GetFullPath(GetCurrentPath());
 
             List<string> files;
-            if (!View.ChooseContentFile(initialDirectory, out files))
+            if (!View.ChooseContentFile(path, out files))
                 return;
 
-            Include(initialDirectory, files.ToArray());
+            Include(path, files.ToArray());
         }
 
         private void Include(string initialDirectory, string[] f)
@@ -636,19 +677,15 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void IncludeFolder(string initialDirectory)
+        public void IncludeFolder()
         {
-            // Root the path to the project.
-            if (!Path.IsPathRooted(initialDirectory))
-                initialDirectory = Path.Combine(_project.Location, initialDirectory);
-            if (!initialDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                initialDirectory += Path.DirectorySeparatorChar.ToString();
+            var path = GetFullPath(GetCurrentPath());
 
             string folder;
-            if (!View.ChooseContentFolder(initialDirectory, out folder))
+            if (!View.ChooseContentFolder(path, out folder))
                 return;
 
-            IncludeFolder(initialDirectory, new []{ folder });
+            IncludeFolder(path, new[] { folder });
         }
 
         public void IncludeFolder(string initialDirectory, string[] dirs)
@@ -793,37 +830,40 @@ namespace MonoGame.Tools.Pipeline
             return ret;
         }
 
-        public void Exclude(IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete)
+        public void Exclude(bool delete)
         {
-            if (delete)
-            {
-                var delitems = new List<string>();
+            if (delete && !View.ShowDeleteDialog(SelectedItems))
+                return;
 
-                foreach (var f in folders)
-                    delitems.Add(f.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
+            var action = new ExcludeAction(this, SelectedItems, delete);
+            if(action.Do())
+                _actionStack.Add(action);
 
-                foreach (var i in items)
-                    delitems.Add(i.OriginalPath);
+            UpdateMenu();
+        }
 
-                if (!View.ShowDeleteDialog(delitems.ToArray()))
-                    return;
-            }
+        public void NewItem()
+        {
+            var path = GetFullPath(GetCurrentPath());
 
-            var action = new ExcludeAction(this, items, folders, delete);
+            string name;
+            ContentItemTemplate template;
+
+            if (!View.ChooseItemTemplate(path, out template, out name))
+                return;
+
+            var action = new NewAction(this, name, path, template);
             if(action.Do())
                 _actionStack.Add(action);
         }
 
-        public void NewItem(string name, string location, ContentItemTemplate template)
+        public void NewFolder()
         {
-            var action = new NewAction(this, name, location, template);
-            if(action.Do())
-                _actionStack.Add(action);
-        }
+            string name;
+            if (!View.ShowEditDialog("New Folder", "Folder Name:", "", true, out name))
+                return;
 
-        public void NewFolder(string name, string location)
-        {
-            string folder = Path.Combine(location, name);
+            string folder = Path.Combine(GetFullPath(GetCurrentPath()), name);
 
             if (!Path.IsPathRooted(folder))
                 folder = _project.Location + Path.DirectorySeparatorChar + folder;
@@ -833,7 +873,8 @@ namespace MonoGame.Tools.Pipeline
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
             }
-            catch {
+            catch
+            {
                 View.ShowError ("Error While Creating a Directory", "An error has occured while the directory: \"" + folder + "\" was beeing created, aborting...");
                 return;
             }
@@ -843,9 +884,37 @@ namespace MonoGame.Tools.Pipeline
                 _actionStack.Add(action);
         }
 
+        public void Rename()
+        {
+            string name;
+            if (SelectedItem == null || !View.ShowEditDialog("Rename Item", "New Name:", SelectedItem.Name, true, out name))
+                return;
+
+            FileType type = FileType.Base;
+            var path = SelectedItem.OriginalPath;
+            var newpath = System.IO.Path.GetDirectoryName(SelectedItem.OriginalPath) + System.IO.Path.DirectorySeparatorChar + name;
+
+            if (SelectedItem is ContentItem)
+                type = FileType.File;
+            else if (SelectedItem is DirectoryItem)
+                type = FileType.Folder;
+            else
+            {
+                path = SelectedItem.Name;
+                newpath = name;
+            }
+
+            Move(new[] { path }, new[] { newpath }, new[] { type });
+        }
+
         public void AddAction(IProjectAction action)
         {
             _actionStack.Add(action);
+            if (!ProjectDirty)
+            {
+                ProjectDirty = true;
+                UpdateMenu();
+            }
         }
 
         public IProjectItem GetItem(string originalPath)
@@ -867,12 +936,6 @@ namespace MonoGame.Tools.Pipeline
         #region Undo, Redo
 
         private readonly ActionStack _actionStack;
-
-        public event CanUndoRedoChanged OnCanUndoRedoChanged
-        {
-            add { _actionStack.OnCanUndoRedoChanged += value; }
-            remove { _actionStack.OnCanUndoRedoChanged -= value; } 
-        }
 
         public bool CanUndo { get { return _actionStack.CanUndo; } }
 
@@ -897,9 +960,9 @@ namespace MonoGame.Tools.Pipeline
             {
                 i.Observer = this;
                 i.ResolveTypes();
-                View.UpdateProperties(i);
             }
 
+            View.UpdateProperties();
             LoadTemplates(Path.Combine(_project.Location, "MGTemplates"));
         }
 
@@ -930,8 +993,6 @@ namespace MonoGame.Tools.Pipeline
                 var fpath = Path.GetDirectoryName(f);
                 item.TemplateFile = Path.GetFullPath(Path.Combine(fpath, item.TemplateFile));
 
-                View.OnTemplateDefined(item);
-
                 _templateItems.Add(item);
             }
         }
@@ -951,6 +1012,89 @@ namespace MonoGame.Tools.Pipeline
                 return filePath;
 
             return _project.Location + Path.DirectorySeparatorChar + filePath;
+        }
+
+        public string GetRelativePath(string path)
+        {
+            if (!ProjectOpen)
+                return path;
+
+            var dirUri = new Uri(ProjectLocation);
+            var fileUri = new Uri(path);
+            var relativeUri = dirUri.MakeRelativeUri(fileUri);
+
+            if (relativeUri == null)
+                return path;
+
+            return Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
+        }
+
+        public void SelectionChanged(List<IProjectItem> items)
+        {
+            SelectedItems = items;
+
+            if (items.Count < 2)
+            {
+                if (items.Count == 1)
+                    SelectedItem = items[0];
+                else
+                    SelectedItem = _project;
+            }
+            else
+                SelectedItem = null;
+
+            UpdateContextMenu();
+            View.UpdateCommands(info);
+            View.UpdateProperties();
+        }
+
+        MenuInfo info;
+
+        public void UpdateMenu()
+        {
+            var notBuilding = !ProjectBuilding;
+            var projectOpenAndNotBuilding = ProjectOpen && notBuilding;
+
+            info = new MenuInfo();
+
+            info.New = notBuilding;
+            info.Open = notBuilding;
+            info.Import = notBuilding;
+            info.Save = projectOpenAndNotBuilding;
+            info.SaveAs = projectOpenAndNotBuilding;
+            info.Close = projectOpenAndNotBuilding;
+            info.Exit = notBuilding;
+
+            info.Undo = _actionStack.CanUndo;
+            info.Redo = _actionStack.CanRedo;
+
+            info.Build = projectOpenAndNotBuilding;
+            info.Rebuild = projectOpenAndNotBuilding;
+            info.Clean = projectOpenAndNotBuilding;
+            info.Cancel = ProjectBuilding;
+
+            UpdateContextMenu();
+
+            View.UpdateCommands(info);
+        }
+
+        private void UpdateContextMenu()
+        {
+            var oneselected = SelectedItems.Count == 1;
+            var somethingselected = SelectedItems.Count > 0;
+            var exists = true;
+
+            foreach (var item in SelectedItems)
+                exists &= item.Exists;
+
+            info.OpenItem = exists && oneselected && SelectedItem is ContentItem;
+            info.OpenItemWith = exists && oneselected && !(SelectedItem is DirectoryItem);
+            info.OpenItemLocation = exists && oneselected;
+            info.Add = (exists && oneselected && !(SelectedItem is ContentItem)) || !somethingselected && ProjectOpen;
+            info.Exclude = somethingselected && !SelectedItems.Contains(_project);
+            info.Rename = exists && oneselected;
+            info.Delete = exists && info.Exclude;
+            info.RebuildItem = exists && somethingselected;
         }
     }
 }

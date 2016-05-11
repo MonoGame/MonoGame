@@ -31,10 +31,6 @@ namespace Microsoft.Xna.Framework {
         public abstract Point Position { get; set; }
 #endif
 
-#if DESKTOPGL
-        public abstract System.Drawing.Icon Icon { get; set; }
-#endif
-
 		public abstract DisplayOrientation CurrentOrientation { get; }
 
 		public abstract IntPtr Handle { get; }

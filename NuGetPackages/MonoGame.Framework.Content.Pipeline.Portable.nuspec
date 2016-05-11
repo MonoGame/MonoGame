@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.Framework.Content.Pipeline.Portable</id>
+        <version>$version$</version>
+        <title>MonoGame.Framework.Content.Pipeline.Portable</title>
+        <authors>MonoGameTeam</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt#L2</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>This is the bait-and-switch PCL build of MonoGame.Framework.Content.Pipeline.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes></releaseNotes>
+        <copyright>Copyright 2016</copyright>
+        <language>en-US</language>
+        <references>
+            <reference file="MonoGame.Framework.Content.Pipeline.dll" />
+        </references>	
+        <dependencies>
+            <dependency id="MonoGame.Framework.Portable" version="$version$" />
+        </dependencies>
+	</metadata>
+    <files>
+        <file src="..\..\MonoGame.Framework.Content.Pipeline\bin\Portable\AnyCPU\MonoGame.Framework.Content.Pipeline.dll" target="lib\net40\MonoGame.Framework.Content.Pipeline.dll" />
+        <file src="..\..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml" target="lib\net40\MonoGame.Framework.Content.Pipeline.xml" />
+    </files>
+</package>

@@ -4,8 +4,6 @@
 
 using System;
 
-#if !PLATFORM_MACOS_LEGACY
-
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary> 
@@ -35,4 +33,3 @@ namespace Microsoft.Xna.Framework.Input
     }
 }
 
-#endif

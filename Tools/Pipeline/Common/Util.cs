@@ -3,7 +3,7 @@ using System.IO;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal static class Util
+    public static class Util
     {
         /// <summary>        
         /// Returns the path 'filspec' made relative path 'folder'.

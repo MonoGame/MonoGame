@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController
+    public partial class PipelineController
     {
         private class FileWatcher : IDisposable
         {
@@ -57,7 +57,7 @@ namespace MonoGame.Tools.Pipeline
                                 continue;
 
                             item.Exists = !item.Exists;
-                            _view.ItemExistanceChanged (item);
+                            _view.Invoke(() => _view.UpdateTreeItem(item));
                         }
                     }
                     catch 
@@ -73,4 +73,3 @@ namespace MonoGame.Tools.Pipeline
         }
     }
 }
-

@@ -194,7 +194,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
             if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
-
+            if (rect.HasValue && rect.Value.Width * rect.Value.Height != elementCount)
+                throw new ArgumentException("The size of the data passed in is too large or too small for this resource");
             PlatformGetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
         }
         /// <summary>

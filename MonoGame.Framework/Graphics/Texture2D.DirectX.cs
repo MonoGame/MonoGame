@@ -33,9 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _renderTarget = (type == SurfaceType.RenderTarget);
             _mipmap = mipmap;
-
-            // Create texture
-            GetTexture();
         }
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
@@ -80,8 +77,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 
-                var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
-
                 var region = new SharpDX.Direct3D11.ResourceRegion();
                 region.Top = y;
                 region.Front = 0;
@@ -90,11 +85,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 region.Left = x;
                 region.Right = x + w;
 
+                
                 // TODO: We need to deal with threaded contexts here!
                 int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
                 var d3dContext = GraphicsDevice._d3dContext;
                 lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
+                    d3dContext.UpdateSubresource(GetTexture(), subresourceIndex, region, dataPtr, GetPitch(w), 0);
             }
             finally
             {
@@ -162,14 +158,14 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             // Some drivers may add pitch to rows.
                             // We need to copy each row separatly and skip trailing zeros.
-                            stream.Seek(startIndex, SeekOrigin.Begin);
+                            stream.Seek(0, SeekOrigin.Begin);
 
                             int elementSizeInByte = Marshal.SizeOf(typeof(T));
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;
                                 for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
-                                    data[i] = stream.Read<T>();
+                                    data[i + startIndex] = stream.Read<T>();
 
                                 if (i >= elementCount)
                                     break;
@@ -320,7 +316,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !WINDOWS_PHONE
 
         [CLSCompliant(false)]
-        public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
+        static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
 
             SharpDX.Direct3D11.Texture2DDescription desc;

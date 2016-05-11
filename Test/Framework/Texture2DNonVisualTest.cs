@@ -77,6 +77,49 @@ namespace MonoGame.Tests.Framework
                 Assert.Throws<InvalidOperationException>(() => _texture = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream));
             }
         }
+        [TestCase(25, 23, 1, 1, 0, 1)]
+        [TestCase(25, 23, 1, 1, 1, 1)]
+        [TestCase(25, 23, 2, 1, 0, 2)]
+        [TestCase(25, 23, 2, 1, 1, 2)]
+        [TestCase(25, 23, 1, 2, 0, 2)]
+        [TestCase(25, 23, 1, 2, 1, 2)]
+        [TestCase(25, 23, 2, 2, 0, 4)]
+        [TestCase(25, 23, 2, 2, 1, 4)]
+
+        public void PlatformGetDataWithOffsetTest(int rx, int ry, int rw, int rh, int startIndex, int elementsToRead)
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Rectangle toReadArea = new Rectangle(rx, ry, rw, rh);
+                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Color[] colors = new Color[startIndex + elementsToRead];
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    colors[i] = Color.White;
+                }
+                t.GetData(0, toReadArea, colors, startIndex, elementsToRead);
+                for (int i = 0; i < elementsToRead; i++)
+                {
+                    Assert.AreNotEqual(255, colors[i + startIndex].R, "colors was not overwritten in position {0}", startIndex + i);
+                }
+            }
+        }
+        [TestCase(25, 23, 2, 2, 0, 2)]
+        [TestCase(25, 23, 2, 2, 1, 2)]
+        public void GetDataException(int rx, int ry, int rw, int rh, int startIndex, int elementsToRead)
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Rectangle toReadArea = new Rectangle(rx, ry, rw, rh);
+                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Color[] colors = new Color[startIndex + elementsToRead];
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    colors[i] = Color.White;
+                }
+                Assert.Throws<ArgumentException>(() => t.GetData(0, toReadArea, colors, startIndex, elementsToRead));
+            }
+        }
         [TestFixtureTearDown]
         public void TearDown()
         {

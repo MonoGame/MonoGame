@@ -383,20 +383,22 @@ namespace Microsoft.Xna.Framework.Graphics
                     break;
             }
 
-			if (sourceRectangle.HasValue) {
+			if (sourceRectangle.HasValue)
+            {
 				_tempRect = sourceRectangle.Value;
-			} else {
-				_tempRect.X = 0;
-				_tempRect.Y = 0;
-				_tempRect.Width = texture.Width;
-				_tempRect.Height = texture.Height;				
-			}
-			
-			_texCoordTL.X = _tempRect.X / (float)texture.Width;
-			_texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-			_texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-			_texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
-
+                _texCoordTL.X = _tempRect.X / (float)texture.Width;
+                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
+                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+            }
+            else
+            {
+                _texCoordTL.X = 0f;
+                _texCoordTL.Y = 0f;
+                _texCoordBR.X = 1f;
+                _texCoordBR.Y = 1f;
+            }
+            
 			if ((effect & SpriteEffects.FlipVertically) != 0) {
                 var temp = _texCoordBR.Y;
 				_texCoordBR.Y = _texCoordTL.Y;
