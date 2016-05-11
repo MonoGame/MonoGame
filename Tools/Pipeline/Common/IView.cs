@@ -2,12 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace MonoGame.Tools.Pipeline
 {
-    enum AskResult
+    public enum AskResult
     {
         Yes,
         No,
@@ -21,9 +22,11 @@ namespace MonoGame.Tools.Pipeline
         Skip
     }
 
-    interface IView
+    public interface IView
     {
         void Attach(IController controller);
+
+        void Invoke(Action action);
 
         AskResult AskSaveOrCancel();
 
@@ -37,7 +40,7 @@ namespace MonoGame.Tools.Pipeline
 
         void ShowMessage(string message);
 
-        bool ShowDeleteDialog(string[] folders, string[] files);
+        bool ShowDeleteDialog(List<IProjectItem> items);
 
         bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname);
 
@@ -47,17 +50,13 @@ namespace MonoGame.Tools.Pipeline
 
         void AddTreeItem(IProjectItem item);
 
-        void AddTreeFolder(string folder);
-
-        void RemoveTreeItem(ContentItem contentItem);
-
-        void RemoveTreeFolder(string folder);
+        void RemoveTreeItem(IProjectItem item);
 
         void UpdateTreeItem(IProjectItem item);
 
         void EndTreeUpdate();
 
-        void UpdateProperties(IProjectItem item);
+        void UpdateProperties();
 
         void OutputAppend(string text);
 
@@ -75,10 +74,8 @@ namespace MonoGame.Tools.Pipeline
 
         Process CreateProcess(string exe, string commands);
 
-        void ItemExistanceChanged(IProjectItem item);
+        void UpdateCommands(MenuInfo info);
 
-        bool GetSelection(out FileType fileType, out string path, out string location);
-
-        bool GetSelection(out FileType[] fileType, out string[] path, out string[] location);
+        void UpdateRecentList(List<string> recentList);
     }
 }

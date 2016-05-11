@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController
+    public partial class PipelineController
     {        
         private class MoveAction : IProjectAction
         {
@@ -99,7 +99,7 @@ namespace MonoGame.Tools.Pipeline
                         MoveFile(cis[i], newpath +  cis[i].OriginalPath.Substring(path.Length));
                     }
 
-                    _con.View.RemoveTreeFolder(path);
+                    _con.View.RemoveTreeItem(new DirectoryItem(path));
                 }
                 else
                     _con.MoveProject(newpath);
