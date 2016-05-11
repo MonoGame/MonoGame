@@ -60,6 +60,7 @@ namespace MonoGame.Tools.Pipeline
         private Point _mouseLocation;
         private int _separatorPos;
         private int _moveSeparator;
+        private bool _edit;
 
         public PropertyGridTable()
         {
@@ -69,6 +70,7 @@ namespace MonoGame.Tools.Pipeline
             _mouseLocation = new Point(-1, -1);
             _cells = new List<CellBase>();
             _moveSeparator = -_separatorWidth / 2 - 1;
+            _edit = false;
 
             Group = true;
         }
@@ -173,6 +175,14 @@ namespace MonoGame.Tools.Pipeline
                 SetCursor(CursorType.VerticalSplit);
             else
                 SetCursor(CursorType.Default);
+
+            if(_edit)
+            {
+                if (_selectedCell != null && _selectedCell.Editable)
+                    _selectedCell.Edit(this);
+
+                _edit = false;
+            }
         }
 
         private void Drawable_MouseDown(object sender, MouseEventArgs e)
@@ -206,8 +216,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void Drawable_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (_selectedCell != null && _selectedCell.Editable)
-                _selectedCell.Edit(this);
+            _edit = true;
         }
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
