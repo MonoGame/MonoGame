@@ -125,6 +125,12 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
+                var s = Alc.GetString (_device, 0x1006);
+                var ext = Marshal.PtrToStringAnsi (s);
+                if (ext != null) {
+                    foreach (var e in ext.Split (new char [] { ' ' }))
+                        System.Diagnostics.Debug.WriteLine (e);
+                }
             }
             catch (Exception ex)
             {
