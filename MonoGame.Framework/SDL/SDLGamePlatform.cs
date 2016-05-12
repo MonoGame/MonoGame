@@ -84,6 +84,7 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
+                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
 
