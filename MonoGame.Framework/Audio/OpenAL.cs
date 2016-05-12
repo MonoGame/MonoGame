@@ -46,6 +46,7 @@ namespace OpenAL
     public enum ALSourcei
     {
         Buffer = 0x1009,
+        EfxDirectFilter = 0x20005,
     }
 
     public enum ALSourcef
@@ -314,6 +315,14 @@ namespace OpenAL
             return array;
         }
 
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetEnumValue")]
+        public static extern int GetEnumValue (string enumName);
+
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alIsExtensionPresent")]
+        public static extern bool IsExtensionPresent (string extensionName);
+
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetProcAddress")]
+        public static extern IntPtr GetProcAddress (string functionName);
 
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetString")]
         private static extern IntPtr alGetString (IntPtr device, int p);
@@ -370,21 +379,103 @@ namespace OpenAL
     {
         public enum XRamStorage
         {
-            Hardware = 1,
+            Automatic,
+            Hardware,
+            Accessible
         }
 
-        public bool IsInitialized { get; set; }
-        public void SetBufferMode(int i, ref int id, XRamStorage storage) { }
+        private int RamSize;
+        private int RamFree;
+        private int StorageAuto;
+        private int StorageHardware;
+        private int StorageAccessible;
+
+        private delegate bool SetBufferModeDelegate (int n, ref int buffers, int value);
+
+        private SetBufferModeDelegate setBufferMode;
+
+        public XRamExtension ()
+        {
+            IsInitialized = false;
+            if (!AL.IsExtensionPresent ("EAX-RAM")) {
+                return;
+            }
+            RamSize = AL.GetEnumValue ("AL_EAX_RAM_SIZE");
+            RamFree = AL.GetEnumValue ("AL_EAX_RAM_FREE");
+            StorageAuto = AL.GetEnumValue ("AL_STORAGE_AUTOMATIC");
+            StorageHardware = AL.GetEnumValue ("AL_STORAGE_HARDWARE");
+            StorageAccessible = AL.GetEnumValue ("AL_STORAGE_ACCESSIBLE");
+            if (RamSize == 0 || RamFree == 0 || StorageAuto == 0 || StorageHardware == 0 || StorageAccessible == 0) {
+                return;
+            }
+            try {
+                setBufferMode = (XRamExtension.SetBufferModeDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("EAXSetBufferMode"), typeof (XRamExtension.SetBufferModeDelegate));
+            } catch (Exception) {
+                return;
+            }
+            IsInitialized = true;
+        }
+
+        public bool IsInitialized { get; private set; }
+
+        public bool SetBufferMode(int i, ref int id, XRamStorage storage) {
+            if (storage == XRamExtension.XRamStorage.Accessible) {
+                return setBufferMode (i, ref id, StorageAccessible);
+            }
+            if (storage != XRamExtension.XRamStorage.Hardware) {
+                return setBufferMode (i, ref id, StorageAuto);
+            }
+            return setBufferMode (i, ref id, StorageHardware);
+        }
     }
 
     public class EffectsExtension
     {
-        public bool IsInitialized { get; set; }
-        public int GenFilter() { return 0; }
-        public void Filter(int sourceId, EfxFilteri filter, int EfxFilterType) { }
-        public void Filter(int sourceId, EfxFilterf filter, float EfxFilterType) { }
-        public void BindFilterToSource(int sourceId, int filterId) { }
-        public void DeleteFilter(int filterId) { }
+        private unsafe delegate void alGenFiltersDelegate (int n, [Out] uint* filters);
+        private delegate void alFilteriDelegate (uint fid, EfxFilteri param, int value);
+        private delegate void alFilterfDelegate (uint fid, EfxFilterf param, float value);
+        private unsafe delegate void alDeleteFiltersDelegate (int n, [In] uint* filters);
+
+        private alGenFiltersDelegate alGenFilters;
+        private alFilteriDelegate alFilteri;
+        private alFilterfDelegate alFilterf;
+        private alDeleteFiltersDelegate alDeleteFilters;
+
+        public EffectsExtension ()
+        {
+            IsInitialized = false;
+            if (!AL.IsExtensionPresent ("ALC_EXT_EFX")) {
+                return;
+            }
+
+            alGenFilters = (alGenFiltersDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alGenFilters"), typeof (alGenFiltersDelegate));
+            alFilteri = (alFilteriDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alFilteri"), typeof (alFilteriDelegate));
+            alFilterf = (alFilterfDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alFilterf"), typeof (alFilterfDelegate));
+            alDeleteFilters = (alDeleteFiltersDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alDeleteFilters"), typeof (alDeleteFiltersDelegate));
+
+            IsInitialized = true;
+        }
+
+        public bool IsInitialized { get; private set; }
+
+        public unsafe int GenFilter() {
+            uint filter = 0;
+            this.alGenFilters (1, &filter);
+            return (int)filter;
+        }
+        public void Filter(int sourceId, EfxFilteri filter, int EfxFilterType) {
+            this.alFilteri ((uint)sourceId, filter, EfxFilterType);
+        }
+        public void Filter(int sourceId, EfxFilterf filter, float EfxFilterType) {
+            this.alFilterf ((uint)sourceId, filter, EfxFilterType);
+        }
+        public void BindFilterToSource(int sourceId, int filterId) {
+            AL.Source (sourceId, ALSourcei.EfxDirectFilter, filterId);
+        }
+        public unsafe void DeleteFilter (int filterId)
+        {
+            alDeleteFilters (1, (uint*)&filterId);
+        }
     }
 }
 
