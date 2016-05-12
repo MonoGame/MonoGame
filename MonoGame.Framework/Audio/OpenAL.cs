@@ -130,18 +130,21 @@ namespace OpenAL
             handle.Free();
         }
 
+        [CLSCompliant (false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteBuffers")]
-        public static extern void DeleteBuffers(int n, ref int[] buffers);
+        public static unsafe extern void DeleteBuffers(int n, int* buffers);
 
         public static void DeleteBuffers(int[] buffers)
         {
-            DeleteBuffers(buffers.Length, ref buffers);
+            DeleteBuffers (buffers.Length, ref buffers [0]);
         }
 
-        public static void DeleteBuffers(int n, ref int buffer)
+        public unsafe static void DeleteBuffers(int n, ref int buffers)
         {
-            var buffers = new[] { buffer };
-            DeleteBuffers(n, ref buffers);
+            fixed (int* pbuffers = &buffers)
+            {
+                DeleteBuffers (n, pbuffers);
+            }
         }
 
         [CLSCompliant (false)]
@@ -234,8 +237,13 @@ namespace OpenAL
         }
 
         [CLSCompliant (false)]
-        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteSource")]
-        public static extern void DeleteSource (int source);
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteSources")]
+        public static extern void DeleteSources(int n, ref int sources);
+
+        public static void DeleteSource(int source)
+        {
+            DeleteSources (1, ref source);
+        }
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourceStop")]
