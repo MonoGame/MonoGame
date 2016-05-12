@@ -387,18 +387,21 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmOpenItem, ref sep);
             AddContextMenu(cmOpenItemWith, ref sep);
             AddContextMenu(cmAdd, ref sep);
-            if (sep && !info.Exclude)
-                sep = false;
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
-            if (sep && !info.Exclude)
-                sep = false;
             AddSeparator(ref sep);
             AddContextMenu(cmExclude, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmRename, ref sep);
             AddContextMenu(cmDelete, ref sep);
+
+            if (_contextMenu.Items.Count > 0)
+            {
+                var lastItem = _contextMenu.Items[_contextMenu.Items.Count - 1];
+                if (lastItem is SeparatorMenuItem)
+                    _contextMenu.Items.Remove(lastItem);
+            }
         }
 
         private void AddContextMenu(MenuItem item, ref bool separator)
@@ -415,7 +418,9 @@ namespace MonoGame.Tools.Pipeline
         {
             if (separator)
             {
-                _contextMenu.Items.Add(new SeparatorMenuItem());
+                if (!(_contextMenu.Items[_contextMenu.Items.Count - 1] is SeparatorMenuItem))
+                    _contextMenu.Items.Add(new SeparatorMenuItem());
+
                 separator = false;
             }
         }
