@@ -359,13 +359,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL || ANGLE
                 Context.Dispose();
                 Context = null;
-
-                if (Threading.BackgroundContext != null)
-                {
-                    Threading.BackgroundContext.Dispose();
-                    Threading.BackgroundContext = null;
-                    Threading.WindowInfo = null;
-                }
 #endif
             });
         }
