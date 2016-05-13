@@ -157,6 +157,9 @@ namespace MonoGame.Tools.Pipeline
         private void Init()
         {
             _treeView = ControlObject as TreeView;
+            _treeView.ItemHeight = 20;
+            _treeView.ShowLines = false;
+            _treeView.FullRowSelect = true;
 
             _selectedNodes = new List<TreeNode>();
             _treeView.SelectedNode = null;
@@ -203,19 +206,14 @@ namespace MonoGame.Tools.Pipeline
                 TreeNode node = _treeView.GetNodeAt(e.Location);
                 if (node != null)
                 {
-                    int leftBound = node.Bounds.X; // - 20; // Allow user to click on image
-                    int rightBound = node.Bounds.Right + 10; // Give a little extra room
-                    if (e.Location.X > leftBound && e.Location.X < rightBound)
+                    if (Control.ModifierKeys == Keys.None && (_selectedNodes.Contains(node)))
                     {
-                        if (Control.ModifierKeys == Keys.None && (_selectedNodes.Contains(node)))
-                        {
-                            // Potential Drag Operation
-                            // Let Mouse Up do select
-                        }
-                        else
-                        {
-                            SelectNode(node);
-                        }
+                        // Potential Drag Operation
+                        // Let Mouse Up do select
+                    }
+                    else
+                    {
+                        SelectNode(node);
                     }
                 }
             }
@@ -686,6 +684,7 @@ namespace MonoGame.Tools.Pipeline
 
             var selected = new List<IProjectItem>();
             var nodes = SelectedNodes;
+
             foreach (var n in nodes)
             {
                 var etoItem = n.Tag as Eto.Forms.TreeItem;
