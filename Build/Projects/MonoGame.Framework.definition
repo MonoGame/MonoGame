@@ -146,8 +146,43 @@
   </Services>
 
   <Files>
-
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.Android.cs">
+        <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.DesktopGL.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.iOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Mac.cs">
+        <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.OUYA.cs">
+        <Platforms>Ouya</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Angle.cs">
+        <Platforms>Angle</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.tvOS.cs">
+        <Platforms>tvOS</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Windows.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.WindowsPhone.cs">
+        <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.WindowsStore.cs">
+        <Platforms>Windows8</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.UniversalWindowsPlatform.cs">
+        <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
 
     <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
       <Platforms>MacOS</Platforms>
