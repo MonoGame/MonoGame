@@ -72,12 +72,12 @@ namespace MonoGame.Tools.Pipeline
 
         public void Add(TreeGridItem root, string path, bool folder, string fullpath)
         {
-            var split = path.Split('/');
+            var split = path.Split(Path.DirectorySeparatorChar);
             var file = split.Length == 1 && !folder;
             var item = GetItem(root, split[0], !file, fullpath);
 
-            if (path.Contains("/"))
-                Add(item, string.Join("/", split, 1, split.Length - 1), folder, fullpath);
+            if (path.Contains(Path.DirectorySeparatorChar.ToString()))
+                Add(item, string.Join(Path.DirectorySeparatorChar.ToString(), split, 1, split.Length - 1), folder, fullpath);
         }
     }
 }
