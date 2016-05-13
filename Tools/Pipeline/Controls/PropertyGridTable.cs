@@ -176,9 +176,12 @@ namespace MonoGame.Tools.Pipeline
             else
                 SetCursor(CursorType.Default);
 
+            // On windows craeting a dialog from double click will freeze
+            // the GUI thread until a click occurs so we need to call the
+            // dialog at the end of Paint event so everything gets drawn.
             if(_edit)
             {
-                if (_selectedCell != null && _selectedCell.Editable)
+                if (!Global.Unix && _selectedCell != null && _selectedCell.Editable)
                     _selectedCell.Edit(this);
 
                 _edit = false;
@@ -217,6 +220,9 @@ namespace MonoGame.Tools.Pipeline
         private void Drawable_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             _edit = true;
+
+            if (Global.Unix && _selectedCell != null && _selectedCell.Editable)
+                _selectedCell.Edit (this);
         }
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
