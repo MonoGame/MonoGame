@@ -100,8 +100,35 @@ namespace Microsoft.Xna.Framework {
 		/// </summary>
 		/// <remarks>
 		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
-		/// </remarks>
+		/// It should only be used to handle input for Textboxes it does not replace Keyboard.GetState
+        /// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
+        /// <summary>
+        /// Use this event to get notified when a Key is Pressed.
+        /// This event should be used in conjuciton with the TextInput event
+        /// to handle draw Text Input and NOT as a replacement for 
+        /// Keyboard.GetState. The TextInput event is raised for character
+        /// keys only. In order to support keys like Backspace, Tab and Enter
+        /// you will need to use this event. 
+        /// </summary>
+        /// <remarks>
+        /// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
+        /// It should only be used to handle input for Textboxes it does not replace Keyboard.GetState
+        /// </remarks>
+        public event EventHandler<KeyInputEventArgs> KeyDown;
+        /// <summary>
+        /// Use this event to get notified when a Key is Released.
+        /// This event should be used in conjuciton with the TextInput event
+        /// to handle draw Text Input and NOT as a replacement for 
+        /// Keyboard.GetState. The TextInput event is raised for character
+        /// keys only. In order to support keys like Backspace, Tab and Enter
+        /// you will need to use this event. 
+        /// </summary>
+        /// <remarks>
+        /// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
+        /// It should only be used to handle input for Textboxes it does not replace Keyboard.GetState
+        /// </remarks>
+        public event EventHandler<KeyInputEventArgs> KeyUp;
 #endif
 
 		#endregion Events
@@ -152,6 +179,18 @@ namespace Microsoft.Xna.Framework {
 			if (TextInput != null)
 				TextInput(sender, e);
 		}
+
+        protected void OnKeyDown (object sender, KeyInputEventArgs e)
+        {
+            if (KeyDown != null)
+                KeyDown (sender, e);
+        }
+
+        protected void OnKeyUp (object sender, KeyInputEventArgs e)
+        {
+            if (KeyUp != null)
+                KeyUp (sender, e);
+        }
 #endif
 
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);

@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
@@ -267,6 +268,16 @@ namespace Microsoft.Xna.Framework
         public void CallTextInput(char c)
         {
             OnTextInput(this, new TextInputEventArgs(c));
+        }
+
+        public void CallKeyDown(Keys key)
+        {
+            OnKeyDown(this, new KeyInputEventArgs(key));
+        }
+
+        public void CallKeyUp(Keys key)
+        {
+            OnKeyUp(this, new KeyInputEventArgs(key));
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
