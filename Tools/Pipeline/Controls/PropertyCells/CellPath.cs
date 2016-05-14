@@ -15,7 +15,7 @@ namespace MonoGame.Tools.Pipeline
                 Value = "";
         }
 
-        public override void Edit(Control control)
+        public override void Edit(PixelLayout control)
         {
             var dialog = new PathDialog(PipelineController.Instance, Value.ToString());
             if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)

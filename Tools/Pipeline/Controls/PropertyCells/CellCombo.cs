@@ -3,13 +3,17 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
     public class CellCombo : CellBase
     {
+        public static int Height;
+
         private object _type;
+        private Rectangle _lastRec;
 
         public CellCombo(string category, string name, object value, object type, EventHandler eventHandler) : base(category, name, value, eventHandler)
         {
@@ -21,9 +25,8 @@ namespace MonoGame.Tools.Pipeline
                 DisplayValue = (value as ProcessorTypeDescription).DisplayName;
         }
 
-        public override void Edit(Control control)
+        public override void Edit(PixelLayout control)
         {
-            var dialog = new DialogBase();
             var combo = new DropDown();
 
             if (_type is Enum)
@@ -58,16 +61,35 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            dialog.CreateContent(combo);
-            if (dialog.Run(control) != DialogResult.Ok || _eventHandler == null || combo.SelectedIndex < 0)
-                return;
+            Height = _lastRec.Height;
+            combo.Style = "OverrideSize";
+            combo.Width = _lastRec.Width + 1;
+            combo.Height = _lastRec.Height;
+            control.Add(combo, _lastRec.X, _lastRec.Y);
 
-            if (_type is Enum)
-                _eventHandler(Enum.Parse(Value.GetType(), combo.SelectedValue.ToString()), EventArgs.Empty);
-            else if (_type is ImporterTypeDescription)
-                _eventHandler(PipelineTypes.Importers[combo.SelectedIndex], EventArgs.Empty);
-            else
-                _eventHandler(PipelineTypes.Processors[combo.SelectedIndex], EventArgs.Empty);
+            combo.SelectedIndexChanged += delegate
+            {
+                if (_eventHandler == null || combo.SelectedIndex < 0)
+                    return;
+
+                if (_type is Enum)
+                    _eventHandler(Enum.Parse(Value.GetType(), combo.SelectedValue.ToString()), EventArgs.Empty);
+                else if (_type is ImporterTypeDescription)
+                    _eventHandler(PipelineTypes.Importers[combo.SelectedIndex], EventArgs.Empty);
+                else
+                    _eventHandler(PipelineTypes.Processors[combo.SelectedIndex], EventArgs.Empty);
+
+                control.Add(combo, _lastRec.X, _lastRec.Y);
+            };
+        }
+
+        public override void Draw(Graphics g, Rectangle rec, int separatorPos, bool selected)
+        {
+            _lastRec = rec;
+            _lastRec.X += separatorPos;
+            _lastRec.Width -= separatorPos;
+
+            base.Draw(g, rec, separatorPos, selected);
         }
     }
 }
