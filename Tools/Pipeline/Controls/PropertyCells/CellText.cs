@@ -14,7 +14,7 @@ namespace MonoGame.Tools.Pipeline
             Editable = editable && value is string;
         }
 
-        public override void Edit(Control control)
+        public override void Edit(PixelLayout control)
         {
             var dialog = new DialogBase();
             var editText = new TextBox();

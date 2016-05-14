@@ -82,15 +82,40 @@ namespace MonoGame.Tools.Pipeline
                 }
             });
 
-            Style.Add<ScrollableHandler>("NoHorizontal", h =>
+            Style.Add<DrawableHandler>("Stretch", h =>
             {
-                var child = ((((h.Control.Child as Gtk.Viewport).Child as Gtk.VBox).Children[0] as Gtk.HBox).Children[0] as Gtk.Alignment).Child;
+                var parent = h.Control.Parent.Parent.Parent.Parent.Parent.Parent;
+
+                parent.SizeAllocated += delegate
+                {
+                    var al = h.Control.Allocation;
+                    al.Width = parent.AllocatedWidth - 2;
+                    h.Control.SetAllocation(al);
+                };
+            });
+
+            Style.Add<PixelLayoutHandler>("Stretch", h =>
+            {
+                var parent = h.Control.Parent.Parent.Parent.Parent.Parent;
+
+                parent.SizeAllocated += delegate
+                {
+                     var al = h.Control.Allocation;
+                     al.Width = parent.AllocatedWidth;
+                     h.Control.SetAllocation(al);
+                };
+            });
+
+            Style.Add<DropDownHandler>("OverrideSize", h =>
+            {
+                var cell = (h.Control.Child as Gtk.ComboBox).Cells[0] as Gtk.CellRendererText;
+                cell.Ellipsize = Pango.EllipsizeMode.End;
 
                 h.Control.SizeAllocated += delegate
                 {
-                    var al = child.Allocation;
-                    al.Width = h.Control.AllocatedWidth - 2;
-                    child.SetAllocation(al);
+                    var al = h.Control.Allocation;
+                    al.Height = CellCombo.Height;
+                    h.Control.SetAllocation(al);
                 };
             });
         }

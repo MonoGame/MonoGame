@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Eto.Drawing;
 using Eto.Forms;
 
@@ -50,7 +51,7 @@ namespace MonoGame.Tools.Pipeline
     {
         private const int _spacing = 12;
         private const int _separatorWidth = 8;
-        private const int _separatorSafeDistance = 20;
+        private const int _separatorSafeDistance = 30;
 
         public bool Group { get; set; }
 
@@ -78,6 +79,16 @@ namespace MonoGame.Tools.Pipeline
         public void Clear()
         {
             _cells.Clear();
+            ClearChildren();
+        }
+
+        private void ClearChildren()
+        {
+            var children = pixel1.Children.ToList();
+
+            foreach (var control in children)
+                if (control != drawable)
+                    pixel1.Remove(control);
         }
 
         public void AddEntry(string category, string name, object value, object type, EventHandler eventHandler = null, bool editable = true)
@@ -137,7 +148,10 @@ namespace MonoGame.Tools.Pipeline
             g.Clear(PropInfo.BackColor);
 
             if (_cells.Count == 0)
+            {
+                drawable.Height = 1;
                 return;
+            }
 
             // Draw separator for not filled rows
             g.FillRectangle(PropInfo.BorderColor, _separatorPos - 1, 0, 1, Height);
@@ -181,8 +195,8 @@ namespace MonoGame.Tools.Pipeline
             // dialog at the end of Paint event so everything gets drawn.
             if(_edit)
             {
-                if (!Global.Unix && _selectedCell != null && _selectedCell.Editable)
-                    _selectedCell.Edit(this);
+                if (!Global.Unix)
+                    _selectedCell.Edit(pixel1);
 
                 _edit = false;
             }
@@ -190,6 +204,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void Drawable_MouseDown(object sender, MouseEventArgs e)
         {
+            ClearChildren();
             if (_currentCursor == CursorType.VerticalSplit)
                 _moveSeparator = (int)e.Location.X - _separatorPos;
         }
@@ -219,16 +234,24 @@ namespace MonoGame.Tools.Pipeline
 
         private void Drawable_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            _edit = true;
-
-            if (Global.Unix && _selectedCell != null && _selectedCell.Editable)
-                _selectedCell.Edit (this);
+            if (e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable)
+            {
+                if (Global.Unix)
+                    _selectedCell.Edit(pixel1);
+                else
+                    _edit = true;
+            }
         }
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
         {
 #if WINDOWS
-            drawable.Width = Width - System.Windows.Forms.SystemInformation.VerticalScrollBarWidth - 10;
+            var scrollsize = 0;
+
+            if((ControlObject as System.Windows.Forms.ScrollableControl).VerticalScroll.Visible)
+                scrollsize = System.Windows.Forms.SystemInformation.VerticalScrollBarWidth;
+
+            drawable.Width = Width - scrollsize - System.Windows.Forms.SystemInformation.VerticalResizeBorderThickness;
 #endif
 
             drawable.Invalidate();
