@@ -52,19 +52,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         private static float XnaPitchToAlPitch(float xnaPitch)
         {
-            /*XNA sets pitch bounds to [-1.0f, 1.0f], each end being one octave.
-            •OpenAL's AL_PITCH boundaries are (0.0f, INF). *
-            •Consider the function f(x) = 2 ^ x
-            •The domain is (-INF, INF) and the range is (0, INF). *
-            •0.0f is the original pitch for XNA, 1.0f is the original pitch for OpenAL.
-            •Note that f(0) = 1, f(1) = 2, f(-1) = 0.5, and so on.
-            •XNA's pitch values are on the domain, OpenAL's are on the range.
-            •Remember: the XNA limit is arbitrarily between two octaves on the domain. *
-            •To convert, we just plug XNA pitch into f(x).*/
-
-            if (xnaPitch < -1.0f || xnaPitch > 1.0f)
-                throw new ArgumentOutOfRangeException("XNA PITCH MUST BE WITHIN [-1.0f, 1.0f]!");
-
             return (float)Math.Pow(2, xnaPitch);
         }
 
