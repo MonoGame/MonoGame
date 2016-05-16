@@ -29,6 +29,7 @@ namespace Microsoft.Xna.Framework.Media
         private MediaSession _session;
         private AudioStreamVolume _volumeController;
         private PresentationClock _clock;
+        const int defaultTimeoutMs = 1000;
 
         // HACK: Need SharpDX to fix this.
         private Guid AudioStreamVolumeGuid;
@@ -57,7 +58,6 @@ namespace Microsoft.Xna.Framework.Media
                 var ev = _player.Session.EndGetEvent(asyncResultRef);
 
                 // Trigger an "on Video Ended" event here if needed
-                System.Diagnostics.Debug.WriteLine(ev.TypeInfo.ToString());
                 if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ready)
                     _player.OnTopologyReady();
                 else if (ev.TypeInfo == MediaEventTypes.SessionStarted)
@@ -116,6 +116,13 @@ namespace Microsoft.Xna.Framework.Media
                 var texData = sampleGrabber.TextureData;
                 if (texData != null)
                     _texture.SetData(texData);
+                else
+                {
+                    // No texture data was returned, so make sure the texture is set to something.
+                    var black = new byte[_texture.Width * _texture.Height * SurfaceFormat.Bgr32.GetSize()];
+                    Array.Clear(black, 0, black.Length);
+                    _texture.SetData(black);
+                }
             }
 
             return _texture;
@@ -192,8 +199,9 @@ namespace Microsoft.Xna.Framework.Media
             System.Diagnostics.Debug.WriteLine("PlatformStopped");
         }
 
-        void WaitForInternalStateChange(InternalState expectedState)
+        bool WaitForInternalStateChange(InternalState expectedState, int milliseconds = defaultTimeoutMs)
         {
+            var timer = System.Diagnostics.Stopwatch.StartNew();
             while (_internalState != expectedState)
             {
 #if WINRT
@@ -201,7 +209,10 @@ namespace Microsoft.Xna.Framework.Media
 #else
                 Thread.Sleep(1);
 #endif
+                if (timer.ElapsedMilliseconds > milliseconds)
+                    return false;
             }
+            return true;
         }
 
         private void SetChannelVolumes()
