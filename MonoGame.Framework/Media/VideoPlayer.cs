@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Media
     {
         #region Fields
 
+        private MediaState _state;
         private Video _currentVideo;
         private float _volume = 1.0f;
         private bool _isLooped = false;
@@ -85,9 +86,8 @@ namespace Microsoft.Xna.Framework.Media
             {
                 // Give the platform code a chance to update 
                 // the playback state before we return the result.
-                MediaState state = MediaState.Stopped;
-                PlatformGetState(ref state);
-                return state;
+                PlatformGetState(ref _state);
+                return _state;
             }
         }
 
@@ -121,6 +121,8 @@ namespace Microsoft.Xna.Framework.Media
 
         public VideoPlayer()
         {
+            _state = MediaState.Stopped;
+
             PlatformInitialize();
         }
 
@@ -178,6 +180,8 @@ namespace Microsoft.Xna.Framework.Media
                 return;
 
             PlatformPause();
+
+            _state = MediaState.Paused;
         }
 
         /// <summary>
@@ -210,6 +214,8 @@ namespace Microsoft.Xna.Framework.Media
             _currentVideo = video;
 
             PlatformPlay();
+
+            _state = MediaState.Playing;
 
             // XNA doesn't return until the video is playing
             const int retries = 5;
@@ -258,6 +264,8 @@ namespace Microsoft.Xna.Framework.Media
             }
 
             PlatformResume();
+
+            _state = MediaState.Playing;
         }
 
         /// <summary>
@@ -269,6 +277,8 @@ namespace Microsoft.Xna.Framework.Media
                 return;
 
             PlatformStop();
+
+            _state = MediaState.Stopped;
         }
 
         #endregion
