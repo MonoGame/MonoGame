@@ -100,6 +100,11 @@ namespace MonoGame.Tools.Pipeline
                         {
                             var serializer = new XmlSerializer(typeof(PipelineSettings));
                             Default = (PipelineSettings)serializer.Deserialize(reader);
+
+                            var history = Default.ProjectHistory.ToArray();
+                            foreach (var h in history)
+                                if (!File.Exists(h))
+                                    Default.ProjectHistory.Remove(h);
                         }
                     }
                 }

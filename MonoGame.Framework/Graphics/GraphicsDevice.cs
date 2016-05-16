@@ -53,6 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
+        private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
@@ -655,17 +656,27 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
+		    {
                 SetRenderTargets(null);
+		    }
 			else
-				SetRenderTargets(new RenderTargetBinding(renderTarget));
+			{
+				_tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget);
+				SetRenderTargets(_tempRenderTargetBinding);
+			}
 		}
 
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
         {
             if (renderTarget == null)
-                SetRenderTarget(null);
+            {
+                SetRenderTargets(null);
+            }
             else
-                SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
+            {
+                _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, cubeMapFace);
+                SetRenderTargets(_tempRenderTargetBinding);
+            }
         }
 
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)

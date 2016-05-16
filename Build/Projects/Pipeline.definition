@@ -39,28 +39,29 @@
     <None Include="App.config" />
     <None Include="app.manifest" />
 
+	<!-- Common platform stuff -->
     <Compile Include="Common\ActionStack.cs" />
-    <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />
-    <Compile Include="Common\ContentItem.Processor.cs" />
     <Compile Include="Common\ContentItem.Importer.cs" />
+    <Compile Include="Common\ContentItem.Processor.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
-    <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\DirectoryItem.cs" />
     <Compile Include="Common\FileType.cs" />
     <Compile Include="Common\ProjectState.cs" />
-    <Compile Include="Common\Selection.cs" />
     <Compile Include="Common\PipelineController.MoveAction.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.FileWatcher.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
-    <Compile Include="Common\PipelineController.UpdateContentItemAction.cs" />
-    <Compile Include="Common\PipelineController.UpdateProjectAction.cs" />
+    <Compile Include="Common\PipelineController.UpdateProcessorAction.cs" />
+    <Compile Include="Common\PipelineController.UpdatePropertyAction.cs" />
     <Compile Include="Common\PipelineSettings.cs" />
     <Compile Include="Common\IController.cs" />
+    <Compile Include="Common\IProjectAction.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
+    <Compile Include="Common\MenuInfo.cs" />
     <Compile Include="Common\OutputParser.cs" />
     <Compile Include="Common\PipelineProjectParser.cs" />
     <Compile Include="Common\Util.cs" />
@@ -71,178 +72,109 @@
     <Compile Include="Common\PipelineTypes.cs" />
     <Compile Include="Common\Extensions.cs" />
     
-    <!-- Eto.Forms GUI stuff -->
-	<Compile Include="Eto\Dialogs\AboutDialog.cs" />
-	<Compile Include="Eto\Dialogs\AboutDialog.eto.cs">
+	<!-- General Stuff -->
+	<Compile Include="Global.cs" />
+	<Compile Include="MainWindow.cs" />
+	<Compile Include="MainWindow.eto.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    
+    <!-- Native Windows -->
+	<Compile Include="Global.Windows.cs">
+      <DependentUpon>Global.cs</DependentUpon>
+      <Platforms>Windows</Platforms>
+    </Compile>
+	<Compile Include="Styles.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.win.cs">
+      <DependentUpon>ProjectControl.cs</DependentUpon>
+      <Platforms>Windows</Platforms>
+    </Compile>
+    
+    <!-- Native Linux -->
+	<Compile Include="Global.Linux.cs">
+      <DependentUpon>Global.cs</DependentUpon>
+      <Platforms>Linux</Platforms>
+    </Compile>
+	<Compile Include="Styles.Linux.cs">
+      <Platforms>Linux</Platforms>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.gtk.cs">
+      <DependentUpon>ProjectControl.cs</DependentUpon>
+      <Platforms>Linux</Platforms>
+    </Compile>
+    
+    <!-- Native Mac -->
+	<Compile Include="Global.Mac.cs">
+      <DependentUpon>Global.cs</DependentUpon>
+      <Platforms>MacOS</Platforms>
+    </Compile>
+	<Compile Include="Styles.Mac.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.mac.cs">
+      <DependentUpon>ProjectControl.cs</DependentUpon>
+      <Platforms>MacOS</Platforms>
+    </Compile>
+	
+	<!-- GUI Controls -->
+	<Compile Include="Controls\PropertyCells\CellBase.cs" />
+	<Compile Include="Controls\PropertyCells\CellBool.cs" />
+	<Compile Include="Controls\PropertyCells\CellColor.cs" />
+	<Compile Include="Controls\PropertyCells\CellCombo.cs" />
+	<Compile Include="Controls\PropertyCells\CellPath.cs" />
+	<Compile Include="Controls\PropertyCells\CellRefs.cs" />
+	<Compile Include="Controls\PropertyCells\CellText.cs" />
+	<Compile Include="Controls\BuildOutput.cs" />
+	<Compile Include="Controls\BuildOutput.eto.cs">
+      <DependentUpon>BuildOutput.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.cs" />
+	<Compile Include="Controls\ProjectControl.eto.cs">
+      <DependentUpon>ProjectControl.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Controls\PropertyGridControl.cs" />
+	<Compile Include="Controls\PropertyGridControl.eto.cs">
+      <DependentUpon>PropertyGridControl.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Controls\PropertyGridTable.cs" />
+	<Compile Include="Controls\PropertyGridTable.eto.cs">
+      <DependentUpon>PropertyGridTable.cs</DependentUpon>
+    </Compile>
+	
+    <!-- GUI Dialogs -->
+	<Compile Include="Dialogs\AboutDialog.cs" />
+	<Compile Include="Dialogs\AboutDialog.eto.cs">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Eto\Dialogs\AddItemDialog.cs" />
-	<Compile Include="Eto\Dialogs\AddItemDialog.eto.cs">
+	<Compile Include="Dialogs\AddItemDialog.cs" />
+	<Compile Include="Dialogs\AddItemDialog.eto.cs">
       <DependentUpon>AddItemDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Eto\Dialogs\DeleteDialog.cs" />
-	<Compile Include="Eto\Dialogs\DeleteDialog.eto.cs">
+	<Compile Include="Dialogs\DeleteDialog.cs" />
+	<Compile Include="Dialogs\DeleteDialog.eto.cs">
       <DependentUpon>DeleteDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Eto\Dialogs\DialogBase.cs" />
-	<Compile Include="Eto\Dialogs\DialogBase.eto.cs">
+	<Compile Include="Dialogs\DialogBase.cs" />
+	<Compile Include="Dialogs\DialogBase.eto.cs">
       <DependentUpon>DialogBase.cs</DependentUpon>
     </Compile>
-	<Compile Include="Eto\Dialogs\EditDialog.cs" />
-	<Compile Include="Eto\Dialogs\EditDialog.eto.cs">
+	<Compile Include="Dialogs\EditDialog.cs" />
+	<Compile Include="Dialogs\EditDialog.eto.cs">
       <DependentUpon>EditDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Eto\Dialogs\NewItemDialog.cs" />
-	<Compile Include="Eto\Dialogs\NewItemDialog.eto.cs">
+	<Compile Include="Dialogs\NewItemDialog.cs" />
+	<Compile Include="Dialogs\NewItemDialog.eto.cs">
       <DependentUpon>NewItemDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Eto\Dialogs\PathDialog.cs" />
-	<Compile Include="Eto\Dialogs\PathDialog.eto.cs">
+	<Compile Include="Dialogs\PathDialog.cs" />
+	<Compile Include="Dialogs\PathDialog.eto.cs">
       <DependentUpon>PathDialog.cs</DependentUpon>
     </Compile>
-	<Compile Include="Eto\Dialogs\ReferenceDialog.cs" />
-	<Compile Include="Eto\Dialogs\ReferenceDialog.eto.cs">
+	<Compile Include="Dialogs\ReferenceDialog.cs" />
+	<Compile Include="Dialogs\ReferenceDialog.eto.cs">
       <DependentUpon>ReferenceDialog.cs</DependentUpon>
-    </Compile>
-	<Compile Include="Eto\Global.cs" />
-	<Compile Include="Eto\Global.Windows.cs">
-      <DependentUpon>Global.cs</DependentUpon>
-      <Platforms>Windows</Platforms>
-    </Compile>
-	<Compile Include="Eto\Global.Linux.cs">
-      <DependentUpon>Global.cs</DependentUpon>
-      <Platforms>Linux</Platforms>
-    </Compile>
-	<Compile Include="Eto\Global.Mac.cs">
-      <DependentUpon>Global.cs</DependentUpon>
-      <Platforms>MacOS</Platforms>
-    </Compile>
-	<Compile Include="Eto\MainWindow.cs" />
-	<Compile Include="Eto\Styles.Linux.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
-	<Compile Include="Eto\Styles.Mac.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-	<Compile Include="Eto\Styles.Windows.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-
-    <!-- The Windows specific stuff -->
-	<Compile Include="Windows\AssemblyReferenceListEditor.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\BuildIcons.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\ContentIcons.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\EditorIcons.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\FolderEditing.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\MainView.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Windows\MainView.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>MainView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\MultiSelectTreeview.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Windows\Controls\FilterOutputControl.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Windows\Controls\TabControlEx.cs">
-      <Platforms>Windows</Platforms>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Windows\PipelineProjectProxy.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\TreeViewExtensions.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\SortedEnumTypeConverter.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <EmbeddedResource Include="Windows\MainView.resx">
-      <Platforms>Windows</Platforms>
-      <DependentUpon>MainView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Platforms>Windows</Platforms>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Platforms>Windows</Platforms>
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <Platforms>Windows</Platforms>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-
-    <!-- The Gtk specific stuff -->
-    <Compile Include="Gtk\MainWindow.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\ProjectView.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\PropertyGridTable.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\PropertiesView.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\BuildOutput.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\BuildOutput.GUI.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Stetic.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\MainWindow.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\ProjectView.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\PropertiesView.GUI.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Widgets\PropertyGridTable.GUI.cs">  
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Global.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Gtk\IgeMacIntegration.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="Gtk\Gtk3Integration.cs">
-      <Platforms>Linux</Platforms>
     </Compile>
 
     <!-- The resources for icons and buttons -->
@@ -250,20 +182,46 @@
     <EmbeddedResource Include="Icons\monogame.png">
       <LogicalName>Icons.monogame.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Icons\blueprint.png" />
-    <EmbeddedResource Include="Icons\missing.png" />
-    <EmbeddedResource Include="Icons\folder_closed.png" />
-    <EmbeddedResource Include="Icons\folder_open.png" />
-    <EmbeddedResource Include="Icons\folder_missing.png" />
-    <EmbeddedResource Include="Icons\settings.png" />
+	
+	<!--- The resources for treeview -->
+    <EmbeddedResource Include="Icons\TreeView\Root.png">
+      <LogicalName>TreeView.Root.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\TreeView\File.png">
+      <LogicalName>TreeView.File.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\TreeView\FileMissing.png">
+      <LogicalName>TreeView.FileMissing.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\TreeView\Folder.png">
+      <LogicalName>TreeView.Folder.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\TreeView\FolderMissing.png">
+      <LogicalName>TreeView.FolderMissing.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\TreeView\Missing.png">
+      <LogicalName>TreeView.Missing.png</LogicalName>
+    </EmbeddedResource>
     
     <!-- The resources for output filtering -->
-    <EmbeddedResource Include="Icons\build_begin_end.png" />
-    <EmbeddedResource Include="Icons\build_clean.png" />
-    <EmbeddedResource Include="Icons\build_fail.png" />
-    <EmbeddedResource Include="Icons\build_processing.png" />
-    <EmbeddedResource Include="Icons\build_skip.png" />
-    <EmbeddedResource Include="Icons\build_succeed.png" />
+    <EmbeddedResource Include="Icons\Build\StartEnd.png">
+      <LogicalName>Build.StartEnd.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Build\Clean.png">
+      <LogicalName>Build.Clean.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Build\Fail.png">
+      <LogicalName>Build.Fail.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Build\Processing.png">
+      <LogicalName>Build.Processing.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Build\Skip.png">
+      <LogicalName>Build.Skip.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Build\Succeed.png">
+      <LogicalName>Build.Succeed.png</LogicalName>
+    </EmbeddedResource>
     
     <!-- The resources for toolbar -->
     <EmbeddedResource Include="Icons\Toolbar\New.png">
@@ -307,11 +265,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Icons\Toolbar\FilterOutput.png">
       <LogicalName>Toolbar.FilterOutput.png</LogicalName>
-    </EmbeddedResource>
-    
-    <!-- Linux specific resources -->
-    <EmbeddedResource Include="Gtk\MainWindow.HeaderBar.glade">
-      <Platforms>Linux</Platforms>
     </EmbeddedResource>
 
     <!-- Copy the template resources to the output -->

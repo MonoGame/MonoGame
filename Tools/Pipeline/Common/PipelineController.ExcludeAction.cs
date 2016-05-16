@@ -9,79 +9,63 @@ using System.Linq;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController
+    public partial class PipelineController
     {        
         private class ExcludeAction : IProjectAction
         {
             private readonly PipelineController _con;
-            private readonly ContentItemState[] _state;
-            private readonly string[] _folder;
+            private readonly List<IProjectItem> _items;
+            private readonly List<ContentItem> _subitems;
             private readonly bool _delete;
 
-            public ExcludeAction(PipelineController controller, IEnumerable<ContentItem> items, IEnumerable<string> folders, bool delete)
+            public ExcludeAction(PipelineController controller, List<IProjectItem> items, bool delete)
             {
+                _items = new List<IProjectItem>();
+                _subitems = new List<ContentItem>();
+
                 _con = controller;
-                _folder = (folders == null) ? new string[0] : folders.ToArray();
+                _items.AddRange(items);
                 _delete = delete;
 
-                if(items == null)
-                    _state = new ContentItemState[0];
-                else
-                {
-                    _state = new ContentItemState[items.Count()];
-                    
-                    var i = 0;
-                    foreach (var item in items)
-                    {
-                        _state[i++] = ContentItemState.Get(item);
-                    }
-                }
+                foreach (var item in items)
+                    if (item is DirectoryItem)
+                        foreach (var citem in _con._project.ContentItems)
+                            if (citem.OriginalPath.StartsWith(item.OriginalPath))
+                                _subitems.Add(citem);
             }
 
             public bool Do()
             {
                 _con.View.BeginTreeUpdate();
 
-                foreach (var obj in _state)
+                foreach (var item in _items)
                 {
-                    for (var i = 0; i < _con._project.ContentItems.Count; i++)
+                    if (item is ContentItem)
+                        _con._project.ContentItems.Remove(item as ContentItem);
+                    _con.View.RemoveTreeItem(item);
+
+                    if (_delete)
                     {
-                        var item = _con._project.ContentItems[i];
-
-                        if (item.OriginalPath == obj.SourceFile)
+                        try
                         {
-                            _con._project.ContentItems.Remove(item);
-                            _con.View.RemoveTreeItem(item);
-
-                            try
-                            {
-                                if (_delete && File.Exists(item.OriginalPath))
-                                    File.Delete(item.OriginalPath);
-                            }
-                            catch(Exception ex)
-                            {
-                                _con.View.ShowError("File could not be deleted", "File '" + item.OriginalPath + "' could not be deleted due to the following reasons: " + ex.Message);
-                            }
-
-                            break;
+                            if (item is DirectoryItem)
+                                Directory.Delete(_con.GetFullPath(item.OriginalPath), true);
+                            else
+                                File.Delete(_con.GetFullPath(item.OriginalPath));
+                        }
+                        catch (FileNotFoundException ex)
+                        {
+                            // No error needed in case file is not found
+                        }
+                        catch (Exception ex)
+                        {
+                            _con.View.ShowError("Error while trying to delete the file", ex.Message);
                         }
                     }
                 }
 
-                foreach (string f in _folder)
-                {
-                    _con.View.RemoveTreeFolder(f);
-
-                    try
-                    {
-                        if (_delete && Directory.Exists(f))
-                            Directory.Delete(f);
-                    }
-                    catch(Exception ex)
-                    {
-                        _con.View.ShowError("Folder could not be deleted", "Folder '" + f + "' could not be deleted due to the following reasons: " + ex.Message);
-                    }
-                }
+                foreach (var sitem in _subitems)
+                    _con._project.ContentItems.Remove(sitem);
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
@@ -96,19 +80,15 @@ namespace MonoGame.Tools.Pipeline
 
                 _con.View.BeginTreeUpdate();
 
-                foreach(string f in _folder)
-                    _con.View.AddTreeFolder(f);
-
-                foreach (var obj in _state)
+                foreach (var item in _items)
                 {
-                    var item = new ContentItem()
-                        {
-                            Observer = _con,
-                            Exists = File.Exists(System.IO.Path.GetDirectoryName(_con._project.OriginalPath) + Path.DirectorySeparatorChar + obj.SourceFile)
-                        };
-                    obj.Apply(item);
-                    item.ResolveTypes();
+                    if(item is ContentItem)
+                        _con._project.ContentItems.Add(item as ContentItem);
+                    _con.View.AddTreeItem(item);
+                }
 
+                foreach (var item in _subitems)
+                {
                     _con._project.ContentItems.Add(item);
                     _con.View.AddTreeItem(item);
                 }

@@ -50,7 +50,8 @@ namespace Microsoft.Xna.Framework.Audio
             get { return _pitch; }
             set
             {
-                if (value < -1.0f || value > 1.0f)
+                // XAct sounds effects don't have pitch limits
+                if (!_isXAct && (value < -1.0f || value > 1.0f))
                     throw new ArgumentOutOfRangeException();
 
                 _pitch = value;
