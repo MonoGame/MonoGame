@@ -106,7 +106,7 @@ namespace MonoGame.Tests.Framework
         }
         [TestCase(25, 23, 2, 2, 0, 2)]
         [TestCase(25, 23, 2, 2, 1, 2)]
-        public void GetDataException(int rx, int ry, int rw, int rh, int startIndex, int elementsToRead)
+        public void GetDataExceptionTest(int rx, int ry, int rw, int rh, int startIndex, int elementsToRead)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
             {
@@ -118,6 +118,76 @@ namespace MonoGame.Tests.Framework
                     colors[i] = Color.White;
                 }
                 Assert.Throws<ArgumentException>(() => t.GetData(0, toReadArea, colors, startIndex, elementsToRead));
+            }
+        }
+        //[TestCase(1, 4097, 4095)]
+        //[TestCase(0, 4097, 4096)]
+        //[TestCase(1, 4097, 4097)]
+        //[TestCase(1, 4097, 4096)]
+        //[TestCase(1, 4096, 4095)]
+        //[TestCase(1, 4096, 4096)]
+        //[TestCase(1, 4095, 4095)]
+#if !XNA
+        [TestCase(0, 4095, 4096)]
+        [TestCase(0, 4095, 4595)]
+        [TestCase(1, 4095, 4096)]
+        [TestCase(1, 4095, 4097)]
+#endif
+        [TestCase(0, 4096, 4096)]
+        [TestCase(1, 4096, 4097)]
+        public void GetDataTintintTest(int startIndex, int elementsToRead, int arraySize)
+        {
+            Console.Error.Write("\n{0},{1},{2}", startIndex, elementsToRead, arraySize);
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Color[] colors = new Color[arraySize];
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    colors[i] = Color.White;
+                }
+                t.GetData(colors, startIndex, elementsToRead);
+                for (int i = 0; i < startIndex; i++)
+                {
+                    Assert.AreEqual(255, colors[i].G, "color written to position {0} before starting index", i);
+                }
+                for (int i = 0; i < elementsToRead; i++)
+                {
+                    Assert.AreNotEqual(255, colors[i + startIndex].G, "colors found in position {0} was {{R{1},G{2},B{3},A{4}}}", startIndex + i, colors[i + startIndex].R, colors[i + startIndex].G, colors[i + startIndex].B, colors[i + startIndex].A);
+                    Assert.True((colors[i + startIndex].A > 0 && colors[i + startIndex].G < 255) || colors[i + startIndex].G == 0);
+                }
+                for (int i = startIndex + elementsToRead; i < arraySize; i++)
+                {
+                    Console.Error.Write("\nComprobando array despues de los datos");
+                    Assert.AreEqual(255, colors[i].G, "color written to position {0} after requested data", i);
+                }
+            }
+        }
+        [TestCase(1, 4097, 4095)]
+        [TestCase(0, 4097, 4096)]
+        [TestCase(1, 4097, 4097)]
+        [TestCase(1, 4097, 4096)]
+        [TestCase(1, 4096, 4095)]
+        [TestCase(1, 4096, 4096)]
+        [TestCase(1, 4095, 4095)]
+#if XNA
+        [TestCase(0, 4095, 4096)]
+        [TestCase(0, 4095, 4595)]
+        [TestCase(1, 4095, 4096)]
+        [TestCase(1, 4095, 4097)]
+#endif
+        public void GetDataTintintExceptionTest(int startIndex, int elementsToRead, int arraySize)
+        {
+            Console.Error.Write("\n{0},{1},{2}", startIndex, elementsToRead, arraySize);
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Color[] colors = new Color[arraySize];
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    colors[i] = Color.White;
+                }
+                Assert.Throws(Is.InstanceOf<Exception>(),()=>t.GetData(colors, startIndex, elementsToRead));
             }
         }
         [TestFixtureTearDown]
