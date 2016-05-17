@@ -44,12 +44,18 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate)
+        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate, int alignment = 0)
         {
             openALFormat = format;
             dataSize = size;
             this.sampleRate = sampleRate;
-            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
+            int unpackedSize = 0;
+            if (alignment > 0) {
+                AL.Bufferi (openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, alignment);
+                ALHelper.CheckError ("Failed to fill buffer.");
+            }
+
+            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, this.sampleRate);
             ALHelper.CheckError("Failed to fill buffer.");
 
             int bits, channels;
@@ -73,7 +79,14 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 else
                 {
-                    Duration = (float)(size / ((bits / 8) * channels)) / (float)sampleRate;
+                    AL.GetBufferi (openALDataBuffer, ALGetBufferi.Size, out unpackedSize);
+                    alError = AL.GetError ();
+                    if (alError != ALError.NoError) {
+                        Console.WriteLine ("Failed to get buffer size: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString (alError), format, size, sampleRate);
+                        Duration = -1;
+                    } else {
+                        Duration = (float)(unpackedSize / ((bits / 8) * channels)) / (float)sampleRate;
+                    }
                 }
             }
             //Console.WriteLine("Duration: " + Duration + " / size: " + size + " bits: " + bits + " channels: " + channels + " rate: " + sampleRate);
