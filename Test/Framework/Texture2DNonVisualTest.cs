@@ -120,13 +120,7 @@ namespace MonoGame.Tests.Framework
                 Assert.Throws<ArgumentException>(() => t.GetData(0, toReadArea, colors, startIndex, elementsToRead));
             }
         }
-        //[TestCase(1, 4097, 4095)]
-        //[TestCase(0, 4097, 4096)]
-        //[TestCase(1, 4097, 4097)]
-        //[TestCase(1, 4097, 4096)]
-        //[TestCase(1, 4096, 4095)]
-        //[TestCase(1, 4096, 4096)]
-        //[TestCase(1, 4095, 4095)]
+
 #if !XNA
         [TestCase(0, 4095, 4096)]
         [TestCase(0, 4095, 4595)]
@@ -137,7 +131,6 @@ namespace MonoGame.Tests.Framework
         [TestCase(1, 4096, 4097)]
         public void GetDataTintintTest(int startIndex, int elementsToRead, int arraySize)
         {
-            Console.Error.Write("\n{0},{1},{2}", startIndex, elementsToRead, arraySize);
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
             {
                 Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
@@ -158,7 +151,6 @@ namespace MonoGame.Tests.Framework
                 }
                 for (int i = startIndex + elementsToRead; i < arraySize; i++)
                 {
-                    Console.Error.Write("\nComprobando array despues de los datos");
                     Assert.AreEqual(255, colors[i].G, "color written to position {0} after requested data", i);
                 }
             }
