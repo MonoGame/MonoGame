@@ -27,7 +27,7 @@ namespace OpenAL
         OutOfMemory = 0xA005,
     }
 
-    public enum AlString
+    public enum ALGetString
     {
         Extensions = 0xB004,
     }
@@ -99,7 +99,7 @@ namespace OpenAL
         NoError = 0,
     }
 
-    public enum AlcString
+    public enum AlcGetString
     {
         Extensions = 0x1006,
     }
@@ -359,7 +359,7 @@ namespace OpenAL
             return Marshal.PtrToStringAnsi (alGetString (p));
         }
 
-        public static string GetString (AlString p)
+        public static string Get (ALGetString p)
         {
             return GetString ((int)p);
         }
@@ -410,7 +410,7 @@ namespace OpenAL
             return Marshal.PtrToStringAnsi (alGetString (device, p));
         }
 
-        public static string GetString (IntPtr device, AlcString p)
+        public static string GetString (IntPtr device, AlcGetString p)
         {
             return GetString (device, (int)p);
         }

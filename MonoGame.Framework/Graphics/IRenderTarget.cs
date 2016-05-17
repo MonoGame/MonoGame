@@ -41,8 +41,13 @@ using SharpDX.Direct3D11;
 #endif
 
 #if OPENGL
+#if GLES
+using OpenTK.Graphics.ES20;
+#else
 using OpenGL;
 #endif
+#endif
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {

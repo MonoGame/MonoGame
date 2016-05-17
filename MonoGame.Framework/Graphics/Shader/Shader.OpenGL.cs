@@ -15,6 +15,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
+using Bool = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

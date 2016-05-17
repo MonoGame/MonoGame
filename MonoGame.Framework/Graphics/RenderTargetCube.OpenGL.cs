@@ -2,7 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#if GLES
+using OpenTK.Graphics.ES20;
+#else
 using OpenGL;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

@@ -3,7 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+#if GLES 
+using OpenTK.Audio.OpenAL;
+#else
 using OpenAL;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -50,10 +54,12 @@ namespace Microsoft.Xna.Framework.Audio
             dataSize = size;
             this.sampleRate = sampleRate;
             int unpackedSize = 0;
+#if !GLES
             if (alignment > 0) {
                 AL.Bufferi (openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, alignment);
                 ALHelper.CheckError ("Failed to fill buffer.");
             }
+#endif
 
             AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, size, this.sampleRate);
             ALHelper.CheckError("Failed to fill buffer.");
@@ -79,7 +85,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 else
                 {
-                    AL.GetBufferi (openALDataBuffer, ALGetBufferi.Size, out unpackedSize);
+                    AL.GetBuffer (openALDataBuffer, ALGetBufferi.Size, out unpackedSize);
                     alError = AL.GetError ();
                     if (alError != ALError.NoError) {
                         Console.WriteLine ("Failed to get buffer size: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString (alError), format, size, sampleRate);

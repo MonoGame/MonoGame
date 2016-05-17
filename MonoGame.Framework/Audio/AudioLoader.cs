@@ -1,6 +1,10 @@
 using System;
 using System.IO;
+#if GLES
+using OpenTK.Audio.OpenAL;
+#else
 using OpenAL;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {

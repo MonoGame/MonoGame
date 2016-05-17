@@ -3,7 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+#if GLES
+using OpenTK.Audio.OpenAL;
+#else
 using OpenAL;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {

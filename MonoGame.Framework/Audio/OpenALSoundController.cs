@@ -5,7 +5,12 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 
+#if GLES
+using OpenTK.Audio.OpenAL;
+using OpenTK;
+#else
 using OpenAL;
+#endif
 using OpenGL;
 
 #if ANDROID
@@ -43,9 +48,15 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private static OpenALSoundController _instance = null;
         private IntPtr _device;
+#if GLES
+        ContextHandle _context;
+        ContextHandle NullContext = ContextHandle.Zero;
+#else
         private IntPtr _context;
-		//int outputSource;
-		//int[] buffers;
+        IntPtr NullContext = IntPtr.Zero;
+#endif
+        //int outputSource;
+        //int[] buffers;
         private AlcError _lastOpenALError;
         private int[] allSourcesArray;
 #if DESKTOPGL || ANGLE
@@ -126,7 +137,7 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
-                var ext = Alc.GetString (_device, AlcString.Extensions);
+                var ext = Alc.GetString (_device, AlcGetString.Extensions);
                 if (ext != null) {
                     System.Diagnostics.Debug.WriteLine ("Supported Alc Extensions");
                     foreach (var e in ext.Split (new char [] { ' ' }))
@@ -250,7 +261,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return(false);
                 }
 
-                if (_context != IntPtr.Zero)
+                if (_context != NullContext)
                 {
                     Alc.MakeContextCurrent(_context);
                     if (CheckALError("Could not make AL context current"))
@@ -258,7 +269,7 @@ namespace Microsoft.Xna.Framework.Audio
                         CleanUpOpenAL();
                         return(false);
                     }
-                    var ext = AL.GetString (AlString.Extensions);
+                    var ext = AL.Get (ALGetString.Extensions);
                     if (ext != null) {
                         System.Diagnostics.Debug.WriteLine ("Supported Al Extensions");
                         foreach (var e in ext.Split (new char [] { ' ' }))
@@ -316,12 +327,12 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         private void CleanUpOpenAL()
         {
-            Alc.MakeContextCurrent(IntPtr.Zero);
+            Alc.MakeContextCurrent(NullContext);
 
-            if (_context != IntPtr.Zero)
+            if (_context != NullContext)
             {
                 Alc.DestroyContext (_context);
-                _context = IntPtr.Zero;
+                _context = NullContext;
             }
             if (_device != IntPtr.Zero)
             {

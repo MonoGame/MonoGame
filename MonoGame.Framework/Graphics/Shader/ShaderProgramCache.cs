@@ -19,6 +19,7 @@ using OpenGL;
 using OpenTK.Graphics.ES20;
 #if IOS || ANDROID
 using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
+using Bool = OpenTK.Graphics.ES20.All;
 #endif
 #endif
 

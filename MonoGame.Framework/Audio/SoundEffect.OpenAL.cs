@@ -12,7 +12,11 @@ using MonoMac.AVFoundation;
 using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
+#if GLES
+using OpenTK.Audio.OpenAL;
+#else
 using OpenAL;
+#endif
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
@@ -123,7 +127,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             Rate = (float)sampleRate;
             Size = (int)count;
+            #if DESKTOPGL
             Format = channels == AudioChannels.Stereo ? ALFormat.StereoMSADPCM : ALFormat.MonoMSADPCM;
+            #else
+            Format = channels == AudioChannels.Stereo ? (ALFormat)0x1303 : (ALFormat)0x1302;
+            #endif
 
             // bind buffer
             SoundBuffer = new OALSoundBuffer ();

@@ -8,8 +8,12 @@ using System;
 using MonoMac.OpenGL;
 #elif DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenGL;
+using GLPixelFormat = OpenGL.PixelFormat;
+using PixelFormat = OpenGL.PixelFormat;
 #elif GLES
 using OpenTK.Graphics.ES20;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -46,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 TextureTarget target = GetGLCubeFace((CubeMapFace)i);
 
-                if (glFormat == PixelFormat.CompressedTextureFormats)
+                if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                 {
                     throw new NotImplementedException();
                 }
@@ -90,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             TextureTarget target = GetGLCubeFace(face);
-            if (glFormat == PixelFormat.CompressedTextureFormats)
+            if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
             {
                 throw new NotImplementedException();
             }

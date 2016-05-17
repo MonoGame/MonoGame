@@ -13,6 +13,7 @@ using OpenTK.Graphics.OpenGL;
 #endif
 #elif GLES
 using OpenTK.Graphics.ES20;
+using GetPName = OpenTK.Graphics.ES20.All;
 #else
 using OpenGL;
 #endif
@@ -160,7 +161,11 @@ namespace Microsoft.Xna.Framework.Graphics
             int anisotropy = 0;
             if (SupportsTextureFilterAnisotropic)
             {
+#if __IOS__
+                GL.GetInteger ((GetPName)All.MaxTextureMaxAnisotropyExt, ref anisotropy);
+#else
                 GL.GetInteger(GetPName.MaxTextureMaxAnisotropyExt, out anisotropy);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
             MaxTextureAnisotropy = anisotropy;
