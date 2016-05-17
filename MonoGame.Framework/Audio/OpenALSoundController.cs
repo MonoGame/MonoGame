@@ -83,6 +83,7 @@ namespace Microsoft.Xna.Framework.Audio
         private bool _bSoundAvailable = false;
         private Exception _SoundInitException; // Here to bubble back up to the developer
         bool _isDisposed;
+        public bool SupportsADPCM = false;
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
@@ -125,9 +126,9 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
-                var s = Alc.GetString (_device, 0x1006);
-                var ext = Marshal.PtrToStringAnsi (s);
+                var ext = Alc.GetString (_device, AlcString.Extensions);
                 if (ext != null) {
+                    System.Diagnostics.Debug.WriteLine ("Supported Alc Extensions");
                     foreach (var e in ext.Split (new char [] { ' ' }))
                         System.Diagnostics.Debug.WriteLine (e);
                 }
@@ -239,9 +240,8 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
                 _context = Alc.CreateContext(_device, attribute);
-
 #if DESKTOPGL
-                _oggstreamer = new OggStreamer();
+        _oggstreamer = null;//new OggStreamer();
 #endif
 
                 if (CheckALError("Could not create AL context"))
@@ -258,6 +258,13 @@ namespace Microsoft.Xna.Framework.Audio
                         CleanUpOpenAL();
                         return(false);
                     }
+                    var ext = AL.GetString (AlString.Extensions);
+                    if (ext != null) {
+                        System.Diagnostics.Debug.WriteLine ("Supported Al Extensions");
+                        foreach (var e in ext.Split (new char [] { ' ' }))
+                            System.Diagnostics.Debug.WriteLine (e);
+                    }
+                    SupportsADPCM = AL.IsExtensionPresent ("AL_SOFT_MSADPCM");
                     return (true);
                 }
             }

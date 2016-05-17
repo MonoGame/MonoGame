@@ -27,15 +27,22 @@ namespace OpenAL
         OutOfMemory = 0xA005,
     }
 
+    public enum AlString
+    {
+        Extensions = 0xB004,
+    }
+
     public enum ALBufferi
     {
         UnpackBlockAlignmentSoft = 0x200C,
+        LoopSoftPointsExt = 0x2015,
     }
 
     public enum ALGetBufferi
     {
         Bits = 0x2002,
         Channels = 0x2003,
+        Size = 0x2004,
     }
 
     public enum ALSourceb
@@ -92,6 +99,11 @@ namespace OpenAL
         NoError = 0,
     }
 
+    public enum AlcString
+    {
+        Extensions = 0x1006,
+    }
+
     public enum EfxFilteri
     {
         FilterType = 0x8001,
@@ -112,21 +124,25 @@ namespace OpenAL
     {
         public const string NativeLibName = "openal32.dll";
 
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alEnable")]
+        public static extern void Enable (int cap);
+
         [CLSCompliant(false)]
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alBufferData")]
-        public static extern void BufferData(uint bid, ALFormat format, IntPtr data, int size, int freq);
+        public static extern void BufferData(uint bid, int format, IntPtr data, int size, int freq);
 
         public static void BufferData(int bid, ALFormat format, byte[] data, int size, int freq)
         {
             var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            BufferData((uint)bid, format, handle.AddrOfPinnedObject(), size, freq);
+            BufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
             handle.Free();
         }
 
         public static void BufferData(int bid, ALFormat format, short[] data, int size, int freq)
         {
             var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            BufferData((uint)bid, format, handle.AddrOfPinnedObject(), size, freq);
+            BufferData((uint)bid, (int)format, handle.AddrOfPinnedObject(), size, freq);
             handle.Free();
         }
 
@@ -153,6 +169,9 @@ namespace OpenAL
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetBufferi")]
         public static extern void GetBufferi(int bid, ALGetBufferi param, out int value);
+
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alBufferiv")]
+        public static extern void Bufferiv (int bid, ALBufferi param, int[] values);
 
         public static void GetBuffer(int bid, ALGetBufferi param, out int value)
         {
@@ -333,11 +352,16 @@ namespace OpenAL
         public static extern IntPtr GetProcAddress (string functionName);
 
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alGetString")]
-        private static extern IntPtr alGetString (IntPtr device, int p);
+        private static extern IntPtr alGetString (int p);
 
-        public static string GetString (IntPtr device, int p)
+        public static string GetString (int p)
         {
-            return Marshal.PtrToStringAnsi (alGetString (device, p));
+            return Marshal.PtrToStringAnsi (alGetString (p));
+        }
+
+        public static string GetString (AlString p)
+        {
+            return GetString ((int)p);
         }
     }
 
@@ -378,9 +402,18 @@ namespace OpenAL
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcOpenDevice")]
         public static extern IntPtr OpenDevice (string device);
 
-        [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetString")]
-        public static extern IntPtr GetString (IntPtr device, int p);
+        internal static extern IntPtr alGetString (IntPtr device, int p);
+
+        public static string GetString (IntPtr device, int p)
+        {
+            return Marshal.PtrToStringAnsi (alGetString (device, p));
+        }
+
+        public static string GetString (IntPtr device, AlcString p)
+        {
+            return GetString (device, (int)p);
+        }
     }
 
     public class XRamExtension
