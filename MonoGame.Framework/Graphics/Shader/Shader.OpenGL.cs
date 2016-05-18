@@ -10,6 +10,7 @@ using System.IO;
 using MonoMac.OpenGL;
 #else
 using OpenTK.Graphics.OpenGL;
+using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #elif DESKTOPGL
 using OpenGL;

@@ -3,11 +3,22 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+
+#if MONOMAC && PLATFORM_MACOS_LEGACY
+using MonoMac.OpenAL;
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
+using OpenTK.Audio.OpenAL;
+#endif
+
 #if GLES 
 using OpenTK.Audio.OpenAL;
-#else
+#endif
+
+#if DESKTOPGL
 using OpenAL;
 #endif
+
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -54,7 +65,7 @@ namespace Microsoft.Xna.Framework.Audio
             dataSize = size;
             this.sampleRate = sampleRate;
             int unpackedSize = 0;
-#if !GLES
+#if DESKTOPGL
             if (alignment > 0) {
                 AL.Bufferi (openALDataBuffer, ALBufferi.UnpackBlockAlignmentSoft, alignment);
                 ALHelper.CheckError ("Failed to fill buffer.");

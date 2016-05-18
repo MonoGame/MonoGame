@@ -13,6 +13,7 @@ using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
 using OpenGL;
+using ExtTextureFilterAnisotropic = OpenGL.TextureParameterName;
 #elif GLES
 using OpenTK.Graphics.ES20;
 #endif
@@ -27,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
         private const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
 #else
-        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = TextureParameterName.TextureMaxAnisotropyExt;
+        private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
         private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 #endif
 

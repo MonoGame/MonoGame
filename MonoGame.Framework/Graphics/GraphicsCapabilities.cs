@@ -10,12 +10,16 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #else
 using OpenTK.Graphics.OpenGL;
+using GetParamName = OpenTK.Graphics.OpenGL.All;
+using GetPName = OpenTK.Graphics.OpenGL.GetPName;
 #endif
 #elif GLES
 using OpenTK.Graphics.ES20;
-using GetPName = OpenTK.Graphics.ES20.All;
+using GetParamName = OpenTK.Graphics.ES20.All;
+using GetPName = OpenTK.Graphics.ES20.GetPName;
 #else
 using OpenGL;
+using GetParamName = OpenGL.GetPName;
 #endif
 #endif
 
@@ -164,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if __IOS__
                 GL.GetInteger ((GetPName)All.MaxTextureMaxAnisotropyExt, ref anisotropy);
 #else
-                GL.GetInteger(GetPName.MaxTextureMaxAnisotropyExt, out anisotropy);
+                GL.GetInteger((GetPName)GetParamName.MaxTextureMaxAnisotropyExt, out anisotropy);
 #endif
                 GraphicsExtensions.CheckGLError();
             }

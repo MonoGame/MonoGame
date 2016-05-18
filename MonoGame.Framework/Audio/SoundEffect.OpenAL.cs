@@ -12,9 +12,9 @@ using MonoMac.AVFoundation;
 using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
-#if GLES
+#if GLES || MONOMAC
 using OpenTK.Audio.OpenAL;
-#else
+#else 
 using OpenAL;
 #endif
 #if IOS || MONOMAC

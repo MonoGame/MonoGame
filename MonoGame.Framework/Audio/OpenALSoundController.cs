@@ -5,10 +5,20 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities;
 
+#if MONOMAC && PLATFORM_MACOS_LEGACY
+using MonoMac.OpenAL;
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
+using OpenTK.Audio.OpenAL;
+using OpenTK.Audio;
+#endif
+
 #if GLES
 using OpenTK.Audio.OpenAL;
 using OpenTK;
-#else
+#endif
+
+#if DESKTOPGL
 using OpenAL;
 #endif
 using OpenGL;
@@ -48,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private static OpenALSoundController _instance = null;
         private IntPtr _device;
-#if GLES
+#if !DESKTOPGL
         ContextHandle _context;
         ContextHandle NullContext = ContextHandle.Zero;
 #else

@@ -11,11 +11,14 @@ using System.Runtime.InteropServices;
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 #endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
+using OpenTK.Graphics.OpenGL;
+#endif
 #if GLES
 using OpenTK.Graphics.ES20;
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
-#if DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
+#if DESKTOPGL
 using OpenGL;
 #endif
 

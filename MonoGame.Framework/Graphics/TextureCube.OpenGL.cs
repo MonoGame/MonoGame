@@ -6,11 +6,18 @@ using System;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
+#endif
+#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
+using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
+using Bool = OpenTK.Graphics.OpenGL.Boolean;
+#endif
+#if DESKTOPGL
 using OpenGL;
 using GLPixelFormat = OpenGL.PixelFormat;
 using PixelFormat = OpenGL.PixelFormat;
-#elif GLES
+#endif
+#if GLES
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
 using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;

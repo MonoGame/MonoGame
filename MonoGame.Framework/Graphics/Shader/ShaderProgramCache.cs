@@ -10,6 +10,7 @@ using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
 #else
 using OpenTK.Graphics.OpenGL;
 using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
+using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #elif DESKTOPGL
 using OpenGL;
