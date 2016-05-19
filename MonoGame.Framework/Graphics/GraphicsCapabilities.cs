@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (SupportsTextureFilterAnisotropic)
             {
 #if __IOS__
-                GL.GetInteger ((GetPName)All.MaxTextureMaxAnisotropyExt, ref anisotropy);
+                GL.GetInteger ((GetPName)All.MaxTextureMaxAnisotropyExt, out anisotropy);
 #else
                 GL.GetInteger((GetPName)GetParamName.MaxTextureMaxAnisotropyExt, out anisotropy);
 #endif
