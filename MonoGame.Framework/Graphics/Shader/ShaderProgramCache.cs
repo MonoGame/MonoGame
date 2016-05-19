@@ -7,6 +7,7 @@ using System.Collections.Generic;
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
+using Bool = MonoMac.OpenGL.Boolean;
 #else
 using OpenTK.Graphics.OpenGL;
 using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;

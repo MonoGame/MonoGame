@@ -30,7 +30,8 @@ using Foundation;
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
+using GLPixelFormat = MonoMac.OpenGL.All;
+using PixelFormat = MonoMac.OpenGL.PixelFormat;
 #else
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.All;

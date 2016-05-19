@@ -8,6 +8,8 @@ using System.Collections.Generic;
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+using GetParamName = MonoMac.OpenGL.All;
+using GetPName = MonoMac.OpenGL.GetPName;
 #else
 using OpenTK.Graphics.OpenGL;
 using GetParamName = OpenTK.Graphics.OpenGL.All;

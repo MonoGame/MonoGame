@@ -6,6 +6,8 @@ using System;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+using GLPixelFormat = MonoMac.OpenGL.All;
+using Bool = MonoMac.OpenGL.Boolean;
 #endif
 #if (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenTK.Graphics.OpenGL;

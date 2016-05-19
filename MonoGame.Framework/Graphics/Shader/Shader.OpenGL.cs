@@ -8,6 +8,7 @@ using System.IO;
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+using Bool = MonoMac.OpenGL.Boolean;
 #else
 using OpenTK.Graphics.OpenGL;
 using Bool = OpenTK.Graphics.OpenGL.Boolean;
