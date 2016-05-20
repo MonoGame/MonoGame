@@ -4,3 +4,6 @@
 [submodule "ThirdParty/Dependencies"]
 	path = ThirdParty/Dependencies
 	url = https://github.com/Mono-Game/MonoGame.Dependencies.git
+[submodule "ThirdParty/lidgren-network-gen3"]
+	path = ThirdParty/lidgren-network-gen3
+	url = git://github.com/lidgren/lidgren-network-gen3.git
