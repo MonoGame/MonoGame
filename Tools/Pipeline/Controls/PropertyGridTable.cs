@@ -193,12 +193,12 @@ namespace MonoGame.Tools.Pipeline
             // On windows craeting a dialog from double click will freeze
             // the GUI thread until a click occurs so we need to call the
             // dialog at the end of Paint event so everything gets drawn.
-            if(_edit)
+            if (_edit)
             {
-                if (!Global.Unix && _selectedCell != null)
-                    _selectedCell.Edit(pixel1);
-
                 _edit = false;
+
+                if (!Global.Unix)
+                    _selectedCell.Edit(pixel1);
             }
         }
 
@@ -211,14 +211,14 @@ namespace MonoGame.Tools.Pipeline
 
         private void Drawable_MouseUp(object sender, MouseEventArgs e)
         {
-            _moveSeparator = - _separatorWidth / 2 - 1;
+            _moveSeparator = -_separatorWidth / 2 - 1;
         }
 
         private void Drawable_MouseMove(object sender, MouseEventArgs e)
         {
             _mouseLocation = new Point((int)e.Location.X, (int)e.Location.Y);
 
-            if(_moveSeparator > -_separatorWidth / 2 - 1)
+            if (_moveSeparator > -_separatorWidth / 2 - 1)
                 _separatorPos = _moveSeparator + _mouseLocation.X;
 
             drawable.Invalidate();
@@ -248,7 +248,7 @@ namespace MonoGame.Tools.Pipeline
 #if WINDOWS
             var scrollsize = 0;
 
-            if((ControlObject as System.Windows.Forms.ScrollableControl).VerticalScroll.Visible)
+            if ((ControlObject as System.Windows.Forms.ScrollableControl).VerticalScroll.Visible)
                 scrollsize = System.Windows.Forms.SystemInformation.VerticalScrollBarWidth;
 
             drawable.Width = Width - scrollsize - System.Windows.Forms.SystemInformation.VerticalResizeBorderThickness;
@@ -258,4 +258,3 @@ namespace MonoGame.Tools.Pipeline
         }
     }
 }
-
