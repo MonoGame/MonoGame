@@ -196,7 +196,7 @@ namespace MonoGame.Tools.Pipeline
             if(_edit)
             {
                 if (!Global.Unix)
-                    _selectedCell.Edit(pixel1);
+                    _selectedCell?.Edit(pixel1);
 
                 _edit = false;
             }
