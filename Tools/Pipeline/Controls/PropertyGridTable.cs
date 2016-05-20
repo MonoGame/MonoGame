@@ -195,8 +195,8 @@ namespace MonoGame.Tools.Pipeline
             // dialog at the end of Paint event so everything gets drawn.
             if(_edit)
             {
-                if (!Global.Unix)
-                    _selectedCell?.Edit(pixel1);
+                if (!Global.Unix && _selectedCell != null)
+                    _selectedCell.Edit(pixel1);
 
                 _edit = false;
             }
