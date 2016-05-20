@@ -76,8 +76,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             string baseName = DecodeBaseName(encodedName);
             if (string.IsNullOrEmpty(baseName))
                 throw new InvalidOperationException("encodedName");
-            // Subtract the base name from the string and convert the remainder to an integer
-            return Int32.Parse(encodedName.Substring(baseName.Length), CultureInfo.InvariantCulture);
+
+            // Subtract the base name from the string and convert the remainder to an integer.
+            // TryParse solves problem when name is just 'BlendIndicies' for example, in which case
+            // we default to index 0, assuming only 1 index
+            int index = 0;
+            Int32.TryParse(encodedName.Substring(baseName.Length), NumberStyles.Integer, CultureInfo.InvariantCulture, out index);
+
+            return index;
         }
 
         /// <summary>
