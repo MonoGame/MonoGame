@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 _context = Alc.CreateContext(_device, attribute);
 #if DESKTOPGL
-        _oggstreamer = null;//new OggStreamer();
+                _oggstreamer = new OggStreamer();
 #endif
 
                 if (CheckALError("Could not create AL context"))
