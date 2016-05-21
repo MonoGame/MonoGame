@@ -16,7 +16,7 @@ namespace MonoGame.Tools.Pipeline
 
         public DirectoryItem(string path)
         {
-            OriginalPath = path.TrimStart(Path.DirectorySeparatorChar);
+            OriginalPath = path.Trim(Path.DirectorySeparatorChar).Replace(Path.DirectorySeparatorChar, '/');
             Exists = true;
         }
 
@@ -31,7 +31,7 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                return System.IO.Path.GetFileName(OriginalPath);
+                return Path.GetFileName(OriginalPath);
             }
         }
 
@@ -41,7 +41,7 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                return System.IO.Path.GetDirectoryName(OriginalPath);
+                return Path.GetDirectoryName(OriginalPath);
             }
         }
 

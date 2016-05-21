@@ -9,17 +9,21 @@ using Eto.WinForms.Drawing;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace MonoGame.Tools.Pipeline
 {
     static partial class Global
     {
+        public static bool IsWindows10 { get; set; }
+
         [DllImport("Shell32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         private static extern int ExtractIconExW(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
 
         private static void PlatformInit()
         {
-
+            var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+            IsWindows10 = (reg.GetValue("ProductName") as string).StartsWith("Windows 10");
         }
 
         public static System.Drawing.Icon ExtractIcon(int number)

@@ -18,6 +18,7 @@ namespace MonoGame.Tools.Pipeline
             textArea.ReadOnly = true;
 
             treeView = new TreeView();
+            treeView.Style = "FilterView";
 
             Content = textArea;
         }

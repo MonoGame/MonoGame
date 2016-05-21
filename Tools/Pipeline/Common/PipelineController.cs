@@ -865,9 +865,6 @@ namespace MonoGame.Tools.Pipeline
 
             string folder = Path.Combine(GetFullPath(GetCurrentPath()), name);
 
-            if (!Path.IsPathRooted(folder))
-                folder = _project.Location + Path.DirectorySeparatorChar + folder;
-
             try
             {
                 if (!Directory.Exists(folder))

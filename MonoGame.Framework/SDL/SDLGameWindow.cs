@@ -249,6 +249,12 @@ namespace Microsoft.Xna.Framework
 
         public void ClientResize(int width, int height)
         {
+            // SDL reports many resize events even if the Size didn't change.
+            // Only call the code below if it actually changed.
+            if (_game.GraphicsDevice.PresentationParameters.BackBufferWidth == width &&
+                _game.GraphicsDevice.PresentationParameters.BackBufferHeight == height) {
+                return;
+            }
             _game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
             _game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
             _game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);

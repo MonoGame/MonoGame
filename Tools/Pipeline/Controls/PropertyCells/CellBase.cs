@@ -29,7 +29,7 @@ namespace MonoGame.Tools.Pipeline
             _eventHandler = eventHandler;
         }
 
-        public virtual void Edit(Control control)
+        public virtual void Edit(PixelLayout control)
         {
 
         }

@@ -113,7 +113,6 @@ namespace MonoGame.Tools.Pipeline
 
             cmdClose = new Command();
             cmdClose.MenuText = "Close";
-            cmdClose.Shortcut = Application.Instance.CommonModifier | Keys.C;
 
             cmdImport = new Command();
             cmdImport.MenuText = "Import";
