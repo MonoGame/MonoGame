@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Input
                     Sdl.Mouse.GetState(out x, out y);
             var clientBounds = window.ClientBounds;
 
-            if (clientBounds.Contains(x, y) && winFlags.HasFlag(Sdl.Window.State.MouseFocus))
+            if (winFlags.HasFlag(Sdl.Window.State.MouseFocus))
             {
                 window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
                 window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
