@@ -39,17 +39,28 @@ namespace Microsoft.Xna.Framework
             Sdl.Minor = sversion.Minor;
             Sdl.Patch = sversion.Patch;
 
+            try
+            {
+                // HACK: The current development version of SDL
+                // returns 2.0.4, to check SDL version we simply
+                // need to try and execute a function that's only
+                // available in the newer version of it.
+                Sdl.Window.SetResizable(IntPtr.Zero, false);
+                Sdl.Patch = 5;
+            }
+            catch { }
+
             var version = 100 * Sdl.Major + 10 * Sdl.Minor + Sdl.Patch;
 
             if (version <= 204)
                 Debug.WriteLine ("Please use SDL 2.0.5 or higher.");
 
-            Sdl.Init((int) (
+            Sdl.Init((int)(
                 Sdl.InitFlags.Video |
                 Sdl.InitFlags.Joystick |
                 Sdl.InitFlags.GameController |
                 Sdl.InitFlags.Haptic
-                ));
+            ));
 
             Sdl.DisableScreenSaver();
 
