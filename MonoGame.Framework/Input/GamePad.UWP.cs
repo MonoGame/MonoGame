@@ -92,6 +92,14 @@ namespace Microsoft.Xna.Framework.Input
                 (state.Buttons.HasFlag(WGI.GamepadButtons.X) ? Buttons.X : 0) |
                 (state.Buttons.HasFlag(WGI.GamepadButtons.Y) ? Buttons.Y : 0) |
                 0;
+
+            // Check triggers
+            const double triggerThreshold = 0.1;
+            if (triggers.Left > triggerThreshold)
+                buttonStates |= Buttons.LeftTrigger;
+            if (triggers.Right > triggerThreshold)
+                buttonStates |= Buttons.RightTrigger;
+
             var buttons = new GamePadButtons(buttonStates);
 
             var dpad = new GamePadDPad(
