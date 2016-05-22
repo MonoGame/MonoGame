@@ -67,8 +67,12 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
+            var events = new Sdl.Event[1];
+            Sdl.PumpEvents ();
+            while (Sdl.PeepEvents(events, 1,Sdl.EventAction.GetEvent, Sdl.EventType.JoyDeviceAdded, Sdl.EventType.JoyDeviceAdded) == 1) {
+                Joystick.AddDevice(events[0].JoystickDevice.Which);
+            }
             _view.CreateWindow();
-            SdlRunLoop();
 
             base.BeforeInitialize ();
         }
@@ -112,7 +116,6 @@ namespace Microsoft.Xna.Framework
                 else if (ev.Type == Sdl.EventType.KeyDown)
                 {
                     var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-
                     if (!_keys.Contains(key))
                         _keys.Add(key);
                 }

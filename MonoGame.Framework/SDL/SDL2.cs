@@ -50,6 +50,10 @@ internal static class Sdl
         MouseWheel = 0x403,
     }
 
+    public enum EventAction {
+        GetEvent = 0x2,
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     public struct Event
     {
@@ -93,6 +97,12 @@ internal static class Sdl
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PollEvent")]
     public static extern int PollEvent([Out] out Event _event);
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PumpEvents")]
+    public static extern int PumpEvents();
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PeepEvents")]
+    public static extern int PeepEvents(Event[] events, int numevents, EventAction action, EventType minType, EventType maxType);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
     public static extern void FreeSurface(IntPtr surface);
