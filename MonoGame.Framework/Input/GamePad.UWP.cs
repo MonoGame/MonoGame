@@ -9,6 +9,12 @@ namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
+        /// <summary>
+        /// Attempts to mimic SharpDX.XInput.Gamepad which defines the trigger threshold as 30 with a range of 0 to 255. 
+        /// We trigger here has a range of 0.0 to 1.0. So, 30 / 255 = 0.11765.
+        /// </summary>
+        private const double triggerThreshold = 0.11765;
+
         internal static bool Back;
 
         private static int PlatformGetMaxNumberOfGamePads()
@@ -94,7 +100,6 @@ namespace Microsoft.Xna.Framework.Input
                 0;
 
             // Check triggers
-            const double triggerThreshold = 0.1;
             if (triggers.Left > triggerThreshold)
                 buttonStates |= Buttons.LeftTrigger;
             if (triggers.Right > triggerThreshold)
