@@ -44,7 +44,7 @@ namespace MonoGame.Utilities.Deflate
     /// </para>
     ///
     /// <para> Using this stream, applications can compress or decompress data via
-    /// stream <c>Read()</c> and <c>Write()</c> operations.  Either compresssion or
+    /// stream <c>Read()</c> and <c>Write()</c> operations.  Either compression or
     /// decompression can occur through either reading or writing. The compression
     /// format used is ZLIB, which is documented in <see
     /// href="http://www.ietf.org/rfc/rfc1950.txt">IETF RFC 1950</see>, "ZLIB Compressed
