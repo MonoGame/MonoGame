@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 		
 		
-		/// <summary>Indicateds whether or not the object has been disposed.</summary>
+		/// <summary>Indicates whether or not the object has been disposed.</summary>
 		public bool IsDisposed { get { return false; } }
 		
 		#region IDisposable implementation
