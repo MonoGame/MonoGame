@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Input
     {
         /// <summary>
         /// Attempts to mimic SharpDX.XInput.Gamepad which defines the trigger threshold as 30 with a range of 0 to 255. 
-        /// We trigger here has a range of 0.0 to 1.0. So, 30 / 255 = 0.11765.
+        /// The trigger here has a range of 0.0 to 1.0. So, 30 / 255 = 0.11765.
         /// </summary>
         private const double TriggerThreshold = 0.11765;
 
