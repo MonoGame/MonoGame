@@ -6,8 +6,15 @@ using System;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
-#elif OPENAL
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
 using OpenTK.Audio.OpenAL;
+#endif
+#if GLES
+using OpenTK.Audio.OpenAL;
+#endif
+#if DESKTOPGL
+using OpenAL;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio

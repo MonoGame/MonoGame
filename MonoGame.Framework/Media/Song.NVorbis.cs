@@ -5,7 +5,7 @@
 using System;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
-using OpenTK.Audio;
+using OpenAL;
 
 namespace Microsoft.Xna.Framework.Media
 {

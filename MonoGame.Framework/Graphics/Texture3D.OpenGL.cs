@@ -13,7 +13,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

@@ -11,8 +11,7 @@ using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
-using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
+using OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using GLStencilFunction = OpenTK.Graphics.ES20.StencilFunction;
