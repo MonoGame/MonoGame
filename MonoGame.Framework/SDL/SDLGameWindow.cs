@@ -17,7 +17,12 @@ namespace Microsoft.Xna.Framework
             set
             {
                 if (_init)
-                    throw new Exception("SDL does not support changing resizable parameter of the window after it's already been created.");
+                {
+                    if (Sdl.Patch > 4)
+                        Sdl.Window.SetResizable(_handle, value);
+                    else
+                        throw new Exception("SDL does not support changing resizable parameter of the window after it's already been created.");
+                }
 
                 _resizable = value;
             }
@@ -236,11 +241,11 @@ namespace Microsoft.Xna.Framework
                 centerY = displayRect.Y + displayRect.Height / 2 - clientHeight / 2;
             }
 
-            // If this window is resizable, there is a bug in SDL where
+            // If this window is resizable, there is a bug in SDL 2.0.4 where
             // after the window gets resized, window position information
             // becomes wrong (for me it always returned 10 8). Solution is
             // to not try and set the window position because it will be wrong.
-            if (!AllowUserResizing)
+            if (Sdl.Patch > 4 || !AllowUserResizing)
                 Sdl.Window.SetPosition(Handle, centerX, centerY);
 
             IsFullScreen = _willBeFullScreen;

@@ -255,6 +255,9 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowPosition")]
         public static extern void SetPosition(IntPtr window, int x, int y);
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowResizable")]
+        public static extern void SetResizable(IntPtr window, bool resizable);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowSize")]
         public static extern void SetSize(IntPtr window, int w, int h);
 
