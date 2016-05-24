@@ -12,7 +12,11 @@ using MonoMac.AVFoundation;
 using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
+#if GLES || MONOMAC
 using OpenTK.Audio.OpenAL;
+#else 
+using OpenAL;
+#endif
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
@@ -119,27 +123,44 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
+        private void PlatformInitializeADPCM (byte [] buffer, int offset, int count, int sampleRate, AudioChannels channels, int dataFormat, int loopStart, int loopLength)
+        {
+            Rate = (float)sampleRate;
+            Size = (int)count;
+            #if DESKTOPGL
+            Format = channels == AudioChannels.Stereo ? ALFormat.StereoMSADPCM : ALFormat.MonoMSADPCM;
+            #else
+            Format = channels == AudioChannels.Stereo ? (ALFormat)0x1303 : (ALFormat)0x1302;
+            #endif
+
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer ();
+            SoundBuffer.BindDataBuffer (buffer, Format, Size, (int)Rate, dataFormat);
+        }
+
         private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
         {
             // We need to decode MSADPCM.
-            if (format == 2)
+            var supportsADPCM = OpenALSoundController.GetInstance.SupportsADPCM;
+            if (format == 2 && !supportsADPCM)
             {
                 using (var stream = new MemoryStream(buffer))
                 using (var reader = new BinaryReader(stream))
                 {
-                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM(
-                        reader,
-                        (short)channels,
-                        (short)((blockAlignment / channels) - 22));
-
+                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM (reader, (short)channels, (short)blockAlignment);
                     format = 1;
                 }
             }
 
-            if (format != 1)
+            if (!supportsADPCM && format != 1)
                 throw new NotSupportedException("Unsupported wave format!");
 
-            PlatformInitializePCM(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+            if (supportsADPCM && format == 2) {
+                PlatformInitializeADPCM (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+            } else {
+                PlatformInitializePCM (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+            }
+            _duration = TimeSpan.FromSeconds (SoundBuffer.Duration);
         }
         
         #endregion
