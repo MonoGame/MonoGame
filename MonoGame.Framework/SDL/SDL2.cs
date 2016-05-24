@@ -49,6 +49,11 @@ internal static class Sdl
         JoyDeviceRemoved = 0x606,
         MouseWheel = 0x403,
     }
+    
+    public enum EventAction
+    {
+        GetEvent = 0x2,
+    }
 
     [StructLayout(LayoutKind.Explicit, Size = 56)]
     public struct Event
@@ -92,7 +97,13 @@ internal static class Sdl
     public static extern void GetVersion(out Version version);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PollEvent")]
-    public static extern int PollEvent(out Event _event);
+    public static extern int PollEvent([Out] out Event _event);
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PumpEvents")]
+    public static extern int PumpEvents();
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PeepEvents")]
+    public static extern int PeepEvents(Event[] events, int numevents, EventAction action, EventType minType, EventType maxType);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
     public static extern void FreeSurface(IntPtr surface);
@@ -336,6 +347,77 @@ internal static class Sdl
         {
             return GetError(SDL_GetWindowDisplayIndex(window));
         }
+    }
+
+    public static class GL
+    {
+        public enum Attribute
+        {
+            RedSize,
+            GreenSize,
+            BlueSize,
+            AlphaSize,
+            BufferSize,
+            DoubleFuffer,
+            DepthSize,
+            StencilSize,
+            AccumRedSize,
+            AccumGreenSize,
+            AccumBlueSize,
+            AccumAlphaSize,
+            Stereo,
+            MultiSampleBuffers,
+            MultiSampleSamples,
+            AcceleratedVisual,
+            RetainedBacking,
+            ContextMajorVersion,
+            ContextMinorVersion,
+            ContextEgl,
+            ContextFlags,
+            ContextProfileMAsl,
+            ShareWithCurrentContext,
+            FramebufferSRGBCapable,
+            ContextReleaseBehaviour,
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_CreateContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_CreateContext(IntPtr window);
+
+        public static IntPtr CreateContext(IntPtr window)
+        {
+            return GetError(SDL_GL_CreateContext(window));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_DeleteContext", ExactSpelling = true)]
+        public static extern void DeleteContext(IntPtr context);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetCurrentContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_GetCurrentContext();
+
+        public static IntPtr GetCurrentContext()
+        {
+            return GetError(SDL_GL_GetCurrentContext());
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetSwapInterval", ExactSpelling = true)]
+        public static extern int GetSwapInterval();
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_MakeCurrent", ExactSpelling = true)]
+        public static extern int MakeCurrent(IntPtr window, IntPtr context);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
+        private static extern int SDL_GL_SetAttribute(Attribute attr, int value);
+
+        public static int SetAttribute(Attribute attr, int value)
+        {
+            return GetError(SDL_GL_SetAttribute(attr, value));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetSwapInterval", ExactSpelling = true)]
+        public static extern int SetSwapInterval(int interval);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SwapWindow", ExactSpelling = true)]
+        public static extern void SwapWindow(IntPtr window);
     }
 
     public static class Mouse

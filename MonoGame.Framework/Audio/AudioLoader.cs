@@ -1,6 +1,10 @@
 using System;
 using System.IO;
+#if GLES
 using OpenTK.Audio.OpenAL;
+#else
+using OpenAL;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -14,8 +18,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             switch (channels)
             {
-                case 1: return bits == 8 ? OpenTK.Audio.OpenAL.ALFormat.Mono8 : OpenTK.Audio.OpenAL.ALFormat.Mono16;
-                case 2: return bits == 8 ? OpenTK.Audio.OpenAL.ALFormat.Stereo8 : OpenTK.Audio.OpenAL.ALFormat.Stereo16;
+                case 1: return bits == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
+                case 2: return bits == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
                 default: throw new NotSupportedException("The specified sound format is not supported.");
             }
         }
