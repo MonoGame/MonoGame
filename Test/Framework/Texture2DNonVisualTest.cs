@@ -132,12 +132,14 @@ namespace MonoGame.Tests.Framework
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
             {
                 Color[] data = new Color[arraySize];
+                Color[] reference = new Color[4096];
                 Color[] written = new Color[4096];
                 for (int i = 0; i < arraySize; i++)
                 {
                     data[i] = Color.White;
                 }
                 Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                t.GetData(reference);
                 t.SetData(data);
                 t.GetData(written);
                 for (int i = 0; i < written.Length; i++)
@@ -145,23 +147,23 @@ namespace MonoGame.Tests.Framework
 
                     if (i < arraySize)
                     {
-                        Assert.AreEqual(255, written[i].R, "Bad color in position:{0};", i);
-                        Assert.AreEqual(255, written[i].G, "Bad color in position:{0};", i);
-                        Assert.AreEqual(255, written[i].B, "Bad color in position:{0};", i);
-                        Assert.AreEqual(255, written[i].A, "Bad color in position:{0};", i);
+                        Assert.AreEqual(255, written[i].R, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].G, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].B, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].A, "Bad color written in position:{0};", i);
                     }
                     else
                     {
-                        Assert.AreNotEqual(255, written[i].R, "Bad color in position:{0};", i);
-                        Assert.AreNotEqual(255, written[i].G, "Bad color in position:{0};", i);
-                        Assert.AreNotEqual(255, written[i].B, "Bad color in position:{0};", i);
-                        Assert.AreNotEqual(255, written[i].A, "Bad color in position:{0};", i);
+                        Assert.AreNotEqual(reference[i].R, written[i].R, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreNotEqual(reference[i].G, written[i].G, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreNotEqual(reference[i].B, written[i].B, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreNotEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
                     }
                 }
             }
         }
-        [TestCase(4200,0,4096)]
-        [TestCase(2000,0,4096)]
+        [TestCase(4200, 0, 4096)]
+        [TestCase(2000, 0, 4096)]
 
         [TestCase(4095, 0, 4095)]
         [TestCase(4095, 1, 4095)]
@@ -199,56 +201,82 @@ namespace MonoGame.Tests.Framework
                 {
                     if (i < arraySize)
                     {
-                        Assert.AreEqual(255, written[i].R, "Bad color in position:{0};", i);
-                        Assert.AreEqual(255, written[i].G, "Bad color in position:{0};", i);
-                        Assert.AreEqual(255, written[i].B, "Bad color in position:{0};", i);
-                        Assert.AreEqual(255, written[i].A, "Bad color in position:{0};", i);
+                        Assert.AreEqual(255, written[i].R, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].G, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].B, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].A, "Bad color written in position:{0};", i);
                     }
                     else
                     {
-                        Assert.AreEqual(reference[i].R, written[i].R, "Bad color in position:{0};", i);
-                        Assert.AreEqual(reference[i].G, written[i].G, "Bad color in position:{0};", i);
-                        Assert.AreEqual(reference[i].B, written[i].B, "Bad color in position:{0};", i);
-                        Assert.AreEqual(reference[i].A, written[i].A, "Bad color in position:{0};", i);
+                        Assert.AreNotEqual(reference[i].R, written[i].R, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreNotEqual(reference[i].G, written[i].G, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreNotEqual(reference[i].B, written[i].B, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreNotEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
                     }
                 }
             }
         }
+        [TestCase(4096, 0, 4096, -1, -1, 65, 65)]
+        [TestCase(3844, 0, 3844, 1, 1, 63, 63)]
+        [TestCase(3845, 1, 3844, 1, 1, 63, 63)]
 
-        //public void SetData5ParameterGoodTest(int arraySize, int startIndex, int elements)
-        //{
-        //    using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
-        //    {
-        //        Rectangle area = new Rectangle();
-        //        Color[] data = new Color[arraySize];
-        //        Color[] written = new Color[4096];
-        //        for (int i = 0; i < arraySize; i++)
-        //        {
-        //            data[i] = Color.White;
-        //        }
-        //        Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
-        //        t.SetData(0, area, data, startIndex, elements);
-        //        t.GetData(0, area, written, 0, elements);
-        //        for (int i = 0; i < arraySize; i++)
-        //        {
-        //            if (i < arraySize)
-                    //{
-                    //    Assert.AreEqual(255, written[i].R, "Bad color in position:{0};", i);
-                    //    Assert.AreEqual(255, written[i].G, "Bad color in position:{0};", i);
-                    //    Assert.AreEqual(255, written[i].B, "Bad color in position:{0};", i);
-                    //    Assert.AreEqual(255, written[i].A, "Bad color in position:{0};", i);
-                    //}
-                    //else
-                    //{
-                    //    Assert.AreNotEqual(255, written[i].R, "Bad color in position:{0};", i);
-                    //    Assert.AreNotEqual(255, written[i].G, "Bad color in position:{0};", i);
-                    //    Assert.AreNotEqual(255, written[i].B, "Bad color in position:{0};", i);
-                    //    Assert.AreNotEqual(255, written[i].A, "Bad color in position:{0};", i);
-                    //}
-//        }
-//    }
-//}
-[TestFixtureTearDown]
+        [TestCase(4096, 0, 4096, 1, 1, 63, 63)]
+        [TestCase(4096, 0, 4095, 0, 0, 64, 64)]
+        [TestCase(4096, 0, 3844, 1, 1, 63, 63)]
+        [TestCase(3969, 0, 4096, 1, 1, 63, 63)]
+        [TestCase(4097, 1, 4096, 1, 1, 63, 63)]
+        [TestCase(4097, 1, 4095, 0, 0, 64, 64)]
+        [TestCase(4097, 1, 3844, 1, 1, 63, 63)]
+        [TestCase(3970, 1, 4096, 1, 1, 63, 63)]
+
+        [TestCase(4096, 0, 4096, 0, 0, 64, 64)]
+        [TestCase(4096, 0, 3969, 1, 1, 63, 63)]
+        [TestCase(3969, 0, 3969, 1, 1, 63, 63)]
+        [TestCase(4096, 1, 3969, 1, 1, 63, 63)]
+        [TestCase(4097, 1, 3969, 1, 1, 63, 63)]
+        [TestCase(3970, 1, 3969, 1, 1, 63, 63)]
+        [TestCase(4097, 1, 4096, 0, 0, 64, 64)]
+        public void SetData5ParameterGoodTest(int arraySize, int startIndex, int elements, int x, int y, int w, int h)
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Rectangle area = new Rectangle(x, y, w, h);
+                int areaLength = w * h;
+                Color[] data = new Color[arraySize];
+                Color[] reference = new Color[4096];
+                Color[] written = new Color[4096];
+                for (int i = 0; i < arraySize; i++)
+                {
+                    data[i] = Color.White;
+                }
+                //data[66] = new Color(212, 212, 212, 212);
+                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                t.GetData(reference);
+                t.SetData(0, area, data, startIndex, elements);
+                //t.GetData(0, area, written, 0, elements);
+                t.GetData(written);
+                //Console.Error.Write("\n{0}", written[0].ToString());
+                for (int i = 0; i < written.Length; i++)
+                {
+                    int rx = i % 64, ry = i / 64;
+                    if (area.Contains(rx, ry))
+                    {
+                        Assert.AreEqual(255, written[i].R, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].G, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].B, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].A, "Bad color written in position:{0};", i);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(reference[i].R, written[i].R, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].G, written[i].G, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].B, written[i].B, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
+                    }
+                }
+            }
+        }
+        [TestFixtureTearDown]
         public void TearDown()
         {
             _game.Dispose();
