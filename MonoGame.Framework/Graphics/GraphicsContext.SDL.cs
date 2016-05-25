@@ -36,6 +36,9 @@ namespace OpenGL
             
             SetWindowHandle(info);
             _context = Sdl.GL.CreateContext(_winHandle);
+
+            // GL entry points must be loaded after the GL context creation, otherwise some Windows drivers will return only GL 1.3 compatible functions
+            OpenGL.GL.LoadEntryPoints();
         }
 
         public void MakeCurrent(IWindowInfo info)
