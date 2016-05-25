@@ -164,8 +164,6 @@ namespace Microsoft.Xna.Framework
                 _winx - _width / 2, _winy - _height / 2,
                 _width, _height, initflags);
 
-            OpenGL.GL.LoadEntryPoints();
-
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
 
             Sdl.Window.SetTitle(Handle, title);
