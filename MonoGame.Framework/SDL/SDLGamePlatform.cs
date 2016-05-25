@@ -106,8 +106,6 @@ namespace Microsoft.Xna.Framework
                 if (_isExiting > 0)
                     break;
             }
-
-            Dispose();
         }
 
         private void SdlRunLoop()
