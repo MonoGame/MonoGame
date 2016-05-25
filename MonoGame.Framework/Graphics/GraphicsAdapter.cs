@@ -326,6 +326,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     adapter.Dispose();
                     dxgiFactory.Dispose();
 #endif
+                    modes.Sort (delegate (DisplayMode a, DisplayMode b) {
+                        if (a == b) return 0;
+                        if (a.Format <= b.Format && a.Width <= b.Width && a.Height <= b.Height) return -1;
+                        else return 1;
+                    });
                     _supportedDisplayModes = new DisplayModeCollection(modes);
                 }
 
