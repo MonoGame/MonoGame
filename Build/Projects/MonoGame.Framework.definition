@@ -291,6 +291,9 @@
     <Compile Include="TextInputEventArgs.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
+    <Compile Include="KeyInputEventArgs.cs">
+      <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
+    </Compile>
     <Compile Include="Threading.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,WindowsPhone,tvOS</Platforms>
     </Compile>
