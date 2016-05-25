@@ -135,11 +135,13 @@ namespace Microsoft.Xna.Framework
                     Joystick.RemoveDevice(ev.JoystickDevice.Which);                
                 else if (ev.Type == Sdl.EventType.MouseWheel)
                     Mouse.ScrollY += ev.Wheel.Y * 120;
-                else if (ev.Type == Sdl.EventType.KeyDown)
-                {
-                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-                    if (!_keys.Contains(key))
-                        _keys.Add(key);
+                else if (ev.Type == Sdl.EventType.KeyDown) {
+                    var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
+                    if (!_keys.Contains (key))
+                        _keys.Add (key);
+                    char character = (char)ev.Key.Keysym.Sym;
+                    if (char.IsControl (character))
+                        _view.CallTextInput (character, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
@@ -153,12 +155,13 @@ namespace Microsoft.Xna.Framework
                     {
                         text = new string((char*)ev.Text.Text);
                     }
-
                     if (text.Length == 0)
                         continue;
-
                     foreach (var c in text)
-                        _view.CallTextInput(c);
+                    {
+                        var key = KeyboardUtil.ToXna ((int)c);
+                        _view.CallTextInput (c, key);
+                    }
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
