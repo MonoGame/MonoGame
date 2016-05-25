@@ -12,8 +12,9 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Form, IView
     {
-        private const string TitleBase = "MonoGame Pipeline Tools";
-
+        public EventHandler<EventArgs> RecentChanged;
+        public EventHandler<EventArgs> TitleChanged;
+        public const string TitleBase = "MonoGame Pipeline Tool";
         public static MainWindow Instance;
 
         private ContextMenu _contextMenu;
@@ -29,6 +30,7 @@ namespace MonoGame.Tools.Pipeline
             InitializeComponent();
 
             Instance = this;
+            Style = "MainWindow";
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
@@ -314,17 +316,22 @@ namespace MonoGame.Tools.Pipeline
         {
             // Title
 
-            var title = TitleBase;
-
-            if (PipelineController.Instance.ProjectOpen)
+            if (TitleChanged != null)
+                TitleChanged(this, EventArgs.Empty);
+            else
             {
-                title += " - " + Path.GetFileName(PipelineController.Instance.ProjectItem.OriginalPath);
+                var title = TitleBase;
 
-                if (PipelineController.Instance.ProjectDirty)
-                    title += "*";
+                if (PipelineController.Instance.ProjectOpen)
+                {
+                    title += " - " + Path.GetFileName(PipelineController.Instance.ProjectItem.OriginalPath);
+
+                    if (PipelineController.Instance.ProjectDirty)
+                        title += "*";
+                }
+
+                Title = title;
             }
-
-            Title = title;
 
             // Menu
 
@@ -359,21 +366,21 @@ namespace MonoGame.Tools.Pipeline
 
             // ToolBar
 
-            if (info.Build && ToolBar.Items.Contains(toolCancelBuild))
+            if (info.Build && toolbar.Items.Contains(toolCancelBuild))
             {
-                ToolBar.Items.Remove(toolCancelBuild);
+                toolbar.Items.Remove(toolCancelBuild);
 
-                ToolBar.Items.Insert(12, toolBuild);
-                ToolBar.Items.Insert(13, toolRebuild);
-                ToolBar.Items.Insert(14, toolClean);
+                toolbar.Items.Insert(12, toolBuild);
+                toolbar.Items.Insert(13, toolRebuild);
+                toolbar.Items.Insert(14, toolClean);
             }
-            else if (info.Cancel && ToolBar.Items.Contains(toolBuild))
+            else if (info.Cancel && toolbar.Items.Contains(toolBuild))
             {
-                ToolBar.Items.Remove(toolBuild);
-                ToolBar.Items.Remove(toolRebuild);
-                ToolBar.Items.Remove(toolClean);
+                toolbar.Items.Remove(toolBuild);
+                toolbar.Items.Remove(toolRebuild);
+                toolbar.Items.Remove(toolClean);
 
-                ToolBar.Items.Insert(12, toolCancelBuild);
+                toolbar.Items.Insert(12, toolCancelBuild);
             }
 
             // Visibility of menu items can't be changed so 
@@ -427,6 +434,12 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateRecentList(List<string> recentList)
         {
+            if (RecentChanged != null)
+            {
+                RecentChanged(recentList, EventArgs.Empty);
+                return;
+            }
+
             menuRecent.Items.Clear();
 
             foreach (var recent in recentList)

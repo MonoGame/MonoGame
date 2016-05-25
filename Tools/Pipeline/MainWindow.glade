@@ -108,6 +108,7 @@
         <property name="receives_default">False</property>
         <property name="tooltip_text" translatable="yes">Open</property>
         <property name="valign">center</property>
+        <property name="popover">popovermenu2</property>
       </object>
     </child>
     <child>
@@ -118,7 +119,7 @@
         <property name="tooltip_text" translatable="yes">Menu</property>
         <property name="valign">center</property>
         <property name="image">menu_image</property>
-        <property name="use_popover">False</property>
+        <property name="popover">popovermenu1</property>
       </object>
       <packing>
         <property name="pack_type">end</property>
@@ -246,6 +247,85 @@
       <packing>
         <property name="submenu">build</property>
       </packing>
+    </child>
+  </object>
+  <object class="GtkPopoverMenu" id="popovermenu2">
+    <child>
+      <object class="GtkBox">
+        <property name="width_request">280</property>
+        <property name="height_request">300</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">5</property>
+        <property name="margin_right">5</property>
+        <property name="margin_top">5</property>
+        <property name="margin_bottom">5</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTreeView" id="treeview1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="headers_visible">False</property>
+                <property name="hover_selection">True</property>
+                <property name="enable_grid_lines">horizontal</property>
+                <property name="activate_on_single_click">True</property>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection"/>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="spacing">5</property>
+            <child>
+              <object class="GtkButton" id="open_other_button">
+                <property name="label" translatable="yes">Open Other...</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="import_button">
+                <property name="label" translatable="yes">Import</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
     </child>
   </object>
 </interface>
