@@ -111,12 +111,27 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'
   
-  ; Install Desktop OpenGL Assemblies
+  ; Install DesktopGL Assemblies
   SetOutPath '$INSTDIR\Assemblies\DesktopGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
-  File '..\..\ThirdParty\Dependencies\OpenTK.dll'
-  File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
+  File '..\..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib'
+  File '..\..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib'
+  File '..\..\ThirdParty\Dependencies\MonoGame.Framework.dll.config'
+  
+  ; Install x86 DesktopGL Dependencies
+  SetOutPath '$INSTDIR\Assemblies\DesktopGL\x86'
+  File '..\..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll'
+  File '..\..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1'
+  
+  ; Install x64 DesktopGL Dependencies
+  SetOutPath '$INSTDIR\Assemblies\DesktopGL\x64'
+  File '..\..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll'
+  File '..\..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1'
   
   ; Install Windows Desktop DirectX Assemblies
   SetOutPath '$INSTDIR\Assemblies\Windows'

@@ -122,7 +122,7 @@ namespace OpenAL
 
     public class AL
     {
-        public const string NativeLibName = "openal32.dll";
+        public const string NativeLibName = "soft_oal.dll";
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alEnable")]
@@ -367,7 +367,7 @@ namespace OpenAL
 
     public partial class Alc
     {
-        public const string NativeLibName = "openal32.dll";
+        public const string NativeLibName = "soft_oal.dll";
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcCreateContext")]
