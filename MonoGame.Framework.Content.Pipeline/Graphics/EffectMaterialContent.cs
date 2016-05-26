@@ -11,6 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public const string EffectKey = "Effect";
         public const string CompiledEffectKey = "CompiledEffect";
 
+        [ContentSerializerIgnore]
         public ExternalReference<EffectContent> Effect
         {
             get { return GetReferenceTypeProperty<ExternalReference<EffectContent>>(EffectKey); }
