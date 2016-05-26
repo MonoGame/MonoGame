@@ -200,9 +200,60 @@
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SDL\MonoGame.Framework.dll.config">
+    <None Include="..\ThirdParty\Dependencies\MonoGame.Framework.dll.config">
       <Platforms>WindowsGL,Linux</Platforms>
       <Link>MonoGame.Framework.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	
+	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libSDL2-2.0.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libopenal.1.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
