@@ -157,7 +157,9 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsFramebufferObjectARB = true; // always supported on GLES 2.0+
             SupportsFramebufferObjectEXT = false;
 #else
-            SupportsFramebufferObjectARB = device._extensions.Contains("GL_ARB_framebuffer_object");
+            // if we're on GL 3.0+, frame buffer extensions are guaranteed to be present, but extensions may be missing
+            // it is then safe to assume that GL_ARB_framebuffer_object is present so that the standard function are loaded
+            SupportsFramebufferObjectARB = device.glMajorVersion >= 3 || device._extensions.Contains("GL_ARB_framebuffer_object");
             SupportsFramebufferObjectEXT = device._extensions.Contains("GL_EXT_framebuffer_object");
 #endif
 #endif
