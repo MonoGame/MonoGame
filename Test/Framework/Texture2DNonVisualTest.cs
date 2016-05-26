@@ -122,8 +122,6 @@ namespace MonoGame.Tests.Framework
         }
 #if !XNA
         [TestCase(2000000)]
-        [TestCase(2000)]
-        [TestCase(4095)]
         [TestCase(4097)]
 #endif
         [TestCase(4096)]
@@ -161,10 +159,10 @@ namespace MonoGame.Tests.Framework
                 }
             }
         }
-#if XNA
-        [TestCase(2000000)]
         [TestCase(2000)]
         [TestCase(4095)]
+#if XNA
+        [TestCase(2000000)]
         [TestCase(4097)]
 #endif
         public void SetData1ParameterExceptionTest(int arraySize)
@@ -193,18 +191,7 @@ namespace MonoGame.Tests.Framework
         }
 
 #if !XNA
-        [TestCase(2000, 0, 4096)]
-        [TestCase(4095, 0, 4095)]
-        [TestCase(4095, 1, 4095)]
-        [TestCase(4096, 1, 4096)]
-        [TestCase(4096, 1, 4095)]
-        [TestCase(4095, 1, 4096)]
-        [TestCase(4096, 1, 4097)]
-        [TestCase(4095, 0, 4094)]
-
-        [TestCase(4097, 1, 4097)]
         [TestCase(4098, 1, 4097)]
-        [TestCase(4097, 1, 4098)]
         [TestCase(4097, 0, 4097)]
         [TestCase(4096, 0, 4095)]
 #endif
@@ -247,7 +234,7 @@ namespace MonoGame.Tests.Framework
             }
         }
 
-#if XNA
+        [TestCase(2000, 0, 4096)]
         [TestCase(4095, 0, 4095)]
         [TestCase(4095, 1, 4095)]
         [TestCase(4096, 1, 4096)]
@@ -255,10 +242,10 @@ namespace MonoGame.Tests.Framework
         [TestCase(4095, 1, 4096)]
         [TestCase(4096, 1, 4097)]
         [TestCase(4095, 0, 4094)]
-
         [TestCase(4097, 1, 4097)]
-        [TestCase(4098, 1, 4097)]
         [TestCase(4097, 1, 4098)]
+#if XNA
+        [TestCase(4098, 1, 4097)]
         [TestCase(4097, 0, 4097)]
         [TestCase(4096, 0, 4095)]
 #endif
@@ -288,18 +275,12 @@ namespace MonoGame.Tests.Framework
         }
 
 #if !XNA
-        //This 2 test cases I'm not sure if they should work or not in MonoGame
-        [TestCase(3844, 0, 3844, 1, 1, 63, 63)]
-        [TestCase(3845, 1, 3844, 1, 1, 63, 63)]
-
         [TestCase(4096, 0, 4096, 1, 1, 63, 63)]
         [TestCase(4096, 0, 4095, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3844, 1, 1, 63, 63)]
-        [TestCase(3969, 0, 4096, 1, 1, 63, 63)]
         [TestCase(4097, 1, 4096, 1, 1, 63, 63)]
         [TestCase(4097, 1, 4095, 0, 0, 64, 64)]
         [TestCase(4097, 1, 3844, 1, 1, 63, 63)]
-        [TestCase(3970, 1, 4096, 1, 1, 63, 63)]
 #endif
         [TestCase(4096, 0, 4096, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3969, 1, 1, 63, 63)]
@@ -345,15 +326,15 @@ namespace MonoGame.Tests.Framework
                 }
             }
         }
-
-        [TestCase(4096, 0, 4096, -1, -1, 65, 65)]
-#if XNA
         [TestCase(3844, 0, 3844, 1, 1, 63, 63)]
         [TestCase(3845, 1, 3844, 1, 1, 63, 63)]
+        [TestCase(3969, 0, 4096, 1, 1, 63, 63)]
+        [TestCase(3970, 1, 4096, 1, 1, 63, 63)]
+        [TestCase(4096, 0, 4096, -1, -1, 65, 65)]
+#if XNA
         [TestCase(4096, 0, 4096, 1, 1, 63, 63)]
         [TestCase(4096, 0, 4095, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3844, 1, 1, 63, 63)]
-        [TestCase(3969, 0, 4096, 1, 1, 63, 63)]
         [TestCase(4097, 1, 4096, 1, 1, 63, 63)]
         [TestCase(4097, 1, 4095, 0, 0, 64, 64)]
         [TestCase(4097, 1, 3844, 1, 1, 63, 63)]

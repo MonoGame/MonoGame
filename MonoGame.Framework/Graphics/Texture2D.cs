@@ -135,10 +135,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (data == null)
                 throw new ArgumentNullException("data");
-
+            if ((!rect.HasValue && (data.Length - startIndex < Bounds.Width * Bounds.Height)) || (rect.HasValue && (rect.Value.Height * rect.Value.Width > data.Length)))
+                throw new ArgumentException("data array is too small");
+            if (elementCount + startIndex > data.Length)
+                throw new ArgumentException("ElementCount must be a valid index in the data array", "elementCount");
+            // if (data.Length < elementCount || (rect.HasValue && data.Length < rect.Value.Width * rect.Value.Height))
+            //   throw new ArgumentException("data array is too short", "data");
             if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
-
+            if (rect.HasValue && !Bounds.Contains(rect.Value))
+                throw new ArgumentException("Rectangle must be inside the Texture Bounds", "rect");
             PlatformSetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
         }
         /// <summary>
