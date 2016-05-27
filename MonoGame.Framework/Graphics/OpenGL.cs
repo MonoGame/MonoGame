@@ -281,6 +281,7 @@ namespace OpenGL
 
     public enum StringName { 
         Extensions = 0x1F03, 
+        Version = 0x1F02,
     }
 
     public enum FramebufferAttachment {
@@ -1214,40 +1215,41 @@ namespace OpenGL
             Uniform1i = (Uniform1iDelegate)LoadEntryPoint<Uniform1iDelegate>("glUniform1i");
             Uniform4fv = (Uniform4fvDelegate)LoadEntryPoint<Uniform4fvDelegate>("glUniform4fv");
 
-            GenRenderbuffers = (GenRenderbuffersDelegate)LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffers");
-            BindRenderbuffer = (BindRenderbufferDelegate)LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbuffer");
-            DeleteRenderbuffers = (DeleteRenderbuffersDelegate)LoadEntryPoint<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
-
-            GenFramebuffers = (GenFramebuffersDelegate)LoadEntryPoint<GenFramebuffersDelegate>("glGenFramebuffers");
-            BindFramebuffer = (BindFramebufferDelegate)LoadEntryPoint<BindFramebufferDelegate>("glBindFramebuffer");
-            DeleteFramebuffers = (DeleteFramebuffersDelegate)LoadEntryPoint<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
-
-            FramebufferTexture2D = (FramebufferTexture2DDelegate)LoadEntryPoint<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
-            FramebufferRenderbuffer = (FramebufferRenderbufferDelegate)LoadEntryPoint<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
-            RenderbufferStorageMultisample = (RenderbufferStorageMultisampleDelegate)LoadEntryPoint<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
-
-            GenerateMipmap = (GenerateMipmapDelegate)LoadEntryPoint<GenerateMipmapDelegate>("glGenerateMipmap");
             ReadBuffer = (ReadBufferDelegate)LoadEntryPoint<ReadBufferDelegate>("glReadBuffer");
             DrawBuffer = (DrawBufferDelegate)LoadEntryPoint<DrawBufferDelegate>("glDrawBuffer");
 
-            BlitFramebuffer = (BlitFramebufferDelegate)LoadEntryPoint<BlitFramebufferDelegate>("glBlitFramebuffer");
-            CheckFramebufferStatus = (CheckFramebufferStatusDelegate)LoadEntryPoint<CheckFramebufferStatusDelegate>("glCheckFramebufferStatus");
-
-            Ext.GenRenderbuffers = (Ext.GenRenderbuffersDelegate)LoadEntryPoint<Ext.GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
-            Ext.BindRenderbuffer = (Ext.BindRenderbufferDelegate)LoadEntryPoint<Ext.BindRenderbufferDelegate>("glBindRenderbufferEXT");
-            Ext.DeleteRenderbuffers = (Ext.DeleteRenderbuffersDelegate)LoadEntryPoint<Ext.DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
-
-            Ext.GenFramebuffers = (Ext.GenFramebuffersDelegate)LoadEntryPoint<Ext.GenFramebuffersDelegate>("glGenFramebuffersEXT");
-            Ext.BindFramebuffer = (Ext.BindFramebufferDelegate)LoadEntryPoint<Ext.BindFramebufferDelegate>("glBindFramebufferEXT");
-            Ext.DeleteFramebuffers = (Ext.DeleteFramebuffersDelegate)LoadEntryPoint<Ext.DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
-
-            Ext.FramebufferTexture2D = (Ext.FramebufferTexture2DDelegate)LoadEntryPoint<Ext.FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
-            Ext.FramebufferRenderbuffer = (Ext.FramebufferRenderbufferDelegate)LoadEntryPoint<Ext.FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
-
-            Ext.GenerateMipmap = (Ext.GenerateMipmapDelegate)LoadEntryPoint<Ext.GenerateMipmapDelegate>("glGenerateMipmapEXT");
-
-            Ext.BlitFramebuffer = (Ext.BlitFramebufferDelegate)LoadEntryPoint<Ext.BlitFramebufferDelegate>("glBlitFramebufferEXT");
-            Ext.CheckFramebufferStatus = (Ext.CheckFramebufferStatusDelegate)LoadEntryPoint<Ext.CheckFramebufferStatusDelegate>("glCheckFramebufferStatusEXT");
+            // these are only in GL 3.0 or ARB_framebuffer_object, if they fail to load (and only if they do), we need to check if EXT_framebuffer_object is present as a fallback
+            try
+            {
+                GenRenderbuffers = (GenRenderbuffersDelegate)LoadEntryPoint<GenRenderbuffersDelegate>("glGenRenderbuffers");
+                BindRenderbuffer = (BindRenderbufferDelegate)LoadEntryPoint<BindRenderbufferDelegate>("glBindRenderbuffer");
+                DeleteRenderbuffers = (DeleteRenderbuffersDelegate)LoadEntryPoint<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
+                GenFramebuffers = (GenFramebuffersDelegate)LoadEntryPoint<GenFramebuffersDelegate>("glGenFramebuffers");
+                BindFramebuffer = (BindFramebufferDelegate)LoadEntryPoint<BindFramebufferDelegate>("glBindFramebuffer");
+                DeleteFramebuffers = (DeleteFramebuffersDelegate)LoadEntryPoint<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
+                FramebufferTexture2D = (FramebufferTexture2DDelegate)LoadEntryPoint<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
+                FramebufferRenderbuffer = (FramebufferRenderbufferDelegate)LoadEntryPoint<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
+                RenderbufferStorageMultisample = (RenderbufferStorageMultisampleDelegate)LoadEntryPoint<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisample");
+                GenerateMipmap = (GenerateMipmapDelegate)LoadEntryPoint<GenerateMipmapDelegate>("glGenerateMipmap");
+                BlitFramebuffer = (BlitFramebufferDelegate)LoadEntryPoint<BlitFramebufferDelegate>("glBlitFramebuffer");
+                CheckFramebufferStatus = (CheckFramebufferStatusDelegate)LoadEntryPoint<CheckFramebufferStatusDelegate>("glCheckFramebufferStatus");
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // then only we check for EXT_framebuffer_object
+                Ext.GenRenderbuffers = (Ext.GenRenderbuffersDelegate)LoadEntryPoint<Ext.GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
+                Ext.BindRenderbuffer = (Ext.BindRenderbufferDelegate)LoadEntryPoint<Ext.BindRenderbufferDelegate>("glBindRenderbufferEXT");
+                Ext.DeleteRenderbuffers = (Ext.DeleteRenderbuffersDelegate)LoadEntryPoint<Ext.DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
+                Ext.GenFramebuffers = (Ext.GenFramebuffersDelegate)LoadEntryPoint<Ext.GenFramebuffersDelegate>("glGenFramebuffersEXT");
+                Ext.BindFramebuffer = (Ext.BindFramebufferDelegate)LoadEntryPoint<Ext.BindFramebufferDelegate>("glBindFramebufferEXT");
+                Ext.DeleteFramebuffers = (Ext.DeleteFramebuffersDelegate)LoadEntryPoint<Ext.DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
+                Ext.FramebufferTexture2D = (Ext.FramebufferTexture2DDelegate)LoadEntryPoint<Ext.FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
+                Ext.FramebufferRenderbuffer = (Ext.FramebufferRenderbufferDelegate)LoadEntryPoint<Ext.FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
+                Ext.RenderbufferStorageMultisample = (Ext.RenderbufferStorageMultisampleDelegate)LoadEntryPoint<Ext.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
+                Ext.GenerateMipmap = (Ext.GenerateMipmapDelegate)LoadEntryPoint<Ext.GenerateMipmapDelegate>("glGenerateMipmapEXT");
+                Ext.BlitFramebuffer = (Ext.BlitFramebufferDelegate)LoadEntryPoint<Ext.BlitFramebufferDelegate>("glBlitFramebufferEXT");
+                Ext.CheckFramebufferStatus = (Ext.CheckFramebufferStatusDelegate)LoadEntryPoint<Ext.CheckFramebufferStatusDelegate>("glCheckFramebufferStatusEXT");
+            }
 
             GenQueries = (GenQueriesDelegate)LoadEntryPoint<GenQueriesDelegate>("glGenQueries");
             BeginQuery = (BeginQueryDelegate)LoadEntryPoint<BeginQueryDelegate>("glBeginQuery");

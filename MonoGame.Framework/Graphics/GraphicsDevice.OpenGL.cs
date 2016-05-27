@@ -58,6 +58,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal FramebufferHelper framebufferHelper;
 
+        internal int glMajorVersion = 0;
+        internal int glMinorVersion = 0;
         internal int glFramebuffer = 0;
         internal int MaxVertexAttributes;        
         internal List<string> _extensions = new List<string>();
@@ -197,6 +199,23 @@ namespace Microsoft.Xna.Framework.Graphics
             
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
+
+            // try getting the context version
+            // GL_MAJOR_VERSION and GL_MINOR_VERSION are GL 3.0+ only, so we need to rely on the GL_VERSION string
+            // this string always starts with the version number in the "major.minor" format, but can be followed by
+            // multiple vendor specific characters
+            try
+            {
+                string version = GL.GetString(StringName.Version);
+                glMajorVersion = Convert.ToInt32(version.Substring(0, 1));
+                glMinorVersion = Convert.ToInt32(version.Substring(2, 1));
+            }
+            catch (FormatException)
+            {
+                // if it fails, we assume to be on a 1.1 context
+                glMajorVersion = 1;
+                glMinorVersion = 1;
+            }
 #if !GLES
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;
