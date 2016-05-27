@@ -83,13 +83,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             GraphicsExtensions.CheckGLError();
-            // Pointer to the start of data to read in the index buffer
+            // Pointer to the start of data to read in the vertex buffer
             ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
 			if (typeof(T) == typeof(byte)) {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
                 // Copy from the vertex buffer to the destination array
-                Marshal.Copy (ptr, buffer, 0, buffer.Length);
+                Marshal.Copy (ptr, buffer, startIndex * vertexStride, elementCount * vertexStride);
             } else {
                 // Temporary buffer to store the copied section of data
                 byte[] buffer = new byte[elementCount * vertexStride - offsetInBytes];
@@ -119,7 +119,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
             GL.UnmapBuffer(BufferTarget.ArrayBuffer);
-            }
+            GraphicsExtensions.CheckGLError();
+        }
         
 #endif
 
