@@ -81,6 +81,29 @@ namespace MonoGame.Utilities
                 return os;
             }
         }
+
+    }
+
+    internal static class NativeHelper
+    {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetDllDirectory(string lpPathName);
+
+        public static void InitDllDirectory()
+        {
+            if (CurrentPlatform.OS == OS.Windows)
+            {
+                string executingDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                if (Environment.Is64BitProcess)
+                {
+                    NativeHelper.SetDllDirectory(System.IO.Path.Combine(executingDirectory, "x64"));
+                }
+                else
+                {
+                    NativeHelper.SetDllDirectory(System.IO.Path.Combine(executingDirectory, "x86"));
+                }
+            }
+        }
     }
 }
 
