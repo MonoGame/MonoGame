@@ -36,6 +36,11 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformPlay()
         {
             AL.GetError();
+
+            // Ensure that the source is not looped (due to source recycling)
+            AL.Source(SourceId, ALSourceb.Looping, false);
+            ALHelper.CheckError("Failed to set source loop state.");
+
             AL.SourcePlay(SourceId);
             ALHelper.CheckError("Failed to play the source.");
         }
