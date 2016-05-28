@@ -50,7 +50,7 @@ internal static class Sdl
         MouseWheel = 0x403,
     }
 
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Size = 56)]
     public struct Event
     {
         [FieldOffset(0)] public EventType Type;
