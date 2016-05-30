@@ -7,14 +7,16 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow
     {
-        Command cmdNew, cmdOpen, cmdClose, cmdImport, cmdSave, cmdSaveAs, cmdExit;
-        Command cmdUndo, cmdRedo, cmdAdd, cmdExclude, cmdRename, cmdDelete;
-        Command cmdNewItem, cmdNewFolder, cmdExistingItem, cmdExistingFolder;
-        Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
-        CheckCommand cmdDebugMode, cmdFilterOutput;
-        Command cmdHelp, cmdAbout;
-        Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdRebuildItem;
+        public Command cmdNew, cmdOpen, cmdClose, cmdImport, cmdSave, cmdSaveAs, cmdExit;
+        public Command cmdUndo, cmdRedo, cmdAdd, cmdExclude, cmdRename, cmdDelete;
+        public Command cmdNewItem, cmdNewFolder, cmdExistingItem, cmdExistingFolder;
+        public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
+        public CheckCommand cmdDebugMode, cmdFilterOutput;
+        public Command cmdHelp, cmdAbout;
+        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdRebuildItem;
 
+        MenuBar menubar;
+        ToolBar toolbar;
         ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
         MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmRebuildItem, cmExclude, cmRename, cmDelete;
@@ -260,7 +262,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitalizeMenu()
         {
-            Menu = new MenuBar();
+            Menu = menubar = new MenuBar();
             Menu.Style = "MenuBar";
 
             menuFile = new ButtonMenuItem();
@@ -347,7 +349,7 @@ namespace MonoGame.Tools.Pipeline
             toolClean = cmdClean.CreateToolItem();
             toolCancelBuild = cmdCancelBuild.CreateToolItem();
 
-            ToolBar = new ToolBar();
+            ToolBar = toolbar = new ToolBar();
             ToolBar.Style = "ToolBar";
             ToolBar.Items.Add(cmdNew);
             ToolBar.Items.Add(cmdOpen);
