@@ -88,15 +88,6 @@ namespace MonoDevelop.MonoGame
 							needsSave = true;
 						}
 					}
-					foreach (var i in ig.Items.Where (x => x.Name == "Reference" && x.Include == "NVorbis")) {
-						if (!i.HasMetadata ("HintPath")) {
-							monitor.Log.WriteLine ("Fixing {0} to be NVorbis", i.Include);
-							var a = ig.AddNewItem ("Reference", i.Include);
-							a.SetMetadata ("HintPath", string.Format (path, platform, "NVorbis.dll"));
-							ritems.Add (i);
-							needsSave = true;
-						}
-					}
 				}
 				foreach (var a in ritems) {
 					project.RemoveItem (a);
@@ -113,10 +104,6 @@ namespace MonoDevelop.MonoGame
 						if (reference.Reference.StartsWith ("OpenTK") && string.IsNullOrEmpty (reference.HintPath)) {
 							items.Add (reference);
 							newitems.Add (new ProjectReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "OpenTK.dll")));
-						}
-						if (reference.Reference == "NVorbis" && string.IsNullOrEmpty (reference.HintPath)) {
-							items.Add (reference);
-							newitems.Add (new ProjectReference (ReferenceType.Assembly, reference.Reference, string.Format (path, platform, "NVorbis.dll")));
 						}
 						if (reference.Reference == "Tao.Sdl" && string.IsNullOrEmpty (reference.HintPath)) {
 							items.Add (reference);

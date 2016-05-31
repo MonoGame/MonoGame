@@ -24,8 +24,6 @@
 				<Reference type="Gac" refto="System.Xml" />
 				<Reference type="Gac" refto="System.Core" />
 				<Reference type="Package" refto="MonoGame.Framework" />
-				<Reference type="Package" refto="OpenTK" />
-				<Reference type="Package" refto="NVorbis" />
 			</References>
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
@@ -39,7 +37,7 @@
 					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference" />
 				</Directory>
 				<ContentFile>
-					<File name="OpenTK.dll.config" src="Common/OpenTK.dll.config" CopyToOutputDirectory="PreserveNewest" />
+					<File name="MonoGame.Framework.dll.config" src="Common/MonoGame.Framework.dll.config" CopyToOutputDirectory="PreserveNewest" />
 				</ContentFile>
 			</Files>
 		</Project>
