@@ -8,7 +8,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public class EffectMaterialContent : MaterialContent
     {
-        public ExternalReference<EffectContent> Effect { get; set; }
-        public ExternalReference<CompiledEffectContent> CompiledEffect { get; set; }
+        public const string EffectKey = "Effect";
+        public const string CompiledEffectKey = "CompiledEffect";
+
+        public ExternalReference<EffectContent> Effect
+        {
+            get { return GetReferenceTypeProperty<ExternalReference<EffectContent>>(EffectKey); }
+            set { SetProperty(EffectKey, value); }
+        }
+
+        public ExternalReference<CompiledEffectContent> CompiledEffect
+        {
+            get { return GetReferenceTypeProperty<ExternalReference<CompiledEffectContent>>(CompiledEffectKey); }
+            set { SetProperty(CompiledEffectKey, value); }
+        }
     }
 }

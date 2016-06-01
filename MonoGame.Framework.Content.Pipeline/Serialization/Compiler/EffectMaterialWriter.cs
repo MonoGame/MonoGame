@@ -20,16 +20,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             foreach (var item in value.OpaqueData)
             {
-                dict.Add(item.Key, item.Value);
+                if (item.Key != EffectMaterialContent.EffectKey && item.Key != EffectMaterialContent.CompiledEffectKey)
+                    dict.Add(item.Key, item.Value);
             }
             output.WriteObject(dict);
-        }
-
-        public override string GetRuntimeReader(TargetPlatform targetPlatform)
-        {
-            var type = typeof(ContentReader);
-            var readerType = type.Namespace + ".EffectMaterialReader, " + type.Assembly.FullName;
-            return readerType;
         }
     }
 }
