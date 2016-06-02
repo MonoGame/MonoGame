@@ -631,7 +631,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.framebufferHelper.BindFramebuffer(glResolveFramebuffer);
                 }
                 // The only fragment operations which affect the resolve are the pixel ownership test, the scissor test, and dithering.
-                if (this._lastDepthStencilState.StencilEnable)
+                if (this._lastRasterizerState.ScissorTestEnable)
                 {
                     GL.Disable(EnableCap.ScissorTest);
                     GraphicsExtensions.CheckGLError();
@@ -646,7 +646,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 if (renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents && this.framebufferHelper.SupportsInvalidateFramebuffer)
                     this.framebufferHelper.InvalidateReadFramebuffer();
-                if (this._lastDepthStencilState.StencilEnable)
+                if (this._lastRasterizerState.ScissorTestEnable)
                 {
                     GL.Enable(EnableCap.ScissorTest);
                     GraphicsExtensions.CheckGLError();
