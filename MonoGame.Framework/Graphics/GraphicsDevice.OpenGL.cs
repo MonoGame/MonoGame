@@ -200,6 +200,8 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
+            SpriteBatch.NeedsHalfPixelOffset = true;
+
             // try getting the context version
             // GL_MAJOR_VERSION and GL_MINOR_VERSION are GL 3.0+ only, so we need to rely on the GL_VERSION string
             // this string always starts with the version number in the "major.minor" format, but can be followed by
