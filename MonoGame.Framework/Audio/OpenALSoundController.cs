@@ -147,12 +147,6 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
-                var ext = Alc.GetString (_device, AlcGetString.Extensions);
-                if (ext != null) {
-                    System.Diagnostics.Debug.WriteLine ("Supported Alc Extensions");
-                    foreach (var e in ext.Split (new char [] { ' ' }))
-                        System.Diagnostics.Debug.WriteLine (e);
-                }
             }
             catch (Exception ex)
             {
@@ -278,12 +272,6 @@ namespace Microsoft.Xna.Framework.Audio
                     {
                         CleanUpOpenAL();
                         return(false);
-                    }
-                    var ext = AL.Get (ALGetString.Extensions);
-                    if (ext != null) {
-                        System.Diagnostics.Debug.WriteLine ("Supported Al Extensions");
-                        foreach (var e in ext.Split (new char [] { ' ' }))
-                            System.Diagnostics.Debug.WriteLine (e);
                     }
                     SupportsADPCM = AL.IsExtensionPresent ("AL_SOFT_MSADPCM");
                     return (true);

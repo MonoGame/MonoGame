@@ -237,22 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var extstring = GL.GetString(StringName.Extensions);
             GraphicsExtensions.CheckGLError();
             if (!string.IsNullOrEmpty(extstring))
-            {
                 extensions.AddRange(extstring.Split(' '));
-#if DEBUG
-#if ANDROID
-                Android.Util.Log.Debug("MonoGame", "Supported extensions:");
-#else
-                System.Diagnostics.Debug.WriteLine("Supported extensions:");
-#endif
-                foreach (string extension in extensions)
-#if ANDROID
-                    Android.Util.Log.Debug("MonoGame", extension);
-#else
-                    System.Diagnostics.Debug.WriteLine(extension);
-#endif
-#endif
-            }
 
             return extensions;
         }
