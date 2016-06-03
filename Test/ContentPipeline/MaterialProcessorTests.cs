@@ -27,6 +27,34 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
+        public void ProcessBasicMaterial()
+        {
+            var processor = new MaterialProcessor();
+            var output = processor.Process(new BasicMaterialContent(), new TestProcessorContext(TargetPlatform.Windows, "dummy.xmb"));
+            Assert.IsNotNull(output);
+            Assert.IsInstanceOf<BasicMaterialContent>(output);
+        }
+
+        [Test]
+        public void ProcessBasicMaterialWithNoBaseEffect()
+        {
+            var processor = new MaterialProcessor();
+            processor.DefaultEffect = MaterialProcessorDefaultEffect.AlphaTestEffect;
+            var output = processor.Process(new BasicMaterialContent(), new TestProcessorContext(TargetPlatform.Windows, "dummy.xmb"));
+            Assert.IsNotNull(output);
+            Assert.IsInstanceOf<AlphaTestMaterialContent>(output);
+        }
+
+        //[Test]
+        //public void ProcessEffectMaterialWithNoBaseEffect()
+        //{
+        //    var processor = new MaterialProcessor();
+        //    var effectMaterial = new EffectMaterialContent();
+        //    effectMaterial.Effect = new ExternalReference<EffectContent>("VertexTextureEffect.fx");
+        //    var output = processor.Process(effectMaterial, new TestProcessorContext(TargetPlatform.Windows, "dummy.xmb"));
+        //}
+
+        [Test]
         public void CreateDefaultMaterialForBasicEffect()
         {
             var defaultMaterial = MaterialProcessor.CreateDefaultMaterial(MaterialProcessorDefaultEffect.BasicEffect);
