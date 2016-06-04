@@ -225,7 +225,7 @@ namespace Microsoft.Xna.Framework
 
             PreparePresentationParameters(_graphicsDevice.PresentationParameters);
 
-            // TOOD: Should this trigger some sort of device reset?
+            // TODO: Should this trigger some sort of device reset?
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
             // Allow for optional platform specific behavior.
