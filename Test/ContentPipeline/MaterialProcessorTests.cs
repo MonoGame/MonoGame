@@ -36,7 +36,7 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        public void ProcessBasicMaterialWithNoBaseEffect()
+        public void ProcessBasicMaterialWithAlphaTestAsDefaultEffect()
         {
             var processor = new MaterialProcessor();
             processor.DefaultEffect = MaterialProcessorDefaultEffect.AlphaTestEffect;
@@ -44,16 +44,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.IsNotNull(output);
             Assert.IsInstanceOf<AlphaTestMaterialContent>(output);
         }
-
-        //[Test]
-        //public void ProcessEffectMaterialWithNoBaseEffect()
-        //{
-        //    var processor = new MaterialProcessor();
-        //    var effectMaterial = new EffectMaterialContent();
-        //    effectMaterial.Effect = new ExternalReference<EffectContent>("VertexTextureEffect.fx");
-        //    var output = processor.Process(effectMaterial, new TestProcessorContext(TargetPlatform.Windows, "dummy.xmb"));
-        //}
-
+        
         [Test]
         public void CreateDefaultMaterialForBasicEffect()
         {
@@ -61,7 +52,6 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.IsInstanceOf(typeof(BasicMaterialContent), defaultMaterial);
             Assert.IsNotNull(defaultMaterial);
         }
-
 
         [Test]
         public void CreateDefaultMaterialForSkinnedEffect()
@@ -98,46 +88,49 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void CreateDefaultMaterialForUnkownEffect()
         {
-            MaterialProcessorDefaultEffect effect = (MaterialProcessorDefaultEffect)(-1);//Create an enum value that does not exist
+            //Create an enum value that does not exist
+            MaterialProcessorDefaultEffect effect = (MaterialProcessorDefaultEffect)(-1);
             Assert.Throws<ArgumentOutOfRangeException>(() => 
                 MaterialProcessor.CreateDefaultMaterial(effect));
         }
 
         [Test]
-        public void CreateDefaultEffectForAlphaTestMaterialContent()
+        public void GetDefaultEffectForAlphaTestMaterialContent()
         {
             var defaultEffect = MaterialProcessor.GetDefaultEffect(new AlphaTestMaterialContent());
             Assert.AreEqual(MaterialProcessorDefaultEffect.AlphaTestEffect, defaultEffect);
         }
 
         [Test]
-        public void CreateDefaultEffectForBasicMaterialContent()
+        public void GetDefaultEffectForBasicMaterialContent()
         {
             var defaultEffect = MaterialProcessor.GetDefaultEffect(new BasicMaterialContent());
             Assert.AreEqual(MaterialProcessorDefaultEffect.BasicEffect, defaultEffect);
         }
 
         [Test]
-        public void CreateDefaultEffectForDualTextureMaterialContent()
+        public void GetDefaultEffectForDualTextureMaterialContent()
         {
             var defaultEffect = MaterialProcessor.GetDefaultEffect(new DualTextureMaterialContent());
             Assert.AreEqual(MaterialProcessorDefaultEffect.DualTextureEffect, defaultEffect);
         }
+
         [Test]
-        public void CreateDefaultEffectForEnvironmentMapMaterialContent()
+        public void GetDefaultEffectForEnvironmentMapMaterialContent()
         {
             var defaultEffect = MaterialProcessor.GetDefaultEffect(new EnvironmentMapMaterialContent());
             Assert.AreEqual(MaterialProcessorDefaultEffect.EnvironmentMapEffect, defaultEffect);
         }
+
         [Test]
-        public void CreateDefaultEffectForSkinnedMaterialContent()
+        public void GetDefaultEffectForSkinnedMaterialContent()
         {
             var defaultEffect = MaterialProcessor.GetDefaultEffect(new SkinnedMaterialContent());
             Assert.AreEqual(MaterialProcessorDefaultEffect.SkinnedEffect, defaultEffect);
         }
 
         [Test]
-        public void CreateDefaultEffectForUnkownMaterial()
+        public void GetDefaultEffectForUnknownMaterial()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
                 MaterialProcessor.GetDefaultEffect(new MockMaterialContent()));
