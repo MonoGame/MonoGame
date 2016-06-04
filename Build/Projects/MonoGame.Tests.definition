@@ -182,6 +182,9 @@
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\MaterialProcessorTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
