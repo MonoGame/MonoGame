@@ -59,8 +59,8 @@
 	    <Version>v4.5.1</Version>
 	  </Platform>
 	  <Platform Name="Android">
-        <Version>v4.4</Version>
-      </Platform>
+            <Version>v4.4</Version>
+          </Platform>
     </FrameworkVersions>
 
   </Properties>
