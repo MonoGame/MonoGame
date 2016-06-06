@@ -1,5 +1,25 @@
 #!/bin/sh
 
+# Functions
+function echodep
+{
+	line=" - $1"
+	
+	while [ ${#line} -lt 50 ]
+	do
+		line+="."
+	done
+    
+	if eval "$2"
+	then
+		line+="\e[32m[Found]\e[0m"
+	else
+		line+="\e[31m[Not Found]\e[0m"
+	fi
+	
+	echo -e "$line"
+}
+
 # Check installation priviledge
 if [ "$(id -u)" != "0" ]; then
 	echo "Please make sure you are running this installer with sudo or as root." 1>&2
@@ -9,20 +29,36 @@ fi
 # Check previous versions
 if type "mgcb" > /dev/null 2>&1
 then
-	echo "Please uninstall any previous versions of MonoGame SDK" 1>&2
-	exit 1
+	echo "Previous version detected, trying to uninstall..."
+	
+	# Try and uninstall previus versions
+	if [ -f /opt/monogame/uninstall.sh ]
+	then
+		sudo sh /opt/monogame/uninstall.sh
+	elif [ -f /opt/MonoGameSDK/uninstall.sh ]
+	then
+		sudo sh /opt/MonoGameSDK/uninstall.sh
+	else
+		echo "Could not uninstall, please uninstall any previous version of MonoGame SDK manually." 1>&2
+		exit 1
+	fi
 fi
 
 DIR=$(pwd)
 IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
 
 # Show dependency list
-echo "Please make sure the following packages are installed:"
-echo " - monodevelop"
-echo " - libopenal-dev"
-echo " - referenceassemblies-pcl / mono-pcl"
-echo " - ttf-mscorefonts-installer / mscore-fonts"
-echo " - gtk-sharp3"
+echo "Dependencies:"
+echodep "mono-runtime" "type 'mono' > /dev/null 2>&1"
+echodep "libopenal" "ldconfig -p | grep -q libopenal"
+echodep "gtk-sharp3" "type 'gacutil' > /dev/null 2>&1 && gacutil /l gtk-sharp | grep -q 3.0.0.0"
+echo ""
+echo "Optional Dependencies:"
+echodep "monodevelop" "type 'mdtool' > /dev/null 2>&1"
+echodep "rider" "type 'rider' > /dev/null 2>&1"
+echodep "referenceassemblies-pcl / mono-pcl" "test -d /usr/lib/mono/xbuild/Microsoft/Portable"
+echodep "ttf-mscorefonts-installer / mscore-fonts" "fc-list | grep -q Arial"
+echo ""
 read -p "Continue (Y, n): " choice2
 case "$choice2" in 
 	n|N ) exit ;;
@@ -45,6 +81,8 @@ chmod +x "$IDIR/Tools/ffprobe"
 # Rider stuff
 if type "rider" > /dev/null 2>&1
 then
+	echo "Installing Rider files..."
+	
 	FINDCOMMAND=$(type -a rider)
 	COMMAND=$(echo $FINDCOMMAND| cut -d' ' -f 3)
 	
@@ -61,21 +99,23 @@ fi
 # MonoDevelop addin
 if type "mdtool" > /dev/null 2>&1
 then
-	read -p "Install monodevelop addin(Y, n): " choice2
-	case "$choice2" in 
-		n|N ) ;;
-		*)
-		sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack"
-	esac
+	echo "Installing MonoDevelop Addin..."
+	sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
 fi
 
 # Monogame Pipeline terminal commands
 echo "Creating launcher items..."
 
-cp $DIR/Main/monogame-pipeline /usr/bin/monogame-pipeline
-chmod +x /usr/bin/monogame-pipeline
+cat > /usr/bin/monogame-pipeline-tool <<'endmsg'
+#!/bin/bash
+mono /usr/lib/mono/xbuild/MonoGame/v3.0/Tools/Pipeline.exe "$@"
+endmsg
+chmod +x /usr/bin/monogame-pipeline-tool
 
-cp $DIR/Main/mgcb /usr/bin/mgcb
+cat > /usr/bin/mgcb <<'endmsg'
+#!/bin/bash
+mono /usr/lib/mono/xbuild/MonoGame/v3.0/Tools/MGCB.exe "$@"
+endmsg
 chmod +x /usr/bin/mgcb
 
 # MonoGame icon
@@ -84,15 +124,30 @@ cp $DIR/Main/monogame.svg /usr/share/icons/hicolor/scalable/mimetypes/monogame.s
 gtk-update-icon-cache /usr/share/icons/hicolor/ -f
 
 # Application launcher
-rm -f /usr/share/applications/Monogame\ Pipeline.desktop
-echo -e "[Desktop Entry]\nVersion=1.0\nEncoding=UTF-8\nName=MonoGame Pipeline\nGenericName=MonoGame Pipeline\nComment=Used to create platform specific .xnb files\nExec=monogame-pipeline %F\nTryExec=monogame-pipeline\nIcon=monogame\nStartupNotify=true\nTerminal=false\nType=Application\nMimeType=text/mgcb;\nCategories=Development;" | sudo tee --append /usr/share/applications/Monogame\ Pipeline.desktop > /dev/null
+cat > /usr/share/applications/MonogamePipeline.desktop <<'endmsg'
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=MonoGame Pipeline Tool
+GenericName=MonoGame Pipeline Tool
+Comment=Creates platform specific content files.
+Exec=monogame-pipeline-tool %F
+TryExec=monogame-pipeline-tool
+Icon=monogame
+StartupNotify=true
+Terminal=false
+Type=Application
+MimeType=text/mgcb;
+Categories=Development;
+endmsg
 
 # Mimetype
 echo "Adding mimetype..."
-xdg-mime install $DIR/Main/mgcb.xml --novendor
-xdg-mime default "Monogame Pipeline.desktop" text/mgcb
+xdg-mime install $DIR/Main/mgcb.xml --novendor > /dev/null
+xdg-mime default "MonogamePipeline.desktop" text/mgcb
 
 # Uninstall script
 chmod +x $IDIR/uninstall.sh
-echo "To uninstall the pipeline please run $IDIR/uninstall.sh"
+ln -s $IDIR/uninstall.sh /usr/bin/monogame-uninstall
 
+echo "To uninstall MonoGame SDK you can run \"monogame-uninstall\" from terminal."

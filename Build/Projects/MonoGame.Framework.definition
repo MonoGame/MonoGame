@@ -78,6 +78,9 @@
     <Uses Name="_XNADesignProvided">
       <Platforms>Windows,WindowsGL,Linux,MacOS</Platforms>
     </Uses>
+    <Uses Name="NVorbis">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Uses>
     <Uses Name="_FrameworkDispatcherProvided">
       <Platforms>Windows,WindowsGL,MacOS</Platforms>
     </Uses>
@@ -129,6 +132,9 @@
     <Service Name="WebAudio">
       <Platforms>Web</Platforms>
       <Conflicts>OpenALAudio,XAudioAudio</Conflicts>
+    </Service>
+    <Service Name="NVorbis">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Service>
 
     <!-- Base supporting features -->
@@ -1386,6 +1392,107 @@
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
 
+    <!-- NVorbis -->
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\BufferedReadStream.cs">
+      <Link>Utilities\NVorbis\BufferedReadStream.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\DataPacket.cs">
+      <Link>Utilities\NVorbis\DataPacket.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Huffman.cs">
+      <Link>Utilities\NVorbis\Huffman.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IContainerReader.cs">
+      <Link>Utilities\NVorbis\IContainerReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IPacketProvider.cs">
+      <Link>Utilities\NVorbis\IPacketProvider.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IVorbisStreamStatus.cs">
+      <Link>Utilities\NVorbis\IVorbisStreamStatus.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Mdct.cs">
+      <Link>Utilities\NVorbis\Mdct.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\NewStreamEventArgs.cs">
+      <Link>Utilities\NVorbis\NewStreamEventArgs.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\ParameterChangeEventArgs.cs">
+      <Link>Utilities\NVorbis\ParameterChangeEventArgs.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\RingBuffer.cs">
+      <Link>Utilities\NVorbis\RingBuffer.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\StreamReadBuffer.cs">
+      <Link>Utilities\NVorbis\StreamReadBuffer.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Utils.cs">
+      <Link>Utilities\NVorbis\Utils.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisCodebook.cs">
+      <Link>Utilities\NVorbis\VorbisCodebook.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisFloor.cs">
+      <Link>Utilities\NVorbis\VorbisFloor.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMapping.cs">
+      <Link>Utilities\NVorbis\VorbisMapping.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMode.cs">
+      <Link>Utilities\NVorbis\VorbisMode.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisReader.cs">
+      <Link>Utilities\NVorbis\VorbisReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisResidue.cs">
+      <Link>Utilities\NVorbis\VorbisResidue.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisStreamDecoder.cs">
+      <Link>Utilities\NVorbis\VorbisStreamDecoder.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisTime.cs">
+      <Link>Utilities\NVorbis\VorbisTime.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggContainerReader.cs">
+      <Link>Utilities\NVorbis\Ogg\OggContainerReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggCrc.cs">
+      <Link>Utilities\NVorbis\Ogg\OggCrc.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacket.cs">
+      <Link>Utilities\NVorbis\Ogg\OggPacket.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacketReader.cs">
+      <Link>Utilities\NVorbis\Ogg\OggPacketReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPageFlags.cs">
+      <Link>Utilities\NVorbis\Ogg\OggPageFlags.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
 
   </Files>
 </Project>
