@@ -7,11 +7,12 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public class CellText : CellBase
+    public class CellNumber : CellBase
     {
-        public CellText(string category, string name, object value, EventHandler eventHandler, bool editable) : base(category, name, value, eventHandler)
+        public CellNumber(string category, string name, object value, EventHandler eventHandler) : base(category, name, value, eventHandler)
         {
-            Editable = editable && value is string;
+            DisplayValue = ((float)value).ToString("0.00");
+            DisplayValue = (DisplayValue.Length > Value.ToString().Length) ? DisplayValue : Value.ToString();
         }
 
         public override void Edit(PixelLayout control)
@@ -20,16 +21,23 @@ namespace MonoGame.Tools.Pipeline
             editText.Style = "OverrideSize";
             editText.Width = _lastRec.Width;
             editText.Height = _lastRec.Height;
-            editText.Text = Value.ToString();
+            editText.Text = DisplayValue;
 
             control.Add(editText, _lastRec.X, _lastRec.Y);
+
+            editText.Focus();
+            editText.CaretIndex = editText.Text.Length;
 
             editText.EnabledChanged += delegate
             {
                 if (_eventHandler == null)
                     return;
-                
-                _eventHandler(editText.Text, EventArgs.Empty);
+
+                try
+                {
+                    _eventHandler(float.Parse(editText.Text), EventArgs.Empty);
+                }
+                catch { }
             };
         }
     }

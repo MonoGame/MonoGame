@@ -87,8 +87,13 @@ namespace MonoGame.Tools.Pipeline
             var children = pixel1.Children.ToList();
 
             foreach (var control in children)
+            {
                 if (control != drawable)
+                {
+                    control.Enabled = false;
                     pixel1.Remove(control);
+                }
+            }
         }
 
         public void AddEntry(string category, string name, object value, object type, EventHandler eventHandler = null, bool editable = true)
@@ -103,6 +108,8 @@ namespace MonoGame.Tools.Pipeline
                 _cells.Add(new CellRefs(category, name, value, eventHandler));
             else if (type is Microsoft.Xna.Framework.Color)
                 _cells.Add(new CellColor(category, name, value, eventHandler));
+            else if(type is Single)
+                _cells.Add(new CellNumber(category, name, value, eventHandler));
             else
                 _cells.Add(new CellText(category, name, value, eventHandler, editable));
         }

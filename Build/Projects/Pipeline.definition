@@ -128,6 +128,7 @@
 	<Compile Include="Controls\PropertyCells\CellBool.cs" />
 	<Compile Include="Controls\PropertyCells\CellColor.cs" />
 	<Compile Include="Controls\PropertyCells\CellCombo.cs" />
+	<Compile Include="Controls\PropertyCells\CellNumber.cs" />
 	<Compile Include="Controls\PropertyCells\CellPath.cs" />
 	<Compile Include="Controls\PropertyCells\CellRefs.cs" />
 	<Compile Include="Controls\PropertyCells\CellText.cs" />
