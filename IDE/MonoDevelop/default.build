@@ -55,6 +55,7 @@
           </fileset>
        </delete>
        <!-- Fix up xml to ${buildNumber} -->
+       <copy file="../../ThirdParty/Dependencies/MonoGame.Framework.dll.config" todir="MonoDevelop.MonoGame/templates/Common" />
        <xmlpoke file="MonoDevelop.MonoGame/MonoDevelop.MonoGame.addin.xml" xpath="/Addin/@version" value="${buildNumber}" />
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Clean -c:Release  MonoDevelop.MonoGame.Addin.sln" />
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Build -c:Release  MonoDevelop.MonoGame.Addin.sln" />
