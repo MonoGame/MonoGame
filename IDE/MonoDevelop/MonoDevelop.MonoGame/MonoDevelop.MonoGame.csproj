@@ -23,9 +23,9 @@
     <CustomCommands>
       <CustomCommands>
         <Command type="Execute" command="&quot;/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/XamarinStudio.exe&quot;" workingdir="/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/">
-        <EnvironmentVariables>
-          <Variable name="MONODEVELOP_DEV_ADDINS" value="${TargetDir}" />
-        </EnvironmentVariables>
+          <EnvironmentVariables>
+            <Variable name="MONODEVELOP_DEV_ADDINS" value="${TargetDir}" />
+          </EnvironmentVariables>
         </Command>
       </CustomCommands>
     </CustomCommands>
@@ -188,6 +188,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\Common\Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\MonoGame.Framework.dll.config">
+      <Link>templates\Common\MonoGame.Framework.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
