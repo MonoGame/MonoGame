@@ -314,6 +314,7 @@
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
     <Compile Include="Serialization\Compiler\DualTextureEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\EffectMaterialWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\EnvironmentMapEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
