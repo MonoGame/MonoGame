@@ -47,6 +47,8 @@ internal static class Sdl
         TextInput = 0x303,
         JoyDeviceAdded = 0x605,
         JoyDeviceRemoved = 0x606,
+        ControllerDeviceAdded = 0x653,
+        ControllerDeviceRemoved = 0x654,
         MouseWheel = 0x403,
     }
     
@@ -65,6 +67,7 @@ internal static class Sdl
         [FieldOffset(0)] public Keyboard.TextInputEvent Text;
         [FieldOffset(0)] public Mouse.WheelEvent Wheel;
         [FieldOffset(0)] public Joystick.DeviceEvent JoystickDevice;
+        [FieldOffset(0)] public GameController.DeviceEvent ControllerDevice;
     }
 
     public struct Rectangle
@@ -103,7 +106,13 @@ internal static class Sdl
     public static extern int PumpEvents();
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PeepEvents")]
-    public static extern int PeepEvents(Event[] events, int numevents, EventAction action, EventType minType, EventType maxType);
+    public static extern int PeepEvents(
+        [Out()] [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1)]
+        Event[] events,
+        int numevents, 
+        EventAction action,
+        EventType minType,
+        EventType maxType);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
     public static extern void FreeSurface(IntPtr surface);
@@ -448,6 +457,7 @@ internal static class Sdl
             Hand
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct WheelEvent
         {
             public EventType Type;
@@ -525,6 +535,7 @@ internal static class Sdl
             Gui = (LeftGui | RightGui)
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct Event
         {
             public EventType Type;
@@ -537,6 +548,7 @@ internal static class Sdl
             public Keysym Keysym;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public unsafe struct TextEditingEvent
         {
             public EventType Type;
@@ -547,6 +559,7 @@ internal static class Sdl
             public int Length;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public unsafe struct TextInputEvent
         {
             public EventType Type;
@@ -571,6 +584,7 @@ internal static class Sdl
             Left,
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct DeviceEvent
         {
             public EventType Type;
@@ -670,6 +684,14 @@ internal static class Sdl
             DpadLeft,
             DpadRight,
             Max,
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DeviceEvent
+        {
+            public EventType Type;
+            public uint TimeStamp;
+            public int Which;
         }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,

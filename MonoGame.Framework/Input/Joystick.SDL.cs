@@ -17,14 +17,12 @@ namespace Microsoft.Xna.Framework.Input
             var instanceid = Sdl.Joystick.InstanceID(jdevice);
 
             Joysticks.Add(instanceid, jdevice);
-            GamePad.AddDevice(deviceId, jdevice);
         }
 
         internal static void RemoveDevice(int instanceid)
         {
             Sdl.Joystick.Close(Joysticks[instanceid]);
             Joysticks.Remove(instanceid);
-            GamePad.RemoveDevice(instanceid);
         }
 
         internal static void CloseDevices()

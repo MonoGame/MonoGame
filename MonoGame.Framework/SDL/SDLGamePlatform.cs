@@ -86,7 +86,12 @@ namespace Microsoft.Xna.Framework
         {
             var events = new Sdl.Event[1];
             Sdl.PumpEvents ();
-            while (Sdl.PeepEvents(events, 1,Sdl.EventAction.GetEvent, Sdl.EventType.JoyDeviceAdded, Sdl.EventType.JoyDeviceAdded) == 1) {
+            while (Sdl.PeepEvents(events, 1, Sdl.EventAction.GetEvent, Sdl.EventType.ControllerDeviceAdded, Sdl.EventType.ControllerDeviceAdded) == 1)
+            {
+                GamePad.AddDevice(events[0].ControllerDevice.Which);
+            }
+            while (Sdl.PeepEvents(events, 1, Sdl.EventAction.GetEvent, Sdl.EventType.JoyDeviceAdded, Sdl.EventType.JoyDeviceAdded) == 1)
+            {
                 Joystick.AddDevice(events[0].JoystickDevice.Which);
             }
             _view.CreateWindow();
@@ -124,8 +129,10 @@ namespace Microsoft.Xna.Framework
                     _isExiting++;
                 else if (ev.Type == Sdl.EventType.JoyDeviceAdded)
                     Joystick.AddDevice(ev.JoystickDevice.Which);
+                else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
+                    GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
+                    Joystick.RemoveDevice(ev.JoystickDevice.Which);                
                 else if (ev.Type == Sdl.EventType.MouseWheel)
                     Mouse.ScrollY += ev.Wheel.Y * 120;
                 else if (ev.Type == Sdl.EventType.KeyDown)

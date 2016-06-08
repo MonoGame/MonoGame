@@ -21,6 +21,9 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
 
+        // we have to maintain this mapping because instance IDs are not ordered by player index (i.e. player lights on Xbox gamepads), but DeviceID are
+        private static readonly Dictionary<int, int> _deviceInstaceToId = new Dictionary<int, int>();
+
         private static Sdl.Haptic.Effect _hapticLeftRightEffect = new Sdl.Haptic.Effect
         {
             type = Sdl.Haptic.EffectId.LeftRight,
@@ -46,22 +49,17 @@ namespace Microsoft.Xna.Framework.Input
                     }
         }
 
-        internal static void AddDevice(int deviceId, IntPtr jdevice)
+        internal static void AddDevice(int deviceId)
         {
+            var jdevice = Sdl.Joystick.Open(deviceId);
             var instanceid = Sdl.Joystick.InstanceID(jdevice);
-
-            if (Sdl.GameController.IsGameController(deviceId) == 0)
-            {
-                var guide = Sdl.Joystick.GetGUID(jdevice)
-                    .ToByteArray()
-                    .Aggregate("", (current, b) => current + ((int)b).ToString("X2"));
-                Sdl.GameController.AddMapping(guide + ",Unknown Gamepad,a:b0,b:b1,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a2,righty:a3,start:b9,x:b2,y:b3,");
-            }
 
             var gamepad = new GamePadInfo();
             gamepad.Device = Sdl.GameController.Open(deviceId);
 
-            Gamepads.Add(instanceid, gamepad);
+            _deviceInstaceToId.Add(instanceid, deviceId);
+
+            Gamepads.Add(deviceId, gamepad);
 
             if (Sdl.Haptic.IsHaptic(jdevice) == 0)
                 return;
@@ -84,8 +82,9 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void RemoveDevice(int instanceid)
         {
-            DisposeDevice(Gamepads[instanceid]);
-            Gamepads.Remove(instanceid);
+            int deviceId = _deviceInstaceToId[instanceid];
+            DisposeDevice(Gamepads[deviceId]);
+            Gamepads.Remove(deviceId);
         }
 
         private static void DisposeDevice(GamePadInfo info)
