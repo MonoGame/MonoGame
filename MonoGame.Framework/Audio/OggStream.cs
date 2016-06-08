@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using NVorbis;
-using OpenTK.Audio.OpenAL;
+using OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {

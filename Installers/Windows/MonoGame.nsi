@@ -111,12 +111,27 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'
   
-  ; Install Desktop OpenGL Assemblies
+  ; Install DesktopGL Assemblies
   SetOutPath '$INSTDIR\Assemblies\DesktopGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
-  File '..\..\ThirdParty\Dependencies\OpenTK.dll'
-  File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
+  File '..\..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib'
+  File '..\..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib'
+  File '..\..\ThirdParty\Dependencies\MonoGame.Framework.dll.config'
+  
+  ; Install x86 DesktopGL Dependencies
+  SetOutPath '$INSTDIR\Assemblies\DesktopGL\x86'
+  File '..\..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll'
+  File '..\..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1'
+  
+  ; Install x64 DesktopGL Dependencies
+  SetOutPath '$INSTDIR\Assemblies\DesktopGL\x64'
+  File '..\..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll'
+  File '..\..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0'
+  File '..\..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1'
   
   ; Install Windows Desktop DirectX Assemblies
   SetOutPath '$INSTDIR\Assemblies\Windows'
@@ -201,12 +216,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   WriteUninstaller "uninstall.exe"
 
 
-SectionEnd
-
-Section "OpenAL" OpenAL
-  ; SetOutPath $INSTDIR
-  File '..\..\ThirdParty\Dependencies\oalinst.exe'
-  ExecWait '"$INSTDIR\oalinst.exe /S"'
 SectionEnd
 
 Section "Visual Studio 2010 Templates" VS2010
@@ -295,7 +304,6 @@ Section "Start Menu Shortcuts" Menu
 SectionEnd
 
 LangString CoreComponentsDesc ${LANG_ENGLISH} "Install the Runtimes and the MSBuild extensions for MonoGame"
-LangString OpenALDesc ${LANG_ENGLISH} "Install the OpenAL drivers"
 LangString MonoDevelopDesc ${LANG_ENGLISH} "Install the project templates for MonoDevelop"
 LangString VS2010Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2010"
 LangString VS2012Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2012"
@@ -305,7 +313,6 @@ LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your 
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${CoreComponents} $(CoreComponentsDesc)
-  !insertmacro MUI_DESCRIPTION_TEXT ${OpenAL} $(OpenALDesc)
   !insertmacro MUI_DESCRIPTION_TEXT ${MonoDevelop} $(MonoDevelopDesc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2010} $(VS2010Desc)
   !insertmacro MUI_DESCRIPTION_TEXT ${VS2012} $(VS2012Desc)

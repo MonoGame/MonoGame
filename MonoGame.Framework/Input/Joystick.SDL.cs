@@ -11,18 +11,25 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static Dictionary<int, IntPtr> Joysticks = new Dictionary<int, IntPtr>();
 
+        // we have to maintain this mapping because instance IDs are not ordered by player index (i.e. player lights on Xbox gamepads), but DeviceID are
+        private static readonly Dictionary<int, int> _deviceInstaceToId = new Dictionary<int, int>();
+
         internal static void AddDevice(int deviceId)
         {
             var jdevice = Sdl.Joystick.Open(deviceId);
+            var instanceid = Sdl.Joystick.InstanceID(jdevice);
+
+            _deviceInstaceToId.Add(instanceid, deviceId);
+
             Joysticks.Add(deviceId, jdevice);
-            GamePad.AddDevice(deviceId, jdevice);
         }
 
-        internal static void RemoveDevice(int deviceId)
+        internal static void RemoveDevice(int instanceid)
         {
+            int deviceId = _deviceInstaceToId[instanceid];
             Sdl.Joystick.Close(Joysticks[deviceId]);
             Joysticks.Remove(deviceId);
-            GamePad.RemoveDevice(deviceId);
+            _deviceInstaceToId.Remove(instanceid);
         }
 
         internal static void CloseDevices()

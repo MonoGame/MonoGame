@@ -7,18 +7,21 @@ using System.Collections.Generic;
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
+using Bool = MonoMac.OpenGL.Boolean;
 #else
 using OpenTK.Graphics.OpenGL;
 using GetProgramParameterName = OpenTK.Graphics.OpenGL.ProgramParameter;
+using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif WINRT
 
 #else
 using OpenTK.Graphics.ES20;
 #if IOS || ANDROID
 using GetProgramParameterName = OpenTK.Graphics.ES20.ProgramParameter;
+using Bool = OpenTK.Graphics.ES20.All;
 #endif
 #endif
 
@@ -129,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out linked);
             GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.GetProgram");
-            if (linked == 0)
+            if (linked == (int)Bool.False)
             {
                 var log = GL.GetProgramInfoLog(program);
                 Console.WriteLine(log);

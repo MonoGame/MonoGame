@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -28,6 +29,11 @@ namespace Microsoft.Xna.Framework
         public SdlGamePlatform(Game game)
             : base(game)
         {
+            // if we're on Windows, we need to detect the CPU arch and load the correct dlls
+            // on other system, the MonoGame.Framework.dll.config handles this
+            if (PlatformParameters.DetectWindowsArchitecture)
+                NativeHelper.InitDllDirectory();
+
             _game = game;
             _keys = new List<Keys>();
             Keyboard.SetKeys(_keys);
@@ -78,8 +84,17 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
+            var events = new Sdl.Event[1];
+            Sdl.PumpEvents ();
+            while (Sdl.PeepEvents(events, 1, Sdl.EventAction.GetEvent, Sdl.EventType.ControllerDeviceAdded, Sdl.EventType.ControllerDeviceAdded) == 1)
+            {
+                GamePad.AddDevice(events[0].ControllerDevice.Which);
+            }
+            while (Sdl.PeepEvents(events, 1, Sdl.EventAction.GetEvent, Sdl.EventType.JoyDeviceAdded, Sdl.EventType.JoyDeviceAdded) == 1)
+            {
+                Joystick.AddDevice(events[0].JoystickDevice.Which);
+            }
             _view.CreateWindow();
-            SdlRunLoop();
 
             base.BeforeInitialize ();
         }
@@ -95,14 +110,13 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
+                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
 
                 if (_isExiting > 0)
                     break;
             }
-
-            Dispose();
         }
 
         private void SdlRunLoop()
@@ -115,14 +129,15 @@ namespace Microsoft.Xna.Framework
                     _isExiting++;
                 else if (ev.Type == Sdl.EventType.JoyDeviceAdded)
                     Joystick.AddDevice(ev.JoystickDevice.Which);
+                else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
+                    GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
+                    Joystick.RemoveDevice(ev.JoystickDevice.Which);                
                 else if (ev.Type == Sdl.EventType.MouseWheel)
                     Mouse.ScrollY += ev.Wheel.Y * 120;
                 else if (ev.Type == Sdl.EventType.KeyDown)
                 {
                     var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
-
                     if (!_keys.Contains(key))
                         _keys.Add(key);
                 }
@@ -147,7 +162,7 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
-                    if (ev.Window.EventID == Sdl.Window.EventId.Resized)
+                    if (ev.Window.EventID == Sdl.Window.EventId.Resized || ev.Window.EventID == Sdl.Window.EventId.SizeChanged)
                         _view.ClientResize(ev.Window.Data1, ev.Window.Data2);
                     else if (ev.Window.EventID == Sdl.Window.EventId.FocusGained)
                         IsActive = true;

@@ -392,15 +392,7 @@ namespace Microsoft.Xna.Framework.Audio
                         _format = new SharpDX.Multimedia.WaveFormatAdpcm(rate, chans, align)
                     };
 #else
-                    using (var dataStream = new MemoryStream(audiodata)) {
-                        using (var source = new BinaryReader(dataStream)) {
-                            _sounds[current_entry] = new SoundEffect(
-                                MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
-                                rate,
-                                (AudioChannels)chans
-                            );
-                        }
-                    }
+                    _sounds[current_entry] = new SoundEffect(audiodata, 2, rate, chans, (align + 16) * 2, 0, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length);
 #endif
                 } 
                 else {

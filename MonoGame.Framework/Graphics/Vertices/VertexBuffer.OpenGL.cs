@@ -10,8 +10,12 @@ using System.Runtime.InteropServices;
 
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif DESKTOPGL || (MONOMAC && !PLATFORM_MACOS_LEGACY)
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
 using OpenTK.Graphics.OpenGL;
+#endif
+#if DESKTOPGL
+using OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
