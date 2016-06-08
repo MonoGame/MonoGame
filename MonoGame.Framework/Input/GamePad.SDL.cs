@@ -48,6 +48,8 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void AddDevice(int deviceId, IntPtr jdevice)
         {
+            var instanceid = Sdl.Joystick.InstanceID(jdevice);
+
             if (Sdl.GameController.IsGameController(deviceId) == 0)
             {
                 var guide = Sdl.Joystick.GetGUID(jdevice)
@@ -59,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input
             var gamepad = new GamePadInfo();
             gamepad.Device = Sdl.GameController.Open(deviceId);
 
-            Gamepads.Add(deviceId, gamepad);
+            Gamepads.Add(instanceid, gamepad);
 
             if (Sdl.Haptic.IsHaptic(jdevice) == 0)
                 return;
@@ -80,10 +82,10 @@ namespace Microsoft.Xna.Framework.Input
                 Sdl.Haptic.Close(gamepad.HapticDevice);
         }
 
-        internal static void RemoveDevice(int deviceId)
+        internal static void RemoveDevice(int instanceid)
         {
-            DisposeDevice(Gamepads[deviceId]);
-            Gamepads.Remove(deviceId);
+            DisposeDevice(Gamepads[instanceid]);
+            Gamepads.Remove(instanceid);
         }
 
         private static void DisposeDevice(GamePadInfo info)

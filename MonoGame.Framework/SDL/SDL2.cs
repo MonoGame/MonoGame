@@ -593,6 +593,9 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickGetHat")]
         public static extern Hat GetHat(IntPtr joystick, int hat);
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickInstanceID")]
+        public static extern int InstanceID(IntPtr joystick);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickOpen")]
         private static extern IntPtr SDL_JoystickOpen(int deviceIndex);
 
