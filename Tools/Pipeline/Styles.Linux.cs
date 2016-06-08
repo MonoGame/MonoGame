@@ -255,13 +255,11 @@ namespace MonoGame.Tools.Pipeline
             {
                 var cell = (h.Control.Child as Gtk.ComboBox).Cells[0] as Gtk.CellRendererText;
                 cell.Ellipsize = Pango.EllipsizeMode.End;
+            });
 
-                h.Control.SizeAllocated += delegate
-                {
-                    var al = h.Control.Allocation;
-                    al.Height = CellCombo.Height;
-                    h.Control.SetAllocation(al);
-                };
+            Style.Add<TextBoxHandler>("OverrideSize", h =>
+            {
+                h.Control.WidthChars = 0;
             });
         }
     }

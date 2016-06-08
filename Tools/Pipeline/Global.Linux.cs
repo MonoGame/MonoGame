@@ -51,7 +51,7 @@ namespace MonoGame.Tools.Pipeline
 
             if (Gtk.Global.MajorVersion >= 3 && Gtk.Global.MinorVersion >= 16)
             {
-                _app = new Gtk.Application("MonoGame.Pipeline.Tool", GLib.ApplicationFlags.None);
+                _app = new Gtk.Application(null, GLib.ApplicationFlags.None);
                 _app.Register(GLib.Cancellable.Current);
 
                 UseHeaderBar = Gtk3Wrapper.gtk_application_prefers_app_menu(_app.Handle);
