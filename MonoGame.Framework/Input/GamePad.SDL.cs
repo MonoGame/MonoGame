@@ -85,6 +85,7 @@ namespace Microsoft.Xna.Framework.Input
             int deviceId = _deviceInstaceToId[instanceid];
             DisposeDevice(Gamepads[deviceId]);
             Gamepads.Remove(deviceId);
+            _deviceInstaceToId.Remove(instanceid);
         }
 
         private static void DisposeDevice(GamePadInfo info)
