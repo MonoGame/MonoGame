@@ -111,6 +111,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 var vertexStride = vertexDeclaration.VertexStride;
                 var offset = (IntPtr)(vertexDeclaration.VertexStride * baseVertex);
 
+                // If instancing is not supported, but InstanceFrequency of the buffer is not zero, throw an exception
+                if (!GraphicsCapabilities.SupportsInstancing && vertexBufferBinding.InstanceFrequency > 0)
+                    throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2. Try upgrading your graphics drivers.");
+
                 foreach (var element in attrInfo.Elements)
                 {
                     GL.VertexAttribPointer(element.AttributeLocation,
@@ -118,8 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         element.VertexAttribPointerType,
                         element.Normalized,
                         vertexStride,
-                        (IntPtr)(offset.ToInt64() + element.Offset));
-                    GraphicsExtensions.CheckGLError();
+                        (IntPtr) (offset.ToInt64() + element.Offset));
 
                     GL.VertexAttribDivisor(element.AttributeLocation, vertexBufferBinding.InstanceFrequency);
                     GraphicsExtensions.CheckGLError();
@@ -928,8 +931,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexBuffersDirty)
             {
-                // don't bind a buffer here because we won't bind attributes yet since we don't know base vertex
-                // to bind vertex attributes we use _vertexBuffers.ApplyAttribs(Shader, int)
+                // Don't bind a buffer here because we won't bind attributes yet since we don't know base vertex.
+                // Buffers only need to be bound when binding attributes.
                 _vertexBuffersDirty = false;
             }
 
@@ -1104,6 +1107,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
         {
+            if (!GraphicsCapabilities.SupportsInstancing)
+                throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2. Try upgrading your graphics card drivers.");
             var shouldApplyAttribs = _vertexBuffersDirty;
             ApplyState(true);
 
