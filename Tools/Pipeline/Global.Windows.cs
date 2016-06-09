@@ -5,11 +5,13 @@
 using System;
 using Eto.Drawing;
 using Eto.Forms;
-using Eto.WinForms.Drawing;
+using Eto.Wpf.Drawing;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -35,16 +37,34 @@ namespace MonoGame.Tools.Pipeline
             return System.Drawing.Icon.FromHandle(large);
         }
 
+        private static BitmapSource Convert(System.Drawing.Bitmap bitmap)
+        {
+            var ret = new BitmapImage();
+
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
+                memory.Position = 0;
+
+                ret.BeginInit();
+                ret.StreamSource = memory;
+                ret.CacheOption = BitmapCacheOption.OnLoad;
+                ret.EndInit();
+            }
+
+            return ret;
+        }
+
         private static Image PlatformGetDirectoryIcon(bool exists)
         {
             System.Drawing.Bitmap icon;
 
-            if(exists)
+            if (exists)
                 icon = ExtractIcon(4).ToBitmap();
             else
                 icon = ExtractIcon(234).ToBitmap();
 
-            return new Bitmap(new BitmapHandler(icon));
+            return new Bitmap(new BitmapHandler(Convert(icon)));
         }
 
         private static Image PlatformGetFileIcon(string path, bool exists)
@@ -65,7 +85,7 @@ namespace MonoGame.Tools.Pipeline
             else
                 icon = ExtractIcon(271).ToBitmap();
 
-            return new Bitmap(new BitmapHandler(icon));
+            return new Bitmap(new BitmapHandler(Convert(icon)));
         }
 
         private static void PlatformShowOpenWithDialog(string filePath)

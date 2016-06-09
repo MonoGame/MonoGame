@@ -55,11 +55,15 @@
 
   <Platform Type="Windows">
     <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
-    <Binary Name="Eto.WinForms" Path="ThirdParty\Dependencies\Eto\Eto.WinForms.dll" />
+    <Binary Name="Eto.Wpf" Path="ThirdParty\Dependencies\Eto\Eto.Wpf.dll" />
     
     <Reference Include="System.Deployment" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
   </Platform>
 	
 </ExternalProject>
