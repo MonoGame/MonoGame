@@ -367,7 +367,7 @@ internal static class Sdl
             BlueSize,
             AlphaSize,
             BufferSize,
-            DoubleFuffer,
+            DoubleBuffer,
             DepthSize,
             StencilSize,
             AccumRedSize,

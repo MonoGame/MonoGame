@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework
                     Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 8);
                     break;
             }
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleFuffer, 1);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleBuffer, 1);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMajorVersion, 2);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMinorVersion, 1);
             
