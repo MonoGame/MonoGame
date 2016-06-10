@@ -62,7 +62,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var ret = new TreeGridItem();
-            var icon = folder ? Global.GetDirectoryIcon(true) : Global.GetFileIcon(fullpath, true);
+            var icon = folder ? Global.GetEtoDirectoryIcon(true) : Global.GetEtoFileIcon(fullpath, true);
             ret.Values = new object[] { icon, text };
             root.Children.Add(ret);
             root.Expanded = true;

@@ -50,7 +50,7 @@ namespace MonoGame.Tools.Pipeline
             splitterVertical.FixedPanel = SplitterFixedPanel.None;
 
             projectControl = new ProjectControl();
-            splitterVertical.Panel1 = projectControl;
+            splitterVertical.Panel1 = projectControl.ToEto();
 
             propertyGridControl = new PropertyGridControl();
             splitterVertical.Panel2 = propertyGridControl;
@@ -62,7 +62,7 @@ namespace MonoGame.Tools.Pipeline
 
             Content = splitterHorizontal;
 
-            projectControl.MouseDoubleClick += CmdOpenItem_Executed;
+            projectControl.RowActivated += CmdOpenItem_Executed;
 
             cmdNew.Executed += CmdNew_Executed;
             cmdOpen.Executed += CmdOpen_Executed;

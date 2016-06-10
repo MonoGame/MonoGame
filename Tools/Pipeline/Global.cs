@@ -56,26 +56,56 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public static Image GetDirectoryIcon(bool exists)
+        public static Image GetEtoDirectoryIcon(bool exists)
         {
+#if WINDOWS || LINUX
             try
             {
-                return PlatformGetDirectoryIcon(exists);
+                return ToEtoImage(PlatformGetDirectoryIcon(exists));
             }
             catch { }
+#endif
 
             return exists ? Bitmap.FromResource("TreeView.Folder.png") : Bitmap.FromResource("TreeView.FolderMissing.png");
         }
 
-        public static Image GetFileIcon(string path, bool exists)
+        public static Image GetEtoFileIcon(string path, bool exists)
         {
+#if WINDOWS || LINUX
             try
             {
-                return PlatformGetFileIcon(path, exists);
+                return ToEtoImage(PlatformGetFileIcon(path, exists));
             }
             catch { }
+#endif
 
             return exists ? Bitmap.FromResource("TreeView.File.png") : Bitmap.FromResource("TreeView.FileMissing.png");
+        }
+
+        public static Xwt.Drawing.Image GetXwtDirectoryIcon(bool exists)
+        {
+#if WINDOWS || LINUX
+            try
+            {
+                return ToXwtImage(PlatformGetDirectoryIcon(exists));
+            }
+            catch { }
+#endif
+
+            return exists ? Xwt.Drawing.Image.FromResource("TreeView.Folder.png") : Xwt.Drawing.Image.FromResource("TreeView.FolderMissing.png");
+        }
+
+        public static Xwt.Drawing.Image GetXwtFileIcon(string path, bool exists)
+        {
+#if WINDOWS || LINUX
+            try
+            {
+                return ToXwtImage(PlatformGetFileIcon(path, exists));
+            }
+            catch { }
+#endif
+
+            return exists ? Xwt.Drawing.Image.FromResource("TreeView.File.png") : Xwt.Drawing.Image.FromResource("TreeView.FileMissing.png");
         }
 
         public static void SetIcon(Command cmd)

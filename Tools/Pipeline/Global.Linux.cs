@@ -3,7 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using Eto.Drawing;
 using Eto.Forms;
@@ -71,7 +73,7 @@ namespace MonoGame.Tools.Pipeline
             adialog.Destroy();
         }
 
-        private static Eto.Drawing.Image PlatformGetDirectoryIcon(bool exists)
+        private static Gdk.Pixbuf PlatformGetDirectoryIcon(bool exists)
         {
             var icon = _theme.LoadIcon("folder", 16, 0);
 
@@ -80,11 +82,11 @@ namespace MonoGame.Tools.Pipeline
                 icon = icon.Copy();
                 _iconMissing.Composite(icon, 8, 8, 8, 8, 8, 8, 0.5, 0.5, Gdk.InterpType.Tiles, 255);
             }
-            
-            return new Bitmap(new BitmapHandler(icon));
+
+            return icon;
         }
 
-        private static Eto.Drawing.Image PlatformGetFileIcon(string path, bool exists)
+        private static Gdk.Pixbuf PlatformGetFileIcon(string path, bool exists)
         {
             Gdk.Pixbuf icon = null;
 
@@ -116,7 +118,29 @@ namespace MonoGame.Tools.Pipeline
                 _iconMissing.Composite(icon, 8, 8, 8, 8, 8, 8, 0.5, 0.5, Gdk.InterpType.Tiles, 255);
             }
 
+            return icon;
+        }
+
+        private static Eto.Drawing.Image ToEtoImage(Gdk.Pixbuf icon)
+        {
             return new Bitmap(new BitmapHandler(icon));
+        }
+
+        private static Xwt.Drawing.Image ToXwtImage(Gdk.Pixbuf icon)
+        {
+            Xwt.Drawing.Image ret;
+
+            var icon2 = new Gdk.Pixbuf(icon.Colorspace, true, icon.BitsPerSample, icon.Width + 1, icon.Height);
+            icon2.Fill(0);
+            icon.Composite(icon2, 0, 0, icon.Width, icon.Height, 0, 0, 1, 1, Gdk.InterpType.Tiles, 255);
+
+            using (var stream = new MemoryStream(icon2.SaveToBuffer("png")))
+            {
+                stream.Position = 0;
+                ret = Xwt.Drawing.Image.FromStream(stream);
+            }
+
+            return ret;
         }
 
         private static bool PlatformSetIcon(Command cmd)

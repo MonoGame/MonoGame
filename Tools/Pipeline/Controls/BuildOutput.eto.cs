@@ -9,7 +9,8 @@ namespace MonoGame.Tools.Pipeline
     public partial class BuildOutput : Panel
     {
         TextArea textArea;
-        TreeView treeView;
+
+        Xwt.TreeView treeView;
 
         private void InitializeComponent()
         {
@@ -17,8 +18,8 @@ namespace MonoGame.Tools.Pipeline
             textArea.Wrap = false;
             textArea.ReadOnly = true;
 
-            treeView = new TreeView();
-            treeView.Style = "FilterView";
+            treeView = new Xwt.TreeView();
+            treeView.HeadersVisible = false;
 
             Content = textArea;
         }

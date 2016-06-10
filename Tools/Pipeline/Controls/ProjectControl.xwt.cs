@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using Eto.Forms;
+using Xwt;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -10,7 +10,8 @@ namespace MonoGame.Tools.Pipeline
     {
         private void InitializeComponent()
         {
-            
+            HeadersVisible = false;
+            SelectionMode = SelectionMode.Multiple;
         }
     }
 }

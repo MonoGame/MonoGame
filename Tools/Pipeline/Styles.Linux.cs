@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Eto;
 using Eto.Forms;
@@ -84,6 +85,26 @@ namespace MonoGame.Tools.Pipeline
                 com.Checked = !com.Checked;
                 widget.Active = com.Checked;
             };
+        }
+
+        [GLib.ConnectBefore]
+        public static void TreeView_ButtonPressEvent(object o, Gtk.ButtonPressEventArgs args)
+        {
+            var treeview = o as Gtk.TreeView;
+
+            if (args.Event.Button == 3)
+            {
+                Gtk.TreeViewDropPosition pos;
+                Gtk.TreePath path;
+                Gtk.TreeIter iter;
+
+                if (treeview.GetDestRowAtPos((int)args.Event.X, (int)args.Event.Y, out path, out pos) && treeview.Model.GetIter(out iter, path))
+                {
+                    var paths = treeview.Selection.GetSelectedRows().ToList();
+                    if (paths.Contains(path))
+                        args.RetVal = true;
+                }
+            }
         }
 
         public static void Load()
