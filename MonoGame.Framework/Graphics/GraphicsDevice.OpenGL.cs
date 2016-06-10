@@ -124,7 +124,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         vertexStride,
                         (IntPtr) (offset.ToInt64() + element.Offset));
 
-                    GL.VertexAttribDivisor(element.AttributeLocation, vertexBufferBinding.InstanceFrequency);
+                    // only set the divisor if instancing is supported
+                    if (GraphicsCapabilities.SupportsInstancing) 
+                        GL.VertexAttribDivisor(element.AttributeLocation, vertexBufferBinding.InstanceFrequency);
+
                     GraphicsExtensions.CheckGLError();
 
                     _newEnabledVertexAttributes[element.AttributeLocation] = true;
