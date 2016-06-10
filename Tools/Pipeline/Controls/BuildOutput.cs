@@ -102,7 +102,11 @@ namespace MonoGame.Tools.Pipeline
             _last = item;
             _root.Children.Add(item);
 
+#if WINDOWS
+            treeView.RefreshData();
+#else
             treeView.RefreshItem(item);
+#endif
 
             treeView.Style = "Scroll";
             treeView.Style = "";

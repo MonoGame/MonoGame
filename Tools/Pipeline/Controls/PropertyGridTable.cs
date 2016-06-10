@@ -61,7 +61,7 @@ namespace MonoGame.Tools.Pipeline
         private Point _mouseLocation;
         private int _separatorPos;
         private int _moveSeparator;
-        private bool _edit;
+        private int _height;
 
         public PropertyGridTable()
         {
@@ -71,7 +71,6 @@ namespace MonoGame.Tools.Pipeline
             _mouseLocation = new Point(-1, -1);
             _cells = new List<CellBase>();
             _moveSeparator = -_separatorWidth / 2 - 1;
-            _edit = false;
 
             Group = true;
         }
@@ -156,7 +155,7 @@ namespace MonoGame.Tools.Pipeline
 
             if (_cells.Count == 0)
             {
-                drawable.Height = 1;
+                drawable.Height = _height = 1;
                 return;
             }
 
@@ -188,7 +187,12 @@ namespace MonoGame.Tools.Pipeline
 
                 rec.Y += PropInfo.TextHeight + _spacing;
             }
-            drawable.Height = rec.Y + 1;
+
+            if (_height != rec.Y + 1)
+            {
+                drawable.Height = _height = rec.Y + 1;
+                SetWidth();
+            }
 
             if (overGroup) // TODO: Group collapsing/expanding?
                 SetCursor(CursorType.Default);
@@ -196,17 +200,6 @@ namespace MonoGame.Tools.Pipeline
                 SetCursor(CursorType.VerticalSplit);
             else
                 SetCursor(CursorType.Default);
-
-            // On windows craeting a dialog from double click will freeze
-            // the GUI thread until a click occurs so we need to call the
-            // dialog at the end of Paint event so everything gets drawn.
-            if(_edit)
-            {
-                _edit = false;
-
-                if (!Global.Unix)
-                    _selectedCell.Edit(pixel1);
-            }
         }
 
         private void Drawable_MouseDown(object sender, MouseEventArgs e)
@@ -243,25 +236,35 @@ namespace MonoGame.Tools.Pipeline
         {
             if (e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable)
             {
-                if (Global.Unix)
-                    _selectedCell.Edit(pixel1);
-                else
-                    _edit = true;
+                var action = new Action(() => _selectedCell.Edit(pixel1));
+
+#if WINDOWS
+                (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action, 
+                    System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+#else
+                action.Invoke();
+#endif
             }
         }
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
         {
-#if WINDOWS
-            var scrollsize = 0;
-
-            if((ControlObject as System.Windows.Forms.ScrollableControl).VerticalScroll.Visible)
-                scrollsize = System.Windows.Forms.SystemInformation.VerticalScrollBarWidth;
-
-            drawable.Width = Width - scrollsize - System.Windows.Forms.SystemInformation.VerticalResizeBorderThickness;
-#endif
-
+            SetWidth();
             drawable.Invalidate();
+        }
+
+        private void SetWidth()
+        {
+#if WINDOWS
+            var action = new Action(() =>
+            {
+                var scrollsize = (_height >= Height) ? System.Windows.SystemParameters.VerticalScrollBarWidth : 0.0;
+                drawable.Width = (int)(Width - scrollsize - System.Windows.SystemParameters.BorderWidth * 2);
+            });
+
+            (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
+                System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+#endif
         }
     }
 }

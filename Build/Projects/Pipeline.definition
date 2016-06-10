@@ -87,7 +87,7 @@
 	<Compile Include="Styles.Windows.cs">
       <Platforms>Windows</Platforms>
     </Compile>
-	<Compile Include="Controls\ProjectControl.win.cs">
+	<Compile Include="Controls\ProjectControl.mac.cs">
       <DependentUpon>ProjectControl.cs</DependentUpon>
       <Platforms>Windows</Platforms>
     </Compile>

@@ -166,7 +166,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void EndTreeUpdate()
         {
-            
+            projectControl.RefreshData();
         }
 
         public void UpdateProperties()
