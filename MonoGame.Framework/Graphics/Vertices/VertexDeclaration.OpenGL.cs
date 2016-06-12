@@ -68,8 +68,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     element.Normalized,
                     VertexStride,
                     (IntPtr)(offset.ToInt64() + element.Offset));
+#if !(GLES || MONOMAC)
                 if (GraphicsDevice.GraphicsCapabilities.SupportsInstancing)
                     GL.VertexAttribDivisor(element.AttributeLocation, 0);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
             GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);

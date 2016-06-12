@@ -124,9 +124,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         vertexStride,
                         (IntPtr) (offset.ToInt64() + element.Offset));
 
+#if !(GLES || MONOMAC)
                     // only set the divisor if instancing is supported
                     if (GraphicsCapabilities.SupportsInstancing) 
                         GL.VertexAttribDivisor(element.AttributeLocation, vertexBufferBinding.InstanceFrequency);
+#endif
 
                     GraphicsExtensions.CheckGLError();
 
@@ -1110,6 +1112,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
         {
+#if GLES || MONOMAC
+            throw new PlatformNotSupportedException("Instanced geometry drawing is not supported yet for GLES or MONOMAC.");
+#else
             if (!GraphicsCapabilities.SupportsInstancing)
                 throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2. Try upgrading your graphics card drivers.");
             var shouldApplyAttribs = _vertexBuffersDirty;
@@ -1132,6 +1137,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexOffsetInBytes,
                                      instanceCount);
             GraphicsExtensions.CheckGLError();
+#endif
         }
 
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)

@@ -190,7 +190,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             SupportsInstancing = true;
 #elif OPENGL
+#if GLES || MONOMAC
+            SupportsInstancing = false;
+#else
             SupportsInstancing = GL.VertexAttribDivisor != null;
+#endif
 #endif
         }
 
