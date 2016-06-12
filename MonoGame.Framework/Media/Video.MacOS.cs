@@ -5,15 +5,9 @@
 using System;
 using System.IO;
 
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.ObjCRuntime;
-using MonoMac.QTKit;
-using MonoMac.Foundation;
-#else
 using ObjCRuntime;
 using QTKit;
 using Foundation;
-#endif
 
 namespace Microsoft.Xna.Framework.Media
 {

@@ -5,14 +5,12 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="tvOS">
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="Linux">
     <Reference Include="System" />
@@ -25,12 +23,6 @@
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Core" />
       <Reference Include="System.Drawing" />
-      <Binary
-        Name="Tao.Sdl"
-        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-      <Binary
-        Name="OpenTK"
-        Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
   </Platform>
 
@@ -38,7 +30,6 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
   </Platform>
 

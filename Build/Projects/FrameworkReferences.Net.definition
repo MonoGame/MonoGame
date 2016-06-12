@@ -25,7 +25,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="Lidgren.Network" />
-    <Reference Include="OpenTK" />
   </Platform>
 
   <Platform Type="Android">

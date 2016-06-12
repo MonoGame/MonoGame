@@ -2,20 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#else
-using MonoGame.OpenGL;
-using OpenTK.Graphics.OpenGL;
-#endif
-#elif DESKTOPGL
 using MonoGame.OpenGL;
 using System;
 using System.Collections.Generic;
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

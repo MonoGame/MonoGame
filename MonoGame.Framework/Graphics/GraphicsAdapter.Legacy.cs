@@ -6,15 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.AppKit;
-using MonoMac.Foundation;
-#else
-using AppKit;
-using Foundation;
-#endif
-#elif IOS
+#if IOS
 using UIKit;
 #elif ANDROID
 using Android.Views;
@@ -53,13 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private DisplayModeCollection _supportedDisplayModes;
 
 
-#if MONOMAC
-		private NSScreen _screen;
-        internal GraphicsAdapter(NSScreen screen)
-        {
-            _screen = screen;
-        }
-#elif IOS
+#if IOS
 		private UIScreen _screen;
         internal GraphicsAdapter(UIScreen screen)
         {
@@ -84,14 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-#if MONOMAC
-                //Dummy values until MonoMac implements Quartz Display Services
-                SurfaceFormat format = SurfaceFormat.Color;
-                
-                return new DisplayMode((int)_screen.Frame.Width,
-                                       (int)_screen.Frame.Height,
-                                       format);
-#elif IOS
+#if IOS
                 return new DisplayMode((int)(_screen.Bounds.Width * _screen.Scale),
                        (int)(_screen.Bounds.Height * _screen.Scale),
                        SurfaceFormat.Color);
@@ -131,14 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (_adapters == null)
                 {
-#if MONOMAC
-                    GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
-                    for (int i=0; i<NSScreen.Screens.Length; i++) {
-                        tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
-                    }
-                    
-                    _adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
-#elif IOS
+#if IOS
 					_adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new [] {new GraphicsAdapter(UIScreen.MainScreen)});
 #else
