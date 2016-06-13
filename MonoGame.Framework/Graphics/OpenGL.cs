@@ -483,71 +483,60 @@ namespace OpenGL
         public partial class Ext
         {
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void GenRenderbuffersDelegate (int count, out int buffer);
             public static GenRenderbuffersDelegate GenRenderbuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void BindRenderbufferDelegate (RenderbufferTarget target, int buffer);
             public static BindRenderbufferDelegate BindRenderbuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void DeleteRenderbuffersDelegate (int count, ref int buffer);
             public static DeleteRenderbuffersDelegate DeleteRenderbuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void RenderbufferStorageMultisampleDelegate (RenderbufferTarget target, int sampleCount,
                 RenderbufferStorage storage, int width, int height);
             public static RenderbufferStorageMultisampleDelegate RenderbufferStorageMultisample;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void GenFramebuffersDelegate (int count, out int buffer);
             public static GenFramebuffersDelegate GenFramebuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void BindFramebufferDelegate (FramebufferTarget target, int buffer);
             public static BindFramebufferDelegate BindFramebuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void DeleteFramebuffersDelegate (int count, ref int buffer);
             public static DeleteFramebuffersDelegate DeleteFramebuffers;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void FramebufferTexture2DDelegate (FramebufferTarget target, FramebufferAttachment attachement,
                 TextureTarget textureTarget, int texture, int level);
             public static FramebufferTexture2DDelegate FramebufferTexture2D;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void FramebufferRenderbufferDelegate (FramebufferTarget target, FramebufferAttachment attachement,
                 RenderbufferTarget renderBufferTarget, int buffer);
             public static FramebufferRenderbufferDelegate FramebufferRenderbuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
             public static GenerateMipmapDelegate GenerateMipmap;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate void BlitFramebufferDelegate (int srcX0,
                 int srcY0,
                 int srcX1,
@@ -561,264 +550,221 @@ namespace OpenGL
             public static BlitFramebufferDelegate BlitFramebuffer;
 
             [System.Security.SuppressUnmanagedCodeSecurity ()]
-            [MonoNativeFunctionWrapper]
-            [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+            [MonoNativeFunctionWrapper]           
             public delegate FramebufferErrorCode CheckFramebufferStatusDelegate (FramebufferTarget target);
             public static CheckFramebufferStatusDelegate CheckFramebufferStatus;
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void EnableVertexAttribArrayDelegate (int attrib);
         public static EnableVertexAttribArrayDelegate EnableVertexAttribArray;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DisableVertexAttribArrayDelegte (int attrib);
         public static DisableVertexAttribArrayDelegte DisableVertexAttribArray;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void MakeCurrentDelegate(IntPtr window);
         public static MakeCurrentDelegate MakeCurrent;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public unsafe delegate void GetIntegerDelegate(int param, [Out] int* data);
         public static GetIntegerDelegate GetIntegerv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         internal delegate IntPtr GetStringDelegate(StringName param);
         internal static GetStringDelegate GetStringInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ClearDepthDelegate (float depth);
         public static ClearDepthDelegate ClearDepth;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        public delegate void DepthRangeDelegate (float min, float max);
+        [MonoNativeFunctionWrapper]       
+        public delegate void DepthRangeDelegate (double min, double max);
         public static DepthRangeDelegate DepthRange;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ClearDelegate(ClearBufferMask mask);
         public static ClearDelegate Clear;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ClearColorDelegate(float red,float green,float blue,float alpha);
         public static ClearColorDelegate ClearColor;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ClearStencilDelegate(int stencil);
         public static ClearStencilDelegate ClearStencil;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ViewportDelegate(int x, int y, int w, int h);
         public static ViewportDelegate Viewport;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate ErrorCode GetErrorDelegate();
         public static GetErrorDelegate GetError;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void FlushDelegate();
         public static FlushDelegate Flush;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GenTexturesDelegte (int count, [Out] out int id);
         public static GenTexturesDelegte GenTextures;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BindTextureDelegate(TextureTarget target, int id);
         public static BindTextureDelegate BindTexture;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate int EnableDelegate (EnableCap cap);
         public static EnableDelegate Enable;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate int DisableDelegate (EnableCap cap);
         public static DisableDelegate Disable;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void CullFaceDelegate(CullFaceMode mode);
         public static CullFaceDelegate CullFace;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void FrontFaceDelegate(FrontFaceDirection direction);
         public static FrontFaceDelegate FrontFace;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void PolygonModeDelegate (MaterialFace face, PolygonMode mode);
         public static PolygonModeDelegate PolygonMode;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void PolygonOffsetDelegate (float slopeScaleDepthBias, float depthbias);
         public static PolygonOffsetDelegate PolygonOffset;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DrawBuffersDelegate (int count, DrawBuffersEnum[] buffers);
         public static DrawBuffersDelegate DrawBuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void UseProgramDelegate(int program);
         public static UseProgramDelegate UseProgram;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public unsafe delegate void Uniform4fvDelegate (int location, int size, float* values);
         public static Uniform4fvDelegate Uniform4fv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void Uniform1iDelegate (int location, int value);
         public static Uniform1iDelegate Uniform1i;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ScissorDelegate(int x, int y, int width, int height);
         public static ScissorDelegate Scissor;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BindBufferDelegate(BufferTarget target, uint buffer);
         public static BindBufferDelegate BindBuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DrawElementsDelegate (GLPrimitiveType primitiveType, int count, DrawElementsType elementType, IntPtr offset);
         public static DrawElementsDelegate DrawElements;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DrawArraysDelegate (GLPrimitiveType primitiveType, int offset, int count);
         public static DrawArraysDelegate DrawArrays;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GenRenderbuffersDelegate(int count, [Out] out int buffer);
         public static GenRenderbuffersDelegate GenRenderbuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BindRenderbufferDelegate (RenderbufferTarget target, int buffer);
         public static BindRenderbufferDelegate BindRenderbuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DeleteRenderbuffersDelegate(int count, [In] [Out] ref int buffer);
         public static DeleteRenderbuffersDelegate DeleteRenderbuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void RenderbufferStorageMultisampleDelegate(RenderbufferTarget target, int sampleCount, 
             RenderbufferStorage storage, int width, int height);
         public static RenderbufferStorageMultisampleDelegate RenderbufferStorageMultisample;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GenFramebuffersDelegate(int count, out int buffer);
         public static GenFramebuffersDelegate GenFramebuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BindFramebufferDelegate (FramebufferTarget target, int buffer);
         public static BindFramebufferDelegate BindFramebuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DeleteFramebuffersDelegate(int count, ref int buffer);
         public static DeleteFramebuffersDelegate DeleteFramebuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void FramebufferTexture2DDelegate(FramebufferTarget target, FramebufferAttachment attachement,
             TextureTarget textureTarget, int texture, int level );
         public static FramebufferTexture2DDelegate FramebufferTexture2D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void FramebufferRenderbufferDelegate (FramebufferTarget target, FramebufferAttachment attachement,
             RenderbufferTarget renderBufferTarget, int buffer);
         public static FramebufferRenderbufferDelegate FramebufferRenderbuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GenerateMipmapDelegate (GenerateMipmapTarget target);
         public static GenerateMipmapDelegate GenerateMipmap;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ReadBufferDelegate (ReadBufferMode buffer);
         public static ReadBufferDelegate ReadBuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DrawBufferDelegate (DrawBufferMode buffer);
         public static DrawBufferDelegate DrawBuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BlitFramebufferDelegate (int srcX0,
             int srcY0,
             int srcX1,
@@ -832,341 +778,286 @@ namespace OpenGL
         public static BlitFramebufferDelegate BlitFramebuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate FramebufferErrorCode CheckFramebufferStatusDelegate (FramebufferTarget target);
         public static CheckFramebufferStatusDelegate CheckFramebufferStatus;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void TexParameterFloatDelegate (TextureTarget target, TextureParameterName name, float value);
         public static TexParameterFloatDelegate TexParameterf;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public unsafe delegate void TexParameterFloatArrayDelegate (TextureTarget target, TextureParameterName name, float* values);
         public static TexParameterFloatArrayDelegate TexParameterfv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void TexParameterIntDelegate (TextureTarget target, TextureParameterName name, int value);
         public static TexParameterIntDelegate TexParameteri;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GenQueriesDelegate (int count, [Out] out int queryId);
         public static GenQueriesDelegate GenQueries;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BeginQueryDelegate (QueryTarget target, int queryId);
         public static BeginQueryDelegate BeginQuery;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void EndQueryDelegate (QueryTarget target);
         public static EndQueryDelegate EndQuery;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GetQueryObjectDelegate(int queryId, GetQueryObjectParam getparam, [Out] out int ready);
         public static GetQueryObjectDelegate GetQueryObject;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DeleteQueriesDelegate(int count, [In] [Out] ref int queryId);
         public static DeleteQueriesDelegate DeleteQueries;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ActiveTextureDelegate (TextureUnit textureUnit);
         public static ActiveTextureDelegate ActiveTexture;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate int CreateShaderDelegate (ShaderType type);
         public static CreateShaderDelegate CreateShader;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public unsafe delegate void ShaderSourceDelegate(uint shaderId, int count, IntPtr code, int* length);
         public static ShaderSourceDelegate ShaderSourceInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void CompileShaderDelegate (int shaderId);
         public static CompileShaderDelegate CompileShader;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public unsafe delegate void GetShaderDelegate(uint shaderId, uint parameter, int* value);
         public static GetShaderDelegate GetShaderiv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GetShaderInfoLogDelegate(uint shader, int bufSize, IntPtr length, StringBuilder infoLog);
         public static GetShaderInfoLogDelegate GetShaderInfoLogInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate bool IsShaderDelegate(int shaderId);
         public static IsShaderDelegate IsShader;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DeleteShaderDelegate (int shaderId);
         public static DeleteShaderDelegate DeleteShader;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate int GetAttribLocationDelegate(int programId, string name);
         public static GetAttribLocationDelegate GetAttribLocation;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate int GetUniformLocationDelegate(int programId, string name);
         public static GetUniformLocationDelegate GetUniformLocation;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate bool IsProgramDelegate (int programId);
         public static IsProgramDelegate IsProgram;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DeleteProgramDelegate (int programId);
         public static DeleteProgramDelegate DeleteProgram;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate int CreateProgramDelegate();
         public static CreateProgramDelegate CreateProgram;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void AttachShaderDelegate (int programId, int shaderId);
         public static AttachShaderDelegate AttachShader;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void LinkProgramDelegate(int programId);
         public static LinkProgramDelegate LinkProgram;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public unsafe delegate void GetProgramDelegate(int programId, uint name, int* linked);
         public static GetProgramDelegate GetProgramiv;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GetProgramInfoLogDelegate(uint program, int bufSize, IntPtr length, StringBuilder infoLog);
         public static GetProgramInfoLogDelegate GetProgramInfoLogInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DetachShaderDelegate(int programId, int shaderId);
         public static DetachShaderDelegate DetachShader;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BlendColorDelegate(float r, float g, float b, float a);
         public static BlendColorDelegate BlendColor;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BlendEquationSeparateDelegate(BlendEquationMode colorMode, BlendEquationMode alphaMode);
         public static BlendEquationSeparateDelegate BlendEquationSeparate;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BlendFuncSeparateDelegate(BlendingFactorSrc colorSrc, BlendingFactorDest colorDst,
             BlendingFactorSrc alphaSrc, BlendingFactorDest alphaDst);
         public static BlendFuncSeparateDelegate BlendFuncSeparate;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void ColorMaskDelegate(bool r, bool g, bool b, bool a);
         public static ColorMaskDelegate ColorMask;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DepthFuncDelegate(DepthFunction function);
         public static DepthFuncDelegate DepthFunc;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DepthMaskDelegate (bool enabled);
         public static DepthMaskDelegate DepthMask;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void StencilFuncSeparateDelegate (StencilFace face, GLStencilFunction function, int referenceStencil, int mask);
         public static StencilFuncSeparateDelegate StencilFuncSeparate;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void StencilOpSeparateDelegate(StencilFace face, StencilOp stencilfail, StencilOp depthFail, StencilOp pass);
         public static StencilOpSeparateDelegate StencilOpSeparate;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void StencilFuncDelegate(GLStencilFunction function, int referenceStencil, int mask);
         public static StencilFuncDelegate StencilFunc;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void StencilOpDelegate (StencilOp stencilfail, StencilOp depthFail, StencilOp pass);
         public static StencilOpDelegate StencilOp;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void StencilMaskDelegate(int mask);
         public static StencilMaskDelegate StencilMask;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void CompressedTexImage2DDelegate(TextureTarget target, int level, PixelInternalFormat internalFormat,
             int width, int height, int border, int size, IntPtr data);
         public static CompressedTexImage2DDelegate CompressedTexImage2D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void TexImage2DDelegate(TextureTarget target,int level, PixelInternalFormat internalFormat,
             int width, int height, int border,PixelFormat format, PixelType pixelType, IntPtr data);
         public static TexImage2DDelegate TexImage2D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void CompressedTexSubImage2DDelegate (TextureTarget target, int level,
             int x, int y, int width, int height, PixelFormat format, int size, IntPtr data);
         public static CompressedTexSubImage2DDelegate CompressedTexSubImage2D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void TexSubImage2DDelegate (TextureTarget target, int level,
             int x, int y, int width, int height, PixelFormat format, PixelType pixelType, IntPtr data);
         public static TexSubImage2DDelegate TexSubImage2D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void PixelStoreDelegate (PixelStoreParameter parameter, int size);
         public static PixelStoreDelegate PixelStore;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void FinishDelegate();
         public static FinishDelegate Finish;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         internal delegate void GetTexImageDelegate(TextureTarget target, int level, PixelFormat format, PixelType type, [Out] IntPtr pixels);
         internal static GetTexImageDelegate GetTexImageInternal;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void TexImage3DDelegate(TextureTarget target,int level, PixelInternalFormat internalFormat,
             int width, int height, int depth, int border,PixelFormat format, PixelType pixelType, IntPtr data);
         public static TexImage3DDelegate TexImage3D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void TexSubImage3DDelegate (TextureTarget target, int level,
             int x, int y, int z, int width, int height, int depth, PixelFormat format, PixelType pixelType, IntPtr data);
         public static TexSubImage3DDelegate TexSubImage3D;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DeleteTexturesDelegate(int count, ref int id);
         public static DeleteTexturesDelegate DeleteTextures;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void GenBuffersDelegate(int count, out uint buffer);
         public static GenBuffersDelegate GenBuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BufferDataDelegate(BufferTarget target, IntPtr size, IntPtr n, BufferUsageHint usage);
         public static BufferDataDelegate BufferData;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate IntPtr MapBufferDelegate(BufferTarget target, BufferAccess access);
         public static MapBufferDelegate MapBuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void UnmapBufferDelegate(BufferTarget target);
         public static UnmapBufferDelegate UnmapBuffer;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void BufferSubDataDelegate (BufferTarget target, IntPtr offset, IntPtr size, IntPtr data);
         public static BufferSubDataDelegate BufferSubData;
 
         [CLSCompliant (false)]
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void DeleteBuffersDelegate (int count, [In] [Out] ref uint buffer);
         [CLSCompliant (false)]
         public static DeleteBuffersDelegate DeleteBuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
-        [MonoNativeFunctionWrapper]
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [MonoNativeFunctionWrapper]       
         public delegate void VertexAttribPointerDelegate(int location, int elementCount, VertexAttribPointerType type, bool normalize,
             int stride, IntPtr data);
         public static VertexAttribPointerDelegate VertexAttribPointer;
