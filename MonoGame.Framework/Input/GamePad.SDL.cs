@@ -68,8 +68,15 @@ namespace Microsoft.Xna.Framework.Input
 
             if (Sdl.Haptic.EffectSupported(gamepad.HapticDevice, ref _hapticLeftRightEffect) == 1)
             {
-                Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
-                gamepad.HapticType = 1;
+                try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some low-end gamepads
+                {
+                    Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
+                    gamepad.HapticType = 1;
+                }
+                catch (Exception)
+                {
+                    Sdl.Haptic.Close(gamepad.HapticDevice);
+                }
             }
             else if (Sdl.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
             {
