@@ -41,6 +41,8 @@ namespace MonoGame.Framework
 
         private bool _isMouseInBounds;
 
+        private XnaKey _lastKey;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -291,6 +293,8 @@ namespace MonoGame.Framework
 
         private void OnRawKeyEvent(object sender, KeyboardInputEventArgs args)
         {
+            _lastKey = XnaKey.None;
+
             if (KeyState == null)
                 return;
 
@@ -325,15 +329,19 @@ namespace MonoGame.Framework
                     break;
             }
 
-            if ((args.State == SharpDX.RawInput.KeyState.KeyDown || args.State == SharpDX.RawInput.KeyState.SystemKeyDown) && !KeyState.Contains(xnaKey))
-                KeyState.Add(xnaKey);
+            if (args.State == SharpDX.RawInput.KeyState.KeyDown || args.State == SharpDX.RawInput.KeyState.SystemKeyDown)
+            {
+                _lastKey = xnaKey;
+                if (!KeyState.Contains(xnaKey))
+                    KeyState.Add(xnaKey);
+            }
             else if (args.State == SharpDX.RawInput.KeyState.KeyUp || args.State == SharpDX.RawInput.KeyState.SystemKeyUp)
                 KeyState.Remove(xnaKey);
         }
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
+            OnTextInput(sender, new TextInputEventArgs(e.KeyChar, _lastKey));
         }
 
         internal void Initialize(int width, int height)

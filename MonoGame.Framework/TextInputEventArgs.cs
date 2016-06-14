@@ -8,25 +8,30 @@ using Microsoft.Xna.Framework.Input;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// This class is used for the game window's TextInput event as EventArgs.
+    /// An event containing keyboard text input data.  See
+    /// <see cref="GameWindow.TextEvent"/> for details.
     /// </summary>
     public class TextInputEventArgs : EventArgs
     {
-        char character;
-        public TextInputEventArgs(char character, Keys key = Keys.None)
+        /// <summary>
+        /// Construct the event.
+        /// </summary>
+        /// <param name="character">The character value.</param>
+        /// <param name="key">The key code.</param>
+        public TextInputEventArgs(char character, Keys key)
         {
-            this.character = character;
-            this.Key = key;
+            Character = character;
+            Key = key;
         }
-        public char Character
-        {
-            get
-            {
-                return character;
-            }
-        }
-        public Keys Key {
-            get; private set;
-        }
+
+        /// <summary>
+        /// The character value for this event.
+        /// </summary>
+        public char Character { get; private set; }
+
+        /// <summary>
+        /// The key code for this event.
+        /// </summary>
+        public Keys Key { get; private set; }
     }
 }

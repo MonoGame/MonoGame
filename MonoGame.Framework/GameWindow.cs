@@ -91,17 +91,15 @@ namespace Microsoft.Xna.Framework {
 
 #if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
 
-        /// <summary>
-		/// Use this event to retrieve text for objects like textbox's.
-		/// This event is not raised by noncharacter keys.
-		/// This event also supports key repeat.
-		/// For more information this event is based off:
-		/// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
+		/// <summary>
+		/// Use this event to retrieve text for UI elements such as text boxes.
 		/// </summary>
 		/// <remarks>
-		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
+		/// This event supports key repeat and non-display keys like backspace.
+		/// It is only supported on Windows, Windows UWP, and DesktopGL platforms.
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
+
 #endif
 
 		#endregion Events
