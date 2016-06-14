@@ -15,4 +15,4 @@ You will need the following, to setup MonoGame on Xamarain Studio for Windows:
  4. Install MonoGame Templates by launching Xamarain Studio. Then click on **Tools** > **Add-in Manager**. At the *Add-in Manager* windows, click on **Install from file...** and browse to the `MonoDevelop.MonoGame-3.5.0.1677.mpack` file and select it, then click on Open.  
 
 ## Conclusion
-Now that you have installed MonoGame on Xamarin Studio for Windows, you can follow the [tutorials](http://www.monogame.net/docs/html/Tutorials.html) to test the installation.
+Now that you have installed MonoGame on Xamarin Studio for Windows, you can follow the [tutorials](tutorials.md) to test the installation.
