@@ -23,8 +23,7 @@ namespace Microsoft.Xna.Framework.Input
             var state = (Sdl.Patch > 4) ? // SDL 2.0.4 has a bug with Global Mouse
                     Sdl.Mouse.GetGlobalState(out x, out y) :
                     Sdl.Mouse.GetState(out x, out y);
-            var clientBounds = window.ClientBounds;
-
+            
             if (winFlags.HasFlag(Sdl.Window.State.MouseFocus))
             {
                 window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
@@ -34,10 +33,11 @@ namespace Microsoft.Xna.Framework.Input
                 window.MouseState.XButton2 = (state.HasFlag(Sdl.Mouse.Button.X2Mask)) ? ButtonState.Pressed : ButtonState.Released;
 
                 window.MouseState.ScrollWheelValue = ScrollY;
-            }
 
-            window.MouseState.X = x - ((Sdl.Patch > 4) ? clientBounds.X : 0);
-            window.MouseState.Y = y - ((Sdl.Patch > 4) ? clientBounds.Y : 0);
+                var clientBounds = window.ClientBounds;
+                window.MouseState.X = x - ((Sdl.Patch > 4) ? clientBounds.X : 0);
+                window.MouseState.Y = y - ((Sdl.Patch > 4) ? clientBounds.Y : 0);
+            }
 
             return window.MouseState;
         }
