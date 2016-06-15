@@ -24,8 +24,6 @@ namespace Microsoft.Xna.Framework
 
         private static async Task<Stream> OpenStreamAsync(string name)
         {
-            var package = Windows.ApplicationModel.Package.Current;
-
             NamedResource result;
 
             if (FileResourceMap != null && FileResourceMap.TryGetValue(name, out result))
