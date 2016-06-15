@@ -1,20 +1,20 @@
 #!/bin/sh
 
 # Functions
-function echodep
+echodep()
 {
 	line=" - $1"
 	
 	while [ ${#line} -lt 50 ]
 	do
-		line+="."
+		line="$line."
 	done
     
 	if eval "$2"
 	then
-		line+="\e[32m[Found]\e[0m"
+		line="$line\e[32m[Found]\e[0m"
 	else
-		line+="\e[31m[Not Found]\e[0m"
+		line="$line\e[31m[Not Found]\e[0m"
 	fi
 	
 	echo -e "$line"
