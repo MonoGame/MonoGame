@@ -20,6 +20,10 @@ using UIKit;
 using Android.Views;
 using Android.Runtime;
 #endif
+#if WINDOWS_UAP
+using Windows.Graphics.Display;
+using Windows.UI.ViewManagement;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -107,6 +111,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     graphics.ReleaseHdc(dc);
                     return new DisplayMode(width, height, SurfaceFormat.Color);
                 }
+#elif WINDOWS_UAP
+                var visibleBounds = ApplicationView.GetForCurrentView().VisibleBounds;
+                var rawPixelsPerViewPixel = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
+                return new DisplayMode((int)(visibleBounds.Width * rawPixelsPerViewPixel + 0.5f),
+                                       (int)(visibleBounds.Height * rawPixelsPerViewPixel + 0.5f),
+                                       SurfaceFormat.Color);
 #else
                 return new DisplayMode(800, 600, SurfaceFormat.Color);
 #endif
