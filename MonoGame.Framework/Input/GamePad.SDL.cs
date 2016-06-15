@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Input
 
             if (Sdl.Haptic.EffectSupported(gamepad.HapticDevice, ref _hapticLeftRightEffect) == 1)
             {
-                try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some low-end gamepads
+                try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F170 for instance)
                 {
                     Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
                     gamepad.HapticType = 1;
@@ -80,8 +80,15 @@ namespace Microsoft.Xna.Framework.Input
             }
             else if (Sdl.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
             {
-                Sdl.Haptic.RumbleInit(gamepad.HapticDevice);
-                gamepad.HapticType = 2;
+                try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F170 for instance)
+                {
+                    Sdl.Haptic.RumbleInit(gamepad.HapticDevice);
+                    gamepad.HapticType = 2;
+                }
+                catch (Exception)
+                {
+                    Sdl.Haptic.Close(gamepad.HapticDevice);
+                }
             }
             else
                 Sdl.Haptic.Close(gamepad.HapticDevice);
