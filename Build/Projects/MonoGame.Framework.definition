@@ -359,7 +359,10 @@
       <Platforms>iOS,tvOS,MacOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
