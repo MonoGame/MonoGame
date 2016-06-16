@@ -16,7 +16,8 @@ namespace MonoGame.Tools.Pipeline
         public string Text { get; set; }
         public bool Editable { get; set; }
 
-        internal EventHandler _eventHandler;
+        protected EventHandler _eventHandler;
+        protected Rectangle _lastRec;
 
         public CellBase(string category, string name, object value, EventHandler eventHandler = null)
         {
@@ -46,6 +47,10 @@ namespace MonoGame.Tools.Pipeline
 
         public virtual void DrawCell(Graphics g, Rectangle rec, int separatorPos, bool selected)
         {
+            _lastRec = rec;
+            _lastRec.X += separatorPos;
+            _lastRec.Width -= separatorPos - 1;
+
             g.DrawText(SystemFonts.Default(), PropInfo.GetTextColor(selected, !Editable), separatorPos + 5, rec.Y + (rec.Height - PropInfo.TextHeight) / 2, DisplayValue);
         }
     }

@@ -52,10 +52,7 @@ using OpenTK.Graphics.ES11;
 using OpenTK.Graphics.ES20;
 #endif
 #elif DESKTOPGL || ANGLE
-using OpenTK.Graphics;
-using OpenTK.Platform;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #endif
 #if WINDOWS_PHONE
 using System.Windows;
@@ -71,14 +68,11 @@ namespace Microsoft.Xna.Framework
         static int mainThreadId;
 #endif
 
-#if ANDROID
+#if ANDROID || WINDOWS || DESKTOPGL || ANGLE
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
 #elif IOS
         public static EAGLContext BackgroundContext;
-#elif WINDOWS || DESKTOPGL || ANGLE
-        public static IGraphicsContext BackgroundContext;
-        public static IWindowInfo WindowInfo;
 #endif
 
 #if !WINDOWS_PHONE
@@ -191,19 +185,6 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif WINDOWS || DESKTOPGL || ANGLE
-            lock (BackgroundContext)
-            {
-                // Make the context current on this thread
-                BackgroundContext.MakeCurrent(WindowInfo);
-                // Execute the action
-                action();
-                // Must flush the GL calls so the texture is ready for the main context to use
-                GL.Flush();
-                GraphicsExtensions.CheckGLError();
-                // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
-                BackgroundContext.MakeCurrent(null);
-            }
 #elif WINDOWS_PHONE
             BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
@@ -230,7 +211,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID
+#if ANDROID || WINDOWS || DESKTOPGL || ANGLE
         static void Add(Action action)
         {
             lock (actions)

@@ -107,7 +107,7 @@ namespace MonoGame.Utilities
     /// </para>
     ///
     /// <para> Using this stream, applications can compress or decompress data via
-    /// stream <c>Read()</c> and <c>Write()</c> operations.  Either compresssion or
+    /// stream <c>Read()</c> and <c>Write()</c> operations.  Either compression or
     /// decompression can occur through either reading or writing. The compression
     /// format used is ZLIB, which is documented in <see
     /// href="http://www.ietf.org/rfc/rfc1950.txt">IETF RFC 1950</see>, "ZLIB Compressed
@@ -8709,7 +8709,7 @@ namespace MonoGame.Utilities
         /// </summary>
         /// <returns>
         /// The number of bytes produced by encoding the specified characters. This class
-        /// alwas returns the value of <paramref name="count"/>.
+        /// always returns the value of <paramref name="count"/>.
         /// </returns>
         public override int GetByteCount(char[] chars, int index, int count)
         {
@@ -8723,7 +8723,7 @@ namespace MonoGame.Utilities
         /// </summary>
         /// <returns>
         /// The number of characters produced by decoding the specified sequence of bytes. This class
-        /// alwas returns the value of <paramref name="count"/>. 
+        /// always returns the value of <paramref name="count"/>. 
         /// </returns>
         public override int GetCharCount(byte[] bytes, int index, int count)
         {
@@ -8736,7 +8736,7 @@ namespace MonoGame.Utilities
         /// </summary>
         /// <returns>
         /// The maximum number of bytes produced by encoding the specified number of characters. This
-        /// class alwas returns the value of <paramref name="charCount"/>.
+        /// class always returns the value of <paramref name="charCount"/>.
         /// </returns>
         /// <param name="charCount">The number of characters to encode. 
         /// </param>
@@ -8750,7 +8750,7 @@ namespace MonoGame.Utilities
         /// </summary>
         /// <returns>
         /// The maximum number of characters produced by decoding the specified number of bytes. This class
-        /// alwas returns the value of <paramref name="byteCount"/>.
+        /// always returns the value of <paramref name="byteCount"/>.
         /// </returns>
         /// <param name="byteCount">The number of bytes to decode.</param> 
         public override int GetMaxCharCount(int byteCount)

@@ -23,6 +23,7 @@
     <Import file="templates/Common/Content.mgcb" />
     <Import file="templates/Common/OpenTK.dll.config" />
     <Import file="templates/Common/Tao.Sdl.dll.config" />
+    <Import file="templates/Common/MonoGame.Framework.dll.config" />
     <!-- Android Templates -->
     <Import file="templates/MonoGameAndroidProject.xpt.xml" />
     <Import file="templates/MonoGameOUYAProject.xpt.xml" />
@@ -60,6 +61,17 @@
     <Import file="MonoDevelop.MonoGame.Core.dll" />
     <Import file="MonoDevelop.MonoGame.iOS.dll" />
     <Import file="MonoDevelop.MonoGame.Mac.dll" />
+    <!-- Native Libraries -->
+    <Import file="templates/libs/x64/libopenal.so.1" />
+    <Import file="templates/libs/x86/libopenal.so.1" />
+    <Import file="templates/libs/libopenal.1.dylib" />
+    <Import file="templates/libs/x64/soft_oal.dll" />
+    <Import file="templates/libs/x86/soft_oal.dll" />
+    <Import file="templates/libs/x64/libSDL2-2.0.so.0" />
+    <Import file="templates/libs/x86/libSDL2-2.0.so.0" />
+    <Import file="templates/libs/libSDL2-2.0.0.dylib" />
+    <Import file="templates/libs/x64/SDL2.dll" />
+    <Import file="templates/libs/x86/SDL2.dll" />
     <!-- Nuget Packages -->
     <Import file="packages/MonoGame.Framework.Android.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.iOS.3.4.0.459.nupkg" />

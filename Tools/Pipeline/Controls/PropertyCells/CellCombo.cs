@@ -10,10 +10,7 @@ namespace MonoGame.Tools.Pipeline
 {
     public class CellCombo : CellBase
     {
-        public static int Height;
-
         private object _type;
-        private Rectangle _lastRec;
 
         public CellCombo(string category, string name, object value, object type, EventHandler eventHandler) : base(category, name, value, eventHandler)
         {
@@ -61,9 +58,8 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
-            Height = _lastRec.Height;
             combo.Style = "OverrideSize";
-            combo.Width = _lastRec.Width + 1;
+            combo.Width = _lastRec.Width;
             combo.Height = _lastRec.Height;
             control.Add(combo, _lastRec.X, _lastRec.Y);
 
@@ -79,17 +75,9 @@ namespace MonoGame.Tools.Pipeline
                 else
                     _eventHandler(PipelineTypes.Processors[combo.SelectedIndex], EventArgs.Empty);
 
+                combo.Enabled = true;
                 control.Add(combo, _lastRec.X, _lastRec.Y);
             };
-        }
-
-        public override void Draw(Graphics g, Rectangle rec, int separatorPos, bool selected)
-        {
-            _lastRec = rec;
-            _lastRec.X += separatorPos;
-            _lastRec.Width -= separatorPos;
-
-            base.Draw(g, rec, separatorPos, selected);
         }
     }
 }

@@ -30,21 +30,25 @@ using Foundation;
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
+using GLPixelFormat = MonoMac.OpenGL.All;
+using PixelFormat = MonoMac.OpenGL.PixelFormat;
 #else
 using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
+using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #endif
 #endif
 
 #if DESKTOPGL
-using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using OpenGL;
+using GLPixelFormat = OpenGL.PixelFormat;
+using PixelFormat = OpenGL.PixelFormat;
 #endif
 
 #if GLES
 using OpenTK.Graphics.ES20;
-using GLPixelFormat = OpenTK.Graphics.ES20.PixelFormat;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #endif
 
 #if ANDROID
@@ -73,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
-                if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+                if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                 {
                     var imageSize = 0;
                     switch (format)
@@ -179,7 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                     GraphicsExtensions.CheckGLError();
-                    if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+                    if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                     {
                         if (rect.HasValue)
                         {
@@ -269,7 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
-            if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+            if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
             {
                 throw new NotImplementedException();
             }

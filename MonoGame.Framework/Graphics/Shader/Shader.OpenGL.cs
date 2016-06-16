@@ -8,13 +8,16 @@ using System.IO;
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+using Bool = MonoMac.OpenGL.Boolean;
 #else
 using OpenTK.Graphics.OpenGL;
+using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
+using Bool = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -52,10 +55,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.CompileShader(_shaderHandle);
             GraphicsExtensions.CheckGLError();
-            var compiled = 0;
+            int compiled = 0;
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
             GraphicsExtensions.CheckGLError();
-            if (compiled == (int)All.False)
+            if (compiled != (int)Bool.True)
             {
                 var log = GL.GetShaderInfoLog(_shaderHandle);
                 Console.WriteLine(log);

@@ -10,7 +10,7 @@ using OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 using System;
 using System.Collections.Generic;
 #elif GLES

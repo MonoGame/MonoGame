@@ -50,14 +50,17 @@
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
       <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
-	
+
     <FrameworkVersions>
 	  <Platform Name="Windows8">
 	    <Version>v4.5.1</Version>
 	  </Platform>
+	  <Platform Name="Android">
+            <Version>v4.4</Version>
+          </Platform>
     </FrameworkVersions>
 
   </Properties>
@@ -196,13 +199,64 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SDL\MonoGame.Framework.dll.config">
-      <Platforms>Linux</Platforms>
+    <None Include="..\ThirdParty\Dependencies\MonoGame.Framework.dll.config">
+      <Platforms>WindowsGL,Linux</Platforms>
       <Link>MonoGame.Framework.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	
+	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libSDL2-2.0.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libopenal.1.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
@@ -330,6 +384,9 @@
       <Services>OpenALAudio</Services>
     </Compile>
 	<Compile Include="Audio\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Audio\OpenAL.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
@@ -523,6 +580,9 @@
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
+    <Compile Include="Graphics\GraphicsContext.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDevice.DirectX.cs">
       <Services>DirectXGraphics</Services>
@@ -540,11 +600,13 @@
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Graphics\IGraphicsContext.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\ImageEx.cs">
       <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\IWindowInfo.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\Model.cs" />
@@ -566,6 +628,15 @@
     </Compile>
     <Compile Include="Graphics\OcclusionQuery.Null.cs">
       <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.Common.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Graphics\PackedVector\Alpha8.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
@@ -825,14 +896,19 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Graphics\Viewport.cs" />
-
-
+    <Compile Include="Graphics\WindowInfo.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    
     <!-- Microsoft.Xna.Framework.Input -->
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Android.cs">
+      <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -908,7 +984,7 @@
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
-    <Compile Include="Input\KeyState.cs" />    
+    <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
@@ -942,7 +1018,7 @@
       <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\MouseCursor.Default.cs">
-      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS,MacOS,Web</Platforms>
+      <ExcludePlatforms>Linux,WindowsGL</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -956,7 +1032,7 @@
     <Compile Include="Input\Touch\TouchQueue.cs">
 			<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
 	</Compile>
-		
+
     <Page Include="Themes\generic.xaml">
 			<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
 			<Generator>MSBuild:Compile</Generator>
@@ -1108,6 +1184,7 @@
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
+    <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />
     <Compile Include="Utilities\ZLibStream\ZlibStream.cs" />
     <Compile Include="Utilities\Png\PngCommon.cs" />
     <Compile Include="Utilities\Png\PngReader.cs" />
@@ -1272,7 +1349,7 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
 
-	  
+
     <!-- Windows UAP Platform -->
     <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
       <Platforms>WindowsUniversal</Platforms>
@@ -1284,7 +1361,7 @@
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
 
-	  
+
     <!-- Windows Desktop Platfom -->
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>

@@ -18,9 +18,7 @@ using GLPrimitiveType = OpenTK.Graphics.OpenGL.BeginMode;
 #endif
 
 #if DESKTOPGL
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
+using OpenGL;
 #endif
 
 #if ANGLE
@@ -60,6 +58,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal FramebufferHelper framebufferHelper;
 
+        internal int glMajorVersion = 0;
+        internal int glMinorVersion = 0;
         internal int glFramebuffer = 0;
         internal int MaxVertexAttributes;        
         internal List<string> _extensions = new List<string>();
@@ -96,7 +96,27 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetup()
         {
 #if DESKTOPGL || ANGLE
-            GraphicsMode mode = GraphicsMode.Default;
+
+            var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
+
+            if (Context == null || Context.IsDisposed)
+            {
+                Context = GL.CreateContext(windowInfo);
+            }
+
+            Context.MakeCurrent(windowInfo);
+            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
+
+            /*if (Threading.BackgroundContext == null)
+            {
+                Threading.BackgroundContext = GL.CreateContext(windowInfo);
+                Threading.WindowInfo = windowInfo;
+                Threading.BackgroundContext.MakeCurrent(null);
+            }*/
+
+            Context.MakeCurrent(windowInfo);
+
+            /*GraphicsMode mode = GraphicsMode.Default;
             var wnd = OpenTK.Platform.Utilities.CreateSdl2WindowInfo(Game.Instance.Window.Handle);
 
             #if GLES
@@ -164,7 +184,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.WindowInfo = wnd;
                 Threading.BackgroundContext.MakeCurrent(null);
             }
-            Context.MakeCurrent(wnd);
+            Context.MakeCurrent(wnd);*/
+
+
 #endif
 
             MaxTextureSlots = 16;
@@ -180,10 +202,27 @@ namespace Microsoft.Xna.Framework.Graphics
 
             SpriteBatch.NeedsHalfPixelOffset = true;
 
+            // try getting the context version
+            // GL_MAJOR_VERSION and GL_MINOR_VERSION are GL 3.0+ only, so we need to rely on the GL_VERSION string
+            // this string always starts with the version number in the "major.minor" format, but can be followed by
+            // multiple vendor specific characters
+            try
+            {
+                string version = GL.GetString(StringName.Version);
+                glMajorVersion = Convert.ToInt32(version.Substring(0, 1));
+                glMinorVersion = Convert.ToInt32(version.Substring(2, 1));
+            }
+            catch (FormatException)
+            {
+                // if it fails, we assume to be on a 1.1 context
+                glMajorVersion = 1;
+                glMinorVersion = 1;
+            }
 #if !GLES
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;
-			GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+            GraphicsExtensions.CheckGLError ();
 			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
@@ -198,22 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var extstring = GL.GetString(StringName.Extensions);
             GraphicsExtensions.CheckGLError();
             if (!string.IsNullOrEmpty(extstring))
-            {
                 extensions.AddRange(extstring.Split(' '));
-#if DEBUG
-#if ANDROID
-                Android.Util.Log.Debug("MonoGame", "Supported extensions:");
-#else
-                System.Diagnostics.Debug.WriteLine("Supported extensions:");
-#endif
-                foreach (string extension in extensions)
-#if ANDROID
-                    Android.Util.Log.Debug("MonoGame", extension);
-#else
-                    System.Diagnostics.Debug.WriteLine(extension);
-#endif
-#endif
-            }
 
             return extensions;
         }
@@ -313,7 +337,7 @@ namespace Microsoft.Xna.Framework.Graphics
  #if GLES
                     GL.ClearDepth (depth);
  #else
-                    GL.ClearDepth((double)depth);
+                    GL.ClearDepth(depth);
  #endif
                     GraphicsExtensions.CheckGLError();
                     _lastClearDepth = depth;
@@ -341,13 +365,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL || ANGLE
                 Context.Dispose();
                 Context = null;
-
-                if (Threading.BackgroundContext != null)
-                {
-                    Threading.BackgroundContext.Dispose();
-                    Threading.BackgroundContext = null;
-                    Threading.WindowInfo = null;
-                }
 #endif
             });
         }
@@ -403,7 +420,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
             GL.DepthRange(value.MinDepth, value.MaxDepth);
 #else
-            GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
+            GL.DepthRange(value.MinDepth, value.MaxDepth);
 #endif
             GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
                 
@@ -624,14 +641,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         this.framebufferHelper.FramebufferTexture2D((int)(FramebufferAttachment.ColorAttachment0 + i), (int) renderTarget.GetFramebufferTarget(renderTargetBinding), renderTarget.GLTexture);
                     }
-                    this.glResolveFramebuffers.Add(this._currentRenderTargetBindings, glResolveFramebuffer);
+                    this.glResolveFramebuffers.Add((RenderTargetBinding[])this._currentRenderTargetBindings.Clone(), glResolveFramebuffer);
                 }
                 else
                 {
                     this.framebufferHelper.BindFramebuffer(glResolveFramebuffer);
                 }
                 // The only fragment operations which affect the resolve are the pixel ownership test, the scissor test, and dithering.
-                if (this._lastDepthStencilState.StencilEnable)
+                if (this._lastRasterizerState.ScissorTestEnable)
                 {
                     GL.Disable(EnableCap.ScissorTest);
                     GraphicsExtensions.CheckGLError();
@@ -646,7 +663,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 if (renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents && this.framebufferHelper.SupportsInvalidateFramebuffer)
                     this.framebufferHelper.InvalidateReadFramebuffer();
-                if (this._lastDepthStencilState.StencilEnable)
+                if (this._lastRasterizerState.ScissorTestEnable)
                 {
                     GL.Enable(EnableCap.ScissorTest);
                     GraphicsExtensions.CheckGLError();
@@ -730,7 +747,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Activates the Current Vertex/Pixel shader pair into a program.         
         /// </summary>
-        private void ActivateShaderProgram()
+        private unsafe void ActivateShaderProgram()
         {
             // Lookup the shader program.
             var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
@@ -787,7 +804,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-            GL.Uniform4(posFixupLoc, 1, _posFixup);
+            fixed (float* floatPtr = _posFixup)
+            {
+                GL.Uniform4(posFixupLoc, 1, floatPtr);
+            }
             GraphicsExtensions.CheckGLError();
         }
 

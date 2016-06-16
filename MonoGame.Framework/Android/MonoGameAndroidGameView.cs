@@ -290,18 +290,17 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        #region Key and Motion
+        #region Key and Motion and Gamepad
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
-#if OUYA
-            if (GamePad.OnKeyDown(keyCode, e))
-                return true;
-#endif
+            // Handle gamepad inputs in Android/OUYA
+            if ((e.Source & InputSourceType.Gamepad) == InputSourceType.Gamepad)
+                return GamePad.OnKeyDown(keyCode, e);
 
             Keyboard.KeyDown(keyCode);
-            // we need to handle the Back key here because it doesnt work any other way
 #if !OUYA
+            // we need to handle the Back key here because it doesnt work any other way
             if (keyCode == Keycode.Back && !this.backPressed)
             {
                 this.backPressed = true;
@@ -329,13 +328,13 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
         {
-#if OUYA
-            if (GamePad.OnKeyUp(keyCode, e))
-                return true;
-#endif
+            if ((e.Source & InputSourceType.Gamepad) == InputSourceType.Gamepad)
+                return GamePad.OnKeyUp(keyCode, e);
+
             Keyboard.KeyUp(keyCode);
 
 #if !OUYA
+            // we need to handle the Back key here because it doesnt work any other way
             if (keyCode == Keycode.Back)
                 this.backPressed = false;
 #endif
@@ -343,15 +342,13 @@ namespace Microsoft.Xna.Framework
             return true;
         }
 
-#if OUYA
         public override bool OnGenericMotionEvent(MotionEvent e)
         {
-            if (GamePad.OnGenericMotionEvent(e))
-                return true;
+            if ((e.Source & InputSourceType.Gamepad) == InputSourceType.Gamepad || (e.Source & InputSourceType.Joystick) == InputSourceType.Joystick)
+                return GamePad.OnGenericMotionEvent(e);                
 
             return base.OnGenericMotionEvent(e);
         }
-#endif
 
         #endregion
     }
