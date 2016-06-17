@@ -141,6 +141,9 @@ internal static class Sdl
         return pointer;
     }
 
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ClearError")]
+    public static extern void ClearError();
+
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetHint")]
     public static extern IntPtr SDL_GetHint(string name);
 
@@ -740,13 +743,14 @@ internal static class Sdl
 
     public static class Haptic
     {
-        public const uint Infinity = uint.MaxValue;
+        public const uint Infinity = 4292967295U;
 
         public enum EffectId : ushort
         {
-            LeftRight = 1 << 2,
+            LeftRight = (1 << 2),
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct LeftRight
         {
             public EffectId Type;
@@ -765,22 +769,11 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticClose")]
         public static extern void Close(IntPtr haptic);
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticEffectSupported")
-        ]
-        private static extern int SDL_HapticEffectSupported(IntPtr haptic, ref Effect effect);
-
-        public static int EffectSupported(IntPtr haptic, ref Effect effect)
-        {
-            return GetError(SDL_HapticEffectSupported(haptic, ref effect));
-        }
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticEffectSupported")]
+        public static extern int EffectSupported(IntPtr haptic, ref Effect effect);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickIsHaptic")]
-        private static extern int SDL_JoystickIsHaptic(IntPtr joystick);
-
-        public static int IsHaptic(IntPtr joystick)
-        {
-            return GetError(SDL_JoystickIsHaptic(joystick));
-        }
+        public static extern int IsHaptic(IntPtr joystick);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticNewEffect")]
         private static extern int SDL_HapticNewEffect(IntPtr haptic, ref Effect effect);
@@ -790,14 +783,8 @@ internal static class Sdl
             GetError(SDL_HapticNewEffect(haptic, ref effect));
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpenFromJoystick"
-            )]
-        private static extern IntPtr SDL_HapticOpenFromJoystick(IntPtr joystick);
-
-        public static IntPtr OpenFromJoystick(IntPtr joystick)
-        {
-            return GetError(SDL_HapticOpenFromJoystick(joystick));
-        }
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpenFromJoystick")]
+        public static extern IntPtr OpenFromJoystick(IntPtr joystick);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticRumbleInit")]
         private static extern int SDL_HapticRumbleInit(IntPtr haptic);
@@ -815,8 +802,7 @@ internal static class Sdl
             GetError(SDL_HapticRumblePlay(haptic, strength, length));
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticRumbleSupported")
-        ]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticRumbleSupported")]
         private static extern int SDL_HapticRumbleSupported(IntPtr haptic);
 
         public static int RumbleSupported(IntPtr haptic)
