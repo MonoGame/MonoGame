@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -301,6 +301,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        
         /// <summary>
         /// Search for the root bone of the skeletion.
         /// </summary>
@@ -325,19 +326,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
 
                 // Next try searching the children for a root bone.
-                foreach (var nodeContent in node.Children)
-                {
-                    var bone = nodeContent as BoneContent;
-                    if (bone == null) 
-                        continue;
-
-                    // If we found a bone
-                    if (root != null)
-                        throw new InvalidContentException("DuplicateSkeleton", node.Identity);
-
-                    // This is our new root.
-                    root = bone;
-                }
+                root = FindNextBone(node);
 
                 // If we found a root bone then return it, else
                 // we continue the search to the node parent.
@@ -348,6 +337,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // We didn't find any bones!
             return null;
         }
+
+        /// <summary>
+        /// Finds next bone down in the hierarchy
+        /// </summary>
+        /// <param name="node"> Node to start search from</param>
+        public static BoneContent FindNextBone(NodeContent node)
+        {
+            if (node == null)
+                throw new ArgumentNullException("Null passed to FindNextBone");
+            BoneContent bone = node as BoneContent;
+            if (bone != null)
+                return bone;
+            foreach (NodeContent child in node.Children)
+            {
+                bone = child as BoneContent;
+                if (bone != null)
+                    return bone;
+                else
+                {
+                    bone = FindNextBone(child);
+                    if (bone != null)
+                        return bone;
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Traverses a skeleton depth-first and builds a list of its bones.
