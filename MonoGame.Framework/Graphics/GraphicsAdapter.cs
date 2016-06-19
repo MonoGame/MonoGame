@@ -129,14 +129,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 return new DisplayMode(width, height, defaultSurfaceFormat);
             }
         }
-#if DIRECTX
-        public static GraphicsAdapter DefaultAdapter => Adapters[PrimaryAdapterIndex];
-#else
+
         public static GraphicsAdapter DefaultAdapter
         {
             get { return Adapters[PrimaryAdapterIndex]; }
         }
-#endif
 
         public static ReadOnlyCollection<GraphicsAdapter> Adapters 
         {
@@ -196,7 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static bool UseReferenceDevice
         {
-            get { return UseDriverType==DriverType.Reference; }
+            get { return UseDriverType == DriverType.Reference; }
             set { UseDriverType = value ? DriverType.Reference : DriverType.Hardware; }
         }
 
@@ -223,9 +220,16 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
         */
-        public string Description => adapter.Description1.Description;
+        public string Description
+        {
+            get { return adapter.Description1.Description; }
+        }
 
-        public int DeviceId => adapter.Description1.DeviceId;
+        public int DeviceId
+        {
+            get { return adapter.Description1.DeviceId; }
+        }
+
         /*
         public Guid DeviceIdentifier
         {
@@ -235,7 +239,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
         */
-        public string DeviceName => adapter.Outputs[PrimaryOutputIndex].Description.DeviceName;
+        public string DeviceName
+        {
+            get { return adapter.Outputs[PrimaryOutputIndex].Description.DeviceName; }
+        }
+
         /*
         public string DriverDll
         {
@@ -270,17 +278,35 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
         
-        public IntPtr MonitorHandle => adapter.Outputs[PrimaryOutputIndex].Description.MonitorHandle;
+        public IntPtr MonitorHandle
+        {
+            get { return adapter.Outputs[PrimaryOutputIndex].Description.MonitorHandle; }
+        }
 
-        public int Revision => adapter.Description1.Revision;
+        public int Revision
+        {
+            get { return adapter.Description1.Revision; }
+        }
 
-        public int SubSystemId => adapter.Description1.SubsystemId;
+        public int SubSystemId
+        {
+            get { return adapter.Description1.SubsystemId; }
+        }
 
-        public int VendorId => adapter.Description1.VendorId;
+        public int VendorId
+        {
+            get { return adapter.Description1.VendorId; }
+        }
 
-        public long DeviceIdentifier1 => adapter.Description1.Luid;
+        public long DeviceIdentifier1
+        {
+            get { return adapter.Description1.Luid; }
+        }
 
-        public IntPtr Handle => adapter.NativePointer;
+        public IntPtr Handle
+        {
+            get { return adapter.NativePointer; }
+        }
 #endif
 
         /*
@@ -492,8 +518,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Common widescreen modes: 21:9 (2.3333), 16:9 (1.7777), 16:10 (1.6), 2:1 (2)
                 // XNA does not appear to account for rotated displays on the desktop
                 const float limit = 4.0f / 3.0f;
-                var aspect = CurrentDisplayMode.AspectRatio;
-                return aspect > limit;
+                return CurrentDisplayMode.AspectRatio > limit;
             }
         }
 
