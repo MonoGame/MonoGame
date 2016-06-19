@@ -1,11 +1,12 @@
+#region License
 // MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+#endregion
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
 #if MONOMAC
 #if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
@@ -20,6 +21,9 @@ using UIKit;
 using Android.Views;
 using Android.Runtime;
 #endif
+#if DIRECTX
+using SharpDX.DXGI;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -30,116 +34,152 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public enum DriverType
         {
-            /// <summary>
-            /// Hardware device been used for rendering. Maximum speed and performance.
-            /// </summary>
+            /// <summary>Hardware device been used for rendering. Maximum speed and performance.</summary>
             Hardware,
-            /// <summary>
-            /// Emulates the hardware device on CPU. Slowly, only for testing.
-            /// </summary>
+            /// <summary>Emulates the hardware device on CPU. Slowly, only for testing.</summary>
             Reference,
-            /// <summary>
-            /// Useful when <see cref="DriverType.Hardware"/> acceleration does not work.
-            /// </summary>
+            /// <summary>Useful when <see cref="Hardware"/> acceleration does not work.</summary>
             FastSoftware
         }
-       
-        private static ReadOnlyCollection<GraphicsAdapter> _adapters;
 
-        private DisplayModeCollection _supportedDisplayModes;
+        private static ReadOnlyCollection<GraphicsAdapter> adapters;
 
-        
+        private DisplayModeCollection supportedDisplayModes;
+
+        private const int PrimaryAdapterIndex = 0;
 #if MONOMAC
-		private NSScreen _screen;
+        private NSScreen screen;
         internal GraphicsAdapter(NSScreen screen)
         {
-            _screen = screen;
+            this.screen = screen;
         }
 #elif IOS
-		private UIScreen _screen;
+        private UIScreen screen;
         internal GraphicsAdapter(UIScreen screen)
         {
-            _screen = screen;
+            this.screen = screen;
         }
 #elif DESKTOPGL
-        int _displayIndex;
+        int displayIndex;
+#elif DIRECTX
+        private const int PrimaryOutputIndex = 0;
+        private readonly Adapter1 adapter;
+        internal GraphicsAdapter(Adapter1 adapter)
+        {
+            this.adapter = adapter;
+        }
 #else
         internal GraphicsAdapter()
         {
         }
 #endif
-        
+
         public void Dispose()
         {
         }
-            
+
         public DisplayMode CurrentDisplayMode
         {
             get
             {
+                var width = 800;
+                var height = 600;
+                const SurfaceFormat defaultSurfaceFormat = SurfaceFormat.Color;
 #if MONOMAC
-                //Dummy values until MonoMac implements Quartz Display Services
-                SurfaceFormat format = SurfaceFormat.Color;
-                
-                return new DisplayMode((int)_screen.Frame.Width,
-                                       (int)_screen.Frame.Height,
-                                       format);
+                // Dummy values until MonoMac implements Quartz Display Services
+                width = (int)screen.Frame.Width;
+                height = (int)screen.Frame.Height;
 #elif IOS
-                return new DisplayMode((int)(_screen.Bounds.Width * _screen.Scale),
-                       (int)(_screen.Bounds.Height * _screen.Scale),
-                       SurfaceFormat.Color);
+                width = (int)(screen.Bounds.Width * screen.Scale);
+                height = (int)(screen.Bounds.Height * screen.Scale);
 #elif ANDROID
                 View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
-                return new DisplayMode(view.Width, view.Height, SurfaceFormat.Color);
+                width = view.Width;
+                height = view.Height;
 #elif DESKTOPGL
                 var displayIndex = Sdl.Display.GetWindowDisplayIndex(SdlGameWindow.Instance.Handle);
 
                 Sdl.Display.Mode mode;
                 Sdl.Display.GetCurrentDisplayMode(displayIndex, out mode);
 
-                return new DisplayMode(mode.Width, mode.Height, SurfaceFormat.Color);
+                width = mode.Width;
+                height = mode.Height;
 #elif WINDOWS
                 using (var graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
                 {
                     var dc = graphics.GetHdc();
-                    int width = GetDeviceCaps(dc, HORZRES);
-                    int height = GetDeviceCaps(dc, VERTRES);
+                    width = GetDeviceCaps(dc, HORZRES);
+                    height = GetDeviceCaps(dc, VERTRES);
                     graphics.ReleaseHdc(dc);
-                    return new DisplayMode(width, height, SurfaceFormat.Color);
                 }
-#else
-                return new DisplayMode(800, 600, SurfaceFormat.Color);
+#elif DIRECTX
+                using (var factory = new Factory1())
+                {
+                    // Returns primary display from primary adapter since DXGI 1.1!
+                    // https://msdn.microsoft.com/en-us/library/windows/desktop/bb205075%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396#WARP_new_for_Win8
+                    using (var primaryAdapter = factory.GetAdapter1(PrimaryAdapterIndex))
+                    {
+                        using (var output = primaryAdapter.GetOutput(PrimaryOutputIndex))
+                        {
+                            width = output.Description.DesktopBounds.Right;
+                            height = output.Description.DesktopBounds.Bottom;
+                        }
+                    }
+                }
 #endif
+                return new DisplayMode(width, height, defaultSurfaceFormat);
             }
         }
 
         public static GraphicsAdapter DefaultAdapter
         {
-            get { return Adapters[0]; }
+            get { return Adapters[PrimaryAdapterIndex]; }
         }
-        
-        public static ReadOnlyCollection<GraphicsAdapter> Adapters 
+
+        public static ReadOnlyCollection<GraphicsAdapter> Adapters
         {
-            get 
+            get
             {
-                if (_adapters == null) 
+                if (adapters == null)
                 {
 #if MONOMAC
                     GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
-                    for (int i=0; i<NSScreen.Screens.Length; i++) {
+                    for (int i=0; i<NSScreen.Screens.Length; ++i)
+                    {
                         tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
                     }
                     
-                    _adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(tmpAdapters);
 #elif IOS
-					_adapters = new ReadOnlyCollection<GraphicsAdapter>(
-						new [] {new GraphicsAdapter(UIScreen.MainScreen)});
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(
+                        new [] {new GraphicsAdapter(UIScreen.MainScreen)});
+#elif DIRECTX
+                    GraphicsAdapter[] results;
+                    using (var factory = new Factory1())
+                    {
+                        var adapterCount = factory.GetAdapterCount();
+
+                        results = new GraphicsAdapter[adapterCount];
+                        for (var i = 0; i < adapterCount; ++i)
+                        {
+                            using (var tmpAdapter = factory.GetAdapter1(i))
+                            {
+                                // Filter out software adapters
+                                //if ((tmpAdapter.Description1.Flags & AdapterFlags.Software) == 0)
+                                //{
+                                results[i] = new GraphicsAdapter(tmpAdapter);
+                                //}
+                            }
+                        }
+                    }
+
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(results);
 #else
-                    _adapters = new ReadOnlyCollection<GraphicsAdapter>(new[] {new GraphicsAdapter()});
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new[] {new GraphicsAdapter()});
 #endif
                 }
 
-                return _adapters;
+                return adapters;
             }
         }
 
@@ -154,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static bool UseReferenceDevice
         {
-            get { return UseDriverType==DriverType.Reference; }
+            get { return UseDriverType == DriverType.Reference; }
             set { UseDriverType = value ? DriverType.Reference : DriverType.Hardware; }
         }
 
@@ -167,18 +207,121 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static DriverType UseDriverType { get; set; }
 
+#if DIRECTX
         /*
-		public bool QueryRenderTargetFormat(
-			GraphicsProfile graphicsProfile,
-			SurfaceFormat format,
-			DepthFormat depthFormat,
-			int multiSampleCount,
-			out SurfaceFormat selectedFormat,
-			out DepthFormat selectedDepthFormat,
-			out int selectedMultiSampleCount)
-		{
-			throw new NotImplementedException();
-		}
+        public bool QueryRenderTargetFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            throw new NotImplementedException();
+        }
+        */
+        public string Description
+        {
+            get { return adapter.Description1.Description; }
+        }
+
+        public int DeviceId
+        {
+            get { return adapter.Description1.DeviceId; }
+        }
+
+        /*
+        public Guid DeviceIdentifier
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+        */
+        public string DeviceName
+        {
+            get { return adapter.Outputs[PrimaryOutputIndex].Description.DeviceName; }
+        }
+
+        /*
+        public string DriverDll
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Version DriverVersion
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+        */
+        public bool IsDefaultAdapter
+        {
+            get
+            {
+                bool isResult;
+                using (var factory = new Factory1())
+                {
+                    using (var primaryAdapter = factory.GetAdapter1(PrimaryAdapterIndex))
+                    {
+                        isResult = adapter.Equals(primaryAdapter);
+                    }
+                }
+
+                return isResult;
+            }
+        }
+
+        public IntPtr MonitorHandle
+        {
+            get { return adapter.Outputs[PrimaryOutputIndex].Description.MonitorHandle; }
+        }
+
+        public int Revision
+        {
+            get { return adapter.Description1.Revision; }
+        }
+
+        public int SubSystemId
+        {
+            get { return adapter.Description1.SubsystemId; }
+        }
+
+        public int VendorId
+        {
+            get { return adapter.Description1.VendorId; }
+        }
+
+        public long DeviceIdentifier1
+        {
+            get { return adapter.Description1.Luid; }
+        }
+
+        public IntPtr Handle
+        {
+            get { return adapter.NativePointer; }
+        }
+#endif
+
+        /*
+        public bool QueryRenderTargetFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            throw new NotImplementedException();
+        }
 
         public string Description
         {
@@ -267,14 +410,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException();
             }
         }
-        */
-       
-#if DIRECTX && !WINDOWS_PHONE
-        private static readonly Dictionary<SharpDX.DXGI.Format, SurfaceFormat> FormatTranslations = new Dictionary<SharpDX.DXGI.Format, SurfaceFormat>
+
+        public int VendorId
+        {
+            get
             {
-                { SharpDX.DXGI.Format.R8G8B8A8_UNorm, SurfaceFormat.Color },
-                { SharpDX.DXGI.Format.B8G8R8A8_UNorm, SurfaceFormat.Color },
-                { SharpDX.DXGI.Format.B5G6R5_UNorm, SurfaceFormat.Bgr565 },
+                throw new NotImplementedException();
+            }
+        }
+        */
+
+#if DIRECTX && !WINDOWS_PHONE
+        private static readonly Dictionary<Format, SurfaceFormat> FormatTranslations = new Dictionary<Format, SurfaceFormat>
+            {
+                { Format.R8G8B8A8_UNorm, SurfaceFormat.Color },
+                { Format.B8G8R8A8_UNorm, SurfaceFormat.Color },
+                { Format.B5G6R5_UNorm, SurfaceFormat.Bgr565 },
             };
 #endif
 
@@ -282,22 +433,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                bool displayChanged = false;
 #if DESKTOPGL
-                var displayIndex = Sdl.Display.GetWindowDisplayIndex (SdlGameWindow.Instance.Handle);
-                displayChanged = displayIndex != _displayIndex;
-#endif
-                if (_supportedDisplayModes == null || displayChanged)
+                var newDisplayIndex = Sdl.Display.GetWindowDisplayIndex (SdlGameWindow.Instance.Handle);
+                if (supportedDisplayModes == null || newDisplayIndex != displayIndex)
                 {
-                    var modes = new List<DisplayMode>(new[] { CurrentDisplayMode, });
-
+#else
+                if (supportedDisplayModes == null)
+                {
+#endif
+                    var modes = new List<DisplayMode>();
 #if DESKTOPGL
-                    _displayIndex = displayIndex;
-                    modes.Clear();
+                    displayIndex = newDisplayIndex;
                     
                     var modeCount = Sdl.Display.GetNumDisplayModes(displayIndex);
 
-                    for (int i = 0;i < modeCount;i++)
+                    for (var i = 0; i < modeCount; ++i)
                     {
                         Sdl.Display.Mode mode;
                         Sdl.Display.GetDisplayMode(displayIndex, i, out mode);
@@ -309,64 +459,67 @@ namespace Microsoft.Xna.Framework.Graphics
                             modes.Add(displayMode);
                     }
 #elif DIRECTX && !WINDOWS_PHONE
-                    var dxgiFactory = new SharpDX.DXGI.Factory1();
-                    var adapter = dxgiFactory.GetAdapter(0);
-                    var output = adapter.Outputs[0];
-
-                    modes.Clear();
-                    foreach (var formatTranslation in FormatTranslations)
+                    using (var dxgiFactory = new Factory1())
                     {
-                        var displayModes = output.GetDisplayModeList(formatTranslation.Key, 0);
-                        foreach (var displayMode in displayModes)
+                        using (var primaryAdapter = dxgiFactory.GetAdapter(PrimaryAdapterIndex))
                         {
-                            var xnaDisplayMode = new DisplayMode(displayMode.Width, displayMode.Height, formatTranslation.Value);
-                            if (!modes.Contains(xnaDisplayMode))
-                                modes.Add(xnaDisplayMode);
+                            using (var primaryOutput = primaryAdapter.Outputs[PrimaryOutputIndex])
+                            {
+                                foreach (var formatTranslation in FormatTranslations)
+                                {
+                                    var displayModes = primaryOutput.GetDisplayModeList(formatTranslation.Key, 0);
+                                    foreach (var displayMode in displayModes)
+                                    {
+                                        var mode = new DisplayMode(displayMode.Width, displayMode.Height, formatTranslation.Value);
+                                        if (!modes.Contains(mode))
+                                        {
+                                            modes.Add(mode);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-
-                    output.Dispose();
-                    adapter.Dispose();
-                    dxgiFactory.Dispose();
 #endif
-                    modes.Sort (delegate (DisplayMode a, DisplayMode b) {
-                        if (a == b) return 0;
-                        if (a.Format <= b.Format && a.Width <= b.Width && a.Height <= b.Height) return -1;
-                        else return 1;
+                    modes.Sort(delegate (DisplayMode a, DisplayMode b)
+                    {
+                        if (a.Equals(b))
+                        {
+                            return 0;
+                        }
+                        // FIXME: XNA did this in opposite order on PC with DirectX! It would also align better when primary display index = 0 compares with the highest possible screen resolution index = 0.
+                        if (a.Format <= b.Format &&
+                            a.Width <= b.Width &&
+                            a.Height <= b.Height)
+                        {
+                            return -1;
+                        }
+
+                        return 1;
                     });
-                    _supportedDisplayModes = new DisplayModeCollection(modes);
+
+                    supportedDisplayModes = new DisplayModeCollection(modes);
                 }
 
-                return _supportedDisplayModes;
+                return supportedDisplayModes;
             }
         }
-
-        /*
-        public int VendorId
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-        */
 
         /// <summary>
         /// Gets a <see cref="System.Boolean"/> indicating whether
         /// <see cref="GraphicsAdapter.CurrentDisplayMode"/> has a
         /// Width:Height ratio corresponding to a widescreen <see cref="DisplayMode"/>.
-        /// Common widescreen modes include 16:9, 16:10 and 2:1.
+        /// Common widescreen modes include 21:9, 16:9, 16:10 and 2:1.
         /// </summary>
         public bool IsWideScreen
         {
             get
             {
-                // Common non-widescreen modes: 4:3, 5:4, 1:1
-                // Common widescreen modes: 16:9, 16:10, 2:1
+                // Common non-widescreen modes: 4:3 (1.3333), 5:4 (1.25), 1:1 (1)
+                // Common widescreen modes: 21:9 (2.3333), 16:9 (1.7777), 16:10 (1.6), 2:1 (2)
                 // XNA does not appear to account for rotated displays on the desktop
                 const float limit = 4.0f / 3.0f;
-                var aspect = CurrentDisplayMode.AspectRatio;
-                return aspect > limit;
+                return CurrentDisplayMode.AspectRatio > limit;
             }
         }
 

@@ -29,53 +29,36 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     [DataContract]
-    public class DisplayMode
+    public class DisplayMode : IEquatable<DisplayMode>
     {
-        #region Fields
-
-        private SurfaceFormat format;
-        private int height;
-        private int width;
-
-        #endregion Fields
-
         #region Properties
-        
-        public float AspectRatio {
-            get { return (float)width / (float)height; }
-        }
 
-        public SurfaceFormat Format {
-            get { return format; }
-        }
+        public float AspectRatio { get; }
 
-        public int Height {
-            get { return this.height; }
-        }
+        public SurfaceFormat Format { get; }
 
-        public int Width {
-            get { return this.width; }
-        }
-        
-        public Rectangle TitleSafeArea {
-            get { return new Rectangle(0, 0, Width, Height); }    
-        }
+        public int Height { get; }
+
+        public int Width { get; }
+
+        public Rectangle TitleSafeArea { get; }
 
         #endregion Properties
 
         #region Constructors
-        
+
         internal DisplayMode(int width, int height, SurfaceFormat format)
         {
-            this.width = width;
-            this.height = height;
-            this.format = format;
+            Width = width;
+            Height = height;
+            Format = format;
+            AspectRatio = width / (float)height;
+            TitleSafeArea = new Rectangle(0, 0, width, height);
         }
 
         #endregion Constructors
@@ -89,36 +72,42 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool operator ==(DisplayMode left, DisplayMode right)
         {
-            if (ReferenceEquals(left, right)) //Same object or both are null
+            if (ReferenceEquals(left, right))
             {
+                // Same object or both are null
                 return true;
             }
             if (ReferenceEquals(left, null) || ReferenceEquals(right, null))
             {
                 return false;
             }
-            return (left.format == right.format) &&
-                (left.height == right.height) &&
-                (left.width == right.width);
+            return (left.Format == right.Format) &&
+                   (left.Height == right.Height) &&
+                   (left.Width == right.Width);
         }
 
         #endregion Operators
 
         #region Public Methods
 
-        public override bool Equals(object obj)
+        public bool Equals(DisplayMode other)
         {
-            return obj is DisplayMode && this == (DisplayMode)obj;
+            return Format == other.Format && Width == other.Width && Height == other.Height;
+        }
+
+        public override bool Equals(object other)
+        {
+            return other is DisplayMode && this == (DisplayMode)other;
         }
 
         public override int GetHashCode()
         {
-            return (this.width.GetHashCode() ^ this.height.GetHashCode() ^ this.format.GetHashCode());
+            return Width.GetHashCode() ^ Height.GetHashCode() ^ Format.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "{{Width:" + this.width + " Height:" + this.height + " Format:" + this.Format + "}}";
+            return string.Format("{{{{Width:{0} Height:{1} Format:{2}}}}}", Width, Height, Format);
         }
 
         #endregion Public Methods
