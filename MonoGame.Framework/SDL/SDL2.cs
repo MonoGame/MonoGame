@@ -38,36 +38,89 @@ internal static class Sdl
         GameController = 0x00002000,
     }
 
-    public enum EventType
+    public enum EventType : uint
     {
+        First = 0,
+
         Quit = 0x100,
+
         WindowEvent = 0x200,
+        SysWM = 0x201,
+
         KeyDown = 0x300,
         KeyUp = 0x301,
+        TextEditing = 0x302,
         TextInput = 0x303,
+
+        MouseMotion = 0x400,
+        MouseButtonDown = 0x401,
+        MouseButtonup = 0x402,
+        MouseWheel = 0x403,
+
+        JoyAxisMotion = 0x600,
+        JoyBallMotion = 0x601,
+        JoyHatMotion = 0x602,
+        JoyButtonDown = 0x603,
+        JoyButtonUp = 0x604,
         JoyDeviceAdded = 0x605,
         JoyDeviceRemoved = 0x606,
+
+        ControllerAxisMotion = 0x650,
+        ControllerButtonDown = 0x651,
+        ControllerButtonUp = 0x652,
         ControllerDeviceAdded = 0x653,
         ControllerDeviceRemoved = 0x654,
-        MouseWheel = 0x403,
+        ControllerDeviceRemapped = 0x654,
+
+        FingerDown = 0x700,
+        FingerUp = 0x701,
+        FingerMotion = 0x702,
+
+        DollarGesture = 0x800,
+        DollarRecord = 0x801,
+        MultiGesture = 0x802,
+
+        ClipboardUpdate = 0x900,
+
+        DropFile = 0x1000,
+
+        AudioDeviceAdded = 0x1100,
+        AudioDeviceRemoved = 0x1101,
+
+        RenderTargetsReset = 0x2000,
+        RenderDeviceReset = 0x2001,
+
+        UserEvent = 0x8000,
+
+        Last = 0xFFFF
     }
     
     public enum EventAction
     {
+        AddEvent = 0x0,
+        PeekEvent = 0x1,
         GetEvent = 0x2,
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 56)]
     public struct Event
     {
-        [FieldOffset(0)] public EventType Type;
-        [FieldOffset(0)] public Window.Event Window;
-        [FieldOffset(0)] public Keyboard.Event Key;
-        [FieldOffset(0)] public Keyboard.TextEditingEvent Edit;
-        [FieldOffset(0)] public Keyboard.TextInputEvent Text;
-        [FieldOffset(0)] public Mouse.WheelEvent Wheel;
-        [FieldOffset(0)] public Joystick.DeviceEvent JoystickDevice;
-        [FieldOffset(0)] public GameController.DeviceEvent ControllerDevice;
+        [FieldOffset(0)]
+        public EventType Type;
+        [FieldOffset(0)]
+        public Window.Event Window;
+        [FieldOffset(0)]
+        public Keyboard.Event Key;
+        [FieldOffset(0)]
+        public Keyboard.TextEditingEvent Edit;
+        [FieldOffset(0)]
+        public Keyboard.TextInputEvent Text;
+        [FieldOffset(0)]
+        public Mouse.WheelEvent Wheel;
+        [FieldOffset(0)]
+        public Joystick.DeviceEvent JoystickDevice;
+        [FieldOffset(0)]
+        public GameController.DeviceEvent ControllerDevice;
     }
 
     public struct Rectangle
@@ -532,6 +585,7 @@ internal static class Sdl
             NumLock = 0x1000,
             CapsLock = 0x2000,
             AltGr = 0x4000,
+            Reserved = 0x8000,
             Ctrl = (LeftCtrl | RightCtrl),
             Shift = (LeftShift | RightShift),
             Alt = (LeftAlt | RightAlt),
