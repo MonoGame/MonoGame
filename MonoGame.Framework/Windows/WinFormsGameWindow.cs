@@ -138,10 +138,7 @@ namespace MonoGame.Framework
             _form = new WinFormsGameForm(this);
             _form.ClientSize = new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
 
-            // When running unit tests this can return null.
-            var assembly = Assembly.GetEntryAssembly();
-            if (assembly != null)
-                _form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            SetIcon();
             Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             _form.MaximizeBox = false;
@@ -164,6 +161,20 @@ namespace MonoGame.Framework
             _form.KeyPress += OnKeyPress;
 
             RegisterToAllWindows();
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
+        private static extern IntPtr ExtractIcon(IntPtr hInst, string exeFileName, int iconIndex);
+
+        private void SetIcon()
+        {
+            // When running unit tests this can return null.
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly == null)
+                return;
+            var handle = ExtractIcon(IntPtr.Zero, assembly.Location, 0);
+            if (handle != IntPtr.Zero)
+                _form.Icon = Icon.FromHandle(handle);
         }
 
         ~WinFormsGameWindow()
