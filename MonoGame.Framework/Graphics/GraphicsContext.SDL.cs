@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework;
 
 namespace OpenGL
 {
@@ -35,6 +36,7 @@ namespace OpenGL
                 return;
             
             SetWindowHandle(info);
+            Threading.BackgroundContext = Sdl.GL.CreateContext (_winHandle);
             _context = Sdl.GL.CreateContext(_winHandle);
 
             // GL entry points must be loaded after the GL context creation, otherwise some Windows drivers will return only GL 1.3 compatible functions

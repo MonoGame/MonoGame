@@ -160,6 +160,7 @@ namespace Microsoft.Xna.Framework
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleBuffer, 1);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMajorVersion, 2);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMinorVersion, 1);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ShareWithCurrentContext, 1);
             
             _handle = Sdl.Window.Create (title,
                 _winx - _width / 2, _winy - _height / 2,
