@@ -149,6 +149,9 @@ internal static class Sdl
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_DisableScreenSaver")]
     public static extern void DisableScreenSaver();
 
+    [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_EnableScreenSaver")]
+    public static extern void EnableScreenSaver ();
+
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetVersion")]
     public static extern void GetVersion(out Version version);
 
