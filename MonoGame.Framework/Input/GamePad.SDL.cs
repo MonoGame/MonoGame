@@ -61,37 +61,42 @@ namespace Microsoft.Xna.Framework.Input
 
             Gamepads.Add(deviceId, gamepad);
 
-            if (Sdl.Haptic.IsHaptic(jdevice) == 0)
-                return;
-
-            gamepad.HapticDevice = Sdl.Haptic.OpenFromJoystick(jdevice);
-
-            if (Sdl.Haptic.EffectSupported(gamepad.HapticDevice, ref _hapticLeftRightEffect) == 1)
+            if (Sdl.Haptic.IsHaptic(jdevice) == 1)
             {
-                try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F170 for instance)
+
+                gamepad.HapticDevice = Sdl.Haptic.OpenFromJoystick(jdevice);
+
+                if (gamepad.HapticDevice != IntPtr.Zero && Sdl.Haptic.EffectSupported(gamepad.HapticDevice, ref _hapticLeftRightEffect) == 1)
                 {
-                    Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
-                    gamepad.HapticType = 1;
+                    try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F710, F310 for instance)
+                    {
+                        Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
+                        gamepad.HapticType = 1;
+                    }
+                    catch (Exception)
+                    {
+                        Sdl.Haptic.Close(gamepad.HapticDevice);
+                    }
                 }
-                catch (Exception)
+                else if (gamepad.HapticDevice != IntPtr.Zero && Sdl.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
+                {
+                    try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F710, F310 for instance)
+                    {
+                        Sdl.Haptic.RumbleInit(gamepad.HapticDevice);
+                        gamepad.HapticType = 2;
+                    }
+                    catch (Exception)
+                    {
+                        Sdl.Haptic.Close(gamepad.HapticDevice);
+                    }
+                }
+                else
                 {
                     Sdl.Haptic.Close(gamepad.HapticDevice);
                 }
             }
-            else if (Sdl.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
-            {
-                try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F170 for instance)
-                {
-                    Sdl.Haptic.RumbleInit(gamepad.HapticDevice);
-                    gamepad.HapticType = 2;
-                }
-                catch (Exception)
-                {
-                    Sdl.Haptic.Close(gamepad.HapticDevice);
-                }
-            }
-            else
-                Sdl.Haptic.Close(gamepad.HapticDevice);
+
+            Sdl.ClearError(); // in case anything wrong happened with the haptic init
         }
 
         internal static void RemoveDevice(int instanceid)
@@ -104,7 +109,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private static void DisposeDevice(GamePadInfo info)
         {
-            Sdl.Haptic.Close(info.HapticDevice);
+            if (info.HapticType > 0)
+                Sdl.Haptic.Close(info.HapticDevice);
             Sdl.GameController.Close(info.Device);
         }
 
