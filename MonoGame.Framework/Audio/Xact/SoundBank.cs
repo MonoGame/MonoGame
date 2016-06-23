@@ -18,8 +18,6 @@ namespace Microsoft.Xna.Framework.Audio
         readonly WaveBank[] _waveBanks;
         readonly Dictionary<string, Cue> _cues = new Dictionary<string, Cue>();
         
-        public bool IsDisposed { get; private set; }
-
         internal AudioEngine AudioEngine { get { return _audioengine; } }
         
         /// <param name="audioEngine">AudioEngine that will be associated with this sound bank.</param>
@@ -270,21 +268,46 @@ namespace Microsoft.Xna.Framework.Audio
             cue.Apply3D(listener, emitter);
         }
 
-        #region IDisposable implementation
         /// <summary>
-        /// Immediately releases any unmanaged resources used by this object.
+        /// This event is triggered when the SoundBank is disposed.
+        /// </summary>
+        public event EventHandler<EventArgs> Disposing;
+
+        /// <summary>
+        /// Is true of the SoundBank has been disposed.
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// Disposes the SoundBank.
         /// </summary>
         public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~SoundBank()
+        {
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
         {
             if (IsDisposed)
                 return;
 
-            foreach (var cue in _cues.Values)
-                cue.Dispose();
-
             IsDisposed = true;
+
+            if (disposing)
+            {
+                foreach (var cue in _cues.Values)
+                    cue.Dispose();
+
+                if (Disposing != null)
+                    Disposing(this, EventArgs.Empty);
+            }
         }
-        #endregion
     }
 }
 

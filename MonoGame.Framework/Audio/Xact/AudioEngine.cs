@@ -305,12 +305,43 @@ namespace Microsoft.Xna.Framework.Audio
 
             _variables[i].SetValue(value);
         }
-        
+
+        /// <summary>
+        /// This event is triggered when the AudioEngine is disposed.
+        /// </summary>
+        public event EventHandler<EventArgs> Disposing;
+
+        /// <summary>
+        /// Is true of the AudioEngine has been disposed.
+        /// </summary>
         public bool IsDisposed { get; private set; }
 
+        /// <summary>
+        /// Disposes the AudioEngine.
+        /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~AudioEngine()
+        {
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) 
+                return;
+
             IsDisposed = true;
+
+            // TODO: Should we be forcing any active
+            // audio cues to stop here?
+
+            if (disposing && Disposing != null)
+                Disposing(this, EventArgs.Empty);
         }
     }
 }

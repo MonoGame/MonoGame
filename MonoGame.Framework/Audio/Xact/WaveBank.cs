@@ -16,8 +16,6 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundEffect[] _sounds;
         private string _bankName;
 
-        public bool IsDisposed { get; private set; }
-
         struct Segment
         {
             public int Offset;
@@ -421,18 +419,46 @@ namespace Microsoft.Xna.Framework.Audio
             return _sounds[trackIndex];
         }
 
-        #region IDisposable implementation
-        public void Dispose ()
+        /// <summary>
+        /// This event is triggered when the WaveBank is disposed.
+        /// </summary>
+        public event EventHandler<EventArgs> Disposing;
+
+        /// <summary>
+        /// Is true of the WaveBank has been disposed.
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// Disposes the WaveBank.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~WaveBank()
+        {
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
         {
             if (IsDisposed)
                 return;
 
-            foreach (var s in _sounds)
-                s.Dispose();
-
             IsDisposed = true;
+
+            if (disposing)
+            {
+                foreach (var s in _sounds)
+                    s.Dispose();
+
+                if (Disposing != null)
+                    Disposing(this, EventArgs.Empty);
+            }
         }
-        #endregion
     }
 }
 

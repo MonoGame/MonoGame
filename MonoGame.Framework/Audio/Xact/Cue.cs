@@ -300,16 +300,37 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
         
-        
-        /// <summary>Indicates whether or not the object has been disposed.</summary>
-        public bool IsDisposed { get { return false; } }
-        
-        #region IDisposable implementation
-        /// <summary>Immediately releases any unmanaged resources used by this object.</summary>
-        public void Dispose ()
+        /// <summary>
+        /// This event is triggered when the Cue is disposed.
+        /// </summary>
+        public event EventHandler<EventArgs> Disposing;
+
+        /// <summary>
+        /// Is true of the Cue has been disposed.
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// Disposes the Cue.
+        /// </summary>
+        public void Dispose()
         {
+            Dispose(true);
         }
-        #endregion
+
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed)
+                return;
+
+            IsDisposed = true;
+
+            if (disposing)
+            {
+                if (Disposing != null)
+                    Disposing(this, EventArgs.Empty);
+            }
+        }
     }
 }
 
