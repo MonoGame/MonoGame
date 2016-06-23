@@ -40,8 +40,7 @@ namespace Microsoft.Xna.Framework.Audio
                 reader.ReadUInt16(); // toolVersion
 
                 uint formatVersion = reader.ReadUInt16();
-                // TODO: This does not match XNA, XNA uses 43.
-                if (formatVersion != 46) 
+                if (formatVersion != 43)
                     Debug.WriteLine("Warning: SoundBank format {0} not supported.", formatVersion);
 
                 reader.ReadUInt16(); // crc, TODO: Verify crc (FCS16)
