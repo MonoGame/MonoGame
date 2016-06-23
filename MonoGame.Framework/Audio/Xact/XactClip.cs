@@ -442,10 +442,10 @@ namespace Microsoft.Xna.Framework.Audio
                 evt.SetTrackVolume(volume);
 	    }
 
-        public void Apply3D(AudioListener listener, AudioEmitter emitter)
+        public void SetPan(float pan)
         {
             foreach (var evt in _events)
-                evt.Apply3D(listener, emitter);
+                evt.SetTrackPan(pan);
         }
     }
 }

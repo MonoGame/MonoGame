@@ -194,6 +194,12 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+	    public override void SetTrackPan(float pan)
+	    {
+            if (_wav != null)
+                _wav.Pan = pan;
+	    }
+
         public override void SetFade(float fadeInDuration, float fadeOutDuration)
         {
             // TODO
@@ -222,12 +228,6 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             return _wav != null && _wav.State != SoundState.Stopped;
-        }
-
-        public override void Apply3D(AudioListener listener, AudioEmitter emitter)
-        {
-            if (_wav != null)
-                _wav.Apply3D(listener, emitter);
         }
     }
 }

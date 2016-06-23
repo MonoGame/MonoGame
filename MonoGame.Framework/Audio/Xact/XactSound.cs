@@ -20,7 +20,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         private SoundEffectInstance _wave;
 
-        private float _cueVolume;
+        private float _cueVolume = 1;
+	    private float _cuePitch = 0;
+
+	    internal readonly int[] RpcCurves;
 
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
@@ -29,9 +32,10 @@ namespace Microsoft.Xna.Framework.Audio
             _soundBank = soundBank;
             _waveBankIndex = waveBankIndex;
             _trackIndex = trackIndex;
+            RpcCurves = new int[0];
         }
 
-		public XactSound(SoundBank soundBank, BinaryReader soundReader)
+		public XactSound(AudioEngine engine, SoundBank soundBank, BinaryReader soundReader)
 		{
             _soundBank = soundBank;
 			
@@ -46,7 +50,7 @@ namespace Microsoft.Xna.Framework.Audio
 			soundReader.ReadByte(); //priority
             soundReader.ReadUInt16(); // filter stuff?
 			
-			uint numClips = 0;
+			var numClips = 0;
 			if (_complexSound)
 				numClips = soundReader.ReadByte();
 			else 
@@ -55,10 +59,22 @@ namespace Microsoft.Xna.Framework.Audio
 				_waveBankIndex = soundReader.ReadByte();
 			}
 
-			if (hasRPCs)
+			if (!hasRPCs)
+                RpcCurves = new int[0];
+            else
 			{
 				var current = soundReader.BaseStream.Position;
+
+                // This doesn't seem to be used... might have been there
+                // to allow for some future file format expansion.
 				var dataLength = soundReader.ReadUInt16();
+
+			    var numPresets = soundReader.ReadByte();
+			    RpcCurves = new int[numPresets];
+			    for (var i = 0; i < numPresets; i++)
+                    RpcCurves[i] = engine.GetRpcIndex(soundReader.ReadUInt32());
+
+                // Just in case seek to the right spot.
 				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
 			}
 
@@ -132,8 +148,8 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
-                _wave.Pitch = _pitch;
-                _wave.Volume = _volume * category._volume[0];
+                _wave.Pitch = _pitch + _cuePitch;
+                _wave.Volume = _volume * _cueVolume * category._volume[0];
                 _wave.Play();
 			}
 		}
@@ -220,6 +236,22 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+	    internal void UpdatePitch()
+	    {
+            var pitch = _pitch + _cuePitch;
+             
+            if (_complexSound)
+            {
+                //foreach (var clip in _soundClips)
+                    //clip.AddPitch(volume);
+            }
+            else
+            {
+                if (_wave != null)
+                    _wave.Pitch = pitch;
+            }
+	    }
+
         internal void UpdateCategoryVolume(float categoryVolume)
         {
             // The different volumes modulate each other.
@@ -242,6 +274,26 @@ namespace Microsoft.Xna.Framework.Audio
             _cueVolume = volume;
             var category = _soundBank.AudioEngine.Categories[_categoryID];
             UpdateCategoryVolume(category._volume[0]);
+        }
+
+        internal void SetCuePitch(float pitch)
+        {
+            _cuePitch = pitch;
+            UpdatePitch();
+        }
+
+        internal void SetCuePan(float pan)
+        {
+            if (_complexSound)
+            {
+                foreach (var clip in _soundClips)
+                    clip.SetPan(pan);
+            }
+            else
+            {
+                if (_wave != null)
+                    _wave.Pan = pan;
+            }
         }
 
 		public bool Playing 
@@ -294,20 +346,6 @@ namespace Microsoft.Xna.Framework.Audio
                 return _wave != null && _wave.State == SoundState.Paused;
 			}
 		}
-
-        public void Apply3D(AudioListener listener, AudioEmitter emitter)
-        {
-            if (_complexSound)
-            {
-                foreach (var clip in _soundClips)
-                    clip.Apply3D(listener, emitter);
-            }
-            else
-            {
-                if (_wave != null)
-                    _wave.Apply3D(listener, emitter);
-            }
-        }
     }
 }
 

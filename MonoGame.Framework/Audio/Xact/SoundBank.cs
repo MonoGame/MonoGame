@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                             var oldPosition = stream.Position;
                             stream.Seek(soundOffset, SeekOrigin.Begin);
-                            XactSound sound = new XactSound(this, reader);
+                            XactSound sound = new XactSound(audioEngine, this, reader);
                             stream.Seek(oldPosition, SeekOrigin.Begin);
 
                             Cue cue = new Cue(_audioengine, cueNames[i], sound);
@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                                 var oldPosition = stream.Position;
                                 stream.Seek(soundOffset, SeekOrigin.Begin);
-                                XactSound sound = new XactSound(this, reader);
+                                XactSound sound = new XactSound(audioEngine, this, reader);
                                 stream.Seek(oldPosition, SeekOrigin.Begin);
 
                                 cue = new Cue(_audioengine, cueNames[numSimpleCues + i], sound);
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                                                 var oldPosition = stream.Position;
                                                 stream.Seek(soundOffset, SeekOrigin.Begin);
-                                                cueSounds[j] = new XactSound(this, reader);
+                                                cueSounds[j] = new XactSound(audioEngine, this, reader);
                                                 stream.Seek(oldPosition, SeekOrigin.Begin);
                                                 break;
                                             }
@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                                                 var oldPosition = stream.Position;
                                                 stream.Seek(soundOffset, SeekOrigin.Begin);
-                                                cueSounds[j] = new XactSound(this, reader);
+                                                cueSounds[j] = new XactSound(audioEngine, this, reader);
                                                 stream.Seek(oldPosition, SeekOrigin.Begin);
                                                 break;
                                             }

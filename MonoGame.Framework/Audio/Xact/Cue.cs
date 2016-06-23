@@ -19,8 +19,12 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly XactSound[] _sounds;
 		private readonly float[] _probs;
 
+        private readonly RpcVariable[] _variables;
+
         private XactSound _curSound;
-        private float _volume = 1.0f;
+
+        private bool _applied3D;
+        private bool _played;
 
         /// <summary>Indicates whether or not the cue is currently paused.</summary>
         /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
@@ -102,6 +106,7 @@ namespace Microsoft.Xna.Framework.Audio
 			_sounds[0] = sound;
 			_probs = new float[1];
 			_probs[0] = 1.0f;
+            _variables = engine.CreateCueVariables();
 		}
 		
 		internal Cue(AudioEngine engine, string cuename, XactSound[] sounds, float[] probs)
@@ -110,6 +115,7 @@ namespace Microsoft.Xna.Framework.Audio
 			_name = cuename;
 			_sounds = sounds;
 			_probs = probs;
+            _variables = engine.CreateCueVariables();
 		}
 
         /// <summary>Pauses playback.</summary>
@@ -123,15 +129,16 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>Calling Play when the Cue already is playing can result in an InvalidOperationException.</remarks>
 		public void Play()
 		{
-            if (!_engine._activeCues.Contains(this))
-                _engine._activeCues.Add(this);
+            if (!_engine.ActiveCues.Contains(this))
+                _engine.ActiveCues.Add(this);
 			
 			//TODO: Probabilities
             var index = XactHelpers.Random.Next(_sounds.Length);
             _curSound = _sounds[index];
 			
-			_curSound.SetCueVolume(_volume);
+			_curSound.SetCueVolume(1.0f);
 			_curSound.Play();
+            _played = true;
 		}
 
         /// <summary>Resumes playback of a paused Cue.</summary>
@@ -145,30 +152,41 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="options">Specifies if the sound should play any pending release phases or transitions before stopping.</param>
 		public void Stop(AudioStopOptions options)
 		{
-            _engine._activeCues.Remove(this);
+            _engine.ActiveCues.Remove(this);
 			
 			if (_curSound != null)
                 _curSound.Stop(options);
 		}
-		
+
+        private int FindVariable(string name)
+        {
+            // Do a simple linear search... which is fast
+            // for as little variables as most cues have.
+            for (var i = 0; i < _variables.Length; i++)
+            {
+                if (_variables[i].Name == name)
+                    return i;
+            }
+
+            return -1;
+        }
+
         /// <summary>
         /// Sets the value of a cue-instance variable based on its friendly name.
         /// </summary>
         /// <param name="name">Friendly name of the variable to set.</param>
         /// <param name="value">Value to assign to the variable.</param>
         /// <remarks>The friendly name is a value set from the designer.</remarks>
-		public void SetVariable (string name, float value)
+		public void SetVariable(string name, float value)
 		{
-			if (name == "Volume") 
-            {
-				_volume = value;
-				if (_curSound != null)
-                    _curSound.SetCueVolume(_volume);
-			} 
-            else
-            {
-				_engine.SetGlobalVariable (name, value);
-			}
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            var i = FindVariable(name);
+            if (i == -1)
+                throw new IndexOutOfRangeException("The specified variable index is invalid.");
+
+            _variables[i].SetValue(value);
 		}
 
         /// <summary>Gets a cue-instance variable value based on its friendly name.</summary>
@@ -178,12 +196,16 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>Cue-instance variables are useful when multiple instantiations of a single cue (and its associated sounds) are required (for example, a "car" cue where there may be more than one car at any given time). While a global variable allows multiple audio elements to be controlled in unison, a cue instance variable grants discrete control of each instance of a cue, even for each copy of the same cue.</para>
         /// <para>The friendly name is a value set from the designer.</para>
         /// </remarks>
-		public float GetVariable (string name)
+		public float GetVariable(string name)
 		{
-			if (name == "Volume")
-				return _volume;
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
 
-            return _engine.GetGlobalVariable (name);
+            var i = FindVariable(name);
+            if (i == -1)
+                throw new IndexOutOfRangeException("The specified variable index is invalid.");
+
+            return _variables[i].Value;
 		}
 
         /// <summary>Updates the simulated 3D Audio settings calculated between an AudioEmitter and AudioListener.</summary>
@@ -195,14 +217,87 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
 		public void Apply3D(AudioListener listener, AudioEmitter emitter) 
         {
+            if (listener == null)
+                throw new ArgumentNullException("listener");
+            if (emitter == null)
+                throw new ArgumentNullException("emitter");
+
+            if (_played && !_applied3D)
+                throw new InvalidOperationException("You must call Apply3D on a Cue before calling Play to be able to call Apply3D after calling Play.");
+
+            var direction = listener.Position - emitter.Position;
+
+            // Set the distance for falloff.
+            var distance = direction.Length();
+            var i = FindVariable("Distance");
+            _variables[i].SetValue(distance);
+
+            // Calculate the orientation.
+            if (distance > 0.0f)
+                direction /= distance;
+            var right = Vector3.Cross(listener.Up, listener.Forward);
+            var slope = Vector3.Dot(direction, listener.Forward);
+            var angle = MathHelper.ToDegrees((float)Math.Acos(slope));
+            var j = FindVariable("OrientationAngle");
+            _variables[j].SetValue(angle);
             if (_curSound != null)
-                _curSound.Apply3D(listener, emitter);			
+                _curSound.SetCuePan(Vector3.Dot(direction, right));
+
+            // Calculate doppler effect.
+            var relativeVelocity = emitter.Velocity - listener.Velocity;
+            relativeVelocity *= emitter.DopplerScale;
+
+            _applied3D = true;
         }
 
         internal void Update(float dt)
         {
             if (_curSound != null)
                 _curSound.Update(dt);
+
+            // Evaluate the runtime parameter controls.
+            var rpcCurves = _curSound.RpcCurves;
+            if (rpcCurves.Length > 0)
+            {
+                var volume = 1.0f;
+                var pitch = 0.0f;
+
+                for (var i = 0; i < rpcCurves.Length; i++)
+                {
+                    var rpcCurve = _engine.RpcCurves[rpcCurves[i]];
+
+                    // Positive values are global variables and negative values are locals.
+                    float value;
+                    if (rpcCurve.IsGlobal)
+                        value = rpcCurve.Evaluate(_engine.GetGlobalVariable(rpcCurve.Variable));
+                    else
+                        value = rpcCurve.Evaluate(_variables[rpcCurve.Variable].Value);
+
+                    // Evaluate the 
+                    switch (rpcCurve.Parameter)
+                    {
+                        case RpcParameter.Volume:
+                            volume *= XactHelpers.ParseVolumeFromDecibels(value / 100.0f);
+                            break;
+
+                        case RpcParameter.Pitch:
+                            pitch += value / 1000.0f;
+                            break;
+
+                        case RpcParameter.ReverbSend:
+                        case RpcParameter.FilterFrequency:
+                        case RpcParameter.FilterQFactor:
+                            // TODO: Implement me!
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException("rpcCurve.Parameter");
+                    }
+                }
+
+                _curSound.SetCueVolume(volume);
+                _curSound.SetCuePitch(pitch);
+            }
         }
 		
 		
