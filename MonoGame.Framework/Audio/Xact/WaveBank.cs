@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>This constructor immediately loads all wave data into memory at once.</remarks>
         public WaveBank(AudioEngine audioEngine, string nonStreamingWaveBankFilename)
         {
+            if (audioEngine == null)
+                throw new ArgumentNullException("audioEngine");
+            if (string.IsNullOrEmpty(nonStreamingWaveBankFilename))
+                throw new ArgumentNullException("nonStreamingWaveBankFilename");
+
             //XWB PARSING
             //Adapted from MonoXNA
             //Originally adaped from Luigi Auriemma's unxwb
@@ -84,8 +89,6 @@ namespace Microsoft.Xna.Framework.Audio
             wavebankentry.PlayRegion.Offset = 0;
 
             int wavebank_offset = 0;
-
-            nonStreamingWaveBankFilename = FileHelpers.NormalizeFilePathSeparators(nonStreamingWaveBankFilename);
 
             BinaryReader reader = new BinaryReader(AudioEngine.OpenStream(nonStreamingWaveBankFilename));
 

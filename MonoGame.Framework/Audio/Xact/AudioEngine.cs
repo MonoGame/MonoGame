@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Audio
         public const int ContentVersion = 39;
 
         /// <param name="settingsFile">Path to a XACT settings file.</param>
-        public AudioEngine (string settingsFile)
+        public AudioEngine(string settingsFile)
             : this(settingsFile, TimeSpan.Zero, "")
         {            
         }
@@ -75,6 +75,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>For the best results, use a lookAheadTime of 250 milliseconds or greater.</remarks>
         public AudioEngine(string settingsFile, TimeSpan lookAheadTime, string rendererId)
         {
+            if (string.IsNullOrEmpty(settingsFile))
+                throw new ArgumentNullException("settingsFile");
+
             // Read the xact settings file
             // Credits to alisci01 for initial format documentation
             using (var stream = OpenStream(settingsFile))
@@ -303,11 +306,12 @@ namespace Microsoft.Xna.Framework.Audio
             _variables[i].SetValue(value);
         }
         
-        #region IDisposable implementation
-        public void Dispose ()
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
         {
+            IsDisposed = true;
         }
-        #endregion
     }
 }
 
