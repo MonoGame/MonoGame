@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Audio
             //XWB PARSING
             //Adapted from MonoXNA
             //Originally adaped from Luigi Auriemma's unxwb
-			
+            
             WaveBankHeader wavebankheader;
             WaveBankData wavebankdata;
             WaveBankEntry wavebankentry;
@@ -87,17 +87,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             nonStreamingWaveBankFilename = FileHelpers.NormalizeFilePathSeparators(nonStreamingWaveBankFilename);
 
-#if !ANDROID
-            BinaryReader reader = new BinaryReader(TitleContainer.OpenStream(nonStreamingWaveBankFilename));
-#else 
-			Stream stream = Game.Activity.Assets.Open(nonStreamingWaveBankFilename);
-			MemoryStream ms = new MemoryStream();
-			stream.CopyTo( ms );
-			stream.Close();
-			ms.Position = 0;
-			BinaryReader reader = new BinaryReader(ms);
-#endif
-			reader.ReadBytes(4);
+            BinaryReader reader = new BinaryReader(AudioEngine.OpenStream(nonStreamingWaveBankFilename));
+
+            reader.ReadBytes(4);
 
             wavebankheader.Version = reader.ReadInt32();
 
@@ -177,8 +169,8 @@ namespace Microsoft.Xna.Framework.Audio
                 //SHOWFILEOFF;
 
                 //memset(&wavebankentry, 0, sizeof(wavebankentry));
-				wavebankentry.LoopRegion.Length = 0;
-				wavebankentry.LoopRegion.Offset = 0;
+                wavebankentry.LoopRegion.Length = 0;
+                wavebankentry.LoopRegion.Offset = 0;
 
                 if ((wavebankdata.Flags & Flag_Compact) != 0)
                 {
@@ -318,7 +310,7 @@ namespace Microsoft.Xna.Framework.Audio
                             _format = waveFormat
                         };
 
-					_sounds[current_entry] = sfx;
+                    _sounds[current_entry] = sfx;
 #else
                     _sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans);
 #endif
@@ -375,7 +367,7 @@ namespace Microsoft.Xna.Framework.Audio
                             _sounds[current_entry] = SoundEffect.FromStream(audioFile);
                         }
 #else
-						throw new NotImplementedException();
+                        throw new NotImplementedException();
 #endif
                     } else {
                         //An xWMA or XMA2 file. Can't be played atm :(
@@ -400,10 +392,10 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 
             }
-			
-			audioEngine.Wavebanks[_bankName] = this;
+            
+            audioEngine.Wavebanks[_bankName] = this;
         }
-		
+        
         /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
         /// <param name="streamingWaveBankFilename">Path to the .xwb to stream from.</param>
         /// <param name="offset">DVD sector-aligned offset within the wave bank data file.</param>
@@ -413,22 +405,22 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>Note that packetsize is in sectors, which is 2048 bytes.</para>
         /// <para>AudioEngine.Update() must be called at least once before using data from a streaming wave bank.</para>
         /// </remarks>
-		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
-			: this(audioEngine, streamingWaveBankFilename)
-		{
-			if (offset != 0) {
-				throw new NotImplementedException();
-			}
-		}
+        public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
+            : this(audioEngine, streamingWaveBankFilename)
+        {
+            if (offset != 0) {
+                throw new NotImplementedException();
+            }
+        }
 
         internal SoundEffect GetSoundEffect(int trackIndex)
         {
             return _sounds[trackIndex];
         }
 
-		#region IDisposable implementation
-		public void Dispose ()
-		{
+        #region IDisposable implementation
+        public void Dispose ()
+        {
             if (IsDisposed)
                 return;
 
@@ -437,7 +429,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             IsDisposed = true;
         }
-		#endregion
+        #endregion
     }
 }
 

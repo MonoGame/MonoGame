@@ -12,8 +12,8 @@ namespace Microsoft.Xna.Framework.Audio
     /// <summary>
     /// Class used to create and manipulate code audio objects.
     /// </summary> 
-	public class AudioEngine : IDisposable
-	{
+    public class AudioEngine : IDisposable
+    {
         private readonly AudioCategory[] _categories;
         private readonly Dictionary<string, int> _categoryLookup = new Dictionary<string, int>();
 
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal List<Cue> ActiveCues = new List<Cue>();
 
-		internal AudioCategory[] Categories { get { return _categories; } }
+        internal AudioCategory[] Categories { get { return _categories; } }
 
         internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
 
@@ -42,10 +42,10 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <param name="settingsFile">Path to a XACT settings file.</param>
-		public AudioEngine (string settingsFile)
-			: this(settingsFile, TimeSpan.Zero, "")
-		{            
-		}
+        public AudioEngine (string settingsFile)
+            : this(settingsFile, TimeSpan.Zero, "")
+        {            
+        }
 
         internal static Stream OpenStream(string filePath)
         {
@@ -68,99 +68,99 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="lookAheadTime">Determines how many milliseconds the engine will look ahead when determing when to transition to another sound.</param>
         /// <param name="rendererId">A string that specifies the audio renderer to use.</param>
         /// <remarks>For the best results, use a lookAheadTime of 250 milliseconds or greater.</remarks>
-		public AudioEngine(string settingsFile, TimeSpan lookAheadTime, string rendererId)
-		{
-			// Read the xact settings file
-			// Credits to alisci01 for initial format documentation
+        public AudioEngine(string settingsFile, TimeSpan lookAheadTime, string rendererId)
+        {
+            // Read the xact settings file
+            // Credits to alisci01 for initial format documentation
             using (var stream = OpenStream(settingsFile))
             using (var reader = new BinaryReader(stream)) 
             {
-				uint magic = reader.ReadUInt32 ();
-				if (magic != 0x46534758) //'XGFS'
-					throw new ArgumentException ("XGS format not recognized");
+                uint magic = reader.ReadUInt32 ();
+                if (magic != 0x46534758) //'XGFS'
+                    throw new ArgumentException ("XGS format not recognized");
 
                 reader.ReadUInt16 (); // toolVersion
-				uint formatVersion = reader.ReadUInt16();
-				if (formatVersion != 42)
-					Debug.WriteLine("Warning: XGS format " + formatVersion + " not supported!");
+                uint formatVersion = reader.ReadUInt16();
+                if (formatVersion != 42)
+                    Debug.WriteLine("Warning: XGS format " + formatVersion + " not supported!");
 
                 reader.ReadUInt16 (); // crc
                 reader.ReadUInt32 (); // lastModifiedLow
                 reader.ReadUInt32 (); // lastModifiedHigh
-				reader.ReadByte (); //unkn, 0x03. Platform?
+                reader.ReadByte (); //unkn, 0x03. Platform?
 
-				uint numCats = reader.ReadUInt16 ();
-				uint numVars = reader.ReadUInt16 ();
+                uint numCats = reader.ReadUInt16 ();
+                uint numVars = reader.ReadUInt16 ();
 
-				reader.ReadUInt16 (); //unkn, 0x16
-				reader.ReadUInt16 (); //unkn, 0x16
+                reader.ReadUInt16 (); //unkn, 0x16
+                reader.ReadUInt16 (); //unkn, 0x16
 
-				uint numRpc = reader.ReadUInt16 ();
+                uint numRpc = reader.ReadUInt16 ();
                 reader.ReadUInt16 (); // numDspPresets
                 reader.ReadUInt16 (); // numDspParams
 
-				uint catsOffset = reader.ReadUInt32 ();
-				uint varsOffset = reader.ReadUInt32 ();
+                uint catsOffset = reader.ReadUInt32 ();
+                uint varsOffset = reader.ReadUInt32 ();
 
-				reader.ReadUInt32 (); //unknown, leads to a short with value of 1?
+                reader.ReadUInt32 (); //unknown, leads to a short with value of 1?
                 reader.ReadUInt32 (); // catNameIndexOffset
-				reader.ReadUInt32 (); //unknown, two shorts of values 2 and 3?
+                reader.ReadUInt32 (); //unknown, two shorts of values 2 and 3?
                 reader.ReadUInt32 (); // varNameIndexOffset
 
-				uint catNamesOffset = reader.ReadUInt32 ();
-				uint varNamesOffset = reader.ReadUInt32 ();
-				uint rpcOffset = reader.ReadUInt32 ();
+                uint catNamesOffset = reader.ReadUInt32 ();
+                uint varNamesOffset = reader.ReadUInt32 ();
+                uint rpcOffset = reader.ReadUInt32 ();
                 reader.ReadUInt32 (); // dspPresetsOffset
                 reader.ReadUInt32 (); // dspParamsOffset
-				reader.BaseStream.Seek (catNamesOffset, SeekOrigin.Begin);
-				string[] categoryNames = ReadNullTerminatedStrings(numCats, reader);
+                reader.BaseStream.Seek (catNamesOffset, SeekOrigin.Begin);
+                string[] categoryNames = ReadNullTerminatedStrings(numCats, reader);
 
-				_categories = new AudioCategory[numCats];
-				reader.BaseStream.Seek (catsOffset, SeekOrigin.Begin);
-				for (int i=0; i<numCats; i++) {
-					_categories [i] = new AudioCategory (this, categoryNames [i], reader);
-					_categoryLookup.Add (categoryNames [i], i);
-				}
+                _categories = new AudioCategory[numCats];
+                reader.BaseStream.Seek (catsOffset, SeekOrigin.Begin);
+                for (int i=0; i<numCats; i++) {
+                    _categories [i] = new AudioCategory (this, categoryNames [i], reader);
+                    _categoryLookup.Add (categoryNames [i], i);
+                }
 
-				reader.BaseStream.Seek (varNamesOffset, SeekOrigin.Begin);
-				string[] varNames = ReadNullTerminatedStrings(numVars, reader);
+                reader.BaseStream.Seek (varNamesOffset, SeekOrigin.Begin);
+                string[] varNames = ReadNullTerminatedStrings(numVars, reader);
 
                 var cueVariables = new List<RpcVariable>();
-				_variables = new RpcVariable[numVars];
-				reader.BaseStream.Seek (varsOffset, SeekOrigin.Begin);
-				for (var i=0; i < numVars; i++)
-				{
-					var v = new RpcVariable();
-					v.Name = varNames[i];
-					v.Flags = reader.ReadByte();						
-					v.InitValue = reader.ReadSingle();
-					v.MinValue = reader.ReadSingle();
-					v.MaxValue = reader.ReadSingle();
-					v.Value = v.InitValue;
+                _variables = new RpcVariable[numVars];
+                reader.BaseStream.Seek (varsOffset, SeekOrigin.Begin);
+                for (var i=0; i < numVars; i++)
+                {
+                    var v = new RpcVariable();
+                    v.Name = varNames[i];
+                    v.Flags = reader.ReadByte();						
+                    v.InitValue = reader.ReadSingle();
+                    v.MinValue = reader.ReadSingle();
+                    v.MaxValue = reader.ReadSingle();
+                    v.Value = v.InitValue;
 
-					_variables[i] = v;
+                    _variables[i] = v;
                     _variableLookup.Add(v.Name, i);
 
                     // Gather the cue instance varaibles seperately.
                     if (!v.IsGlobal)
                         cueVariables.Add(v);
-				}
+                }
                 _cueVariables = cueVariables.ToArray();
 
                 RpcCurves = new RpcCurve[numRpc];
-				reader.BaseStream.Seek(rpcOffset, SeekOrigin.Begin);
-				for (var i=0; i < numRpc; i++)
-				{
+                reader.BaseStream.Seek(rpcOffset, SeekOrigin.Begin);
+                for (var i=0; i < numRpc; i++)
+                {
                     RpcCurves[i].FileOffset = (uint)reader.BaseStream.Position;
 
                     var vindex = reader.ReadUInt16();
-					if (_variables[vindex].IsGlobal)
-					{
-					    RpcCurves[i].IsGlobal = true;
+                    if (_variables[vindex].IsGlobal)
+                    {
+                        RpcCurves[i].IsGlobal = true;
                         RpcCurves[i].Variable = vindex;
-					}
-					else
-					{
+                    }
+                    else
+                    {
                         // Fixup index to point at the cue instance variables.
                         var name = _variables[vindex].Name;
                         for (var j = 0; j < _cueVariables.Length; j++)
@@ -171,24 +171,24 @@ namespace Microsoft.Xna.Framework.Audio
                             RpcCurves[i].Variable = j;
                             break;
                         }
-					}
+                    }
 
-					var pointCount = (int)reader.ReadByte();
+                    var pointCount = (int)reader.ReadByte();
                     RpcCurves[i].Parameter = (RpcParameter)reader.ReadUInt16();
 
                     RpcCurves[i].Points = new RpcPoint[pointCount];
-					for (var j=0; j < pointCount; j++) 
+                    for (var j=0; j < pointCount; j++) 
                     {
                         RpcCurves[i].Points[j].Position = reader.ReadSingle();
                         RpcCurves[i].Points[j].Value = reader.ReadSingle();
                         RpcCurves[i].Points[j].Type = (RpcPointType)reader.ReadByte();
-					}
-				}
+                    }
+                }
             }
 
             _stopwatch = new Stopwatch();
             _stopwatch.Start();
-		}
+        }
 
         internal int GetRpcIndex(uint fileOffset)
         {
@@ -199,30 +199,30 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             return -1;
-		}
+        }
 
-		private static string[] ReadNullTerminatedStrings(uint count, BinaryReader reader)
-		{
-			var ret = new string[count];
-			
+        private static string[] ReadNullTerminatedStrings(uint count, BinaryReader reader)
+        {
+            var ret = new string[count];
+            
             for (var i=0; i < count; i++) 
             {
-				var s = new List<char>();
-				while (reader.PeekChar() != 0) 
-					s.Add(reader.ReadChar()); 
+                var s = new List<char>();
+                while (reader.PeekChar() != 0) 
+                    s.Add(reader.ReadChar()); 
 
                 reader.ReadChar();
-				ret[i] = new string(s.ToArray());
-			}
+                ret[i] = new string(s.ToArray());
+            }
 
-			return ret;
-		}
+            return ret;
+        }
 
         /// <summary>
         /// Performs periodic work required by the audio engine.
         /// </summary>
         /// <remarks>Must be called at least once per frame.</remarks>
-		public void Update()
+        public void Update()
         {
             var cur = _stopwatch.Elapsed;
             var elapsed = cur - _lastUpdateTime;
@@ -245,13 +245,13 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             // TODO: Process global RPC curves.
-		}
-		
+        }
+        
         /// <summary>Returns an audio category by name.</summary>
         /// <param name="name">Friendly name of the category to get.</param>
         /// <returns>The AudioCategory with a matching name. Throws an exception if not found.</returns>
-		public AudioCategory GetCategory(string name)
-		{
+        public AudioCategory GetCategory(string name)
+        {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
@@ -259,15 +259,15 @@ namespace Microsoft.Xna.Framework.Audio
             if (!_categoryLookup.TryGetValue(name, out i))
                 throw new InvalidOperationException("This resource could not be created.");
 
-			return _categories[i];
-		}
+            return _categories[i];
+        }
 
         /// <summary>Gets the value of a global variable.</summary>
         /// <param name="name">Friendly name of the variable.</param>
         /// <returns>float value of the queried variable.</returns>
         /// <remarks>A global variable has global scope. It can be accessed by all code within a project.</remarks>
-		public float GetGlobalVariable(string name)
-		{
+        public float GetGlobalVariable(string name)
+        {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
@@ -275,8 +275,8 @@ namespace Microsoft.Xna.Framework.Audio
             if (!_variableLookup.TryGetValue(name, out i))
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
-			return _variables[i].Value;
-		}
+            return _variables[i].Value;
+        }
 
         internal float GetGlobalVariable(int index)
         {
@@ -286,8 +286,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>Sets the value of a global variable.</summary>
         /// <param name="name">Friendly name of the variable.</param>
         /// <param name="value">Value of the global variable.</param>
-		public void SetGlobalVariable(string name, float value)
-		{
+        public void SetGlobalVariable(string name, float value)
+        {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
@@ -295,14 +295,14 @@ namespace Microsoft.Xna.Framework.Audio
             if (!_variableLookup.TryGetValue(name, out i))
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
-			_variables[i].SetValue(value);
-		}
-		
-		#region IDisposable implementation
-		public void Dispose ()
-		{
-		}
-		#endregion
-	}
+            _variables[i].SetValue(value);
+        }
+        
+        #region IDisposable implementation
+        public void Dispose ()
+        {
+        }
+        #endregion
+    }
 }
 

@@ -12,12 +12,12 @@ namespace Microsoft.Xna.Framework.Audio
     /// <para>Cues also define specific properties such as pitch or volume.</para>
     /// <para>Cues are referenced through SoundBank objects.</para>
     /// </remarks>
-	public class Cue : IDisposable
-	{
+    public class Cue : IDisposable
+    {
         private readonly AudioEngine _engine;
         private readonly string _name;
         private readonly XactSound[] _sounds;
-		private readonly float[] _probs;
+        private readonly float[] _probs;
 
         private readonly RpcVariable[] _variables;
 
@@ -28,41 +28,41 @@ namespace Microsoft.Xna.Framework.Audio
 
         /// <summary>Indicates whether or not the cue is currently paused.</summary>
         /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
-		public bool IsPaused
-		{
-			get 
+        public bool IsPaused
+        {
+            get 
             {
-				if (_curSound != null)
-					return _curSound.IsPaused;
+                if (_curSound != null)
+                    return _curSound.IsPaused;
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
         /// <summary>Indicates whether or not the cue is currently playing.</summary>
         /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
-		public bool IsPlaying
-		{
-			get 
+        public bool IsPlaying
+        {
+            get 
             {
-				if (_curSound != null)
-					return _curSound.Playing;
+                if (_curSound != null)
+                    return _curSound.Playing;
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
         /// <summary>Indicates whether or not the cue is currently stopped.</summary>
-		public bool IsStopped
-		{
-			get 
+        public bool IsStopped
+        {
+            get 
             {
-				if (_curSound != null)
+                if (_curSound != null)
                     return _curSound.Stopped;
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
         public bool IsStopping
         {
@@ -93,70 +93,70 @@ namespace Microsoft.Xna.Framework.Audio
 
         /// <summary>Gets the friendly name of the cue.</summary>
         /// <remarks>The friendly name is a value set from the designer.</remarks>
-		public string Name
-		{
-			get { return _name; }
-		}
-		
-		internal Cue(AudioEngine engine, string cuename, XactSound sound)
-		{
-			_engine = engine;
-			_name = cuename;
-			_sounds = new XactSound[1];
-			_sounds[0] = sound;
-			_probs = new float[1];
-			_probs[0] = 1.0f;
-            _variables = engine.CreateCueVariables();
-		}
-		
-		internal Cue(AudioEngine engine, string cuename, XactSound[] sounds, float[] probs)
-		{
+        public string Name
+        {
+            get { return _name; }
+        }
+        
+        internal Cue(AudioEngine engine, string cuename, XactSound sound)
+        {
             _engine = engine;
-			_name = cuename;
-			_sounds = sounds;
-			_probs = probs;
+            _name = cuename;
+            _sounds = new XactSound[1];
+            _sounds[0] = sound;
+            _probs = new float[1];
+            _probs[0] = 1.0f;
             _variables = engine.CreateCueVariables();
-		}
+        }
+        
+        internal Cue(AudioEngine engine, string cuename, XactSound[] sounds, float[] probs)
+        {
+            _engine = engine;
+            _name = cuename;
+            _sounds = sounds;
+            _probs = probs;
+            _variables = engine.CreateCueVariables();
+        }
 
         /// <summary>Pauses playback.</summary>
-		public void Pause()
-		{
-			if (_curSound != null)
-				_curSound.Pause();
-		}
+        public void Pause()
+        {
+            if (_curSound != null)
+                _curSound.Pause();
+        }
 
         /// <summary>Requests playback of a prepared or preparing Cue.</summary>
         /// <remarks>Calling Play when the Cue already is playing can result in an InvalidOperationException.</remarks>
-		public void Play()
-		{
+        public void Play()
+        {
             if (!_engine.ActiveCues.Contains(this))
                 _engine.ActiveCues.Add(this);
-			
-			//TODO: Probabilities
+            
+            //TODO: Probabilities
             var index = XactHelpers.Random.Next(_sounds.Length);
             _curSound = _sounds[index];
-			
-			_curSound.SetCueVolume(1.0f);
-			_curSound.Play();
+            
+            _curSound.SetCueVolume(1.0f);
+            _curSound.Play();
             _played = true;
-		}
+        }
 
         /// <summary>Resumes playback of a paused Cue.</summary>
-		public void Resume()
-		{
-			if (_curSound != null)
-				_curSound.Resume();
-		}
+        public void Resume()
+        {
+            if (_curSound != null)
+                _curSound.Resume();
+        }
 
         /// <summary>Stops playback of a Cue.</summary>
         /// <param name="options">Specifies if the sound should play any pending release phases or transitions before stopping.</param>
-		public void Stop(AudioStopOptions options)
-		{
+        public void Stop(AudioStopOptions options)
+        {
             _engine.ActiveCues.Remove(this);
-			
-			if (_curSound != null)
+            
+            if (_curSound != null)
                 _curSound.Stop(options);
-		}
+        }
 
         private int FindVariable(string name)
         {
@@ -177,8 +177,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="name">Friendly name of the variable to set.</param>
         /// <param name="value">Value to assign to the variable.</param>
         /// <remarks>The friendly name is a value set from the designer.</remarks>
-		public void SetVariable(string name, float value)
-		{
+        public void SetVariable(string name, float value)
+        {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             _variables[i].SetValue(value);
-		}
+        }
 
         /// <summary>Gets a cue-instance variable value based on its friendly name.</summary>
         /// <param name="name">Friendly name of the variable.</param>
@@ -196,8 +196,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>Cue-instance variables are useful when multiple instantiations of a single cue (and its associated sounds) are required (for example, a "car" cue where there may be more than one car at any given time). While a global variable allows multiple audio elements to be controlled in unison, a cue instance variable grants discrete control of each instance of a cue, even for each copy of the same cue.</para>
         /// <para>The friendly name is a value set from the designer.</para>
         /// </remarks>
-		public float GetVariable(string name)
-		{
+        public float GetVariable(string name)
+        {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             return _variables[i].Value;
-		}
+        }
 
         /// <summary>Updates the simulated 3D Audio settings calculated between an AudioEmitter and AudioListener.</summary>
         /// <param name="listener">The listener to calculate.</param>
@@ -215,7 +215,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>This must be called before Play().</para>
         /// <para>Calling this method automatically converts the sound to monoaural and sets the speaker mix for any sound played by this cue to a value calculated with the listener's and emitter's positions. Any stereo information in the sound will be discarded.</para>
         /// </remarks>
-		public void Apply3D(AudioListener listener, AudioEmitter emitter) 
+        public void Apply3D(AudioListener listener, AudioEmitter emitter) 
         {
             if (listener == null)
                 throw new ArgumentNullException("listener");
@@ -299,17 +299,17 @@ namespace Microsoft.Xna.Framework.Audio
                 _curSound.SetCuePitch(pitch);
             }
         }
-		
-		
-		/// <summary>Indicates whether or not the object has been disposed.</summary>
-		public bool IsDisposed { get { return false; } }
-		
-		#region IDisposable implementation
+        
+        
+        /// <summary>Indicates whether or not the object has been disposed.</summary>
+        public bool IsDisposed { get { return false; } }
+        
+        #region IDisposable implementation
         /// <summary>Immediately releases any unmanaged resources used by this object.</summary>
-		public void Dispose ()
-		{
-		}
-		#endregion
-	}
+        public void Dispose ()
+        {
+        }
+        #endregion
+    }
 }
 
