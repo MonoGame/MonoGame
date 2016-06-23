@@ -157,8 +157,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 default:
                     // Bitmap and other formats are converted to 32-bit by default
+                    // Are we in the BGRA format?  If so, we need to switch R & B instead of R & G
+                    bool isBGRA =
+                        imageType == FREE_IMAGE_TYPE.FIT_BITMAP &&
+                        FreeImage.GetBlueMask(fBitmap) == 0x000000FF &&
+                        FreeImage.GetGreenMask(fBitmap) == 0x0000FF00 &&
+                        FreeImage.GetRedMask(fBitmap) == 0x00FF0000;
+
                     bgra = FreeImage.ConvertTo32Bits(fBitmap);
-                    SwitchRedAndBlueChannels(bgra);
+
+                    if (isBGRA)
+                        SwitchRedAndGreenChannels(bgra);
+                    else
+                        SwitchRedAndBlueChannels(bgra);
+                    
                     FreeImage.UnloadEx(ref fBitmap);
                     fBitmap = bgra;
                     break;
@@ -178,6 +190,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
             FreeImage.UnloadEx(ref r);
             FreeImage.UnloadEx(ref b);
+        }
+        /// <summary>
+        /// Switches the red and green channels
+        /// </summary>
+        /// <param name="fBitmap">image</param>
+        private static void SwitchRedAndGreenChannels(FIBITMAP fBitmap)
+        {
+            var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+            var g = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_GREEN);
+            FreeImage.SetChannel(fBitmap, g, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
+            FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_GREEN);
+            FreeImage.UnloadEx(ref r);
+            FreeImage.UnloadEx(ref g);
         }
     }
 }
