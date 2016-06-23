@@ -41,6 +41,11 @@ namespace Microsoft.Xna.Framework.Audio
             return clone;
         }
 
+        /// <summary>
+        /// The current content version.
+        /// </summary>
+        public const int ContentVersion = 39;
+
         /// <param name="settingsFile">Path to a XACT settings file.</param>
         public AudioEngine (string settingsFile)
             : this(settingsFile, TimeSpan.Zero, "")
