@@ -57,6 +57,7 @@
     <Reference Include="Microsoft.Xna.Framework.Content.Pipeline, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Xact, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="NDesk.Options">
       <HintPath>..\ThirdParty\Dependencies\Tests\NDesk.Options.dll</HintPath>
     </Reference>
@@ -96,6 +97,7 @@
     <Compile Include="ContentPipeline\TextureContentTests.cs" />
     <Compile Include="ContentPipeline\TextureProcessorTests.cs" />
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
+    <Compile Include="Framework\Audio\XactTest.cs" />
     <Compile Include="Framework\ColorTest.cs" />
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
@@ -716,6 +718,15 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Audio\Win\Tests.xgs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xsb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xwb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Assets\Fonts\JingJing.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
