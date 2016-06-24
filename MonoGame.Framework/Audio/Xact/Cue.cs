@@ -266,14 +266,14 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     var rpcCurve = _engine.RpcCurves[rpcCurves[i]];
 
-                    // Positive values are global variables and negative values are locals.
+                    // Some curves are driven by global variables and others by cue instance variables.
                     float value;
                     if (rpcCurve.IsGlobal)
                         value = rpcCurve.Evaluate(_engine.GetGlobalVariable(rpcCurve.Variable));
                     else
                         value = rpcCurve.Evaluate(_variables[rpcCurve.Variable].Value);
 
-                    // Evaluate the 
+                    // Process the final curve value based on the parameter type it is.
                     switch (rpcCurve.Parameter)
                     {
                         case RpcParameter.Volume:
