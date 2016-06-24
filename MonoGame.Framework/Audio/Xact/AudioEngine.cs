@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework.Audio
                 string[] varNames = ReadNullTerminatedStrings(numVars, reader);
 
                 var cueVariables = new List<RpcVariable>();
-                _variables = new RpcVariable[numVars];
+                var variables = new List<RpcVariable>();
                 reader.BaseStream.Seek (varsOffset, SeekOrigin.Begin);
                 for (var i=0; i < numVars; i++)
                 {
@@ -146,14 +146,16 @@ namespace Microsoft.Xna.Framework.Audio
                     v.MaxValue = reader.ReadSingle();
                     v.Value = v.InitValue;
 
-                    _variables[i] = v;
-                    _variableLookup.Add(v.Name, i);
-
-                    // Gather the cue instance varaibles seperately.
                     if (!v.IsGlobal)
                         cueVariables.Add(v);
+                    else
+                    {
+                        variables.Add(v);
+                        _variableLookup.Add(v.Name, variables.Count - 1);                        
+                    }
                 }
                 _cueVariables = cueVariables.ToArray();
+                _variables = variables.ToArray();
 
                 RpcCurves = new RpcCurve[numRpc];
                 reader.BaseStream.Seek(rpcOffset, SeekOrigin.Begin);
@@ -280,7 +282,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ArgumentNullException("name");
 
             int i;
-            if (!_variableLookup.TryGetValue(name, out i))
+            if (!_variableLookup.TryGetValue(name, out i) || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             return _variables[i].Value;
@@ -300,7 +302,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ArgumentNullException("name");
 
             int i;
-            if (!_variableLookup.TryGetValue(name, out i))
+            if (!_variableLookup.TryGetValue(name, out i) || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             _variables[i].SetValue(value);

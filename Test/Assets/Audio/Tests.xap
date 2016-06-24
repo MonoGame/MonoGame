@@ -16,8 +16,8 @@ Global Settings
     Header File = D:\Projects\MonoGame\Test\Assets\Audio\Tests.h;
     Exclude Category Names = 0;
     Exclude Variable Names = 0;
-    Last Modified Low = 30526869;
-    Last Modified High = 2444811380;
+    Last Modified Low = 3376737601;
+    Last Modified High = 30526876;
 
     Category
     {
@@ -266,6 +266,40 @@ Global Settings
         Min = 0.000000;
         Max = 1000000.000000;
     }
+
+    Variable
+    {
+        Name = This Is Public;
+        Public = 1;
+        Global = 1;
+        Internal = 0;
+        External = 0;
+        Monitored = 1;
+        Reserved = 0;
+        Read Only = 0;
+        Time = 0;
+        Value = 0.000000;
+        Initial Value = 12.340000;
+        Min = 0.000000;
+        Max = 100.000000;
+    }
+
+    Variable
+    {
+        Name = This Is Private;
+        Public = 0;
+        Global = 1;
+        Internal = 0;
+        External = 0;
+        Monitored = 1;
+        Reserved = 0;
+        Read Only = 0;
+        Time = 0;
+        Value = 0.000000;
+        Initial Value = 0.000000;
+        Min = 0.000000;
+        Max = 100.000000;
+    }
 }
 
 Wave Bank
@@ -340,6 +374,8 @@ Sound Bank
     Windows File = Win\Tests.xsb;
     Xbox Bank Path Edited = 0;
     Windows Bank Path Edited = 0;
+    Bank Last Modified Low = 3376807607;
+    Bank Last Modified High = 30526876;
     Header Last Modified High = 0;
     Header Last Modified Low = 0;
 

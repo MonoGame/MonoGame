@@ -91,5 +91,62 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.AreEqual("The End", _audioEngine.GetCategory("The End").Name);
             Assert.AreEqual("Subcat", _audioEngine.GetCategory("Subcat").Name);
         }
+
+        [Test]
+        public void GetGlobalVariable()
+        {
+            Assert.Throws<ArgumentNullException>(() => _audioEngine.GetGlobalVariable(null));
+            Assert.Throws<ArgumentNullException>(() => _audioEngine.GetGlobalVariable(""));
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("DoesNotExist"));
+
+            // Make sure case matters.
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("SPEEDOFSOUND"));
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("speedofsound"));
+
+            Assert.AreEqual(343.5f, _audioEngine.GetGlobalVariable("SpeedOfSound"));
+            Assert.AreEqual(12.34f, _audioEngine.GetGlobalVariable("This Is Public"));
+            
+            // Make sure instance variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("OrientationAngle"));
+
+            // Make sure private variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("This Is Private"));
+        }
+
+        [Test]
+        public void SetGlobalVariable()
+        {
+            Assert.Throws<ArgumentNullException>(() => _audioEngine.SetGlobalVariable(null, 0));
+            Assert.Throws<ArgumentNullException>(() => _audioEngine.SetGlobalVariable("", 0));
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("DoesNotExist", 0));
+
+            // Make sure case matters.
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("SPEEDOFSOUND", 0));
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("speedofsound", 0));
+
+            // Make sure a reserved variable can be set.
+            Assert.AreEqual(343.5f, _audioEngine.GetGlobalVariable("SpeedOfSound"));
+            _audioEngine.SetGlobalVariable("SpeedOfSound", 1.0f);
+            Assert.AreEqual(1.0f, _audioEngine.GetGlobalVariable("SpeedOfSound"));
+            _audioEngine.SetGlobalVariable("SpeedOfSound", 343.5f);
+            Assert.AreEqual(343.5f, _audioEngine.GetGlobalVariable("SpeedOfSound"));
+
+            // Make sure a user variable can be set.
+            Assert.AreEqual(12.34f, _audioEngine.GetGlobalVariable("This Is Public"));
+            _audioEngine.SetGlobalVariable("This Is Public", 1.0f);
+            Assert.AreEqual(1.0f, _audioEngine.GetGlobalVariable("This Is Public"));
+
+            // Make sure variable limits are working.
+            _audioEngine.SetGlobalVariable("This Is Public", -100.0f);
+            Assert.AreEqual(0.0f, _audioEngine.GetGlobalVariable("This Is Public"));
+            _audioEngine.SetGlobalVariable("This Is Public", 1000.0f);
+            Assert.AreEqual(100.0f, _audioEngine.GetGlobalVariable("This Is Public"));
+
+            // Make sure instance variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("OrientationAngle", 1.0f));
+
+            // Make sure private variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("This Is Private", 1.0f));
+        }
     }
 }
