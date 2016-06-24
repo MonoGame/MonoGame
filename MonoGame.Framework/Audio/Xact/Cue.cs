@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
                 if (_curSound != null)
                     return _curSound.Stopped;
 
-                return true;
+                return IsCreated;
             }
         }
 
@@ -73,23 +73,14 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public bool IsPreparing
+        public bool IsPreparing 
         {
-            get
-            {
-                // TODO: Implement me!
-                return false;
-            }
+            get { return false; }
         }
 
-        public bool IsPrepared
-        {
-            get
-            {
-                // TODO: Implement me!
-                return false;
-            }
-        }
+        public bool IsPrepared { get; internal set; }
+
+        public bool IsCreated { get; internal set; }
 
         /// <summary>Gets the friendly name of the cue.</summary>
         /// <remarks>The friendly name is a value set from the designer.</remarks>
@@ -118,6 +109,13 @@ namespace Microsoft.Xna.Framework.Audio
             _variables = engine.CreateCueVariables();
         }
 
+        internal void Prepare()
+        {
+            IsDisposed = false;
+            IsCreated = false;
+            IsPrepared = true;            
+        }
+
         /// <summary>Pauses playback.</summary>
         public void Pause()
         {
@@ -138,6 +136,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             _curSound.Play(1.0f, _engine);
             _played = true;
+            IsCreated = true;
         }
 
         /// <summary>Resumes playback of a paused Cue.</summary>
@@ -182,7 +181,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ArgumentNullException("name");
 
             var i = FindVariable(name);
-            if (i == -1)
+            if (i == -1 || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             _variables[i].SetValue(value);
@@ -201,7 +200,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ArgumentNullException("name");
 
             var i = FindVariable(name);
-            if (i == -1)
+            if (i == -1 || !_variables[i].IsPublic)
                 throw new IndexOutOfRangeException("The specified variable index is invalid.");
 
             return _variables[i].Value;
@@ -322,6 +321,8 @@ namespace Microsoft.Xna.Framework.Audio
                 return;
 
             IsDisposed = true;
+            IsCreated = false;
+            IsPrepared = false;
 
             if (disposing)
             {

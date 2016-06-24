@@ -253,7 +253,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // Note: In XNA this returns a new Cue instance, but that
             // generates garbage which is one reason to not do it.
-            cue.IsDisposed = false;
+            cue.Prepare();
             return cue;
         }
         
@@ -272,6 +272,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             IsInUse = true;
 
+            cue.Prepare();
             cue.Play();
         }
 
@@ -295,6 +296,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             IsInUse = true;
 
+            cue.Prepare();
             cue.Apply3D(listener, emitter);
             cue.Play();
         }

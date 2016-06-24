@@ -108,13 +108,13 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("speedofsound"));
 
             Assert.AreEqual(343.5f, _audioEngine.GetGlobalVariable("SpeedOfSound"));
-            Assert.AreEqual(12.34f, _audioEngine.GetGlobalVariable("This Is Public"));
+            Assert.AreEqual(12.34f, _audioEngine.GetGlobalVariable("Global Public"));
             
             // Make sure instance variables can't be accessed.
             Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("OrientationAngle"));
 
             // Make sure private variables can't be accessed.
-            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("This Is Private"));
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.GetGlobalVariable("Global Private"));
         }
 
         [Test]
@@ -136,50 +136,56 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.AreEqual(343.5f, _audioEngine.GetGlobalVariable("SpeedOfSound"));
 
             // Make sure a user variable can be set.
-            Assert.AreEqual(12.34f, _audioEngine.GetGlobalVariable("This Is Public"));
-            _audioEngine.SetGlobalVariable("This Is Public", 1.0f);
-            Assert.AreEqual(1.0f, _audioEngine.GetGlobalVariable("This Is Public"));
+            Assert.AreEqual(12.34f, _audioEngine.GetGlobalVariable("Global Public"));
+            _audioEngine.SetGlobalVariable("Global Public", 1.0f);
+            Assert.AreEqual(1.0f, _audioEngine.GetGlobalVariable("Global Public"));
 
             // Make sure variable limits are working.
-            _audioEngine.SetGlobalVariable("This Is Public", -100.0f);
-            Assert.AreEqual(0.0f, _audioEngine.GetGlobalVariable("This Is Public"));
-            _audioEngine.SetGlobalVariable("This Is Public", 1000.0f);
-            Assert.AreEqual(100.0f, _audioEngine.GetGlobalVariable("This Is Public"));
+            _audioEngine.SetGlobalVariable("Global Public", -100.0f);
+            Assert.AreEqual(0.0f, _audioEngine.GetGlobalVariable("Global Public"));
+            _audioEngine.SetGlobalVariable("Global Public", 1000.0f);
+            Assert.AreEqual(100.0f, _audioEngine.GetGlobalVariable("Global Public"));
 
             // Make sure instance variables can't be accessed.
             Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("OrientationAngle", 1.0f));
 
             // Make sure private variables can't be accessed.
-            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("This Is Private", 1.0f));
+            Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("Global Private", 1.0f));
         }
 
         [Test]
         public void SoundBankGetCue()
         {
-            Assert.False(_soundBank.IsInUse);
-            Assert.False(_waveBank.IsInUse);
-
             Assert.Throws<ArgumentNullException>(() => _soundBank.GetCue(null));
             Assert.Throws<ArgumentNullException>(() => _soundBank.GetCue(""));
             Assert.Throws<ArgumentException>(() => _soundBank.GetCue("DoesNotExist"));
             Assert.Throws<ArgumentException>(() => _soundBank.GetCue("BLAST_MONO"));
 
-            Assert.False(_waveBank.IsInUse);
-            Assert.False(_soundBank.IsInUse);
             var cue = _soundBank.GetCue("blast_mono");
-            Assert.True(_soundBank.IsInUse);
-            //Assert.True(_waveBank.IsInUse); // MonoGame fail
-
             Assert.NotNull(cue);
             Assert.AreEqual("blast_mono", cue.Name);
-            Assert.True(!cue.IsDisposed);
-           
+            Assert.False(cue.IsDisposed);
+
+            // Make sure the initial state is correct.
+            Assert.False(cue.IsCreated);
+            Assert.False(cue.IsPreparing);
+            Assert.True(cue.IsPrepared);
+            Assert.False(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+            Assert.False(cue.IsStopping);
+
             cue.Dispose();
+
+            // Make sure the disposed state is correct.
             Assert.True(cue.IsDisposed);
-            
-            // TODO: This fails on MonoGame!
-            //Assert.False(_soundBank.IsInUse); // MonoGame fail
-            //Assert.True(_waveBank.IsInUse);  // MonoGame fail
+            Assert.False(cue.IsCreated);
+            Assert.False(cue.IsPreparing);
+            Assert.False(cue.IsPrepared);
+            Assert.False(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+            Assert.False(cue.IsStopping);
         }
 
         [Test]
@@ -193,6 +199,71 @@ namespace MonoGame.Tests.Framework.Audio
 
             // TODO: Add actual playback tests!
             //_soundBank.PlayCue("blast_mono");
+        }
+
+        [Test]
+        public void CueGetVariable()
+        {
+            var cue = _soundBank.GetCue("blast_mono");
+
+            Assert.Throws<ArgumentNullException>(() => cue.GetVariable(null));
+            Assert.Throws<ArgumentNullException>(() => cue.GetVariable(""));
+            Assert.Throws<IndexOutOfRangeException>(() => cue.GetVariable("DoesNotExist"));
+
+            // Make sure case matters.
+            Assert.Throws<IndexOutOfRangeException>(() => cue.GetVariable("DISTANCE"));
+            Assert.Throws<IndexOutOfRangeException>(() => cue.GetVariable("distance"));
+
+            Assert.AreEqual(0.0f, cue.GetVariable("Distance"));
+            Assert.AreEqual(45.67f, cue.GetVariable("Cue Public"));
+            
+            // Make sure globbal variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => cue.GetVariable("SpeedOfSound"));
+
+            // Make sure private variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => cue.GetVariable("Cue Private"));
+
+            cue.Dispose();
+        }
+
+        [Test]
+        public void CueSetVariable()
+        {
+            var cue = _soundBank.GetCue("blast_mono");
+
+            Assert.Throws<ArgumentNullException>(() => cue.SetVariable(null, 0));
+            Assert.Throws<ArgumentNullException>(() => cue.SetVariable("", 0));
+            Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("DoesNotExist", 0));
+
+            // Make sure case matters.
+            Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("DISTANCE", 0));
+            Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("distance", 0));
+
+            // Make sure a reserved variable can be set.
+            Assert.AreEqual(0, cue.GetVariable("Distance"));
+            cue.SetVariable("Distance", 1.0f);
+            Assert.AreEqual(1.0f, cue.GetVariable("Distance"));
+            cue.SetVariable("Distance", 0);
+            Assert.AreEqual(0, cue.GetVariable("Distance"));
+
+            // Make sure a user variable can be set.
+            Assert.AreEqual(45.67f, cue.GetVariable("Cue Public"));
+            cue.SetVariable("Cue Public", 1.0f);
+            Assert.AreEqual(1.0f, cue.GetVariable("Cue Public"));
+
+            // Make sure variable limits are working.
+            cue.SetVariable("Cue Public", -100.0f);
+            Assert.AreEqual(0.0f, cue.GetVariable("Cue Public"));
+            cue.SetVariable("Cue Public", 1000.0f);
+            Assert.AreEqual(100.0f, cue.GetVariable("Cue Public"));
+
+            // Make sure global variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("Global Public", 1.0f));
+
+            // Make sure private variables can't be accessed.
+            Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("Cue Private", 1.0f));
+
+            cue.Dispose();
         }
     }
 }

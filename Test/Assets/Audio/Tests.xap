@@ -16,8 +16,8 @@ Global Settings
     Header File = D:\Projects\MonoGame\Test\Assets\Audio\Tests.h;
     Exclude Category Names = 0;
     Exclude Variable Names = 0;
-    Last Modified Low = 3376737601;
-    Last Modified High = 30526876;
+    Last Modified Low = 1116158178;
+    Last Modified High = 30527053;
 
     Category
     {
@@ -269,7 +269,7 @@ Global Settings
 
     Variable
     {
-        Name = This Is Public;
+        Name = Global Public;
         Public = 1;
         Global = 1;
         Internal = 0;
@@ -286,7 +286,7 @@ Global Settings
 
     Variable
     {
-        Name = This Is Private;
+        Name = Global Private;
         Public = 0;
         Global = 1;
         Internal = 0;
@@ -297,6 +297,40 @@ Global Settings
         Time = 0;
         Value = 0.000000;
         Initial Value = 0.000000;
+        Min = 0.000000;
+        Max = 100.000000;
+    }
+
+    Variable
+    {
+        Name = Cue Private;
+        Public = 0;
+        Global = 0;
+        Internal = 0;
+        External = 0;
+        Monitored = 1;
+        Reserved = 0;
+        Read Only = 0;
+        Time = 0;
+        Value = 0.000000;
+        Initial Value = 0.000000;
+        Min = 0.000000;
+        Max = 100.000000;
+    }
+
+    Variable
+    {
+        Name = Cue Public;
+        Public = 1;
+        Global = 0;
+        Internal = 0;
+        External = 0;
+        Monitored = 1;
+        Reserved = 0;
+        Read Only = 0;
+        Time = 0;
+        Value = 0.000000;
+        Initial Value = 45.669998;
         Min = 0.000000;
         Max = 100.000000;
     }
