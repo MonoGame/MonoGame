@@ -60,6 +60,16 @@ namespace MonoGame.Tests.Framework.Audio
         }
 
         [Test]
+        public void SoundBankCtor()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SoundBank(null, null));
+            Assert.Throws<ArgumentNullException>(() => new SoundBank(_audioEngine, null));
+            Assert.Throws<ArgumentNullException>(() => new SoundBank(_audioEngine, ""));
+            //Assert.Throws<DirectoryNotFoundException>(() => new SoundBank(_audioEngine, @"This\Does\Not\Exist.xsb"));
+            Assert.Throws<FileNotFoundException>(() => new SoundBank(_audioEngine, @"Assets\Audio\Win\NotTheFile.xsb"));
+        }
+
+        [Test]
         public void ContentVersion()
         {
             Assert.AreEqual(39, AudioEngine.ContentVersion);            

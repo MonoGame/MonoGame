@@ -24,9 +24,12 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="fileName">Path to a .xsb SoundBank file.</param>
         public SoundBank(AudioEngine audioEngine, string fileName)
         {
-            _audioengine = audioEngine;
-            fileName = FileHelpers.NormalizeFilePathSeparators(fileName);
+            if (audioEngine == null)
+                throw new ArgumentNullException("audioEngine");
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException("fileName");
 
+            _audioengine = audioEngine;
 
             using (var stream = AudioEngine.OpenStream(fileName))
             using (var reader = new BinaryReader(stream))
