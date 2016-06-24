@@ -59,6 +59,14 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MiniFormatTag_ADPCM = 0x2;
         private const int MiniForamtTag_WMA = 0x3;
 
+        /// <summary>
+        /// </summary>
+        public bool IsInUse { get; private set; }
+
+        /// <summary>
+        /// </summary>
+        public bool IsPrepared { get { return true; } }
+
         /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
         /// <param name="nonStreamingWaveBankFilename">Path to the .xwb file to load.</param>
         /// <remarks>This constructor immediately loads all wave data into memory at once.</remarks>

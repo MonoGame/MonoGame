@@ -24,6 +24,8 @@ namespace MonoGame.Tests.Framework.Audio
             _soundBank = new SoundBank(_audioEngine, @"Assets\Audio\Win\Tests.xsb");
 
             Assert.False(_soundBank.IsInUse);
+            Assert.False(_waveBank.IsInUse);
+            Assert.True(_waveBank.IsPrepared);
 
             Assert.False(_audioEngine.IsDisposed);
             Assert.False(_waveBank.IsDisposed);
@@ -155,15 +157,18 @@ namespace MonoGame.Tests.Framework.Audio
         public void SoundBankGetCue()
         {
             Assert.False(_soundBank.IsInUse);
+            Assert.False(_waveBank.IsInUse);
 
             Assert.Throws<ArgumentNullException>(() => _soundBank.GetCue(null));
             Assert.Throws<ArgumentNullException>(() => _soundBank.GetCue(""));
             Assert.Throws<ArgumentException>(() => _soundBank.GetCue("DoesNotExist"));
             Assert.Throws<ArgumentException>(() => _soundBank.GetCue("BLAST_MONO"));
 
+            Assert.False(_waveBank.IsInUse);
             Assert.False(_soundBank.IsInUse);
             var cue = _soundBank.GetCue("blast_mono");
             Assert.True(_soundBank.IsInUse);
+            //Assert.True(_waveBank.IsInUse); // MonoGame fail
 
             Assert.NotNull(cue);
             Assert.AreEqual("blast_mono", cue.Name);
@@ -173,7 +178,8 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.True(cue.IsDisposed);
             
             // TODO: This fails on MonoGame!
-            //Assert.True(_soundBank.IsInUse);
+            //Assert.False(_soundBank.IsInUse); // MonoGame fail
+            //Assert.True(_waveBank.IsInUse);  // MonoGame fail
         }
 
         [Test]
