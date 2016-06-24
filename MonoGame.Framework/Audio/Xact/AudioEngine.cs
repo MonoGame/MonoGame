@@ -314,7 +314,7 @@ namespace Microsoft.Xna.Framework.Audio
         public event EventHandler<EventArgs> Disposing;
 
         /// <summary>
-        /// Is true of the AudioEngine has been disposed.
+        /// Is true if the AudioEngine has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 

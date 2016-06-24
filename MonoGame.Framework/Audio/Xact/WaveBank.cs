@@ -425,7 +425,7 @@ namespace Microsoft.Xna.Framework.Audio
         public event EventHandler<EventArgs> Disposing;
 
         /// <summary>
-        /// Is true of the WaveBank has been disposed.
+        /// Is true if the WaveBank has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 

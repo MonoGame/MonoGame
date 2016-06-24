@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework.Audio
         public event EventHandler<EventArgs> Disposing;
 
         /// <summary>
-        /// Is true of the SoundBank has been disposed.
+        /// Is true if the SoundBank has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 
