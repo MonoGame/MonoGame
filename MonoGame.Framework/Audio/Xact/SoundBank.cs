@@ -18,8 +18,6 @@ namespace Microsoft.Xna.Framework.Audio
         readonly WaveBank[] _waveBanks;
         readonly Dictionary<string, Cue> _cues = new Dictionary<string, Cue>();
         
-        internal AudioEngine AudioEngine { get { return _audioengine; } }
-        
         /// <param name="audioEngine">AudioEngine that will be associated with this sound bank.</param>
         /// <param name="fileName">Path to a .xsb SoundBank file.</param>
         public SoundBank(AudioEngine audioEngine, string fileName)

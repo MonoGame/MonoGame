@@ -135,9 +135,8 @@ namespace Microsoft.Xna.Framework.Audio
             //TODO: Probabilities
             var index = XactHelpers.Random.Next(_sounds.Length);
             _curSound = _sounds[index];
-            
-            _curSound.SetCueVolume(1.0f);
-            _curSound.Play();
+
+            _curSound.Play(1.0f, _engine);
             _played = true;
         }
 
@@ -295,8 +294,7 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
 
-                _curSound.SetCueVolume(volume);
-                _curSound.SetCuePitch(pitch);
+                _curSound.UpdateCueState(_engine, volume, pitch);
             }
         }
         

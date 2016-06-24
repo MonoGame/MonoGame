@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Audio
 					_soundClips[i] = new XactClip(soundBank, soundReader);
 			}
 
-            var category = soundBank.AudioEngine.Categories[_categoryID];
+            var category = engine.Categories[_categoryID];
             category.AddSound(this);
 		}
 
@@ -113,9 +113,12 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-		public void Play()
+		public void Play(float volume, AudioEngine engine)
         {
-            var category = _soundBank.AudioEngine.Categories[_categoryID];
+            _cueVolume = volume;
+            var category = engine.Categories[_categoryID];
+            UpdateCategoryVolume(category._volume[0]);
+
             var curInstances = category.GetPlayingInstanceCount();
             if (curInstances >= category.maxInstances)
             {
@@ -236,22 +239,6 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-	    internal void UpdatePitch()
-	    {
-            var pitch = _pitch + _cuePitch;
-             
-            if (_complexSound)
-            {
-                //foreach (var clip in _soundClips)
-                    //clip.AddPitch(volume);
-            }
-            else
-            {
-                if (_wave != null)
-                    _wave.Pitch = pitch;
-            }
-	    }
-
         internal void UpdateCategoryVolume(float categoryVolume)
         {
             // The different volumes modulate each other.
@@ -269,17 +256,24 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal void SetCueVolume(float volume)
-		{
-            _cueVolume = volume;
-            var category = _soundBank.AudioEngine.Categories[_categoryID];
-            UpdateCategoryVolume(category._volume[0]);
-        }
-
-        internal void SetCuePitch(float pitch)
+        internal void UpdateCueState(AudioEngine engine, float volume, float pitch)
         {
+            _cueVolume = volume;
+            var category = engine.Categories[_categoryID];
+            UpdateCategoryVolume(category._volume[0]);
+
             _cuePitch = pitch;
-            UpdatePitch();
+            var finalPitch = _pitch + _cuePitch;
+            if (_complexSound)
+            {
+                //foreach (var clip in _soundClips)
+                //clip.AddPitch(volume);
+            }
+            else
+            {
+                if (_wave != null)
+                    _wave.Pitch = finalPitch;
+            }
         }
 
         internal void SetCuePan(float pan)
