@@ -321,11 +321,12 @@ namespace Microsoft.Xna.Framework.Audio
                 return;
 
             IsDisposed = true;
-            IsCreated = false;
-            IsPrepared = false;
 
             if (disposing)
             {
+                IsCreated = false;
+                IsPrepared = false;
+
                 if (Disposing != null)
                     Disposing(this, EventArgs.Empty);
             }

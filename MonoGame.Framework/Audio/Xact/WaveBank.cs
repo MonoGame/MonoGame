@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         /// <summary>
         /// </summary>
-        public bool IsPrepared { get { return true; } }
+        public bool IsPrepared { get; private set; }
 
         /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
         /// <param name="nonStreamingWaveBankFilename">Path to the .xwb file to load.</param>
@@ -403,6 +403,8 @@ namespace Microsoft.Xna.Framework.Audio
             }
             
             audioEngine.Wavebanks[_bankName] = this;
+
+            IsPrepared = true;
         }
         
         /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
@@ -417,9 +419,8 @@ namespace Microsoft.Xna.Framework.Audio
         public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
             : this(audioEngine, streamingWaveBankFilename)
         {
-            if (offset != 0) {
+            if (offset != 0)
                 throw new NotImplementedException();
-            }
         }
 
         internal SoundEffect GetSoundEffect(int trackIndex)
@@ -462,6 +463,9 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 foreach (var s in _sounds)
                     s.Dispose();
+
+                IsPrepared = false;
+                IsInUse = false;
 
                 if (Disposing != null)
                     Disposing(this, EventArgs.Empty);

@@ -16,41 +16,34 @@ namespace MonoGame.Tests.Framework.Audio
         private SoundBank _soundBank;
         private WaveBank _waveBank;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public void Setup()
         {
             _audioEngine = new AudioEngine(@"Assets\Audio\Win\Tests.xgs");
             _waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
             _soundBank = new SoundBank(_audioEngine, @"Assets\Audio\Win\Tests.xsb");
-
-            Assert.False(_soundBank.IsInUse);
-            Assert.False(_waveBank.IsInUse);
-            Assert.True(_waveBank.IsPrepared);
-
-            Assert.False(_audioEngine.IsDisposed);
-            Assert.False(_waveBank.IsDisposed);
-            Assert.False(_soundBank.IsDisposed);
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public void TearDown()
         {
             _soundBank.Dispose();
             _waveBank.Dispose();
             _audioEngine.Dispose();
-
-            Assert.True(_audioEngine.IsDisposed);
-            Assert.True(_waveBank.IsDisposed);
-            Assert.True(_soundBank.IsDisposed);
         }
 
         [Test]
-        public void AudioEngineCtor()
+        public static void AudioEngineCtor()
         {
             Assert.Throws<ArgumentNullException>(() => new AudioEngine(null));
             Assert.Throws<ArgumentNullException>(() => new AudioEngine(""));
             //Assert.Throws<DirectoryNotFoundException>(() => new AudioEngine(@"This\Does\Not\Exist.xgs"));
-            Assert.Throws<FileNotFoundException>(() => new AudioEngine(@"Assets\Audio\Win\NotTheFile.xgs"));            
+            Assert.Throws<FileNotFoundException>(() => new AudioEngine(@"Assets\Audio\Win\NotTheFile.xgs"));
+
+            var audioEngine = new AudioEngine(@"Assets\Audio\Win\Tests.xgs");
+            Assert.False(audioEngine.IsDisposed);
+            audioEngine.Dispose();
+            Assert.True(audioEngine.IsDisposed);
         }
 
         [Test]
@@ -60,7 +53,17 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.Throws<ArgumentNullException>(() => new WaveBank(_audioEngine, null));
             Assert.Throws<ArgumentNullException>(() => new WaveBank(_audioEngine, ""));
             //Assert.Throws<DirectoryNotFoundException>(() => new WaveBank(_audioEngine, @"This\Does\Not\Exist.xwb"));
-            Assert.Throws<FileNotFoundException>(() => new WaveBank(_audioEngine, @"Assets\Audio\Win\NotTheFile.xwb"));            
+            Assert.Throws<FileNotFoundException>(() => new WaveBank(_audioEngine, @"Assets\Audio\Win\NotTheFile.xwb"));
+
+            var waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsDisposed);
+            Assert.True(waveBank.IsPrepared);
+
+            waveBank.Dispose();
+            Assert.True(waveBank.IsDisposed);
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsPrepared);
         }
 
         [Test]
@@ -71,10 +74,23 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.Throws<ArgumentNullException>(() => new SoundBank(_audioEngine, ""));
             //Assert.Throws<DirectoryNotFoundException>(() => new SoundBank(_audioEngine, @"This\Does\Not\Exist.xsb"));
             Assert.Throws<FileNotFoundException>(() => new SoundBank(_audioEngine, @"Assets\Audio\Win\NotTheFile.xsb"));
+
+            var soundBank = new SoundBank(_audioEngine, @"Assets\Audio\Win\Tests.xsb");
+            Assert.False(soundBank.IsInUse);
+            Assert.False(soundBank.IsDisposed);
+
+            var cue = soundBank.GetCue("blast_mono");
+            Assert.True(soundBank.IsInUse);
+            cue.Dispose();
+            //Assert.False(soundBank.IsInUse); // MonoGame Fail
+
+            soundBank.Dispose();
+            Assert.True(soundBank.IsDisposed);
+            Assert.False(soundBank.IsInUse);
         }
 
         [Test]
-        public void ContentVersion()
+        public static void ContentVersion()
         {
             Assert.AreEqual(39, AudioEngine.ContentVersion);            
         }

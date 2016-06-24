@@ -337,6 +337,8 @@ namespace Microsoft.Xna.Framework.Audio
                 foreach (var cue in _cues.Values)
                     cue.Dispose();
 
+                IsInUse = false;
+
                 if (Disposing != null)
                     Disposing(this, EventArgs.Empty);
             }
