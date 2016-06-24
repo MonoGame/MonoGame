@@ -350,10 +350,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 // Loop start and length in number of samples. Defaults to entire sound
                 loopStart = 0;
-                if (data != null && bitsPerSample > 0 && channelCount > 0)
-                    loopLength = data.Count / ((bitsPerSample / 8) * channelCount);
-                else
-                    loopLength = 0;
+                loopLength = (int)Math.Floor(sampleRate * durationInSeconds);
             }
             finally
             {

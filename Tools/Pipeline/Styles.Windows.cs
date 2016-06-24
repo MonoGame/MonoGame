@@ -3,9 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Eto;
-using Eto.WinForms.Forms.Controls;
-using Eto.WinForms.Forms.Menu;
-using Eto.WinForms.Forms.ToolBar;
+using Eto.Wpf.Forms.Menu;
+using Eto.Wpf.Forms.ToolBar;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -13,14 +12,34 @@ namespace MonoGame.Tools.Pipeline
     {
         public static void Load()
         {
-            Style.Add<LabelHandler>("Wrap", h => h.Control.MaximumSize = new System.Drawing.Size(400, 0));
-            Style.Add<GridViewHandler>("GridView", h =>
+            Style.Add<MenuBarHandler>("MenuBar", h =>
             {
-                h.Control.BackgroundColor = System.Drawing.SystemColors.Window;
-                h.Control.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+                h.Control.Background = System.Windows.SystemColors.ControlLightLightBrush;
             });
-            Style.Add<MenuBarHandler>("MenuBar", h => h.Control.BackColor = System.Drawing.SystemColors.Window);
-            Style.Add<ToolBarHandler>("ToolBar", h => h.Control.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden );
+
+            Style.Add<ToolBarHandler>("ToolBar", h =>
+            {
+                h.Control.Background = System.Windows.SystemColors.ControlLightLightBrush;
+
+                h.Control.Loaded += delegate
+                {
+                    var overflowGrid = h.Control.Template.FindName("OverflowGrid", h.Control) as System.Windows.FrameworkElement;
+
+                    if (overflowGrid != null)
+                        overflowGrid.Visibility = System.Windows.Visibility.Collapsed;
+
+                    foreach(var item in h.Control.Items)
+                    {
+                        var i = item as System.Windows.Controls.Button;
+
+                        if (i != null)
+                        {
+                            i.Opacity = i.IsEnabled ? 1.0 : 0.2;
+                            i.IsEnabledChanged += (sender, e) => i.Opacity = i.IsEnabled ? 1.0 : 0.2;
+                        }
+                    }
+                };
+            });
         }
     }
 }

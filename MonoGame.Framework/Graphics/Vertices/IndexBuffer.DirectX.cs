@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var startBytes = startIndex * elementSizeInBytes;
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
-                    var box = new SharpDX.DataBox(dataPtr, 1, 0);
+                    var box = new SharpDX.DataBox(dataPtr, elementCount * elementSizeInBytes, 0);
 
                     var region = new SharpDX.Direct3D11.ResourceRegion();
                     region.Top = 0;

@@ -3,6 +3,10 @@
     <Exclude>nvtt.dll</Exclude>
 	<Exclude>freetype6.dll</Exclude>
 	<Exlcude>pvrtc.dll</Exlcude>
+	<Exlcude>templates/libs/x86/SDL2.dll</Exlcude>
+	<Exlcude>templates/libs/x64/SDL2.dll</Exlcude>
+	<Exclude>templates/libs/x86/soft_oal.dll</Exclude>
+	<Exclude>templates/libs/x64/soft_oal.dll</Exclude>
 	<!--
 	<Exclude>libnvtt.dylib</Exlcude>
 	<Exclude>libnvimage.dylib</Exlcude>

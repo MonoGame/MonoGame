@@ -6,17 +6,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if MONOMAC
-#if PLATFORM_MACOS_LEGACY
-using MonoMac.OpenGL;
-#else
-using OpenGL;
-#endif
-#elif GLES
-using OpenTK.Graphics.ES20;
-#elif OPENGL
-using OpenTK.Graphics.OpenGL;
-#elif WINDOWS_STOREAPP || WINDOWS_UAP
+#if WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -497,15 +487,14 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets the boolean which defines how window switches from windowed to fullscreen state.
         /// "Hard" mode(true) is slow to switch, but more effecient for performance, while "soft" mode(false) is vice versa.
-        /// The default value is <c>true</c>. Can only be changed before graphics device is created (in game's constructor).
+        /// The default value is <c>true</c>.
         /// </summary>
         public bool HardwareModeSwitch
         {
             get { return _hardwareModeSwitch; }
             set
             {
-                if (_graphicsDevice == null) _hardwareModeSwitch = value;
-                else throw new InvalidOperationException("This property can only be changed before graphics device is created(in game constructor).");
+                _hardwareModeSwitch = value;
             }
         }
 

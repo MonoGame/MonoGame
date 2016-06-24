@@ -14,15 +14,23 @@ namespace MonoGame.Tools.Pipeline
             Editable = editable && value is string;
         }
 
-        public override void Edit(Control control)
+        public override void Edit(PixelLayout control)
         {
-            var dialog = new DialogBase();
             var editText = new TextBox();
+            editText.Style = "OverrideSize";
+            editText.Width = _lastRec.Width;
+            editText.Height = _lastRec.Height;
             editText.Text = Value.ToString();
 
-            dialog.CreateContent(editText);
-            if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)
+            control.Add(editText, _lastRec.X, _lastRec.Y);
+
+            editText.EnabledChanged += delegate
+            {
+                if (_eventHandler == null)
+                    return;
+                
                 _eventHandler(editText.Text, EventArgs.Empty);
+            };
         }
     }
 }

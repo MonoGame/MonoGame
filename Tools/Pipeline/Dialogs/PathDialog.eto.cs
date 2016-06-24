@@ -19,6 +19,7 @@ namespace MonoGame.Tools.Pipeline
         {
             Title = "Select Folder";
             Width = 370;
+            Height = 165;
 
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(4, 4);

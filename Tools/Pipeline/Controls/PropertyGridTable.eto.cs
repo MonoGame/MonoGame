@@ -9,16 +9,24 @@ namespace MonoGame.Tools.Pipeline
 {
     public partial class PropertyGridTable : Scrollable
     {
+        PixelLayout pixel1;
         Drawable drawable;
 
         private void InitializeComponent()
         {
-            drawable = new Drawable();
-            drawable.Style = "Test";
-            drawable.Size = new Size(10, -1);
+            BackgroundColor = PropInfo.BackColor;
 
-            Content = drawable;
-            Style = "NoHorizontal";
+            pixel1 = new PixelLayout();
+            pixel1.BackgroundColor = PropInfo.BackColor;
+
+            drawable = new Drawable();
+            drawable.Height = 100;
+            pixel1.Add(drawable, 0, 0);
+
+            Content = pixel1;
+
+            pixel1.Style = "Stretch";
+            drawable.Style = "Stretch";
 
             drawable.Paint += Drawable_Paint;
             drawable.MouseDown += Drawable_MouseDown;

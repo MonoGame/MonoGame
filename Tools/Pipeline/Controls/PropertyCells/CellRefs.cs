@@ -18,7 +18,7 @@ namespace MonoGame.Tools.Pipeline
             DisplayValue = (Value as List<string>).Count > 0 ? "Collection" : "None";
         }
 
-        public override void Edit(Control control)
+        public override void Edit(PixelLayout control)
         {
             var dialog = new ReferenceDialog(PipelineController.Instance, (Value as List<string>).ToArray());
             if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)

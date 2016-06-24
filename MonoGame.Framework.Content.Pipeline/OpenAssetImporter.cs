@@ -480,6 +480,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // For the children, this is the new parent.
                 aiParent = aiNode;
                 parent = node;
+
+                if (_scene.HasAnimations)
+                {
+                    foreach (var animation in _scene.Animations)
+                    {
+                        var animationContent = ImportAnimation(animation, node.Name);
+                        if (animationContent.Channels.Count > 0)
+                            node.Animations.Add(animationContent.Name, animationContent);
+                    }
+                }
             }
 
             Debug.Assert(parent != null);
@@ -777,8 +787,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Converts the specified animation to XNA.
         /// </summary>
         /// <param name="aiAnimation">The animation.</param>
+        /// <param name="nodeName">An optional filter.</param>
         /// <returns>The animation converted to XNA.</returns>
-        private AnimationContent ImportAnimation(Animation aiAnimation)
+        private AnimationContent ImportAnimation(Animation aiAnimation, string nodeName = null)
         {
             var animation = new AnimationContent
             {
@@ -792,8 +803,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             //                 "nodeXyz_$AssimpFbx$_Rotation",
             //                 "nodeXyz_$AssimpFbx$_Scaling"
             // Group animation channels by name (strip the "_$AssimpFbx$" part).
-            var channelGroups = aiAnimation.NodeAnimationChannels
+            IEnumerable < IGrouping < string,NodeAnimationChannel >> channelGroups;
+            if (nodeName != null)
+            {
+                channelGroups = aiAnimation.NodeAnimationChannels
+                                           .Where(channel => nodeName == GetNodeName(channel.NodeName))
                                            .GroupBy(channel => GetNodeName(channel.NodeName));
+            }
+            else
+            {
+                channelGroups = aiAnimation.NodeAnimationChannels
+                                           .GroupBy(channel => GetNodeName(channel.NodeName));
+            }
 
             foreach (var channelGroup in channelGroups)
             {

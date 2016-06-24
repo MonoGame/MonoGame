@@ -61,6 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _screen = screen;
         }
+#elif DESKTOPGL
+        int _displayIndex;
 #else
         internal GraphicsAdapter()
         {
@@ -280,30 +282,31 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-
-                if (_supportedDisplayModes == null)
+                bool displayChanged = false;
+#if DESKTOPGL
+                var displayIndex = Sdl.Display.GetWindowDisplayIndex (SdlGameWindow.Instance.Handle);
+                displayChanged = displayIndex != _displayIndex;
+#endif
+                if (_supportedDisplayModes == null || displayChanged)
                 {
                     var modes = new List<DisplayMode>(new[] { CurrentDisplayMode, });
 
 #if DESKTOPGL
-                    var displayCount = Sdl.Display.GetNumVideoDisplays();
+                    _displayIndex = displayIndex;
                     modes.Clear();
                     
-                    for (int displayIndex = 0; displayIndex < displayCount;displayIndex++)
+                    var modeCount = Sdl.Display.GetNumDisplayModes(displayIndex);
+
+                    for (int i = 0;i < modeCount;i++)
                     {
-                        var modeCount = Sdl.Display.GetNumDisplayModes(displayIndex);
+                        Sdl.Display.Mode mode;
+                        Sdl.Display.GetDisplayMode(displayIndex, i, out mode);
 
-                        for (int i = 0;i < modeCount;i++)
-                        {
-                            Sdl.Display.Mode mode;
-                            Sdl.Display.GetDisplayMode(displayIndex, i, out mode);
-
-                            // We are only using one format, Color
-                            // mode.Format gets the Color format from SDL
-                            var displayMode = new DisplayMode(mode.Width, mode.Height, SurfaceFormat.Color);
-                            if (!modes.Contains(displayMode))
-                                modes.Add(displayMode);
-                        }
+                        // We are only using one format, Color
+                        // mode.Format gets the Color format from SDL
+                        var displayMode = new DisplayMode(mode.Width, mode.Height, SurfaceFormat.Color);
+                        if (!modes.Contains(displayMode))
+                            modes.Add(displayMode);
                     }
 #elif DIRECTX && !WINDOWS_PHONE
                     var dxgiFactory = new SharpDX.DXGI.Factory1();
@@ -326,6 +329,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     adapter.Dispose();
                     dxgiFactory.Dispose();
 #endif
+                    modes.Sort (delegate (DisplayMode a, DisplayMode b) {
+                        if (a == b) return 0;
+                        if (a.Format <= b.Format && a.Width <= b.Width && a.Height <= b.Height) return -1;
+                        else return 1;
+                    });
                     _supportedDisplayModes = new DisplayModeCollection(modes);
                 }
 

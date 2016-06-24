@@ -23,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
                 color = new Color();
         }
 
-        public override void Edit(Control control)
+        public override void Edit(PixelLayout control)
         {
             var dialog = new ColorDialog();
             dialog.Color = color;
