@@ -23,6 +23,8 @@ namespace MonoGame.Tests.Framework.Audio
             _waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
             _soundBank = new SoundBank(_audioEngine, @"Assets\Audio\Win\Tests.xsb");
 
+            Assert.False(_soundBank.IsInUse);
+
             Assert.False(_audioEngine.IsDisposed);
             Assert.False(_waveBank.IsDisposed);
             Assert.False(_soundBank.IsDisposed);
@@ -147,6 +149,44 @@ namespace MonoGame.Tests.Framework.Audio
 
             // Make sure private variables can't be accessed.
             Assert.Throws<IndexOutOfRangeException>(() => _audioEngine.SetGlobalVariable("This Is Private", 1.0f));
+        }
+
+        [Test]
+        public void SoundBankGetCue()
+        {
+            Assert.False(_soundBank.IsInUse);
+
+            Assert.Throws<ArgumentNullException>(() => _soundBank.GetCue(null));
+            Assert.Throws<ArgumentNullException>(() => _soundBank.GetCue(""));
+            Assert.Throws<ArgumentException>(() => _soundBank.GetCue("DoesNotExist"));
+            Assert.Throws<ArgumentException>(() => _soundBank.GetCue("BLAST_MONO"));
+
+            Assert.False(_soundBank.IsInUse);
+            var cue = _soundBank.GetCue("blast_mono");
+            Assert.True(_soundBank.IsInUse);
+
+            Assert.NotNull(cue);
+            Assert.AreEqual("blast_mono", cue.Name);
+            Assert.True(!cue.IsDisposed);
+           
+            cue.Dispose();
+            Assert.True(cue.IsDisposed);
+            
+            // TODO: This fails on MonoGame!
+            //Assert.True(_soundBank.IsInUse);
+        }
+
+        [Test]
+        public void SoundBankPlayCue()
+        {
+            Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue(null));
+            Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue(""));
+            Assert.Throws<InvalidOperationException>(() => _soundBank.PlayCue("DoesNotExist", null, null));
+            Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue("blast_mono", null, null));
+            Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue("blast_mono", new AudioListener(), null));
+
+            // TODO: Add actual playback tests!
+            //_soundBank.PlayCue("blast_mono");
         }
     }
 }

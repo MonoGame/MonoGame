@@ -306,7 +306,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Is true if the Cue has been disposed.
         /// </summary>
-        public bool IsDisposed { get; private set; }
+        public bool IsDisposed { get; internal set; }
 
         /// <summary>
         /// Disposes the Cue.

@@ -17,7 +17,12 @@ namespace Microsoft.Xna.Framework.Audio
         readonly string[] _waveBankNames;
         readonly WaveBank[] _waveBanks;
         readonly Dictionary<string, Cue> _cues = new Dictionary<string, Cue>();
-        
+
+        /// <summary>
+        /// Is true if the SoundBank has any live Cues in use.
+        /// </summary>
+        public bool IsInUse { get; private set; }
+
         /// <param name="audioEngine">AudioEngine that will be associated with this sound bank.</param>
         /// <param name="fileName">Path to a .xsb SoundBank file.</param>
         public SoundBank(AudioEngine audioEngine, string fileName)
@@ -237,9 +242,19 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public Cue GetCue(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            Cue cue;
+            if (!_cues.TryGetValue(name, out cue))
+                throw new ArgumentException();
+
+            IsInUse = true;
+
             // Note: In XNA this returns a new Cue instance, but that
             // generates garbage which is one reason to not do it.
-            return _cues[name];
+            cue.IsDisposed = false;
+            return cue;
         }
         
         /// <summary>
@@ -248,7 +263,15 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="name">Name of the cue to play.</param>
         public void PlayCue(string name)
         {
-            var cue = GetCue(name);
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            Cue cue;
+            if (!_cues.TryGetValue(name, out cue))
+                throw new ArgumentException();
+
+            IsInUse = true;
+
             cue.Play();
         }
 
@@ -263,9 +286,17 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="emitter">The cue emitter state.</param>
         public void PlayCue(string name, AudioListener listener, AudioEmitter emitter)
         {
-            var cue = GetCue(name);
-            cue.Play();
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            Cue cue;
+            if (!_cues.TryGetValue(name, out cue))
+                throw new InvalidOperationException();
+
+            IsInUse = true;
+
             cue.Apply3D(listener, emitter);
+            cue.Play();
         }
 
         /// <summary>
