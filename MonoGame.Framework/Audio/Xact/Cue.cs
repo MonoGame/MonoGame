@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
                 if (_curSound != null)
                     return _curSound.Stopped;
 
-                return IsCreated;
+                return !IsDisposed && !IsPrepared;
             }
         }
 
@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             _curSound.Play(1.0f, _engine);
             _played = true;
-            IsCreated = true;
+            IsPrepared = false;
         }
 
         /// <summary>Resumes playback of a paused Cue.</summary>
@@ -154,6 +154,8 @@ namespace Microsoft.Xna.Framework.Audio
             
             if (_curSound != null)
                 _curSound.Stop(options);
+
+            IsPrepared = false;
         }
 
         private int FindVariable(string name)
