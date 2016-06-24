@@ -7,9 +7,9 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	class XactSound
-	{
-		private readonly bool _complexSound;
+    class XactSound
+    {
+        private readonly bool _complexSound;
         private readonly XactClip[] _soundClips;
         private readonly int _waveBankIndex;
         private readonly int _trackIndex;
@@ -21,9 +21,9 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundEffectInstance _wave;
 
         private float _cueVolume = 1;
-	    private float _cuePitch = 0;
+        private float _cuePitch = 0;
 
-	    internal readonly int[] RpcCurves;
+        internal readonly int[] RpcCurves;
 
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
@@ -35,10 +35,10 @@ namespace Microsoft.Xna.Framework.Audio
             RpcCurves = new int[0];
         }
 
-		public XactSound(AudioEngine engine, SoundBank soundBank, BinaryReader soundReader)
-		{
+        public XactSound(AudioEngine engine, SoundBank soundBank, BinaryReader soundReader)
+        {
             _soundBank = soundBank;
-			
+            
             var flags = soundReader.ReadByte();
             _complexSound = (flags & 0x1) != 0;
             var hasRPCs = (flags & 0x0E) != 0;
@@ -47,54 +47,54 @@ namespace Microsoft.Xna.Framework.Audio
             _categoryID = soundReader.ReadUInt16();
             _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
             _pitch = soundReader.ReadInt16() / 1000.0f;
-			soundReader.ReadByte(); //priority
+            soundReader.ReadByte(); //priority
             soundReader.ReadUInt16(); // filter stuff?
-			
-			var numClips = 0;
-			if (_complexSound)
-				numClips = soundReader.ReadByte();
-			else 
+            
+            var numClips = 0;
+            if (_complexSound)
+                numClips = soundReader.ReadByte();
+            else 
             {
-				_trackIndex = soundReader.ReadUInt16();
-				_waveBankIndex = soundReader.ReadByte();
-			}
+                _trackIndex = soundReader.ReadUInt16();
+                _waveBankIndex = soundReader.ReadByte();
+            }
 
-			if (!hasRPCs)
+            if (!hasRPCs)
                 RpcCurves = new int[0];
             else
-			{
-				var current = soundReader.BaseStream.Position;
+            {
+                var current = soundReader.BaseStream.Position;
 
                 // This doesn't seem to be used... might have been there
                 // to allow for some future file format expansion.
-				var dataLength = soundReader.ReadUInt16();
+                var dataLength = soundReader.ReadUInt16();
 
-			    var numPresets = soundReader.ReadByte();
-			    RpcCurves = new int[numPresets];
-			    for (var i = 0; i < numPresets; i++)
+                var numPresets = soundReader.ReadByte();
+                RpcCurves = new int[numPresets];
+                for (var i = 0; i < numPresets; i++)
                     RpcCurves[i] = engine.GetRpcIndex(soundReader.ReadUInt32());
 
                 // Just in case seek to the right spot.
-				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
-			}
+                soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+            }
 
-			if (hasEffects)
-			{
-				var current = soundReader.BaseStream.Position;
-				var dataLength = soundReader.ReadUInt16();
-				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
-			}
-
-			if (_complexSound)
+            if (hasEffects)
             {
-				_soundClips = new XactClip[numClips];
-				for (int i=0; i<numClips; i++) 
-					_soundClips[i] = new XactClip(soundBank, soundReader);
-			}
+                var current = soundReader.BaseStream.Position;
+                var dataLength = soundReader.ReadUInt16();
+                soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+            }
+
+            if (_complexSound)
+            {
+                _soundClips = new XactClip[numClips];
+                for (int i=0; i<numClips; i++) 
+                    _soundClips[i] = new XactClip(soundBank, soundReader);
+            }
 
             var category = engine.Categories[_categoryID];
             category.AddSound(this);
-		}
+        }
 
         internal void SetFade(float fadeInTime, float fadeOutTime)
         {
@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-		public void Play(float volume, AudioEngine engine)
+        public void Play(float volume, AudioEngine engine)
         {
             _cueVolume = volume;
             var category = engine.Categories[_categoryID];
@@ -132,11 +132,11 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-			if (_complexSound) 
+            if (_complexSound) 
             {
-				foreach (XactClip clip in _soundClips)
-					clip.Play();
-			} 
+                foreach (XactClip clip in _soundClips)
+                    clip.Play();
+            } 
             else 
             {
                 if (_wave != null && _wave.State != SoundState.Stopped && _wave.IsLooped)
@@ -154,8 +154,8 @@ namespace Microsoft.Xna.Framework.Audio
                 _wave.Pitch = _pitch + _cuePitch;
                 _wave.Volume = _volume * _cueVolume * category._volume[0];
                 _wave.Play();
-			}
-		}
+            }
+        }
 
         internal void Update(float dt)
         {
@@ -187,8 +187,8 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
         }
-		
-		public void Stop(AudioStopOptions options)
+        
+        public void Stop(AudioStopOptions options)
         {
             if (_complexSound)
             {
@@ -203,41 +203,41 @@ namespace Microsoft.Xna.Framework.Audio
                     _wave = null;
                 }
             }
-		}
-		
-		public void Pause()
+        }
+        
+        public void Pause()
         {
-			if (_complexSound)
+            if (_complexSound)
             {
                 foreach (var sound in _soundClips)
                 {
                     if (sound.State == SoundState.Playing)
                         sound.Pause();
                 }
-			}
+            }
             else
             {
                 if (_wave != null && _wave.State == SoundState.Playing)
                     _wave.Pause();
-			}
-		}
+            }
+        }
                 
-		public void Resume()
+        public void Resume()
         {
-			if (_complexSound)
+            if (_complexSound)
             {
                 foreach (var sound in _soundClips)
                 {
                     if (sound.State == SoundState.Paused)
                         sound.Resume();
                 }
-			}
+            }
             else
             {
                 if (_wave != null && _wave.State == SoundState.Paused)
                     _wave.Resume();
-			}
-		}
+            }
+        }
 
         internal void UpdateCategoryVolume(float categoryVolume)
         {
@@ -290,22 +290,22 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-		public bool Playing 
+        public bool Playing 
         {
-			get 
+            get 
             {
-				if (_complexSound)
+                if (_complexSound)
                 {
                     foreach (var clip in _soundClips)
                         if (clip.State == SoundState.Playing)
                             return true;
 
                     return false;
-				} 
+                } 
 
                 return _wave != null && _wave.State == SoundState.Playing;
-			}
-		}
+            }
+        }
 
         public bool Stopped
         {
@@ -324,22 +324,22 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-		public bool IsPaused
-		{
-			get
-			{
-				if (_complexSound) 
+        public bool IsPaused
+        {
+            get
+            {
+                if (_complexSound) 
                 {
-					foreach (var clip in _soundClips)
-						if (clip.State == SoundState.Paused) 
+                    foreach (var clip in _soundClips)
+                        if (clip.State == SoundState.Paused) 
                             return true;
 
-					return false;
+                    return false;
                 }
 
                 return _wave != null && _wave.State == SoundState.Paused;
-			}
-		}
+            }
+        }
     }
 }
 
