@@ -104,8 +104,8 @@ namespace Microsoft.Xna.Framework.Audio
                 reader.ReadUInt16 (); //unkn, 0x16
 
                 uint numRpc = reader.ReadUInt16 ();
-                reader.ReadUInt16 (); // numDspPresets
-                reader.ReadUInt16 (); // numDspParams
+                uint numDspPresets = reader.ReadUInt16 (); 
+                uint numDspParams = reader.ReadUInt16 (); 
 
                 uint catsOffset = reader.ReadUInt32 ();
                 uint varsOffset = reader.ReadUInt32 ();
@@ -118,14 +118,16 @@ namespace Microsoft.Xna.Framework.Audio
                 uint catNamesOffset = reader.ReadUInt32 ();
                 uint varNamesOffset = reader.ReadUInt32 ();
                 uint rpcOffset = reader.ReadUInt32 ();
-                reader.ReadUInt32 (); // dspPresetsOffset
-                reader.ReadUInt32 (); // dspParamsOffset
+                uint dspPresetsOffset = reader.ReadUInt32 ();
+                uint dspParamsOffset = reader.ReadUInt32 (); 
+
                 reader.BaseStream.Seek (catNamesOffset, SeekOrigin.Begin);
                 string[] categoryNames = ReadNullTerminatedStrings(numCats, reader);
 
                 _categories = new AudioCategory[numCats];
                 reader.BaseStream.Seek (catsOffset, SeekOrigin.Begin);
-                for (int i=0; i<numCats; i++) {
+                for (int i=0; i<numCats; i++) 
+                {
                     _categories [i] = new AudioCategory (this, categoryNames [i], reader);
                     _categoryLookup.Add (categoryNames [i], i);
                 }
@@ -158,40 +160,61 @@ namespace Microsoft.Xna.Framework.Audio
                 _variables = variables.ToArray();
 
                 RpcCurves = new RpcCurve[numRpc];
-                reader.BaseStream.Seek(rpcOffset, SeekOrigin.Begin);
-                for (var i=0; i < numRpc; i++)
+                if (numRpc > 0)
                 {
-                    RpcCurves[i].FileOffset = (uint)reader.BaseStream.Position;
+                    reader.BaseStream.Seek(rpcOffset, SeekOrigin.Begin);
+                    for (var i=0; i < numRpc; i++)
+                    {
+                        RpcCurves[i].FileOffset = (uint)reader.BaseStream.Position;
 
-                    var vindex = reader.ReadUInt16();
-                    if (_variables[vindex].IsGlobal)
-                    {
-                        RpcCurves[i].IsGlobal = true;
-                        RpcCurves[i].Variable = vindex;
-                    }
-                    else
-                    {
-                        // Fixup index to point at the cue instance variables.
-                        var name = _variables[vindex].Name;
-                        for (var j = 0; j < _cueVariables.Length; j++)
+                        var vindex = reader.ReadUInt16();
+                        if (_variables[vindex].IsGlobal)
                         {
-                            if (_cueVariables[j].Name != name)
-                                continue;
+                            RpcCurves[i].IsGlobal = true;
+                            RpcCurves[i].Variable = vindex;
+                        }
+                        else
+                        {
+                            // Fixup index to point at the cue instance variables.
+                            var name = _variables[vindex].Name;
+                            for (var j = 0; j < _cueVariables.Length; j++)
+                            {
+                                if (_cueVariables[j].Name != name)
+                                    continue;
 
-                            RpcCurves[i].Variable = j;
-                            break;
+                                RpcCurves[i].Variable = j;
+                                break;
+                            }
+                        }
+
+                        var pointCount = (int)reader.ReadByte();
+                        RpcCurves[i].Parameter = (RpcParameter)reader.ReadUInt16();
+
+                        RpcCurves[i].Points = new RpcPoint[pointCount];
+                        for (var j=0; j < pointCount; j++) 
+                        {
+                            RpcCurves[i].Points[j].Position = reader.ReadSingle();
+                            RpcCurves[i].Points[j].Value = reader.ReadSingle();
+                            RpcCurves[i].Points[j].Type = (RpcPointType)reader.ReadByte();
                         }
                     }
+                }
 
-                    var pointCount = (int)reader.ReadByte();
-                    RpcCurves[i].Parameter = (RpcParameter)reader.ReadUInt16();
-
-                    RpcCurves[i].Points = new RpcPoint[pointCount];
-                    for (var j=0; j < pointCount; j++) 
+                if (numDspPresets > 0)
+                {
+                    reader.BaseStream.Seek(dspPresetsOffset, SeekOrigin.Begin);
+                    for (var i = 0; i < numDspPresets; i++)
                     {
-                        RpcCurves[i].Points[j].Position = reader.ReadSingle();
-                        RpcCurves[i].Points[j].Value = reader.ReadSingle();
-                        RpcCurves[i].Points[j].Type = (RpcPointType)reader.ReadByte();
+                        // TODO!
+                    }
+                }
+
+                if (numDspParams > 0)
+                {
+                    reader.BaseStream.Seek(dspParamsOffset, SeekOrigin.Begin);
+                    for (var i = 0; i < numDspParams; i++)
+                    {
+                        // TODO!
                     }
                 }
             }
