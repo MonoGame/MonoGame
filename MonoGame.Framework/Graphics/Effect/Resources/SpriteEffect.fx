@@ -40,7 +40,9 @@ VSOutput SpriteVertexShader(	float4 position	: POSITION0,
 
 float4 SpritePixelShader(VSOutput input) : SV_Target0
 {
-    return SAMPLE_TEXTURE(Texture, input.texCoord) * input.color;
+    float4 color = SAMPLE_TEXTURE(Texture, input.texCoord) * input.color;
+	color.rgb *= input.color.a;
+	return color;
 }
 
 TECHNIQUE( SpriteBatch, SpriteVertexShader, SpritePixelShader );
