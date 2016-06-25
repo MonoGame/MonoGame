@@ -135,8 +135,9 @@ namespace Microsoft.Xna.Framework.Audio
                 reader.BaseStream.Seek (varNamesOffset, SeekOrigin.Begin);
                 string[] varNames = ReadNullTerminatedStrings(numVars, reader);
 
-                var cueVariables = new List<RpcVariable>();
                 var variables = new List<RpcVariable>();
+                var cueVariables = new List<RpcVariable>();
+                var globalVariables = new List<RpcVariable>();
                 reader.BaseStream.Seek (varsOffset, SeekOrigin.Begin);
                 for (var i=0; i < numVars; i++)
                 {
@@ -148,16 +149,17 @@ namespace Microsoft.Xna.Framework.Audio
                     v.MaxValue = reader.ReadSingle();
                     v.Value = v.InitValue;
 
+                    variables.Add(v);
                     if (!v.IsGlobal)
                         cueVariables.Add(v);
                     else
                     {
-                        variables.Add(v);
-                        _variableLookup.Add(v.Name, variables.Count - 1);                        
+                        globalVariables.Add(v);
+                        _variableLookup.Add(v.Name, globalVariables.Count - 1);                        
                     }
                 }
                 _cueVariables = cueVariables.ToArray();
-                _variables = variables.ToArray();
+                _variables = globalVariables.ToArray();
 
                 RpcCurves = new RpcCurve[numRpc];
                 if (numRpc > 0)
@@ -167,24 +169,16 @@ namespace Microsoft.Xna.Framework.Audio
                     {
                         RpcCurves[i].FileOffset = (uint)reader.BaseStream.Position;
 
-                        var vindex = reader.ReadUInt16();
-                        if (_variables[vindex].IsGlobal)
+                        var variable = variables[ reader.ReadUInt16() ];
+                        if (variable.IsGlobal)
                         {
                             RpcCurves[i].IsGlobal = true;
-                            RpcCurves[i].Variable = vindex;
+                            RpcCurves[i].Variable = globalVariables.FindIndex(e => e.Name == variable.Name);
                         }
                         else
                         {
-                            // Fixup index to point at the cue instance variables.
-                            var name = _variables[vindex].Name;
-                            for (var j = 0; j < _cueVariables.Length; j++)
-                            {
-                                if (_cueVariables[j].Name != name)
-                                    continue;
-
-                                RpcCurves[i].Variable = j;
-                                break;
-                            }
+                            RpcCurves[i].IsGlobal = false;
+                            RpcCurves[i].Variable = cueVariables.FindIndex(e => e.Name == variable.Name);
                         }
 
                         var pointCount = (int)reader.ReadByte();
