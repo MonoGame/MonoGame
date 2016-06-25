@@ -14,6 +14,8 @@ namespace Microsoft.Xna.Framework.Audio
         internal SourceVoice _voice;
         internal WaveFormat _format;
 
+        private SharpDX.XAudio2.Fx.Reverb _reverb;
+
         private static float[] _panMatrix;
 
         private bool _paused;
@@ -251,10 +253,64 @@ namespace Microsoft.Xna.Framework.Audio
                 _voice.SetVolume(value, XAudio2.CommitNow);
         }
 
+        internal void PlatformSetReverb(DspReverb reverb)
+        {
+            if (_voice == null)
+                return;
+
+            // Are we turning off the reverb effect?
+            if (reverb == null)
+            {
+                _voice.DisableEffect(0);
+                return;
+            }
+
+            if (_reverb == null)
+            {
+                _reverb = new SharpDX.XAudio2.Fx.Reverb();
+                var desc = new EffectDescriptor(_reverb);
+                desc.InitialState = false;
+                desc.OutputChannelCount = 1;
+                _voice.SetEffectChain(desc);
+            }
+
+            var p = new SharpDX.XAudio2.Fx.ReverbParameters
+            {
+                ReflectionsGain = reverb.ReflectionsGainDb.Value,
+                ReverbGain = reverb.ReverbGainDb.Value,
+                DecayTime = reverb.DecayTimeSec.Value,
+                ReflectionsDelay = (byte)reverb.ReflectionsDelayMs.Value,
+                ReverbDelay = (byte)reverb.ReverbDelayMs.Value,
+                RearDelay = (byte)reverb.RearDelayMs.Value,
+                RoomSize = reverb.RoomSizeFeet.Value,
+                Density = reverb.DensityPct.Value,
+                LowEQGain = (byte)reverb.LowEqGain.Value,
+                LowEQCutoff = (byte)reverb.LowEqCutoff.Value,
+                HighEQGain = (byte)reverb.HighEqGain.Value,
+                HighEQCutoff = (byte)reverb.HighEqCutoff.Value,
+                PositionLeft = (byte)reverb.PositionLeft.Value,
+                PositionRight = (byte)reverb.PositionRight.Value,
+                PositionMatrixLeft = (byte)reverb.PositionLeftMatrix.Value,
+                PositionMatrixRight = (byte)reverb.PositionRightMatrix.Value,
+                EarlyDiffusion = (byte)reverb.EarlyDiffusion.Value,
+                LateDiffusion = (byte)reverb.LateDiffusion.Value,
+                RoomFilterMain = reverb.RoomFilterMainDb.Value,
+                RoomFilterFreq = reverb.RoomFilterFrequencyHz.Value,
+                RoomFilterHF = reverb.RoomFilterHighFrequencyDb.Value,
+                WetDryMix = reverb.WetDryMixPct.Value
+            };
+
+            _voice.SetEffectParameters(0, p);
+            _voice.EnableEffect(0);           
+        }
+
         private void PlatformDispose(bool disposing)
         {
             if (disposing)
             {
+                if (_reverb != null)
+                    _reverb.Dispose();
+
                 if (_voice != null)
                 {
                     _voice.DestroyVoice();
@@ -263,6 +319,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
             _voice = null;
             _effect = null;
+            _reverb = null;
         }
     }
 }

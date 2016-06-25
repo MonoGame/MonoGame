@@ -80,6 +80,7 @@ namespace Microsoft.Xna.Framework.Audio
                 inst.Pan = 0.0f;
                 inst.Pitch = 0.0f;
                 inst.IsLooped = false;
+                inst.PlatformSetReverb(null);
             }
             else
             {

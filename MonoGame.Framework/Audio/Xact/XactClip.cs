@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly ClipEvent[] _events;
         private float _time;
         private int _nextEvent;
+        
+        internal DspReverb Reverb;
 
         public XactClip (SoundBank soundBank, BinaryReader clipReader)
         {

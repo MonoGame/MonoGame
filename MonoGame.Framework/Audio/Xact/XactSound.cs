@@ -94,8 +94,12 @@ namespace Microsoft.Xna.Framework.Audio
             if (_complexSound)
             {
                 _soundClips = new XactClip[numClips];
-                for (int i=0; i<numClips; i++) 
+                for (int i = 0; i < numClips; i++)
+                {
                     _soundClips[i] = new XactClip(soundBank, soundReader);
+                    if (UseReverb)
+                        _soundClips[i].Reverb = engine.DspReverb;
+                }
             }
 
             var category = engine.Categories[_categoryID];

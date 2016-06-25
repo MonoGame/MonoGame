@@ -22,8 +22,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         private readonly RpcVariable[] _cueVariables;
 
-        private readonly DspReverb _dspReverb;
-
         private readonly Stopwatch _stopwatch;
         private TimeSpan _lastUpdateTime;
 
@@ -35,6 +33,8 @@ namespace Microsoft.Xna.Framework.Audio
         internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
 
         internal readonly RpcCurve[] RpcCurves;
+
+        internal readonly DspReverb DspReverb;
 
         internal RpcVariable[] CreateCueVariables()
         {
@@ -209,7 +209,7 @@ namespace Microsoft.Xna.Framework.Audio
                         throw new Exception("Unexpected number of DSP parameters!");
 
                     reader.BaseStream.Seek(dspParamsOffset, SeekOrigin.Begin);
-                    _dspReverb = new DspReverb(reader);
+                    DspReverb = new DspReverb(reader);
                 }
             }
 
