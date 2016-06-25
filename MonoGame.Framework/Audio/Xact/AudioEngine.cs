@@ -22,6 +22,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private readonly RpcVariable[] _cueVariables;
 
+        private readonly DspReverb _dspReverb;
+
         private readonly Stopwatch _stopwatch;
         private TimeSpan _lastUpdateTime;
 
@@ -118,7 +120,7 @@ namespace Microsoft.Xna.Framework.Audio
                 uint catNamesOffset = reader.ReadUInt32 ();
                 uint varNamesOffset = reader.ReadUInt32 ();
                 uint rpcOffset = reader.ReadUInt32 ();
-                uint dspPresetsOffset = reader.ReadUInt32 ();
+                reader.ReadUInt32(); // dspPresetsOffset
                 uint dspParamsOffset = reader.ReadUInt32 (); 
 
                 reader.BaseStream.Seek (catNamesOffset, SeekOrigin.Begin);
@@ -196,20 +198,18 @@ namespace Microsoft.Xna.Framework.Audio
 
                 if (numDspPresets > 0)
                 {
-                    reader.BaseStream.Seek(dspPresetsOffset, SeekOrigin.Begin);
-                    for (var i = 0; i < numDspPresets; i++)
-                    {
-                        // TODO!
-                    }
-                }
+                    // Note:  It seemed like MS designed this to support multiple
+                    // DSP effects, but in practice XACT only has one... Microsoft Reverb.
+                    //
+                    // So because of this we know exactly how many presets and 
+                    // parameters we should have.
+                    if (numDspPresets != 1)
+                        throw new Exception("Unexpected number of DSP presets!");
+                    if (numDspParams != 22)
+                        throw new Exception("Unexpected number of DSP parameters!");
 
-                if (numDspParams > 0)
-                {
                     reader.BaseStream.Seek(dspParamsOffset, SeekOrigin.Begin);
-                    for (var i = 0; i < numDspParams; i++)
-                    {
-                        // TODO!
-                    }
+                    _dspReverb = new DspReverb(reader);
                 }
             }
 

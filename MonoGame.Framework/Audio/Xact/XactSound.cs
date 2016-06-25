@@ -24,6 +24,8 @@ namespace Microsoft.Xna.Framework.Audio
         private float _cuePitch = 0;
 
         internal readonly int[] RpcCurves;
+        
+        internal readonly bool UseReverb;
 
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
@@ -42,7 +44,7 @@ namespace Microsoft.Xna.Framework.Audio
             var flags = soundReader.ReadByte();
             _complexSound = (flags & 0x1) != 0;
             var hasRPCs = (flags & 0x0E) != 0;
-            var hasEffects = (flags & 0x10) != 0;
+            var hasDSPs = (flags & 0x10) != 0;
 
             _categoryID = soundReader.ReadUInt16();
             _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
@@ -78,11 +80,15 @@ namespace Microsoft.Xna.Framework.Audio
                 soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
             }
 
-            if (hasEffects)
+            if (!hasDSPs)
+                UseReverb = false;
+            else
             {
-                var current = soundReader.BaseStream.Position;
-                var dataLength = soundReader.ReadUInt16();
-                soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+                // The file format for this seems to follow the pattern for 
+                // the RPC curves above, but in this case XACT only supports
+                // a single effect...  Microsoft Reverb... so just set it.
+                UseReverb = true;
+                soundReader.BaseStream.Seek(7, SeekOrigin.Current);
             }
 
             if (_complexSound)
