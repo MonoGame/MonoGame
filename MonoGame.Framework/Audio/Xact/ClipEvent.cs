@@ -28,9 +28,8 @@ namespace Microsoft.Xna.Framework.Audio
         public abstract void Resume();
         public abstract void SetFade(float fadeInDuration, float fadeOutDuration);
         public abstract void SetTrackVolume(float volume);
+        public abstract void SetTrackPan(float pan);
 	    public abstract bool Update(float dt);
-
-        public abstract void Apply3D(AudioListener listener, AudioEmitter emitter);
     }
 }
 

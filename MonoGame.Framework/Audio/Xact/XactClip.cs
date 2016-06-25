@@ -7,50 +7,50 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	class XactClip
-	{
+    class XactClip
+    {
         private readonly float _defaultVolume;
         private float _volumeScale;
         private float _volume;
 
-		private readonly ClipEvent[] _events;
+        private readonly ClipEvent[] _events;
         private float _time;
         private int _nextEvent;
 
-		public XactClip (SoundBank soundBank, BinaryReader clipReader)
-		{
+        public XactClip (SoundBank soundBank, BinaryReader clipReader)
+        {
 #pragma warning disable 0219
             State = SoundState.Stopped;
 
-		    var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
+            var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
             _defaultVolume = XactHelpers.ParseVolumeFromDecibels(volumeDb);
             var clipOffset = clipReader.ReadUInt32();
 
             // Unknown!
             clipReader.ReadUInt32();
 
-			var oldPosition = clipReader.BaseStream.Position;
-			clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
-			
-			var numEvents = clipReader.ReadByte();
-			_events = new ClipEvent[numEvents];
-			
-			for (var i=0; i<numEvents; i++) 
+            var oldPosition = clipReader.BaseStream.Position;
+            clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
+            
+            var numEvents = clipReader.ReadByte();
+            _events = new ClipEvent[numEvents];
+            
+            for (var i=0; i<numEvents; i++) 
             {
-				var eventInfo = clipReader.ReadUInt32();
+                var eventInfo = clipReader.ReadUInt32();
                 var randomOffset = clipReader.ReadUInt16() * 0.001f;
 
                 // TODO: eventInfo still has 11 bits that are unknown!
-				var eventId = eventInfo & 0x1F;
+                var eventId = eventInfo & 0x1F;
                 var timeStamp = ((eventInfo >> 5) & 0xFFFF) * 0.001f;
                 var unknown = eventInfo >> 21;
 
-				switch (eventId) {
+                switch (eventId) {
                 case 0:
                     // Stop Event
                     throw new NotImplementedException("Stop event");
 
-				case 1:
+                case 1:
                 {
                     // Unknown!
                     clipReader.ReadByte();
@@ -61,9 +61,9 @@ namespace Microsoft.Xna.Framework.Audio
                     var panEnabled = (eventFlags & 0x02) == 0x02;
                     var useCenterSpeaker = (eventFlags & 0x04) == 0x04;
 
-					int trackIndex = clipReader.ReadUInt16();
+                    int trackIndex = clipReader.ReadUInt16();
                     int waveBankIndex = clipReader.ReadByte();					
-					var loopCount = clipReader.ReadByte();
+                    var loopCount = clipReader.ReadByte();
                     var panAngle = clipReader.ReadUInt16() / 100.0f;
                     var panArc = clipReader.ReadUInt16() / 100.0f;
                     
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework.Audio
                         loopCount,
                         false);
 
-					break;
+                    break;
                 }
 
                 case 3:
@@ -331,14 +331,14 @@ namespace Microsoft.Xna.Framework.Audio
                     // Marker Event
                     throw new NotImplementedException("Marker event");
 
-				default:
+                default:
                     throw new NotSupportedException("Unknown event " + eventId);
-				}
-			}
-			
+                }
+            }
+            
             clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 #pragma warning restore 0219
-		}
+        }
 
         internal void Update(float dt)
         {
@@ -379,36 +379,36 @@ namespace Microsoft.Xna.Framework.Audio
                     evt.SetFade(fadeInDuration, fadeOutDuration);
             }
         }
-		
-		public void Play()
-		{
-		    _time = 0.0f;
+        
+        public void Play()
+        {
+            _time = 0.0f;
             _nextEvent = 0;
-		    SetVolume(_defaultVolume);
+            SetVolume(_defaultVolume);
             State = SoundState.Playing; 
             Update(0);
         }
 
-		public void Resume()
-		{
+        public void Resume()
+        {
             foreach (var evt in _events)
                 evt.Resume();
 
             State = SoundState.Playing;
-		}
-		
-		public void Stop()
+        }
+        
+        public void Stop()
         {
             foreach (var evt in _events)
                 evt.Stop();
 
             State = SoundState.Stopped;
         }
-		
-		public void Pause()
+        
+        public void Pause()
         {
-		    foreach (var evt in _events)
-		        evt.Pause();
+            foreach (var evt in _events)
+                evt.Pause();
 
             State = SoundState.Paused;
         }
@@ -422,7 +422,7 @@ namespace Microsoft.Xna.Framework.Audio
         public void SetVolumeScale(float volume)
         {
             _volumeScale = volume;
-		    UpdateVolumes();
+            UpdateVolumes();
         }
 
         /// <summary>
@@ -435,17 +435,17 @@ namespace Microsoft.Xna.Framework.Audio
             UpdateVolumes();
         }
 
-	    private void UpdateVolumes()
-	    {
+        private void UpdateVolumes()
+        {
             var volume = _volume * _volumeScale;
             foreach (var evt in _events)
                 evt.SetTrackVolume(volume);
-	    }
+        }
 
-        public void Apply3D(AudioListener listener, AudioEmitter emitter)
+        public void SetPan(float pan)
         {
             foreach (var evt in _events)
-                evt.Apply3D(listener, emitter);
+                evt.SetTrackPan(pan);
         }
     }
 }
