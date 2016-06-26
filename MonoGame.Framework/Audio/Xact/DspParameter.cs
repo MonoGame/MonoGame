@@ -14,9 +14,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         public DspParameter(BinaryReader reader)
         {
-            // Is always 0 or 1... not sure what it is for.
+            // This is 1 if the type is byte sized and 0 for 
+            // floats... not sure if we should use this info.
             reader.ReadByte();
-
+            
             // The value and the min/max range for limiting the 
             // results from the RPC curve when animated.
             Value = reader.ReadSingle();
@@ -26,6 +27,16 @@ namespace Microsoft.Xna.Framework.Audio
             // Looks to always be zero...  maybe some padding
             // for future expansion that never occured?
             reader.ReadUInt16();
+        }
+
+        public void SetValue(float value)
+        {
+            if (value < MinValue)
+                Value = MinValue;
+            else if (value > MaxValue)
+                Value = MaxValue;
+            else
+                Value = value;
         }
 
         public override string ToString()

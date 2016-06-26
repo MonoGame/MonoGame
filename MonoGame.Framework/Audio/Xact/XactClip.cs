@@ -17,12 +17,14 @@ namespace Microsoft.Xna.Framework.Audio
         private float _time;
         private int _nextEvent;
         
-        internal DspReverb Reverb;
+        internal readonly bool UseReverb;
 
-        public XactClip (SoundBank soundBank, BinaryReader clipReader)
+        public XactClip (SoundBank soundBank, BinaryReader clipReader, bool useReverb)
         {
 #pragma warning disable 0219
             State = SoundState.Stopped;
+
+            UseReverb = useReverb;
 
             var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
             _defaultVolume = XactHelpers.ParseVolumeFromDecibels(volumeDb);

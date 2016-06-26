@@ -17,6 +17,7 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly float _pitch;
         private readonly uint _categoryID;
         private readonly SoundBank _soundBank;
+        private readonly bool _useReverb;
 
         private SoundEffectInstance _wave;
 
@@ -25,8 +26,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal readonly int[] RpcCurves;
         
-        internal readonly bool UseReverb;
-
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
             _complexSound = false;
@@ -81,13 +80,13 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             if (!hasDSPs)
-                UseReverb = false;
+                _useReverb = false;
             else
             {
                 // The file format for this seems to follow the pattern for 
                 // the RPC curves above, but in this case XACT only supports
                 // a single effect...  Microsoft Reverb... so just set it.
-                UseReverb = true;
+                _useReverb = true;
                 soundReader.BaseStream.Seek(7, SeekOrigin.Current);
             }
 
@@ -95,11 +94,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 _soundClips = new XactClip[numClips];
                 for (int i = 0; i < numClips; i++)
-                {
-                    _soundClips[i] = new XactClip(soundBank, soundReader);
-                    if (UseReverb)
-                        _soundClips[i].Reverb = engine.DspReverb;
-                }
+                    _soundClips[i] = new XactClip(soundBank, soundReader, _useReverb);
             }
 
             var category = engine.Categories[_categoryID];
@@ -163,6 +158,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 _wave.Pitch = _pitch + _cuePitch;
                 _wave.Volume = _volume * _cueVolume * category._volume[0];
+                _wave.PlatformEnableReverb(_useReverb);
                 _wave.Play();
             }
         }

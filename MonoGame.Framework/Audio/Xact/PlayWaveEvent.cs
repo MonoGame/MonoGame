@@ -156,8 +156,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // This is a shortcut for infinite looping of a single track.
             _wav.IsLooped = _loopCount == 255 && trackCount == 1;
-            if (_clip.Reverb != null)
-                _wav.PlatformSetReverb(_clip.Reverb);
+            _wav.PlatformEnableReverb(_clip.UseReverb);
             _wav.Play();
 		}
 

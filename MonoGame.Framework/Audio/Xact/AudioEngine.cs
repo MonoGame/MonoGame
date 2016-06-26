@@ -25,6 +25,8 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly Stopwatch _stopwatch;
         private TimeSpan _lastUpdateTime;
 
+        private readonly ReverbSettings _reverbSettings;
+        private readonly RpcCurve[] _reverbCurves;
 
         internal List<Cue> ActiveCues = new List<Cue>();
 
@@ -33,8 +35,6 @@ namespace Microsoft.Xna.Framework.Audio
         internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
 
         internal readonly RpcCurve[] RpcCurves;
-
-        internal readonly DspReverb DspReverb;
 
         internal RpcVariable[] CreateCueVariables()
         {
@@ -163,38 +163,49 @@ namespace Microsoft.Xna.Framework.Audio
                 _cueVariables = cueVariables.ToArray();
                 _variables = globalVariables.ToArray();
 
+                var reverbCurves = new List<RpcCurve>();
                 RpcCurves = new RpcCurve[numRpc];
                 if (numRpc > 0)
                 {
                     reader.BaseStream.Seek(rpcOffset, SeekOrigin.Begin);
                     for (var i=0; i < numRpc; i++)
                     {
-                        RpcCurves[i].FileOffset = (uint)reader.BaseStream.Position;
+                        var curve = new RpcCurve();
+                        curve.FileOffset = (uint)reader.BaseStream.Position;
 
                         var variable = variables[ reader.ReadUInt16() ];
                         if (variable.IsGlobal)
                         {
-                            RpcCurves[i].IsGlobal = true;
-                            RpcCurves[i].Variable = globalVariables.FindIndex(e => e.Name == variable.Name);
+                            curve.IsGlobal = true;
+                            curve.Variable = globalVariables.FindIndex(e => e.Name == variable.Name);
                         }
                         else
                         {
-                            RpcCurves[i].IsGlobal = false;
-                            RpcCurves[i].Variable = cueVariables.FindIndex(e => e.Name == variable.Name);
+                            curve.IsGlobal = false;
+                            curve.Variable = cueVariables.FindIndex(e => e.Name == variable.Name);
                         }
 
                         var pointCount = (int)reader.ReadByte();
-                        RpcCurves[i].Parameter = (RpcParameter)reader.ReadUInt16();
+                        curve.Parameter = (RpcParameter)reader.ReadUInt16();
 
-                        RpcCurves[i].Points = new RpcPoint[pointCount];
+                        curve.Points = new RpcPoint[pointCount];
                         for (var j=0; j < pointCount; j++) 
                         {
-                            RpcCurves[i].Points[j].Position = reader.ReadSingle();
-                            RpcCurves[i].Points[j].Value = reader.ReadSingle();
-                            RpcCurves[i].Points[j].Type = (RpcPointType)reader.ReadByte();
+                            curve.Points[j].Position = reader.ReadSingle();
+                            curve.Points[j].Value = reader.ReadSingle();
+                            curve.Points[j].Type = (RpcPointType)reader.ReadByte();
                         }
+
+                        // If the parameter is greater than the max then this is a DSP
+                        // parameter which is for reverb.
+                        var dspParameter = curve.Parameter - RpcParameter.NumParameters;
+                        if (dspParameter >= 0 && variable.IsGlobal)
+                            reverbCurves.Add(curve);
+
+                        RpcCurves[i] = curve;
                     }
                 }
+                _reverbCurves = reverbCurves.ToArray();
 
                 if (numDspPresets > 0)
                 {
@@ -209,7 +220,7 @@ namespace Microsoft.Xna.Framework.Audio
                         throw new Exception("Unexpected number of DSP parameters!");
 
                     reader.BaseStream.Seek(dspParamsOffset, SeekOrigin.Begin);
-                    DspReverb = new DspReverb(reader);
+                    _reverbSettings = new ReverbSettings(reader);
                 }
             }
 
@@ -271,7 +282,20 @@ namespace Microsoft.Xna.Framework.Audio
                 x++;
             }
 
-            // TODO: Process global RPC curves.
+            // The only global curves we can process seem to be 
+            // specifically for the reverb DSP effect.
+            if (_reverbSettings != null)
+            {
+                for (var i = 0; i < _reverbCurves.Length; i++)
+                {
+                    var curve = _reverbCurves[i];
+                    var result = curve.Evaluate(_variables[curve.Variable].Value);
+                    var parameter = curve.Parameter - RpcParameter.NumParameters;
+                    _reverbSettings[parameter] = result;
+                }
+
+                SoundEffect.PlatformSetReverbSettings(_reverbSettings);
+            }
         }
         
         /// <summary>Returns an audio category by name.</summary>
