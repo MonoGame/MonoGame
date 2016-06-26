@@ -161,7 +161,7 @@ namespace MonoGame.Tests.Visual {
 		public void Draw_with_alpha_blending (string colorName, byte alpha)
 		{
 			var color = colorName.ToColor();
-			color.A = alpha;
+            color = Color.FromNonPremultiplied(color.R, color.G, color.B, alpha);
 
 			Game.DrawWith += (sender, e) => {
 				_spriteBatch.Begin ();
