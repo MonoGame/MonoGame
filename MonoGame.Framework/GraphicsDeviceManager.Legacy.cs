@@ -346,7 +346,7 @@ namespace Microsoft.Xna.Framework
 #elif WINDOWS_UAP
 			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
 			presentationParameters.SwapChainPanel = this.SwapChainPanel;
-#elif WINDOWS_STORE
+#elif WINDOWS_STOREAPP
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
             if (this.SwapChainBackgroundPanel != null)

@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #if WINDOWS_UAP
-        [CLSCompliant(false)]
+        [CLSCompliant(false)] 
         public SwapChainPanel SwapChainPanel { get; set; }
 #endif
 
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.DeviceWindowHandle = IntPtr.Zero;
             presentationParameters.SwapChainPanel = this.SwapChainPanel;
 
-#elif WINDOWS_STORE
+#elif WINDOWS_STOREAPP
 
             // The graphics device can use a XAML panel or a window
             // to created the default swapchain target.
