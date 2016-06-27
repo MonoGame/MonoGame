@@ -8,6 +8,18 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
+    public class CellAttribute : Attribute
+    {
+        public string Name;
+        public Type Type;
+
+        public CellAttribute(Type type)
+        {
+            Type = type;
+        }
+    }
+
     public class CellBase
     {
         public string Category { get; set; }
@@ -15,11 +27,13 @@ namespace MonoGame.Tools.Pipeline
         public string DisplayValue { get; set; }
         public string Text { get; set; }
         public bool Editable { get; set; }
+        public Action OnKill;
 
         protected EventHandler _eventHandler;
         protected Rectangle _lastRec;
+        protected object _type;
 
-        public CellBase(string category, string name, object value, EventHandler eventHandler = null)
+        public void Create(string category, string name, object value, object type, EventHandler eventHandler = null)
         {
             Category = category;
             Value = value;
@@ -28,6 +42,14 @@ namespace MonoGame.Tools.Pipeline
             Editable = true;
 
             _eventHandler = eventHandler;
+            _type = type;
+
+            OnCreate();
+        }
+
+        public virtual void OnCreate()
+        {
+            
         }
 
         public virtual void Edit(PixelLayout control)
