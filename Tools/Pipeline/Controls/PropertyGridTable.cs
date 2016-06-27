@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Eto.Drawing;
 using Eto.Forms;
 
@@ -55,6 +56,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool Group { get; set; }
 
+        private IEnumerable<Type> _cellTypes;
         private CursorType _currentCursor;
         private CellBase _selectedCell;
         private List<CellBase> _cells;
@@ -67,6 +69,7 @@ namespace MonoGame.Tools.Pipeline
         {
             InitializeComponent();
 
+            _cellTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && t.IsSubclassOf(typeof(CellBase)));
             _separatorPos = 100;
             _mouseLocation = new Point(-1, -1);
             _cells = new List<CellBase>();
@@ -89,28 +92,50 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (control != drawable)
                 {
-                    control.Enabled = false;
+                    if (control.Tag is CellBase && (control.Tag as CellBase).OnKill != null)
+                        (control.Tag as CellBase).OnKill();
+
                     pixel1.Remove(control);
                 }
             }
         }
 
+        private Type GetCellType(IEnumerable<Type> types, string name, object type)
+        {
+            Type ret = null;
+
+            foreach (var ct in types)
+            {
+                var attrs = ct.GetCustomAttributes<CellAttribute>();
+
+                foreach (var a in attrs)
+                {
+                    if (a.Type == type.GetType() || type.GetType().IsSubclassOf(a.Type))
+                    {
+                        if (a.Name == name)
+                        {
+                            ret = ct;
+                            break;
+                        }
+
+                        if (string.IsNullOrEmpty(a.Name) && ret == null)
+                            ret = ct;
+                    }
+                }
+            }
+
+            return ret;
+        }
+
         public void AddEntry(string category, string name, object value, object type, EventHandler eventHandler = null, bool editable = true)
         {
-            if (type is Boolean)
-                _cells.Add(new CellBool(category, name, value, type, eventHandler));
-            else if (type is Enum || type is ImporterTypeDescription || type is ProcessorTypeDescription)
-                _cells.Add(new CellCombo(category, name, value, type, eventHandler));
-            else if (name.Contains("Dir"))
-                _cells.Add(new CellPath(category, name, value, eventHandler));
-            else if (type is IList)
-                _cells.Add(new CellRefs(category, name, value, eventHandler));
-            else if (type is Microsoft.Xna.Framework.Color)
-                _cells.Add(new CellColor(category, name, value, eventHandler));
-            else if(type is Single)
-                _cells.Add(new CellNumber(category, name, value, eventHandler));
-            else
-                _cells.Add(new CellText(category, name, value, eventHandler, editable));
+            var cellType = GetCellType(_cellTypes, name, type);
+
+            var cell = (cellType == null) ? new CellText() : (CellBase)Activator.CreateInstance(cellType);
+            cell.Create(category, name, value, type, eventHandler);
+            cell.Editable = (cellType != null) && editable;
+
+            _cells.Add(cell);
         }
 
         public void Update()
