@@ -218,6 +218,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         GL.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
                     }
 
+#if !ANDROID
+                    GL.Finish();
+                    GraphicsExtensions.CheckGLError();
+#endif
                     // Restore the bound texture.
                     GL.BindTexture(TextureTarget.Texture2D, prevTexture);
                     GraphicsExtensions.CheckGLError();
