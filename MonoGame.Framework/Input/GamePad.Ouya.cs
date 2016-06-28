@@ -199,7 +199,7 @@ namespace Microsoft.Xna.Framework.Input
                     thumbSticks,
                     new GamePadTriggers(gamePad._leftTrigger, gamePad._rightTrigger),
                     new GamePadButtons(gamePad._buttons),
-                    new GamePadDPad(new Buttons[] {gamePad._buttons}));
+                    new GamePadDPad(gamePad._buttons));
             }
 
             return state;
