@@ -84,17 +84,9 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            var events = new Sdl.Event[1];
-            Sdl.PumpEvents ();
-            while (Sdl.PeepEvents(events, 1, Sdl.EventAction.GetEvent, Sdl.EventType.ControllerDeviceAdded, Sdl.EventType.ControllerDeviceAdded) == 1)
-            {
-                GamePad.AddDevice(events[0].ControllerDevice.Which);
-            }
-            while (Sdl.PeepEvents(events, 1, Sdl.EventAction.GetEvent, Sdl.EventType.JoyDeviceAdded, Sdl.EventType.JoyDeviceAdded) == 1)
-            {
-                Joystick.AddDevice(events[0].JoystickDevice.Which);
-            }
+            GamePad.InitDatabase();
             _view.CreateWindow();
+            SdlRunLoop();
 
             base.BeforeInitialize ();
         }
