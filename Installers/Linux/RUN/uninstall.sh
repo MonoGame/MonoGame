@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #check removale priviledge
 if [ "$(id -u)" != "0" ]; then
