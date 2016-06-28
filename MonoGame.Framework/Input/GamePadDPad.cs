@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Input
             Right = rightValue;
         }
 
-        internal GamePadDPad(params Buttons[] buttons)
+        internal GamePadDPad(Buttons[] buttons)
             : this()
         {
             foreach (var b in buttons)
