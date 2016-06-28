@@ -5,6 +5,7 @@
 using System;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 internal static class Sdl
 {
@@ -181,7 +182,7 @@ internal static class Sdl
     public static int GetError(int value)
     {
         if (value < 0)
-            throw new Exception(GetError());
+            Debug.WriteLine(GetError());
 
         return value;
     }
@@ -189,7 +190,7 @@ internal static class Sdl
     public static IntPtr GetError(IntPtr pointer)
     {
         if (pointer == IntPtr.Zero)
-            throw new Exception(GetError());
+            Debug.WriteLine(GetError());
 
         return pointer;
     }
@@ -652,6 +653,14 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickClose")]
         public static extern void Close(IntPtr joystick);
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickFromInstanceID")]
+        private static extern IntPtr SDL_JoystickFromInstanceID(int joyid);
+
+        public static IntPtr FromInstanceID(int joyid)
+        {
+            return GetError(SDL_JoystickFromInstanceID(joyid));
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickGetAxis")]
         public static extern short GetAxis(IntPtr joystick, int axis);
 
@@ -758,8 +767,15 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerClose")]
         public static extern void Close(IntPtr gamecontroller);
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerGetAxis")
-        ]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickFromInstanceID")]
+        private static extern IntPtr SDL_GameControllerFromInstanceID(int joyid);
+
+        public static IntPtr FromInstanceID(int joyid)
+        {
+            return GetError(SDL_GameControllerFromInstanceID(joyid));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerGetAxis")]
         public static extern short GetAxis(IntPtr gamecontroller, Axis axis);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
@@ -836,9 +852,17 @@ internal static class Sdl
         {
             GetError(SDL_HapticNewEffect(haptic, ref effect));
         }
+        
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpen")]
+        public static extern IntPtr Open(int device_index);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpenFromJoystick")]
-        public static extern IntPtr OpenFromJoystick(IntPtr joystick);
+        private static extern IntPtr SDL_HapticOpenFromJoystick(IntPtr joystick);
+
+        public static IntPtr OpenFromJoystick(IntPtr joystick)
+        {
+            return GetError(SDL_HapticOpenFromJoystick(joystick));
+        }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticRumbleInit")]
         private static extern int SDL_HapticRumbleInit(IntPtr haptic);
