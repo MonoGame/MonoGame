@@ -121,6 +121,10 @@ namespace Microsoft.Xna.Framework.Audio
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
+            Filter = 0;
+            if (EffectsExtension.Instance.IsInitialized) {
+                Filter = EffectsExtension.Instance.GenFilter ();
+            }
 
             availableSourcesCollection = new List<int>(allSourcesArray);
 			inUseSourcesCollection = new List<int>();
@@ -147,6 +151,7 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
+                EffectsExtension.device = _device;
             }
             catch (Exception ex)
             {
@@ -288,6 +293,10 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        public int Filter {
+            get; private set;
+        }
+
         public static void DestroyInstance()
         {
             if (_instance != null)
@@ -371,6 +380,9 @@ namespace Microsoft.Xna.Framework.Audio
                             AL.DeleteSource(allSourcesArray[i]);
                             ALHelper.CheckError("Failed to delete source.");
                         }
+
+                        if (Filter != 0 && EffectsExtension.Instance.IsInitialized)
+                            EffectsExtension.Instance.DeleteFilter (Filter);
                         
                         CleanUpOpenAL();
                     }
