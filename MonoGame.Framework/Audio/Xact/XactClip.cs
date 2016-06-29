@@ -186,13 +186,30 @@ namespace Microsoft.Xna.Framework.Audio
                     var maxVolume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
 
                     // Filter variation
-                    var minFrequency = clipReader.ReadSingle() / 1000.0f;
-                    var maxFrequency = clipReader.ReadSingle() / 1000.0f;
+                    var minFrequency = clipReader.ReadSingle();
+                    var maxFrequency = clipReader.ReadSingle();
                     var minQ = clipReader.ReadSingle();
                     var maxQ = clipReader.ReadSingle();
 
                     // Unknown!
                     clipReader.ReadByte();
+
+                    var variationFlags = clipReader.ReadByte();
+
+                    // Enable pitch variation
+                    Vector2? pitchVar = null;
+                    if ((variationFlags & 0x10) == 0x10)
+                        pitchVar = new Vector2(minPitch, maxPitch - minPitch);
+
+                    // Enable volume variation
+                    Vector2? volumeVar = null;
+                    if ((variationFlags & 0x20) == 0x20)
+                        volumeVar = new Vector2(minVolume, maxVolume - minVolume);
+
+                    // Enable filter variation
+                    Vector4? filterVar = null;
+                    if ((variationFlags & 0x40) == 0x40)
+                        filterVar = new Vector4(minFrequency, maxFrequency - minFrequency, minQ, maxQ - minQ);
 
                     _events[i] = new PlayWaveEvent(
                         this,
@@ -204,8 +221,8 @@ namespace Microsoft.Xna.Framework.Audio
                         null,
                         0,
                         VariationType.Ordered,
-                        new Vector2(minVolume, maxVolume - minVolume),
-                        new Vector2(minPitch, maxPitch - minPitch), 
+                        volumeVar,
+                        pitchVar, 
                         loopCount,
                         false);
 
@@ -236,8 +253,8 @@ namespace Microsoft.Xna.Framework.Audio
                     var maxVolume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
 
                     // Filter variation range
-                    var minFrequency = clipReader.ReadSingle() / 1000.0f;
-                    var maxFrequency = clipReader.ReadSingle() / 1000.0f;
+                    var minFrequency = clipReader.ReadSingle();
+                    var maxFrequency = clipReader.ReadSingle();
                     var minQ = clipReader.ReadSingle();
                     var maxQ = clipReader.ReadSingle();
 
