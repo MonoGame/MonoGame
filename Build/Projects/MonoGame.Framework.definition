@@ -427,6 +427,7 @@
     <Compile Include="Audio\Xact\CrossfadeType.cs" />
     <Compile Include="Audio\Xact\Cue.cs" />
     <Compile Include="Audio\Xact\DspParameter.cs" />
+    <Compile Include="Audio\Xact\FilterMode.cs" />
     <Compile Include="Audio\Xact\MaxInstanceBehavior.cs" />
     <Compile Include="Audio\Xact\PlayWaveEvent.cs" />
     <Compile Include="Audio\Xact\ReverbSettings.cs" />	

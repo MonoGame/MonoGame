@@ -16,7 +16,12 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly ClipEvent[] _events;
         private float _time;
         private int _nextEvent;
-        
+
+        internal readonly bool FilterEnabled;
+        internal readonly FilterMode FilterMode;
+        internal readonly float FilterQ;
+        internal readonly ushort FilterFrequency;
+
         internal readonly bool UseReverb;
 
         public XactClip (SoundBank soundBank, BinaryReader clipReader, bool useReverb)
@@ -30,8 +35,12 @@ namespace Microsoft.Xna.Framework.Audio
             _defaultVolume = XactHelpers.ParseVolumeFromDecibels(volumeDb);
             var clipOffset = clipReader.ReadUInt32();
 
-            // Unknown!
-            clipReader.ReadUInt32();
+            // Read the filter info.
+            var filterQAndFlags = clipReader.ReadUInt16();
+            FilterEnabled = (filterQAndFlags & 1) == 1;
+            FilterMode = (FilterMode)((filterQAndFlags >> 1) & 3);
+            FilterQ = (filterQAndFlags >> 3) * 0.01f;
+            FilterFrequency = clipReader.ReadUInt16();
 
             var oldPosition = clipReader.BaseStream.Position;
             clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
