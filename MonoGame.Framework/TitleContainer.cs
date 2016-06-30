@@ -47,9 +47,13 @@ namespace Microsoft.Xna.Framework
                 if (stream == null)
                     throw FileNotFoundException(name, null);
             }
+            catch (FileNotFoundException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
-                throw FileNotFoundException(name, ex);
+                throw new FileNotFoundException(name, ex);
             }
 
             return stream;

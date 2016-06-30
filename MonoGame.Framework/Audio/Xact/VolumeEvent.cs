@@ -38,6 +38,10 @@ namespace Microsoft.Xna.Framework.Audio
         {
 		}
 
+	    public override void SetTrackPan(float pan)
+	    {
+	    }
+
 	    public override bool Update(float dt)
 	    {
 	        return false;
@@ -47,9 +51,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        public override void Apply3D(AudioListener listener, AudioEmitter emitter)
-        {
-        }
     }
 }
 

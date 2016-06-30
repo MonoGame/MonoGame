@@ -159,6 +159,7 @@
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
+    <Compile Include="Framework\Audio\XactTest.cs" />
 
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
@@ -203,6 +204,16 @@
     <Compile Include="ContentPipeline\TextureProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+
+    <Content Include="Assets\Audio\Win\Tests.xgs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xsb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xwb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

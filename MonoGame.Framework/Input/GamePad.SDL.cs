@@ -21,9 +21,6 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
 
-        // we have to maintain this mapping because instance IDs are not ordered by player index (i.e. player lights on Xbox gamepads), but DeviceID are
-        private static readonly Dictionary<int, int> _deviceInstaceToId = new Dictionary<int, int>();
-
         private static Sdl.Haptic.Effect _hapticLeftRightEffect = new Sdl.Haptic.Effect
         {
             type = Sdl.Haptic.EffectId.LeftRight,
@@ -36,7 +33,7 @@ namespace Microsoft.Xna.Framework.Input
             }
         };
 
-        static GamePad()
+        public static void InitDatabase()
         {
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("gamecontrollerdb.txt"))
                 if (stream != null)
@@ -51,60 +48,53 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void AddDevice(int deviceId)
         {
-            var jdevice = Sdl.Joystick.Open(deviceId);
-            var instanceid = Sdl.Joystick.InstanceID(jdevice);
-
             var gamepad = new GamePadInfo();
             gamepad.Device = Sdl.GameController.Open(deviceId);
+            gamepad.HapticDevice = Sdl.Haptic.Open(deviceId);
 
-            _deviceInstaceToId.Add(instanceid, deviceId);
+            var id = 0;
+            while (Gamepads.ContainsKey(id))
+                id++;
 
-            Gamepads.Add(deviceId, gamepad);
+            Gamepads.Add(id, gamepad);
+            
+            if (gamepad.HapticDevice == IntPtr.Zero)
+                return;
 
-            if (Sdl.Haptic.IsHaptic(jdevice) == 1)
+            try
             {
-
-                gamepad.HapticDevice = Sdl.Haptic.OpenFromJoystick(jdevice);
-
-                if (gamepad.HapticDevice != IntPtr.Zero && Sdl.Haptic.EffectSupported(gamepad.HapticDevice, ref _hapticLeftRightEffect) == 1)
+                if (Sdl.Haptic.EffectSupported(gamepad.HapticDevice, ref _hapticLeftRightEffect) == 1)
                 {
-                    try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F710, F310 for instance)
-                    {
-                        Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
-                        gamepad.HapticType = 1;
-                    }
-                    catch (Exception)
-                    {
-                        Sdl.Haptic.Close(gamepad.HapticDevice);
-                    }
+                    Sdl.Haptic.NewEffect(gamepad.HapticDevice, ref _hapticLeftRightEffect);
+                    gamepad.HapticType = 1;
                 }
-                else if (gamepad.HapticDevice != IntPtr.Zero && Sdl.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
+                else if (Sdl.Haptic.RumbleSupported(gamepad.HapticDevice) == 1)
                 {
-                    try // for some reason, even if a GamePad "supports" the haptic effect, it may still fail on some gamepads (Logitech F710, F310 for instance)
-                    {
-                        Sdl.Haptic.RumbleInit(gamepad.HapticDevice);
-                        gamepad.HapticType = 2;
-                    }
-                    catch (Exception)
-                    {
-                        Sdl.Haptic.Close(gamepad.HapticDevice);
-                    }
+                    Sdl.Haptic.RumbleInit(gamepad.HapticDevice);
+                    gamepad.HapticType = 2;
                 }
                 else
-                {
                     Sdl.Haptic.Close(gamepad.HapticDevice);
-                }
             }
-
-            Sdl.ClearError(); // in case anything wrong happened with the haptic init
+            catch
+            {
+                Sdl.Haptic.Close(gamepad.HapticDevice);
+                gamepad.HapticDevice = IntPtr.Zero;
+                Sdl.ClearError();
+            }
         }
 
         internal static void RemoveDevice(int instanceid)
         {
-            int deviceId = _deviceInstaceToId[instanceid];
-            DisposeDevice(Gamepads[deviceId]);
-            Gamepads.Remove(deviceId);
-            _deviceInstaceToId.Remove(instanceid);
+            foreach (KeyValuePair<int, GamePadInfo> entry in Gamepads)
+            {
+                if (Sdl.Joystick.InstanceID(Sdl.GameController.GetJoystick(entry.Value.Device)) == instanceid)
+                {
+                    Gamepads.Remove(entry.Key);
+                    DisposeDevice(entry.Value);
+                    break;
+                }
+            }
         }
 
         private static void DisposeDevice(GamePadInfo info)

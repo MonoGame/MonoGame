@@ -16,8 +16,6 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundEffect[] _sounds;
         private string _bankName;
 
-        public bool IsDisposed { get; private set; }
-
         struct Segment
         {
             public int Offset;
@@ -61,15 +59,28 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MiniFormatTag_ADPCM = 0x2;
         private const int MiniForamtTag_WMA = 0x3;
 
+        /// <summary>
+        /// </summary>
+        public bool IsInUse { get; private set; }
+
+        /// <summary>
+        /// </summary>
+        public bool IsPrepared { get; private set; }
+
         /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
         /// <param name="nonStreamingWaveBankFilename">Path to the .xwb file to load.</param>
         /// <remarks>This constructor immediately loads all wave data into memory at once.</remarks>
         public WaveBank(AudioEngine audioEngine, string nonStreamingWaveBankFilename)
         {
+            if (audioEngine == null)
+                throw new ArgumentNullException("audioEngine");
+            if (string.IsNullOrEmpty(nonStreamingWaveBankFilename))
+                throw new ArgumentNullException("nonStreamingWaveBankFilename");
+
             //XWB PARSING
             //Adapted from MonoXNA
             //Originally adaped from Luigi Auriemma's unxwb
-			
+            
             WaveBankHeader wavebankheader;
             WaveBankData wavebankdata;
             WaveBankEntry wavebankentry;
@@ -85,19 +96,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             int wavebank_offset = 0;
 
-            nonStreamingWaveBankFilename = FileHelpers.NormalizeFilePathSeparators(nonStreamingWaveBankFilename);
+            BinaryReader reader = new BinaryReader(AudioEngine.OpenStream(nonStreamingWaveBankFilename));
 
-#if !ANDROID
-            BinaryReader reader = new BinaryReader(TitleContainer.OpenStream(nonStreamingWaveBankFilename));
-#else 
-			Stream stream = Game.Activity.Assets.Open(nonStreamingWaveBankFilename);
-			MemoryStream ms = new MemoryStream();
-			stream.CopyTo( ms );
-			stream.Close();
-			ms.Position = 0;
-			BinaryReader reader = new BinaryReader(ms);
-#endif
-			reader.ReadBytes(4);
+            reader.ReadBytes(4);
 
             wavebankheader.Version = reader.ReadInt32();
 
@@ -177,8 +178,8 @@ namespace Microsoft.Xna.Framework.Audio
                 //SHOWFILEOFF;
 
                 //memset(&wavebankentry, 0, sizeof(wavebankentry));
-				wavebankentry.LoopRegion.Length = 0;
-				wavebankentry.LoopRegion.Offset = 0;
+                wavebankentry.LoopRegion.Length = 0;
+                wavebankentry.LoopRegion.Offset = 0;
 
                 if ((wavebankdata.Flags & Flag_Compact) != 0)
                 {
@@ -318,7 +319,7 @@ namespace Microsoft.Xna.Framework.Audio
                             _format = waveFormat
                         };
 
-					_sounds[current_entry] = sfx;
+                    _sounds[current_entry] = sfx;
 #else
                     _sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans);
 #endif
@@ -375,7 +376,7 @@ namespace Microsoft.Xna.Framework.Audio
                             _sounds[current_entry] = SoundEffect.FromStream(audioFile);
                         }
 #else
-						throw new NotImplementedException();
+                        throw new NotImplementedException();
 #endif
                     } else {
                         //An xWMA or XMA2 file. Can't be played atm :(
@@ -400,10 +401,12 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 
             }
-			
-			audioEngine.Wavebanks[_bankName] = this;
+            
+            audioEngine.Wavebanks[_bankName] = this;
+
+            IsPrepared = true;
         }
-		
+        
         /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
         /// <param name="streamingWaveBankFilename">Path to the .xwb to stream from.</param>
         /// <param name="offset">DVD sector-aligned offset within the wave bank data file.</param>
@@ -413,31 +416,61 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>Note that packetsize is in sectors, which is 2048 bytes.</para>
         /// <para>AudioEngine.Update() must be called at least once before using data from a streaming wave bank.</para>
         /// </remarks>
-		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
-			: this(audioEngine, streamingWaveBankFilename)
-		{
-			if (offset != 0) {
-				throw new NotImplementedException();
-			}
-		}
+        public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
+            : this(audioEngine, streamingWaveBankFilename)
+        {
+            if (offset != 0)
+                throw new NotImplementedException();
+        }
 
         internal SoundEffect GetSoundEffect(int trackIndex)
         {
             return _sounds[trackIndex];
         }
 
-		#region IDisposable implementation
-		public void Dispose ()
-		{
+        /// <summary>
+        /// This event is triggered when the WaveBank is disposed.
+        /// </summary>
+        public event EventHandler<EventArgs> Disposing;
+
+        /// <summary>
+        /// Is true if the WaveBank has been disposed.
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// Disposes the WaveBank.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~WaveBank()
+        {
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
+        {
             if (IsDisposed)
                 return;
 
-            foreach (var s in _sounds)
-                s.Dispose();
-
             IsDisposed = true;
+
+            if (disposing)
+            {
+                foreach (var s in _sounds)
+                    s.Dispose();
+
+                IsPrepared = false;
+                IsInUse = false;
+
+                if (Disposing != null)
+                    Disposing(this, EventArgs.Empty);
+            }
         }
-		#endregion
     }
 }
 
