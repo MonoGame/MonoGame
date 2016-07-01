@@ -262,6 +262,8 @@ namespace Microsoft.Xna.Framework.Audio
                 var volume = 1.0f;
                 var pitch = 0.0f;
                 var reverbMix = 1.0f;
+                float? filterFrequency = null;
+                float? filterQFactor = null;
 
                 for (var i = 0; i < rpcCurves.Length; i++)
                 {
@@ -290,8 +292,11 @@ namespace Microsoft.Xna.Framework.Audio
                             break;
 
                         case RpcParameter.FilterFrequency:
+                            filterFrequency = value;
+                            break;
+
                         case RpcParameter.FilterQFactor:
-                            // TODO: Implement me!
+                            filterQFactor = value;
                             break;
 
                         default:
@@ -299,7 +304,7 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
 
-                _curSound.UpdateCueState(_engine, volume, pitch, reverbMix);
+                _curSound.UpdateState(_engine, volume, pitch, reverbMix, filterFrequency, filterQFactor);
             }
         }
         

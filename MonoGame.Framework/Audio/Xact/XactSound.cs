@@ -24,6 +24,8 @@ namespace Microsoft.Xna.Framework.Audio
         private float _cueVolume = 1;
         private float _cuePitch = 0;
         private float _cueReverbMix = 0;
+        private float? _cueFilterFrequency;
+        private float? _cueFilterQFactor;
 
         internal readonly int[] RpcCurves;
         
@@ -263,28 +265,27 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal void UpdateCueState(AudioEngine engine, float volume, float pitch, float reverbMix)
+        internal void UpdateState(AudioEngine engine, float volume, float pitch, float reverbMix, float? filterFrequency, float? filterQFactor)
         {
             _cueVolume = volume;
-            var category = engine.Categories[_categoryID];
-            UpdateCategoryVolume(category._volume[0]);
+            var finalVolume = _volume * _cueVolume * engine.Categories[_categoryID]._volume[0];
 
             _cueReverbMix = reverbMix;
+            _cueFilterFrequency = filterFrequency;
+            _cueFilterQFactor = filterQFactor;
 
             _cuePitch = pitch;
             var finalPitch = _pitch + _cuePitch;
+
             if (_complexSound)
             {
-                //foreach (var clip in _soundClips)
-                //clip.AddPitch(volume);
+                foreach (var clip in _soundClips)
+                    clip.UpdateState(finalVolume, finalPitch, _useReverb ? _cueReverbMix : 0.0f, _cueFilterFrequency, _cueFilterQFactor);
             }
-            else
+            else if (_wave != null)
             {
-                if (_wave != null)
-                {
-                    _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
-                    _wave.Pitch = finalPitch;
-                }
+                _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
+                _wave.Pitch = finalPitch;
             }
         }
 

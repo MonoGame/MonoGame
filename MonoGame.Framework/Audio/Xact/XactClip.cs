@@ -414,6 +414,15 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
         
+        internal void UpdateState(float volume, float pitch, float reverbMix, float? filterFrequency, float? filterQFactor)
+        {
+            _volumeScale = volume;
+            var trackVolume = _volume * _volumeScale;
+
+            foreach (var evt in _events)
+                evt.SetState(trackVolume, pitch, reverbMix, filterFrequency, filterQFactor);
+        }
+
         public void Play()
         {
             _time = 0.0f;
