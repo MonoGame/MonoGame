@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Audio
         Shuffle
     };
 
-	class PlayWaveEvent : ClipEvent
+    class PlayWaveEvent : ClipEvent
     {
         private readonly SoundBank _soundBank;
 
@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Audio
         private float _clipPitch;
         private float _clipReverbMix;
 
-	    private readonly Vector4? _filterVar;
+        private readonly Vector4? _filterVar;
         private readonly Vector2? _volumeVar;
         private readonly Vector2? _pitchVar;
 
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Audio
             _newWaveOnLoop = newWaveOnLoop;
         }
 
-		public override void Play() 
+        public override void Play() 
         {
             if (_wav != null && _wav.State != SoundState.Stopped)
                 _wav.Stop();
@@ -188,9 +188,9 @@ namespace Microsoft.Xna.Framework.Audio
             // Update all the wave states then play.
             UpdateState();
             _wav.Play();
-		}
+        }
 
-		public override void Stop()
+        public override void Stop()
         {
             if (_wav != null)
             {
@@ -198,19 +198,19 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav = null;
             }
             _loopIndex = 0;
-		}
+        }
 
-		public override void Pause() 
+        public override void Pause() 
         {
             if (_wav != null)
                 _wav.Pause();
-		}
+        }
 
-		public override void Resume()
-		{
+        public override void Resume()
+        {
             if (_wav != null && _wav.State == SoundState.Paused)
                 _wav.Resume();
-		}
+        }
 
         public override void SetTrackVolume(float volume)
         {
@@ -219,30 +219,30 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav.Volume = _trackVolume * _clipVolume;
         }
 
-	    public override void SetTrackPan(float pan)
-	    {
+        public override void SetTrackPan(float pan)
+        {
             if (_wav != null)
                 _wav.Pan = pan;
-	    }
+        }
 
-	    public override void SetState(float volume, float pitch, float reverbMix, float? filterFrequency, float? filterQFactor)
-	    {
+        public override void SetState(float volume, float pitch, float reverbMix, float? filterFrequency, float? filterQFactor)
+        {
             _clipVolume = volume;
             _clipPitch = pitch;
             _clipReverbMix = reverbMix;
 
             // The RPC filter overrides the randomized track filter.
-	        if (filterFrequency.HasValue)
-	            _trackFilterFrequency = filterFrequency.Value;
+            if (filterFrequency.HasValue)
+                _trackFilterFrequency = filterFrequency.Value;
             if (filterQFactor.HasValue)
                 _trackFilterQFactor = filterQFactor.Value;
 
             if (_wav != null)
-	            UpdateState();
+                UpdateState();
         }
 
         private void UpdateState()
-	    {
+        {
             _wav.Volume = _trackVolume * _clipVolume;
             _wav.Pitch = _trackPitch + _clipPitch;
 
@@ -252,7 +252,7 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav.PlatformSetFilter(_clip.FilterMode, _trackFilterQFactor, _trackFilterFrequency);
         }
 
-	    public override void SetFade(float fadeInDuration, float fadeOutDuration)
+        public override void SetFade(float fadeInDuration, float fadeOutDuration)
         {
             // TODO
         }
