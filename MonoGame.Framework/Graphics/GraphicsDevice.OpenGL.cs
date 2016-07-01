@@ -54,8 +54,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static readonly float[] _posFixup = new float[4];
 
+        private static BufferBindingInfo[] _bufferBindingInfos;
         private static bool[] _newEnabledVertexAttributes;
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
+        internal static bool _attribsDirty;
 
         internal FramebufferHelper framebufferHelper;
 
@@ -75,9 +77,25 @@ namespace Microsoft.Xna.Framework.Graphics
         private float _lastClearDepth = 1.0f;
         private int _lastClearStencil = 0;
 
+        // Get a hashed value based on the currently bound shaders
+        // throws an exception if no shaders are bound
+        private int ShaderProgramHash
+        {
+            get
+            {
+                if (_vertexShader == null && _pixelShader == null)
+                        throw new InvalidOperationException("There is no shader bound!");
+                if (_vertexShader == null)
+                    return _pixelShader.HashKey;
+                if (_pixelShader == null)
+                    return _vertexShader.HashKey;
+                return _vertexShader.HashKey ^ _pixelShader.HashKey;
+            }
+        }
+
         internal void SetVertexAttributeArray(bool[] attrs)
         {
-            for(int x = 0; x < attrs.Length; x++)
+            for(var x = 0; x < attrs.Length; x++)
             {
                 if (attrs[x] && !_enabledVertexAttributes.Contains(x))
                 {
@@ -96,8 +114,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void ApplyAttribs(Shader shader, int baseVertex)
         {
-            var programHash = _vertexShader.HashKey | _pixelShader.HashKey;
-            Array.Clear(_newEnabledVertexAttributes, 0, _newEnabledVertexAttributes.Length);
+            var programHash = ShaderProgramHash;
+            var bindingsChanged = false;
 
             for (var slot = 0; slot < _vertexBuffers.Count; slot++)
             {
@@ -105,11 +123,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 var vertexDeclaration = vertexBufferBinding.VertexBuffer.VertexDeclaration;
                 var attrInfo = vertexDeclaration.GetAttributeInfo(shader, programHash);
 
+                var vertexStride = vertexDeclaration.VertexStride;
+                var offset = (IntPtr)(vertexDeclaration.VertexStride * (baseVertex + vertexBufferBinding.VertexOffset));
+
+                if (!_attribsDirty &&
+                    _bufferBindingInfos[slot].VertexOffset == offset &&
+                    ReferenceEquals(_bufferBindingInfos[slot].AttributeInfo, attrInfo) &&
+                    _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency)
+                    continue;
+
+                bindingsChanged = true;
+
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferBinding.VertexBuffer.vbo);
                 GraphicsExtensions.CheckGLError();
-
-                var vertexStride = vertexDeclaration.VertexStride;
-                var offset = (IntPtr)(vertexDeclaration.VertexStride * baseVertex);
 
                 // If instancing is not supported, but InstanceFrequency of the buffer is not zero, throw an exception
                 if (!GraphicsCapabilities.SupportsInstancing && vertexBufferBinding.InstanceFrequency > 0)
@@ -131,8 +157,22 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
                     GraphicsExtensions.CheckGLError();
+                }
 
-                    _newEnabledVertexAttributes[element.AttributeLocation] = true;
+                _bufferBindingInfos[slot].VertexOffset = offset;
+                _bufferBindingInfos[slot].AttributeInfo = attrInfo;
+                _bufferBindingInfos[slot].InstanceFrequency = vertexBufferBinding.InstanceFrequency;
+            }
+
+            _attribsDirty = false;
+
+            if (bindingsChanged)
+            {
+                Array.Clear(_newEnabledVertexAttributes, 0, _newEnabledVertexAttributes.Length);
+                for (var slot = 0; slot < _vertexBuffers.Count; slot++)
+                {
+                    foreach (var element in _bufferBindingInfos[slot].AttributeInfo.Elements)
+                        _newEnabledVertexAttributes[element.AttributeLocation] = true;
                 }
             }
             SetVertexAttributeArray(_newEnabledVertexAttributes);
@@ -349,6 +389,10 @@ namespace Microsoft.Xna.Framework.Graphics
             this.PlatformApplyBlend(true);
             this.DepthStencilState.PlatformApplyState(this, true);
             this.RasterizerState.PlatformApplyState(this, true);
+
+            _bufferBindingInfos = new BufferBindingInfo[_maxVertexBufferSlots];
+            for (int i = 0; i < _bufferBindingInfos.Length; i++)
+                _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0);
         }
         
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
@@ -934,13 +978,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 _indexBufferDirty = false;
             }
 
-            if (_vertexBuffersDirty)
-            {
-                // Don't bind a buffer here because we won't bind attributes yet since we don't know base vertex.
-                // Buffers only need to be bound when binding attributes.
-                _vertexBuffersDirty = false;
-            }
-
             if (_vertexShader == null)
                 throw new InvalidOperationException("A vertex shader must be set!");
             if (_pixelShader == null)
@@ -978,7 +1015,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
-            var shouldApplyAttribs = _vertexBuffersDirty;
             ApplyState(true);
 
             var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
@@ -989,8 +1025,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);
 
-            if (shouldApplyAttribs)
-                ApplyAttribs(_vertexShader, baseVertex);
+            ApplyAttribs(_vertexShader, baseVertex);
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -1008,15 +1043,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBuffersDirty = _indexBufferDirty = true;
+            _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            var programHash = _vertexShader.HashKey | _pixelShader.HashKey;
-            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject(), programHash);
+            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject(), ShaderProgramHash);
 
             //Draw
             GL.DrawArrays(PrimitiveTypeGL(primitiveType),
@@ -1030,11 +1064,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            var shouldApplyAttribs = _vertexBuffersDirty;
             ApplyState(true);   
 
-            if (shouldApplyAttribs)
-                ApplyAttribs(_vertexShader, 0);
+            ApplyAttribs(_vertexShader, 0);
 
 			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
 			              vertexStart,
@@ -1051,7 +1083,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBuffersDirty = _indexBufferDirty = true;
+            _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -1061,8 +1093,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            var programHash = _vertexShader.HashKey | _pixelShader.HashKey;
-            vertexDeclaration.Apply(_vertexShader, vertexAddr, programHash);
+            vertexDeclaration.Apply(_vertexShader, vertexAddr, ShaderProgramHash);
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
@@ -1085,7 +1116,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
             GraphicsExtensions.CheckGLError();
-            _vertexBuffersDirty = _indexBufferDirty = true;
+            _indexBufferDirty = true;
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -1095,8 +1126,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            var programHash = _vertexShader.HashKey | _pixelShader.HashKey;
-            vertexDeclaration.Apply(_vertexShader, vertexAddr, programHash);
+            vertexDeclaration.Apply(_vertexShader, vertexAddr, ShaderProgramHash);
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
@@ -1117,7 +1147,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             if (!GraphicsCapabilities.SupportsInstancing)
                 throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2. Try upgrading your graphics card drivers.");
-            var shouldApplyAttribs = _vertexBuffersDirty;
             ApplyState(true);
 
             var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
@@ -1128,8 +1157,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
             var target = PrimitiveTypeGL(primitiveType);
 
-            if (shouldApplyAttribs)
-                ApplyAttribs(_vertexShader, baseVertex);
+            ApplyAttribs(_vertexShader, baseVertex);
 
             GL.DrawElementsInstanced(target,
                                      indexElementCount,
@@ -1154,6 +1182,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             presentationParameters.MultiSampleCount = 4;
             quality = 0;
+        }
+
+        // Holds information for caching
+        private class BufferBindingInfo
+        {
+            public VertexDeclaration.VertexDeclarationAttributeInfo AttributeInfo;
+            public IntPtr VertexOffset;
+            public int InstanceFrequency;
+
+            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency)
+            {
+                AttributeInfo = attributeInfo;
+                VertexOffset = vertexOffset;
+                InstanceFrequency = instanceFrequency;
+            }
         }
     }
 }
