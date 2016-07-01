@@ -261,6 +261,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var volume = 1.0f;
                 var pitch = 0.0f;
+                var reverbMix = 1.0f;
 
                 for (var i = 0; i < rpcCurves.Length; i++)
                 {
@@ -285,6 +286,9 @@ namespace Microsoft.Xna.Framework.Audio
                             break;
 
                         case RpcParameter.ReverbSend:
+                            reverbMix *= XactHelpers.ParseVolumeFromDecibels(value / 100.0f);
+                            break;
+
                         case RpcParameter.FilterFrequency:
                         case RpcParameter.FilterQFactor:
                             // TODO: Implement me!
@@ -295,7 +299,7 @@ namespace Microsoft.Xna.Framework.Audio
                     }
                 }
 
-                _curSound.UpdateCueState(_engine, volume, pitch);
+                _curSound.UpdateCueState(_engine, volume, pitch, reverbMix);
             }
         }
         

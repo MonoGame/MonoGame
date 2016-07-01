@@ -34,6 +34,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private float _trackVolume;
 
+	    private readonly Vector4? _filterVar;
         private readonly Vector2? _volumeVar;
         private readonly Vector2? _pitchVar;
 
@@ -44,7 +45,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public PlayWaveEvent(   XactClip clip, float timeStamp, float randomOffset, SoundBank soundBank,
                                 int[] waveBanks, int[] tracks, byte[] weights, int totalWeights,
-                                VariationType variation, Vector2? volumeVar, Vector2? pitchVar, 
+                                VariationType variation, Vector2? volumeVar, Vector2? pitchVar, Vector4? filterVar,
                                 int loopCount, bool newWaveOnLoop)
             : base(clip, timeStamp, randomOffset)
         {
@@ -55,6 +56,7 @@ namespace Microsoft.Xna.Framework.Audio
             _totalWeights = totalWeights;
             _volumeVar = volumeVar;
             _pitchVar = pitchVar;
+            _filterVar = filterVar;
             _wavIndex = -1;
             _loopIndex = 0;
             _trackVolume = 1.0f;
@@ -156,7 +158,18 @@ namespace Microsoft.Xna.Framework.Audio
 
             // This is a shortcut for infinite looping of a single track.
             _wav.IsLooped = _loopCount == 255 && trackCount == 1;
-            _wav.PlatformEnableReverb(_clip.UseReverb);
+            _wav.PlatformSetReverbMix(_clip.UseReverb ? 1.0f : 0.0f);
+            if (_clip.FilterEnabled)
+            {
+                var filterQ = _clip.FilterQ;
+                var frequency = (float)_clip.FilterFrequency;
+                if (_filterVar.HasValue)
+                {
+                    frequency = _filterVar.Value.X + ((float)XactHelpers.Random.NextDouble() * _filterVar.Value.Y);
+                    filterQ = _filterVar.Value.Z + ((float)XactHelpers.Random.NextDouble() * _filterVar.Value.W);
+                }
+                _wav.PlatformSetFilter(_clip.FilterMode, filterQ, frequency);
+            }
             _wav.Play();
 		}
 

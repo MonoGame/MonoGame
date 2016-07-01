@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private float _cueVolume = 1;
         private float _cuePitch = 0;
+        private float _cueReverbMix = 0;
 
         internal readonly int[] RpcCurves;
         
@@ -158,7 +159,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 _wave.Pitch = _pitch + _cuePitch;
                 _wave.Volume = _volume * _cueVolume * category._volume[0];
-                _wave.PlatformEnableReverb(_useReverb);
+                _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
                 _wave.Play();
             }
         }
@@ -262,11 +263,13 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal void UpdateCueState(AudioEngine engine, float volume, float pitch)
+        internal void UpdateCueState(AudioEngine engine, float volume, float pitch, float reverbMix)
         {
             _cueVolume = volume;
             var category = engine.Categories[_categoryID];
             UpdateCategoryVolume(category._volume[0]);
+
+            _cueReverbMix = reverbMix;
 
             _cuePitch = pitch;
             var finalPitch = _pitch + _cuePitch;
@@ -278,7 +281,10 @@ namespace Microsoft.Xna.Framework.Audio
             else
             {
                 if (_wave != null)
+                {
+                    _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
                     _wave.Pitch = finalPitch;
+                }
             }
         }
 

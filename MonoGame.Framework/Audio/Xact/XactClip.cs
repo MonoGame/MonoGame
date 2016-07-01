@@ -92,6 +92,7 @@ namespace Microsoft.Xna.Framework.Audio
                         VariationType.Ordered, 
                         null,
                         null,
+                        null,
                         loopCount,
                         false);
 
@@ -152,6 +153,7 @@ namespace Microsoft.Xna.Framework.Audio
                         weights,
                         totalWeights,
                         variationType,
+                        null,
                         null,
                         null,
                         loopCount,
@@ -223,6 +225,7 @@ namespace Microsoft.Xna.Framework.Audio
                         VariationType.Ordered,
                         volumeVar,
                         pitchVar, 
+                        filterVar,
                         loopCount,
                         false);
 
@@ -320,6 +323,7 @@ namespace Microsoft.Xna.Framework.Audio
                         variationType,
                         volumeVar,
                         pitchVar, 
+                        filterVar,
                         loopCount,
                         newWaveOnLoop);
 
