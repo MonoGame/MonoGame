@@ -212,10 +212,10 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 string version = GL.GetString(StringName.Version);
                 string[] versionSplit = version.Split(' ');
-                if(version.Length > 2 && version[0].Equals("OpenGL") && version[1].Equals("ES"))
+                if(versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
                 {
-                    glMajorVersion = Convert.ToInt32(version.Substring(0, 1));
-                    glMinorVersion = Convert.ToInt32(version.Substring(2, 1));
+                    glMajorVersion = Convert.ToInt32(versionSplit[2].Substring(0, 1));
+                    glMinorVersion = Convert.ToInt32(versionSplit[2].Substring(2, 1));
                 }
                 else
                 {
