@@ -102,7 +102,7 @@ namespace MonoGame.Framework
             {
                  Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
                  Game.GraphicsDevice.CreateSizeDependentResources(true);
-                 Game.GraphicsDevice.ApplyRenderTargets(null);
+                 Game.GraphicsDevice.ApplyRenderTargets(null, 0);
                 _window._form.WindowState = FormWindowState.Maximized;
             }
             else
@@ -125,7 +125,7 @@ namespace MonoGame.Framework
                 _window._form.WindowState = FormWindowState.Normal;
                 Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
                 Game.GraphicsDevice.CreateSizeDependentResources(true);
-                Game.GraphicsDevice.ApplyRenderTargets(null);
+                Game.GraphicsDevice.ApplyRenderTargets(null, 0);
             }
             else
             {
