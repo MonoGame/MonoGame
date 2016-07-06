@@ -77,8 +77,8 @@ namespace Microsoft.Xna.Framework.Graphics
         SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
 
         private readonly Dictionary<VertexDeclaration, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<VertexDeclaration, DynamicVertexBuffer>();
-
-        private readonly Dictionary<IndexElementSize, DynamicIndexBuffer> _userIndexBuffers = new Dictionary<IndexElementSize, DynamicIndexBuffer>();
+        private DynamicIndexBuffer _userIndexBuffer16;
+        private DynamicIndexBuffer _userIndexBuffer32;
 
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 
@@ -888,6 +888,14 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _d3dDevice);
             SharpDX.Utilities.Dispose(ref _d3dContext);
 
+            if (_userIndexBuffer16 != null)
+                _userIndexBuffer16.Dispose();
+            if (_userIndexBuffer32 != null)
+                _userIndexBuffer32.Dispose();
+
+            foreach (var vb in _userVertexBuffers.Values)
+                vb.Dispose();
+				
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 
             if (_swapChain != null)
@@ -1283,13 +1291,30 @@ namespace Microsoft.Xna.Framework.Graphics
             var indexSize = Marshal.SizeOf(indexType);
             var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
 
-            if (!_userIndexBuffers.TryGetValue(indexElementSize, out buffer) || buffer.IndexCount < indexCount)
+            var requiredIndexCount = Math.Max(indexCount, 6000);
+            if (indexElementSize == IndexElementSize.SixteenBits)
             {
-                if (buffer != null)
-                    buffer.Dispose();
+                if (_userIndexBuffer16 == null || _userIndexBuffer16.IndexCount < requiredIndexCount)
+                {
+                    if (_userIndexBuffer16 != null)
+                        _userIndexBuffer16.Dispose();
 
-                buffer = new DynamicIndexBuffer(this, indexElementSize, Math.Max(indexCount, 6000), BufferUsage.WriteOnly);
-                _userIndexBuffers[indexElementSize] = buffer;
+                    _userIndexBuffer16 = new DynamicIndexBuffer(this, indexElementSize, requiredIndexCount, BufferUsage.WriteOnly);
+                }
+
+                buffer = _userIndexBuffer16;
+            }
+            else
+            {
+                if (_userIndexBuffer32 == null || _userIndexBuffer32.IndexCount < requiredIndexCount)
+                {
+                    if (_userIndexBuffer32 != null)
+                        _userIndexBuffer32.Dispose();
+
+                    _userIndexBuffer32 = new DynamicIndexBuffer(this, indexElementSize, requiredIndexCount, BufferUsage.WriteOnly);
+                }
+
+                buffer = _userIndexBuffer32;                
             }
 
             var startIndex = buffer.UserOffset;
