@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Eto;
+using Eto.Wpf.Forms;
 using Eto.Wpf.Forms.Menu;
 using Eto.Wpf.Forms.ToolBar;
 
@@ -12,6 +13,16 @@ namespace MonoGame.Tools.Pipeline
     {
         public static void Load()
         {
+            Style.Add<FormHandler>("MainWindow", h =>
+            {
+                h.Control.Loaded += (e, args) => h.Control.ResizeMode = System.Windows.ResizeMode.CanResize;
+            });
+
+            Style.Add<DialogHandler>("Dialog", h =>
+            {
+                h.Control.Loaded += (e, args) => h.Control.ResizeMode = System.Windows.ResizeMode.CanResize;
+            });
+
             Style.Add<MenuBarHandler>("MenuBar", h =>
             {
                 h.Control.Background = System.Windows.SystemColors.ControlLightLightBrush;
