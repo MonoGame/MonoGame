@@ -13,6 +13,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitializeComponent()
         {
+            Style = "Dialog";
             Width = 100;
             Height = 100;
 
