@@ -114,6 +114,12 @@ namespace Microsoft.Xna.Framework
         {
             Sdl.Event ev;
 
+            if (Mouse.IsMouseCaptured)
+            {
+                Window.MouseState.X = 0;
+                Window.MouseState.Y = 0;
+            }
+
             while (Sdl.PollEvent(out ev) == 1)
             {
                 if (ev.Type == Sdl.EventType.Quit)
@@ -123,16 +129,17 @@ namespace Microsoft.Xna.Framework
                 else if (ev.Type == Sdl.EventType.ControllerDeviceRemoved)
                     GamePad.RemoveDevice(ev.ControllerDevice.Which);
                 else if (ev.Type == Sdl.EventType.JoyDeviceRemoved)
-                    Joystick.RemoveDevice(ev.JoystickDevice.Which);                
+                    Joystick.RemoveDevice(ev.JoystickDevice.Which);
                 else if (ev.Type == Sdl.EventType.MouseWheel)
                     Mouse.ScrollY += ev.Wheel.Y * 120;
-                else if (ev.Type == Sdl.EventType.KeyDown) {
-                    var key = KeyboardUtil.ToXna (ev.Key.Keysym.Sym);
-                    if (!_keys.Contains (key))
-                        _keys.Add (key);
+                else if (ev.Type == Sdl.EventType.KeyDown)
+                {
+                    var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                    if (!_keys.Contains(key))
+                        _keys.Add(key);
                     char character = (char)ev.Key.Keysym.Sym;
-                    if (char.IsControl (character))
-                        _view.CallTextInput (character, key);
+                    if (char.IsControl(character))
+                        _view.CallTextInput(character, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
@@ -150,9 +157,14 @@ namespace Microsoft.Xna.Framework
                         continue;
                     foreach (var c in text)
                     {
-                        var key = KeyboardUtil.ToXna ((int)c);
-                        _view.CallTextInput (c, key);
+                        var key = KeyboardUtil.ToXna((int)c);
+                        _view.CallTextInput(c, key);
                     }
+                }
+                else if (ev.Type == Sdl.EventType.MouseMotion && Mouse.IsMouseCaptured)
+                {
+                    Window.MouseState.X = ev.Motion.RelativeX;
+                    Window.MouseState.Y = ev.Motion.RelativeY;
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)
                 {
