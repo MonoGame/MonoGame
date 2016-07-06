@@ -561,7 +561,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void OnPresentationChanged()
         {
             CreateSizeDependentResources();
-            ApplyRenderTargets(null);
+            ApplyRenderTargets(null, 0);
         }
 
 #endif
@@ -834,7 +834,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void OnPresentationChanged()
         {
             CreateSizeDependentResources();
-            ApplyRenderTargets(null);
+            ApplyRenderTargets(null, 0);
         }
 
 #endif // WINDOWS

@@ -221,7 +221,7 @@ namespace MonoGame.Framework
                    {
                        Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
                        Game.GraphicsDevice.CreateSizeDependentResources(true);
-                        Game.GraphicsDevice.ApplyRenderTargets(null);
+                        Game.GraphicsDevice.ApplyRenderTargets(null, 0);
                    }
                 }
           }

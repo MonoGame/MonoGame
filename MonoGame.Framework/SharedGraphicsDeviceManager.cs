@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework
             else
             {
                 GraphicsDevice.CreateSizeDependentResources();
-                GraphicsDevice.ApplyRenderTargets(null);
+                GraphicsDevice.ApplyRenderTargets(null, 0);
             }
 
             // Set the new display size on the touch panel.
