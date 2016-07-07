@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-	/// <summary>
+        /// <summary>
         /// Returns a handle to internal device object. Valid only on DirectX platforms.
         /// For usage, convert this to SharpDX.Direct3D11.Device.
         /// </summary>
@@ -601,7 +601,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 supportedFeatureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
             }
             catch (SharpDX.SharpDXException)
-            {   
+            {
                 // if GetSupportedFeatureLevel() fails, do not crash the initialization. Program can run without this.
             }
 
@@ -625,7 +625,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #if DEBUG
-            try 
+            try
             {
 #endif
                 // Create the Direct3D device.
@@ -633,7 +633,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
 #if DEBUG
             }
-            catch(SharpDXException)
+            catch (SharpDXException)
             {
                 // Try again without the debug flag.  This allows debug builds to run
                 // on machines that don't have the debug runtime installed.
@@ -647,7 +647,13 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
         }
 
-        internal void CreateSizeDependentResources(bool useFullscreenParameter = false)
+        internal void SetHardwareFullscreen()
+        {
+            // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
+            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+        }
+
+        internal void CreateSizeDependentResources()
         {
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null,
                                                 (SharpDX.Direct3D11.RenderTargetView)null);
@@ -717,16 +723,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_swapChain != null)
             {
                 _swapChain.ResizeBuffers(2,
-                                            PresentationParameters.BackBufferWidth,
-                                            PresentationParameters.BackBufferHeight,
-                                            format,
-                                            SwapChainFlags.None);
-
-                // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
-                if (useFullscreenParameter)
-                {
-                    _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
-                }
+                                        PresentationParameters.BackBufferWidth,
+                                        PresentationParameters.BackBufferHeight,
+                                        format,
+                                        SwapChainFlags.None);
 
                 // Update Vsync setting.
                 using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
@@ -755,7 +755,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         Scaling = DisplayModeScaling.Unspecified,
 #endif
                         Width = PresentationParameters.BackBufferWidth,
-                        Height = PresentationParameters.BackBufferHeight,                        
+                        Height = PresentationParameters.BackBufferHeight,
                     },
 
                     OutputHandle = PresentationParameters.DeviceWindowHandle,
@@ -763,11 +763,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
-                    IsWindowed = useFullscreenParameter ? PresentationParameters.IsFullScreen : true
+                    IsWindowed = true
                 };
 
                 // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device
-                
+
                 // First, retrieve the underlying DXGI Device from the D3D Device.
                 // Creates the swap chain 
                 using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
@@ -864,10 +864,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_UAP
 							_d3dContext.ClearRenderTargetView(view, new RawColor4(color.X, color.Y, color.Z, color.W));
 #else
-							_d3dContext.ClearRenderTargetView(view, new Color4(color.X, color.Y, color.Z, color.W));
+                            _d3dContext.ClearRenderTargetView(view, new Color4(color.X, color.Y, color.Z, color.W));
 #endif
-					}
-				}
+                    }
+                }
 
                 // Clear the depth/stencil render buffer.
                 SharpDX.Direct3D11.DepthStencilClearFlags flags = 0;
@@ -1002,9 +1002,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					MaxDepth = _viewport.MaxDepth
 				};
 #else
-				var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+                var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
 #endif
-				lock (_d3dContext)
+                lock (_d3dContext)
                     _d3dContext.Rasterizer.SetViewport(viewport);
             }
         }
@@ -1155,16 +1155,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // NOTE: This code assumes _d3dContext has been locked by the caller.
 
-            if ( _scissorRectangleDirty )
-	        {
-	            _d3dContext.Rasterizer.SetScissorRectangle(
-                    _scissorRectangle.X, 
-                    _scissorRectangle.Y, 
-                    _scissorRectangle.Right, 
+            if (_scissorRectangleDirty)
+            {
+                _d3dContext.Rasterizer.SetScissorRectangle(
+                    _scissorRectangle.X,
+                    _scissorRectangle.Y,
+                    _scissorRectangle.Right,
                     _scissorRectangle.Bottom);
-	            _scissorRectangleDirty = false;
-	        }
-            
+                _scissorRectangleDirty = false;
+            }
+
             // If we're not applying shaders then early out now.
             if (!applyShaders)
                 return;
@@ -1175,7 +1175,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     _d3dContext.InputAssembler.SetIndexBuffer(
                         _indexBuffer.Buffer,
-                        _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
+                        _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ?
                             SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
                         0);
                 }
@@ -1247,7 +1247,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SamplerStates.PlatformSetSamplers(this);
         }
 
-        private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl) 
+        private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
             where T : struct
         {
             DynamicVertexBuffer buffer;
@@ -1422,27 +1422,27 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _d3dContext.Flush();
         }
-        
+
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             FeatureLevel featureLevel;
-			try
+            try
             {
-				if (graphicsDevice == null || graphicsDevice._d3dDevice == null || graphicsDevice._d3dDevice.NativePointer == null) 
-					featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
-               	else
-                	featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
+                if (graphicsDevice == null || graphicsDevice._d3dDevice == null || graphicsDevice._d3dDevice.NativePointer == null)
+                    featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+                else
+                    featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
             }
             catch (SharpDXException)
-            { 
-            	featureLevel = FeatureLevel.Level_9_1; //Minimum defined level
+            {
+                featureLevel = FeatureLevel.Level_9_1; //Minimum defined level
             }
 
             GraphicsProfile graphicsProfile;
 
             if (featureLevel >= FeatureLevel.Level_10_0 || GraphicsAdapter.UseReferenceDevice)
                 graphicsProfile = GraphicsProfile.HiDef;
-            else 
+            else
                 graphicsProfile = GraphicsProfile.Reach;
 
             return graphicsProfile;
