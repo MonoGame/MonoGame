@@ -68,6 +68,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         SwapChain _swapChain;
 
+        bool _shouldRetrySettingFullscreen = false;
+
 #endif
 
         // The active render targets.
@@ -725,7 +727,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
                 if (useFullscreenParameter)
                 {
-                    _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+                    // Entering fullscreen mode may raise a SharpDXException with HRESULT 0x887A0022 [DXGI_ERROR_NOT_CURRENTLY_AVAILABLE/NotCurrentlyAvailable] if the device is not yet ready to do so.
+                    // The DXGI documention states that "when this error is returned, an application can continue to run in windowed mode and try to switch to full-screen mode later"
+                    // See https://msdn.microsoft.com/en-us/library/windows/desktop/bb174579(v=vs.85).aspx
+                    // Another error may be raised here, 0x887A0004 [DXGI_ERROR_UNSUPPORTED/Unsupported], upon which we fall back to borberless in EnterFullScreen()
+                    try
+                    {
+                        _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+                        _shouldRetrySettingFullscreen = false;
+                    }
+                    catch (SharpDXException ex)
+                    {
+                        if (ex.ResultCode.Code == unchecked((int)0x887A0022)) // [DXGI_ERROR_NOT_CURRENTLY_AVAILABLE/NotCurrentlyAvailable]
+                            _shouldRetrySettingFullscreen = true;   
+                        else
+                            throw;
+                    }
                 }
 
                 // Update Vsync setting.
@@ -970,10 +987,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // The first argument instructs DXGI to block n VSyncs before presenting.
                 lock (_d3dContext)
+                {
                     _swapChain.Present(syncInterval, PresentFlags.None);
+                    // Try setting the fullscreen state if it failed because of the device not being ready during CreateSizeDependentResources()
+                    if (_shouldRetrySettingFullscreen)
+                    {
+                        _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+                        _shouldRetrySettingFullscreen = false;
+                    }
+                }
             }
-            catch (SharpDX.SharpDXException)
+            catch (SharpDX.SharpDXException ex)
             {
+                // Exception related to the device not being ready shall be silent because it can safely retry to set the fullscreen mode later
+                if (!_shouldRetrySettingFullscreen || ex.ResultCode.Code != unchecked((int)0x887A0022))
+                    throw;
+
                 // TODO: How should we deal with a device lost case here?
             }
 #endif
