@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -17,6 +21,7 @@ namespace TwoMGFX
 		public bool Debug { get; private set; }
 
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
+
         public Dictionary<string, SamplerStateInfo> SamplerStates = new Dictionary<string, SamplerStateInfo>();
 
         public List<string> Dependencies { get; private set; }
@@ -34,21 +39,7 @@ namespace TwoMGFX
 			var macros = new Dictionary<string, string>();
 			macros.Add("MGFX", "1");
 
-			// Under the DX11 profile we pass a few more macros.
-			if (options.Profile == ShaderProfile.DirectX_11)
-			{
-				macros.Add("HLSL", "1");
-				macros.Add("SM4", "1");
-			}
-            else if (options.Profile == ShaderProfile.OpenGL)
-            {
-                macros.Add("GLSL", "1");
-                macros.Add("OPENGL", "1");
-            }
-            else if (options.Profile == ShaderProfile.PlayStation4)
-            {
-                throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
-            }
+			options.Profile.AddMacros(macros);
 
 			// If we're building shaders for debug set that flag too.
 			if (options.Debug)

@@ -90,6 +90,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Sony PlayStation4
         /// </summary>
         PlayStation4,
+
+        /// <summary>
+        /// PlayStation Vita
+        /// </summary>
+        PSVita,
+       
+        /// <summary>
+        /// Xbox One
+        /// </summary>
+        XboxOne,
     }
 
 
