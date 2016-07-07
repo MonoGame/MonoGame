@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,11 +12,54 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace TwoMGFX
 {
-    public abstract partial class ShaderProfile : Enumeration<ShaderProfile>
+    [TypeConverter(typeof(StringConverter))]
+    public abstract class ShaderProfile
     {
-        private ShaderProfile(string name, int value)
-            : base(name, value)
+        private static readonly LoadedTypeCollection<ShaderProfile> _profiles = new LoadedTypeCollection<ShaderProfile>();
+
+        protected ShaderProfile(string name, byte formatId)
         {
+            Name = name;
+            FormatId = formatId;
+        }
+
+        public static readonly ShaderProfile OpenGL = FromName("OpenGL");
+
+        public static readonly ShaderProfile DirectX_11 = FromName("DirectX_11");
+
+        /// <summary>
+        /// Returns all the loaded shader profiles.
+        /// </summary>
+        public static IEnumerable<ShaderProfile> All
+        {
+            get { return _profiles; }
+        }
+
+        /// <summary>
+        /// Returns the name of the shader profile.
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// Returns the format identifier used in the MGFX file format.
+        /// </summary>
+        public byte FormatId { get; private set; }
+
+        /// <summary>
+        /// Returns the correct profile for the named platform or
+        /// null if no supporting profile is found.
+        /// </summary>
+        public static ShaderProfile ForPlatform(string platform)
+        {
+            return _profiles.FirstOrDefault(p => p.Supports(platform));
+        }
+
+        /// <summary>
+        /// Returns the profile by name or null if no match is found.
+        /// </summary>
+        public static ShaderProfile FromName(string name)
+        {
+            return _profiles.FirstOrDefault(p => p.Name == name);
         }
 
         internal abstract void AddMacros(Dictionary<string, string> macros);
@@ -26,12 +70,7 @@ namespace TwoMGFX
 
         internal abstract bool Supports(string platform);
 
-        public static ShaderProfile ForPlatform(string platform)
-        {
-            return All.FirstOrDefault(p => p.Supports(platform));
-        }
-
-        private static void ParseShaderModel(string text, Regex regex, out int major, out int minor)
+        protected static void ParseShaderModel(string text, Regex regex, out int major, out int minor)
         {
             var match = regex.Match(text);
             if (!match.Success)
@@ -43,6 +82,25 @@ namespace TwoMGFX
 
             major = int.Parse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
             minor = int.Parse(match.Groups["minor"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
+        }
+
+        private class StringConverter : TypeConverter
+        {
+            public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+            {
+                if (value is string)
+                {
+                    var name = value as string;
+
+                    foreach (var e in All)
+                    {
+                        if (e.Name == name)
+                            return e;
+                    }
+                }
+
+                return base.ConvertFrom(context, culture, value);
+            }
         }
     }
 }

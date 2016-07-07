@@ -9,75 +9,70 @@ using System.Text.RegularExpressions;
 
 namespace TwoMGFX
 {
-    partial class ShaderProfile
+    class OpenGLShaderProfile : ShaderProfile
     {
-        static public readonly ShaderProfile OpenGL = new OpenGLShaderProfile();
+        private static readonly Regex GlslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
+        private static readonly Regex GlslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
 
-        class OpenGLShaderProfile : ShaderProfile
+        public OpenGLShaderProfile()
+            : base("OpenGL", 0)
+        {                
+        }
+
+        internal override void AddMacros(Dictionary<string, string> macros)
         {
-            private static readonly Regex GlslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
-            private static readonly Regex GlslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
+            macros.Add("GLSL", "1");
+            macros.Add("OPENGL", "1");                
+        }
 
-            public OpenGLShaderProfile()
-                : base("OpenGL", 0)
-            {                
-            }
+        internal override void ValidateShaderModels(PassInfo pass)
+        {
+            int major, minor;
 
-            internal override void AddMacros(Dictionary<string, string> macros)
+            if (!string.IsNullOrEmpty(pass.vsFunction))
             {
-                macros.Add("GLSL", "1");
-                macros.Add("OPENGL", "1");                
+                ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor);
+                if (major > 3)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.vsFunction));
             }
 
-            internal override void ValidateShaderModels(PassInfo pass)
+            if (!string.IsNullOrEmpty(pass.psFunction))
             {
-                int major, minor;
-
-                if (!string.IsNullOrEmpty(pass.vsFunction))
-                {
-                    ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor);
-                    if (major > 3)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.vsFunction));
-                }
-
-                if (!string.IsNullOrEmpty(pass.psFunction))
-                {
-                    ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor);
-                    if (major > 3)
-                        throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.psFunction));
-                }
+                ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor);
+                if (major > 3)
+                    throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.psFunction));
             }
+        }
 
-            internal override ShaderData CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
+        internal override ShaderData CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
+        {
+            // For now GLSL is only supported via translation
+            // using MojoShader which works from HLSL bytecode.
+            var bytecode = EffectObject.CompileHLSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
+
+            // First look to see if we already created this same shader.
+            foreach (var shader in effect.Shaders)
             {
-                // For now GLSL is only supported via translation
-                // using MojoShader which works from HLSL bytecode.
-                var bytecode = EffectObject.CompileHLSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
-
-                // First look to see if we already created this same shader.
-                foreach (var shader in effect.Shaders)
-                {
-                    if (bytecode.SequenceEqual(shader.Bytecode))
-                        return shader;
-                }
-
-                var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
-                effect.Shaders.Add(shaderData);
-
-                return shaderData;
+                if (bytecode.SequenceEqual(shader.Bytecode))
+                    return shader;
             }
+
+            var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+            effect.Shaders.Add(shaderData);
+
+            return shaderData;
+        }
             
-            internal override bool Supports(string platform)
-            {
-                if (platform == "iOS" ||
-                    platform == "Android" ||
-                    platform == "DesktopGL" ||
-                    platform == "MacOSX" ||
-                    platform == "RaspberryPi")
-                    return true;
+        internal override bool Supports(string platform)
+        {
+            if (platform == "iOS" ||
+                platform == "Android" ||
+                platform == "DesktopGL" ||
+                platform == "MacOSX" ||
+                platform == "RaspberryPi")
+                return true;
 
-                return false;
-            }
+            return false;
         }
     }
 }
