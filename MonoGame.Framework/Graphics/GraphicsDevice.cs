@@ -216,7 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DEBUG
             if (DisplayMode == null)
             {
-                throw new ApplicationException(
+                throw new Exception(
                     "Unable to determine the current display mode.  This can indicate that the " +
                     "game is not configured to be HiDPI aware under Windows 10 or later.  See " +
                     "https://github.com/MonoGame/MonoGame/issues/5040 for more information.");

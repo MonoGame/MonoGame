@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities.Png;
+using SharpDX.DXGI;
 
 #if WINDOWS_PHONE
 using System.Threading;
@@ -27,6 +28,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _renderTarget;
         private bool _mipmap;
+
+        private SampleDescription _sampleDescription;
+
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             _shared = shared;
@@ -120,6 +124,9 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.SampleDescription.Quality = 0;
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+
+            // Save sampling description.
+            _sampleDescription = desc.SampleDescription;
 
             var d3dContext = GraphicsDevice._d3dContext;
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
@@ -399,7 +406,15 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_shared)
                 desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
 
+            // Save sampling description.
+            _sampleDescription = desc.SampleDescription;
+
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
+
+        internal SampleDescription GetTextureSampleDescription()
+        {
+            return _sampleDescription;
         }
 
         private void PlatformReload(Stream textureStream)
