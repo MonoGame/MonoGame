@@ -56,8 +56,10 @@
     <Compile Include="Audio\AudioFileType.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioHelper.cs" />
+    <Compile Include="Audio\AudioProfile.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Audio\DefaultAudioProfile.cs" />
 
 
     <!-- MonoGame.Framework.Content.Pipeline.Builder -->
