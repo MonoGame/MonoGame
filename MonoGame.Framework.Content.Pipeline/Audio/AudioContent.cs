@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <summary>
         /// The name of the original source audio file.
         /// </summary>
-        [ContentSerializerAttribute]
+        [ContentSerializer(AllowNull = false)]
         public string FileName { get { return _fileName; } }
 
         /// <summary>
