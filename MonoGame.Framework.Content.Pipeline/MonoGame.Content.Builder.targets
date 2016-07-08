@@ -84,8 +84,10 @@
           Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header) /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot; /quiet"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
-    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" AdditionalMetadata="SubDir=%(ContentReferences.RelativeDir)">
+   
+    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" AdditionalMetadata="ContentOutputDir=%(ContentReferences.RelativeDir)">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
+  
     </CreateItem>
   </Target>
 
@@ -93,7 +95,7 @@
           Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)">
 
     <CreateItem Include="%(ExtraContent.FullPath)"
-         AdditionalMetadata="Link=$(PlatformResourcePrefix)%(ExtraContent.SubDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest"
+         AdditionalMetadata="Link=$(PlatformResourcePrefix)%(ExtraContent.ContentOutputDir)%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest"
          Condition="'%(ExtraContent.Filename)' != ''">
 
       <Output TaskParameter="Include" ItemName="Content" Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'" />
