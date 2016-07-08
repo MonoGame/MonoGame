@@ -7,11 +7,13 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
+    [CellAttribute(typeof(string), Name = "IntermediateDir")]
+    [CellAttribute(typeof(string), Name = "OutputDir")]
     public class CellPath : CellBase
     {
-        public CellPath(string category, string name, object value, EventHandler eventHandler) : base(category, name, value, eventHandler)
+        public override void OnCreate()
         {
-            if (value == null)
+            if (Value == null)
                 Value = "";
         }
 
