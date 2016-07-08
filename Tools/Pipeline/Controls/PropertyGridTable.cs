@@ -100,7 +100,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        private Type GetCellType(IEnumerable<Type> types, string name, object type)
+        private Type GetCellType(IEnumerable<Type> types, string name, Type type)
         {
             Type ret = null;
 
@@ -110,7 +110,7 @@ namespace MonoGame.Tools.Pipeline
 
                 foreach (var a in attrs)
                 {
-                    if (a.Type == type.GetType() || type.GetType().IsSubclassOf(a.Type))
+                    if (a.Type == type || type.IsSubclassOf(a.Type))
                     {
                         if (a.Name == name)
                         {
@@ -127,7 +127,7 @@ namespace MonoGame.Tools.Pipeline
             return ret;
         }
 
-        public void AddEntry(string category, string name, object value, object type, EventHandler eventHandler = null, bool editable = true)
+        public void AddEntry(string category, string name, object value, Type type, EventHandler eventHandler = null, bool editable = true)
         {
             var cellType = GetCellType(_cellTypes, name, type);
 
