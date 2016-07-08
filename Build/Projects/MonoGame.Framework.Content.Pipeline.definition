@@ -63,6 +63,7 @@
     <!-- MonoGame.Framework.Content.Pipeline.Builder -->
     <Compile Include="Builder\FileHelper.cs" />
     <Compile Include="Builder\Convertors\StringToColorConverter.cs" />
+    <Compile Include="Builder\Convertors\StringToCharacteRegionsConvertor.cs" />
     <Compile Include="Builder\PathHelper.cs" />
     <Compile Include="Builder\PipelineBuildEvent.cs" />
     <Compile Include="Builder\PipelineBuildLogger.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Graphics\BoneContent.cs" />
     <Compile Include="Graphics\BoneWeight.cs" />
     <Compile Include="Graphics\BoneWeightCollection.cs" />
+    <Compile Include="Graphics\CharacterRegionsDescription.cs" />
     <Compile Include="Graphics\Font\CharacterRegion.cs" />
     <Compile Include="Graphics\Font\CharacterRegionTypeConverter.cs" />
     <Compile Include="Graphics\DefaultTextureProfile.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="Processors\EffectProcessor.cs" />
     <Compile Include="Processors\EffectProcessorDebugMode.cs" />
     <Compile Include="Processors\FontDescriptionProcessor.cs" />
+    <Compile Include="Processors\FontProcessor.cs" />
     <Compile Include="Processors\FontTextureProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
@@ -425,6 +428,7 @@
     <Compile Include="ExternalTool.cs" />
     <Compile Include="FbxImporter.cs" />
     <Compile Include="FontDescriptionImporter.cs" />
+    <Compile Include="FontImporter.cs" />
     <Compile Include="H264Importer.cs" />
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />

@@ -24,9 +24,9 @@ namespace MonoGame.Tools.Pipeline
         {
             var combo = new DropDown();
 
-            if (_type is Enum)
+            if (_type.IsSubclassOf(typeof(Enum)))
             {
-                var values = Enum.GetValues(_type.GetType());
+                var values = Enum.GetValues(_type);
                 foreach (var v in values)
                 {
                     combo.Items.Add(v.ToString());
@@ -35,7 +35,7 @@ namespace MonoGame.Tools.Pipeline
                         combo.SelectedIndex = combo.Items.Count - 1;
                 }
             }
-            else if (_type is ImporterTypeDescription)
+            else if (_type == typeof(ImporterTypeDescription))
             {
                 foreach (var v in PipelineTypes.Importers)
                 {
@@ -66,9 +66,9 @@ namespace MonoGame.Tools.Pipeline
                 if (_eventHandler == null || combo.SelectedIndex < 0)
                     return;
 
-                if (_type is Enum)
+                if (_type.IsSubclassOf(typeof(Enum)))
                     _eventHandler(Enum.Parse(Value.GetType(), combo.SelectedValue.ToString()), EventArgs.Empty);
-                else if (_type is ImporterTypeDescription)
+                else if (_type == typeof(ImporterTypeDescription))
                     _eventHandler(PipelineTypes.Importers[combo.SelectedIndex], EventArgs.Empty);
                 else
                     _eventHandler(PipelineTypes.Processors[combo.SelectedIndex], EventArgs.Empty);
