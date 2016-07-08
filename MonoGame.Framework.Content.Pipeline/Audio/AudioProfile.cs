@@ -52,15 +52,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public abstract ConversionQuality ConvertStreamingAudio(TargetPlatform platform, ConversionQuality quality, AudioContent content, ref string outputFileName);
 
 
-        protected static int QualityToSampleRate(ConversionQuality quality, AudioFormat format)
+        protected static int QualityToSampleRate(ConversionQuality quality, int sourceSampleRate)
         {
             switch (quality)
             {
                 case ConversionQuality.Low:
-                    return Math.Max(8000, format.SampleRate / 2);
+                    return Math.Max(8000, (int)Math.Floor(sourceSampleRate / 2.0));
+                case ConversionQuality.Medium:
+                    return Math.Max(8000, (int)Math.Floor((sourceSampleRate / 4.0) * 3));
             }
 
-            return Math.Max(8000, format.SampleRate);
+            return Math.Max(8000, sourceSampleRate);
         }
 
         protected static int QualityToBitRate(ConversionQuality quality)
