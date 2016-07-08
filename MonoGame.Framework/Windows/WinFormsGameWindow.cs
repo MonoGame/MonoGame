@@ -220,7 +220,7 @@ namespace MonoGame.Framework
                     if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
                    {
                        Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
-                       Game.GraphicsDevice.CreateSizeDependentResources(true);
+                       Game.GraphicsDevice.CreateSizeDependentResources();
                         Game.GraphicsDevice.ApplyRenderTargets(null);
                    }
                 }
@@ -365,12 +365,12 @@ namespace MonoGame.Framework
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
 
-#if !(WINDOWS && DIRECTX)
-                manager.PreferredBackBufferWidth = newWidth;
-                manager.PreferredBackBufferHeight = newHeight;
-#endif
                 if (manager.GraphicsDevice == null)
                     return;
+
+                manager.GraphicsDevice.PresentationParameters.BackBufferWidth = newWidth;
+                manager.GraphicsDevice.PresentationParameters.BackBufferHeight = newHeight;
+                manager.GraphicsDevice.OnPresentationChanged();
             }
 
             // Set the new view state which will trigger the 
@@ -460,7 +460,8 @@ namespace MonoGame.Framework
 
         internal void ChangeClientSize(Size clientBounds)
         {
-            this._form.ClientSize = clientBounds;
+            if(this._form.ClientSize != clientBounds)
+                this._form.ClientSize = clientBounds;
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously
