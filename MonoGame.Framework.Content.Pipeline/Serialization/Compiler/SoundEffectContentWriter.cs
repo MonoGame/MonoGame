@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="value">The value to write to the output.</param>
         protected internal override void Write(ContentWriter output, SoundEffectContent value)
         {
-            // The WaveFormat provided by NAudio already contains the size
+            output.Write(value.format.Count);
             output.Write(value.format.ToArray());
 
             output.Write(value.data.Count);
