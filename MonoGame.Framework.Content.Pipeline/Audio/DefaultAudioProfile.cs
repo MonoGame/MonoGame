@@ -253,42 +253,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
         public static void WritePcmFile(AudioContent content, string saveToFile)
         {
-            var temporarySource = Path.GetTempFileName();
-
-            try
-            {
-                File.WriteAllBytes(temporarySource, content.RawData.ToArray());
-
-                string ffmpegStdout, ffmpegStderr;
-                var ffmpegExitCode = ExternalTool.Run(
-                    "ffmpeg",
-                    string.Format(
-                        "-y -i \"{0}\" -vn -c:a pcm_s16le -b:a 192000 -f:a wav -strict experimental \"{1}\"",
-                        temporarySource,
-                        saveToFile),
-                    out ffmpegStdout,
-                    out ffmpegStderr);
-                if (ffmpegExitCode != 0)
-                    throw new InvalidOperationException("ffmpeg exited with non-zero exit code: \n" + ffmpegStdout + "\n" + ffmpegStderr);
-            }
-            finally
-            {
-                ExternalTool.DeleteFile(temporarySource);
-            }            
+            string ffmpegStdout, ffmpegStderr;
+            var ffmpegExitCode = ExternalTool.Run(
+                "ffmpeg",
+                string.Format(
+                    "-y -i \"{0}\" -vn -c:a pcm_s16le -b:a 192000 -f:a wav -strict experimental \"{1}\"",
+                    content.FileName,
+                    saveToFile),
+                out ffmpegStdout,
+                out ffmpegStderr);
+            if (ffmpegExitCode != 0)
+                throw new InvalidOperationException("ffmpeg exited with non-zero exit code: \n" + ffmpegStdout + "\n" + ffmpegStderr);          
         }
 
         public static ConversionQuality ConvertToFormat(AudioContent content, ConversionFormat formatType, ConversionQuality quality, string saveToFile)
         {
-            var temporarySource = Path.GetTempFileName();
             var temporaryOutput = Path.GetTempFileName();
             try
             {
-                using (var fs = new FileStream(temporarySource, FileMode.Create, FileAccess.Write))
-                {
-                    var dataBytes = content.RawData.ToArray();
-                    fs.Write(dataBytes, 0, dataBytes.Length);
-                }
-
                 string ffmpegCodecName, ffmpegMuxerName;
                 int format;
                 switch (formatType)
@@ -352,7 +334,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         "ffmpeg",
                         string.Format(
                             "-y -i \"{0}\" -vn -c:a {1} -b:a {2} -ar {3} -f:a {4} -strict experimental \"{5}\"",
-                            temporarySource,
+                            content.FileName,
                             ffmpegCodecName,
                             QualityToBitRate(quality),
                             QualityToSampleRate(quality, content.Format.SampleRate),
@@ -393,7 +375,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             }
             finally
             {
-                ExternalTool.DeleteFile(temporarySource);
                 ExternalTool.DeleteFile(temporaryOutput);
             }
 

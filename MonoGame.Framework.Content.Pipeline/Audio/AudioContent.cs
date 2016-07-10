@@ -19,20 +19,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         private bool _disposed;
         private readonly string _fileName;
         private readonly AudioFileType _fileType;
-        private byte[] _rawData;
         private ReadOnlyCollection<byte> _data;
         private TimeSpan _duration;
         private AudioFormat _format;
         private int _loopStart;
         private int _loopLength;
-
-        internal byte[] RawData
-        {
-            get
-            {
-                return _rawData;                
-            }
-        }
 
         /// <summary>
         /// The name of the original source audio file.
@@ -131,18 +122,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 if (audioFileType != _fileType)
                     throw new ArgumentException("Incorrect file type!", "audioFileType");
 
-                // Must be opened in read mode otherwise it fails to open
-                // read-only files (found in some source control systems)
-                using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
+                // Only provide the data for WAV files.
+                if (audioFileType == AudioFileType.Wav)
                 {
-                    _rawData = new byte[fs.Length];
-                    fs.Read(_rawData, 0, _rawData.Length);
-                }
+                    byte[] rawData;
 
-                // Only provide the data if it has a riff header we can remove.
-                var stripped = DefaultAudioProfile.StripRiffWaveHeader(_rawData);
-                if (stripped != _rawData)
+                    // Must be opened in read mode otherwise it fails to open
+                    // read-only files (found in some source control systems)
+                    using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
+                    {
+                        rawData = new byte[fs.Length];
+                        fs.Read(rawData, 0, rawData.Length);
+                    }
+
+                    var stripped = DefaultAudioProfile.StripRiffWaveHeader(rawData);
                     _data = Array.AsReadOnly(stripped);
+                }
             }
             catch (Exception ex)
             {
@@ -175,8 +170,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (format == null)
                 throw new ArgumentNullException("format");
 
-            _rawData = data;
-            _data = Array.AsReadOnly(_rawData);
+            _data = Array.AsReadOnly(data);
             _format = format;
             _duration = duration;
             _loopStart = loopStart;
@@ -186,7 +180,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public void Dispose()
         {
             _disposed = true;
-            _rawData = null;
             _data = null;
         }
     }
