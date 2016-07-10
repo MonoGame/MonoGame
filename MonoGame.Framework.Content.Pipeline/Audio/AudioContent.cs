@@ -13,15 +13,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     /// source audio. This type is produced by the audio importers and used by audio
     /// processors to produce compiled audio assets.
     /// </summary>
-    public class AudioContent : ContentItem
+    /// <remarks>Note that AudioContent can load and process audio files that are not supported by the importers.</remarks>
+    public class AudioContent : ContentItem, IDisposable
     {
+        private bool _disposed;
         private readonly string _fileName;
         private readonly AudioFileType _fileType;
+        private byte[] _rawData;
         private ReadOnlyCollection<byte> _data;
         private TimeSpan _duration;
         private AudioFormat _format;
         private int _loopStart;
         private int _loopLength;
+
+        internal byte[] RawData
+        {
+            get
+            {
+                return _rawData;                
+            }
+        }
 
         /// <summary>
         /// The name of the original source audio file.
@@ -35,15 +46,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public AudioFileType FileType { get { return _fileType; } }
 
         /// <summary>
-        /// The current raw audio data.
+        /// The current raw audio data without header information.
         /// </summary>
-        /// <remarks>This changes from the source data to the output data after conversion.</remarks>
+        /// <remarks>
+        /// This changes from the source data to the output data after conversion.
+        /// For MP3 and WMA files this throws an exception to match XNA behavior.
+        /// </remarks>
         public ReadOnlyCollection<byte> Data 
         {
             get
             {
-                if (_data == null)
-                    ReadData();
+                if (_disposed || _data == null)                
+                    throw new InvalidContentException("Could not read the audio data from file \"" + Path.GetFileName(_fileName) + "\".");
                 return _data;
             }
         }
@@ -55,8 +69,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             get
             {
-                if (_format == null)
-                    ReadFormat();
                 return _duration;
             }
         }
@@ -69,8 +81,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             get
             {
-                if (_format == null)
-                    ReadFormat();
                 return _format;
             }
         }
@@ -83,8 +93,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             get
             {
-                if (_format == null)
-                    ReadFormat();
                 return _loopLength;
             } 
         }
@@ -97,8 +105,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             get
             {
-                if (_format == null)
-                    ReadFormat();
                 return _loopStart;
             }
         }
@@ -112,7 +118,37 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public AudioContent(string audioFileName, AudioFileType audioFileType)
         {
             _fileName = audioFileName;
-            _fileType = audioFileType;
+
+            try
+            {
+                // Get the full path to the file.
+                audioFileName = Path.GetFullPath(audioFileName);
+
+                // Use probe to get the details of the file.
+                DefaultAudioProfile.ProbeFormat(audioFileName, out _fileType, out _format, out _duration, out _loopStart, out _loopLength);
+
+                // If the read file type doesn't match the input then fail.            
+                if (audioFileType != _fileType)
+                    throw new ArgumentException("Incorrect file type!", "audioFileType");
+
+                // Must be opened in read mode otherwise it fails to open
+                // read-only files (found in some source control systems)
+                using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
+                {
+                    _rawData = new byte[fs.Length];
+                    fs.Read(_rawData, 0, _rawData.Length);
+                }
+
+                // Only provide the data if it has a riff header we can remove.
+                var stripped = DefaultAudioProfile.StripRiffWaveHeader(_rawData);
+                if (stripped != _rawData)
+                    _data = Array.AsReadOnly(stripped);
+            }
+            catch (Exception ex)
+            {
+                var message = string.Format("Failed to open file {0}. Ensure the file is a valid audio file and is not DRM protected.", Path.GetFileNameWithoutExtension(audioFileName));
+                throw new InvalidContentException(message, ex);
+            }
         }
 
         /// <summary>
@@ -139,32 +175,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (format == null)
                 throw new ArgumentNullException("format");
 
-            _data = Array.AsReadOnly(data);
+            _rawData = data;
+            _data = Array.AsReadOnly(_rawData);
             _format = format;
             _duration = duration;
             _loopStart = loopStart;
             _loopLength = loopLength;
         }
 
-        private void ReadData()
+        public void Dispose()
         {
-            byte[] data;
-
-            // Must be opened in read mode otherwise it fails to open
-            // read-only files (found in some source control systems)
-            using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
-            {
-                data = new byte[fs.Length];
-                fs.Read(data, 0, data.Length);
-            }
-
-            _data = Array.AsReadOnly(data);
-        }
-
-        private void ReadFormat()
-        {
-            // Use probe to get the format of the file.
-            DefaultAudioProfile.ProbeFormat(_fileName, out _format, out _duration, out _loopStart, out _loopLength);
+            _disposed = true;
+            _rawData = null;
+            _data = null;
         }
     }
 }

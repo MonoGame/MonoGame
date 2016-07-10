@@ -178,11 +178,13 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.Throws<InvalidContentException>(() => { var temp = content.Data; });
         }
 
-        private static int ConversionFormatToWavFormat(ConversionFormat format)
+        private static int ToWavFormat(ConversionFormat format, int bitsPerSample)
         {
             switch (format)
             {
                 case ConversionFormat.Pcm:
+                    if (bitsPerSample == 32)
+                        return -2;
                     return 1;
                     break;
                 case ConversionFormat.Adpcm:
@@ -195,6 +197,29 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
 
+        // 8bit PCM Mono -> PCM
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 44100, 44100, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Medium, 1, 33075, 33075, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Low, 1, 22050, 22050, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 22050, 22050, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Medium, 1, 16537, 16537, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Low, 1, 11025, 11025, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 11025, 11025, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Medium, 1, 8268, 8268, 8, 1)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", ConversionFormat.Pcm, ConversionQuality.Low, 1, 8000, 8000, 8, 1)]
+
+        // 8bit PCM Mono -> ADPCM
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 1, 24104, 44077, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 24104, 44077, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 12073, 22078, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 1, 12073, 22077, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 12073, 22077, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 6036, 11039, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 1, 6036, 11039, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 6036, 11039, 4, 70)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 4386, 8021, 4, 70)]
+
+        // 16bit PCM Mono -> PCM
         [TestCase(@"Assets/Audio/blast_mono.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 88200, 44100, 16, 2)]
         [TestCase(@"Assets/Audio/blast_mono.wav", ConversionFormat.Pcm, ConversionQuality.Medium, 1, 66150, 33075, 16, 2)]
         [TestCase(@"Assets/Audio/blast_mono.wav", ConversionFormat.Pcm, ConversionQuality.Low, 1, 44100, 22050, 16, 2)]
@@ -204,6 +229,8 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Pcm, ConversionQuality.Best, 1, 22050, 11025, 16, 2)]
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Pcm, ConversionQuality.Medium, 1, 16536, 8268, 16, 2)]
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Pcm, ConversionQuality.Low, 1, 16000, 8000, 16, 2)]
+
+        // 16bit PCM Stereo -> PCM
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Pcm, ConversionQuality.Best, 2, 176400, 44100, 16, 4)]
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Pcm, ConversionQuality.Medium, 2, 132300, 33075, 16, 4)]
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Pcm, ConversionQuality.Low, 2, 88200, 22050, 16, 4)]
@@ -213,6 +240,8 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Pcm, ConversionQuality.Best, 2, 44100, 11025, 16, 4)]
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Pcm, ConversionQuality.Medium, 2, 33072, 8268, 16, 4)]
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Pcm, ConversionQuality.Low, 2, 32000, 8000, 16, 4)]
+
+        // 16bit PCM Mono -> ADPCM
         [TestCase(@"Assets/Audio/blast_mono.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 1, 24121, 44108, 4, 70)]
         [TestCase(@"Assets/Audio/blast_mono.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 24121, 44108, 4, 70)]
         [TestCase(@"Assets/Audio/blast_mono.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 12055, 22045, 4, 70)]
@@ -222,6 +251,8 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 1, 6027, 11022, 4, 70)]
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 6027, 11022, 4, 70)]
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 4376, 8003, 4, 70)]
+
+        // 16bit PCM Stereo -> ADPCM 
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 2, 48240, 44106, 4, 140)]
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 2, 48240, 44106, 4, 140)]
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 2, 24120, 22053, 4, 140)]
@@ -231,15 +262,16 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 2, 12059, 11026, 4, 140)]
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 2, 12059, 11026, 4, 140)]
         [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 2, 8744, 7995, 4, 140)]
+
         public void Convert(string sourceFile, ConversionFormat format, ConversionQuality quality, int channels, int averageBytesPerSecond, int sampleRate, int bitsPerSample, int blockAlign)
         {
             var content = new AudioContent(sourceFile, AudioFileType.Wav);
             content.ConvertFormat(format, quality, null);
 
-            Assert.AreEqual(ConversionFormatToWavFormat(format), content.Format.Format);
+            Assert.AreEqual(ToWavFormat(format, content.Format.BitsPerSample), content.Format.Format);
             Assert.AreEqual(channels, content.Format.ChannelCount);
-            Assert.AreEqual(averageBytesPerSecond, content.Format.AverageBytesPerSecond);
             Assert.AreEqual(sampleRate, content.Format.SampleRate);
+            Assert.AreEqual(averageBytesPerSecond, content.Format.AverageBytesPerSecond);
             Assert.AreEqual(bitsPerSample, content.Format.BitsPerSample);
             Assert.AreEqual(blockAlign, content.Format.BlockAlign);
 

@@ -63,12 +63,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             return ConvertToFormat(content, targetFormat, quality, outputFileName);
         }
 
-        public static void ProbeFormat(string sourceFile, out AudioFormat audioFormat, out TimeSpan duration, out int loopStart, out int loopLength)
+        public static void ProbeFormat(string sourceFile, out AudioFileType audioFileType, out AudioFormat audioFormat, out TimeSpan duration, out int loopStart, out int loopLength)
         {
             string ffprobeStdout, ffprobeStderr;
             var ffprobeExitCode = ExternalTool.Run(
                 "ffprobe",
-                string.Format("-i \"{0}\" -show_entries streams -v quiet -of flat", sourceFile),
+                string.Format("-i \"{0}\" -show_format -show_entries streams -v quiet -of flat", sourceFile),
                 out ffprobeStdout,
                 out ffprobeStderr);
             if (ffprobeExitCode != 0)
@@ -81,7 +81,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             int channelCount = 0;
             int sampleRate = 0;
             int format = 0;
+            string sampleFormat = null;
             double durationInSeconds = 0;
+            var formatName = string.Empty;
 
             try
             {
@@ -98,14 +100,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         case "streams.stream.0.bits_per_sample":
                             bitsPerSample = int.Parse(kv[1].Trim('"'), numberFormat);
                             break;
+                        case "streams.stream.0.start_time":
+                        {
+                            double seconds;
+                            if (double.TryParse(kv[1].Trim('"'), NumberStyles.Any, numberFormat, out seconds))
+                                durationInSeconds += seconds;
+                            break;
+                        }
                         case "streams.stream.0.duration":
-                            durationInSeconds = double.Parse(kv[1].Trim('"'), numberFormat);
+                            durationInSeconds += double.Parse(kv[1].Trim('"'), numberFormat);
                             break;
                         case "streams.stream.0.channels":
                             channelCount = int.Parse(kv[1].Trim('"'), numberFormat);
                             break;
+                        case "streams.stream.0.sample_fmt":
+                            sampleFormat = kv[1].Trim('"').ToLowerInvariant();
+                            break;
                         case "streams.stream.0.bit_rate":
                             averageBytesPerSecond = (int.Parse(kv[1].Trim('"'), numberFormat)/8);
+                            break;
+                        case "format.format_name":
+                            formatName = kv[1].Trim('"').ToLowerInvariant();
                             break;
                         case "streams.stream.0.codec_tag":
                         {
@@ -121,17 +136,74 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 throw new InvalidOperationException("Failed to parse ffprobe output.", ex);
             }
 
-            // Calculate block alignment... it may only be valid if 
-            // ffprob returns a bits per sample value.
+            // XNA seems to use the sample format for the bits per sample
+            // in the case of non-PCM formats like MP3 and WMA.
+            if (bitsPerSample == 0 && sampleFormat != null)
             {
-                // Block alignment value is the number of bytes in an atomic unit (that is, a block) of audio for a particular format. For Pulse Code Modulation (PCM) formats, the formula for calculating block alignment is as follows: 
-                //  - Block Alignment = Bytes per Sample x Number of Channels
-                // For example, the block alignment value for 16-bit PCM format mono audio is 2 (2 bytes per sample x 1 channel). For 16-bit PCM format stereo audio, the block alignment value is 4.
-                // https://msdn.microsoft.com/en-us/library/system.speech.audioformat.speechaudioformatinfo.blockalign(v=vs.110).aspx
-                blockAlign = (bitsPerSample / 8) * channelCount;
+                switch (sampleFormat)
+                {
+                    case "u8":
+                    case "u8p":
+                        bitsPerSample = 8;
+                        break;
+                    case "s16":
+                    case "s16p":
+                        bitsPerSample = 16;
+                        break;
+                    case "s32":
+                    case "s32p":
+                    case "flt":
+                    case "fltp":
+                        bitsPerSample = 32;
+                        break;
+                    case "dbl":
+                    case "dblp":
+                        bitsPerSample = 64;
+                        break;
+                }
             }
 
-            duration = TimeSpan.FromSeconds(durationInSeconds);
+            // Figure out the file type.
+            var durationMs = (int)Math.Floor(durationInSeconds * 1000.0);
+            if (formatName == "wav")
+            {
+                audioFileType = AudioFileType.Wav;
+
+                // A quirk of XNA?
+                if (bitsPerSample == 32)
+                    format = -2;
+            }
+            else if (formatName == "mp3")
+            {
+                audioFileType = AudioFileType.Mp3;
+                format = 1;
+                durationMs = (int)Math.Ceiling(durationInSeconds * 1000.0);
+                bitsPerSample = Math.Min(bitsPerSample, 16);
+            }
+            else if (formatName == "wma" || formatName == "asf")
+            {
+                audioFileType = AudioFileType.Wma;
+                format = 1;
+                durationMs = (int)Math.Ceiling(durationInSeconds * 1000.0);
+                bitsPerSample = Math.Min(bitsPerSample, 16);
+            }
+            else
+                audioFileType = (AudioFileType) (-1);
+
+            // XNA seems to calculate the block alignment directly from 
+            // the bits per sample and channel count regardless of the 
+            // format of the audio data.
+            if (bitsPerSample > 0)
+                blockAlign = (bitsPerSample * channelCount) / 8;
+
+            // XNA seems to only be accurate to the millisecond.
+            duration = TimeSpan.FromMilliseconds(durationMs);
+
+            // Looks like XNA calculates the average bps from
+            // the sample rate and block alignment.
+            if (blockAlign > 0)
+                averageBytesPerSecond = sampleRate * blockAlign;
+
             audioFormat = new AudioFormat(
                 averageBytesPerSecond,
                 bitsPerSample,
@@ -140,10 +212,43 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 format,
                 sampleRate);
 
-            // Loop start and length in number of samples. Defaults to entire sound
-            // TODO: Extract loop info when it exists from ffprob.
+            // Loop start and length in number of samples.  For some
+            // reason XNA doesn't report loop length for non-WAV sources.
             loopStart = 0;
-            loopLength = (int)Math.Floor(sampleRate * durationInSeconds);
+            if (audioFileType != AudioFileType.Wav)
+                loopLength = 0;
+            else
+                loopLength = (int)Math.Floor(sampleRate * durationInSeconds);
+        }
+
+        internal static byte[] StripRiffWaveHeader(byte[] data)
+        {
+            using (var reader = new BinaryReader(new MemoryStream(data)))
+            {
+                var signature = new string(reader.ReadChars(4));
+                if (signature != "RIFF")
+                    return data;
+
+                reader.ReadInt32(); // riff_chunck_size
+
+                var wformat = new string(reader.ReadChars(4));
+                if (wformat != "WAVE")
+                    return data;
+
+                // Look for the data chunk.
+                while (true)
+                {
+                    var chunkSignature = new string(reader.ReadChars(4));
+                    if (chunkSignature.ToLowerInvariant() == "data")
+                        break;
+                    reader.BaseStream.Seek(reader.ReadInt32(), SeekOrigin.Current);
+                }
+
+                var dataSize = reader.ReadInt32();
+                data = reader.ReadBytes(dataSize);
+            }
+
+            return data;
         }
 
         public static void WritePcmFile(AudioContent content, string saveToFile)
@@ -152,7 +257,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
             try
             {
-                File.WriteAllBytes(temporarySource, content.Data.ToArray());
+                File.WriteAllBytes(temporarySource, content.RawData.ToArray());
 
                 string ffmpegStdout, ffmpegStderr;
                 var ffmpegExitCode = ExternalTool.Run(
@@ -180,7 +285,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             {
                 using (var fs = new FileStream(temporarySource, FileMode.Create, FileAccess.Write))
                 {
-                    var dataBytes = content.Data.ToArray();
+                    var dataBytes = content.RawData.ToArray();
                     fs.Write(dataBytes, 0, dataBytes.Length);
                 }
 
@@ -195,9 +300,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         format = 0x0002; /* WAVE_FORMAT_ADPCM */
                         break;
                     case ConversionFormat.Pcm:
-                        // PCM signed 16-bit little-endian
-                        ffmpegCodecName = "pcm_s16le";
-                        ffmpegMuxerName = "s16le";
+                        // XNA seems to preserve the bit size of the input
+                        // format when converting to PCM.
+                        if (content.Format.BitsPerSample == 8)
+                            ffmpegCodecName = "pcm_u8";
+                        else if (content.Format.BitsPerSample == 32)
+                            ffmpegCodecName = "pcm_s32le";
+                        else
+                            ffmpegCodecName = "pcm_s16le";
+                        ffmpegMuxerName = "wav";
                         format = 0x0001; /* WAVE_FORMAT_PCM */
                         break;
                     case ConversionFormat.WindowsMedia:
@@ -240,10 +351,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     ffmpegExitCode = ExternalTool.Run(
                         "ffmpeg",
                         string.Format(
-                            "-y -i \"{0}\" -vn -c:a {1} -b:a {2} -f:a {3} -strict experimental \"{4}\"",
+                            "-y -i \"{0}\" -vn -c:a {1} -b:a {2} -ar {3} -f:a {4} -strict experimental \"{5}\"",
                             temporarySource,
                             ffmpegCodecName,
                             QualityToBitRate(quality),
+                            QualityToSampleRate(quality, content.Format.SampleRate),
                             ffmpegMuxerName,
                             temporaryOutput),
                         out ffmpegStdout,
@@ -271,12 +383,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 }
 
                 // Use probe to get the final format and information on the converted file.
+                AudioFileType audioFileType;
                 AudioFormat audioFormat;
                 TimeSpan duration;
                 int loopStart, loopLength;
-                ProbeFormat(temporaryOutput, out audioFormat, out duration, out loopStart, out loopLength);
+                ProbeFormat(temporaryOutput, out audioFileType, out audioFormat, out duration, out loopStart, out loopLength);
 
-                content.SetData(rawData, audioFormat, duration, loopStart, loopLength);
+                content.SetData(StripRiffWaveHeader(rawData), audioFormat, duration, loopStart, loopLength);
             }
             finally
             {

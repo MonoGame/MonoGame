@@ -36,6 +36,11 @@ namespace MonoGame.Tests.ContentPipeline
 
         // TODO: Need to add tests for channel counts and sample rate most likely!
 
+        [TestCase(@"Assets/Audio/bark_mono_88hz_16bit.wav")]
+        public void InvalidSampleRate(string sourceFile)
+        {
+            Assert.Throws<InvalidContentException>(() => new WavImporter().Import(sourceFile, new TestImporterContext("TestObj", "TestBin")));
+        }
 
         // 8bit Mono
         [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", 1, 44100, 44100, 8, 1)]
