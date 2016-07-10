@@ -113,6 +113,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             format = GetTextureFormatForPlatform(format, context.TargetPlatform);
 
+            // Make sure we're in a floating point format
+            content.ConvertBitmapType(typeof(PixelBitmapContent<Vector4>));
+
             switch (format)
             {
                 case TextureProcessorOutputFormat.AtcCompressed:

@@ -7,13 +7,9 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
+    [CellAttribute(typeof(bool))]
     public class CellBool : CellBase
     {
-        public CellBool(string category, string name, object value, object type, EventHandler eventHandler) : base(category, name, value, eventHandler)
-        {
-
-        }
-
         public override void Edit(PixelLayout control)
         {
             if (Value == null)
