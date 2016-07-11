@@ -24,6 +24,12 @@ namespace MonoGame.Tests.ContentPipeline
             // Test invalid file types.
             Assert.Throws<InvalidContentException>(() => new AudioContent(@"Assets/Audio/blast_mono.wav", AudioFileType.Mp3));
             Assert.Throws<InvalidContentException>(() => new AudioContent(@"Assets/Audio/blast_mono.wav", AudioFileType.Wma));
+            Assert.Throws<InvalidContentException>(() => new AudioContent(@"Assets/Audio/rock_loop_stereo.wma", AudioFileType.Wav));
+            Assert.Throws<InvalidContentException>(() => new AudioContent(@"Assets/Audio/rock_loop_stereo.mp3", AudioFileType.Wav));
+
+            // This for some reason does not throw!
+            new AudioContent(@"Assets/Audio/rock_loop_stereo.wma", AudioFileType.Mp3);
+            new AudioContent(@"Assets/Audio/rock_loop_stereo.mp3", AudioFileType.Wma);
         }
 
         [Test]

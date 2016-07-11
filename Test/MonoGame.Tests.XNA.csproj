@@ -95,12 +95,14 @@
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs" />
     <Compile Include="ContentPipeline\IntermediateSerializerTest.cs" />
     <Compile Include="ContentPipeline\ModelProcessorTests.cs" />
+    <Compile Include="ContentPipeline\Mp3ImporterTests.cs" />
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs" />
     <Compile Include="ContentPipeline\TestImporterContext.cs" />
     <Compile Include="ContentPipeline\TestProcessorContext.cs" />
     <Compile Include="ContentPipeline\TextureContentTests.cs" />
     <Compile Include="ContentPipeline\TextureProcessorTests.cs" />
     <Compile Include="ContentPipeline\WavImporterTests.cs" />
+    <Compile Include="ContentPipeline\WmaImporterTests.cs" />
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
     <Compile Include="Framework\Audio\XactTest.cs" />
     <Compile Include="Framework\ColorTest.cs" />

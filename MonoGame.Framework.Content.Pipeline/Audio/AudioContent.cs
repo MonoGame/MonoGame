@@ -118,8 +118,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 // Use probe to get the details of the file.
                 DefaultAudioProfile.ProbeFormat(audioFileName, out _fileType, out _format, out _duration, out _loopStart, out _loopLength);
 
-                // If the read file type doesn't match the input then fail.            
-                if (audioFileType != _fileType)
+                // Looks like XNA only cares about type mismatch when
+                // the type is WAV... else it is ok.
+                if (    (audioFileType == AudioFileType.Wav || _fileType == AudioFileType.Wav) &&
+                        audioFileType != _fileType)
                     throw new ArgumentException("Incorrect file type!", "audioFileType");
 
                 // Only provide the data for WAV files.
