@@ -25,7 +25,7 @@ namespace TwoMGFX
 
             // Write an simple identifier for DX11 vs GLSL
             // so we can easily detect the correct shader type.
-            var profile = (byte)options.Profile;
+            var profile = (byte)options.Profile.FormatId;
             writer.Write(profile);
 
             // Write the rest to a memory stream.

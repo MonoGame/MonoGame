@@ -889,7 +889,7 @@ namespace MonoGame.Tools.Pipeline
 
             FileType type = FileType.Base;
             var path = SelectedItem.OriginalPath;
-            var newpath = System.IO.Path.GetDirectoryName(SelectedItem.OriginalPath) + System.IO.Path.DirectorySeparatorChar + name;
+            var newpath = Path.Combine(Path.GetDirectoryName(SelectedItem.OriginalPath), name);
 
             if (SelectedItem is ContentItem)
                 type = FileType.File;

@@ -3,9 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using FreeImageAPI;
@@ -81,69 +78,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return nearestPower;
         }
 
-        /// <summary>
-        /// Returns true if the format is a compressed format.
-        /// </summary>
-        /// <param name="format">The texture processor output format.</param>
-        /// <returns>True if the format is a compressed format.</returns>
-        public static bool IsCompressedTextureFormat(TextureProcessorOutputFormat format)
-        {
-            switch (format)
-            {
-                case TextureProcessorOutputFormat.AtcCompressed:
-                case TextureProcessorOutputFormat.DxtCompressed:
-                case TextureProcessorOutputFormat.Etc1Compressed:
-                case TextureProcessorOutputFormat.PvrCompressed:
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Determines if the texture format requires power-of-two dimensions on the target platform.
-        /// </summary>
-        /// <param name="format">The texture format.</param>
-        /// <param name="platform">The target platform.</param>
-        /// <param name="profile">The targeted graphics profile.</param>
-        /// <returns>True if the texture format requires power-of-two dimensions on the target platform.</returns>
-        public static bool RequiresPowerOfTwo(TextureProcessorOutputFormat format, TargetPlatform platform, GraphicsProfile profile)
-        {
-            if (format == TextureProcessorOutputFormat.Compressed)
-                format = GetTextureFormatForPlatform(format, platform);
-
-            switch (format)
-            {
-                case TextureProcessorOutputFormat.DxtCompressed:
-                    return profile == GraphicsProfile.Reach;
-
-                case TextureProcessorOutputFormat.PvrCompressed:
-                case TextureProcessorOutputFormat.Etc1Compressed:
-                    return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Determines if the given texture format requires equal width and height on the target platform.
-        /// </summary>
-        /// <param name="format">The texture format.</param>
-        /// <param name="platform">The target platform.</param>
-        /// <returns>True if the texture format requires equal width and height on the target platform.</returns>
-        public static bool RequiresSquare(TextureProcessorOutputFormat format, TargetPlatform platform)
-        {
-            if (format == TextureProcessorOutputFormat.Compressed)
-                format = GetTextureFormatForPlatform(format, platform);
-
-            switch (format)
-            {
-                case TextureProcessorOutputFormat.PvrCompressed:
-                    return true;
-            }
-
-            return false;
-        }
-
         enum AlphaRange
         {
             /// <summary>
@@ -188,94 +122,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return result;
         }
 
-        /// <summary>
-        /// If format is TextureProcessorOutputFormat.Compressed, the appropriate compressed texture format for the target
-        /// platform is returned. Otherwise the format is returned unchanged.
-        /// </summary>
-        /// <param name="format">The supplied texture format.</param>
-        /// <param name="platform">The target platform.</param>
-        /// <returns>The texture format.</returns>
-        public static TextureProcessorOutputFormat GetTextureFormatForPlatform(TextureProcessorOutputFormat format, TargetPlatform platform)
-        {
-            // Select the default texture compression format for the target platform
-            if (format == TextureProcessorOutputFormat.Compressed)
-            {
-                switch (platform)
-                {
-                    case TargetPlatform.iOS:
-                        format = TextureProcessorOutputFormat.PvrCompressed;
-                        break;
-
-                    case TargetPlatform.Android:
-                        format = TextureProcessorOutputFormat.Etc1Compressed;
-                        break;
-
-                    default:
-                        format = TextureProcessorOutputFormat.DxtCompressed;
-                        break;
-                }
-            }
-
-            if (IsCompressedTextureFormat(format))
-            {
-                // Make sure the target platform supports the selected texture compression format
-                switch (platform)
-                {
-                    case TargetPlatform.iOS:
-                        if (format != TextureProcessorOutputFormat.PvrCompressed)
-                            throw new PlatformNotSupportedException("iOS platform only supports PVR texture compression");
-                        break;
-
-                    case TargetPlatform.Windows:
-                    case TargetPlatform.WindowsPhone8:
-                    case TargetPlatform.WindowsStoreApp:
-                    case TargetPlatform.DesktopGL:
-                    case TargetPlatform.MacOSX:
-                    case TargetPlatform.NativeClient:
-                        if (format != TextureProcessorOutputFormat.DxtCompressed)
-                            throw new PlatformNotSupportedException(platform.ToString() + " platform only supports DXT texture compression");
-                        break;
-                }
-            }
-
-            return format;
-        }
-
-        /// <summary>
-        /// Compresses TextureContent in a format appropriate to the platform
-        /// </summary>
-        public static void CompressTexture(GraphicsProfile profile, TextureContent content, TextureProcessorOutputFormat format, ContentProcessorContext context, bool generateMipmaps, bool sharpAlpha)
-        {
-            format = GetTextureFormatForPlatform(format, context.TargetPlatform);
-
-            // Make sure we're in a floating point format
-            content.ConvertBitmapType(typeof(PixelBitmapContent<Vector4>));
-
-            switch (format)
-            {
-                case TextureProcessorOutputFormat.AtcCompressed:
-                    CompressAti(content, generateMipmaps);
-                    break;
-
-                case TextureProcessorOutputFormat.Color16Bit:
-                    CompressColor16Bit(content, generateMipmaps);
-                    break;
-
-                case TextureProcessorOutputFormat.DxtCompressed:
-                    CompressDxt(profile, content, generateMipmaps, sharpAlpha);
-                    break;
-
-                case TextureProcessorOutputFormat.Etc1Compressed:
-                    CompressEtc1(content, generateMipmaps);
-                    break;
-
-                case TextureProcessorOutputFormat.PvrCompressed:
-                    CompressPvrtc(content, generateMipmaps);
-                    break;
-            }
-        }
-        
-        private static void CompressPvrtc(TextureContent content, bool generateMipMaps)
+        public static void CompressPvrtc(TextureContent content, bool generateMipMaps)
         {
             // Calculate number of mip levels
             var width = content.Faces[0][0].Height;
@@ -297,7 +144,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 Compress(typeof(PvrtcRgba4BitmapContent), content, generateMipMaps);
         }
 
-        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool sharpAlpha)
+        public static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool sharpAlpha)
         {
             var face = content.Faces[0][0];
 
@@ -317,8 +164,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             else
                 Compress(typeof(Dxt5BitmapContent), content, generateMipMaps);
         }
-  
-        static void CompressAti(TextureContent content, bool generateMipMaps)
+
+        static public void CompressAti(TextureContent content, bool generateMipMaps)
         {
 			var face = content.Faces[0][0];
 			var alphaRange = CalculateAlphaRange(face);
@@ -329,7 +176,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 Compress(typeof(AtcInterpolatedBitmapContent), content, generateMipMaps);
         }
 
-        static void CompressEtc1(TextureContent content, bool generateMipMaps)
+        static public void CompressEtc1(TextureContent content, bool generateMipMaps)
         {
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
@@ -348,7 +195,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        static void CompressColor16Bit(TextureContent content, bool generateMipMaps)
+        static public void CompressColor16Bit(TextureContent content, bool generateMipMaps)
         {
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);

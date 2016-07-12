@@ -100,9 +100,9 @@ namespace MonoGame.Framework
 
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
             {
-                 Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
-                 Game.GraphicsDevice.CreateSizeDependentResources(true);
-                 Game.GraphicsDevice.ApplyRenderTargets(null);
+                Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
+                Game.GraphicsDevice.SetHardwareFullscreen();
+
                 _window._form.WindowState = FormWindowState.Maximized;
             }
             else
@@ -122,10 +122,16 @@ namespace MonoGame.Framework
 
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
             {
-                _window._form.WindowState = FormWindowState.Normal;
+
                 Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
-                Game.GraphicsDevice.CreateSizeDependentResources(true);
-                Game.GraphicsDevice.ApplyRenderTargets(null);
+                Game.GraphicsDevice.SetHardwareFullscreen();
+
+                _window._form.WindowState = FormWindowState.Normal;
+
+                Game.GraphicsDevice.PresentationParameters.BackBufferWidth = Game.graphicsDeviceManager.PreferredBackBufferWidth;
+                Game.GraphicsDevice.PresentationParameters.BackBufferHeight = Game.graphicsDeviceManager.PreferredBackBufferHeight;
+
+                Game.GraphicsDevice.OnPresentationChanged();
             }
             else
             {

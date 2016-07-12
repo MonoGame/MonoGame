@@ -3,23 +3,21 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Eto.Drawing;
 using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
+    [CellAttribute(typeof(Enum))]
+    [CellAttribute(typeof(ImporterTypeDescription))]
+    [CellAttribute(typeof(ProcessorTypeDescription))]
     public class CellCombo : CellBase
     {
-        private object _type;
-
-        public CellCombo(string category, string name, object value, object type, EventHandler eventHandler) : base(category, name, value, eventHandler)
+        public override void OnCreate()
         {
-            _type = type;
-
-            if (value is ImporterTypeDescription)
-                DisplayValue = (value as ImporterTypeDescription).DisplayName;
-            else if (value is ProcessorTypeDescription)
-                DisplayValue = (value as ProcessorTypeDescription).DisplayName;
+            if (Value is ImporterTypeDescription)
+                DisplayValue = (Value as ImporterTypeDescription).DisplayName;
+            else if (Value is ProcessorTypeDescription)
+                DisplayValue = (Value as ProcessorTypeDescription).DisplayName;
         }
 
         public override void Edit(PixelLayout control)
