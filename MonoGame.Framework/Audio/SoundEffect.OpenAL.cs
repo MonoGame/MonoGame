@@ -174,6 +174,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         #endregion
 
+        internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
+        {
+        }
+
         #region IDisposable Members
 
         private void PlatformDispose(bool disposing)

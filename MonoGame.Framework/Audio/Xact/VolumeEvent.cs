@@ -42,6 +42,10 @@ namespace Microsoft.Xna.Framework.Audio
 	    {
 	    }
 
+	    public override void SetState(float volume, float pitch, float reverbMix, float? filterFrequency, float? filterQFactor)
+	    {
+	    }
+
 	    public override bool Update(float dt)
 	    {
 	        return false;

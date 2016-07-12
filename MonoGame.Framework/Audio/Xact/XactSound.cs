@@ -17,14 +17,18 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly float _pitch;
         private readonly uint _categoryID;
         private readonly SoundBank _soundBank;
+        private readonly bool _useReverb;
 
         private SoundEffectInstance _wave;
 
         private float _cueVolume = 1;
         private float _cuePitch = 0;
+        private float _cueReverbMix = 0;
+        private float? _cueFilterFrequency;
+        private float? _cueFilterQFactor;
 
         internal readonly int[] RpcCurves;
-
+        
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
             _complexSound = false;
@@ -42,7 +46,7 @@ namespace Microsoft.Xna.Framework.Audio
             var flags = soundReader.ReadByte();
             _complexSound = (flags & 0x1) != 0;
             var hasRPCs = (flags & 0x0E) != 0;
-            var hasEffects = (flags & 0x10) != 0;
+            var hasDSPs = (flags & 0x10) != 0;
 
             _categoryID = soundReader.ReadUInt16();
             _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
@@ -78,18 +82,22 @@ namespace Microsoft.Xna.Framework.Audio
                 soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
             }
 
-            if (hasEffects)
+            if (!hasDSPs)
+                _useReverb = false;
+            else
             {
-                var current = soundReader.BaseStream.Position;
-                var dataLength = soundReader.ReadUInt16();
-                soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+                // The file format for this seems to follow the pattern for 
+                // the RPC curves above, but in this case XACT only supports
+                // a single effect...  Microsoft Reverb... so just set it.
+                _useReverb = true;
+                soundReader.BaseStream.Seek(7, SeekOrigin.Current);
             }
 
             if (_complexSound)
             {
                 _soundClips = new XactClip[numClips];
-                for (int i=0; i<numClips; i++) 
-                    _soundClips[i] = new XactClip(soundBank, soundReader);
+                for (int i = 0; i < numClips; i++)
+                    _soundClips[i] = new XactClip(soundBank, soundReader, _useReverb);
             }
 
             var category = engine.Categories[_categoryID];
@@ -153,6 +161,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 _wave.Pitch = _pitch + _cuePitch;
                 _wave.Volume = _volume * _cueVolume * category._volume[0];
+                _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
                 _wave.Play();
             }
         }
@@ -256,23 +265,27 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal void UpdateCueState(AudioEngine engine, float volume, float pitch)
+        internal void UpdateState(AudioEngine engine, float volume, float pitch, float reverbMix, float? filterFrequency, float? filterQFactor)
         {
             _cueVolume = volume;
-            var category = engine.Categories[_categoryID];
-            UpdateCategoryVolume(category._volume[0]);
+            var finalVolume = _volume * _cueVolume * engine.Categories[_categoryID]._volume[0];
+
+            _cueReverbMix = reverbMix;
+            _cueFilterFrequency = filterFrequency;
+            _cueFilterQFactor = filterQFactor;
 
             _cuePitch = pitch;
             var finalPitch = _pitch + _cuePitch;
+
             if (_complexSound)
             {
-                //foreach (var clip in _soundClips)
-                //clip.AddPitch(volume);
+                foreach (var clip in _soundClips)
+                    clip.UpdateState(finalVolume, finalPitch, _useReverb ? _cueReverbMix : 0.0f, _cueFilterFrequency, _cueFilterQFactor);
             }
-            else
+            else if (_wave != null)
             {
-                if (_wave != null)
-                    _wave.Pitch = finalPitch;
+                _wave.PlatformSetReverbMix(_useReverb ? _cueReverbMix : 0.0f);
+                _wave.Pitch = finalPitch;
             }
         }
 
