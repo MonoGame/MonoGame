@@ -206,7 +206,8 @@ namespace Microsoft.Xna.Framework.Input
                     ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Start) == 1) ? Buttons.Start : 0) |
                     ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.X) == 1) ? Buttons.X : 0) |
                     ((Sdl.GameController.GetButton(gdevice, Sdl.GameController.Button.Y) == 1) ? Buttons.Y : 0) |
-                    0
+                    ((triggers.Left > 0f) ? Buttons.LeftTrigger : 0) |
+                    ((triggers.Right > 0f) ? Buttons.RightTrigger : 0)
                 );
 
             var dPad =
