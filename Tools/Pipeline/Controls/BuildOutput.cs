@@ -83,6 +83,7 @@ namespace MonoGame.Tools.Pipeline
                     break;
                 case OutputState.BuildTime:
                     _last.Text = _last.Text.TrimEnd(new[] { '.', ' ' }) + ", " + line;
+                    treeView.RefreshItem(_last);
                     break;
             }
         }
