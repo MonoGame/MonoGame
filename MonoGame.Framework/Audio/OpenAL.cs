@@ -126,28 +126,28 @@ namespace OpenAL
     {
         None = 0x0000,
         Lowpass = 0x0001,
-        HighPass = 0x0002,
-        BandPass = 0x0003,
+        Highpass = 0x0002,
+        Bandpass = 0x0003,
     }
 
     public enum EfxEffecti
     {
-        FilterType = 0x8001,
+        EffectType = 0x8001,
         SlotEffect = 0x0001,
     }
 
     public enum EfxEffectf
     {
-        Density = 0x0001,
-        Diffusion = 0x0002,
-        Gain = 0x0003,
-        GainHighFrequency = 0x0004,
-        GainLowFrequency = 0x0005,
+        EaxReverbDensity = 0x0001,
+        EaxReverbDiffusion = 0x0002,
+        EaxReverbGain = 0x0003,
+        EaxReverbGainHF = 0x0004,
+        EaxReverbGainLF = 0x0005,
         DecayTime = 0x0006,
         DecayHighFrequencyRatio = 0x0007,
         DecayLowFrequencyRation = 0x0008,
-        ReflectionsGain = 0x0009,
-        ReflectionsDelay = 0x000A,
+        EaxReverbReflectionsGain = 0x0009,
+        EaxReverbReflectionsDelay = 0x000A,
         ReflectionsPain = 0x000B,
         LateReverbGain = 0x000C,
         LateReverbDelay = 0x000D,
@@ -157,8 +157,8 @@ namespace OpenAL
         ModulationTime = 0x0011,
         ModulationDepth = 0x0012,
         AirAbsorbsionHighFrequency = 0x0013,
-        HighFrequencyReference = 0x0014,
-        LowFrequencyReference = 0x0015,
+        EaxReverbHFReference = 0x0014,
+        EaxReverbLFReference = 0x0015,
         RoomRolloffFactor = 0x0016,
         DecayHighFrequencyLimit = 0x0017,
     }
@@ -531,12 +531,12 @@ namespace OpenAL
         /* Effect API */
 
         private delegate void alGenEffectsDelegate (int n, out uint effect);
-        private delegate void alDeleteEffectsDelegate (int n, ref uint effect);
+        private delegate void alDeleteEffectsDelegate (int n, ref int effect);
         private delegate bool alIsEffectDelegate (uint effect);
         private delegate void alEffectfDelegate (uint effect, EfxEffectf param, float value);
         private delegate void alEffectiDelegate (uint effect, EfxEffecti param, int value);
         private delegate void alGenAuxiliaryEffectSlotsDelegate (int n, out uint effectslots);
-        private delegate void alDeleteAuxiliaryEffectSlotsDelegate (int n, ref uint effectslots);
+        private delegate void alDeleteAuxiliaryEffectSlotsDelegate (int n, ref int effectslots);
         private delegate void alAuxiliaryEffectSlotiDelegate (uint slot, EfxEffecti type, uint effect);
 
         /* Filter API */
@@ -594,39 +594,54 @@ namespace OpenAL
 
         public bool IsInitialized { get; private set; }
 
-        public uint GetEffect (out uint slot)
-        {
-            uint effect = 0;
-            slot = 0;
-            this.alGenAuxiliaryEffectSlots (1, out slot);
-            ALHelper.CheckError ("Failed to Genereate Aux slot");
-            this.alGenEffects (1, out effect);
-            ALHelper.CheckError ("Failed to Generate Effect.");
-            alEffecti (effect, EfxEffecti.FilterType, (int)EfxEffectType.Reverb);
+        /*
+            
+
+alEffecti (effect, EfxEffecti.FilterType, (int)EfxEffectType.Reverb);
             ALHelper.CheckError ("Failed to set Filter Type.");
-            return effect;
+            
+        */
+
+        public void GenAuxiliaryEffectSlots (int count, out uint slot)
+        {
+            this.alGenAuxiliaryEffectSlots (count, out slot);
+            ALHelper.CheckError ("Failed to Genereate Aux slot");
         }
 
-        public void DeleteEffect (uint effect, uint slot)
+        public void GenEffect (out uint effect)
         {
+            this.alGenEffects (1, out effect);
+            ALHelper.CheckError ("Failed to Generate Effect.");
+        }
+
+		public void DeleteAuxiliaryEffectSlot (int slot)
+		{
             alDeleteAuxiliaryEffectSlots (1, ref slot);
+		}
+
+        public void DeleteEffect (int effect)
+        {
             alDeleteEffects (1, ref effect);
         }
 
-        public void BindEffectToSlot (uint effect, uint slot)
+        public void BindEffectToAuxiliarySlot (uint effect, uint slot)
         {
             alAuxiliaryEffectSloti (slot,EfxEffecti.SlotEffect, effect);
             ALHelper.CheckError ("Failed to bind Effect");
         }
 
-        public void SetEffectParam (uint effect, EfxEffectf param, float value)
+        public void BindSourceToAuxiliarySlot (int SounceId, int slot, int slotnumber, int filter)
+		{
+            AL.Source (SounceId, ALSourcei.EfxAuxilarySendFilter, slot, slotnumber, filter);
+		}
+
+        public void Effect (uint effect, EfxEffectf param, float value)
         {
             alEffectf (effect, param, value);
             ALHelper.CheckError ("Failed to set " + param + " " + value);
         }
 
-
-        public void SetEffectParam (uint effect, EfxEffecti param, int value)
+        public void Effect (uint effect, EfxEffecti param, int value)
         {
             alEffecti (effect, param, value);
             ALHelper.CheckError ("Failed to set " + param + " " + value);

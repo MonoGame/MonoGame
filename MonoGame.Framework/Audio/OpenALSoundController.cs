@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
 	internal sealed class OpenALSoundController : IDisposable
     {
         private static OpenALSoundController _instance = null;
+        private static EffectsExtension _efx = null;
         private IntPtr _device;
 #if !DESKTOPGL
         ContextHandle _context;
@@ -122,8 +123,8 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
             Filter = 0;
-            if (EffectsExtension.Instance.IsInitialized) {
-                Filter = EffectsExtension.Instance.GenFilter ();
+            if (Efx.IsInitialized) {
+                Filter = Efx.GenFilter ();
             }
 
             availableSourcesCollection = new List<int>(allSourcesArray);
@@ -151,7 +152,6 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
-                EffectsExtension.device = _device;
             }
             catch (Exception ex)
             {
@@ -293,6 +293,14 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        public static EffectsExtension Efx {
+            get {
+                if (_efx == null)
+                    _efx = new EffectsExtension ();
+                return _efx;
+            }
+        }
+
         public int Filter {
             get; private set;
         }
@@ -381,8 +389,8 @@ namespace Microsoft.Xna.Framework.Audio
                             ALHelper.CheckError("Failed to delete source.");
                         }
 
-                        if (Filter != 0 && EffectsExtension.Instance.IsInitialized)
-                            EffectsExtension.Instance.DeleteFilter (Filter);
+                        if (Filter != 0 && Efx.IsInitialized)
+                            Efx.DeleteFilter (Filter);
                         
                         CleanUpOpenAL();
                     }

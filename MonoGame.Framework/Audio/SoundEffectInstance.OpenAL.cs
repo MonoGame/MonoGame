@@ -143,28 +143,29 @@ namespace Microsoft.Xna.Framework.Audio
             ALHelper.CheckError("Failed to set source pitch.");
 
             if (reverb > 0f && SoundEffect.ReverbSlot != 0) {
-                AL.Source (SourceId, ALSourcei.EfxAuxilarySendFilter, (int)SoundEffect.ReverbSlot, 0, 0);
+                OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, (int)SoundEffect.ReverbSlot, 0, 0);
                 ALHelper.CheckError ("Failed to set reverb.");
             }
 
             if (applyFilter && controller.Filter > 0) {
                 var freq = frequency / 20000f;
                 var lf = 1.0f - freq;
-                EffectsExtension.Instance.Filter (controller.Filter, EfxFilteri.FilterType, (int)filterType);
+                var efx = OpenALSoundController.Efx;
+                efx.Filter (controller.Filter, EfxFilteri.FilterType, (int)filterType);
                 ALHelper.CheckError ("Failed to set filter.");
                 switch (filterType) {
                     case EfxFilterType.Lowpass:
-                        EffectsExtension.Instance.Filter (controller.Filter, EfxFilterf.LowpassGainHF, freq);
+                        efx.Filter (controller.Filter, EfxFilterf.LowpassGainHF, freq);
                         ALHelper.CheckError ("Failed to set LowpassGainHF.");
                     break;
-                    case EfxFilterType.HighPass:
-                        EffectsExtension.Instance.Filter (controller.Filter, EfxFilterf.HighpassGainLF, freq);
+                    case EfxFilterType.Highpass:
+                        efx.Filter (controller.Filter, EfxFilterf.HighpassGainLF, freq);
                         ALHelper.CheckError ("Failed to set HighpassGainLF.");
                     break;
-                    case EfxFilterType.BandPass:
-                        EffectsExtension.Instance.Filter (controller.Filter, EfxFilterf.BandpassGainHF, freq);
+                    case EfxFilterType.Bandpass:
+                        efx.Filter (controller.Filter, EfxFilterf.BandpassGainHF, freq);
                         ALHelper.CheckError ("Failed to set BandpassGainHF.");
-                        EffectsExtension.Instance.Filter (controller.Filter, EfxFilterf.BandpassGainLF, lf);
+                        efx.Filter (controller.Filter, EfxFilterf.BandpassGainLF, lf);
                         ALHelper.CheckError ("Failed to set BandpassGainLF.");
                     break;
                 }
@@ -216,7 +217,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 // Reset the SendFilter to 0 if we are NOT using revert since 
                 // sources are recyled
-                AL.Source (SourceId, ALSourcei.EfxAuxilarySendFilter, 0, 0, 0);
+                OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, 0, 0, 0);
                 ALHelper.CheckError ("Failed to unset reverb.");
 
                 AL.Source (SourceId, ALSourcei.EfxDirectFilter, 0);
@@ -304,26 +305,26 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformSetReverbMix(float mix)
         {
-            if (!EffectsExtension.Instance.IsInitialized)
+            if (!OpenALSoundController.Efx.IsInitialized)
                 return;
             reverb = mix;
         }
 
         internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
         {
-            if (!EffectsExtension.Instance.IsInitialized)
+            if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
             applyFilter = true;
             switch (mode) {
             case FilterMode.BandPass:
-                filterType = EfxFilterType.BandPass;
+                filterType = EfxFilterType.Bandpass;
                 break;
                 case FilterMode.LowPass:
                 filterType = EfxFilterType.Lowpass;
                 break;
                 case FilterMode.HighPass:
-                filterType = EfxFilterType.HighPass;
+                filterType = EfxFilterType.Highpass;
                 break;
             }
             this.filterQ = filterQ;
@@ -332,7 +333,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformClearFilter()
         {
-            if (!EffectsExtension.Instance.IsInitialized)
+            if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
             applyFilter = false;

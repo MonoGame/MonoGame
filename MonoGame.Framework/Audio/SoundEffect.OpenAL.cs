@@ -178,27 +178,29 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
         {
-            if (!EffectsExtension.Instance.IsInitialized)
+            if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
             if (ReverbEffect != 0)
                 return;
             
-            var efx = EffectsExtension.Instance;
-            ReverbEffect = efx.GetEffect (out ReverbSlot);
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.ReflectionsDelay, reverbSettings.ReflectionsDelayMs / 1000.0f);
+            var efx = OpenALSoundController.Efx;
+            efx.GenAuxiliaryEffectSlots (1, out ReverbSlot);
+            efx.GenEffect (out ReverbEffect);
+            efx.Effect (ReverbEffect, EfxEffecti.EffectType, (int)EfxEffectType.Reverb);
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbReflectionsDelay, reverbSettings.ReflectionsDelayMs / 1000.0f);
             // map these from range 0-15 to 0-1
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.Diffusion, reverbSettings.EarlyDiffusion / 15f);
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.Diffusion, reverbSettings.LateDiffusion / 15f);
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.GainLowFrequency, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.LowEqGain - 8f), 1.0f));
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.LowFrequencyReference, (reverbSettings.LowEqCutoff * 50f) + 50f);
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.GainHighFrequency, XactHelpers.ParseVolumeFromDecibels (reverbSettings.HighEqGain - 8f));
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.HighFrequencyReference, (reverbSettings.HighEqCutoff * 500f) + 1000f);
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.ReflectionsGain, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.ReflectionsGainDb), 1.0f));
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.Gain, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.ReverbGainDb), 1.0f));
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbDiffusion, reverbSettings.EarlyDiffusion / 15f);
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbDiffusion, reverbSettings.LateDiffusion / 15f);
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbGainLF, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.LowEqGain - 8f), 1.0f));
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbLFReference, (reverbSettings.LowEqCutoff * 50f) + 50f);
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbGainHF, XactHelpers.ParseVolumeFromDecibels (reverbSettings.HighEqGain - 8f));
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbHFReference, (reverbSettings.HighEqCutoff * 500f) + 1000f);
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbReflectionsGain, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.ReflectionsGainDb), 1.0f));
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbGain, Math.Min (XactHelpers.ParseVolumeFromDecibels (reverbSettings.ReverbGainDb), 1.0f));
             // map these from 0-100 down to 0-1
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.Density, reverbSettings.DensityPct / 100f);
-            efx.SetEffectParam (ReverbEffect, EfxEffectf.Gain, reverbSettings.WetDryMixPct / 100f);
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbDensity, reverbSettings.DensityPct / 100f);
+            efx.Effect (ReverbEffect, EfxEffectf.EaxReverbGain, reverbSettings.WetDryMixPct / 100f);
 
             // Dont know what to do with these EFX has no mapping for them. Just ignore for now
             // we can enable them as we go. 
@@ -213,7 +215,7 @@ namespace Microsoft.Xna.Framework.Audio
             //efx.SetEffectParam (ReverbEffect, EfxEffectf.LowFrequencyReference, reverbSettings.DecayTimeSec);
             //efx.SetEffectParam (ReverbEffect, EfxEffectf.LowFrequencyReference, reverbSettings.RoomSizeFeet);
 
-            efx.BindEffectToSlot (ReverbEffect, ReverbSlot);
+            efx.BindEffectToAuxiliarySlot (ReverbSlot, ReverbEffect);
         }
 
         #region IDisposable Members
@@ -231,8 +233,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
-            if (ReverbEffect != 0)
-                EffectsExtension.Instance.DeleteEffect (ReverbEffect, ReverbSlot);
+            if (ReverbEffect != 0) {
+                OpenALSoundController.Efx.DeleteAuxiliaryEffectSlot ((int)ReverbSlot);
+                OpenALSoundController.Efx.DeleteEffect ((int)ReverbEffect);
+            }
             OpenALSoundController.DestroyInstance();
         }
     }
