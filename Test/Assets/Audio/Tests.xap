@@ -5,7 +5,7 @@ Release = February 2010;
 
 Options
 {
-    Verbose Report = 1;
+    Verbose Report = 0;
     Generate C/C++ Headers = 1;
 }
 
@@ -16,8 +16,8 @@ Global Settings
     Header File = D:\Projects\MonoGame\Test\Assets\Audio\Tests.h;
     Exclude Category Names = 0;
     Exclude Variable Names = 0;
-    Last Modified Low = 2537014858;
-    Last Modified High = 30528454;
+    Last Modified Low = 2235367809;
+    Last Modified High = 30530715;
 
     Category
     {
@@ -335,487 +335,12 @@ Global Settings
         Max = 100.000000;
     }
 
-    Variable
+    Compression Preset
     {
-        Name = Reverb;
-        Public = 1;
-        Global = 1;
-        Internal = 0;
-        External = 0;
-        Monitored = 1;
-        Reserved = 0;
-        Read Only = 0;
-        Time = 0;
-        Value = 100.000000;
-        Initial Value = 100.000000;
-        Min = 0.000000;
-        Max = 100.000000;
-    }
-
-    Variable
-    {
-        Name = ReverbSend;
-        Public = 1;
-        Global = 0;
-        Internal = 0;
-        External = 0;
-        Monitored = 1;
-        Reserved = 0;
-        Read Only = 0;
-        Time = 0;
-        Value = 100.000000;
-        Initial Value = 100.000000;
-        Min = 0.000000;
-        Max = 100.000000;
-    }
-
-    Variable
-    {
-        Name = CueFrequency;
-        Public = 1;
-        Global = 0;
-        Internal = 0;
-        External = 0;
-        Monitored = 1;
-        Reserved = 0;
-        Read Only = 0;
-        Time = 0;
-        Value = 100.000000;
-        Initial Value = 0.000000;
-        Min = 0.000000;
-        Max = 100.000000;
-    }
-
-    Variable
-    {
-        Name = GlobalFilterQ;
-        Public = 1;
-        Global = 1;
-        Internal = 0;
-        External = 0;
-        Monitored = 1;
-        Reserved = 0;
-        Read Only = 0;
-        Time = 0;
-        Value = 0.000000;
-        Initial Value = 0.000000;
-        Min = 0.000000;
-        Max = 100.000000;
-    }
-
-    RPC
-    {
-        Name = Microsoft Reverb;
-        Comment = This is a note on the Reverb curve.;
-
-        RPC Curve
-        {
-            Name = Effect::c17581dc-cf2e-4c05-96e2-70444c6e2235;
-            Property = 5;
-            Sound = 0;
-            Line Color = 4286030350;
-            Viewable = 1;
-
-            Variable Entry
-            {
-                Name = Reverb;
-            }
-
-            Effect Parameter Entry
-            {
-                Effect Name = Microsoft Reverb;
-                Parameter Name = Wet/Dry Mix;
-            }
-
-            RPC Point
-            {
-                X = 1.000000;
-                Y = 0.000000;
-                Curve = 0;
-            }
-
-            RPC Point
-            {
-                X = 100.000000;
-                Y = 100.000000;
-                Curve = 0;
-            }
-        }
-
-        Effect Entry
-        {
-            Effect Name = Microsoft Reverb;
-        }
-    }
-
-    RPC
-    {
-        Name = CuePublic;
-
-        RPC Curve
-        {
-            Name = Sound::c5592915-b819-458f-a22b-b3acf3a859a5;
-            Property = 2;
-            Sound = 1;
-            Line Color = 4293321324;
-            Viewable = 1;
-
-            Variable Entry
-            {
-                Name = Cue Public;
-            }
-
-            RPC Point
-            {
-                X = 10.000000;
-                Y = 0.000000;
-                Curve = 0;
-            }
-
-            RPC Point
-            {
-                X = 80.000000;
-                Y = 0.000000;
-                Curve = 0;
-            }
-        }
-    }
-
-    RPC
-    {
-        Name = GlobalPublic;
-
-        RPC Curve
-        {
-            Name = Sound::2e109357-9af1-4d06-9795-28de817c577b;
-            Property = 0;
-            Sound = 1;
-            Line Color = 4278775462;
-            Viewable = 1;
-
-            Variable Entry
-            {
-                Name = Global Public;
-            }
-
-            RPC Point
-            {
-                X = 20.197044;
-                Y = -7552.940918;
-                Curve = 0;
-            }
-
-            RPC Point
-            {
-                X = 80.049263;
-                Y = 211.764709;
-                Curve = 0;
-            }
-        }
-    }
-
-    RPC
-    {
-        Name = ReverbSend;
-
-        RPC Curve
-        {
-            Name = Sound::124a560c-f154-43b0-b7e1-b269529207f8;
-            Property = 2;
-            Sound = 1;
-            Line Color = 4291497604;
-            Viewable = 1;
-
-            Variable Entry
-            {
-                Name = ReverbSend;
-            }
-
-            RPC Point
-            {
-                X = 0.000000;
-                Y = -9600.000000;
-                Curve = 0;
-            }
-
-            RPC Point
-            {
-                X = 100.000000;
-                Y = 600.000000;
-                Curve = 0;
-            }
-        }
-    }
-
-    RPC
-    {
-        Name = CueFrequency;
-
-        RPC Curve
-        {
-            Name = Sound::c46da0bc-32b7-452e-a501-04789b0780f6;
-            Property = 3;
-            Sound = 1;
-            Line Color = 4281520571;
-            Viewable = 1;
-
-            Variable Entry
-            {
-                Name = CueFrequency;
-            }
-
-            RPC Point
-            {
-                X = 2.517163;
-                Y = 20.000000;
-                Curve = 0;
-            }
-
-            RPC Point
-            {
-                X = 98.626999;
-                Y = 20000.000000;
-                Curve = 0;
-            }
-        }
-    }
-
-    RPC
-    {
-        Name = GlobalFilterQ;
-
-        RPC Curve
-        {
-            Name = Sound::d8ff5a1c-25b9-4021-a4ea-83e5348e4460;
-            Property = 4;
-            Sound = 1;
-            Line Color = 4290673719;
-            Viewable = 1;
-
-            Variable Entry
-            {
-                Name = GlobalFilterQ;
-            }
-
-            RPC Point
-            {
-                X = 2.709360;
-                Y = 0.666700;
-                Curve = 0;
-            }
-
-            RPC Point
-            {
-                X = 95.812805;
-                Y = 30.000000;
-                Curve = 0;
-            }
-        }
-    }
-
-    Effect
-    {
-        Name = Microsoft Reverb;
-        Global = 1;
-        Parameter Preset = Massive;
-
-        Effect Parameter
-        {
-            Name = Reflections Delay;
-            Minimum = 0.000000;
-            Maximum = 300.000000;
-            Value = 20.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Reverb Delay;
-            Minimum = 0.000000;
-            Maximum = 85.000000;
-            Value = 5.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Position Left;
-            Minimum = 0.000000;
-            Maximum = 30.000000;
-            Value = 6.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Position Right;
-            Minimum = 0.000000;
-            Maximum = 30.000000;
-            Value = 6.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Position Left Matrix;
-            Minimum = 0.000000;
-            Maximum = 30.000000;
-            Value = 27.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Position Right Matrix;
-            Minimum = 0.000000;
-            Maximum = 30.000000;
-            Value = 27.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Early Diffusion;
-            Minimum = 0.000000;
-            Maximum = 15.000000;
-            Value = 8.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Late Diffusion;
-            Minimum = 0.000000;
-            Maximum = 15.000000;
-            Value = 8.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Low EQ Gain;
-            Minimum = 0.000000;
-            Maximum = 12.000000;
-            Value = 8.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Low EQ Cutoff;
-            Minimum = 0.000000;
-            Maximum = 9.000000;
-            Value = 4.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = High EQ Gain;
-            Minimum = 0.000000;
-            Maximum = 8.000000;
-            Value = 8.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = High EQ Cutoff;
-            Minimum = 0.000000;
-            Maximum = 14.000000;
-            Value = 4.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Rear Delay;
-            Minimum = 0.000000;
-            Maximum = 5.000000;
-            Value = 5.000000;
-            Type = 1;
-        }
-
-        Effect Parameter
-        {
-            Name = Room Filter Frequency;
-            Minimum = 20.000000;
-            Maximum = 20000.000000;
-            Value = 5000.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Room Filter Main;
-            Minimum = -100.000000;
-            Maximum = 0.000000;
-            Value = 0.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Room Filter High Frequency;
-            Minimum = -100.000000;
-            Maximum = 0.000000;
-            Value = 0.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Reflections Gain;
-            Minimum = -100.000000;
-            Maximum = 20.000000;
-            Value = 0.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Reverb Gain;
-            Minimum = -100.000000;
-            Maximum = 20.000000;
-            Value = 0.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Decay Time;
-            Minimum = 0.100000;
-            Maximum = 30.000000;
-            Value = 5.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Density;
-            Minimum = 0.000000;
-            Maximum = 100.000000;
-            Value = 66.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Room Size;
-            Minimum = 1.000000;
-            Maximum = 100.000000;
-            Value = 50.000000;
-            Type = 0;
-        }
-
-        Effect Parameter
-        {
-            Name = Wet/Dry Mix;
-            Minimum = 0.000000;
-            Maximum = 100.000000;
-            Value = 100.000000;
-            Type = 0;
-        }
+        Name = Adpcm;
+        Xbox Format Tag = 0;
+        PC Format Tag = 2;
+        Samples Per Block = 128;
     }
 }
 
@@ -830,10 +355,10 @@ Wave Bank
     Compression Preset Name = <none>;
     Xbox Bank Last Modified Low = 0;
     Xbox Bank Last Modified High = 0;
-    PC Bank Last Modified Low = 2537064857;
-    PC Bank Last Modified High = 30528454;
-    Bank Last Revised Low = 2537064857;
-    Bank Last Revised High = 30528454;
+    PC Bank Last Modified Low = 2235437834;
+    PC Bank Last Modified High = 30530715;
+    Bank Last Revised Low = 1968512440;
+    Bank Last Revised High = 30530715;
 
     Wave
     {
@@ -853,8 +378,8 @@ Wave Bank
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 2140701564;
-            Last Modified High = 30527853;
+            Last Modified Low = 2255033196;
+            Last Modified High = 30529426;
         }
     }
 
@@ -876,40 +401,18 @@ Wave Bank
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 2141681617;
-            Last Modified High = 30527853;
+            Last Modified Low = 2255273154;
+            Last Modified High = 30529426;
         }
     }
 
     Wave
     {
-        Name = rock_loop_mono;
-        File = rock_loop_mono.wav;
-        Build Settings Last Modified Low = 714136509;
-        Build Settings Last Modified High = 30527103;
-
-        Cache
-        {
-            Format Tag = 0;
-            Channels = 1;
-            Sampling Rate = 44100;
-            Bits Per Sample = 1;
-            Play Region Offset = 44;
-            Play Region Length = 700308;
-            Loop Region Offset = 0;
-            Loop Region Length = 0;
-            File Type = 1;
-            Last Modified Low = 497454016;
-            Last Modified High = 30527103;
-        }
-    }
-
-    Wave
-    {
-        Name = bark_mono;
-        File = bark_mono.wav;
-        Build Settings Last Modified Low = 2008669980;
-        Build Settings Last Modified High = 30527354;
+        Name = bark_mono_44hz_16bit;
+        File = bark_mono_44hz_16bit.wav;
+        Build Settings Last Modified Low = 724851642;
+        Build Settings Last Modified High = 30530715;
+        Compression Preset Name = Adpcm;
 
         Cache
         {
@@ -922,8 +425,8 @@ Wave Bank
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 1922244991;
-            Last Modified High = 30527354;
+            Last Modified Low = 4285451975;
+            Last Modified High = 30530714;
         }
     }
 }
@@ -935,8 +438,8 @@ Sound Bank
     Windows File = Win\Tests.xsb;
     Xbox Bank Path Edited = 0;
     Windows Bank Path Edited = 0;
-    Bank Last Modified Low = 2771620216;
-    Bank Last Modified High = 30528453;
+    Bank Last Modified Low = 2236507872;
+    Bank Last Modified High = 30530715;
     Header Last Modified High = 0;
     Header Last Modified Low = 0;
 
@@ -996,7 +499,7 @@ Sound Bank
 
         Category Entry
         {
-            Name = Music;
+            Name = Default;
         }
 
         Track
@@ -1037,14 +540,14 @@ Sound Bank
 
     Sound
     {
-        Name = rock_loop_mono;
+        Name = bark_mono;
         Volume = -1200;
         Pitch = 0;
         Priority = 0;
 
         Category Entry
         {
-            Name = Music;
+            Name = Default;
         }
 
         Track
@@ -1054,7 +557,6 @@ Sound Bank
 
             Play Wave Event
             {
-                Loop Count = 255;
                 Break Loop = 0;
                 Use Speaker Position = 0;
                 Use Center Speaker = 1;
@@ -1074,344 +576,8 @@ Sound Bank
                 {
                     Bank Name = Tests;
                     Bank Index = 0;
-                    Entry Name = rock_loop_mono;
+                    Entry Name = bark_mono_44hz_16bit;
                     Entry Index = 2;
-                    Weight = 255;
-                    Weight Min = 0;
-                }
-            }
-        }
-    }
-
-    Sound
-    {
-        Name = rock_loop_reverb;
-        Volume = -1200;
-        Pitch = 0;
-        Priority = 0;
-
-        Category Entry
-        {
-            Name = Music;
-        }
-
-        Effect Entry
-        {
-            Effect Name = Microsoft Reverb;
-        }
-
-        Track
-        {
-            Volume = 0;
-            Use Filter = 0;
-
-            Play Wave Event
-            {
-                Loop Count = 255;
-                Break Loop = 0;
-                Use Speaker Position = 0;
-                Use Center Speaker = 1;
-                New Speaker Position On Loop = 1;
-                Speaker Position Angle = 0.000000;
-                Speaker Position Arc = 0.000000;
-
-                Event Header
-                {
-                    Timestamp = 0;
-                    Relative = 0;
-                    Random Recurrence = 0;
-                    Random Offset = 0;
-                }
-
-                Wave Entry
-                {
-                    Bank Name = Tests;
-                    Bank Index = 0;
-                    Entry Name = rock_loop_mono;
-                    Entry Index = 2;
-                    Weight = 255;
-                    Weight Min = 0;
-                }
-            }
-        }
-    }
-
-    Sound
-    {
-        Name = bark_mono_reverb;
-        Volume = -1200;
-        Pitch = 0;
-        Priority = 0;
-
-        Category Entry
-        {
-            Name = Default;
-        }
-
-        RPC Entry
-        {
-            RPC Name = ReverbSend;
-        }
-
-        Effect Entry
-        {
-            Effect Name = Microsoft Reverb;
-        }
-
-        Track
-        {
-            Volume = 0;
-            Use Filter = 0;
-
-            Play Wave Event
-            {
-                Break Loop = 0;
-                Use Speaker Position = 0;
-                Use Center Speaker = 1;
-                New Speaker Position On Loop = 1;
-                Speaker Position Angle = 0.000000;
-                Speaker Position Arc = 0.000000;
-
-                Event Header
-                {
-                    Timestamp = 0;
-                    Relative = 0;
-                    Random Recurrence = 0;
-                    Random Offset = 0;
-                }
-
-                Wave Entry
-                {
-                    Bank Name = Tests;
-                    Bank Index = 0;
-                    Entry Name = bark_mono;
-                    Entry Index = 3;
-                    Weight = 255;
-                    Weight Min = 0;
-                }
-            }
-        }
-    }
-
-    Sound
-    {
-        Name = blast_mono_lowpass;
-        Volume = -1200;
-        Pitch = 0;
-        Priority = 0;
-
-        Category Entry
-        {
-            Name = Default;
-        }
-
-        Track
-        {
-            Volume = 0;
-            Use Filter = 1;
-            Filter Mode = 0;
-            Filter Frequency = 256.000000;
-            Filter Q Factor = 12.340000;
-
-            Play Wave Event
-            {
-                Break Loop = 0;
-                Use Speaker Position = 0;
-                Use Center Speaker = 1;
-                New Speaker Position On Loop = 1;
-                Speaker Position Angle = 0.000000;
-                Speaker Position Arc = 0.000000;
-
-                Event Header
-                {
-                    Timestamp = 0;
-                    Relative = 0;
-                    Random Recurrence = 0;
-                    Random Offset = 0;
-                }
-
-                Wave Entry
-                {
-                    Bank Name = Tests;
-                    Bank Index = 0;
-                    Entry Name = blast_mono;
-                    Entry Index = 0;
-                    Weight = 255;
-                    Weight Min = 0;
-                }
-            }
-        }
-    }
-
-    Sound
-    {
-        Name = bark_mono_filtervar;
-        Volume = -1200;
-        Pitch = 0;
-        Priority = 0;
-
-        Category Entry
-        {
-            Name = Default;
-        }
-
-        Track
-        {
-            Volume = 0;
-            Use Filter = 1;
-            Filter Mode = 0;
-            Filter Frequency = 1000.000000;
-            Filter Q Factor = 30.000000;
-
-            Play Wave Event
-            {
-                Break Loop = 0;
-                Use Speaker Position = 0;
-                Use Center Speaker = 1;
-                New Speaker Position On Loop = 1;
-                Speaker Position Angle = 0.000000;
-                Speaker Position Arc = 0.000000;
-
-                Event Header
-                {
-                    Timestamp = 0;
-                    Relative = 0;
-                    Random Recurrence = 0;
-                    Random Offset = 0;
-                }
-
-                Frequency Variation
-                {
-                    Min = 23.000000;
-                    Max = 20000.000000;
-                    Operator = 0;
-                    New Variation On Loop = 0;
-                }
-
-                Q Factor Variation
-                {
-                    Min = 0.810000;
-                    Max = 30.000000;
-                    Operator = 0;
-                    New Variation On Loop = 0;
-                }
-
-                Wave Entry
-                {
-                    Bank Name = Tests;
-                    Bank Index = 0;
-                    Entry Name = bark_mono;
-                    Entry Index = 3;
-                    Weight = 255;
-                    Weight Min = 0;
-                }
-            }
-        }
-    }
-
-    Sound
-    {
-        Name = blast_mono_filter_rpc_cue;
-        Volume = -1200;
-        Pitch = 0;
-        Priority = 0;
-
-        Category Entry
-        {
-            Name = Default;
-        }
-
-        RPC Entry
-        {
-            RPC Name = CueFrequency;
-        }
-
-        Track
-        {
-            Volume = 0;
-            Use Filter = 1;
-            Filter Mode = 0;
-            Filter Frequency = 1000.000000;
-            Filter Q Factor = 30.000000;
-
-            Play Wave Event
-            {
-                Break Loop = 0;
-                Use Speaker Position = 0;
-                Use Center Speaker = 1;
-                New Speaker Position On Loop = 1;
-                Speaker Position Angle = 0.000000;
-                Speaker Position Arc = 0.000000;
-
-                Event Header
-                {
-                    Timestamp = 0;
-                    Relative = 0;
-                    Random Recurrence = 0;
-                    Random Offset = 0;
-                }
-
-                Wave Entry
-                {
-                    Bank Name = Tests;
-                    Bank Index = 0;
-                    Entry Name = blast_mono;
-                    Entry Index = 0;
-                    Weight = 255;
-                    Weight Min = 0;
-                }
-            }
-        }
-    }
-
-    Sound
-    {
-        Name = blast_mono_filter_rpc_global;
-        Volume = -1200;
-        Pitch = 0;
-        Priority = 0;
-
-        Category Entry
-        {
-            Name = Default;
-        }
-
-        RPC Entry
-        {
-            RPC Name = GlobalFilterQ;
-        }
-
-        Track
-        {
-            Volume = 0;
-            Use Filter = 1;
-            Filter Mode = 0;
-            Filter Frequency = 1000.000000;
-            Filter Q Factor = 30.000000;
-
-            Play Wave Event
-            {
-                Break Loop = 0;
-                Use Speaker Position = 0;
-                Use Center Speaker = 1;
-                New Speaker Position On Loop = 1;
-                Speaker Position Angle = 0.000000;
-                Speaker Position Arc = 0.000000;
-
-                Event Header
-                {
-                    Timestamp = 0;
-                    Relative = 0;
-                    Random Recurrence = 0;
-                    Random Offset = 0;
-                }
-
-                Wave Entry
-                {
-                    Bank Name = Tests;
-                    Bank Index = 0;
-                    Entry Name = blast_mono;
-                    Entry Index = 0;
                     Weight = 255;
                     Weight Min = 0;
                 }
@@ -1461,7 +627,7 @@ Sound Bank
 
     Cue
     {
-        Name = rock_loop_mono;
+        Name = bark_mono;
 
         Variation
         {
@@ -1472,128 +638,8 @@ Sound Bank
 
         Sound Entry
         {
-            Name = rock_loop_mono;
+            Name = bark_mono;
             Index = 2;
-            Weight Min = 0;
-            Weight Max = 255;
-        }
-    }
-
-    Cue
-    {
-        Name = rock_loop_reverb;
-
-        Variation
-        {
-            Variation Type = 3;
-            Variation Table Type = 1;
-            New Variation on Loop = 0;
-        }
-
-        Sound Entry
-        {
-            Name = rock_loop_reverb;
-            Index = 3;
-            Weight Min = 0;
-            Weight Max = 255;
-        }
-    }
-
-    Cue
-    {
-        Name = bark_mono_reverb;
-
-        Variation
-        {
-            Variation Type = 3;
-            Variation Table Type = 1;
-            New Variation on Loop = 0;
-        }
-
-        Sound Entry
-        {
-            Name = bark_mono_reverb;
-            Index = 4;
-            Weight Min = 0;
-            Weight Max = 255;
-        }
-    }
-
-    Cue
-    {
-        Name = blast_mono_lowpass;
-
-        Variation
-        {
-            Variation Type = 3;
-            Variation Table Type = 1;
-            New Variation on Loop = 0;
-        }
-
-        Sound Entry
-        {
-            Name = blast_mono_lowpass;
-            Index = 5;
-            Weight Min = 0;
-            Weight Max = 255;
-        }
-    }
-
-    Cue
-    {
-        Name = bark_mono_filtervar;
-
-        Variation
-        {
-            Variation Type = 3;
-            Variation Table Type = 1;
-            New Variation on Loop = 0;
-        }
-
-        Sound Entry
-        {
-            Name = bark_mono_filtervar;
-            Index = 6;
-            Weight Min = 0;
-            Weight Max = 255;
-        }
-    }
-
-    Cue
-    {
-        Name = blast_mono_filter_rpc_cue;
-
-        Variation
-        {
-            Variation Type = 3;
-            Variation Table Type = 1;
-            New Variation on Loop = 0;
-        }
-
-        Sound Entry
-        {
-            Name = blast_mono_filter_rpc_cue;
-            Index = 7;
-            Weight Min = 0;
-            Weight Max = 255;
-        }
-    }
-
-    Cue
-    {
-        Name = blast_mono_filter_rpc_global;
-
-        Variation
-        {
-            Variation Type = 3;
-            Variation Table Type = 1;
-            New Variation on Loop = 0;
-        }
-
-        Sound Entry
-        {
-            Name = blast_mono_filter_rpc_global;
-            Index = 8;
             Weight Min = 0;
             Weight Max = 255;
         }

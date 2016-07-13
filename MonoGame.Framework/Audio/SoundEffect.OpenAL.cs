@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Constructors
 
-        private void PlatformLoadAudioStream(Stream s)
+        private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
         {
             byte[] buffer;
 
@@ -59,6 +59,7 @@ namespace Microsoft.Xna.Framework.Audio
             Size = size;
             Rate = freq;
 
+            duration = TimeSpan.FromSeconds((float)size / freq);
 #endif
 
 #if MONOMAC || IOS
@@ -90,14 +91,14 @@ namespace Microsoft.Xna.Framework.Audio
                         bitsPerChannel = player.SoundSetting.LinearPcmBitDepth.GetValueOrDefault(16);
 
 						Rate = (float)player.SoundSetting.SampleRate;
-                        _duration = TimeSpan.FromSeconds(player.Duration);
+                        duration = TimeSpan.FromSeconds(player.Duration);
                     }
                 }
                 else
                 {
                     Rate = (float)asbd.SampleRate;
                     double duration = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
-                    _duration = TimeSpan.FromSeconds(duration);
+                    duration = TimeSpan.FromSeconds(duration);
                 }
 
                 if (channelsPerFrame == 1)
@@ -160,9 +161,20 @@ namespace Microsoft.Xna.Framework.Audio
             } else {
                 PlatformInitializePCM (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
             }
-            _duration = TimeSpan.FromSeconds (SoundBuffer.Duration);
         }
-        
+
+        private void PlatformInitializeXact(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength, out TimeSpan duration)
+        {
+            if (codec == MiniFormatTag.Adpcm)
+            {
+                PlatformInitializeADPCM(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
+                return;
+            }
+
+            throw new NotSupportedException("Unsupported sound format!");
+        }
+
         #endregion
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
