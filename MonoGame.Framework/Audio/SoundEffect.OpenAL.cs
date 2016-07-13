@@ -139,8 +139,13 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer (buffer, Format, Size, (int)Rate, dataFormat);
         }
 
-        private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
+        private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
         {
+            var format = BitConverter.ToInt16(header, 0);
+            var channels = BitConverter.ToInt16(header, 2);
+            var sampleRate = BitConverter.ToInt32(header, 4);
+            var blockAlignment = BitConverter.ToInt32(header, 12);
+
             // We need to decode MSADPCM.
             var supportsADPCM = OpenALSoundController.GetInstance.SupportsADPCM;
             if (format == 2 && !supportsADPCM)
