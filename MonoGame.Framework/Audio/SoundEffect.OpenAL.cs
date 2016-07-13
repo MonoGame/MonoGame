@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
-        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             Rate = (float)sampleRate;
             Size = (int)count;
@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
-        private void PlatformInitializeADPCM (byte [] buffer, int offset, int count, int sampleRate, AudioChannels channels, int dataFormat, int loopStart, int loopLength)
+        private void PlatformInitializeAdpcm (byte [] buffer, int offset, int count, int sampleRate, AudioChannels channels, int dataFormat, int loopStart, int loopLength)
         {
             Rate = (float)sampleRate;
             Size = (int)count;
@@ -157,9 +157,9 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new NotSupportedException("Unsupported wave format!");
 
             if (supportsADPCM && format == 2) {
-                PlatformInitializeADPCM (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
             } else {
-                PlatformInitializePCM (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                PlatformInitializePcm (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
             }
         }
 
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (codec == MiniFormatTag.Adpcm)
             {
-                PlatformInitializeADPCM(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
                 duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
                 return;
             }
