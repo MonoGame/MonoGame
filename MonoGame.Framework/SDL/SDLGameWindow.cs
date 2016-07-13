@@ -167,6 +167,7 @@ namespace Microsoft.Xna.Framework
                 _width, _height, initflags);
 
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
+            Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
             Sdl.Window.SetTitle(Handle, title);
 

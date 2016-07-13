@@ -4,13 +4,10 @@
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    enum RpcParameter
+    enum FilterMode
     {
-        Volume,
-        Pitch,
-        ReverbSend,
-        FilterFrequency,
-        FilterQFactor,
-        NumParameters,
+        LowPass = 0,
+        BandPass = 1,
+        HighPass = 2,
     }
 }

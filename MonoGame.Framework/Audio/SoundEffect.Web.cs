@@ -37,6 +37,10 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
+        internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
+        {
+        }
+
         internal static void PlatformShutdown()
         {
         }
