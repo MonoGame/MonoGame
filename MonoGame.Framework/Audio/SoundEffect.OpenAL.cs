@@ -97,8 +97,8 @@ namespace Microsoft.Xna.Framework.Audio
                 else
                 {
                     Rate = (float)asbd.SampleRate;
-                    double duration = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
-                    duration = TimeSpan.FromSeconds(duration);
+                    double durationSec = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
+                    duration = TimeSpan.FromSeconds(durationSec);
                 }
 
                 if (channelsPerFrame == 1)
