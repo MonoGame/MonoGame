@@ -36,8 +36,8 @@
     <!-- We do this here so we are compatible with xbuild -->
     <ItemGroup>
       <ContentReferences Include="@(MonoGameContentReference)">
-        <ContentOutputDir>$(ProjectDir)%(RelativeDir)\bin\$(MonoGamePlatform)</ContentOutputDir>
-        <ContentIntermediateOutputDir>$(ProjectDir)%(RelativeDir)\obj\$(MonoGamePlatform)</ContentIntermediateOutputDir>
+        <ContentOutputDir>$(ProjectDir)%(RelativeDir)\bin\$(MonoGamePlatform)\%(Filename)</ContentOutputDir>
+        <ContentIntermediateOutputDir>$(ProjectDir)%(RelativeDir)\obj\$(MonoGamePlatform)\%(Filename)</ContentIntermediateOutputDir>
       </ContentReferences>
     </ItemGroup>
 
@@ -84,10 +84,13 @@
           Command="$(MonoGameContentBuilderCmd) /@:&quot;%(ContentReferences.FullPath)&quot; $(Header) /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot; /quiet"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
-   
+
+    <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" Condition="'%(ContentReferences.Link)' != ''" AdditionalMetadata="ContentOutputDir=$([System.String]::Copy('%(ContentReferences.Link)').Replace('%(Filename)%(Extension)', ''))">
+      <Output TaskParameter="Include" ItemName="ExtraContent" />
+    </CreateItem>
     <CreateItem Include="%(ContentReferences.ContentOutputDir)\**\*.*" AdditionalMetadata="ContentOutputDir=%(ContentReferences.RelativeDir)">
       <Output TaskParameter="Include" ItemName="ExtraContent" />
-  
+
     </CreateItem>
   </Target>
 
