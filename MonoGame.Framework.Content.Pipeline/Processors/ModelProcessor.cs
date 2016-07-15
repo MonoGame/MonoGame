@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         private bool _premultiplyTextureAlpha = true;
         private bool _premultiplyVertexColors = true;
         private float _scale = 1.0f;
-        private TextureProcessorOutputFormat _textureFormat = TextureProcessorOutputFormat.DxtCompressed;
+        private TextureProcessorOutputFormat _textureFormat = TextureProcessorOutputFormat.Compressed;
 
         #endregion
 
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public virtual bool SwapWindingOrder { get; set; }
 
-		[DefaultValue(typeof(TextureProcessorOutputFormat), "DxtCompressed")]
+		[DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat
         {
             get { return _textureFormat; }
