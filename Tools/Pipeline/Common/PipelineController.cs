@@ -714,7 +714,7 @@ namespace MonoGame.Tools.Pipeline
 
                 if (!folder.StartsWith(initialDirectory))
                 {
-                    string nd = folder.Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar);
+                    string nd = folder.Replace(folder, Path.Combine(initialDirectory, (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
 
                     if (!applyforall)
                     if (!View.CopyOrLinkFolder(folder, Directory.Exists(nd), out caction, out applyforall))
@@ -723,10 +723,10 @@ namespace MonoGame.Tools.Pipeline
                     if (caction == CopyAction.Copy)
                     {
                         for (int i = 0; i < directories.Count; i++)
-                            ddirectories.Add(directories[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
+                            ddirectories.Add(directories[i].Replace(folder, Path.Combine(initialDirectory, (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar)));
 
                         for (int i = 0; i < files.Count; i++)
-                            ffiles.Add(files[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
+                            ffiles.Add(files[i].Replace(folder, Path.Combine(initialDirectory, (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar)));
 
                         sc.Add(folder);
                         dc.Add(nd);
@@ -999,11 +999,9 @@ namespace MonoGame.Tools.Pipeline
             if (_project == null)
                 return filePath;
 
-            #if WINDOWS
-            filePath = filePath.Replace("/", "\\");
+            filePath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
             if (filePath.StartsWith("\\"))
-                filePath = filePath.Substring(2);
-            #endif
+                filePath = filePath.Substring(1);
 
             if (Path.IsPathRooted(filePath))
                 return filePath;
