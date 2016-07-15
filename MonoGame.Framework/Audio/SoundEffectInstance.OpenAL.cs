@@ -28,7 +28,9 @@ namespace Microsoft.Xna.Framework.Audio
 		internal int SourceId;
         private float reverb = 0f;
         bool applyFilter = false;
+#if !MONOMAC
         EfxFilterType filterType;
+#endif
         float filterQ;
         float frequency;
         int pauseCount;
@@ -37,7 +39,7 @@ namespace Microsoft.Xna.Framework.Audio
         
         internal bool HasSourceId = false;
 
-        #region Initialization
+#region Initialization
 
         /// <summary>
         /// Creates a standalone SoundEffectInstance from given wavedata.
@@ -56,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
             controller = OpenALSoundController.GetInstance;
         }
 
-        #endregion // Initialization
+#endregion // Initialization
 
         /// <summary>
         /// Converts the XNA [-1, 1] pitch range to OpenAL pitch (0, INF) or Android SoundPool playback rate [0.5, 2].
@@ -141,7 +143,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pitch
 			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
             ALHelper.CheckError("Failed to set source pitch.");
-
+#if !MONOMAC
             if (reverb > 0f && SoundEffect.ReverbSlot != 0) {
                 OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, (int)SoundEffect.ReverbSlot, 0, 0);
                 ALHelper.CheckError ("Failed to set reverb.");
@@ -172,7 +174,7 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.Source (SourceId, ALSourcei.EfxDirectFilter, controller.Filter);
                 ALHelper.CheckError ("Failed to set DirectFilter.");
             }
-
+#endif
             AL.SourcePlay(SourceId);
             ALHelper.CheckError("Failed to play source.");
 
@@ -215,11 +217,12 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.SourceStop(SourceId);
                 ALHelper.CheckError("Failed to stop source.");
 
+#if !MONOMAC
                 // Reset the SendFilter to 0 if we are NOT using revert since 
                 // sources are recyled
                 OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, 0, 0, 0);
                 ALHelper.CheckError ("Failed to unset reverb.");
-
+#endif
                 AL.Source (SourceId, ALSourcei.EfxDirectFilter, 0);
                 ALHelper.CheckError ("Failed to unset filter.");
 
@@ -305,13 +308,16 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformSetReverbMix(float mix)
         {
+#if !MONOMAC
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
             reverb = mix;
+#endif
         }
 
         internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
         {
+#if !MONOMAC
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
@@ -329,14 +335,17 @@ namespace Microsoft.Xna.Framework.Audio
             }
             this.filterQ = filterQ;
             this.frequency = frequency;
+#endif
         }
 
         internal void PlatformClearFilter()
         {
+#if !MONOMAC
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
             applyFilter = false;
+#endif
         }
 
         private void PlatformDispose(bool disposing)

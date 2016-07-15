@@ -178,6 +178,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
         {
+#if !MONOMAC
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
@@ -216,9 +217,10 @@ namespace Microsoft.Xna.Framework.Audio
             //efx.SetEffectParam (ReverbEffect, EfxEffectf.LowFrequencyReference, reverbSettings.RoomSizeFeet);
 
             efx.BindEffectToAuxiliarySlot (ReverbSlot, ReverbEffect);
+#endif
         }
 
-        #region IDisposable Members
+#region IDisposable Members
 
         private void PlatformDispose(bool disposing)
         {
@@ -229,14 +231,16 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        #endregion
+#endregion
 
         internal static void PlatformShutdown()
         {
+#if !MONOMAC
             if (ReverbEffect != 0) {
                 OpenALSoundController.Efx.DeleteAuxiliaryEffectSlot ((int)ReverbSlot);
                 OpenALSoundController.Efx.DeleteEffect ((int)ReverbEffect);
             }
+#endif
             OpenALSoundController.DestroyInstance();
         }
     }
