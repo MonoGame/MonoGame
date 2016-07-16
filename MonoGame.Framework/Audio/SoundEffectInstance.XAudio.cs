@@ -93,12 +93,19 @@ namespace Microsoft.Xna.Framework.Audio
             if (_dxEmitter == null)
                 _dxEmitter = new Emitter();
 
+#if WINDOWS_UAP
+            _dxEmitter.Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
+            _dxEmitter.Velocity =  new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
+            _dxEmitter.OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
+            _dxEmitter.OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
+            
+#else
             _dxEmitter.Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z);
             _dxEmitter.Velocity = new SharpDX.Vector3(vel.X, vel.Y, vel.Z);
             _dxEmitter.OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z);
             _dxEmitter.OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z);
             _dxEmitter.DopplerScaler = emitter.DopplerScale;
-
+#endif
             return _dxEmitter;
         }
 
@@ -132,11 +139,17 @@ namespace Microsoft.Xna.Framework.Audio
             if (_dxListener == null)
                 _dxListener = new Listener();
 
+#if WINDOWS_UAP
+            _dxListener.Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
+            _dxListener.Velocity = new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
+            _dxListener.OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
+            _dxListener.OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
+#else
             _dxListener.Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z);
             _dxListener.Velocity = new SharpDX.Vector3(vel.X, vel.Y, vel.Z);
             _dxListener.OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z);
             _dxListener.OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z);
-
+#endif
             return _dxListener;
         }
 
