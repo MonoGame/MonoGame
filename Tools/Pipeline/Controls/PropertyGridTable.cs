@@ -102,7 +102,7 @@ namespace MonoGame.Tools.Pipeline
 
         private Type GetCellType(IEnumerable<Type> types, string name, object type)
         {
-            Type ret = null;
+            Type ret = null; if (type == null) type = "";
 
             foreach (var ct in types)
             {
