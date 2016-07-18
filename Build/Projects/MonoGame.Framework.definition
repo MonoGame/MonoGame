@@ -432,6 +432,7 @@
     <Compile Include="Audio\Xact\DspParameter.cs" />
     <Compile Include="Audio\Xact\FilterMode.cs" />
     <Compile Include="Audio\Xact\MaxInstanceBehavior.cs" />
+    <Compile Include="Audio\Xact\MiniFormatTag.cs" />
     <Compile Include="Audio\Xact\PlayWaveEvent.cs" />
     <Compile Include="Audio\Xact\ReverbSettings.cs" />	
     <Compile Include="Audio\Xact\RpcCurve.cs" />

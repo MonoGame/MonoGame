@@ -20,67 +20,87 @@ namespace Microsoft.Xna.Framework.Audio
         private string _name = string.Empty;
         
         private bool _isDisposed = false;
-        private TimeSpan _duration = TimeSpan.Zero;
+        private readonly TimeSpan _duration;
 
         #endregion
 
         #region Internal Constructors
 
-        internal SoundEffect() {}
+        // Only used from SoundEffect.FromStream.
+        private SoundEffect(Stream stream)
+        {
+            /*
+              The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.
+              The audio format has the following restrictions:
+              Must be a PCM wave file
+              Can only be mono or stereo
+              Must be 8 or 16 bit
+              Sample rate must be between 8,000 Hz and 48,000 Hz
+            */
 
-        internal SoundEffect(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int durationMs, int loopStart, int loopLength)
+            PlatformLoadAudioStream(stream, out _duration);
+        }
+
+        // Only used from SoundEffectReader.
+        internal SoundEffect(byte[] header, byte[] buffer, int bufferSize, int durationMs, int loopStart, int loopLength)
         {
             _duration = TimeSpan.FromMilliseconds(durationMs);
 
-            // This is regular PCM data.
+            // Peek at the format... handle regular PCM data.
+            var format = BitConverter.ToInt16(header, 0);
             if (format == 1)
             {
-                PlatformInitializePCM(buffer, 0, buffer.Length, sampleRate, (AudioChannels) channels, loopStart, loopLength);
+                var channels = BitConverter.ToInt16(header, 2);
+                var sampleRate = BitConverter.ToInt32(header, 4);
+                PlatformInitializePcm(buffer, 0, bufferSize, sampleRate, (AudioChannels)channels, loopStart, loopLength);
                 return;
             }
 
             // Everything else is platform specific.
-            PlatformInitializeFormat(buffer, format, sampleRate, channels, blockAlignment, loopStart, loopLength);
+            PlatformInitializeFormat(header, buffer, bufferSize, loopStart, loopLength);
+        }
+
+        // Only used from XACT WaveBank.
+        internal SoundEffect(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength)
+        {
+            // Handle the common case... the rest is platform specific.
+            if (codec == MiniFormatTag.Pcm)
+            {
+                _duration = TimeSpan.FromSeconds((float)buffer.Length / (sampleRate * blockAlignment));
+                PlatformInitializePcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                return;
+            }
+
+            PlatformInitializeXact(codec, buffer, channels, sampleRate, blockAlignment, loopStart, loopLength, out _duration);
         }
 
         #endregion
 
         #region Public Constructors
 
-        /// <param name="buffer">Buffer containing 16bit PCM wave data.</param>
-        /// <param name="sampleRate">Sample rate, in Hertz (Hz)</param>
-        /// <param name="channels">Number of channels (mono or stereo).</param>
+        /// <summary>
+        /// Create a sound effect.
+        /// </summary>
+        /// <param name="buffer">The buffer with the sound data.</param>
+        /// <param name="sampleRate">The sound data sample rate in hertz.</param>
+        /// <param name="channels">The number of channels in the sound data.</param>
+        /// <remarks>This only supports uncompressed 16bit PCM wav data.</remarks>
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
+             : this(buffer, 0, buffer != null ? buffer.Length : 0, sampleRate, channels, 0, 0)
         {
-            if (sampleRate < 8000 || sampleRate > 48000)
-                throw new ArgumentOutOfRangeException("sampleRate");
-            if ((int)channels != 1 && (int)channels != 2)
-                throw new ArgumentOutOfRangeException("channels");
-
-            if (buffer == null || buffer.Length == 0)
-                throw new ArgumentException("Ensure that the buffer length is non-zero.", "buffer");
-
-            // Make sure the buffer length matches the block alignment.
-            var blockAlign = (int)channels * 2;
-            if ((buffer.Length % blockAlign) != 0)
-                throw new ArgumentException("Ensure that the buffer meets the block alignment requirements for the number of channels.", "buffer");
-
-            _duration = GetSampleDuration(buffer.Length, sampleRate, channels);
-
-            // Use the total sample count for the loop length.
-            var loopLength = buffer.Length / blockAlign;
-
-            PlatformInitializePCM(buffer, 0, buffer.Length, sampleRate, channels, 0, loopLength);
         }
 
-        /// <param name="buffer">Buffer containing 16bit PCM wave data.</param>
-        /// <param name="offset">Offset, in bytes, to the starting position of the audio data.</param>
-        /// <param name="count">Amount, in bytes, of audio data.</param>
-        /// <param name="sampleRate">Sample rate, in Hertz (Hz)</param>
-        /// <param name="channels">Number of channels (mono or stereo).</param>
-        /// <param name="loopStart">The position, in samples, where the audio should begin looping.</param>
-        /// <param name="loopLength">The duration, in samples, that audio should loop over.</param>
-        /// <remarks>Use SoundEffect.GetSampleDuration() to convert time to samples.</remarks>
+        /// <summary>
+        /// Create a sound effect.
+        /// </summary>
+        /// <param name="buffer">The buffer with the sound data.</param>
+        /// <param name="offset">The offset to the start of the sound data in bytes.</param>
+        /// <param name="count">The length of the sound data in bytes.</param>
+        /// <param name="sampleRate">The sound data sample rate in hertz.</param>
+        /// <param name="channels">The number of channels in the sound data.</param>
+        /// <param name="loopStart">The position where the sound should begin looping in samples.</param>
+        /// <param name="loopLength">The duration of the sound data loop in samples.</param>
+        /// <remarks>This only supports uncompressed 16bit PCM wav data.</remarks>
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             if (sampleRate < 8000 || sampleRate > 48000)
@@ -90,6 +110,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (buffer == null || buffer.Length == 0)
                 throw new ArgumentException("Ensure that the buffer length is non-zero.", "buffer");
+
             var blockAlign = (int)channels * 2;
             if ((buffer.Length % blockAlign) != 0)
                 throw new ArgumentException("Ensure that the buffer meets the block alignment requirements for the number of channels.", "buffer");
@@ -121,7 +142,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             _duration = GetSampleDuration(count, sampleRate, channels);
 
-            PlatformInitializePCM(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
+            PlatformInitializePcm(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
         }
 
         #endregion
@@ -158,30 +179,17 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Creates a SoundEffect object based on the specified data stream.
+        /// Creates a new SoundEffect object based on the specified data stream.
         /// </summary>
-        /// <param name="s">Stream object containing PCM wave data.</param>
+        /// <param name="stream">A stream containing the PCM wave data.</param>
         /// <returns>A new SoundEffect object.</returns>
-        /// <remarks>The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.</remarks>
-        public static SoundEffect FromStream(Stream s)
+        /// <remarks>The stream must point to the head of a valid PCM wave file in the RIFF bitstream format.</remarks>
+        public static SoundEffect FromStream(Stream stream)
         {
-            if (s == null)
-                throw new ArgumentNullException();
+            if (stream == null)
+                throw new ArgumentNullException("stream");
 
-            // Notes from the docs:
-
-            /*The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.
-              The audio format has the following restrictions:
-              Must be a PCM wave file
-              Can only be mono or stereo
-              Must be 8 or 16 bit
-              Sample rate must be between 8,000 Hz and 48,000 Hz*/
-
-            var sfx = new SoundEffect();
-
-            sfx.PlatformLoadAudioStream(s);
-
-            return sfx;
+            return new SoundEffect(stream);
         }
 
         /// <summary>

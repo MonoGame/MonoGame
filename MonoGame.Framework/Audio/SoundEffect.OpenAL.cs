@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Constructors
 
-        private void PlatformLoadAudioStream(Stream s)
+        private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
         {
             byte[] buffer;
 
@@ -59,6 +59,7 @@ namespace Microsoft.Xna.Framework.Audio
             Size = size;
             Rate = freq;
 
+            duration = TimeSpan.FromSeconds((float)size / freq);
 #endif
 
 #if MONOMAC || IOS
@@ -90,14 +91,14 @@ namespace Microsoft.Xna.Framework.Audio
                         bitsPerChannel = player.SoundSetting.LinearPcmBitDepth.GetValueOrDefault(16);
 
 						Rate = (float)player.SoundSetting.SampleRate;
-                        _duration = TimeSpan.FromSeconds(player.Duration);
+                        duration = TimeSpan.FromSeconds(player.Duration);
                     }
                 }
                 else
                 {
                     Rate = (float)asbd.SampleRate;
-                    double duration = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
-                    _duration = TimeSpan.FromSeconds(duration);
+                    double durationSec = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
+                    duration = TimeSpan.FromSeconds(durationSec);
                 }
 
                 if (channelsPerFrame == 1)
@@ -112,7 +113,7 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
-        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             Rate = (float)sampleRate;
             Size = (int)count;
@@ -123,7 +124,7 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
-        private void PlatformInitializeADPCM (byte [] buffer, int offset, int count, int sampleRate, AudioChannels channels, int dataFormat, int loopStart, int loopLength)
+        private void PlatformInitializeAdpcm (byte [] buffer, int offset, int count, int sampleRate, AudioChannels channels, int dataFormat, int loopStart, int loopLength)
         {
             Rate = (float)sampleRate;
             Size = (int)count;
@@ -138,8 +139,13 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer (buffer, Format, Size, (int)Rate, dataFormat);
         }
 
-        private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
+        private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
         {
+            var format = BitConverter.ToInt16(header, 0);
+            var channels = BitConverter.ToInt16(header, 2);
+            var sampleRate = BitConverter.ToInt32(header, 4);
+            var blockAlignment = BitConverter.ToInt32(header, 12);
+
             // We need to decode MSADPCM.
             var supportsADPCM = OpenALSoundController.GetInstance.SupportsADPCM;
             if (format == 2 && !supportsADPCM)
@@ -156,13 +162,24 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new NotSupportedException("Unsupported wave format!");
 
             if (supportsADPCM && format == 2) {
-                PlatformInitializeADPCM (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
             } else {
-                PlatformInitializePCM (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+                PlatformInitializePcm (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
             }
-            _duration = TimeSpan.FromSeconds (SoundBuffer.Duration);
         }
-        
+
+        private void PlatformInitializeXact(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength, out TimeSpan duration)
+        {
+            if (codec == MiniFormatTag.Adpcm)
+            {
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
+                return;
+            }
+
+            throw new NotSupportedException("Unsupported sound format!");
+        }
+
         #endregion
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
