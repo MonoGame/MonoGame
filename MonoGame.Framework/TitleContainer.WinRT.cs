@@ -5,29 +5,45 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Resources.Core;
 
 namespace Microsoft.Xna.Framework
 {
     partial class TitleContainer
     {
+        static internal ResourceContext ResourceContext;
+        static internal ResourceMap FileResourceMap;
+
         static partial void PlatformInit()
         {
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+
+            ResourceContext = new Windows.ApplicationModel.Resources.Core.ResourceContext();
+            FileResourceMap = ResourceManager.Current.MainResourceMap.GetSubtree("Files");
         }
 
         private static async Task<Stream> OpenStreamAsync(string name)
         {
-            var package = Windows.ApplicationModel.Package.Current;
+            NamedResource result;
 
-            try
+            if (FileResourceMap != null && FileResourceMap.TryGetValue(name, out result))
             {
-                var storageFile = await package.InstalledLocation.GetFileAsync(name);
-                var randomAccessStream = await storageFile.OpenReadAsync();
-                return randomAccessStream.AsStreamForRead();
+                var resolved = result.Resolve(ResourceContext);
+
+                try
+                {
+                    var storageFile = await resolved.GetValueAsFileAsync();
+                    var randomAccessStream = await storageFile.OpenReadAsync();
+                    return randomAccessStream.AsStreamForRead();
+                }
+                catch (IOException)
+                {
+                    // The file must not exist... return a null stream.
+                    return null;
+                }
             }
-            catch (IOException)
+            else
             {
-                // The file must not exist... return a null stream.
                 return null;
             }
         }
