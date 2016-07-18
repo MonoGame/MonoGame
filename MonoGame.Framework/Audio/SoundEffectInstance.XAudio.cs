@@ -305,6 +305,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformClearFilter()
         {
+            if (_voice == null)
+                return;
+
             var filter = new FilterParameters { Frequency = 1.0f, OneOverQ = 1.0f, Type = FilterType.LowPassFilter };
             _voice.SetFilterParameters(filter);            
         }
