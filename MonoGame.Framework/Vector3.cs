@@ -1136,9 +1136,9 @@ namespace Microsoft.Xna.Framework
 
                 destinationArray[i] =
                     new Vector3(
-                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + 1.0,
-                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + 1.0,
-                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + 1.0);
+                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + 1f,
+                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + 1f,
+                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + 1f);
             }
         }
 
