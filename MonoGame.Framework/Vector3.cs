@@ -1113,6 +1113,37 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
+        #region TransformCoord
+
+        /// <summary>
+        /// Apply transformation on all vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/>, projecting the result back into w = 1 and places the results in an another array.
+        /// </summary>
+        /// <param name="sourceArray">Source array.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="destinationArray">Destination array.</param>
+        public static void TransformCoord(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
+        {
+            if (sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if (destinationArray.Length < sourceArray.Length)
+                throw new ArgumentException("Destination array length is lesser than source array length");
+
+            for (var i = 0; i < sourceArray.Length; i++)
+            {
+                var position = sourceArray[i];
+
+                destinationArray[i] =
+                    new Vector3(
+                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + 1.0,
+                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + 1.0,
+                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + 1.0);
+            }
+        }
+
+        #endregion
+
         #region TransformNormal
 
         /// <summary>
