@@ -119,6 +119,8 @@
     <Compile Include="Framework\Vector4Test.cs" />
     <Compile Include="Framework\VertexTests.cs" />
     
+    <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
+	
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
