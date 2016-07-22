@@ -255,6 +255,10 @@ namespace OpenAL
             return errorCode.ToString (); 
         }
 
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alIsSource")]
+        public static extern bool IsSource(int source);
+
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteSources")]
         public static extern void DeleteSources(int n, ref int sources);
