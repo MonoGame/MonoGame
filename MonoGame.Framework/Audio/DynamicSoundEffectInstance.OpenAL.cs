@@ -6,8 +6,15 @@ using System;
 using System.Collections.Generic;
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenAL;
-#elif OPENAL
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
 using OpenTK.Audio.OpenAL;
+#endif
+#if GLES
+using OpenTK.Audio.OpenAL;
+#endif
+#if DESKTOPGL
+using OpenAL;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -66,7 +73,7 @@ namespace Microsoft.Xna.Framework.Audio
             ALHelper.CheckError("Failed to stop the source.");
 
             // Remove all queued buffers
-            AL.BindBufferToSource(SourceId, 0);
+            AL.Source(SourceId, ALSourcei.Buffer, 0);
             while (_queuedBuffers.Count > 0)
             {
                 var buffer = _queuedBuffers.Dequeue();
@@ -112,7 +119,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (AL.IsSource(SourceId))
             {
                 AL.SourceStop(SourceId);
-                AL.BindBufferToSource(SourceId, 0);
+                AL.Source(SourceId, ALSourcei.Buffer, 0);
                 ALHelper.CheckError("Failed to stop the source.");
                 controller.RecycleSource(SourceId);
             }
