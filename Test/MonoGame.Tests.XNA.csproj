@@ -182,6 +182,7 @@
     <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\AlphaTestEffect.fx">
