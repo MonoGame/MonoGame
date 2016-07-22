@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Audio
     /// </summary>
     internal static class DynamicSoundEffectInstanceManager
     {
-        private static List<WeakReference> _playingInstances;
+        private static readonly List<WeakReference> _playingInstances;
 
         static DynamicSoundEffectInstanceManager()
         {

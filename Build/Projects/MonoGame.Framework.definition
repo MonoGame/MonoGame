@@ -378,18 +378,17 @@
     <Compile Include="Audio\AudioLoader.cs">
       <Platforms>Linux,WindowsGL,Angle,Android,Ouya</Platforms>
     </Compile>
-	<Compile Include="Audio\DynamicSoundEffectInstance.cs">
-	  <Services>OpenALAudio,XAudioAudio</Services>
-	</Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstance.cs" />
 	<Compile Include="Audio\DynamicSoundEffectInstance.OpenAL.cs">
 	  <Services>OpenALAudio</Services>
 	</Compile>
 	<Compile Include="Audio\DynamicSoundEffectInstance.XAudio.cs">
 	  <Services>XAudioAudio</Services>
 	</Compile>
-	<Compile Include="Audio\DynamicSoundEffectInstanceManager.cs">
-	  <Services>OpenALAudio,XAudioAudio</Services>
-	</Compile>
+    <Compile Include="Audio\DynamicSoundEffectInstance.Web.cs">
+	  <Services>WebAudio</Services>
+    </Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstanceManager.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,Web,tvOS</Platforms>
