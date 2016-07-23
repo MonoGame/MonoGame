@@ -110,6 +110,7 @@ namespace MonoGame.Tests {
 		public Predicate<FrameInfo> ExitCondition { get; set; }
 		public bool SuppressExtraUpdatesAndDraws { get; set; }
 
+		public event EventHandler<FrameInfoEventArgs> InitializeWith;
 		public event EventHandler<FrameInfoEventArgs> LoadContentWith;
 		public event EventHandler<FrameInfoEventArgs> UnloadContentWith;
 		public event EventHandler<FrameInfoEventArgs> DrawWith;
@@ -124,6 +125,7 @@ namespace MonoGame.Tests {
 
 		public void ClearActions ()
 		{
+			InitializeWith = null;
 			LoadContentWith = null;
 			UnloadContentWith = null;
 			DrawWith = null;
@@ -147,6 +149,7 @@ namespace MonoGame.Tests {
 		{
 			SafeRaise (PreInitializeWith);
 			base.Initialize ();
+			SafeRaise (InitializeWith);
 		}
 
 		protected override void LoadContent ()
