@@ -604,7 +604,15 @@
 		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs">
+      <ExcludePlatforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\GraphicsAdapter.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsAdapter.Legacy.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS,Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\GraphicsContext.SDL.cs">
       <Platforms>WindowsGL,Linux</Platforms>
