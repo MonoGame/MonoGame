@@ -94,7 +94,7 @@ namespace MonoGame.Tests.Visual
             Texture2D tex = null;
             SpriteBatch spriteBatch = null;
 
-            game.InitializeWith += (sender, args) =>
+            game.PreInitializeWith += (sender, args) =>
             {
                 tex = new Texture2D(game.GraphicsDevice, 1, 1);
                 tex.SetData(new[] { Color.White.PackedValue });
