@@ -126,6 +126,8 @@
 	<!-- GUI Controls -->
 	<Compile Include="Controls\PropertyCells\CellBase.cs" />
 	<Compile Include="Controls\PropertyCells\CellBool.cs" />
+	<Compile Include="Controls\PropertyCells\CellCRDesc.cs" />
+	<Compile Include="Controls\PropertyCells\CellChar.cs" />
 	<Compile Include="Controls\PropertyCells\CellColor.cs" />
 	<Compile Include="Controls\PropertyCells\CellCombo.cs" />
 	<Compile Include="Controls\PropertyCells\CellNumber.cs" />
@@ -157,6 +159,10 @@
 	<Compile Include="Dialogs\AddItemDialog.cs" />
 	<Compile Include="Dialogs\AddItemDialog.eto.cs">
       <DependentUpon>AddItemDialog.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Dialogs\CRDescDialog.cs" />
+	<Compile Include="Dialogs\CRDescDialog.eto.cs">
+      <DependentUpon>CRDescDialog.cs</DependentUpon>
     </Compile>
 	<Compile Include="Dialogs\DeleteDialog.cs" />
 	<Compile Include="Dialogs\DeleteDialog.eto.cs">

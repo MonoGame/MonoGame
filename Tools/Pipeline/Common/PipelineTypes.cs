@@ -12,7 +12,6 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
-using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -334,6 +333,8 @@ namespace MonoGame.Tools.Pipeline
         {
             if (type == typeof(Color))
                 return new StringToColorConverter();
+            else if (type == typeof(CharacterRegionsDescription))
+                return new StringToCharacterRegionsConverter();
 
             return TypeDescriptor.GetConverter(type);
         }
