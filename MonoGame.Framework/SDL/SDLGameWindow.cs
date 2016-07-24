@@ -27,12 +27,9 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                int x = 0, y = 0, w, h;
-
-                Sdl.Window.GetSize(Handle, out w, out h);
+                int x = 0, y = 0;
                 Sdl.Window.GetPosition(Handle, out x, out y);
-
-                return new Rectangle(x, y, w, h);
+                return new Rectangle(x, y, _width, _height);
             }
         }
 
@@ -83,7 +80,7 @@ namespace Microsoft.Xna.Framework
         private bool _init, _disposed;
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible;
         private string _screenDeviceName;
-        private int _winx, _winy;
+        private int _winx, _winy, _width, _height;
 
         public SdlGameWindow(Game game)
         {
@@ -110,8 +107,8 @@ namespace Microsoft.Xna.Framework
 
         internal void CreateWindow()
         {
-            var width = GraphicsDeviceManager.DefaultBackBufferWidth;
-            var height = GraphicsDeviceManager.DefaultBackBufferHeight;
+            _width = GraphicsDeviceManager.DefaultBackBufferWidth;
+            _height = GraphicsDeviceManager.DefaultBackBufferHeight;
             var title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             var initflags =
@@ -128,8 +125,8 @@ namespace Microsoft.Xna.Framework
 
             Sdl.Window.Destroy(_handle);
             _handle = Sdl.Window.Create (title,
-                _winx - width / 2, _winy - height / 2,
-                width, height, initflags);
+                _winx - _width / 2, _winy - _height / 2,
+                _width, _height, initflags);
 
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
 
@@ -212,8 +209,17 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
             }
 
-            if (!_willBeFullScreen)
+            if (!_willBeFullScreen || _game.graphicsDeviceManager.HardwareModeSwitch)
+            {
                 Sdl.Window.SetSize(Handle, clientWidth, clientHeight);
+                _width = clientWidth;
+                _height = clientHeight;
+            }
+            else
+            {
+                _width = displayRect.Width;
+                _height = displayRect.Height;
+            }
 
             var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), 0);
             var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), 0);
@@ -245,8 +251,9 @@ namespace Microsoft.Xna.Framework
         {
             _game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
             _game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
-
             _game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
+
+            Sdl.Window.GetSize(Handle, out _width, out _height);
 
             OnClientSizeChanged();
         }

@@ -415,8 +415,29 @@ internal static class Sdl
         {
             public int Scancode;
             public int Sym;
-            public ushort Mod;
+            public Keymod Mod;
             public uint Unicode;
+        }
+
+        [Flags]
+        public enum Keymod : ushort
+        {
+            None = 0x0000,
+            LeftShift = 0x0001,
+            RightShift = 0x0002,
+            LeftCtrl = 0x0040,
+            RightCtrl = 0x0080,
+            LeftAlt = 0x0100,
+            RightAlt = 0x0200,
+            LeftGui = 0x0400,
+            RightGui = 0x0800,
+            NumLock = 0x1000,
+            CapsLock = 0x2000,
+            AltGr = 0x4000,
+            Ctrl = (LeftCtrl | RightCtrl),
+            Shift = (LeftShift | RightShift),
+            Alt = (LeftAlt | RightAlt),
+            Gui = (LeftGui | RightGui)
         }
 
         public struct Event
@@ -448,6 +469,9 @@ internal static class Sdl
             public uint WindowId;
             public fixed byte Text [32];
         }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetModState")]
+        public static extern Keymod GetModState();
     }
 
     public static class Joystick

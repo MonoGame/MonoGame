@@ -149,7 +149,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>MacOS, Linux</Platforms>
+      <Platforms>WindowsGL,Linux,MacOS</Platforms>
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -783,7 +783,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,MacOS,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -827,14 +827,20 @@
     <Compile Include="Input\Joystick.SDL.cs">
       <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Input\Joystick.MacOS.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
     <Compile Include="Input\Joystick.Web.cs">
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Input\Keyboard.cs">
 		<ExcludePlatforms>Android,Ouya</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.Default.cs">
+		<ExcludePlatforms>Android,Ouya,Windows,WindowsGL,Linux</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.SDL.cs">
+		<Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\Keyboard.Windows.cs">
+		<Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
@@ -870,6 +876,18 @@
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\Mouse.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.MacOS.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Input\Mouse.Default.cs">
+      <ExcludePlatforms>WindowsGL,Linux,Windows,MacOS</ExcludePlatforms>
+    </Compile>
     <Compile Include="Input\MouseCursor.cs" />
     <Compile Include="Input\MouseCursor.SDL.cs">
       <Platforms>Linux,WindowsGL</Platforms>
