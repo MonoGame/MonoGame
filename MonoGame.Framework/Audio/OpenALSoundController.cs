@@ -155,6 +155,9 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
+#if DESKTOPGL
+                EffectsExtension.device = _device;
+#endif
             }
             catch (Exception ex)
             {
