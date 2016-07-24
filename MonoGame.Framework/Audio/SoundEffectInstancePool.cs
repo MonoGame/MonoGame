@@ -80,6 +80,8 @@ namespace Microsoft.Xna.Framework.Audio
                 inst.Pan = 0.0f;
                 inst.Pitch = 0.0f;
                 inst.IsLooped = false;
+                inst.PlatformSetReverbMix(0);
+                inst.PlatformClearFilter();
             }
             else
             {
@@ -103,7 +105,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 inst = _playingInstances[x];
 
-                if (inst.State == SoundState.Stopped || inst.IsDisposed || inst._effect == null)
+                if (inst.IsDisposed || inst.State == SoundState.Stopped || (inst._effect == null && !inst._isDynamic))
                 {
 #if OPENAL
                     inst.Stop(true); // force stopping it to free its AL source

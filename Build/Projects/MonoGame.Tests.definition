@@ -93,12 +93,14 @@
 	<Compile Include="Framework\CurveTest.cs" />
 	<Compile Include="Framework\EnumConformingTest.cs" />
 	<Compile Include="Framework\FrameworkDispatcherTest.cs" />
+    <Compile Include="Framework\GameComponentTest.cs" />
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\GamePadThumbSticksTest.cs" />
     <Compile Include="Framework\GameTest.cs" />	
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Framework\GestureRecognizerTest.cs" />
+    <Compile Include="Framework\GraphicsAdapterTest.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />
 	<Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\MockWindow.cs" />
@@ -120,10 +122,13 @@
     <Compile Include="Framework\Vector4Test.cs" />
     <Compile Include="Framework\VertexTests.cs" />
     
+    <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
+	
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
+    <Compile Include="Framework\Components\InitializeOrderComponent.cs" />
     <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
     <Compile Include="Framework\Components\Simple3DCubeComponent.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
@@ -160,11 +165,15 @@
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
     <Compile Include="Framework\Audio\SoundEffectTest.cs" />
+    <Compile Include="Framework\Audio\XactTest.cs" />
 
     <Compile Include="ContentPipeline\AssetTestClasses.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\AssetTestUtility.cs" />
+    <Compile Include="ContentPipeline\AudioContentTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\BitmapContentTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -186,6 +195,9 @@
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\Mp3ImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -204,6 +216,83 @@
     <Compile Include="ContentPipeline\TextureProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\WavImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\WmaImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+
+    <Content Include="Assets\Audio\Win\Tests.xgs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xsb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xwb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	
+    <Content Include="Assets\Audio\bark_mono_11hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_22hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_44hz_32bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_44hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_88hz_16bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_11hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_11hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_22hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_22hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_44hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.wma">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_11hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_11hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_22hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_22hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_44hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_44hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

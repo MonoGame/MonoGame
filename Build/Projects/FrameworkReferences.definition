@@ -8,6 +8,9 @@
     <Reference Include="OpenTK-1.0" />
   </Platform>
   <Platform Type="tvOS">
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="OpenTK-1.0" />
   </Platform>
@@ -16,12 +19,6 @@
     <Reference Include="System.Runtime.Serialization" />
     <Service Name="MonoGame.Framework/OpenGLGraphics">
       <Reference Include="System.Drawing" />
-      <Binary
-        Name="NVorbis"
-        Path="ThirdParty/Dependencies/NVorbis/NVorbis.dll" />
-      <Binary
-        Name="OpenTK"
-        Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
   </Platform>
 
@@ -103,9 +100,6 @@
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
-      <Binary
-        Name="OpenTK"
-        Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
   </Platform>
 
@@ -147,12 +141,6 @@
       <Reference Include="System.Web.Services" />
       <Reference Include="System.Windows.Forms" />
       <Reference Include="System.Xml" />
-      <Binary
-        Name="NVorbis"
-        Path="ThirdParty/Dependencies/NVorbis/NVorbis.dll" />
-      <Binary
-        Name="OpenTK"
-        Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
   </Platform>
 
@@ -244,9 +232,6 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Binary
-      Name="OpenTK"
-      Path="ThirdParty/Dependencies/OpenTK.dll" />
   </Service>
 
 </ExternalProject>

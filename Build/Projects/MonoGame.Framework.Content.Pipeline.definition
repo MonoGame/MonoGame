@@ -56,8 +56,10 @@
     <Compile Include="Audio\AudioFileType.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\AudioHelper.cs" />
+    <Compile Include="Audio\AudioProfile.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Audio\DefaultAudioProfile.cs" />
 
 
     <!-- MonoGame.Framework.Content.Pipeline.Builder -->
@@ -91,6 +93,7 @@
     <Compile Include="Graphics\BoneWeightCollection.cs" />
     <Compile Include="Graphics\Font\CharacterRegion.cs" />
     <Compile Include="Graphics\Font\CharacterRegionTypeConverter.cs" />
+    <Compile Include="Graphics\DefaultTextureProfile.cs" />
     <Compile Include="Graphics\DualTextureMaterialContent.cs" />
     <Compile Include="Graphics\Dxt1BitmapContent.cs" />
     <Compile Include="Graphics\Dxt3BitmapContent.cs" />
@@ -131,6 +134,7 @@
     <Compile Include="Graphics\Texture3DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureCubeContent.cs" />
+    <Compile Include="Graphics\TextureProfile.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
     <Compile Include="Graphics\VertexChannel.cs" />
     <Compile Include="Graphics\VertexChannelCollection.cs" />
@@ -280,6 +284,14 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderProfile.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderProfile.OpenGL.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderProfile.OpenGL.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderProfile.DirectX.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderProfile.DirectX.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\TechniqueInfo.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\TechniqueInfo.cs</Link>
@@ -314,6 +326,7 @@
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
     <Compile Include="Serialization\Compiler\DualTextureEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\EffectMaterialWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\EnvironmentMapEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
@@ -418,6 +431,7 @@
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
+    <Compile Include="LoadedTypeCollection.cs" />
     <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OggImporter.cs" />

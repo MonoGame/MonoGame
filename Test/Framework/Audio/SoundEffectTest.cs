@@ -1,4 +1,9 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
+using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
 
@@ -261,6 +266,139 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.DoesNotThrow(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, 1));
             Assert.Throws<ArgumentException>(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, 2));
             Assert.Throws<ArgumentException>(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, int.MaxValue));
+        }
+
+        private byte[] LoadRiff(string filename, out int sampleRate, out AudioChannels channels)
+        {
+            using (var stream = File.OpenRead(filename))
+            using (var reader = new BinaryReader(stream))
+            {
+                var signature = new string(reader.ReadChars(4));
+                if (signature != "RIFF")
+                    throw new Exception("Missing RIFF header!");
+
+                reader.ReadInt32(); // riff_chunck_size
+
+                var wformat = new string(reader.ReadChars(4));
+                if (wformat != "WAVE")
+                    throw new Exception("Not WAVE format!");
+
+                // Look for the format chunk.
+                while (true)
+                {
+                    var chunkSignature = new string(reader.ReadChars(4));
+                    if (chunkSignature.ToLowerInvariant() == "fmt ")
+                        break;
+                    reader.BaseStream.Seek(reader.ReadInt32(), SeekOrigin.Current);
+                }
+
+                // Read the format header.
+                var headerSize = reader.ReadInt32();
+                var header = reader.ReadBytes(headerSize);
+
+                channels = (AudioChannels)BitConverter.ToInt16(header, 2);
+                sampleRate = BitConverter.ToInt32(header, 4);
+
+                // Look for the data chunk.
+                while (true)
+                {
+                    var chunkSignature = new string(reader.ReadChars(4));
+                    if (chunkSignature.ToLowerInvariant() == "data")
+                        break;
+                    reader.BaseStream.Seek(reader.ReadInt32(), SeekOrigin.Current);
+                }
+
+                var dataSize = reader.ReadInt32();
+                return reader.ReadBytes(dataSize);
+            }
+        }
+
+        [TestCase(@"Assets/Audio/blast_mono.wav", 71650000)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 71650000)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 71650000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo.wav", 79400000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz.wav", 79400000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", 79400000)]
+        public void LoadCtor1_16Bit(string filename, long durationTicks)
+        {
+            int sampleRate; AudioChannels channels;
+            var data = LoadRiff(filename, out sampleRate, out channels);
+            var sound = new SoundEffect(data, sampleRate, channels);
+            Assert.AreEqual(durationTicks, sound.Duration.Ticks);
+        }
+
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav")]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav")]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav")]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz_8bit.wav")]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz_8bit.wav")]
+        public void LoadCtor1_8Bit_Throws(string filename)
+        {
+            int sampleRate; AudioChannels channels;
+            var data = LoadRiff(filename, out sampleRate, out channels);
+            Assert.Throws<ArgumentException >(() => new SoundEffect(data, sampleRate, channels));
+        }
+
+        // These 8bit PCMs pass although the SoundEffect constructors although
+        // they don't support 8bit PCM.  This is because it is interpreting it
+        // as 16bit and generating a bad sound... hence half the duration.
+        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_8bit.wav", 79400000)]
+        public void LoadCtor1_8Bit_BadDuration(string filename, long durationTicks)
+        {
+            int sampleRate; AudioChannels channels;
+            var data = LoadRiff(filename, out sampleRate, out channels);
+            var sound = new SoundEffect(data, sampleRate, channels);
+            Assert.AreEqual(durationTicks / 2, sound.Duration.Ticks);
+        }
+
+        // MSADPCM data can be passed into the constructors, but
+        // it calculates and incorrect duration and plays static.
+        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 18110000)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 18110000)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 18110000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_adpcm_ms.wav", 20140000)]
+        public void LoadCtor1_MsAdpcm_BadDuration(string filename, long durationTicks)
+        {
+            int sampleRate; AudioChannels channels;
+            var data = LoadRiff(filename, out sampleRate, out channels);
+            var sound = new SoundEffect(data, sampleRate, channels);
+            Assert.AreEqual(durationTicks, sound.Duration.Ticks);
+        }
+
+        [Test]
+        public void FromStream_NotNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => SoundEffect.FromStream(null));
+        }
+
+        [TestCase(@"Assets/Audio/blast_mono.wav", 71650000)]
+        [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 71650000)]
+        [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 71650000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo.wav", 79400000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz.wav", 79400000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz.wav", 79400000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_44hz_8bit.wav", 79400000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_22hz_8bit.wav", 79400000)]
+        [TestCase(@"Assets/Audio/rock_loop_stereo_11hz_8bit.wav", 79400000)]
+        [TestCase(@"Assets/Audio/bark_mono_44hz_8bit.wav", 16120000)]
+        [TestCase(@"Assets/Audio/bark_mono_22hz_8bit.wav", 16120000)]
+        [TestCase(@"Assets/Audio/bark_mono_11hz_8bit.wav", 16120000)]
+        public void FromStream_Supported_Formats(string filename, long durationTicks)
+        {
+            using (var stream = File.OpenRead(filename))
+            {
+                var sound = SoundEffect.FromStream(stream);
+                Assert.AreEqual(durationTicks, sound.Duration.Ticks);
+            }
+        }
+
+        [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav")]
+        [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav")]
+        [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav")]
+        public void FromStream_Unsupported_Formats(string filename)
+        {
+            using (var stream = File.OpenRead(filename))
+                Assert.Throws<ArgumentException>(() => SoundEffect.FromStream(stream));
         }
     }
 }

@@ -14,15 +14,29 @@ namespace Microsoft.Xna.Framework.Input
         internal static void AddDevice(int deviceId)
         {
             var jdevice = Sdl.Joystick.Open(deviceId);
-            Joysticks.Add(deviceId, jdevice);
-            GamePad.AddDevice(deviceId, jdevice);
+            var id = 0;
+
+            while (Joysticks.ContainsKey(id))
+                id++;
+
+            Joysticks.Add(id, jdevice);
+
+            if (Sdl.GameController.IsGameController(deviceId) == 1)
+                GamePad.AddDevice(deviceId);
         }
 
-        internal static void RemoveDevice(int deviceId)
+        internal static void RemoveDevice(int instanceid)
         {
-            Sdl.Joystick.Close(Joysticks[deviceId]);
-            Joysticks.Remove(deviceId);
-            GamePad.RemoveDevice(deviceId);
+            foreach (KeyValuePair<int, IntPtr> entry in Joysticks)
+            {
+                if (Sdl.Joystick.InstanceID(entry.Value) == instanceid)
+                {
+                    Sdl.Joystick.Close(Joysticks[entry.Key]);
+                    Joysticks.Remove(entry.Key);
+                    break;
+                }
+            }
+
         }
 
         internal static void CloseDevices()

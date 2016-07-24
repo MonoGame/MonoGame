@@ -12,7 +12,11 @@ using MonoMac.AVFoundation;
 using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
+#if GLES || MONOMAC
 using OpenTK.Audio.OpenAL;
+#else 
+using OpenAL;
+#endif
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
@@ -37,7 +41,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Constructors
 
-        private void PlatformLoadAudioStream(Stream s)
+        private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
         {
             byte[] buffer;
 
@@ -55,6 +59,7 @@ namespace Microsoft.Xna.Framework.Audio
             Size = size;
             Rate = freq;
 
+            duration = TimeSpan.FromSeconds((float)size / freq);
 #endif
 
 #if MONOMAC || IOS
@@ -86,14 +91,14 @@ namespace Microsoft.Xna.Framework.Audio
                         bitsPerChannel = player.SoundSetting.LinearPcmBitDepth.GetValueOrDefault(16);
 
 						Rate = (float)player.SoundSetting.SampleRate;
-                        _duration = TimeSpan.FromSeconds(player.Duration);
+                        duration = TimeSpan.FromSeconds(player.Duration);
                     }
                 }
                 else
                 {
                     Rate = (float)asbd.SampleRate;
-                    double duration = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
-                    _duration = TimeSpan.FromSeconds(duration);
+                    double durationSec = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
+                    duration = TimeSpan.FromSeconds(durationSec);
                 }
 
                 if (channelsPerFrame == 1)
@@ -108,7 +113,7 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
-        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             Rate = (float)sampleRate;
             Size = (int)count;
@@ -119,29 +124,62 @@ namespace Microsoft.Xna.Framework.Audio
             SoundBuffer.BindDataBuffer(buffer, Format, Size, (int)Rate);
         }
 
-        private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
+        private void PlatformInitializeAdpcm (byte [] buffer, int offset, int count, int sampleRate, AudioChannels channels, int dataFormat, int loopStart, int loopLength)
         {
+            Rate = (float)sampleRate;
+            Size = (int)count;
+            #if DESKTOPGL
+            Format = channels == AudioChannels.Stereo ? ALFormat.StereoMSADPCM : ALFormat.MonoMSADPCM;
+            #else
+            Format = channels == AudioChannels.Stereo ? (ALFormat)0x1303 : (ALFormat)0x1302;
+            #endif
+
+            // bind buffer
+            SoundBuffer = new OALSoundBuffer ();
+            SoundBuffer.BindDataBuffer (buffer, Format, Size, (int)Rate, dataFormat);
+        }
+
+        private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
+        {
+            var format = BitConverter.ToInt16(header, 0);
+            var channels = BitConverter.ToInt16(header, 2);
+            var sampleRate = BitConverter.ToInt32(header, 4);
+            var blockAlignment = BitConverter.ToInt32(header, 12);
+
             // We need to decode MSADPCM.
-            if (format == 2)
+            var supportsADPCM = OpenALSoundController.GetInstance.SupportsADPCM;
+            if (format == 2 && !supportsADPCM)
             {
                 using (var stream = new MemoryStream(buffer))
                 using (var reader = new BinaryReader(stream))
                 {
-                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM(
-                        reader,
-                        (short)channels,
-                        (short)((blockAlignment / channels) - 22));
-
+                    buffer = MSADPCMToPCM.MSADPCM_TO_PCM (reader, (short)channels, (short)blockAlignment);
                     format = 1;
                 }
             }
 
-            if (format != 1)
+            if (!supportsADPCM && format != 1)
                 throw new NotSupportedException("Unsupported wave format!");
 
-            PlatformInitializePCM(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+            if (supportsADPCM && format == 2) {
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+            } else {
+                PlatformInitializePcm (buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, loopStart, loopLength);
+            }
         }
-        
+
+        private void PlatformInitializeXact(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength, out TimeSpan duration)
+        {
+            if (codec == MiniFormatTag.Adpcm)
+            {
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
+                return;
+            }
+
+            throw new NotSupportedException("Unsupported sound format!");
+        }
+
         #endregion
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
@@ -152,6 +190,10 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         #endregion
+
+        internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
+        {
+        }
 
         #region IDisposable Members
 

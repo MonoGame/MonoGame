@@ -5,6 +5,7 @@
 using System;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 internal static class Sdl
 {
@@ -38,28 +39,89 @@ internal static class Sdl
         GameController = 0x00002000,
     }
 
-    public enum EventType
+    public enum EventType : uint
     {
+        First = 0,
+
         Quit = 0x100,
+
         WindowEvent = 0x200,
+        SysWM = 0x201,
+
         KeyDown = 0x300,
         KeyUp = 0x301,
+        TextEditing = 0x302,
         TextInput = 0x303,
+
+        MouseMotion = 0x400,
+        MouseButtonDown = 0x401,
+        MouseButtonup = 0x402,
+        MouseWheel = 0x403,
+
+        JoyAxisMotion = 0x600,
+        JoyBallMotion = 0x601,
+        JoyHatMotion = 0x602,
+        JoyButtonDown = 0x603,
+        JoyButtonUp = 0x604,
         JoyDeviceAdded = 0x605,
         JoyDeviceRemoved = 0x606,
-        MouseWheel = 0x403,
+
+        ControllerAxisMotion = 0x650,
+        ControllerButtonDown = 0x651,
+        ControllerButtonUp = 0x652,
+        ControllerDeviceAdded = 0x653,
+        ControllerDeviceRemoved = 0x654,
+        ControllerDeviceRemapped = 0x654,
+
+        FingerDown = 0x700,
+        FingerUp = 0x701,
+        FingerMotion = 0x702,
+
+        DollarGesture = 0x800,
+        DollarRecord = 0x801,
+        MultiGesture = 0x802,
+
+        ClipboardUpdate = 0x900,
+
+        DropFile = 0x1000,
+
+        AudioDeviceAdded = 0x1100,
+        AudioDeviceRemoved = 0x1101,
+
+        RenderTargetsReset = 0x2000,
+        RenderDeviceReset = 0x2001,
+
+        UserEvent = 0x8000,
+
+        Last = 0xFFFF
+    }
+    
+    public enum EventAction
+    {
+        AddEvent = 0x0,
+        PeekEvent = 0x1,
+        GetEvent = 0x2,
     }
 
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Size = 56)]
     public struct Event
     {
-        [FieldOffset(0)] public EventType Type;
-        [FieldOffset(0)] public Window.Event Window;
-        [FieldOffset(0)] public Keyboard.Event Key;
-        [FieldOffset(0)] public Keyboard.TextEditingEvent Edit;
-        [FieldOffset(0)] public Keyboard.TextInputEvent Text;
-        [FieldOffset(0)] public Mouse.WheelEvent Wheel;
-        [FieldOffset(0)] public Joystick.DeviceEvent JoystickDevice;
+        [FieldOffset(0)]
+        public EventType Type;
+        [FieldOffset(0)]
+        public Window.Event Window;
+        [FieldOffset(0)]
+        public Keyboard.Event Key;
+        [FieldOffset(0)]
+        public Keyboard.TextEditingEvent Edit;
+        [FieldOffset(0)]
+        public Keyboard.TextInputEvent Text;
+        [FieldOffset(0)]
+        public Mouse.WheelEvent Wheel;
+        [FieldOffset(0)]
+        public Joystick.DeviceEvent JoystickDevice;
+        [FieldOffset(0)]
+        public GameController.DeviceEvent ControllerDevice;
     }
 
     public struct Rectangle
@@ -92,7 +154,19 @@ internal static class Sdl
     public static extern void GetVersion(out Version version);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PollEvent")]
-    public static extern int PollEvent(out Event _event);
+    public static extern int PollEvent([Out] out Event _event);
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PumpEvents")]
+    public static extern int PumpEvents();
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PeepEvents")]
+    public static extern int PeepEvents(
+        [Out()] [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 1)]
+        Event[] events,
+        int numevents, 
+        EventAction action,
+        EventType minType,
+        EventType maxType);
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface")]
     public static extern void FreeSurface(IntPtr surface);
@@ -108,7 +182,7 @@ internal static class Sdl
     public static int GetError(int value)
     {
         if (value < 0)
-            throw new Exception(GetError());
+            Debug.WriteLine(GetError());
 
         return value;
     }
@@ -116,10 +190,13 @@ internal static class Sdl
     public static IntPtr GetError(IntPtr pointer)
     {
         if (pointer == IntPtr.Zero)
-            throw new Exception(GetError());
+            Debug.WriteLine(GetError());
 
         return pointer;
     }
+
+    [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ClearError")]
+    public static extern void ClearError();
 
     [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetHint")]
     public static extern IntPtr SDL_GetHint(string name);
@@ -255,6 +332,9 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowPosition")]
         public static extern void SetPosition(IntPtr window, int x, int y);
 
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowResizable")]
+        public static extern void SetResizable(IntPtr window, bool resizable);
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowSize")]
         public static extern void SetSize(IntPtr window, int w, int h);
 
@@ -335,6 +415,77 @@ internal static class Sdl
         }
     }
 
+    public static class GL
+    {
+        public enum Attribute
+        {
+            RedSize,
+            GreenSize,
+            BlueSize,
+            AlphaSize,
+            BufferSize,
+            DoubleBuffer,
+            DepthSize,
+            StencilSize,
+            AccumRedSize,
+            AccumGreenSize,
+            AccumBlueSize,
+            AccumAlphaSize,
+            Stereo,
+            MultiSampleBuffers,
+            MultiSampleSamples,
+            AcceleratedVisual,
+            RetainedBacking,
+            ContextMajorVersion,
+            ContextMinorVersion,
+            ContextEgl,
+            ContextFlags,
+            ContextProfileMAsl,
+            ShareWithCurrentContext,
+            FramebufferSRGBCapable,
+            ContextReleaseBehaviour,
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_CreateContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_CreateContext(IntPtr window);
+
+        public static IntPtr CreateContext(IntPtr window)
+        {
+            return GetError(SDL_GL_CreateContext(window));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_DeleteContext", ExactSpelling = true)]
+        public static extern void DeleteContext(IntPtr context);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetCurrentContext", ExactSpelling = true)]
+        private static extern IntPtr SDL_GL_GetCurrentContext();
+
+        public static IntPtr GetCurrentContext()
+        {
+            return GetError(SDL_GL_GetCurrentContext());
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_GetSwapInterval", ExactSpelling = true)]
+        public static extern int GetSwapInterval();
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_MakeCurrent", ExactSpelling = true)]
+        public static extern int MakeCurrent(IntPtr window, IntPtr context);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
+        private static extern int SDL_GL_SetAttribute(Attribute attr, int value);
+
+        public static int SetAttribute(Attribute attr, int value)
+        {
+            return GetError(SDL_GL_SetAttribute(attr, value));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetSwapInterval", ExactSpelling = true)]
+        public static extern int SetSwapInterval(int interval);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SwapWindow", ExactSpelling = true)]
+        public static extern void SwapWindow(IntPtr window);
+    }
+
     public static class Mouse
     {
         [Flags]
@@ -363,6 +514,7 @@ internal static class Sdl
             Hand
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct WheelEvent
         {
             public EventType Type;
@@ -434,12 +586,14 @@ internal static class Sdl
             NumLock = 0x1000,
             CapsLock = 0x2000,
             AltGr = 0x4000,
+            Reserved = 0x8000,
             Ctrl = (LeftCtrl | RightCtrl),
             Shift = (LeftShift | RightShift),
             Alt = (LeftAlt | RightAlt),
             Gui = (LeftGui | RightGui)
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct Event
         {
             public EventType Type;
@@ -452,6 +606,7 @@ internal static class Sdl
             public Keysym Keysym;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public unsafe struct TextEditingEvent
         {
             public EventType Type;
@@ -462,6 +617,7 @@ internal static class Sdl
             public int Length;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public unsafe struct TextInputEvent
         {
             public EventType Type;
@@ -486,6 +642,7 @@ internal static class Sdl
             Left,
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct DeviceEvent
         {
             public EventType Type;
@@ -495,6 +652,14 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickClose")]
         public static extern void Close(IntPtr joystick);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickFromInstanceID")]
+        private static extern IntPtr SDL_JoystickFromInstanceID(int joyid);
+
+        public static IntPtr FromInstanceID(int joyid)
+        {
+            return GetError(SDL_JoystickFromInstanceID(joyid));
+        }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickGetAxis")]
         public static extern short GetAxis(IntPtr joystick, int axis);
@@ -507,6 +672,9 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickGetHat")]
         public static extern Hat GetHat(IntPtr joystick, int hat);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickInstanceID")]
+        public static extern int InstanceID(IntPtr joystick);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickOpen")]
         private static extern IntPtr SDL_JoystickOpen(int deviceIndex);
@@ -584,6 +752,14 @@ internal static class Sdl
             Max,
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DeviceEvent
+        {
+            public EventType Type;
+            public uint TimeStamp;
+            public int Which;
+        }
+
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
             EntryPoint = "SDL_GameControllerAddMapping")]
         public static extern int AddMapping(string mappingString);
@@ -591,8 +767,15 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerClose")]
         public static extern void Close(IntPtr gamecontroller);
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerGetAxis")
-        ]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickFromInstanceID")]
+        private static extern IntPtr SDL_GameControllerFromInstanceID(int joyid);
+
+        public static IntPtr FromInstanceID(int joyid)
+        {
+            return GetError(SDL_GameControllerFromInstanceID(joyid));
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerGetAxis")]
         public static extern short GetAxis(IntPtr gamecontroller, Axis axis);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl,
@@ -630,13 +813,14 @@ internal static class Sdl
 
     public static class Haptic
     {
-        public const uint Infinity = uint.MaxValue;
+        public const uint Infinity = 4292967295U;
 
         public enum EffectId : ushort
         {
-            LeftRight = 1 << 2,
+            LeftRight = (1 << 2),
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct LeftRight
         {
             public EffectId Type;
@@ -655,22 +839,11 @@ internal static class Sdl
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticClose")]
         public static extern void Close(IntPtr haptic);
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticEffectSupported")
-        ]
-        private static extern int SDL_HapticEffectSupported(IntPtr haptic, ref Effect effect);
-
-        public static int EffectSupported(IntPtr haptic, ref Effect effect)
-        {
-            return GetError(SDL_HapticEffectSupported(haptic, ref effect));
-        }
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticEffectSupported")]
+        public static extern int EffectSupported(IntPtr haptic, ref Effect effect);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickIsHaptic")]
-        private static extern int SDL_JoystickIsHaptic(IntPtr joystick);
-
-        public static int IsHaptic(IntPtr joystick)
-        {
-            return GetError(SDL_JoystickIsHaptic(joystick));
-        }
+        public static extern int IsHaptic(IntPtr joystick);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticNewEffect")]
         private static extern int SDL_HapticNewEffect(IntPtr haptic, ref Effect effect);
@@ -679,9 +852,11 @@ internal static class Sdl
         {
             GetError(SDL_HapticNewEffect(haptic, ref effect));
         }
+        
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpen")]
+        public static extern IntPtr Open(int device_index);
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpenFromJoystick"
-            )]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticOpenFromJoystick")]
         private static extern IntPtr SDL_HapticOpenFromJoystick(IntPtr joystick);
 
         public static IntPtr OpenFromJoystick(IntPtr joystick)
@@ -705,8 +880,7 @@ internal static class Sdl
             GetError(SDL_HapticRumblePlay(haptic, strength, length));
         }
 
-        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticRumbleSupported")
-        ]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_HapticRumbleSupported")]
         private static extern int SDL_HapticRumbleSupported(IntPtr haptic);
 
         public static int RumbleSupported(IntPtr haptic)

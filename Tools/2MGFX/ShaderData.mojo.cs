@@ -9,9 +9,7 @@ namespace TwoMGFX
 	{
         public static ShaderData CreateGLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
 		{
-			var dxshader = new ShaderData ();
-			dxshader.SharedIndex = sharedIndex;
-			dxshader.Bytecode = (byte[])byteCode.Clone ();
+            var dxshader = new ShaderData(isVertexShader, sharedIndex, byteCode);
 
 			// Use MojoShader to convert the HLSL bytecode to GLSL.
 
@@ -35,18 +33,6 @@ namespace TwoMGFX
 				);
 				throw new Exception (errors [0].error);
 			}
-
-			switch (parseData.shader_type) {
-			case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_PIXEL:
-				dxshader.IsVertexShader = false;
-				break;
-			case MojoShader.MOJOSHADER_shaderType.MOJOSHADER_TYPE_VERTEX:
-				dxshader.IsVertexShader = true;
-				break;
-			default:
-				throw new NotSupportedException ();
-			}
-	
 
 			// Conver the attributes.
 			//

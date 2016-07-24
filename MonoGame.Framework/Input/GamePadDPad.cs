@@ -42,8 +42,8 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
-	public struct GamePadDPad
-	{
+    public struct GamePadDPad
+    {
         public ButtonState Down
         {
             get;
@@ -74,20 +74,17 @@ namespace Microsoft.Xna.Framework.Input
             Right = rightValue;
         }
 
-        internal GamePadDPad(params Buttons[] buttons)
+        internal GamePadDPad(Buttons buttons)
             : this()
         {
-            foreach (var b in buttons)
-            {
-                if ((b & Buttons.DPadDown) == Buttons.DPadDown)
-                    Down = ButtonState.Pressed;
-                if ((b & Buttons.DPadLeft) == Buttons.DPadLeft)
-                    Left = ButtonState.Pressed;
-                if ((b & Buttons.DPadRight) == Buttons.DPadRight)
-                    Right = ButtonState.Pressed;
-                if ((b & Buttons.DPadUp) == Buttons.DPadUp)
-                    Up = ButtonState.Pressed;
-            }
+            if ((buttons & Buttons.DPadDown) == Buttons.DPadDown)
+                Down = ButtonState.Pressed;
+            if ((buttons & Buttons.DPadLeft) == Buttons.DPadLeft)
+                Left = ButtonState.Pressed;
+            if ((buttons & Buttons.DPadRight) == Buttons.DPadRight)
+                Right = ButtonState.Pressed;
+            if ((buttons & Buttons.DPadUp) == Buttons.DPadUp)
+                Up = ButtonState.Pressed;
         }
 
         /// <summary>
@@ -125,13 +122,13 @@ namespace Microsoft.Xna.Framework.Input
             return (obj is GamePadDPad) && (this == (GamePadDPad)obj);
         }
 
-        public override int GetHashCode ()
+        public override int GetHashCode()
         {
-            return 
-                (this.Down  == ButtonState.Pressed ? 1 : 0) +
-                (this.Left  == ButtonState.Pressed ? 2 : 0) +
+            return
+                (this.Down == ButtonState.Pressed ? 1 : 0) +
+                (this.Left == ButtonState.Pressed ? 2 : 0) +
                 (this.Right == ButtonState.Pressed ? 4 : 0) +
-                (this.Up    == ButtonState.Pressed ? 8 : 0);
+                (this.Up == ButtonState.Pressed ? 8 : 0);
         }
-	}
+    }
 }

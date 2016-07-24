@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,Web,tvOS">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne">
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
     for backwards compatibility with existing users of MonoGame, and are not
@@ -50,14 +50,17 @@
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
       <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
-      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>		
+      <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
-	
+
     <FrameworkVersions>
 	  <Platform Name="Windows8">
 	    <Version>v4.5.1</Version>
 	  </Platform>
+	  <Platform Name="Android">
+            <Version>v4.4</Version>
+          </Platform>
     </FrameworkVersions>
 
   </Properties>
@@ -77,6 +80,9 @@
     </Uses>
     <Uses Name="_XNADesignProvided">
       <Platforms>Windows,WindowsGL,Linux,MacOS</Platforms>
+    </Uses>
+    <Uses Name="NVorbis">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Uses>
     <Recommends Name="DirectXGraphics">
       <Platforms>Windows</Platforms>
@@ -127,6 +133,9 @@
       <Platforms>Web</Platforms>
       <Conflicts>OpenALAudio,XAudioAudio</Conflicts>
     </Service>
+    <Service Name="NVorbis">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Service>
 
     <!-- Base supporting features -->
     <Service Name="_GLCompatible">
@@ -140,8 +149,43 @@
   </Services>
 
   <Files>
-
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.Android.cs">
+        <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.DesktopGL.cs">
+        <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.iOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Mac.cs">
+        <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.OUYA.cs">
+        <Platforms>Ouya</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Angle.cs">
+        <Platforms>Angle</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.tvOS.cs">
+        <Platforms>tvOS</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Windows.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.WindowsPhone.cs">
+        <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.WindowsStore.cs">
+        <Platforms>Windows8</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.UniversalWindowsPlatform.cs">
+        <Platforms>WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
 
     <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
       <Platforms>MacOS</Platforms>
@@ -149,13 +193,64 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Platforms>MacOS</Platforms>
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SDL\MonoGame.Framework.dll.config">
-      <Platforms>Linux</Platforms>
+    <None Include="..\ThirdParty\Dependencies\MonoGame.Framework.dll.config">
+      <Platforms>WindowsGL,Linux</Platforms>
       <Link>MonoGame.Framework.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	
+	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x86\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libSDL2-2.0.0.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+	<None Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
+	  <Platforms>WindowsGL,Linux</Platforms>
+      <Link>libopenal.1.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
@@ -201,7 +296,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GamePlatform.Mobile.cs">
-      <Platforms>Android,iOS,Ouya,WindowsPhone,WindowsPhone81,Web</Platforms>
+      <Platforms>Android,iOS,Ouya,WindowsPhone,WindowsPhone81,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
@@ -256,7 +351,10 @@
       <Platforms>iOS,tvOS,MacOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
@@ -272,6 +370,17 @@
     <Compile Include="Audio\AudioLoader.cs">
       <Platforms>Linux,WindowsGL,Angle,Android,Ouya</Platforms>
     </Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstance.cs" />
+	<Compile Include="Audio\DynamicSoundEffectInstance.OpenAL.cs">
+	  <Services>OpenALAudio</Services>
+	</Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstance.XAudio.cs">
+	  <Services>XAudioAudio</Services>
+	</Compile>
+    <Compile Include="Audio\DynamicSoundEffectInstance.Web.cs">
+	  <Services>WebAudio</Services>
+    </Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstanceManager.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,Web,tvOS</Platforms>
@@ -281,6 +390,9 @@
       <Services>OpenALAudio</Services>
     </Compile>
 	<Compile Include="Audio\OggStream.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Audio\OpenAL.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
@@ -318,10 +430,21 @@
     <Compile Include="Audio\Xact\AudioEngine.cs" />
     <Compile Include="Audio\Xact\AudioStopOptions.cs" />
     <Compile Include="Audio\Xact\ClipEvent.cs" />
+    <Compile Include="Audio\Xact\CrossfadeType.cs" />
     <Compile Include="Audio\Xact\Cue.cs" />
+    <Compile Include="Audio\Xact\DspParameter.cs" />
+    <Compile Include="Audio\Xact\FilterMode.cs" />
+    <Compile Include="Audio\Xact\MaxInstanceBehavior.cs" />
+    <Compile Include="Audio\Xact\MiniFormatTag.cs" />
     <Compile Include="Audio\Xact\PlayWaveEvent.cs" />
-    <Compile Include="Audio\Xact\VolumeEvent.cs" />
+    <Compile Include="Audio\Xact\ReverbSettings.cs" />	
+    <Compile Include="Audio\Xact\RpcCurve.cs" />
+    <Compile Include="Audio\Xact\RpcParameter.cs" />
+    <Compile Include="Audio\Xact\RpcPoint.cs" />
+    <Compile Include="Audio\Xact\RpcPointType.cs" />
+    <Compile Include="Audio\Xact\RpcVariable.cs" />
     <Compile Include="Audio\Xact\SoundBank.cs" />
+    <Compile Include="Audio\Xact\VolumeEvent.cs" />
     <Compile Include="Audio\Xact\WaveBank.cs" />
     <Compile Include="Audio\Xact\XactClip.cs" />
     <Compile Include="Audio\Xact\XactHelpers.cs" />
@@ -472,8 +595,19 @@
 		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs">
+      <ExcludePlatforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\GraphicsAdapter.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsAdapter.Legacy.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS,Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
+    <Compile Include="Graphics\GraphicsContext.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDevice.DirectX.cs">
       <Services>DirectXGraphics</Services>
@@ -491,11 +625,13 @@
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Graphics\IGraphicsContext.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\ImageEx.cs">
       <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\IWindowInfo.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\Model.cs" />
@@ -517,6 +653,15 @@
     </Compile>
     <Compile Include="Graphics\OcclusionQuery.Null.cs">
       <Services>WebGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.Common.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    <Compile Include="Graphics\OpenGL.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
     <Compile Include="Graphics\PackedVector\Alpha8.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
@@ -776,14 +921,19 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Graphics\Viewport.cs" />
-
-
+    <Compile Include="Graphics\WindowInfo.SDL.cs">
+      <Platforms>WindowsGL,Linux</Platforms>
+    </Compile>
+    
     <!-- Microsoft.Xna.Framework.Input -->
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Android.cs">
+      <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -859,7 +1009,7 @@
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
-    <Compile Include="Input\KeyState.cs" />    
+    <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
       <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
@@ -893,7 +1043,7 @@
       <Platforms>Linux,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Input\MouseCursor.Default.cs">
-      <Platforms>Angle,Android,MacOS,Ouya,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS,MacOS,Web</Platforms>
+      <ExcludePlatforms>Linux,WindowsGL</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -907,7 +1057,7 @@
     <Compile Include="Input\Touch\TouchQueue.cs">
 			<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
 	</Compile>
-		
+
     <Page Include="Themes\generic.xaml">
 			<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
 			<Generator>MSBuild:Compile</Generator>
@@ -1059,6 +1209,7 @@
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
     <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
+    <Compile Include="Utilities\LzxStream\LzxDecoderStream.cs" />
     <Compile Include="Utilities\ZLibStream\ZlibStream.cs" />
     <Compile Include="Utilities\Png\PngCommon.cs" />
     <Compile Include="Utilities\Png\PngReader.cs" />
@@ -1223,7 +1374,7 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
 
-	  
+
     <!-- Windows UAP Platform -->
     <Compile Include="WindowsUniversal\UAPGamePlatform.cs">
       <Platforms>WindowsUniversal</Platforms>
@@ -1235,7 +1386,7 @@
       <Platforms>WindowsUniversal</Platforms>
     </Compile>
 
-	  
+
     <!-- Windows Desktop Platfom -->
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>
@@ -1343,6 +1494,107 @@
       <Services>DirectXGraphics</Services>
     </EmbeddedResource>
 
+    <!-- NVorbis -->
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\BufferedReadStream.cs">
+      <Link>Utilities\NVorbis\BufferedReadStream.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\DataPacket.cs">
+      <Link>Utilities\NVorbis\DataPacket.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Huffman.cs">
+      <Link>Utilities\NVorbis\Huffman.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IContainerReader.cs">
+      <Link>Utilities\NVorbis\IContainerReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IPacketProvider.cs">
+      <Link>Utilities\NVorbis\IPacketProvider.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\IVorbisStreamStatus.cs">
+      <Link>Utilities\NVorbis\IVorbisStreamStatus.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Mdct.cs">
+      <Link>Utilities\NVorbis\Mdct.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\NewStreamEventArgs.cs">
+      <Link>Utilities\NVorbis\NewStreamEventArgs.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\ParameterChangeEventArgs.cs">
+      <Link>Utilities\NVorbis\ParameterChangeEventArgs.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\RingBuffer.cs">
+      <Link>Utilities\NVorbis\RingBuffer.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\StreamReadBuffer.cs">
+      <Link>Utilities\NVorbis\StreamReadBuffer.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Utils.cs">
+      <Link>Utilities\NVorbis\Utils.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisCodebook.cs">
+      <Link>Utilities\NVorbis\VorbisCodebook.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisFloor.cs">
+      <Link>Utilities\NVorbis\VorbisFloor.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMapping.cs">
+      <Link>Utilities\NVorbis\VorbisMapping.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisMode.cs">
+      <Link>Utilities\NVorbis\VorbisMode.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisReader.cs">
+      <Link>Utilities\NVorbis\VorbisReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisResidue.cs">
+      <Link>Utilities\NVorbis\VorbisResidue.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisStreamDecoder.cs">
+      <Link>Utilities\NVorbis\VorbisStreamDecoder.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\VorbisTime.cs">
+      <Link>Utilities\NVorbis\VorbisTime.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggContainerReader.cs">
+      <Link>Utilities\NVorbis\Ogg\OggContainerReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggCrc.cs">
+      <Link>Utilities\NVorbis\Ogg\OggCrc.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacket.cs">
+      <Link>Utilities\NVorbis\Ogg\OggPacket.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPacketReader.cs">
+      <Link>Utilities\NVorbis\Ogg\OggPacketReader.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
+    <Compile Include="..\ThirdParty\NVorbis\NVorbis\Ogg\OggPageFlags.cs">
+      <Link>Utilities\NVorbis\Ogg\OggPageFlags.cs</Link>
+      <Services>NVorbis</Services>
+    </Compile>
 
   </Files>
 </Project>

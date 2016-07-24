@@ -44,7 +44,7 @@ namespace MonoGame.Tests.Framework
         [TestCase(Buttons.DPadUp, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Pressed })]
         public void ConstructDPadState(Buttons button, ButtonState[] expectedDPadButtonStates)
         {
-            var state = new GamePadState(Vector2.Zero, Vector2.Zero, 0f, 0f, button != 0 ? new Buttons[] { button } : new Buttons[] { });
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, 0f, 0f, button != 0 ? button : new Buttons());
 
             if (button != 0)
                 Assert.True(state.IsButtonDown(button));

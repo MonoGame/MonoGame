@@ -23,9 +23,9 @@
     <CustomCommands>
       <CustomCommands>
         <Command type="Execute" command="&quot;/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/XamarinStudio.exe&quot;" workingdir="/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/">
-        <EnvironmentVariables>
-          <Variable name="MONODEVELOP_DEV_ADDINS" value="${TargetDir}" />
-        </EnvironmentVariables>
+          <EnvironmentVariables>
+            <Variable name="MONODEVELOP_DEV_ADDINS" value="${TargetDir}" />
+          </EnvironmentVariables>
         </Command>
       </CustomCommands>
     </CustomCommands>
@@ -91,6 +91,9 @@
     <Folder Include="templates\" />
     <Folder Include="templates\Common\" />
     <Folder Include="packages\" />
+    <Folder Include="templates\libs\" />
+    <Folder Include="templates\libs\x64\" />
+    <Folder Include="templates\libs\x86\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="templates\MonoGameWindowsProject.xpt.xml">
@@ -188,6 +191,50 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\Common\Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\MonoGame.Framework.dll.config">
+      <Link>templates\Common\MonoGame.Framework.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
+      <Link>templates\libs\libopenal.1.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
+      <Link>templates\libs\x64\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
+      <Link>templates\libs\x64\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
+      <Link>templates\libs\x86\soft_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\openal-soft\Linux\x86\libopenal.so.1">
+      <Link>templates\libs\x86\libopenal.so.1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\SDL\Linux\x64\libSDL2-2.0.so.0">
+      <Link>templates\libs\x64\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\SDL\Windows\x64\SDL2.dll">
+      <Link>templates\libs\x64\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\SDL\Windows\x86\SDL2.dll">
+      <Link>templates\libs\x86\SDL2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\SDL\Linux\x86\libSDL2-2.0.so.0">
+      <Link>templates\libs\x86\libSDL2-2.0.so.0</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\ThirdParty\Dependencies\SDL\MacOS\Universal\libSDL2-2.0.0.dylib">
+      <Link>templates\libs\libSDL2-2.0.0.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

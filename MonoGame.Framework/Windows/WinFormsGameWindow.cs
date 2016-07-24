@@ -138,10 +138,7 @@ namespace MonoGame.Framework
             _form = new WinFormsGameForm(this);
             _form.ClientSize = new Size(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
 
-            // When running unit tests this can return null.
-            var assembly = Assembly.GetEntryAssembly();
-            if (assembly != null)
-                _form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            SetIcon();
             Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             _form.MaximizeBox = false;
@@ -164,6 +161,20 @@ namespace MonoGame.Framework
             _form.KeyPress += OnKeyPress;
 
             RegisterToAllWindows();
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Auto, BestFitMapping = false)]
+        private static extern IntPtr ExtractIcon(IntPtr hInst, string exeFileName, int iconIndex);
+
+        private void SetIcon()
+        {
+            // When running unit tests this can return null.
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly == null)
+                return;
+            var handle = ExtractIcon(IntPtr.Zero, assembly.Location, 0);
+            if (handle != IntPtr.Zero)
+                _form.Icon = Icon.FromHandle(handle);
         }
 
         ~WinFormsGameWindow()
@@ -209,7 +220,7 @@ namespace MonoGame.Framework
                     if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
                    {
                        Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
-                       Game.GraphicsDevice.CreateSizeDependentResources(true);
+                       Game.GraphicsDevice.CreateSizeDependentResources();
                         Game.GraphicsDevice.ApplyRenderTargets(null);
                    }
                 }
@@ -354,12 +365,12 @@ namespace MonoGame.Framework
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
 
-#if !(WINDOWS && DIRECTX)
-                manager.PreferredBackBufferWidth = newWidth;
-                manager.PreferredBackBufferHeight = newHeight;
-#endif
                 if (manager.GraphicsDevice == null)
                     return;
+
+                manager.GraphicsDevice.PresentationParameters.BackBufferWidth = newWidth;
+                manager.GraphicsDevice.PresentationParameters.BackBufferHeight = newHeight;
+                manager.GraphicsDevice.OnPresentationChanged();
             }
 
             // Set the new view state which will trigger the 
@@ -449,7 +460,8 @@ namespace MonoGame.Framework
 
         internal void ChangeClientSize(Size clientBounds)
         {
-            this._form.ClientSize = clientBounds;
+            if(this._form.ClientSize != clientBounds)
+                this._form.ClientSize = clientBounds;
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously

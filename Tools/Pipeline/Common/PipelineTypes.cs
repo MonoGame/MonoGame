@@ -26,6 +26,11 @@ namespace MonoGame.Tools.Pipeline
         public IEnumerable<string> FileExtensions;
         public Type OutputType;
 
+        public ImporterTypeDescription()
+        {
+            TypeName = "Invalid / Missing Importer";
+        }
+
         public override string ToString()
         {
             return TypeName;

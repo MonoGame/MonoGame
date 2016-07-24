@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
@@ -17,7 +18,12 @@ namespace Microsoft.Xna.Framework
             set
             {
                 if (_init)
-                    throw new Exception("SDL does not support changing resizable parameter of the window after it's already been created.");
+                {
+                    if (Sdl.Patch > 4)
+                        Sdl.Window.SetResizable(_handle, value);
+                    else
+                        throw new Exception("SDL does not support changing resizable parameter of the window after it's already been created.");
+                }
 
                 _resizable = value;
             }
@@ -124,11 +130,46 @@ namespace Microsoft.Xna.Framework
                 initflags |= Sdl.Window.State.Boderless;
 
             Sdl.Window.Destroy(_handle);
+
+            var surfaceFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat.GetColorFormat ();
+            var depthStencilFormat = _game.graphicsDeviceManager.PreferredDepthStencilFormat;
+            // TODO Need to get this data from the Presentation Parameters
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.RedSize, surfaceFormat.R);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
+            switch (depthStencilFormat)
+            {
+                case DepthFormat.None:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 0);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth16:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 16);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth24:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 24);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth24Stencil8:
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 24);
+                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 8);
+                    break;
+            }
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleBuffer, 1);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMajorVersion, 2);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMinorVersion, 1);
+            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ShareWithCurrentContext, 1);
+            
             _handle = Sdl.Window.Create (title,
                 _winx - _width / 2, _winy - _height / 2,
                 _width, _height, initflags);
 
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
+            Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
+
+            Sdl.Window.SetTitle(Handle, title);
 
             using (
                 var stream =
@@ -236,11 +277,11 @@ namespace Microsoft.Xna.Framework
                 centerY = displayRect.Y + displayRect.Height / 2 - clientHeight / 2;
             }
 
-            // If this window is resizable, there is a bug in SDL where
+            // If this window is resizable, there is a bug in SDL 2.0.4 where
             // after the window gets resized, window position information
             // becomes wrong (for me it always returned 10 8). Solution is
             // to not try and set the window position because it will be wrong.
-            if (!AllowUserResizing)
+            if (Sdl.Patch > 4 || !AllowUserResizing)
                 Sdl.Window.SetPosition(Handle, centerX, centerY);
 
             IsFullScreen = _willBeFullScreen;
@@ -249,6 +290,12 @@ namespace Microsoft.Xna.Framework
 
         public void ClientResize(int width, int height)
         {
+            // SDL reports many resize events even if the Size didn't change.
+            // Only call the code below if it actually changed.
+            if (_game.GraphicsDevice.PresentationParameters.BackBufferWidth == width &&
+                _game.GraphicsDevice.PresentationParameters.BackBufferHeight == height) {
+                return;
+            }
             _game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
             _game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
             _game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
@@ -258,9 +305,9 @@ namespace Microsoft.Xna.Framework
             OnClientSizeChanged();
         }
 
-        public void CallTextInput(char c)
+        public void CallTextInput(char c, Keys key = Keys.None)
         {
-            OnTextInput(this, new TextInputEventArgs(c));
+            OnTextInput(this, new TextInputEventArgs(c, key));
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
