@@ -651,7 +651,6 @@ namespace Microsoft.Xna.Framework
             if (Platform.BeforeUpdate(gameTime))
             {
                 FrameworkDispatcher.Update();
-                DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
 				
                 Update(gameTime);
 
