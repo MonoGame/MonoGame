@@ -31,6 +31,7 @@ namespace Microsoft.Xna.Framework
 
         private static void DoUpdate()
         {
+            DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
             SoundEffectInstancePool.Update();
         }
 
