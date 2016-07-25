@@ -17,16 +17,22 @@ namespace Microsoft.Xna.Framework.Audio
         // This platform is only limited by memory.
         internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
 
-        private void PlatformLoadAudioStream(Stream s)
+        private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
+        {
+            duration = TimeSpan.Zero;
+        }
+
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
         }
 
-        private void PlatformInitializePCM(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
         {
         }
 
-        private void PlatformInitializeFormat(byte[] buffer, int format, int sampleRate, int channels, int blockAlignment, int loopStart, int loopLength)
+        private void PlatformInitializeXact(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength, out TimeSpan duration)
         {
+            throw new NotSupportedException("Unsupported sound format!");
         }
 
         private void PlatformSetupInstance(SoundEffectInstance instance)
@@ -34,6 +40,10 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         private void PlatformDispose(bool disposing)
+        {
+        }
+
+        internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
         {
         }
 

@@ -133,12 +133,21 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
         public void SetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
+            Rectangle resizedBounds = new Rectangle(0, 0, Math.Max(Bounds.Width >> level, 1), Math.Max(Bounds.Height >> level, 1));
+            if (level >= LevelCount)
+                throw new ArgumentException("Texture only has "+_levelCount+" levels", "level");
             if (data == null)
                 throw new ArgumentNullException("data");
-
+            if ((!rect.HasValue && (data.Length - startIndex < resizedBounds.Width * resizedBounds.Height)) || (rect.HasValue && (rect.Value.Height * rect.Value.Width > data.Length)))
+                throw new ArgumentException("data array is too small");
+            if (elementCount + startIndex > data.Length)
+                throw new ArgumentException("ElementCount must be a valid index in the data array", "elementCount");
             if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
-
+            if (arraySlice >= ArraySize)
+                throw new ArgumentException("Texture array only has "+ArraySize+" textures","arraySlice");
+            if (rect.HasValue && !resizedBounds.Contains(rect.Value))
+                throw new ArgumentException("Rectangle must be inside the Texture Bounds", "rect");
             PlatformSetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
         }
         /// <summary>

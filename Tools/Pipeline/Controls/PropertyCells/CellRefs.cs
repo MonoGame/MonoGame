@@ -8,9 +8,10 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
+    [CellAttribute(typeof(List<string>), Name = "References")]
     public class CellRefs : CellBase
     {
-        public CellRefs(string category, string name, object value, EventHandler eventHandler) : base(category, name, value, eventHandler)
+        public override void OnCreate()
         {
             if (Value == null)
                 Value = new List<string>();

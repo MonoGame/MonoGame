@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Audio;
 
 namespace OpenAL
 {
@@ -54,6 +55,7 @@ namespace OpenAL
     {
         Buffer = 0x1009,
         EfxDirectFilter = 0x20005,
+        EfxAuxilarySendFilter = 0x20006,
     }
 
     public enum ALSourcef
@@ -113,11 +115,57 @@ namespace OpenAL
     {
         LowpassGain = 0x0001,
         LowpassGainHF = 0x0002,
+        HighpassGain = 0x0001,
+        HighpassGainLF = 0x0002,
+        BandpassGain = 0x0001,
+        BandpassGainLF = 0x0002,
+        BandpassGainHF = 0x0003,
     }
 
     public enum EfxFilterType
     {
+        None = 0x0000,
         Lowpass = 0x0001,
+        Highpass = 0x0002,
+        Bandpass = 0x0003,
+    }
+
+    public enum EfxEffecti
+    {
+        EffectType = 0x8001,
+        SlotEffect = 0x0001,
+    }
+
+    public enum EfxEffectf
+    {
+        EaxReverbDensity = 0x0001,
+        EaxReverbDiffusion = 0x0002,
+        EaxReverbGain = 0x0003,
+        EaxReverbGainHF = 0x0004,
+        EaxReverbGainLF = 0x0005,
+        DecayTime = 0x0006,
+        DecayHighFrequencyRatio = 0x0007,
+        DecayLowFrequencyRation = 0x0008,
+        EaxReverbReflectionsGain = 0x0009,
+        EaxReverbReflectionsDelay = 0x000A,
+        ReflectionsPain = 0x000B,
+        LateReverbGain = 0x000C,
+        LateReverbDelay = 0x000D,
+        LateRevertPain = 0x000E,
+        EchoTime = 0x000F,
+        EchoDepth = 0x0010,
+        ModulationTime = 0x0011,
+        ModulationDepth = 0x0012,
+        AirAbsorbsionHighFrequency = 0x0013,
+        EaxReverbHFReference = 0x0014,
+        EaxReverbLFReference = 0x0015,
+        RoomRolloffFactor = 0x0016,
+        DecayHighFrequencyLimit = 0x0017,
+    }
+
+    public enum EfxEffectType
+    {
+        Reverb = 0x8000,
     }
 
     public class AL
@@ -255,6 +303,10 @@ namespace OpenAL
             return errorCode.ToString (); 
         }
 
+        [CLSCompliant(false)]
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alIsSource")]
+        public static extern bool IsSource(int source);
+
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alDeleteSources")]
         public static extern void DeleteSources(int n, ref int sources);
@@ -271,6 +323,10 @@ namespace OpenAL
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourcei")]
         internal static extern void Source (int sourceId, int i, int a);
+
+        [CLSCompliant (false)]
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSource3i")]
+        public static extern void Source (int sourceId, ALSourcei i, int a, int b, int c);
 
         public static void Source (int sourceId, ALSourcei i, int a)
         {
@@ -400,7 +456,10 @@ namespace OpenAL
 
         [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcOpenDevice")]
-        public static extern IntPtr OpenDevice (string device);
+        public static extern IntPtr OpenDevice ([MarshalAs (UnmanagedType.LPStr)]  string device);
+
+        [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcIsExtensionPresent")]
+        public static extern bool IsExtensionPresent (IntPtr device, [MarshalAs (UnmanagedType.LPStr)] string extensionName);
 
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alcGetString")]
         internal static extern IntPtr alGetString (IntPtr device, int p);
@@ -470,24 +529,64 @@ namespace OpenAL
         }
     }
 
+    [CLSCompliant (false)]
     public class EffectsExtension
     {
+        /* Effect API */
+
+        private delegate void alGenEffectsDelegate (int n, out uint effect);
+        private delegate void alDeleteEffectsDelegate (int n, ref int effect);
+        private delegate bool alIsEffectDelegate (uint effect);
+        private delegate void alEffectfDelegate (uint effect, EfxEffectf param, float value);
+        private delegate void alEffectiDelegate (uint effect, EfxEffecti param, int value);
+        private delegate void alGenAuxiliaryEffectSlotsDelegate (int n, out uint effectslots);
+        private delegate void alDeleteAuxiliaryEffectSlotsDelegate (int n, ref int effectslots);
+        private delegate void alAuxiliaryEffectSlotiDelegate (uint slot, EfxEffecti type, uint effect);
+
+        /* Filter API */
         private unsafe delegate void alGenFiltersDelegate (int n, [Out] uint* filters);
         private delegate void alFilteriDelegate (uint fid, EfxFilteri param, int value);
         private delegate void alFilterfDelegate (uint fid, EfxFilterf param, float value);
         private unsafe delegate void alDeleteFiltersDelegate (int n, [In] uint* filters);
 
+
+        private alGenEffectsDelegate alGenEffects;
+        private alDeleteEffectsDelegate alDeleteEffects;
+        private alIsEffectDelegate alIsEffect;
+        private alEffectfDelegate alEffectf;
+        private alEffectiDelegate alEffecti;
+        private alGenAuxiliaryEffectSlotsDelegate alGenAuxiliaryEffectSlots;
+        private alDeleteAuxiliaryEffectSlotsDelegate alDeleteAuxiliaryEffectSlots;
+        private alAuxiliaryEffectSlotiDelegate alAuxiliaryEffectSloti;
         private alGenFiltersDelegate alGenFilters;
         private alFilteriDelegate alFilteri;
         private alFilterfDelegate alFilterf;
         private alDeleteFiltersDelegate alDeleteFilters;
 
+        internal static IntPtr device;
+        static EffectsExtension _instance;
+        public static EffectsExtension Instance {
+            get {
+                if (_instance == null)
+                    _instance = new EffectsExtension ();
+                return _instance;
+            }
+        }
+
         public EffectsExtension ()
         {
             IsInitialized = false;
-            if (!AL.IsExtensionPresent ("ALC_EXT_EFX")) {
+            if (!Alc.IsExtensionPresent (device, "ALC_EXT_EFX")) {
                 return;
             }
+
+            alGenEffects = (alGenEffectsDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alGenEffects"), typeof (alGenEffectsDelegate));
+            alDeleteEffects = (alDeleteEffectsDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alDeleteEffects"), typeof (alDeleteEffectsDelegate));
+            alEffectf = (alEffectfDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alEffectf"), typeof (alEffectfDelegate));
+            alEffecti = (alEffectiDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alEffecti"), typeof (alEffectiDelegate));
+            alGenAuxiliaryEffectSlots = (alGenAuxiliaryEffectSlotsDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alGenAuxiliaryEffectSlots"), typeof (alGenAuxiliaryEffectSlotsDelegate));
+            alDeleteAuxiliaryEffectSlots = (alDeleteAuxiliaryEffectSlotsDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alDeleteAuxiliaryEffectSlots"), typeof (alDeleteAuxiliaryEffectSlotsDelegate));
+            alAuxiliaryEffectSloti = (alAuxiliaryEffectSlotiDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alAuxiliaryEffectSloti"), typeof (alAuxiliaryEffectSlotiDelegate));
 
             alGenFilters = (alGenFiltersDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alGenFilters"), typeof (alGenFiltersDelegate));
             alFilteri = (alFilteriDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alFilteri"), typeof (alFilteriDelegate));
@@ -498,6 +597,59 @@ namespace OpenAL
         }
 
         public bool IsInitialized { get; private set; }
+
+        /*
+            
+
+alEffecti (effect, EfxEffecti.FilterType, (int)EfxEffectType.Reverb);
+            ALHelper.CheckError ("Failed to set Filter Type.");
+            
+        */
+
+        public void GenAuxiliaryEffectSlots (int count, out uint slot)
+        {
+            this.alGenAuxiliaryEffectSlots (count, out slot);
+            ALHelper.CheckError ("Failed to Genereate Aux slot");
+        }
+
+        public void GenEffect (out uint effect)
+        {
+            this.alGenEffects (1, out effect);
+            ALHelper.CheckError ("Failed to Generate Effect.");
+        }
+
+		public void DeleteAuxiliaryEffectSlot (int slot)
+		{
+            alDeleteAuxiliaryEffectSlots (1, ref slot);
+		}
+
+        public void DeleteEffect (int effect)
+        {
+            alDeleteEffects (1, ref effect);
+        }
+
+        public void BindEffectToAuxiliarySlot (uint effect, uint slot)
+        {
+            alAuxiliaryEffectSloti (slot,EfxEffecti.SlotEffect, effect);
+            ALHelper.CheckError ("Failed to bind Effect");
+        }
+
+        public void BindSourceToAuxiliarySlot (int SounceId, int slot, int slotnumber, int filter)
+		{
+            AL.Source (SounceId, ALSourcei.EfxAuxilarySendFilter, slot, slotnumber, filter);
+		}
+
+        public void Effect (uint effect, EfxEffectf param, float value)
+        {
+            alEffectf (effect, param, value);
+            ALHelper.CheckError ("Failed to set " + param + " " + value);
+        }
+
+        public void Effect (uint effect, EfxEffecti param, int value)
+        {
+            alEffecti (effect, param, value);
+            ALHelper.CheckError ("Failed to set " + param + " " + value);
+        }
 
         public unsafe int GenFilter() {
             uint filter = 0;

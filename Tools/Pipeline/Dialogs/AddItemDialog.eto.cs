@@ -16,6 +16,9 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitializeComponent()
         {
+            if (!Global.Unix)
+                this.Height = 250;
+
             layout1 = new DynamicLayout();
             layout1.DefaultSpacing = new Size(8, 8);
             layout1.Padding = new Padding(6);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,Web,tvOS">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne">
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
     for backwards compatibility with existing users of MonoGame, and are not
@@ -359,7 +359,10 @@
       <Platforms>iOS,tvOS,MacOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.WinRT.cs">
-      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="TitleContainer.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
@@ -375,6 +378,17 @@
     <Compile Include="Audio\AudioLoader.cs">
       <Platforms>Linux,WindowsGL,Angle,Android,Ouya</Platforms>
     </Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstance.cs" />
+	<Compile Include="Audio\DynamicSoundEffectInstance.OpenAL.cs">
+	  <Services>OpenALAudio</Services>
+	</Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstance.XAudio.cs">
+	  <Services>XAudioAudio</Services>
+	</Compile>
+    <Compile Include="Audio\DynamicSoundEffectInstance.Web.cs">
+	  <Services>WebAudio</Services>
+    </Compile>
+	<Compile Include="Audio\DynamicSoundEffectInstanceManager.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,Web,tvOS</Platforms>
@@ -426,8 +440,12 @@
     <Compile Include="Audio\Xact\ClipEvent.cs" />
     <Compile Include="Audio\Xact\CrossfadeType.cs" />
     <Compile Include="Audio\Xact\Cue.cs" />
+    <Compile Include="Audio\Xact\DspParameter.cs" />
+    <Compile Include="Audio\Xact\FilterMode.cs" />
     <Compile Include="Audio\Xact\MaxInstanceBehavior.cs" />
+    <Compile Include="Audio\Xact\MiniFormatTag.cs" />
     <Compile Include="Audio\Xact\PlayWaveEvent.cs" />
+    <Compile Include="Audio\Xact\ReverbSettings.cs" />	
     <Compile Include="Audio\Xact\RpcCurve.cs" />
     <Compile Include="Audio\Xact\RpcParameter.cs" />
     <Compile Include="Audio\Xact\RpcPoint.cs" />
@@ -585,7 +603,15 @@
 		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
-    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs">
+      <ExcludePlatforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS,Web</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Graphics\GraphicsAdapter.DirectX.cs">
+      <Services>DirectXGraphics</Services>
+    </Compile>
+    <Compile Include="Graphics\GraphicsAdapter.Legacy.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL,tvOS,Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\GraphicsContext.SDL.cs">
       <Platforms>WindowsGL,Linux</Platforms>

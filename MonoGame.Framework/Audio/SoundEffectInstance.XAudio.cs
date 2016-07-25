@@ -14,7 +14,11 @@ namespace Microsoft.Xna.Framework.Audio
         internal SourceVoice _voice;
         internal WaveFormat _format;
 
-        private static float[] _panMatrix;
+        private SharpDX.XAudio2.Fx.Reverb _reverb;
+
+        private static readonly float[] _panMatrix = new float[8];
+
+        private float _reverbMix;
 
         private bool _paused;
         private bool _loop;
@@ -135,19 +139,29 @@ namespace Microsoft.Xna.Framework.Audio
             _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
 
             // If we have no voice then nothing more to do.
-            if (_voice == null || _effect == null)
+            if (_voice == null)
                 return;
 
-            var srcChannelCount = _effect._format.Channels;
+            UpdateOutputMatrix();
+        }
+
+        private void UpdateOutputMatrix()
+        {
+            var srcChannelCount = _voice.VoiceDetails.InputChannelCount;
             var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
 
-            if (_panMatrix == null || _panMatrix.Length < dstChannelCount)
-                _panMatrix = new float[Math.Max(dstChannelCount, 8)];
+            // Set the pan on the correct channels based on the reverb mix.
+            if (!(_reverbMix > 0.0f))
+                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, 1.0f));
+            else
+            {
+                _voice.SetOutputMatrix(SoundEffect.ReverbVoice, srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, _reverbMix));
+                _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, CalculatePanMatrix(_pan, 1.0f - Math.Min(_reverbMix, 1.0f)));
+            }
+        }
 
-            // Default to full volume for all channels/destinations   
-            for (var i = 0; i < _panMatrix.Length; i++)
-                _panMatrix[i] = 1.0f;
-
+        private static float[] CalculatePanMatrix(float pan, float scale)
+        {
             // From X3DAudio documentation:
             /*
                 For submix and mastering voices, and for source voices without a channel mask or a channel mask of 0, 
@@ -168,6 +182,10 @@ namespace Microsoft.Xna.Framework.Audio
                 9 or more No implicit positions (one-to-one mapping)                      
              */
 
+            // Clear all the channels.
+            var panMatrix = _panMatrix;
+            Array.Clear(panMatrix, 0, panMatrix.Length);
+
             // Notes:
             //
             // Since XNA does not appear to expose any 'master' voice channel mask / speaker configuration,
@@ -175,38 +193,38 @@ namespace Microsoft.Xna.Framework.Audio
             //
             // Assuming it is correct to pan all channels which have a left/right component.
 
-            var lVal = 1.0f - _pan;
-            var rVal = 1.0f + _pan;
+            var lVal = (1.0f - pan) * scale;
+            var rVal = (1.0f + pan) * scale;
 
             switch (SoundEffect.Speakers)
             {
                 case Speakers.Stereo:
                 case Speakers.TwoPointOne:
                 case Speakers.Surround:
-                    _panMatrix[0] = lVal;
-                    _panMatrix[1] = rVal;
+                    panMatrix[0] = lVal;
+                    panMatrix[1] = rVal;
                     break;
 
                 case Speakers.Quad:
-                    _panMatrix[0] = _panMatrix[2] = lVal;
-                    _panMatrix[1] = _panMatrix[3] = rVal;
+                    panMatrix[0] = panMatrix[2] = lVal;
+                    panMatrix[1] = panMatrix[3] = rVal;
                     break;
 
                 case Speakers.FourPointOne:
-                    _panMatrix[0] = _panMatrix[3] = lVal;
-                    _panMatrix[1] = _panMatrix[4] = rVal;
+                    panMatrix[0] = panMatrix[3] = lVal;
+                    panMatrix[1] = panMatrix[4] = rVal;
                     break;
 
                 case Speakers.FivePointOne:
                 case Speakers.SevenPointOne:
                 case Speakers.FivePointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = rVal;
+                    panMatrix[0] = panMatrix[4] = lVal;
+                    panMatrix[1] = panMatrix[5] = rVal;
                     break;
 
                 case Speakers.SevenPointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = _panMatrix[6] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = _panMatrix[7] = rVal;
+                    panMatrix[0] = panMatrix[4] = panMatrix[6] = lVal;
+                    panMatrix[1] = panMatrix[5] = panMatrix[7] = rVal;
                     break;
 
                 case Speakers.Mono:
@@ -215,7 +233,7 @@ namespace Microsoft.Xna.Framework.Audio
                     break;
             }
 
-            _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
+            return panMatrix;
         }
 
         private void PlatformSetPitch(float value)
@@ -251,10 +269,56 @@ namespace Microsoft.Xna.Framework.Audio
                 _voice.SetVolume(value, XAudio2.CommitNow);
         }
 
+        internal void PlatformSetReverbMix(float mix)
+        {
+            // At least for XACT we can't go over 2x the volume on the mix.
+            _reverbMix = MathHelper.Clamp(mix, 0, 2);
+
+            // If we have no voice then nothing more to do.
+            if (_voice == null)
+                return;
+
+            if (!(_reverbMix > 0.0f))
+                _voice.SetOutputVoices(new VoiceSendDescriptor(SoundEffect.MasterVoice));
+            else
+            {
+                _voice.SetOutputVoices( new VoiceSendDescriptor(SoundEffect.ReverbVoice), 
+                                        new VoiceSendDescriptor(SoundEffect.MasterVoice));
+            }
+
+            UpdateOutputMatrix();
+        }
+
+        internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
+        {
+            if (_voice == null)
+                return;
+
+            var filter = new FilterParameters 
+            {
+                Frequency = XAudio2.CutoffFrequencyToRadians(frequency, _voice.VoiceDetails.InputSampleRate), 
+                OneOverQ = 1.0f / filterQ, 
+                Type = (FilterType)mode 
+            };
+            _voice.SetFilterParameters(filter);
+        }
+
+        internal void PlatformClearFilter()
+        {
+            if (_voice == null)
+                return;
+
+            var filter = new FilterParameters { Frequency = 1.0f, OneOverQ = 1.0f, Type = FilterType.LowPassFilter };
+            _voice.SetFilterParameters(filter);            
+        }
+
         private void PlatformDispose(bool disposing)
         {
             if (disposing)
             {
+                if (_reverb != null)
+                    _reverb.Dispose();
+
                 if (_voice != null)
                 {
                     _voice.DestroyVoice();
@@ -263,6 +327,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
             _voice = null;
             _effect = null;
+            _reverb = null;
         }
     }
 }

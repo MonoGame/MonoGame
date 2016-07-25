@@ -5,15 +5,12 @@
 using System;
 using System.IO;
 
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Utilities;
-
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>Represents a collection of wave files.</summary>
     public class WaveBank : IDisposable
     {
-        private SoundEffect[] _sounds;
+        private readonly SoundEffect[] _sounds;
         private string _bankName;
 
         struct Segment
@@ -54,11 +51,6 @@ namespace Microsoft.Xna.Framework.Audio
         private const int Flag_SeekTables = 0x00080000; // Bank includes seek tables.
         private const int Flag_Mask = 0x000F0000;
         
-        private const int MiniFormatTag_PCM = 0x0;
-        private const int MiniFormatTag_XMA = 0x1;
-        private const int MiniFormatTag_ADPCM = 0x2;
-        private const int MiniForamtTag_WMA = 0x3;
-
         /// <summary>
         /// </summary>
         public bool IsInUse { get; private set; }
@@ -240,8 +232,8 @@ namespace Microsoft.Xna.Framework.Audio
                 wavebankentry.PlayRegion.Offset += playregion_offset;
                 
                 // Parse WAVEBANKMINIWAVEFORMAT
-                
-                int codec;
+
+                MiniFormatTag codec;
                 int chans;
                 int rate;
                 int align;
@@ -259,7 +251,7 @@ namespace Microsoft.Xna.Framework.Audio
                     // | wBlockAlign
                     // wBitsPerSample
 
-                    codec = (wavebankentry.Format) & ((1 << 1) - 1);
+                    codec = (MiniFormatTag)((wavebankentry.Format) & ((1 << 1) - 1));
                     chans = (wavebankentry.Format >> (1)) & ((1 << 3) - 1);
                     rate = (wavebankentry.Format >> (1 + 3 + 1)) & ((1 << 18) - 1);
                     align = (wavebankentry.Format >> (1 + 3 + 1 + 18)) & ((1 << 8) - 1);
@@ -296,7 +288,7 @@ namespace Microsoft.Xna.Framework.Audio
                     // | wBlockAlign
                     // wBitsPerSample
 
-                    codec = (wavebankentry.Format) & ((1 << 2) - 1);
+                    codec = (MiniFormatTag)((wavebankentry.Format) & ((1 << 2) - 1));
                     chans = (wavebankentry.Format >> (2)) & ((1 << 3) - 1);
                     rate = (wavebankentry.Format >> (2 + 3)) & ((1 << 18) - 1);
                     align = (wavebankentry.Format >> (2 + 3 + 18)) & ((1 << 8) - 1);
@@ -305,101 +297,9 @@ namespace Microsoft.Xna.Framework.Audio
                 
                 reader.BaseStream.Seek(wavebankentry.PlayRegion.Offset, SeekOrigin.Begin);
                 byte[] audiodata = reader.ReadBytes(wavebankentry.PlayRegion.Length);
-                
-                if (codec == MiniFormatTag_PCM) {
 
-                    //write PCM data into a wav
-#if DIRECTX
-                    // TODO: Wouldn't storing a SoundEffectInstance like this
-                    // result in the "parent" SoundEffect being garbage collected?
-
-                    SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
-                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
-                        {
-                            _format = waveFormat
-                        };
-
-                    _sounds[current_entry] = sfx;
-#else
-                    _sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans);
-#endif
-                } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
-                    byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
-                    
-                    bool isWma = true;
-                    for (int i=0; i<wmaSig.Length; i++) {
-                        if (wmaSig[i] != audiodata[i]) {
-                            isWma = false;
-                            break;
-                        }
-                    }
-                    
-                    //Let's support m4a data as well for convenience
-                    byte[][] m4aSigs = new byte[][] {
-                        new byte[] {0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x4D, 0x34, 0x41, 0x20, 0x00, 0x00, 0x02, 0x00},
-                        new byte[] {0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, 0x4D, 0x34, 0x41, 0x20, 0x00, 0x00, 0x00, 0x00}
-                    };
-                    
-                    bool isM4a = false;
-                    for (int i=0; i<m4aSigs.Length; i++) {    
-                        byte[] sig = m4aSigs[i];
-                        bool matches = true;
-                        for (int j=0; j<sig.Length; j++) {
-                            if (sig[j] != audiodata[j]) {
-                                matches = false;
-                                break;
-                            }
-                        }
-                        if (matches) {
-                            isM4a = true;
-                            break;
-                        }
-                    }
-                    
-                    if (isWma || isM4a) {
-                        //WMA data can sometimes be played directly
-#if DIRECTX
-                        throw new NotImplementedException();
-#elif !WINRT
-                        //hack - NSSound can't play non-wav from data, we have to give a filename
-                        string filename = Path.GetTempFileName();
-                        if (isWma) {
-                            filename = filename.Replace(".tmp", ".wma");
-                        } else if (isM4a) {
-                            filename = filename.Replace(".tmp", ".m4a");
-                        }
-                        using (var audioFile = File.Create(filename))
-                        {
-                            audioFile.Write(audiodata, 0, audiodata.Length);
-                            audioFile.Seek(0, SeekOrigin.Begin);
-       
-                            _sounds[current_entry] = SoundEffect.FromStream(audioFile);
-                        }
-#else
-                        throw new NotImplementedException();
-#endif
-                    } else {
-                        //An xWMA or XMA2 file. Can't be played atm :(
-                        throw new NotImplementedException();
-                    }
-                } 
-                else if (codec == MiniFormatTag_ADPCM) 
-                {
-#if DIRECTX
-                    // TODO not sure if this is the right way to calculate the duration
-                    int durationMs = 1000 * wavebankentry.LoopRegion.Length / rate;
-                    _sounds[current_entry] = new SoundEffect(audiodata, 0x0002 /*ADPCM*/, rate, chans, align, durationMs, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
-                    {
-                        _format = new SharpDX.Multimedia.WaveFormatAdpcm(rate, chans, align)
-                    };
-#else
-                    _sounds[current_entry] = new SoundEffect(audiodata, 2, rate, chans, (align + 16) * 2, 0, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length);
-#endif
-                } 
-                else {
-                    throw new NotImplementedException();
-                }
-                
+                // Call the special constuctor on SoundEffect to sort it out.
+                _sounds[current_entry] = new SoundEffect(codec, audiodata, chans, rate, align, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length);                
             }
             
             audioEngine.Wavebanks[_bankName] = this;

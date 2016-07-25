@@ -16,8 +16,8 @@ Global Settings
     Header File = D:\Projects\MonoGame\Test\Assets\Audio\Tests.h;
     Exclude Category Names = 0;
     Exclude Variable Names = 0;
-    Last Modified Low = 1116158178;
-    Last Modified High = 30527053;
+    Last Modified Low = 2235367809;
+    Last Modified High = 30530715;
 
     Category
     {
@@ -334,6 +334,14 @@ Global Settings
         Min = 0.000000;
         Max = 100.000000;
     }
+
+    Compression Preset
+    {
+        Name = Adpcm;
+        Xbox Format Tag = 0;
+        PC Format Tag = 2;
+        Samples Per Block = 128;
+    }
 }
 
 Wave Bank
@@ -347,12 +355,10 @@ Wave Bank
     Compression Preset Name = <none>;
     Xbox Bank Last Modified Low = 0;
     Xbox Bank Last Modified High = 0;
-    PC Bank Last Modified Low = 2444941403;
-    PC Bank Last Modified High = 30526869;
-    Header Last Modified Low = 0;
-    Header Last Modified High = 0;
-    Bank Last Revised Low = 2139623808;
-    Bank Last Revised High = 30526869;
+    PC Bank Last Modified Low = 2235437834;
+    PC Bank Last Modified High = 30530715;
+    Bank Last Revised Low = 1968512440;
+    Bank Last Revised High = 30530715;
 
     Wave
     {
@@ -372,8 +378,8 @@ Wave Bank
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 1634464499;
-            Last Modified High = 30526868;
+            Last Modified Low = 2255033196;
+            Last Modified High = 30529426;
         }
     }
 
@@ -395,8 +401,32 @@ Wave Bank
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 2360417637;
-            Last Modified High = 30526868;
+            Last Modified Low = 2255273154;
+            Last Modified High = 30529426;
+        }
+    }
+
+    Wave
+    {
+        Name = bark_mono_44hz_16bit;
+        File = bark_mono_44hz_16bit.wav;
+        Build Settings Last Modified Low = 724851642;
+        Build Settings Last Modified High = 30530715;
+        Compression Preset Name = Adpcm;
+
+        Cache
+        {
+            Format Tag = 0;
+            Channels = 1;
+            Sampling Rate = 44100;
+            Bits Per Sample = 1;
+            Play Region Offset = 44;
+            Play Region Length = 142154;
+            Loop Region Offset = 0;
+            Loop Region Length = 0;
+            File Type = 1;
+            Last Modified Low = 4285451975;
+            Last Modified High = 30530714;
         }
     }
 }
@@ -408,8 +438,8 @@ Sound Bank
     Windows File = Win\Tests.xsb;
     Xbox Bank Path Edited = 0;
     Windows Bank Path Edited = 0;
-    Bank Last Modified Low = 3376807607;
-    Bank Last Modified High = 30526876;
+    Bank Last Modified Low = 2236507872;
+    Bank Last Modified High = 30530715;
     Header Last Modified High = 0;
     Header Last Modified Low = 0;
 
@@ -508,6 +538,53 @@ Sound Bank
         }
     }
 
+    Sound
+    {
+        Name = bark_mono;
+        Volume = -1200;
+        Pitch = 0;
+        Priority = 0;
+
+        Category Entry
+        {
+            Name = Default;
+        }
+
+        Track
+        {
+            Volume = 0;
+            Use Filter = 0;
+
+            Play Wave Event
+            {
+                Break Loop = 0;
+                Use Speaker Position = 0;
+                Use Center Speaker = 1;
+                New Speaker Position On Loop = 1;
+                Speaker Position Angle = 0.000000;
+                Speaker Position Arc = 0.000000;
+
+                Event Header
+                {
+                    Timestamp = 0;
+                    Relative = 0;
+                    Random Recurrence = 0;
+                    Random Offset = 0;
+                }
+
+                Wave Entry
+                {
+                    Bank Name = Tests;
+                    Bank Index = 0;
+                    Entry Name = bark_mono_44hz_16bit;
+                    Entry Index = 2;
+                    Weight = 255;
+                    Weight Min = 0;
+                }
+            }
+        }
+    }
+
     Cue
     {
         Name = blast_mono;
@@ -543,6 +620,26 @@ Sound Bank
         {
             Name = rock_loop_stereo;
             Index = 1;
+            Weight Min = 0;
+            Weight Max = 255;
+        }
+    }
+
+    Cue
+    {
+        Name = bark_mono;
+
+        Variation
+        {
+            Variation Type = 3;
+            Variation Table Type = 1;
+            New Variation on Loop = 0;
+        }
+
+        Sound Entry
+        {
+            Name = bark_mono;
+            Index = 2;
             Weight Min = 0;
             Weight Max = 255;
         }
