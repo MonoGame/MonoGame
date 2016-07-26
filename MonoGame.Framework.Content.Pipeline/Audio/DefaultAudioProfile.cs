@@ -187,6 +187,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 durationMs = (int)Math.Ceiling(durationInSeconds * 1000.0);
                 bitsPerSample = Math.Min(bitsPerSample, 16);
             }
+            else if (formatName == "ogg")
+            {
+                audioFileType = AudioFileType.Ogg;
+                format = 1;
+                durationMs = (int)Math.Ceiling(durationInSeconds * 1000.0);
+                bitsPerSample = Math.Min(bitsPerSample, 16);
+            }
             else
                 audioFileType = (AudioFileType) (-1);
 
