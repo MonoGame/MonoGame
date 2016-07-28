@@ -15,9 +15,13 @@ namespace Microsoft.Xna.Framework.Graphics
             // Get the current desktop DPI.
             Vector2 dpiScale;
             {
+#if WINDOWS_PHONE
+                dpiScale = Vector2.One;
+#else
                 var direct2d = new SharpDX.Direct2D1.Factory(SharpDX.Direct2D1.FactoryType.SingleThreaded);
                 dpiScale = new Vector2(direct2d.DesktopDpi.Width / 96.0f, direct2d.DesktopDpi.Height / 96.0f);
                 direct2d.Dispose();
+#endif
             }
 
             var factory = new SharpDX.DXGI.Factory1();
