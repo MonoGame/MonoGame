@@ -12,6 +12,14 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private static void PlatformInitializeAdapters(out ReadOnlyCollection<GraphicsAdapter> adapters)
         {
+            // Get the current desktop DPI.
+            Vector2 dpiScale;
+            {
+                var direct2d = new SharpDX.Direct2D1.Factory(SharpDX.Direct2D1.FactoryType.SingleThreaded);
+                dpiScale = new Vector2(direct2d.DesktopDpi.Width / 96.0f, direct2d.DesktopDpi.Height / 96.0f);
+                direct2d.Dispose();
+            }
+
             var factory = new SharpDX.DXGI.Factory1();
 
             var adapterCount = factory.GetAdapterCount();
@@ -26,7 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var monitor = device.GetOutput(j);
 
-                    var adapter = CreateAdapter(device, monitor);
+                    var adapter = CreateAdapter(device, monitor, dpiScale);
                     adapterList.Add(adapter);
 
                     monitor.Dispose();
@@ -47,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
             { SharpDX.DXGI.Format.B5G6R5_UNorm, SurfaceFormat.Bgr565 },
         };
 
-        private static GraphicsAdapter CreateAdapter(SharpDX.DXGI.Adapter1 device, SharpDX.DXGI.Output monitor)
+        private static GraphicsAdapter CreateAdapter(SharpDX.DXGI.Adapter1 device, SharpDX.DXGI.Output monitor, Vector2 dpiScale)
         {            
             var adapter = new GraphicsAdapter();
 
@@ -59,6 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
             adapter.SubSystemId = device.Description1.SubsystemId;
             adapter.MonitorHandle = monitor.Description.MonitorHandle;
 
+            // Get the correct desktop resolution for this monitor accounting for DPI scaling.
 #if WINDOWS_UAP
             var desktopWidth = monitor.Description.DesktopBounds.Right - monitor.Description.DesktopBounds.Left;
             var desktopHeight = monitor.Description.DesktopBounds.Bottom - monitor.Description.DesktopBounds.Top;
@@ -66,6 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var desktopWidth = monitor.Description.DesktopBounds.Width;
             var desktopHeight = monitor.Description.DesktopBounds.Height;
 #endif
+            desktopWidth = (int)Math.Ceiling(desktopWidth * dpiScale.X);
+            desktopHeight = (int)Math.Ceiling(desktopHeight * dpiScale.Y);
 
             var modes = new List<DisplayMode>();
 
