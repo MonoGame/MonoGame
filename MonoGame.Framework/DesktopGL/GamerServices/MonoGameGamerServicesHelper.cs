@@ -7,8 +7,6 @@ namespace Microsoft.Xna.Framework.GamerServices
     {
         private static MonoLiveGuide guide = null;
 
-
-
         public static void ShowSigninSheet()
         {
             guide.Enabled = true;
@@ -23,7 +21,8 @@ namespace Microsoft.Xna.Framework.GamerServices
                 guide = new MonoLiveGuide(game);                
                 game.Components.Add(guide);
             }
-        }}
+        }
+    }
 
     internal class MonoLiveGuide : DrawableGameComponent
     {
@@ -37,7 +36,6 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             this.Enabled = false;
             this.Visible = false;
-            //Guide.IsVisible = false;
             this.DrawOrder = Int32.MaxValue;
         }
 
@@ -123,7 +121,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                 startalpha += 255 / 12;
             }
 
-            if ((gameTime.TotalGameTime - gt).TotalSeconds > 5) // close after 10 seconds
+            if ((gameTime.TotalGameTime - gt).TotalSeconds > 1) // close after 2 seconds
             {
                 string strUsr = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
@@ -141,7 +139,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
                 this.Visible = false;
                 this.Enabled = false;
-                //Guide.IsVisible = false;
+                Guide.IsVisible = false;
                 gt = TimeSpan.Zero;
             }
             base.Update(gameTime);
