@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
+// MonoGame - Copyright © 2009-2010 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -40,152 +40,19 @@
 
 #region Using clause
 using System;
-using System.IO;
 
-using Microsoft.Xna.Framework.Graphics;
 #endregion Using clause
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
-
-
-	public class PacketReader : BinaryReader
+	public enum NetworkSessionType
 	{
-		
-		// Read comments within the PacketWriter
-		#region Constructors
-		public PacketReader() : this(0)
-		{
-		}
-		
-		
-		public PacketReader(int capacity) : base(new MemoryStream(0))
-		{
-			
-		}
-		#endregion
-		
-		#region Methods
-		internal byte[] Data
-		{
-			get {
-				MemoryStream stream = (MemoryStream)this.BaseStream;
-				return stream.GetBuffer();
-			}			
-			set {
-				MemoryStream ms = (MemoryStream)this.BaseStream;
-				ms.Write(value, 0, value.Length);
-			}
-		}
-		
-		public Color ReadColor()
-		{
-			Color newColor = Color.Transparent;
-			newColor.PackedValue = this.ReadUInt32();
-			return newColor;
-		}
-		
-		public override double ReadDouble()
-		{
-			return this.ReadDouble();
-		}
-		
-		public Matrix ReadMatrix()
-		{
-			Matrix matrix = new Matrix();
-			
-			matrix.M11 = this.ReadSingle();
-			matrix.M12 = this.ReadSingle();
-			matrix.M13 = this.ReadSingle();
-			matrix.M14 = this.ReadSingle();
-			
-			matrix.M21 = this.ReadSingle();
-			matrix.M22 = this.ReadSingle();
-			matrix.M23 = this.ReadSingle();
-			matrix.M24 = this.ReadSingle();
-			
-			matrix.M31 = this.ReadSingle();
-			matrix.M32 = this.ReadSingle();
-			matrix.M33 = this.ReadSingle();
-			matrix.M34 = this.ReadSingle();
-			
-			matrix.M41 = this.ReadSingle();
-			matrix.M42 = this.ReadSingle();
-			matrix.M43 = this.ReadSingle();
-			matrix.M44 = this.ReadSingle();
+		Local,    		// Does not involve any networking traffic, but can be used for split-screen gaming on a single Xbox 360 console. Creating a local network session may also make it easier to share code between local and online game modes. 
 
-			return matrix;
-		}
-		
-		public Quaternion ReadQuaternion()
-		{
-			Quaternion quat = new Quaternion();
-			quat.X = this.ReadSingle();
-			quat.Y = this.ReadSingle();
-			quat.Z = this.ReadSingle();
-			quat.W = this.ReadSingle();
-			
-			return quat;
-			
-		}
-		
-//		public override float ReadSingle()
-//		{
-//			return this.ReadSingle();
-//		}
-		
-		public Vector2 ReadVector2()
-		{
-			Vector2 vect = new Vector2();
-			vect.X = this.ReadSingle();
-			vect.Y = this.ReadSingle();
-			
-			return vect;		}
-		
-		public Vector3 ReadVector3()
-		{
-			Vector3 vect = new Vector3();
-			vect.X = this.ReadSingle();
-			vect.Y = this.ReadSingle();
-			vect.Z = this.ReadSingle();
-			
-			return vect;
-		}
-			
-		public Vector4 ReadVector4()
-		{
-			Vector4 vect = new Vector4();
-			vect.X = this.ReadSingle();
-			vect.Y = this.ReadSingle();
-			vect.Z = this.ReadSingle();
-			vect.W = this.ReadSingle();
-			
-			return vect;
-		}
-		
-		internal void Reset(int size) {
-			MemoryStream ms = (MemoryStream)BaseStream;
-			ms.SetLength(size);
-			ms.Position = 0;
-		}
-		#endregion
-		
-		#region Properties
-		public int Length { 
-			get {
-				return (int)BaseStream.Length;
-			}
-		}
+		SystemLink,	// Connect multiple Xbox 360 consoles or computers over a local subnet. These machines do not require a connection to Xbox LIVE or any LIVE accounts. However, connection to machines on different subnets is not allowed.
+				// If you are a Creators Club developer testing your game, you can use this type to connect an Xbox 360 console to a computer. However, cross-platform networking is not supported in games distributed to non-–Creators Club community players.
 
-		public int Position { 
-			get {
-				return (int)BaseStream.Position;
-			}
-			set {
-				if (BaseStream.Position != value)
-					BaseStream.Position = value;
-			} 
-		}
-		#endregion
+		PlayerMatch,	// Uses the Xbox LIVE servers. This enables connection to other machines over the Internet. It requires a LIVE Silver Membership for Windows-based games or a LIVE Gold membership for Xbox 360 games. Games in development will also require an XNA Creators Club premium membership. While in trial mode, Indie games downloaded from Xbox LIVE Markeplace will not have access to LIVE matchmaking.
+		Ranked,		// All session matches are ranked. This option is available only for commercial games that have passed Xbox LIVE certification. Due to the competitive nature of the gameplay, this session type does not support join-in-progress.
 	}
 }

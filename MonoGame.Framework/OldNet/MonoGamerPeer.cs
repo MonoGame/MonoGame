@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 using Lidgren.Network;
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
     public class MonoGameNetworkConfiguration
     {

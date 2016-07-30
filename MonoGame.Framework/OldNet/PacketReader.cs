@@ -36,101 +36,156 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-#endregion License 
+#endregion License
 
 #region Using clause
 using System;
-using System.Net;
+using System.IO;
 
+using Microsoft.Xna.Framework.Graphics;
 #endregion Using clause
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
-	public sealed class AvailableNetworkSession
+
+
+	public class PacketReader : BinaryReader
 	{
-
-		public AvailableNetworkSession ()
+		
+		// Read comments within the PacketWriter
+		#region Constructors
+		public PacketReader() : this(0)
 		{
-			_QualityOfService = new QualityOfService();
 		}
 		
-		int _currentGameCount;
-		public int CurrentGamerCount 
-		{ 
-			get
-			{
-				return _currentGameCount;
-			}
-			
-			internal set { _currentGameCount = value; }
-		}
 		
-		string _hostGamertag;
-		public string HostGamertag 
-		{ 
-			get
-			{
-				return _hostGamertag;
-			}
-			
-			internal set { _hostGamertag = value; }
-		}
-		
-		int _openPrivateGamerSlots;
-		public int OpenPrivateGamerSlots 
-		{ 
-			get
-			{
-				return _openPrivateGamerSlots;
-			}
-			
-			internal set { _openPrivateGamerSlots = value; }			
-		}
-		
-		int _openPublicGamerSlots; 
-		public int OpenPublicGamerSlots 
-		{ 
-			get
-			{
-				return _openPublicGamerSlots;
-			}
-			internal set { _openPublicGamerSlots = value; }			
-		}
-		
-		private QualityOfService _QualityOfService;
-		public QualityOfService QualityOfService 
-		{ 
-			get
-			{
-				return _QualityOfService;
-			}
-			internal set { _QualityOfService = value; }			
-		}
-		
-		NetworkSessionProperties _sessionProperties;
-		public NetworkSessionProperties SessionProperties 
-		{ 
-			get
-			{
-				return _sessionProperties;
-			}
-			internal set { _sessionProperties = value; }			
-		}
-		
-		IPEndPoint _endPoint;
-		internal IPEndPoint EndPoint 
+		public PacketReader(int capacity) : base(new MemoryStream(0))
 		{
-			get { return _endPoint; }
-			set { _endPoint = value;}
+			
 		}
-        IPEndPoint _internalendPoint;
+		#endregion
+		
+		#region Methods
+		internal byte[] Data
+		{
+			get {
+				MemoryStream stream = (MemoryStream)this.BaseStream;
+				return stream.GetBuffer();
+			}			
+			set {
+				MemoryStream ms = (MemoryStream)this.BaseStream;
+				ms.Write(value, 0, value.Length);
+			}
+		}
+		
+		public Color ReadColor()
+		{
+			Color newColor = Color.Transparent;
+			newColor.PackedValue = this.ReadUInt32();
+			return newColor;
+		}
+		
+		public override double ReadDouble()
+		{
+			return this.ReadDouble();
+		}
+		
+		public Matrix ReadMatrix()
+		{
+			Matrix matrix = new Matrix();
+			
+			matrix.M11 = this.ReadSingle();
+			matrix.M12 = this.ReadSingle();
+			matrix.M13 = this.ReadSingle();
+			matrix.M14 = this.ReadSingle();
+			
+			matrix.M21 = this.ReadSingle();
+			matrix.M22 = this.ReadSingle();
+			matrix.M23 = this.ReadSingle();
+			matrix.M24 = this.ReadSingle();
+			
+			matrix.M31 = this.ReadSingle();
+			matrix.M32 = this.ReadSingle();
+			matrix.M33 = this.ReadSingle();
+			matrix.M34 = this.ReadSingle();
+			
+			matrix.M41 = this.ReadSingle();
+			matrix.M42 = this.ReadSingle();
+			matrix.M43 = this.ReadSingle();
+			matrix.M44 = this.ReadSingle();
 
-        internal IPEndPoint InternalEndpont
-        {
-            get { return _internalendPoint; }
-            set { _internalendPoint = value; }
-        }
+			return matrix;
+		}
+		
+		public Quaternion ReadQuaternion()
+		{
+			Quaternion quat = new Quaternion();
+			quat.X = this.ReadSingle();
+			quat.Y = this.ReadSingle();
+			quat.Z = this.ReadSingle();
+			quat.W = this.ReadSingle();
+			
+			return quat;
+			
+		}
+		
+//		public override float ReadSingle()
+//		{
+//			return this.ReadSingle();
+//		}
+		
+		public Vector2 ReadVector2()
+		{
+			Vector2 vect = new Vector2();
+			vect.X = this.ReadSingle();
+			vect.Y = this.ReadSingle();
+			
+			return vect;		}
+		
+		public Vector3 ReadVector3()
+		{
+			Vector3 vect = new Vector3();
+			vect.X = this.ReadSingle();
+			vect.Y = this.ReadSingle();
+			vect.Z = this.ReadSingle();
+			
+			return vect;
+		}
+			
+		public Vector4 ReadVector4()
+		{
+			Vector4 vect = new Vector4();
+			vect.X = this.ReadSingle();
+			vect.Y = this.ReadSingle();
+			vect.Z = this.ReadSingle();
+			vect.W = this.ReadSingle();
+			
+			return vect;
+		}
+		
+		internal void Reset(int size) {
+			MemoryStream ms = (MemoryStream)BaseStream;
+			ms.SetLength(size);
+			ms.Position = 0;
+		}
+		#endregion
+		
+		#region Properties
+		public int Length { 
+			get {
+				return (int)BaseStream.Length;
+			}
+		}
 
-        internal NetworkSessionType SessionType { get; set; }
-    }
+		public int Position { 
+			get {
+				return (int)BaseStream.Position;
+			}
+			set {
+				if (BaseStream.Position != value)
+					BaseStream.Position = value;
+			} 
+		}
+		#endregion
+	}
 }

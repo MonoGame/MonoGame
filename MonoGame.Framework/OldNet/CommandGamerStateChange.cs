@@ -1,6 +1,6 @@
 using System;
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
 	internal class CommandGamerStateChange : ICommand
 	{

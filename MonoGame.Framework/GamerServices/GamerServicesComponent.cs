@@ -71,7 +71,7 @@ non-infringement.
 using System;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Net;
+using Microsoft.Xna.Framework.OldNet;
 #endregion Statements
 
 #if !WINDOWS_PHONE

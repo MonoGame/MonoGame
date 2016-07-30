@@ -46,7 +46,7 @@ using System.ComponentModel;
 using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
 	public class NetworkGamer : Gamer, INotifyPropertyChanged
 	{

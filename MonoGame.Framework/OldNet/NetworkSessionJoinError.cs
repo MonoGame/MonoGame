@@ -38,18 +38,16 @@
 // */
 #endregion License
 
-#region Using clause
 using System;
-#endregion Using clause
 
-
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
-	public enum NetworkSessionEndReason
+
+
+	public enum NetworkSessionJoinError
 	{
-		ClientSignedOut,	// This client player has signed out of session.
-		HostEndedSession,	// The host left the session, removing all active players.
-		RemovedByHost,		// The host removed this client player from the session.
-		Disconnected,		// Network connectivity problems ended the session
+		SessionNotFound, 	// The session could not be found. Occurs if the session has ended after the matchmaking query but before the client joined, of if there is no network connectivity between the client and session host machines.
+		SessionNotJoinable,	// The session exists but is not joinable. Occurs if the session is in progress but does not allow gamers to join a session in progress.
+		SessionFull,		// The session exists but does not have any open slots for local signed-in gamers.
 	}
 }

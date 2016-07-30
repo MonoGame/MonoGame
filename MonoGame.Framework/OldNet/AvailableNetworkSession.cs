@@ -1,7 +1,7 @@
 #region License
 // /*
 // Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009-2010 The MonoGame Team
+// MonoGame - Copyright © 2009 The MonoGame Team
 // 
 // All rights reserved.
 // 
@@ -36,23 +36,101 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-#endregion License
+#endregion License 
 
 #region Using clause
 using System;
+using System.Net;
 
 #endregion Using clause
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
-	public enum NetworkSessionType
+	public sealed class AvailableNetworkSession
 	{
-		Local,    		// Does not involve any networking traffic, but can be used for split-screen gaming on a single Xbox 360 console. Creating a local network session may also make it easier to share code between local and online game modes. 
 
-		SystemLink,	// Connect multiple Xbox 360 consoles or computers over a local subnet. These machines do not require a connection to Xbox LIVE or any LIVE accounts. However, connection to machines on different subnets is not allowed.
-				// If you are a Creators Club developer testing your game, you can use this type to connect an Xbox 360 console to a computer. However, cross-platform networking is not supported in games distributed to non-–Creators Club community players.
+		public AvailableNetworkSession ()
+		{
+			_QualityOfService = new QualityOfService();
+		}
+		
+		int _currentGameCount;
+		public int CurrentGamerCount 
+		{ 
+			get
+			{
+				return _currentGameCount;
+			}
+			
+			internal set { _currentGameCount = value; }
+		}
+		
+		string _hostGamertag;
+		public string HostGamertag 
+		{ 
+			get
+			{
+				return _hostGamertag;
+			}
+			
+			internal set { _hostGamertag = value; }
+		}
+		
+		int _openPrivateGamerSlots;
+		public int OpenPrivateGamerSlots 
+		{ 
+			get
+			{
+				return _openPrivateGamerSlots;
+			}
+			
+			internal set { _openPrivateGamerSlots = value; }			
+		}
+		
+		int _openPublicGamerSlots; 
+		public int OpenPublicGamerSlots 
+		{ 
+			get
+			{
+				return _openPublicGamerSlots;
+			}
+			internal set { _openPublicGamerSlots = value; }			
+		}
+		
+		private QualityOfService _QualityOfService;
+		public QualityOfService QualityOfService 
+		{ 
+			get
+			{
+				return _QualityOfService;
+			}
+			internal set { _QualityOfService = value; }			
+		}
+		
+		NetworkSessionProperties _sessionProperties;
+		public NetworkSessionProperties SessionProperties 
+		{ 
+			get
+			{
+				return _sessionProperties;
+			}
+			internal set { _sessionProperties = value; }			
+		}
+		
+		IPEndPoint _endPoint;
+		internal IPEndPoint EndPoint 
+		{
+			get { return _endPoint; }
+			set { _endPoint = value;}
+		}
+        IPEndPoint _internalendPoint;
 
-		PlayerMatch,	// Uses the Xbox LIVE servers. This enables connection to other machines over the Internet. It requires a LIVE Silver Membership for Windows-based games or a LIVE Gold membership for Xbox 360 games. Games in development will also require an XNA Creators Club premium membership. While in trial mode, Indie games downloaded from Xbox LIVE Markeplace will not have access to LIVE matchmaking.
-		Ranked,		// All session matches are ranked. This option is available only for commercial games that have passed Xbox LIVE certification. Due to the competitive nature of the gameplay, this session type does not support join-in-progress.
-	}
+        internal IPEndPoint InternalEndpont
+        {
+            get { return _internalendPoint; }
+            set { _internalendPoint = value; }
+        }
+
+        internal NetworkSessionType SessionType { get; set; }
+    }
 }

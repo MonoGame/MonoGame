@@ -36,21 +36,49 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-#endregion License 
+#endregion License
 
 #region Using clause
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Microsoft.Xna.Framework.GamerServices;
 #endregion Using clause
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
-	public enum SendDataOptions
+	// Represents a physical machine that is participating in a multiplayer session. 
+	// It can be used to detect when more than one NetworkGamer is playing on the same actual machine. 	
+	public sealed class NetworkMachine
 	{
-		None,
-		Reliable,
-		InOrder,
-		ReliableInOrder,
-		Chat,
+		private GamerCollection<NetworkGamer> gamers;
+		
+		#region Constructors
+		public NetworkMachine ()
+		{
+			gamers = new GamerCollection<NetworkGamer>();
+		}
+		#endregion
+		
+		#region Methods
+        /*
+		public void RemoveFromSession ()
+		{
+			throw new NotImplementedException();
+		}
+        */
+		#endregion
+		
+		#region Methods
+		public GamerCollection<NetworkGamer> Gamers 
+		{ 
+			get
+			{
+				return gamers;
+			}
+		}
+		#endregion
 	}
 }

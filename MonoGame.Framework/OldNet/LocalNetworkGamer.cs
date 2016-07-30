@@ -46,7 +46,7 @@ using Microsoft.Xna.Framework.GamerServices;
 
 #endregion Using clause
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
 	public sealed class LocalNetworkGamer : NetworkGamer
 	{

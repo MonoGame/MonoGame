@@ -1,6 +1,6 @@
 using System;
 
-namespace Microsoft.Xna.Framework.Net
+namespace Microsoft.Xna.Framework.OldNet
 {
 	// These are for internal use specifying the Data Packet Contents
 	internal enum NetworkMessageType : byte
