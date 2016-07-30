@@ -138,7 +138,6 @@ namespace Microsoft.Xna.Framework.Audio
                 PlatformPlay();
                 _state = SoundState.Playing;
 
-                CheckBufferCount();
                 DynamicSoundEffectInstanceManager.AddInstance(this);
             }
         }
@@ -277,12 +276,6 @@ namespace Microsoft.Xna.Framework.Audio
             base.Dispose(disposing);
         }
 
-        private void CheckBufferCount()
-        {
-            if ((PendingBufferCount < TargetPendingBufferCount) && (_state == SoundState.Playing))
-                _buffersNeeded++;
-        }
-
         internal void UpdateQueue()
         {
             // Update the buffers
@@ -291,7 +284,7 @@ namespace Microsoft.Xna.Framework.Audio
             // Raise the event
             if (BufferNeeded != null)
             {
-                var eventCount = (_buffersNeeded < 3) ? _buffersNeeded : 3;
+                var eventCount = TargetPendingBufferCount - PendingBufferCount;
                 for (var i = 0; i < eventCount; i++)
                 {
                     BufferNeeded(this, EventArgs.Empty);
