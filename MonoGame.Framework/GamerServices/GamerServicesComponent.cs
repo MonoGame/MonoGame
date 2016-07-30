@@ -81,9 +81,6 @@ namespace MonoGame.Xna.Framework.GamerServices {
 #endif
 
 	public class GamerServicesComponent : GameComponent {
-		private static LocalNetworkGamer lng;
-
-		internal static LocalNetworkGamer LocalNetworkGamer { get { return lng; } set { lng = value; } }
 
 		public GamerServicesComponent(Game game)
 			: base(game)
@@ -108,12 +105,4 @@ namespace MonoGame.Xna.Framework.GamerServices {
 
 		}
 	}
-
-    public class MonoGameGamerServicesComponent : GamerServicesComponent
-    {
-        public MonoGameGamerServicesComponent(Game game): base (game)
-        {
-
-        }
-    }
 }
