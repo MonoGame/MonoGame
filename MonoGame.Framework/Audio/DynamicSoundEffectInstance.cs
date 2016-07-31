@@ -276,6 +276,12 @@ namespace Microsoft.Xna.Framework.Audio
             base.Dispose(disposing);
         }
 
+        private void CheckBufferCount()
+        {
+            if ((PendingBufferCount < TargetPendingBufferCount) && (_state == SoundState.Playing))
+                _buffersNeeded ++;
+        }
+
         internal void UpdateQueue()
         {
             // Update the buffers
