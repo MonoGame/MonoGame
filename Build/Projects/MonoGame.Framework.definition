@@ -292,7 +292,7 @@
     <Compile Include="DisplayOrientation.cs" />
     <Compile Include="DrawableGameComponent.cs" />
     <Compile Include="FrameworkDispatcher.cs">
-      <Platforms>_FrameworkDispatcherProvided</Platforms>
+      <Services>_FrameworkDispatcherProvided</Services>
     </Compile>
 	<Compile Include="FrameworkResources.cs" />
     <Compile Include="GameComponentCollection.cs" />
