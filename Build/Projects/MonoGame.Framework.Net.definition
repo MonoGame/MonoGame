@@ -146,7 +146,15 @@
     <Compile Include="Net\NetworkSessionType.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-
+    <Compile Include="Net\NetworkException.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionJoinError.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\NetworkSessionJoinException.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
 
     <Compile Include="OldNet\AvailableNetworkSessionCollection.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>

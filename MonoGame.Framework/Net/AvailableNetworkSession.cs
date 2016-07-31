@@ -1,11 +1,15 @@
-﻿namespace Microsoft.Xna.Framework.Net
+﻿using System.Net;
+
+namespace Microsoft.Xna.Framework.Net
 {
     public sealed class AvailableNetworkSession
     {
+        internal IPEndPoint remoteEndPoint;
         private string hostGamertag;
 
-        internal AvailableNetworkSession(string hostGamertag)
+        internal AvailableNetworkSession(IPEndPoint remoteEndPoint, string hostGamertag)
         {
+            this.remoteEndPoint = remoteEndPoint;
             this.hostGamertag = hostGamertag;
         }
 
