@@ -32,8 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
             // fill up buffers before playing
             if (_state == SoundState.Stopped && BufferNeeded != null)
             {
-                var eventCount = TargetPendingBufferCount - PendingBufferCount;
-                for (var i = 0; i < eventCount; i++)
+                if (PendingBufferCount < TargetPendingBufferCount)
                     BufferNeeded(this, EventArgs.Empty);
             }
 
