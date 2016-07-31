@@ -387,8 +387,41 @@ namespace MonoGame.Tools.Pipeline
             BuildCommand(commands);
         }
 
-        public void RebuildItems(IProjectItem[] items)
+        private IEnumerable<IProjectItem> GetItems(IProjectItem dir)
         {
+            foreach (var item in _project.ContentItems)
+                if (item.OriginalPath.StartsWith(dir.OriginalPath + "/"))
+                    yield return item;
+        }
+
+        public void RebuildItems()
+        {
+            var items = new List<IProjectItem>();
+
+            // If the project itself was selected, just
+            // rebuild the entire project
+            if (items.Contains(_project))
+            {
+                Build(true);
+                return;
+            }
+
+            // Convert selected DirectoryItems into ContentItems
+            foreach (var item in SelectedItems)
+            {
+                if (item is ContentItem)
+                {
+                    if (!items.Contains(item))
+                        items.Add(item);
+                    
+                    continue;
+                }
+
+                foreach (var subitem in GetItems(item))
+                    if (!items.Contains(subitem))
+                        items.Add(subitem);
+            }
+
             // Make sure we save first!
             if (!AskSaveProject())
                 return;
@@ -512,8 +545,9 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (_buildProcess == null)
                     return;
-
+                
                 _buildProcess.Kill();
+                _buildProcess = null;
                 View.OutputAppend("Build terminated!" + Environment.NewLine);
             }
         }
@@ -1091,7 +1125,7 @@ namespace MonoGame.Tools.Pipeline
             info.Exclude = somethingselected && !SelectedItems.Contains(_project);
             info.Rename = exists && oneselected;
             info.Delete = exists && info.Exclude;
-            info.RebuildItem = exists && somethingselected;
+            info.RebuildItem = exists && somethingselected && !ProjectBuilding;
         }
     }
 }
