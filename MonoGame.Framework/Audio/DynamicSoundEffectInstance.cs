@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -65,6 +64,7 @@ namespace Microsoft.Xna.Framework.Audio
         #endregion
 
         private const int TargetPendingBufferCount = 3;
+        private int _bufferNeeded = 0;
         private int _sampleRate;
         private AudioChannels _channels;
         private SoundState _state;
@@ -278,6 +278,29 @@ namespace Microsoft.Xna.Framework.Audio
         internal void UpdateQueue()
         {
             PlatformUpdateQueue();
+
+            // Make sure the event is raised to repopulate the buffers
+            if (PendingBufferCount + _bufferNeeded < TargetPendingBufferCount)
+                _bufferNeeded = TargetPendingBufferCount - PendingBufferCount;
+
+            CheckBufferNeeded();
+        }
+
+        internal void CheckBufferNeeded()
+        {
+            if (BufferNeeded != null)
+            {
+                while (_bufferNeeded > 0)
+                {
+                    // TODO event should be invoked here for DX too, but this causes stuttering for now
+                    // Most likely this is a SharpDX issue
+#if !DIRECTX
+                    BufferNeeded.Invoke(this, EventArgs.Empty);
+#endif
+                    _bufferNeeded--;
+                }
+            }
+
         }
 
         #endregion

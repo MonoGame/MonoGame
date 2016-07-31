@@ -30,10 +30,15 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformPlay()
         {
             // fill up buffers before playing
-            if (_state == SoundState.Stopped && BufferNeeded != null)
+            if (_state == SoundState.Stopped)
             {
                 if (PendingBufferCount < TargetPendingBufferCount)
-                    BufferNeeded(this, EventArgs.Empty);
+                {
+                    _bufferNeeded++;
+                    // TODO This should be removed when invoking the event from another thread no longer causes stuttering
+                    if (BufferNeeded != null)
+                        BufferNeeded.Invoke(this, EventArgs.Empty);
+                }
             }
 
             _voice.Start();
@@ -100,8 +105,14 @@ namespace Microsoft.Xna.Framework.Audio
                 buffer.Stream.Dispose();
             }
 
-            if (BufferNeeded != null && PendingBufferCount < TargetPendingBufferCount)
-                BufferNeeded(this, EventArgs.Empty);
+            if (PendingBufferCount < TargetPendingBufferCount)
+            {
+                _bufferNeeded++;
+
+                // TODO This should be removed when invoking the event from another thread no longer causes stuttering
+                if (BufferNeeded != null)
+                    BufferNeeded.Invoke(this, EventArgs.Empty);
+            }
         }
     }
 }
