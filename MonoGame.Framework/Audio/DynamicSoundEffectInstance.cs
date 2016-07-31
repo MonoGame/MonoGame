@@ -65,7 +65,6 @@ namespace Microsoft.Xna.Framework.Audio
         #endregion
 
         private const int TargetPendingBufferCount = 3;
-        private int _buffersNeeded;
         private int _sampleRate;
         private AudioChannels _channels;
         private SoundState _state;
@@ -276,28 +275,9 @@ namespace Microsoft.Xna.Framework.Audio
             base.Dispose(disposing);
         }
 
-        private void CheckBufferCount()
-        {
-            if ((PendingBufferCount < TargetPendingBufferCount) && (_state == SoundState.Playing))
-                _buffersNeeded ++;
-        }
-
         internal void UpdateQueue()
         {
-            // Update the buffers
             PlatformUpdateQueue();
-
-            // Raise the event
-            if (BufferNeeded != null)
-            {
-                var eventCount = TargetPendingBufferCount - PendingBufferCount;
-                for (var i = 0; i < eventCount; i++)
-                {
-                    BufferNeeded(this, EventArgs.Empty);
-                }
-            }
-
-            _buffersNeeded = 0;
         }
 
         #endregion

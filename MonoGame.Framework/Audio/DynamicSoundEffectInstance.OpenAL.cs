@@ -158,6 +158,16 @@ namespace Microsoft.Xna.Framework.Audio
                     buffer.Dispose();
                 }
             }
+
+            // Raise the event
+            if (BufferNeeded != null)
+            {
+                var eventCount = TargetPendingBufferCount - PendingBufferCount;
+                for (var i = 0; i < eventCount; i++)
+                {
+                    BufferNeeded(this, EventArgs.Empty);
+                }
+            }
         }
     }
 }

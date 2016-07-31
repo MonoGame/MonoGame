@@ -29,6 +29,14 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
+            // fill up buffers before playing
+            if (_state == SoundState.Stopped && BufferNeeded != null)
+            {
+                var eventCount = TargetPendingBufferCount - PendingBufferCount;
+                for (var i = 0; i < eventCount; i++)
+                    BufferNeeded(this, EventArgs.Empty);
+            }
+
             _voice.Start();
         }
 
@@ -93,7 +101,8 @@ namespace Microsoft.Xna.Framework.Audio
                 buffer.Stream.Dispose();
             }
 
-            CheckBufferCount();
+            if (BufferNeeded != null && PendingBufferCount < TargetPendingBufferCount)
+                BufferNeeded(this, EventArgs.Empty);
         }
     }
 }
