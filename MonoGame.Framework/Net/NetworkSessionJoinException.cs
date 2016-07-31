@@ -5,8 +5,6 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkSessionJoinException : NetworkException
     {
-        protected NetworkSessionJoinError joinError;
-
         public NetworkSessionJoinException()
         { }
 
@@ -21,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetworkSessionJoinException(string message, NetworkSessionJoinError joinError) : base(message)
         {
-            this.joinError = joinError;
+            this.JoinError = joinError;
         }
 
         public NetworkSessionJoinError JoinError { get; set; }
