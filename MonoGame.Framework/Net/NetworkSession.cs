@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Diagnostics;
 
 using Microsoft.Xna.Framework.GamerServices;
-
 using Lidgren.Network;
-using System.Threading;
 
 namespace Microsoft.Xna.Framework.Net
 {
+    internal enum CustomMessageType
+    {
+        HostToPendingPeer,
+        ApprovedPeer,
+        UserData
+    }
+
     public sealed class NetworkSession : IDisposable
     {
         private static int Port = 14242;
@@ -88,15 +95,17 @@ namespace Microsoft.Xna.Framework.Net
                     case NetIncomingMessageType.DebugMessage:
                     case NetIncomingMessageType.WarningMessage:
                     case NetIncomingMessageType.ErrorMessage:
-                        System.Diagnostics.Debug.WriteLine("Lidgren: " + msg.ReadString());
+                        Debug.WriteLine("Lidgren: " + msg.ReadString());
                         break;
                     default:
-                        System.Diagnostics.Debug.WriteLine("Unhandled type: " + msg.MessageType);
+                        Debug.WriteLine("Unhandled type: " + msg.MessageType);
                         break;
                 }
 
                 discoverPeer.Recycle(msg);
             }
+
+            discoverPeer.Shutdown("Discovery peer done");
 
             return new AvailableNetworkSessionCollection(availableSessions);
         }
@@ -147,6 +156,9 @@ namespace Microsoft.Xna.Framework.Net
         public event EventHandler<WriteLeaderboardsEventArgs> WriteTrueSkill; // No documentation exists
         public event EventHandler<WriteLeaderboardsEventArgs> WriteUnarbitratedLeaderboard; // No documentation exists
 
+        private void HandleCustomMessage(NetIncomingMessage msg)
+        { }
+
         public void Update()
         {
             NetIncomingMessage msg;
@@ -157,20 +169,28 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     // Discovery
                     case NetIncomingMessageType.DiscoveryRequest:
-                        System.Diagnostics.Debug.WriteLine("Discovery request received");
+                        Debug.WriteLine("Discovery request received");
                         NetOutgoingMessage response = peer.CreateMessage();
                         response.Write("Some Gamertag");
                         peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
+                        break;
+                    // Peer state changes
+                    case NetIncomingMessageType.StatusChanged:
+                        Debug.WriteLine("Status now: " + (NetConnectionStatus)msg.ReadByte() + "; Reason: " + msg.ReadString());
+                        break;
+                    // Custom data
+                    case NetIncomingMessageType.Data:
+                        HandleCustomMessage(msg);
                         break;
                     // Error checking
                     case NetIncomingMessageType.VerboseDebugMessage:
                     case NetIncomingMessageType.DebugMessage:
                     case NetIncomingMessageType.WarningMessage:
                     case NetIncomingMessageType.ErrorMessage:
-                        System.Diagnostics.Debug.WriteLine(msg.ReadString());
+                        Debug.WriteLine(msg.ReadString());
                         break;
                     default:
-                        System.Diagnostics.Debug.WriteLine("Unhandled type: " + msg.MessageType);
+                        Debug.WriteLine("Unhandled type: " + msg.MessageType);
                         break;
                 }
 
@@ -180,7 +200,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            peer.Shutdown("Peer done");
         }
     }
 }
