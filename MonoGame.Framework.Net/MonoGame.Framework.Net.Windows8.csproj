@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A65B8326-1DDD-4E5D-8130-E74F70919E81}</ProjectGuid>
+    <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <AssemblyName>MonoGame.Framework.Net</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>1591,0436</NoWarn>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <LangVersion>Default</LangVersion>
+    <DefaultLanguage>en-US</DefaultLanguage>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <OutputPath>bin\Windows8\AnyCPU\Debug</OutputPath>
+    <IntermediateOutputPath>obj\Windows8\AnyCPU\Debug</IntermediateOutputPath>
+    <DocumentationFile>bin\Windows8\AnyCPU\Debug\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <OutputPath>bin\Windows8\AnyCPU\Release</OutputPath>
+    <IntermediateOutputPath>obj\Windows8\AnyCPU\Release</IntermediateOutputPath>
+    <DocumentationFile>bin\Windows8\AnyCPU\Release\MonoGame.Framework.Net.xml</DocumentationFile>
+    <DefineConstants>TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE;NET</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GamerServices\AchievementCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\Achievement.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\FriendCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\FriendGamer.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\Gamer.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerDefaults.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPresence.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPresenceMode.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPrivileges.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerProfile.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerZone.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="GamerServices\LeaderboardEntry.cs" />
+    <Compile Include="GamerServices\LeaderboardIdentity.cs" />
+    <Compile Include="GamerServices\LeaderboardKey.cs" />
+    <Compile Include="GamerServices\LeaderboardReader.cs" />
+    <Compile Include="GamerServices\LeaderboardWriter.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="GamerServices\SignedInGamerCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Windows8\GamerServices\SignedInGamer.cs">
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+    <Compile Include="Windows\GamerServices\Guide.cs">
+      <Platforms>Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
+    <VisualStudioVersion>11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <PropertyGroup>
+    <_PostBuildHookTimestamp>@(IntermediateAssembly-&gt;'%(FullPath).timestamp')</_PostBuildHookTimestamp>
+    <_PostBuildHookHostPlatform>$(Platform)</_PostBuildHookHostPlatform>
+  </PropertyGroup>
+  <Target Name="PostBuildHooks" Inputs="@(IntermediateAssembly);@(ReferencePath)" Outputs="@(IntermediateAssembly);$(_PostBuildHookTimestamp)" AfterTargets="CoreCompile" BeforeTargets="AfterCompile">
+    <Touch Files="$(_PostBuildHookTimestamp)" AlwaysCreate="True" />
+  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows8.csproj">
+      <Project>{0518563C-ACCA-4A14-8C5D-DDBE93E2605F}</Project>
+      <Name>MonoGame.Framework.Windows8</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties><Policies>
+  <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+  <CSharpFormattingPolicy IndentSwitchSection="True" NewLinesForBracesInProperties="True" NewLinesForBracesInAccessors="True" NewLinesForBracesInAnonymousMethods="True" NewLinesForBracesInControlBlocks="True" NewLinesForBracesInAnonymousTypes="True" NewLinesForBracesInObjectCollectionArrayInitializers="True" NewLinesForBracesInLambdaExpressionBody="True" NewLineForElse="True" NewLineForCatch="True" NewLineForFinally="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceAfterMethodCallName="False" SpaceBeforeOpenSquareBracket="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+</Policies>
+</Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
