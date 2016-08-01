@@ -4,7 +4,10 @@ namespace Microsoft.Xna.Framework.Utilities
 {
     public class ByteBufferPool
     {
-        public int FreeAmount => _freeBuffers.Count;
+        public int FreeAmount
+        {
+            get { return _freeBuffers.Count; }
+        }
 
         private readonly List<byte[]> _freeBuffers;
 
