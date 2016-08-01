@@ -1,0 +1,61 @@
+﻿using System.Collections.Generic;
+
+namespace Microsoft.Xna.Framework.Utilities
+{
+    public class ByteBufferPool
+    {
+        public int FreeAmount => _freeBuffers.Count;
+
+        private readonly List<byte[]> _freeBuffers;
+
+        public ByteBufferPool()
+        {
+            _freeBuffers = new List<byte[]>();
+        }
+
+        /// <summary>
+        /// Get a buffer that is at least as big as size.
+        /// </summary>
+        public byte[] Get(int size)
+        {
+            byte[] result;
+            lock (_freeBuffers)
+            {
+                var index = FirstLargerThan(size);
+
+                if (index == -1)
+                {
+                    result = new byte[size];
+                }
+                else
+                {
+                    result = _freeBuffers[index];
+                    _freeBuffers.RemoveAt(index);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Return the given buffer to the pool.
+        /// </summary>
+        /// <param name="buffer"></param>
+        public void Return(byte[] buffer)
+        {
+            lock (_freeBuffers)
+            {
+                var index = FirstLargerThan(buffer.Length);
+                if (index == -1)
+                    _freeBuffers.Add(buffer);
+                else
+                    _freeBuffers.Insert(index + 1, buffer);
+            }
+        }
+
+        // Find the smallest buffer that is larger than or equally large as size or -1 if none exist
+        private int FirstLargerThan(int size)
+        {
+            return _freeBuffers.FindIndex(b => b.Length >= size);
+        }
+    }
+}

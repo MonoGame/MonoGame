@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Utilities;
 using SharpDX;
 using SharpDX.Multimedia;
 using SharpDX.XAudio2;
@@ -13,6 +14,8 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
     {
         private Queue<AudioBuffer> _queuedBuffers;
+        private Queue<byte[]> _pooledBuffers;
+        private static ByteBufferPool _bufferPool = new ByteBufferPool();
 
         private void PlatformCreate()
         {
@@ -20,6 +23,7 @@ namespace Microsoft.Xna.Framework.Audio
             _voice = new SourceVoice(SoundEffect.Device, _format, true);
             _voice.BufferEnd += OnBufferEnd;
             _queuedBuffers = new Queue<AudioBuffer>();
+            _pooledBuffers = new Queue<byte[]>();
         }
 
         private int PlatformGetPendingBufferCount()
@@ -53,12 +57,19 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var buffer = _queuedBuffers.Dequeue();
                 buffer.Stream.Dispose();
+                _bufferPool.Return(_pooledBuffers.Dequeue());
             }
         }
 
         private void PlatformSubmitBuffer(byte[] buffer, int offset, int count)
         {
-            var stream = DataStream.Create(buffer, true, false, offset, true);
+            // we need to copy so datastream does not pin the buffer that the user might modify later
+            byte[] pooledBuffer;
+            pooledBuffer = _bufferPool.Get(count);
+            _pooledBuffers.Enqueue(pooledBuffer);
+            Buffer.BlockCopy(buffer, offset, pooledBuffer, 0, count);
+
+            var stream = DataStream.Create(pooledBuffer, true, false, offset, true);
             var audioBuffer = new AudioBuffer(stream);
             audioBuffer.AudioBytes = count;
 
@@ -79,6 +90,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     var buffer = _queuedBuffers.Dequeue();
                     buffer.Stream.Dispose();
+                    _bufferPool.Return(_pooledBuffers.Dequeue());
                 }
             }
             // _voice is disposed by SoundEffectInstance.PlatformDispose
@@ -91,9 +103,11 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var buffer = _queuedBuffers.Dequeue();
                 buffer.Stream.Dispose();
+                _bufferPool.Return(_pooledBuffers.Dequeue());
             }
 
             CheckBufferCount();
         }
+
     }
 }
