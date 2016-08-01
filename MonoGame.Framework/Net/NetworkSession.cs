@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Net
     {
         private static int Port = 14242;
         private static int DiscoveryTime = 1000;
+        private static int JoinTime = 1000;
 
         internal static NetworkSession Session = null;
 
@@ -114,8 +115,10 @@ namespace Microsoft.Xna.Framework.Net
             // NetworkSessionJoinException if availableSession full/not joinable/cannot be found
 
             NetPeer peer = new NetPeer(CreateNetPeerConfig(false));
-
+            peer.Start();
             peer.Connect(availableSession.remoteEndPoint);
+
+            Thread.Sleep(JoinTime);
 
             if (peer.ConnectionsCount == 0)
             {
@@ -133,12 +136,22 @@ namespace Microsoft.Xna.Framework.Net
             this.peer = peer;
         }
 
+        public event EventHandler<GamerJoinedEventArgs> GamerJoined;
+        public event EventHandler<GamerLeftEventArgs> GamerLeft;
+        public event EventHandler<GameStartedEventArgs> GameStarted;
+        public event EventHandler<GameEndedEventArgs> GameEnded;
+        public event EventHandler<HostChangedEventArgs> HostChanged;
+        public static event EventHandler<InviteAcceptedEventArgs> InviteAccepted;
+        public event EventHandler<NetworkSessionEndedEventArgs> SessionEnded;
+        public event EventHandler<WriteLeaderboardsEventArgs> WriteArbitratedLeaderboard; // No documentation exists
+        public event EventHandler<WriteLeaderboardsEventArgs> WriteTrueSkill; // No documentation exists
+        public event EventHandler<WriteLeaderboardsEventArgs> WriteUnarbitratedLeaderboard; // No documentation exists
+
         public void Update()
         {
             NetIncomingMessage msg;
             while ((msg = peer.ReadMessage()) != null)
             {
-
                 // Message decoding
                 switch (msg.MessageType)
                 {
