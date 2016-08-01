@@ -82,7 +82,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void FromStreamArgumentNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(_game.GraphicsDevice, null));
+            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(_game.GraphicsDevice, (Stream) null));
             Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(null, new MemoryStream()));
         }
 
