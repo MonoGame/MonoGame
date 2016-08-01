@@ -146,14 +146,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get
 			{
-                // TODO : Possible change it for XBOX or PS4 
+                var safeX = (width + 19) / 20;
+                var safeY = (height + 19) / 20;
 
-                var iSafeStartX = x;
-                var iSafeStartY = y;
-                var iSafeWidth = width;
-                var iSafeHeight = height;
-
-                return new Rectangle(iSafeStartX, iSafeStartY, iSafeWidth, iSafeHeight);
+                var safeW = width - safeX * 2;
+                var safeH = height - safeY * 2;
+                return new Rectangle(safeX, safeY, safeW, safeH);
 			}
 		}
 
