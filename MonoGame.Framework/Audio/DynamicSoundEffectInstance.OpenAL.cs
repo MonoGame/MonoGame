@@ -105,7 +105,10 @@ namespace Microsoft.Xna.Framework.Audio
             _queuedBuffers.Enqueue(oalBuffer);
 
             // If the source has run out of buffers, restart it
-            if (_state == SoundState.Playing)
+            var sourceState = AL.GetSourceState(SourceId);
+            ALHelper.CheckError();
+
+            if (_state == SoundState.Playing && sourceState == ALSourceState.Stopped)
             {
                 AL.SourcePlay(SourceId);
                 ALHelper.CheckError("Failed to resume source playback.");
@@ -155,10 +158,6 @@ namespace Microsoft.Xna.Framework.Audio
                     buffer.Dispose();
                 }
             }
-
-            // Raise the event for each removed buffer, if needed
-            for (int i = 0; i < numBuffers; i++)
-                CheckBufferCount();
         }
     }
 }
