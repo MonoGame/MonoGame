@@ -129,52 +129,52 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Threading.BlockOnUIThread(() =>
             {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            // Use try..finally to make sure dataHandle is freed in case of an error
-            try
-            {
-                var startBytes = startIndex * elementSizeInByte;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                int x, y, w, h;
-                if (rect.HasValue)
+                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                // Use try..finally to make sure dataHandle is freed in case of an error
+                try
                 {
-                    x = rect.Value.X;
-                    y = rect.Value.Y;
-                    w = rect.Value.Width;
-                    h = rect.Value.Height;
-                }
-                else
-                {
-                    x = 0;
-                    y = 0;
-                    w = Math.Max(width >> level, 1);
-                    h = Math.Max(height >> level, 1);
-
-                    // For DXT textures the width and height of each level is a multiple of 4.
-                    // OpenGL only: The last two mip levels require the width and height to be 
-                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
-                    // a 4x4 block. 
-                    // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                    if (_format == SurfaceFormat.Dxt1
-                        || _format == SurfaceFormat.Dxt1a
-                        || _format == SurfaceFormat.Dxt3
-                        || _format == SurfaceFormat.Dxt5
-                        || _format == SurfaceFormat.RgbaAtcExplicitAlpha
-                        || _format == SurfaceFormat.RgbaAtcInterpolatedAlpha
-                        || _format == SurfaceFormat.RgbPvrtc2Bpp
-                        || _format == SurfaceFormat.RgbPvrtc4Bpp
-                        || _format == SurfaceFormat.RgbaPvrtc2Bpp
-                        || _format == SurfaceFormat.RgbaPvrtc4Bpp
-                        || _format == SurfaceFormat.RgbEtc1
-                        )
+                    var startBytes = startIndex * elementSizeInByte;
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                    int x, y, w, h;
+                    if (rect.HasValue)
                     {
-                            if (w > 4)
-                                w = (w + 3) & ~3;
-                            if (h > 4)
-                                h = (h + 3) & ~3;
+                        x = rect.Value.X;
+                        y = rect.Value.Y;
+                        w = rect.Value.Width;
+                        h = rect.Value.Height;
                     }
-                }
+                    else
+                    {
+                        x = 0;
+                        y = 0;
+                        w = Math.Max(width >> level, 1);
+                        h = Math.Max(height >> level, 1);
+
+                        // For DXT textures the width and height of each level is a multiple of 4.
+                        // OpenGL only: The last two mip levels require the width and height to be 
+                        // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
+                        // a 4x4 block. 
+                        // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
+                        if (_format == SurfaceFormat.Dxt1
+                            || _format == SurfaceFormat.Dxt1a
+                            || _format == SurfaceFormat.Dxt3
+                            || _format == SurfaceFormat.Dxt5
+                            || _format == SurfaceFormat.RgbaAtcExplicitAlpha
+                            || _format == SurfaceFormat.RgbaAtcInterpolatedAlpha
+                            || _format == SurfaceFormat.RgbPvrtc2Bpp
+                            || _format == SurfaceFormat.RgbPvrtc4Bpp
+                            || _format == SurfaceFormat.RgbaPvrtc2Bpp
+                            || _format == SurfaceFormat.RgbaPvrtc4Bpp
+                            || _format == SurfaceFormat.RgbEtc1
+                            )
+                        {
+                                if (w > 4)
+                                    w = (w + 3) & ~3;
+                                if (h > 4)
+                                    h = (h + 3) & ~3;
+                        }
+                    }
 
                     // Store the current bound texture.
                     var prevTexture = GraphicsExtensions.GetBoundTexture2D();
@@ -218,14 +218,18 @@ namespace Microsoft.Xna.Framework.Graphics
                         GL.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
                     }
 
+#if !ANDROID
+                    GL.Finish();
+                    GraphicsExtensions.CheckGLError();
+#endif
                     // Restore the bound texture.
                     GL.BindTexture(TextureTarget.Texture2D, prevTexture);
                     GraphicsExtensions.CheckGLError();
-            }
-            finally
-            {
-                dataHandle.Free();
-            }
+                }
+                finally
+                {
+                    dataHandle.Free();
+                }
 
 #if !ANDROID
                 // Required to make sure that any texture uploads on a thread are completed
