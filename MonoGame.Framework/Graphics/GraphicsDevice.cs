@@ -1116,5 +1116,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
         }
+
+        // uniformly scales down the given rectangle by 10%, note that this ignores the passed x and y
+        internal static Rectangle GetDefaultTitleSafeArea(int width, int height)
+        {
+            var x = (width + 19) / 20;
+            var y = (height + 19) / 20;
+
+            width -= x * 2;
+            height -= y * 2;
+            return new Rectangle(x, y, width, height);
+        }
+
+        internal static Rectangle GetTitleSafeArea(int width, int height)
+        {
+            return PlatformGetTitleSafeArea(width, height);
+        }
     }
 }
