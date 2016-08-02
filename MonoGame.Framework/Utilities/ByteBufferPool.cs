@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Utilities
 {
-    public class ByteBufferPool
+    internal class ByteBufferPool
     {
         public int FreeAmount
         {
@@ -58,7 +58,31 @@ namespace Microsoft.Xna.Framework.Utilities
         // Find the smallest buffer that is larger than or equally large as size or -1 if none exist
         private int FirstLargerThan(int size)
         {
-            return _freeBuffers.FindIndex(b => b.Length >= size);
+            if (_freeBuffers.Count == 0) return -1;
+
+            var l = 0;
+            var r = _freeBuffers.Count - 1;
+
+            while (l <= r)
+            {
+                var m = (l + r)/2;
+                var buffer = _freeBuffers[m];
+                if (buffer.Length < size)
+                {
+                    l = m + 1;
+                }
+                else if (buffer.Length > size)
+                {
+                    r = m;
+                    if (l == r) return l;
+                }
+                else
+                {
+                    return m;
+                }
+            }
+
+            return -1;
         }
     }
 }
