@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Effect : GraphicsResource
+	public class Effect : GraphicsResource, IEffect
     {
         struct MGFXHeader 
         {
@@ -41,6 +41,21 @@ namespace Microsoft.Xna.Framework.Graphics
         public EffectTechnique CurrentTechnique { get; set; }
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
+
+        IEffectParameterCollection IEffect.Parameters
+        {
+            get { return Parameters; }
+        }
+
+        IEffectTechniqueCollection IEffect.Techniques
+        {
+            get { return Techniques; }
+        }
+
+        IEffectTechnique IEffect.CurrentTechnique
+        {
+            get { return CurrentTechnique; }
+        }
 
         private Shader[] _shaders;
 

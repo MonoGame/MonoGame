@@ -1,7 +1,7 @@
 using System;
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class EffectTechnique
+	public class EffectTechnique : IEffectTechnique
 	{
         public EffectPassCollection Passes { get; private set; }
 
@@ -25,6 +25,25 @@ namespace Microsoft.Xna.Framework.Graphics
             Passes = passes;
             Annotations = annotations;
         }
+
+        #region Interface Members
+        
+        IEffectPassCollection IEffectTechnique.Passes
+        {
+            get { return Passes; }
+        }
+
+        IEffectAnnotationCollection IEffectTechnique.Annotations
+        {
+            get { return Annotations; }
+        }
+
+        string IEffectTechnique.Name
+        {
+            get { return Name; }
+        }
+
+        #endregion
     }
 
 

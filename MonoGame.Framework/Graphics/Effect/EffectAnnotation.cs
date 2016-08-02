@@ -4,7 +4,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     // TODO: This class needs to be finished!
 
-	public class EffectAnnotation
+	public class EffectAnnotation : IEffectAnnotation
 	{
 		internal EffectAnnotation (
 			EffectParameterClass class_,

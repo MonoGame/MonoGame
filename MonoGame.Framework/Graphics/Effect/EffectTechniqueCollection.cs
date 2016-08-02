@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class EffectTechniqueCollection : IEnumerable<EffectTechnique>
+    public class EffectTechniqueCollection : IEnumerable<EffectTechnique>, IEffectTechniqueCollection
     {
 		private readonly EffectTechnique[] _techniques;
 
@@ -51,5 +51,18 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return _techniques.GetEnumerator();
         }
+
+        #region Interface Members
+
+        IEffectTechnique IEffectTechniqueCollection.this[string name] { get { return this[name]; } }
+
+        IEffectTechnique IEffectTechniqueCollection.this[int index] { get { return this[index]; } }
+
+        IEnumerable<IEffectTechnique> IEffectTechniqueCollection.Interfaces
+        {
+            get { return this; }
+        }
+
+        #endregion
     }
 }

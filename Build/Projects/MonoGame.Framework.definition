@@ -578,6 +578,15 @@
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs">
 		<ExcludePlatforms>Web</ExcludePlatforms>
     </Compile>
+    <Compile Include="Graphics\Effect\IEffect.cs" />
+    <Compile Include="Graphics\Effect\IEffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\IEffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\IEffectParameter.cs" />
+    <Compile Include="Graphics\Effect\IEffectParameterCollection.cs" />
+    <Compile Include="Graphics\Effect\IEffectPass.cs" />
+    <Compile Include="Graphics\Effect\IEffectPassCollection.cs" />
+    <Compile Include="Graphics\Effect\IEffectTechnique.cs" />
+    <Compile Include="Graphics\Effect\IEffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\IEffectFog.cs" />
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />

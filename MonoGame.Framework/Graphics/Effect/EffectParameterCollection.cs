@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class EffectParameterCollection : IEnumerable<EffectParameter>
+    public class EffectParameterCollection : IEnumerable<EffectParameter>, IEffectParameterCollection
     {
         internal static readonly EffectParameterCollection Empty = new EffectParameterCollection(new EffectParameter[0]);
 
@@ -34,8 +34,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return _parameters[index]; }
 		}
-		
-		public EffectParameter this[string name]
+
+        public EffectParameter this[string name]
         {
             get 
             {
@@ -59,5 +59,24 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return _parameters.GetEnumerator();
         }
+
+        #region Interface Members
+
+        IEffectParameter IEffectParameterCollection.this[string name]
+        {
+            get { return this[name]; }
+        }
+
+        IEffectParameter IEffectParameterCollection.this[int index]
+        {
+            get { return this[index]; }
+        }
+
+        IEnumerable<IEffectParameter> IEffectParameterCollection.Interfaces
+        {
+            get { return this; }
+        }
+
+        #endregion
     }
 }
