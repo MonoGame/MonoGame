@@ -181,6 +181,7 @@ namespace Microsoft.Xna.Framework.Net
 
         private bool GetNewUniqueId(out byte id)
         {
+            // TODO: Calculate accurate
             id = 0;
             return true;
         }
@@ -301,7 +302,7 @@ namespace Microsoft.Xna.Framework.Net
                             pendingSignedInGamers.RemoveAt(0);
 
                             LocalNetworkGamer localGamer = new LocalNetworkGamer(signedInGamer, uniqueId);
-                            machine.AddLocalGamer(localGamer); // move network gamer creation to gamer joined message
+                            machine.AddLocalGamer(localGamer); // TODO: Move network gamer creation to gamer joined message
 
                             SendGamerJoined(localGamer);
                         }
@@ -315,9 +316,11 @@ namespace Microsoft.Xna.Framework.Net
                     string gamertag = msg.ReadString();
                     byte id = msg.ReadByte();
                     Debug.WriteLine("Gamer joined received with display name " + gamertag + " and id " + id);
-                    // If message sent from this machine, create local network gamer, otherwise network gamer
+                    // TODO: If message sent from this machine, create local network gamer, otherwise network gamer
                     NetworkMachine remoMachine = msg.SenderConnection.Peer.Tag as NetworkMachine;
                     remoMachine.AddRemoteGamer(new NetworkGamer(false, id));
+
+                    // TODO: Fire GamerJoined event
 
                     break;
             }
