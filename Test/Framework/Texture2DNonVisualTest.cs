@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,6 +78,14 @@ namespace MonoGame.Tests.Framework
                 Assert.Throws<InvalidOperationException>(() => _texture = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream));
             }
         }
+
+        [Test]
+        public void FromStreamArgumentNullTest()
+        {
+            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(_game.GraphicsDevice, (Stream) null));
+            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(null, new MemoryStream()));
+        }
+
         [TestCase(25, 23, 1, 1, 0, 1)]
         [TestCase(25, 23, 1, 1, 1, 1)]
         [TestCase(25, 23, 2, 1, 0, 2)]
@@ -85,7 +94,6 @@ namespace MonoGame.Tests.Framework
         [TestCase(25, 23, 1, 2, 1, 2)]
         [TestCase(25, 23, 2, 2, 0, 4)]
         [TestCase(25, 23, 2, 2, 1, 4)]
-
         public void PlatformGetDataWithOffsetTest(int rx, int ry, int rw, int rh, int startIndex, int elementsToRead)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))

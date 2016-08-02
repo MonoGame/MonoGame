@@ -204,8 +204,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // try getting the context version
             // GL_MAJOR_VERSION and GL_MINOR_VERSION are GL 3.0+ only, so we need to rely on the GL_VERSION string
-            // this string always starts with the version number in the "major.minor" format, but can be followed by
+            // for non GLES this string always starts with the version number in the "major.minor" format, but can be followed by
             // multiple vendor specific characters
+            // For GLES this string is formatted as: OpenGL<space>ES<space><version number><space><vendor-specific information>
+#if GLES
+            try
+            {
+                string version = GL.GetString(StringName.Version);
+                string[] versionSplit = version.Split(' ');
+                if(versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
+                {
+                    glMajorVersion = Convert.ToInt32(versionSplit[2].Substring(0, 1));
+                    glMinorVersion = Convert.ToInt32(versionSplit[2].Substring(2, 1));
+                }
+                else
+                {
+                    glMajorVersion = 1;
+                    glMinorVersion = 1;
+                }
+            }
+            catch (FormatException)
+            {
+                //if it fails we default to 1.1 context
+                glMajorVersion = 1;
+                glMinorVersion = 1;
+            }
+#else
             try
             {
                 string version = GL.GetString(StringName.Version);
@@ -218,6 +242,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 glMajorVersion = 1;
                 glMinorVersion = 1;
             }
+#endif
+
 #if !GLES
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;

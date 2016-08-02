@@ -102,6 +102,7 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
+                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
 
@@ -150,8 +151,8 @@ namespace Microsoft.Xna.Framework
                         continue;
                     foreach (var c in text)
                     {
-                        var key = KeyboardUtil.ToXna ((int)c);
-                        _view.CallTextInput (c, key);
+                        var key = KeyboardUtil.ToXna((int)c);
+                        _view.CallTextInput(c, key);
                     }
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)

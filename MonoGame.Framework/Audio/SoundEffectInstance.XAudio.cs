@@ -35,13 +35,13 @@ namespace Microsoft.Xna.Framework.Audio
                 return;
 
             // Convert from XNA Emitter to a SharpDX Emitter
-            var e = emitter.ToEmitter();
+            var e = ToDXEmitter(emitter);
             e.CurveDistanceScaler = SoundEffect.DistanceScale;
             e.DopplerScaler = SoundEffect.DopplerScale;
             e.ChannelCount = _effect._format.Channels;
 
             // Convert from XNA Listener to a SharpDX Listener
-            var l = listener.ToListener();
+            var l = ToDXListener(listener);
 
             // Number of channels in the sound being played.
             // Not actually sure if XNA supported 3D attenuation of sterio sounds, but X3DAudio does.
@@ -58,6 +58,99 @@ namespace Microsoft.Xna.Framework.Audio
 
             // Apply Pitch settings (from doppler) ...
             _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
+        }
+
+        private SharpDX.X3DAudio.Emitter _dxEmitter;
+        private SharpDX.X3DAudio.Listener _dxListener;
+
+        private SharpDX.X3DAudio.Emitter ToDXEmitter(AudioEmitter emitter)
+        {
+            // Pulling out Vector properties for efficiency.
+            var pos = emitter.Position;
+            var vel = emitter.Velocity;
+            var forward = emitter.Forward;
+            var up = emitter.Up;
+
+            // From MSDN:
+            //  X3DAudio uses a left-handed Cartesian coordinate system, 
+            //  with values on the x-axis increasing from left to right, on the y-axis from bottom to top, 
+            //  and on the z-axis from near to far. 
+            //  Azimuths are measured clockwise from a given reference direction. 
+            //
+            // From MSDN:
+            //  The XNA Framework uses a right-handed coordinate system, 
+            //  with the positive z-axis pointing toward the observer when the positive x-axis is pointing to the right, 
+            //  and the positive y-axis is pointing up. 
+            //
+            // Programmer Notes:         
+            //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
+            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
+
+            forward *= -1.0f;
+            pos.Z *= -1.0f;
+            vel.Z *= -1.0f;
+
+            if (_dxEmitter == null)
+                _dxEmitter = new Emitter();
+
+#if WINDOWS_UAP
+            _dxEmitter.Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
+            _dxEmitter.Velocity =  new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
+            _dxEmitter.OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
+            _dxEmitter.OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
+            
+#else
+            _dxEmitter.Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z);
+            _dxEmitter.Velocity = new SharpDX.Vector3(vel.X, vel.Y, vel.Z);
+            _dxEmitter.OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z);
+            _dxEmitter.OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z);
+            _dxEmitter.DopplerScaler = emitter.DopplerScale;
+#endif
+            return _dxEmitter;
+        }
+
+        private SharpDX.X3DAudio.Listener ToDXListener(AudioListener listener)
+        {
+            // Pulling out Vector properties for efficiency.
+            var pos = listener.Position;
+            var vel = listener.Velocity;
+            var forward = listener.Forward;
+            var up = listener.Up;
+
+            // From MSDN:
+            //  X3DAudio uses a left-handed Cartesian coordinate system, 
+            //  with values on the x-axis increasing from left to right, on the y-axis from bottom to top, 
+            //  and on the z-axis from near to far. 
+            //  Azimuths are measured clockwise from a given reference direction. 
+            //
+            // From MSDN:
+            //  The XNA Framework uses a right-handed coordinate system, 
+            //  with the positive z-axis pointing toward the observer when the positive x-axis is pointing to the right, 
+            //  and the positive y-axis is pointing up. 
+            //
+            // Programmer Notes:         
+            //  According to this description the z-axis (forward vector) is inverted between these two coordinate systems.
+            //  Therefore, we need to negate the z component of any position/velocity values, and negate any forward vectors.
+
+            forward *= -1.0f;
+            pos.Z *= -1.0f;
+            vel.Z *= -1.0f;
+
+            if (_dxListener == null)
+                _dxListener = new Listener();
+
+#if WINDOWS_UAP
+            _dxListener.Position = new SharpDX.Mathematics.Interop.RawVector3 { X = pos.X, Y = pos.Y, Z = pos.Z };
+            _dxListener.Velocity = new SharpDX.Mathematics.Interop.RawVector3 { X = vel.X, Y = vel.Y, Z = vel.Z };
+            _dxListener.OrientFront = new SharpDX.Mathematics.Interop.RawVector3 { X = forward.X, Y = forward.Y, Z = forward.Z };
+            _dxListener.OrientTop = new SharpDX.Mathematics.Interop.RawVector3 { X = up.X, Y = up.Y, Z = up.Z };
+#else
+            _dxListener.Position = new SharpDX.Vector3(pos.X, pos.Y, pos.Z);
+            _dxListener.Velocity = new SharpDX.Vector3(vel.X, vel.Y, vel.Z);
+            _dxListener.OrientFront = new SharpDX.Vector3(forward.X, forward.Y, forward.Z);
+            _dxListener.OrientTop = new SharpDX.Vector3(up.X, up.Y, up.Z);
+#endif
+            return _dxListener;
         }
 
         private void PlatformPause()
