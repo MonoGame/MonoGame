@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		public Rectangle TitleSafeArea 
 		{
-			get { return GraphicsDevice.GetTitleSafeArea(width, height); }
+			get { return GraphicsDevice.GetTitleSafeArea(x, y, width, height); }
 		}
 
         /// <summary>

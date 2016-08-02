@@ -1052,9 +1052,9 @@ namespace Microsoft.Xna.Framework.Graphics
            return GraphicsProfile.HiDef;
         }
 
-        private static Rectangle PlatformGetTitleSafeArea(int width, int height)
+        private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
         {
-            return new Rectangle(0, 0, width, height);
+            return new Rectangle(x, y, width, height);
         }
     }
 }

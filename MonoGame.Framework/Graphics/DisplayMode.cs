@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         
         public Rectangle TitleSafeArea {
-            get { return GraphicsDevice.GetTitleSafeArea(width, height); }
+            get { return GraphicsDevice.GetTitleSafeArea(0, 0, width, height); }
         }
 
         #endregion Properties
