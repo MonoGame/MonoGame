@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework
                 initflags |= Sdl.Window.State.Resizable;
 
             if (_borderless)
-                initflags |= Sdl.Window.State.Boderless;
+                initflags |= Sdl.Window.State.Borderless;
 
             Sdl.Window.Destroy(_handle);
 
