@@ -1,15 +1,20 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
+
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework.Net
 {
     public sealed class AvailableNetworkSession
     {
         internal IPEndPoint remoteEndPoint;
+        internal IEnumerable<SignedInGamer> gamers;
         private string hostGamertag;
 
-        internal AvailableNetworkSession(IPEndPoint remoteEndPoint, string hostGamertag)
+        internal AvailableNetworkSession(IPEndPoint remoteEndPoint, IEnumerable<SignedInGamer> gamers, string hostGamertag)
         {
             this.remoteEndPoint = remoteEndPoint;
+            this.gamers = gamers;
             this.hostGamertag = hostGamertag;
         }
 
