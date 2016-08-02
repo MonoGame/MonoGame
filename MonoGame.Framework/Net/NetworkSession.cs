@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
@@ -10,8 +11,8 @@ namespace Microsoft.Xna.Framework.Net
 {
     internal enum CustomMessageType
     {
-        HostToPendingPeer,
-        ApprovedPeer,
+        JoinRequest, // Sent by host
+        JoinSuccessful, // Sent by peer
         UserData
     }
 
@@ -33,6 +34,7 @@ namespace Microsoft.Xna.Framework.Net
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
             config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
             config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
+            config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
             return config;
         }
@@ -57,7 +59,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("Internal error", e);
             }
 
-            Session = new NetworkSession(peer);
+            Session = new NetworkSession(peer, true);
             return Session;
         }
 
@@ -134,16 +136,28 @@ namespace Microsoft.Xna.Framework.Net
                 throw new NetworkSessionJoinException("Connection failed", NetworkSessionJoinError.SessionNotFound);
             }
 
-            Session = new NetworkSession(peer);
+            Session = new NetworkSession(peer, false);
             return Session;
         }
 
         private NetPeer peer;
+        private NetworkMachine machine;
 
-        internal NetworkSession(NetPeer peer)
+        private ICollection<IPEndPoint> pendingEndPoints = new List<IPEndPoint>();
+
+        // Host stores which connections were open when a particular peer connected
+        private Dictionary<NetConnection, ICollection<NetConnection>> pendingPeerConnections = new Dictionary<NetConnection, ICollection<NetConnection>>();
+
+        internal NetworkSession(NetPeer peer, bool isHost)
         {
             this.peer = peer;
+            this.machine = new NetworkMachine(!isHost);
+            this.IsHost = isHost;
+
+            this.peer.Tag = this.machine;
         }
+
+        public bool IsHost { get; }
 
         public event EventHandler<GamerJoinedEventArgs> GamerJoined;
         public event EventHandler<GamerLeftEventArgs> GamerLeft;
@@ -156,15 +170,84 @@ namespace Microsoft.Xna.Framework.Net
         public event EventHandler<WriteLeaderboardsEventArgs> WriteTrueSkill; // No documentation exists
         public event EventHandler<WriteLeaderboardsEventArgs> WriteUnarbitratedLeaderboard; // No documentation exists
 
-        private void HandleCustomMessage(NetIncomingMessage msg)
-        { }
+        private bool IsConnectedToEndPoint(IPEndPoint endPoint)
+        {
+            return peer.GetConnection(endPoint) != null;
+        }
+
+        private NetOutgoingMessage BuildCustomMessage(CustomMessageType type, NetConnection receiver)
+        {
+            NetOutgoingMessage msg = peer.CreateMessage();
+            msg.Write((byte)type);
+
+            switch (type)
+            {
+                case CustomMessageType.JoinRequest:
+                    ICollection<NetConnection> requestedConnections = pendingPeerConnections[receiver];
+                    msg.Write((int)requestedConnections.Count);
+                    foreach (NetConnection c in requestedConnections)
+                    {
+                        msg.Write(c.RemoteEndPoint);
+                    }
+                    Debug.WriteLine("JoinRequest sent (with " + requestedConnections.Count + " connections)");
+                    break;
+                case CustomMessageType.JoinSuccessful:
+                    Debug.WriteLine("JoinSuccessful sent");
+                    break;
+            }
+
+            return msg;
+        }
+
+        private void SendCustomMessage(CustomMessageType type)
+        {
+            foreach (NetConnection c in peer.Connections)
+            {
+                SendCustomMessage(type, c);
+            }
+        }
+
+        private void SendCustomMessage(CustomMessageType type, NetConnection recipient)
+        {
+            peer.SendMessage(BuildCustomMessage(type, recipient), recipient, NetDeliveryMethod.ReliableUnordered, 0);
+        }
+
+        private void ReceiveCustomMessage(NetIncomingMessage msg)
+        {
+            CustomMessageType type = (CustomMessageType)msg.ReadByte();
+
+            switch (type)
+            {
+                case CustomMessageType.JoinRequest:
+                    Debug.WriteLine("JoinRequest received");
+                    pendingEndPoints.Clear();
+
+                    int requestedConnectionCount = msg.ReadInt32();
+                    for (int i = 0; i < requestedConnectionCount; i++)
+                    {
+                        IPEndPoint endPoint = msg.ReadIPEndPoint();
+                        pendingEndPoints.Add(endPoint);
+
+                        if (!IsConnectedToEndPoint(endPoint))
+                        {
+                            peer.Connect(endPoint);
+                        }
+                    }
+                    break;
+                case CustomMessageType.JoinSuccessful:
+                    Debug.WriteLine("JoinSuccessful received");
+                    NetworkMachine machine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+                    machine.pending = false;
+                    break;
+            }
+        }
 
         public void Update()
         {
+            // Handle incoming messages
             NetIncomingMessage msg;
             while ((msg = peer.ReadMessage()) != null)
             {
-                // Message decoding
                 switch (msg.MessageType)
                 {
                     // Discovery
@@ -176,18 +259,64 @@ namespace Microsoft.Xna.Framework.Net
                         break;
                     // Peer state changes
                     case NetIncomingMessageType.StatusChanged:
-                        Debug.WriteLine("Status now: " + (NetConnectionStatus)msg.ReadByte() + "; Reason: " + msg.ReadString());
+                        NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
+                        Debug.WriteLine("Status now: " + status + "; Reason: " + msg.ReadString());
+
+                        if (status == NetConnectionStatus.Connected)
+                        {
+                            NetConnection newConnection = msg.SenderConnection;
+
+                            // Create a pending network machine
+                            newConnection.Peer.Tag = new NetworkMachine(true);
+
+                            if (IsHost)
+                            {
+                                // Save snapshot of current connections and send them to new peer
+                                ICollection<NetConnection> requestedConnections = new HashSet<NetConnection>(peer.Connections);
+                                requestedConnections.Remove(newConnection);
+
+                                pendingPeerConnections.Add(newConnection, requestedConnections);
+
+                                SendCustomMessage(CustomMessageType.JoinRequest, newConnection);
+                            }
+                        }
+
+                        if (status == NetConnectionStatus.Disconnected)
+                        {
+                            if (IsHost)
+                            {
+                                NetConnection disconnectedConnection = msg.SenderConnection;
+
+                                // If disconnected peer was pending, remove it
+                                pendingPeerConnections.Remove(disconnectedConnection);
+
+                                // Update pending peers
+                                foreach (var pendingPeer in pendingPeerConnections)
+                                {
+                                    if (pendingPeer.Value.Contains(disconnectedConnection))
+                                    {
+                                        pendingPeer.Value.Remove(disconnectedConnection);
+
+                                        SendCustomMessage(CustomMessageType.JoinRequest, pendingPeer.Key);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    // Unconnected data
+                    case NetIncomingMessageType.UnconnectedData:
+                        Debug.WriteLine("Unconnected data received!");
                         break;
                     // Custom data
                     case NetIncomingMessageType.Data:
-                        HandleCustomMessage(msg);
+                        ReceiveCustomMessage(msg);
                         break;
                     // Error checking
                     case NetIncomingMessageType.VerboseDebugMessage:
                     case NetIncomingMessageType.DebugMessage:
                     case NetIncomingMessageType.WarningMessage:
                     case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine(msg.ReadString());
+                        Debug.WriteLine("Lidgren: " + msg.ReadString());
                         break;
                     default:
                         Debug.WriteLine("Unhandled type: " + msg.MessageType);
@@ -195,6 +324,26 @@ namespace Microsoft.Xna.Framework.Net
                 }
 
                 peer.Recycle(msg);
+            }
+
+            // Handle pending peer
+            if (machine.pending)
+            {
+                bool done = true;
+
+                foreach (IPEndPoint endPoint in pendingEndPoints)
+                {
+                    if (!IsConnectedToEndPoint(endPoint))
+                    {
+                        done = false;
+                    }
+                }
+
+                if (done)
+                {
+                    SendCustomMessage(CustomMessageType.JoinSuccessful);
+                    machine.pending = false;
+                }
             }
         }
 
