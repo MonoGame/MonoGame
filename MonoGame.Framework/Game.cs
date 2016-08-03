@@ -524,7 +524,7 @@ namespace Microsoft.Xna.Framework
 
         protected virtual void Initialize()
         {
-            // TODO: We shouldn't need to do this here.
+            // TODO: This should be removed once all platforms use the new GraphicsDeviceManager
             applyChanges(graphicsDeviceManager);
 
             // According to the information given on MSDN (see link below), all
@@ -537,9 +537,6 @@ namespace Microsoft.Xna.Framework
             _graphicsDeviceService = (IGraphicsDeviceService)
                 Services.GetService(typeof(IGraphicsDeviceService));
 
-            // FIXME: If this test fails, is LoadContent ever called?  This
-            //        seems like a condition that warrants an exception more
-            //        than a silent failure.
             if (_graphicsDeviceService != null &&
                 _graphicsDeviceService.GraphicsDevice != null)
             {
