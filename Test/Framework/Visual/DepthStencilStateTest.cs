@@ -17,6 +17,8 @@ namespace MonoGame.Tests.Visual
         public void ShouldNotBeAbleToSetNullDepthStencilState()
         {
             var game = new TestGameBase();
+            new GraphicsDeviceManager(game);
+
             game.InitializeOnly();
 
             Assert.Throws<ArgumentNullException>(() => game.GraphicsDevice.DepthStencilState = null);
@@ -28,6 +30,8 @@ namespace MonoGame.Tests.Visual
         public void ShouldNotBeAbleToMutateStateObjectAfterBindingToGraphicsDevice()
         {
             var game = new TestGameBase();
+            new GraphicsDeviceManager(game);
+
             game.InitializeOnly();
 
             var depthStencilState = new DepthStencilState();

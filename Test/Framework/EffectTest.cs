@@ -2,11 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
-namespace MonoGame.Tests.Visual
+namespace MonoGame.Tests.Framework
 {
+    [TestFixture]
     internal class EffectTest
     {
         private TestGameBase Game;
@@ -15,6 +17,8 @@ namespace MonoGame.Tests.Visual
         public void Setup()
         {
             Game = new TestGameBase();
+            new GraphicsDeviceManager(Game);
+
             Game.InitializeOnly();
         }
 
@@ -88,22 +92,18 @@ namespace MonoGame.Tests.Visual
         [Test]
         public void EffectPassShouldOverrideTextureIfNotExplicitlySet()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-                Game.GraphicsDevice.Textures[0] = texture;
+            var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            Game.GraphicsDevice.Textures[0] = texture;
 
-                var effect = new BasicEffect(Game.GraphicsDevice);
-                effect.TextureEnabled = true;
+            var effect = new BasicEffect(Game.GraphicsDevice);
+            effect.TextureEnabled = true;
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
 
-                var effectPass = effect.CurrentTechnique.Passes[0];
-                effectPass.Apply();
+            var effectPass = effect.CurrentTechnique.Passes[0];
+            effectPass.Apply();
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
-            };
-            Game.Run();
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
         }
     }
 }

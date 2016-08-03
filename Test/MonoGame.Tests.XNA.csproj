@@ -122,6 +122,9 @@
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\GamePadThumbSticksTest.cs" />
     <Compile Include="Framework\GraphicsAdapterTest.cs" />
+    <Compile Include="Framework\GraphicsDeviceManagerNonVisualTest.cs" />
+    <Compile Include="Framework\GraphicsNonVisualTest.cs" />
+    <Compile Include="Framework\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
@@ -154,6 +157,8 @@
     <Compile Include="Runner\Extensions.cs" />
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Runner\FramePixelData.cs" />
+
+    <Compile Include="Framework\BlendStateNonVisualTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
