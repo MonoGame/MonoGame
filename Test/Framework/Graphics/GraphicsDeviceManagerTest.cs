@@ -37,10 +37,65 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        public void InitializeEventCount()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            var resettingCount = 0;
+            var resetCount = 0;
+            var preparingCount = 0;
+            var createdCount = 0;
+            var devDispCount = 0;
+            var dispCount = 0;
+
+            gdm.DeviceResetting += (s, a) => resettingCount++;
+            gdm.DeviceReset += (s, a) => resetCount++;
+            gdm.PreparingDeviceSettings += (s, a) => preparingCount++;
+            gdm.DeviceCreated += (s, a) => createdCount++;
+            gdm.DeviceDisposing += (s, a) => devDispCount++;
+            gdm.Disposed += (s, a) => dispCount++;
+
+            game.InitializeOnly();
+
+            Assert.AreEqual(0, resettingCount);
+            Assert.AreEqual(0, resetCount);
+            Assert.AreEqual(1, preparingCount);
+            Assert.AreEqual(1, createdCount);
+            Assert.AreEqual(0, devDispCount);
+            Assert.AreEqual(0, dispCount);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void DoNotModifyPresentationParametersDirectly()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            game.InitializeWith += (sender, args) =>
+            {
+                var gd = game.GraphicsDevice;
+
+                var oldpp = gd.PresentationParameters;
+                gdm.PreferredBackBufferWidth = 100;
+                gdm.ApplyChanges();
+                var newpp = gd.PresentationParameters;
+                Assert.AreNotSame(oldpp, newpp);
+            };
+
+            game.InitializeOnly();
+            game.Dispose();
+        }
+
+        [Test]
         public void PreparingDeviceSettings()
         {
             var game = new TestGameBase();
             var gdm = new GraphicsDeviceManager(game);
+
+            var count = 0;
 
             gdm.PreparingDeviceSettings += (sender, args) =>
             {
@@ -63,11 +118,204 @@ namespace MonoGame.Tests.Graphics
                 Assert.AreEqual(DisplayOrientation.Default, pp.DisplayOrientation);
                 Assert.AreEqual(RenderTargetUsage.DiscardContents, pp.RenderTargetUsage);
                 Assert.AreEqual(0, pp.MultiSampleCount);
+
+                count++;
             };
 
-            game.ExitCondition = x => x.DrawNumber > 1;
-            game.Run();
+            game.InitializeOnly();
+            Assert.AreEqual(1, count);
             game.Dispose();
+        }
+
+        [Test]
+        public void PreparingDeviceSettingsEventChangeGraphicsProfile()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            Assert.AreEqual(GraphicsProfile.Reach, gdm.GraphicsProfile);
+
+            game.InitializeOnly();
+
+            var invoked = false;
+            gdm.PreparingDeviceSettings += (s, a) =>
+            {
+                a.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
+                invoked = true;
+            };
+
+            // make sure that changing the graphics profile creates a new device and does not reset
+            var creationCount = 0;
+            gdm.DeviceCreated += (sender, args) => creationCount++;
+            var resetCount = 0;
+            gdm.DeviceReset += (sender, args) => resetCount++;
+
+            // make a change so ApplyChanges actually does something
+            gdm.PreferredBackBufferWidth = 100;
+            gdm.ApplyChanges();
+
+            // assert that PreparingDeviceSettings is invoked, but the GraphicsProfile of the gdm did not change
+            Assert.That(invoked);
+            Assert.AreEqual(GraphicsProfile.Reach, gdm.GraphicsProfile);
+            Assert.AreEqual(GraphicsProfile.HiDef, gdm.GraphicsDevice.GraphicsProfile);
+
+            Assert.AreEqual(creationCount, 1);
+            Assert.AreEqual(resetCount, 0);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void PreparingDeviceSettingsArgsPresentationParametersAreApplied()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            var invoked = false;
+
+            game.PreInitializeWith += (sender, args) =>
+            {
+                Assert.AreEqual(RenderTargetUsage.DiscardContents,
+                    gdm.GraphicsDevice.PresentationParameters.RenderTargetUsage);
+
+                gdm.PreparingDeviceSettings += (s, a) =>
+                {
+                    a.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
+                    a.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
+                    invoked = true;
+                };
+            };
+
+            game.InitializeOnly();
+
+            // make a change so ApplyChanges actually does something
+            gdm.PreferredBackBufferWidth = 100;
+            gdm.ApplyChanges();
+
+            Assert.That(invoked);
+            Assert.AreEqual(RenderTargetUsage.PreserveContents, gdm.GraphicsDevice.PresentationParameters.RenderTargetUsage);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void PreparingDeviceSettingsArgsThrowsWhenPPSetToNull()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            var invoked = false;
+
+            gdm.PreparingDeviceSettings += (s, a) =>
+            {
+                a.GraphicsDeviceInformation.PresentationParameters = null;
+                invoked = true;
+            };
+
+            Assert.Throws<NullReferenceException>(() => game.InitializeOnly());
+            Assert.That(invoked);
+
+            game.Dispose();
+        }
+
+        public void ApplyChangesReturnsWhenNoSetterCalled()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            var invoked = false;
+
+            game.PreInitializeWith += (sender, args) =>
+            {
+                gdm.PreparingDeviceSettings += (s, a) =>
+                {
+                    invoked = true;
+                };
+            };
+
+            game.InitializeOnly();
+
+            gdm.ApplyChanges();
+            Assert.IsFalse(invoked);
+
+            // this proves that XNA does not check for equality, but just registers that setters are used
+            gdm.PreferredBackBufferWidth = gdm.PreferredBackBufferWidth;
+
+            gdm.ApplyChanges();
+            Assert.That(invoked);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void ApplyChangesInvokesPreparingDeviceSettings()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            var invoked = false;
+
+            game.InitializeWith += (sender, args) =>
+            {
+                gdm.PreparingDeviceSettings += (s, a) =>
+                {
+                    invoked = true;
+                };
+            };
+
+            game.InitializeOnly();
+
+            gdm.PreferredBackBufferWidth = gdm.PreferredBackBufferWidth;
+            gdm.ApplyChanges();
+            Assert.That(invoked);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void ApplyChangesResetsDevice()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            var count = 0;
+
+            gdm.DeviceReset += (sender, args) => count++;
+
+            game.InitializeOnly();
+
+            gdm.PreferredBackBufferWidth = gdm.PreferredBackBufferWidth;
+            gdm.ApplyChanges();
+            Assert.AreEqual(1, count);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void DeviceDisposingInvokedAfterDeviceDisposed()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            var invoked = false;
+
+            gdm.DeviceDisposing += (sender, args) =>
+            {
+                invoked = true;
+                Assert.IsTrue(gdm.GraphicsDevice.IsDisposed);
+            };
+
+            game.InitializeOnly();
+
+            Assert.IsFalse(gdm.GraphicsDevice.IsDisposed);
+            Assert.IsFalse(invoked);
+            // change the graphics profile so the current device needs to be disposed
+            gdm.GraphicsProfile = GraphicsProfile.HiDef;
+            gdm.ApplyChanges();
+            Assert.IsTrue(invoked);
+
+            game.Dispose();
+
         }
 
         [TestCase(false)]
