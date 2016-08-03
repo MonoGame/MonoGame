@@ -7,79 +7,82 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
 {
-    internal class EffectTest : VisualTestFixtureBase
+    internal class EffectTest
     {
+        private TestGameBase Game;
+
+        [SetUp]
+        public void Setup()
+        {
+            Game = new TestGameBase();
+            Game.InitializeOnly();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Game.Dispose();
+        }
+
         [Test]
         public void EffectPassShouldSetTexture()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-                Game.GraphicsDevice.Textures[0] = null;
+            var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            Game.GraphicsDevice.Textures[0] = null;
 
-                var effect = new BasicEffect(Game.GraphicsDevice);
-                effect.TextureEnabled = true;
-                effect.Texture = texture;
+            var effect = new BasicEffect(Game.GraphicsDevice);
+            effect.TextureEnabled = true;
+            effect.Texture = texture;
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
 
-                var effectPass = effect.CurrentTechnique.Passes[0];
-                effectPass.Apply();
+            var effectPass = effect.CurrentTechnique.Passes[0];
+            effectPass.Apply();
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
-            };
-            Game.Run();
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
         }
 
         [Test]
         public void EffectPassShouldSetTextureOnSubsequentCalls()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-                Game.GraphicsDevice.Textures[0] = null;
+            var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            Game.GraphicsDevice.Textures[0] = null;
 
-                var effect = new BasicEffect(Game.GraphicsDevice);
-                effect.TextureEnabled = true;
-                effect.Texture = texture;
+            var effect = new BasicEffect(Game.GraphicsDevice);
+            effect.TextureEnabled = true;
+            effect.Texture = texture;
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
 
-                var effectPass = effect.CurrentTechnique.Passes[0];
-                effectPass.Apply();
+            var effectPass = effect.CurrentTechnique.Passes[0];
+            effectPass.Apply();
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
 
-                Game.GraphicsDevice.Textures[0] = null;
+            Game.GraphicsDevice.Textures[0] = null;
 
-                effectPass = effect.CurrentTechnique.Passes[0];
-                effectPass.Apply();
+            effectPass = effect.CurrentTechnique.Passes[0];
+            effectPass.Apply();
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
-            };
-            Game.Run();
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
         }
 
         [Test]
         public void EffectPassShouldSetTextureEvenIfNull()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-                Game.GraphicsDevice.Textures[0] = texture;
+            var texture = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            Game.GraphicsDevice.Textures[0] = texture;
 
-                var effect = new BasicEffect(Game.GraphicsDevice);
-                effect.TextureEnabled = true;
-                effect.Texture = null;
+            var effect = new BasicEffect(Game.GraphicsDevice);
+            effect.TextureEnabled = true;
+            effect.Texture = null;
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(texture));
 
-                var effectPass = effect.CurrentTechnique.Passes[0];
-                effectPass.Apply();
+            var effectPass = effect.CurrentTechnique.Passes[0];
+            effectPass.Apply();
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
-            };
-            Game.Run();
+            Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
         }
 
         [Test]

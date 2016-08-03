@@ -12,48 +12,54 @@ namespace MonoGame.Tests.Visual
     [TestFixture]
     internal class BlendStateTest : VisualTestFixtureBase
     {
+        private TestGameBase game;
+
+        [SetUp]
+        public override void SetUp()
+        {
+            game = new TestGameBase();
+            game.InitializeOnly();
+
+            base.SetUp();
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            game.Dispose();
+            base.TearDown();
+        }
+
         [Test]
         public void ShouldNotBeAbleToSetNullBlendState()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                Assert.Throws<ArgumentNullException>(() => Game.GraphicsDevice.BlendState = null);
-            };
-            Game.Run();
+            Assert.Throws<ArgumentNullException>(() => game.GraphicsDevice.BlendState = null);
         }
 
         [Test]
         public void ShouldNotBeAbleToMutateStateObjectAfterBindingToGraphicsDevice()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var blendState = new BlendState();
+            var blendState = new BlendState();
 
-                // Can mutate before binding.
-                DoAsserts(blendState, Assert.DoesNotThrow);
+            // Can mutate before binding.
+            DoAsserts(blendState, Assert.DoesNotThrow);
 
-                // Can't mutate after binding.
-                Game.GraphicsDevice.BlendState = blendState;
-                DoAsserts(blendState, d => Assert.Throws<InvalidOperationException>(d));
+            // Can't mutate after binding.
+            game.GraphicsDevice.BlendState = blendState;
+            DoAsserts(blendState, d => Assert.Throws<InvalidOperationException>(d));
 
-                // Even after changing to different BlendState, you still can't mutate a previously-bound object.
-                Game.GraphicsDevice.BlendState = BlendState.Opaque;
-                DoAsserts(blendState, d => Assert.Throws<InvalidOperationException>(d));
-            };
-            Game.Run();
+            // Even after changing to different BlendState, you still can't mutate a previously-bound object.
+            game.GraphicsDevice.BlendState = BlendState.Opaque;
+            DoAsserts(blendState, d => Assert.Throws<InvalidOperationException>(d));
         }
 
         [Test]
         public void ShouldNotBeAbleToMutateDefaultStateObjects()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                DoAsserts(BlendState.Additive, d => Assert.Throws<InvalidOperationException>(d));
-                DoAsserts(BlendState.AlphaBlend, d => Assert.Throws<InvalidOperationException>(d));
-                DoAsserts(BlendState.NonPremultiplied, d => Assert.Throws<InvalidOperationException>(d));
-                DoAsserts(BlendState.Opaque, d => Assert.Throws<InvalidOperationException>(d));
-            };
-            Game.Run();
+            DoAsserts(BlendState.Additive, d => Assert.Throws<InvalidOperationException>(d));
+            DoAsserts(BlendState.AlphaBlend, d => Assert.Throws<InvalidOperationException>(d));
+            DoAsserts(BlendState.NonPremultiplied, d => Assert.Throws<InvalidOperationException>(d));
+            DoAsserts(BlendState.Opaque, d => Assert.Throws<InvalidOperationException>(d));
         }
 
         private static void DoAsserts(BlendState blendState, Action<TestDelegate> assertMethod)

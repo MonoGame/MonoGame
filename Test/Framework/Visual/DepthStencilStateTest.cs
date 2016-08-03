@@ -16,44 +16,42 @@ namespace MonoGame.Tests.Visual
         [Test]
         public void ShouldNotBeAbleToSetNullDepthStencilState()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                Assert.Throws<ArgumentNullException>(() => Game.GraphicsDevice.DepthStencilState = null);
-            };
-            Game.Run();
+            var game = new TestGameBase();
+            game.InitializeOnly();
+
+            Assert.Throws<ArgumentNullException>(() => game.GraphicsDevice.DepthStencilState = null);
+
+            game.Dispose();
         }
 
         [Test]
         public void ShouldNotBeAbleToMutateStateObjectAfterBindingToGraphicsDevice()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var depthStencilState = new DepthStencilState();
+            var game = new TestGameBase();
+            game.InitializeOnly();
 
-                // Can mutate before binding.
-                DoAsserts(depthStencilState, Assert.DoesNotThrow);
+            var depthStencilState = new DepthStencilState();
 
-                // Can't mutate after binding.
-                Game.GraphicsDevice.DepthStencilState = depthStencilState;
-                DoAsserts(depthStencilState, d => Assert.Throws<InvalidOperationException>(d));
+            // Can mutate before binding.
+            DoAsserts(depthStencilState, Assert.DoesNotThrow);
 
-                // Even after changing to different RasterizerState, you still can't mutate a previously-bound object.
-                Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-                DoAsserts(depthStencilState, d => Assert.Throws<InvalidOperationException>(d));
-            };
-            Game.Run();
+            // Can't mutate after binding.
+            game.GraphicsDevice.DepthStencilState = depthStencilState;
+            DoAsserts(depthStencilState, d => Assert.Throws<InvalidOperationException>(d));
+
+            // Even after changing to different RasterizerState, you still can't mutate a previously-bound object.
+            game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            DoAsserts(depthStencilState, d => Assert.Throws<InvalidOperationException>(d));
+
+            game.Dispose();
         }
 
         [Test]
         public void ShouldNotBeAbleToMutateDefaultStateObjects()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                DoAsserts(DepthStencilState.Default, d => Assert.Throws<InvalidOperationException>(d));
-                DoAsserts(DepthStencilState.DepthRead, d => Assert.Throws<InvalidOperationException>(d));
-                DoAsserts(DepthStencilState.None, d => Assert.Throws<InvalidOperationException>(d));
-            };
-            Game.Run();
+            DoAsserts(DepthStencilState.Default, d => Assert.Throws<InvalidOperationException>(d));
+            DoAsserts(DepthStencilState.DepthRead, d => Assert.Throws<InvalidOperationException>(d));
+            DoAsserts(DepthStencilState.None, d => Assert.Throws<InvalidOperationException>(d));
         }
 
         private static void DoAsserts(DepthStencilState depthStencilState, Action<TestDelegate> assertMethod)
