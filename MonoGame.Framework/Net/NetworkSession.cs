@@ -259,70 +259,75 @@ namespace Microsoft.Xna.Framework.Net
         {
             CustomMessageType type = (CustomMessageType)msg.ReadByte();
 
-            switch (type)
+            if (type == CustomMessageType.JoinRequest)
             {
-                case CustomMessageType.JoinRequest:
-                    Debug.WriteLine("JoinRequest received");
-                    pendingEndPoints.Clear();
+                Debug.WriteLine("JoinRequest received");
+                pendingEndPoints.Clear();
 
-                    int requestedConnectionCount = msg.ReadInt32();
-                    for (int i = 0; i < requestedConnectionCount; i++)
+                int requestedConnectionCount = msg.ReadInt32();
+                for (int i = 0; i < requestedConnectionCount; i++)
+                {
+                    IPEndPoint endPoint = msg.ReadIPEndPoint();
+                    pendingEndPoints.Add(endPoint);
+
+                    if (!IsConnectedToEndPoint(endPoint))
                     {
-                        IPEndPoint endPoint = msg.ReadIPEndPoint();
-                        pendingEndPoints.Add(endPoint);
-
-                        if (!IsConnectedToEndPoint(endPoint))
-                        {
-                            peer.Connect(endPoint);
-                        }
+                        peer.Connect(endPoint);
                     }
-                    break;
-                case CustomMessageType.JoinSuccessful:
-                    Debug.WriteLine("JoinSuccessful received");
-                    NetworkMachine remoteMachine = msg.SenderConnection.Peer.Tag as NetworkMachine;
-                    remoteMachine.isPending = false;
-                    break;
-                case CustomMessageType.GamerJoinRequest:
-                    Debug.WriteLine("GamerJoinRequest received");
-                    if (IsHost)
+                }
+            }
+            else if (type == CustomMessageType.JoinSuccessful)
+            {
+                Debug.WriteLine("JoinSuccessful received");
+                NetworkMachine remoteMachine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+                remoteMachine.isPending = false;
+            }
+            else if (type == CustomMessageType.GamerJoinRequest)
+            {
+                Debug.WriteLine("GamerJoinRequest received");
+                if (IsHost)
+                {
+                    SendCustomMessage(CustomMessageType.GamerJoinResponse, msg.SenderConnection);
+                }
+            }
+            else if (type == CustomMessageType.GamerJoinResponse)
+            {
+                Debug.WriteLine("GamerJoinResponse received");
+                if (IsHost || msg.SenderConnection == hostConnection)
+                {
+                    if (msg.ReadBoolean())
                     {
-                        SendCustomMessage(CustomMessageType.GamerJoinResponse, msg.SenderConnection);
+                        byte uniqueId = msg.ReadByte();
+
+                        // Now possible to create local network gamer
+                        SignedInGamer signedInGamer = pendingSignedInGamers[0];
+                        pendingSignedInGamers.RemoveAt(0);
+
+                        LocalNetworkGamer localGamer = new LocalNetworkGamer(signedInGamer, uniqueId);
+                        machine.AddLocalGamer(localGamer); // TODO: Move network gamer creation to gamer joined message
+
+                        SendGamerJoined(localGamer);
+
+                        GamerJoined.Invoke(this, new GamerJoinedEventArgs(localGamer));
                     }
-                    break;
-                case CustomMessageType.GamerJoinResponse:
-                    Debug.WriteLine("GamerJoinResponse received");
-                    if (IsHost || msg.SenderConnection == hostConnection)
+                    else
                     {
-                        if (msg.ReadBoolean())
-                        {
-                            byte uniqueId = msg.ReadByte();
-
-                            // Now possible to create local network gamer
-                            SignedInGamer signedInGamer = pendingSignedInGamers[0];
-                            pendingSignedInGamers.RemoveAt(0);
-
-                            LocalNetworkGamer localGamer = new LocalNetworkGamer(signedInGamer, uniqueId);
-                            machine.AddLocalGamer(localGamer); // TODO: Move network gamer creation to gamer joined message
-
-                            SendGamerJoined(localGamer);
-                        }
-                        else
-                        {
-                            Debug.WriteLine("Gamer join was not accepted by host!");
-                        }
+                        Debug.WriteLine("Gamer join was not accepted by host!");
                     }
-                    break;
-                case CustomMessageType.GamerJoined:
-                    string gamertag = msg.ReadString();
-                    byte id = msg.ReadByte();
-                    Debug.WriteLine("Gamer joined received with display name " + gamertag + " and id " + id);
-                    // TODO: If message sent from this machine, create local network gamer, otherwise network gamer
-                    NetworkMachine remoMachine = msg.SenderConnection.Peer.Tag as NetworkMachine;
-                    remoMachine.AddRemoteGamer(new NetworkGamer(false, id));
+                }
+            }
+            else if (type == CustomMessageType.GamerJoined)
+            {
+                string gamertag = msg.ReadString();
+                byte id = msg.ReadByte();
+                Debug.WriteLine("Gamer joined received with display name " + gamertag + " and id " + id);
+                // TODO: If message sent from this machine, create local network gamer, otherwise network gamer
+                NetworkGamer remoteGamer = new NetworkGamer(false, id);
+                NetworkMachine remoteMachine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+                remoteMachine.AddRemoteGamer(remoteGamer);
 
-                    // TODO: Fire GamerJoined event
-
-                    break;
+                // TODO: Fire GamerJoined event
+                GamerJoined.Invoke(this, new GamerJoinedEventArgs(remoteGamer));
             }
         }
 
