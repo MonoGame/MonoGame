@@ -23,13 +23,13 @@ namespace MonoGame.Tools.Pipeline
 
         public override void OnCreate()
         {
-            _converter = TypeDescriptor.GetConverter(_type.GetType());
+            _converter = TypeDescriptor.GetConverter(_type);
 
-            if (_type is float || _type is double || _type is decimal)
+            if (_type == typeof(float) || _type == typeof(double) || _type == typeof(decimal))
             {
-                if (_type is float)
+                if (_type == typeof(float))
                     DisplayValue = ((float)Value).ToString("0.00");
-                else if (_type is double)
+                else if (_type == typeof(double))
                     DisplayValue = ((double)Value).ToString("0.00");
                 else
                     DisplayValue = ((decimal)Value).ToString("0.00");
