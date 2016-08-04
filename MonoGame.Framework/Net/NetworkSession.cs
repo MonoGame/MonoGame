@@ -3,12 +3,136 @@ using System.Net;
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 using Microsoft.Xna.Framework.GamerServices;
 using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
+    internal interface INetAction
+    {
+        NetDeliveryMethod DeliveryMethod { get; }
+        int SequenceChannel { get; }
+        void EncodeData(NetworkSession session, NetOutgoingMessage msg); // May not run if local message
+        void DecodeData(NetworkSession session, NetIncomingMessage msg); // May not run if local message
+        void Perform(NetworkSession session);
+    }
+
+    internal struct GamerJoinResponseAction : INetAction
+    {
+        internal bool wasApprovedByHost;
+        internal byte id;
+
+        public GamerJoinResponseAction(NetworkSession session)
+        {
+            if (!session.IsHost)
+            {
+                throw new InvalidOperationException();
+            }
+
+            wasApprovedByHost = session.GetNewUniqueId(out id);
+        }
+
+        public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
+
+        public int SequenceChannel { get { return 0; } }
+
+        public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
+        {
+            msg.Write(wasApprovedByHost);
+            msg.Write(id);
+        }
+
+        public void DecodeData(NetworkSession session, NetIncomingMessage msg)
+        {
+            if (!session.IsHost && msg.SenderConnection != session.hostConnection)
+            {
+                throw new InvalidOperationException();
+            }
+
+            wasApprovedByHost = msg.ReadBoolean();
+            id = msg.ReadByte();
+        }
+
+        public void Perform(NetworkSession session)
+        {
+            if (wasApprovedByHost)
+            {
+                // Host approved request, now possible to create local network gamer
+                SignedInGamer signedInGamer = session.pendingSignedInGamers[0];
+                session.pendingSignedInGamers.RemoveAt(0);
+
+                LocalNetworkGamer localGamer = new LocalNetworkGamer(signedInGamer, id);
+
+                session.SendMessageToEveryone(new GamerJoinedAction(session, localGamer));
+            }
+            else
+            {
+                Debug.WriteLine("Our gamer join request was not accepted by the host!");
+            }
+        }
+    }
+
+    internal struct GamerJoinedAction : INetAction
+    {
+        internal LocalNetworkGamer localGamer;
+        
+        internal NetworkMachine machine;
+        internal string gamertag;
+        internal byte id;
+
+        public GamerJoinedAction(NetworkSession session, LocalNetworkGamer localGamer)
+        {
+            if (localGamer == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            this.localGamer = localGamer;
+            this.machine = session.machine;
+            this.gamertag = localGamer.Gamertag;
+            this.id = localGamer.Id;
+        }
+
+        public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
+
+        public int SequenceChannel { get { return 0; } }
+
+        public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
+        {
+            msg.Write(gamertag);
+            msg.Write(id);
+        }
+
+        public void DecodeData(NetworkSession session, NetIncomingMessage msg)
+        {
+            machine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+            gamertag = msg.ReadString();
+            id = msg.ReadByte();
+        }
+
+        public void Perform(NetworkSession session)
+        {
+            if (localGamer != null)
+            {
+                // Add local gamer
+                machine.AddLocalGamer(localGamer);
+                
+                session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(localGamer));
+            }
+            else
+            {
+                // Add remote gamer
+                NetworkGamer remoteGamer = new NetworkGamer(false, id);
+                machine.AddRemoteGamer(remoteGamer);
+
+                session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(remoteGamer));
+            }
+        }
+    }
+
+
     internal enum CustomMessageType
     {
         JoinRequest, // Sent by host
@@ -143,12 +267,12 @@ namespace Microsoft.Xna.Framework.Net
             return Session;
         }
 
-        private NetPeer peer;
-        private NetworkMachine machine;
-        private NetConnection hostConnection;
+        internal NetPeer peer;
+        internal NetworkMachine machine;
+        internal NetConnection hostConnection;
 
-        private IList<SignedInGamer> pendingSignedInGamers;
-        private ICollection<IPEndPoint> pendingEndPoints = new List<IPEndPoint>();
+        internal IList<SignedInGamer> pendingSignedInGamers;
+        internal ICollection<IPEndPoint> pendingEndPoints = new List<IPEndPoint>();
         
         // Host stores which connections were open when a particular peer connected
         private Dictionary<NetConnection, ICollection<NetConnection>> pendingPeerConnections = new Dictionary<NetConnection, ICollection<NetConnection>>();
@@ -179,7 +303,12 @@ namespace Microsoft.Xna.Framework.Net
         public event EventHandler<WriteLeaderboardsEventArgs> WriteTrueSkill; // No documentation exists
         public event EventHandler<WriteLeaderboardsEventArgs> WriteUnarbitratedLeaderboard; // No documentation exists
 
-        private bool GetNewUniqueId(out byte id)
+        internal void InvokeGamerJoinedEvent(GamerJoinedEventArgs args)
+        {
+            GamerJoined.Invoke(this, args);
+        }
+
+        internal bool GetNewUniqueId(out byte id)
         {
             // TODO: Calculate accurate
             id = 0;
@@ -189,6 +318,32 @@ namespace Microsoft.Xna.Framework.Net
         private bool IsConnectedToEndPoint(IPEndPoint endPoint)
         {
             return peer.GetConnection(endPoint) != null;
+        }
+
+        // To everyone
+        internal void SendMessageToEveryone(INetAction action)
+        {
+            // Handle remote peers (only encode once)
+            NetOutgoingMessage msg = peer.CreateMessage();
+            action.EncodeData(this, msg);
+            peer.SendMessage(msg, peer.Connections, action.DeliveryMethod, action.SequenceChannel);
+
+            // Handle self
+            action.Perform(this);
+        }
+
+        // To self only
+        internal void SendMessageToSelf(INetAction action)
+        {
+            action.Perform(this);
+        }
+
+        // To specific peer
+        internal void SendMessageToPeer(INetAction action, NetConnection recipient)
+        {
+            NetOutgoingMessage msg = peer.CreateMessage();
+            action.EncodeData(this, msg);
+            peer.SendMessage(msg, recipient, action.DeliveryMethod, action.SequenceChannel);
         }
 
         private void SendCustomMessage(CustomMessageType type)
@@ -243,7 +398,7 @@ namespace Microsoft.Xna.Framework.Net
 
             return msg;
         }
-
+        
         private void SendGamerJoined(LocalNetworkGamer localGamer)
         {
             NetOutgoingMessage msg = peer.CreateMessage();
@@ -293,28 +448,7 @@ namespace Microsoft.Xna.Framework.Net
             else if (type == CustomMessageType.GamerJoinResponse)
             {
                 Debug.WriteLine("GamerJoinResponse received");
-                if (IsHost || msg.SenderConnection == hostConnection)
-                {
-                    if (msg.ReadBoolean())
-                    {
-                        byte uniqueId = msg.ReadByte();
-
-                        // Now possible to create local network gamer
-                        SignedInGamer signedInGamer = pendingSignedInGamers[0];
-                        pendingSignedInGamers.RemoveAt(0);
-
-                        LocalNetworkGamer localGamer = new LocalNetworkGamer(signedInGamer, uniqueId);
-                        machine.AddLocalGamer(localGamer); // TODO: Move network gamer creation to gamer joined message
-
-                        SendGamerJoined(localGamer);
-
-                        GamerJoined.Invoke(this, new GamerJoinedEventArgs(localGamer));
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Gamer join was not accepted by host!");
-                    }
-                }
+                
             }
             else if (type == CustomMessageType.GamerJoined)
             {
@@ -413,6 +547,9 @@ namespace Microsoft.Xna.Framework.Net
 
                 peer.Recycle(msg);
             }
+
+            // Handle received actions
+            
 
             // Handle pending peer
             if (machine.isPending)
