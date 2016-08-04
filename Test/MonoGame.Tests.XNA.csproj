@@ -121,6 +121,7 @@
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\GamePadThumbSticksTest.cs" />
     <Compile Include="Framework\Graphics\BlendStateNonVisualTest.cs" />
+    <Compile Include="Framework\Graphics\DepthStencilStateNonVisualTest.cs" />
     <Compile Include="Framework\Graphics\EffectTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
@@ -141,7 +142,7 @@
     <Compile Include="Framework\Visual\DepthStencilStateTest.cs" />
     <Compile Include="Framework\Visual\GraphicsDeviceManagerTest.cs" />
     <Compile Include="Framework\Visual\GraphicsDeviceTest.cs" />
-    <Compile Include="Framework\Visual\IndexBufferTest.cs" />
+    <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
     <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
     <Compile Include="Framework\Visual\RenderTarget2DTest.cs" />
     <Compile Include="Framework\Visual\RenderTargetCubeTest.cs" />

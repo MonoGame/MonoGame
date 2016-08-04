@@ -13,39 +13,6 @@ namespace MonoGame.Tests.Visual
     internal class OcclusionQueryTest : VisualTestFixtureBase
     {
         [Test]
-        public void ConstructorsAndProperties()
-        {
-            Game.DrawWith += (sender, e) =>
-            {
-                Assert.Throws<ArgumentNullException>(() => new OcclusionQuery(null));
-
-                var occlusionQuery = new OcclusionQuery(Game.GraphicsDevice);
-
-                Assert.IsFalse(occlusionQuery.IsComplete);
-
-                Assert.Throws<InvalidOperationException>(
-                    () => { var n = occlusionQuery.PixelCount; },
-                    "PixelCount throws when query not yet started.");
-            };
-            Game.Run();
-        }
-
-        [Test]
-        public void MismatchedBeginEnd()
-        {
-            Game.DrawWith += (sender, e) =>
-            {
-                var occlusionQuery = new OcclusionQuery(Game.GraphicsDevice);
-
-                Assert.Throws<InvalidOperationException>(() => occlusionQuery.End());
-
-                occlusionQuery.Begin();
-                Assert.Throws<InvalidOperationException>(() => occlusionQuery.Begin());
-            };
-            Game.Run();
-        }
-
-        [Test]
         public void QueryOccludedSprites()
         {
             SpriteBatch spriteBatch = null;
