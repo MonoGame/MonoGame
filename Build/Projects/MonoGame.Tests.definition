@@ -143,6 +143,7 @@
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryNonVisualTest.cs" />
+    <Compile Include="Framework\Graphics\RasterizerStateNonVisualTest.cs" />
     <Compile Include="Framework\Graphics\SpriteFontNonVisualTest.cs" />
     <Compile Include="Framework\Graphics\Texture2DNonVisualTest.cs" />
     <Compile Include="Framework\Graphics\Texture3DNonVisualTest.cs" />
