@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework.Constraints;
 
-namespace MonoGame.Tests.Framework
+namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     public class Texture3DNonVisualTest
