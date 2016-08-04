@@ -6,25 +6,8 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Framework
 {
     [TestFixture]
-    public class BlendStateNonVisualTest
+    internal class BlendStateNonVisualTest : GraphicsDeviceTestFixtureBase
     {
-        private TestGameBase game;
-
-        [SetUp]
-        public new void SetUp()
-        {
-            game = new TestGameBase();
-            new GraphicsDeviceManager(game);
-
-            game.InitializeOnly();
-        }
-
-        [TearDown]
-        public new void TearDown()
-        {
-            game.Dispose();
-        }
-
         [Test]
         public void ShouldNotBeAbleToSetNullBlendState()
         {

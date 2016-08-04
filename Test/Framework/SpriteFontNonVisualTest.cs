@@ -9,28 +9,8 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Framework
 {
     [TestFixture]
-    class SpriteFontNonVisualTest
+    internal class SpriteFontNonVisualTest : GraphicsDeviceTestFixtureBase
     {
-        private TestGameBase _game;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _game = new TestGameBase();
-            var graphicsDeviceManager = new GraphicsDeviceManager(_game);
-#if XNA
-            graphicsDeviceManager.ApplyChanges();
-#else
-            graphicsDeviceManager.CreateDevice();
-#endif
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _game.Dispose();
-        }
-
         [TestCase("Default", "The quick brown fox jumps over the lazy dog. 1234567890", 605, 21)]
         [TestCase("Default", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 275, 59)]
         [TestCase("Default", "The quick brown fox jumps over the lazy dog.\r1234567890", 594, 21)]
@@ -57,7 +37,7 @@ namespace MonoGame.Tests.Framework
         [TestCase("SegoeKeycaps", "!", 16, 20)] // LSB=1, W=15, RSB=0
         public void MeasureString_returns_correct_values(string fontName, string text, float width, float height)
         {
-            var font = _game.Content.Load<SpriteFont>(Paths.Font(fontName));
+            var font = game.Content.Load<SpriteFont>(Paths.Font(fontName));
             var actualSize = font.MeasureString(text);
             var expectedSize = new Vector2(width, height);
             Assert.That(actualSize, Is.EqualTo(expectedSize).Using(Vector2Comparer.Epsilon));

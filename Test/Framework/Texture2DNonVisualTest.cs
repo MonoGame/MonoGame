@@ -15,21 +15,9 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Framework
 {
     [TestFixture]
-    public class Texture2DNonVisualTest
+    internal class Texture2DNonVisualTest : GraphicsDeviceTestFixtureBase
     {
         Texture2D _texture;
-        TestGameBase _game;
-        [SetUp]
-        public void Setup()
-        {
-            _game = new TestGameBase();
-            var graphicsDeviceManager = new GraphicsDeviceManager(_game);
-#if XNA
-            graphicsDeviceManager.ApplyChanges();
-#else
-            graphicsDeviceManager.CreateDevice();
-#endif
-        }
 
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
@@ -43,7 +31,7 @@ namespace MonoGame.Tests.Framework
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
             {
-                Assert.DoesNotThrow(() => _texture = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream));
+                Assert.DoesNotThrow(() => _texture = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream));
             }
             Assert.NotNull(_texture);
             try
@@ -75,14 +63,14 @@ namespace MonoGame.Tests.Framework
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
             {
-                Assert.Throws<InvalidOperationException>(() => _texture = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream));
+                Assert.Throws<InvalidOperationException>(() => _texture = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream));
             }
         }
 
         [Test]
         public void FromStreamArgumentNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(_game.GraphicsDevice, (Stream) null));
+            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(game.GraphicsDevice, (Stream) null));
             Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(null, new MemoryStream()));
         }
 
@@ -99,7 +87,7 @@ namespace MonoGame.Tests.Framework
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
             {
                 Rectangle toReadArea = new Rectangle(rx, ry, rw, rh);
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 Color[] colors = new Color[startIndex + elementsToRead];
                 for (int i = 0; i < colors.Length; i++)
                 {
@@ -119,7 +107,7 @@ namespace MonoGame.Tests.Framework
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
             {
                 Rectangle toReadArea = new Rectangle(rx, ry, rw, rh);
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 Color[] colors = new Color[startIndex + elementsToRead];
                 for (int i = 0; i < colors.Length; i++)
                 {
@@ -144,7 +132,7 @@ namespace MonoGame.Tests.Framework
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 t.GetData(reference);
                 t.SetData(data);
                 t.GetData(written);
@@ -184,7 +172,7 @@ namespace MonoGame.Tests.Framework
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 t.GetData(reference);
                 Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(data));
                 t.GetData(written);
@@ -218,7 +206,7 @@ namespace MonoGame.Tests.Framework
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 t.GetData(reference);
                 t.SetData(data, startIndex, elements);
                 t.GetData(written);
@@ -268,7 +256,7 @@ namespace MonoGame.Tests.Framework
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 t.GetData(reference);
                 Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(data, startIndex, elements));
                 t.GetData(written);
@@ -310,7 +298,7 @@ namespace MonoGame.Tests.Framework
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 t.GetData(reference);
                 t.SetData(0, area, data, startIndex, elements);
                 t.GetData(written);
@@ -361,7 +349,7 @@ namespace MonoGame.Tests.Framework
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
                 t.GetData(reference);
                 Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(0, area, data, startIndex, elements));
                 t.GetData(written);
@@ -377,7 +365,7 @@ namespace MonoGame.Tests.Framework
         [TestFixtureTearDown]
         public void TearDown()
         {
-            _game.Dispose();
+            game.Dispose();
         }
     }
 }
