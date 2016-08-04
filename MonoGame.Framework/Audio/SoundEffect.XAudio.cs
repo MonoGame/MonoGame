@@ -350,7 +350,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (MasterVoice != null)
             {
-                MasterVoice.DestroyVoice();
                 MasterVoice.Dispose();
                 MasterVoice = null;
             }
