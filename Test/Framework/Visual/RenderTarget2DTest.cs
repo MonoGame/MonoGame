@@ -4,12 +4,13 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
 {
     [TestFixture]
-    class RenderTarget2DTest : VisualTestFixtureBase
+    class RenderTarget2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
 #if XNA
@@ -23,79 +24,74 @@ namespace MonoGame.Tests.Visual
             // Mipmaps created by DirectX 11 and OpenGL can also be different - at least for 
             // NPOT textures.
 
+            PrepareFrameCapture();
+
             Texture2D texture = null;
             SpriteBatch spriteBatch = null;
 
-            Game.LoadContentWith += (sender, e) =>
+            texture = content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
+            spriteBatch = new SpriteBatch(gd);
+
+            // Remember original (frame capture) render target.
+            var renderTargets = gd.GetRenderTargets();
+            RenderTarget2D originalRenderTarget = null;
+            if (renderTargets != null && renderTargets.Length > 0)
+                originalRenderTarget = renderTargets[0].RenderTarget as RenderTarget2D;
+
+            var viewport = gd.Viewport;
+            var renderTarget = new RenderTarget2D(
+                gd,
+                128,
+                128,
+                true,     // Enable mipmaps.
+                SurfaceFormat.Color,
+                DepthFormat.None,
+                0,
+                RenderTargetUsage.DiscardContents);
+
+            // Render sprites with random positions into the offscreen render target.
+            gd.SetRenderTarget(renderTarget);
+            gd.Clear(Color.Gray);
+            spriteBatch.Begin();
+            for (int i = 0; i < 5; i++)
             {
-                texture = Game.Content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
-                spriteBatch = new SpriteBatch(Game.GraphicsDevice);
-            };
+                spriteBatch.Draw(
+                    texture,
+                    new Vector2(
+                        (i * 1664525 + 1013904223) % (renderTarget.Width - texture.Width),
+                        (i * 22695477 + 7777) % (renderTarget.Height - texture.Height)),
+                    Color.White);
+            }
+            spriteBatch.End();
 
-            Game.DrawWith += (sender, e) =>
+            gd.SetRenderTarget(originalRenderTarget);
+
+            // Display all mip levels.
+            gd.Clear(Color.CornflowerBlue);
+            int x = 0;
+            int y = 0;
+            for (int i = 0; i < renderTarget.LevelCount; i++)
             {
-                // Remember original (frame capture) render target.
-                var renderTargets = Game.GraphicsDevice.GetRenderTargets();
-                RenderTarget2D originalRenderTarget = null;
-                if (renderTargets != null && renderTargets.Length > 0)
-                    originalRenderTarget = renderTargets[0].RenderTarget as RenderTarget2D;
-
-                var viewport = Game.GraphicsDevice.Viewport;
-                var renderTarget = new RenderTarget2D(
-                    Game.GraphicsDevice,
-                    128,
-                    128,
-                    true,     // Enable mipmaps.
-                    SurfaceFormat.Color,
-                    DepthFormat.None,
-                    0,
-                    RenderTargetUsage.DiscardContents);
-
-                // Render sprites with random positions into the offscreen render target.
-                Game.GraphicsDevice.SetRenderTarget(renderTarget);
-                Game.GraphicsDevice.Clear(Color.Gray);
-                spriteBatch.Begin();
-                for (int i = 0; i < 5; i++)
+                var samplerState = new SamplerState
                 {
-                    spriteBatch.Draw(
-                        texture,
-                        new Vector2(
-                            (i * 1664525 + 1013904223) % (renderTarget.Width - texture.Width),
-                            (i * 22695477 + 7777) % (renderTarget.Height - texture.Height)),
-                        Color.White);
-                }
+                    Filter = TextureFilter.Point,
+                    MipMapLevelOfDetailBias = i,
+                    MaxMipLevel = i,
+                };
+                
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, samplerState, null, null);
+                spriteBatch.Draw(renderTarget, new Vector2(x, y), Color.White);
                 spriteBatch.End();
 
-                Game.GraphicsDevice.SetRenderTarget(originalRenderTarget);
-
-                // Display all mip levels.
-                Game.GraphicsDevice.Clear(Color.CornflowerBlue);
-                int x = 0;
-                int y = 0;
-                for (int i = 0; i < renderTarget.LevelCount; i++)
+                x += renderTarget.Width + 1;
+                if (x + renderTarget.Width > viewport.Width)
                 {
-                    var samplerState = new SamplerState
-                    {
-                        Filter = TextureFilter.Point,
-                        MipMapLevelOfDetailBias = i,
-                        MaxMipLevel = i,
-                    };
-                    
-                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, samplerState, null, null);
-                    spriteBatch.Draw(renderTarget, new Vector2(x, y), Color.White);
-                    spriteBatch.End();
-
-                    x += renderTarget.Width + 1;
-                    if (x + renderTarget.Width > viewport.Width)
-                    {
-                        x = 0;
-                        y += renderTarget.Height + 1;
-                    }
+                    x = 0;
+                    y += renderTarget.Height + 1;
                 }
-            };
+            }
 
-            //Game.Run(until: frameInfo => false);
-            RunSingleFrameTest();
+            CheckFrames();
         }
     }
 }

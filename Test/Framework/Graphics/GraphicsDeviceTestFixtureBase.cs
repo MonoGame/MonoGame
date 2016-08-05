@@ -21,6 +21,7 @@ namespace MonoGame.Tests.Graphics
 
         private bool _framePrepared;
         private bool _frameSubmitted;
+        private bool _framesChecked;
         private RenderTarget2D _captureRenderTarget;
         private List<FramePixelData> _submittedFrames;
         private int _totalFramesExpected;
@@ -34,6 +35,7 @@ namespace MonoGame.Tests.Graphics
         protected float Similarity;
         protected WriteSettings WriteCapture;
         protected WriteSettings WriteDiffs;
+        protected bool CheckNumberSubmits;
 
         #endregion
 
@@ -52,16 +54,23 @@ namespace MonoGame.Tests.Graphics
 
             _framePrepared = false;
             _frameSubmitted = false;
+            _framesChecked = false;
 
             Similarity = Constants.StandardRequiredSimilarity;
             WriteCapture = WriteSettings.Always;
             WriteDiffs = WriteSettings.WhenFailed;
+            CheckNumberSubmits = false;
+
+            Paths.SetStandardWorkingDirectory();
         }
 
         [TearDown]
         public void TearDown()
         {
             game.Dispose();
+
+            if (_framePrepared && !_framesChecked)
+                Assert.Fail("Initialized fixture for rendering but did not check frames.");
         }
 
         #endregion
@@ -157,11 +166,13 @@ namespace MonoGame.Tests.Graphics
                 }
             }
 
+            _framesChecked = true;
+
             // write results to console
             WriteComparisonResultReport(allResults);
 
             // now do the actual assertions
-            if (_totalFramesExpected != allResults.Count)
+            if (CheckNumberSubmits && _totalFramesExpected != allResults.Count)
             {
 				Assert.Fail (
 					"Expected {0} frame comparison result(s), but found {1}",

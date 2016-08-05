@@ -6,67 +6,72 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.Components;
+using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
 {
     [TestFixture]
-    internal class RasterizerStateTest : VisualTestFixtureBase
+    internal class RasterizerStateTest : GraphicsDeviceTestFixtureBase
     {
         [TestCase(CullMode.CullClockwiseFace)]
         [TestCase(CullMode.CullCounterClockwiseFace)]
         [TestCase(CullMode.None)]
         public void VisualTestCullMode(CullMode cullMode)
         {
-            Game.Components.Add(new Colored3DCubeComponent(Game));
+            PrepareFrameCapture();
 
-            Game.PreDrawWith += (sender, e) =>
+            var cube = new Colored3DCubeComponent(gd);
+            cube.LoadContent();
+
+            gd.RasterizerState = new RasterizerState
             {
-                Game.GraphicsDevice.RasterizerState = new RasterizerState
-                {
-                    CullMode = cullMode
-                };
+                CullMode = cullMode
             };
+            cube.Draw();
 
-            RunSingleFrameTest();
+            CheckFrames();
         }
 
         [TestCase(FillMode.Solid)]
         [TestCase(FillMode.WireFrame)]
         public void VisualTestFillMode(FillMode fillMode)
         {
-            Game.Components.Add(new Colored3DCubeComponent(Game));
+            PrepareFrameCapture();
 
-            Game.PreDrawWith += (sender, e) =>
+            var cube = new Colored3DCubeComponent(gd);
+            cube.LoadContent();
+
+            gd.RasterizerState = new RasterizerState
             {
-                Game.GraphicsDevice.RasterizerState = new RasterizerState
-                {
-                    FillMode = fillMode
-                };
+                FillMode = fillMode
             };
+            cube.Draw();
 
-            RunSingleFrameTest();
+            CheckFrames();
         }
 
         [TestCase(false)]
         [TestCase(true)]
         public void VisualTestScissorTestEnable(bool scissorTestEnable)
         {
-            Game.Components.Add(new Colored3DCubeComponent(Game));
+            PrepareFrameCapture();
 
-            Game.PreDrawWith += (sender, e) =>
+            var cube = new Colored3DCubeComponent(gd);
+            cube.LoadContent();
+
+            gd.RasterizerState = new RasterizerState
             {
-                Game.GraphicsDevice.RasterizerState = new RasterizerState
-                {
-                    ScissorTestEnable = scissorTestEnable
-                };
-
-                var viewport = Game.GraphicsDevice.Viewport;
-                Game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0,
-                    viewport.Width / 2, viewport.Height / 2);
+                ScissorTestEnable = scissorTestEnable
             };
 
-            RunSingleFrameTest();
+            var viewport = gd.Viewport;
+            gd.ScissorRectangle = new Rectangle(0, 0,
+                viewport.Width / 2, viewport.Height / 2);
+
+            cube.Draw();
+
+            CheckFrames();
         }
 
 #if !XNA
@@ -74,20 +79,21 @@ namespace MonoGame.Tests.Visual
         [TestCase(true)]
         public void VisualTestDepthClipEnable(bool depthClipEnable)
         {
-            Game.Components.Add(new Colored3DCubeComponent(Game)
+            PrepareFrameCapture();
+
+            var cube = new Colored3DCubeComponent(gd)
             {
                 CubePosition = new Vector3(0, 0, 3)
-            });
-
-            Game.PreDrawWith += (sender, e) =>
-            {
-                Game.GraphicsDevice.RasterizerState = new RasterizerState
-                {
-                    DepthClipEnable = depthClipEnable
-                };
             };
+            cube.LoadContent();
 
-            RunSingleFrameTest();
+            gd.RasterizerState = new RasterizerState
+            {
+                DepthClipEnable = depthClipEnable
+            };
+            cube.Draw();
+
+            CheckFrames();
         }
 #endif
     }

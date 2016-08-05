@@ -4,50 +4,51 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
 {
     [TestFixture]
-    class RenderTargetCubeTest : VisualTestFixtureBase
+    class RenderTargetCubeTest : GraphicsDeviceTestFixtureBase
     {
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]
         public void ShouldClearRenderTargetAndGetData(int size)
         {
-            Game.DrawWith += (sender, e) =>
+            PrepareFrameCapture();
+            
+            var dataSize = size * size;
+            var renderTargetCube = new RenderTargetCube(gd, size, false, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            var colors = new[]
             {
-                var dataSize = size * size;
-                var renderTargetCube = new RenderTargetCube(Game.GraphicsDevice, size, false, SurfaceFormat.Color, DepthFormat.Depth16);
-
-                var colors = new[]
-                {
-                    Color.BlanchedAlmond,
-                    Color.BlueViolet,
-                    Color.DarkSeaGreen,
-                    Color.ForestGreen,
-                    Color.IndianRed,
-                    Color.LightGoldenrodYellow
-                };
-
-                for (var i = 0; i < 6; i++)
-                {
-                    Game.GraphicsDevice.SetRenderTarget(renderTargetCube, (CubeMapFace) i);
-                    Game.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, colors[i], 1.0f, 0);
-                    Game.GraphicsDevice.SetRenderTarget(null, (CubeMapFace) i);
-                }
-
-                for (var i = 0; i < 6; i++)
-                {
-                    var readData = new Color[dataSize];
-                    renderTargetCube.GetData((CubeMapFace) i, readData);
-
-                    for (var j = 0; j < dataSize; j++)
-                        Assert.AreEqual(colors[i], readData[j]);
-                }
+                Color.BlanchedAlmond,
+                Color.BlueViolet,
+                Color.DarkSeaGreen,
+                Color.ForestGreen,
+                Color.IndianRed,
+                Color.LightGoldenrodYellow
             };
-            Game.Run();
+
+            for (var i = 0; i < 6; i++)
+            {
+                gd.SetRenderTarget(renderTargetCube, (CubeMapFace) i);
+                gd.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, colors[i], 1.0f, 0);
+                gd.SetRenderTarget(null, (CubeMapFace) i);
+            }
+
+            for (var i = 0; i < 6; i++)
+            {
+                var readData = new Color[dataSize];
+                renderTargetCube.GetData((CubeMapFace) i, readData);
+
+                for (var j = 0; j < dataSize; j++)
+                    Assert.AreEqual(colors[i], readData[j]);
+            }
+
+            CheckFrames();
         }
     }
 }

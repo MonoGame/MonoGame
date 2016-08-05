@@ -96,8 +96,9 @@ namespace MonoGame.Tests.Visual {
 		[Test]
 		public void Colored3DCube ()
 		{
-			Game.Components.Add(new Colored3DCubeComponent(Game));
-			RunSingleFrameTest ();
+            // TODO fix this
+			//Game.Components.Add(new Colored3DCubeComponent(Game));
+            Assert.Fail();
 		}
 		
 		[TestCase(true)]
