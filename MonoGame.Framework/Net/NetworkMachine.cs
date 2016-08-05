@@ -7,26 +7,28 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkMachine
     {
-        internal bool isPending;
-        internal bool isLocal;
-        internal List<LocalNetworkGamer> localGamers;
-        internal List<NetworkGamer> gamers;
+        internal IList<LocalNetworkGamer> localGamers;
+        internal IList<NetworkGamer> gamers;
 
-        internal NetworkMachine(bool isPending, bool isLocal)
+        internal NetworkMachine(bool isLocal, bool isHost)
         {
-            this.isPending = isPending;
-            this.isLocal = isLocal;
+            this.IsPending = true;
+            this.IsLocal = isLocal;
+            this.IsHost = IsHost;
             this.localGamers = isLocal ? new List<LocalNetworkGamer>() : null;
             this.gamers = new List<NetworkGamer>();
 
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
         }
 
+        internal bool IsPending { get; set; }
+        internal bool IsLocal { get; }
+        internal bool IsHost { get; }
         public GamerCollection<NetworkGamer> Gamers { get; }
 
         internal void AddLocalGamer(LocalNetworkGamer localGamer)
         {
-            if (!isLocal)
+            if (!IsLocal)
             {
                 throw new InvalidOperationException("This NetworkMachine is remote");
             }
@@ -35,14 +37,35 @@ namespace Microsoft.Xna.Framework.Net
             gamers.Add(localGamer);
         }
 
+        internal void RemoveLocalGamer(LocalNetworkGamer localGamer)
+        {
+            if (!IsLocal)
+            {
+                throw new InvalidOperationException("This NetworkMachine is remote");
+            }
+
+            localGamers.Remove(localGamer);
+            gamers.Remove(localGamer);
+        }
+
         internal void AddRemoteGamer(NetworkGamer remoteGamer)
         {
-            if (isLocal)
+            if (IsLocal)
             {
                 throw new InvalidOperationException("This NetworkMachine is local");
             }
 
             gamers.Add(remoteGamer);
+        }
+
+        internal void RemoveRemoteGamer(NetworkGamer remoteGamer)
+        {
+            if (IsLocal)
+            {
+                throw new InvalidOperationException("This NetworkMachine is local");
+            }
+
+            gamers.Remove(remoteGamer);
         }
 
         public void RemoveFromSession()

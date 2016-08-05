@@ -5,16 +5,27 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkGamer : Gamer
     {
-        internal NetworkGamer(bool isLocal, byte id) : base()
+        internal NetworkGamer(string displayName, string gamertag, byte id, bool isGuest, bool isHost, bool isLocal, bool isPrivateSlot, NetworkMachine machine, NetworkSession session) : base()
         {
-            this.IsLocal = isLocal;
+            this.DisplayName = displayName;
+            this.Gamertag = gamertag;
+
+            this.HasLeftSession = false;
             this.Id = id;
+            this.IsGuest = isGuest;
+            this.IsHost = isHost;
+            this.IsLocal = isLocal;
+            this.IsPrivateSlot = isPrivateSlot;
+            this.IsReady = false;
+            this.Machine = machine;
+            this.RoundtripTime = TimeSpan.Zero;
+            this.Session = session;
         }
 
         public bool HasLeftSession { get; }
         public bool HasVoice { get { return false; } }
         public byte Id { get; }
-        public bool IsGuest { get { return false; } }
+        public bool IsGuest { get; }
         public bool IsHost { get; }
         public bool IsLocal { get; }
         public bool IsMutedByLocalUser { get { return false; } }

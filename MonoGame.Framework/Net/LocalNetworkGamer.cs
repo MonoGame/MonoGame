@@ -5,12 +5,15 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed class LocalNetworkGamer : NetworkGamer
     {
-        public LocalNetworkGamer(SignedInGamer signedInGamer, byte id) : base(true, id)
+        private bool isDataAvailable;
+
+        internal LocalNetworkGamer(byte id, bool isGuest, bool isHost, bool isPrivateSlot, NetworkSession session, SignedInGamer signedInGamer) : base(signedInGamer.DisplayName, signedInGamer.Gamertag, id, isGuest, isHost, true, isPrivateSlot, session.machine, session)
         {
+            this.isDataAvailable = false;
             this.SignedInGamer = signedInGamer;
         }
-
-        public bool IsDataAvailable { get; }
+        
+        public bool IsDataAvailable { get { return isDataAvailable; } }
         public SignedInGamer SignedInGamer { get; }
 
         public void EnableSendVoice(NetworkGamer remoteGamer, bool enable)
