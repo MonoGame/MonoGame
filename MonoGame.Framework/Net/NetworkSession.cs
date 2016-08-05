@@ -370,9 +370,11 @@ namespace Microsoft.Xna.Framework.Net
 
     public sealed class NetworkSession : IDisposable
     {
-        private static int Port = 14242;
-        private static int DiscoveryTime = 1000;
-        private static int JoinTime = 1000;
+        private const int Port = 14242;
+        private const int DiscoveryTime = 1000;
+        private const int JoinTime = 1000;
+        public const int MaxPreviousGamers = 10;
+        public const int MaxSupportedGamers = 64;
 
         internal static NetworkSession Session = null;
 
@@ -397,8 +399,14 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("Only one NetworkSession allowed");
             }
-            // ArgumentOutOfRangeException if maxGamers/privateGamerSlots out of bounds
-            // ObjectDisposedException if session disposed
+            if (maxGamers < 2 || maxGamers > MaxSupportedGamers)
+            {
+                throw new ArgumentOutOfRangeException("maxGamers must be in the range [2, " + MaxSupportedGamers + "]");
+            }
+            if (privateGamerSlots < 0 || privateGamerSlots > maxGamers)
+            {
+                throw new ArgumentOutOfRangeException("privateGamerSlots must be in the range[0, maxGamers]");
+            }
 
             NetPeer peer = new NetPeer(CreateNetPeerConfig(true));
 
@@ -487,8 +495,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new ArgumentNullException("availableSession");
             }
-            // ObjectDisposedException if availableSession disposed
-            // NetworkSessionJoinException if availableSession full/not joinable/cannot be found
+            // TODO: NetworkSessionJoinException if availableSession full/not joinable/cannot be found
 
             NetPeer peer = new NetPeer(CreateNetPeerConfig(false));
             peer.Start();
@@ -642,6 +649,11 @@ namespace Microsoft.Xna.Framework.Net
             throw new NotImplementedException();
         }
 
+        public void ResetReady() // only host
+        {
+            throw new NotImplementedException();
+        }
+
         public NetworkGamer FindGamerById(byte gamerId)
         {
             foreach (NetworkGamer gamer in AllGamers)
@@ -653,11 +665,6 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             return null;
-        }
-
-        public void ResetReady() // only host
-        {
-            throw new NotImplementedException();
         }
 
         internal void AddGamer(NetworkGamer gamer)
