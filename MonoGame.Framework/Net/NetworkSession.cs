@@ -411,7 +411,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("Internal error", e);
             }
 
-            Session = new NetworkSession(peer, true, null, localGamers);
+            Session = new NetworkSession(peer, true, null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
             return Session;
         }
 
@@ -442,7 +442,20 @@ namespace Microsoft.Xna.Framework.Net
                         // Ignore own message
                         break;
                     case NetIncomingMessageType.DiscoveryResponse:
-                        availableSessions.Add(new AvailableNetworkSession(msg.SenderEndPoint, localGamers, msg.ReadString()));
+                        NetworkSessionType remoteSessionType = (NetworkSessionType)msg.ReadByte();
+
+                        int maxGamers = msg.ReadInt32();
+                        int privateGamerSlots = msg.ReadInt32();
+                        int currentGamerCount = msg.ReadInt32();
+                        string hostGamertag = msg.ReadString();
+                        int openPrivateGamerSlots = msg.ReadInt32();
+                        int openPublicGamerSlots = msg.ReadInt32();
+                        NetworkSessionProperties sessionProperties = null;
+
+                        if (remoteSessionType == sessionType)
+                        {
+                            availableSessions.Add(new AvailableNetworkSession(msg.SenderEndPoint, localGamers, maxGamers, privateGamerSlots, sessionType, currentGamerCount, hostGamertag, openPrivateGamerSlots, openPublicGamerSlots, sessionProperties));
+                        }
                         break;
                     // Error checking
                     case NetIncomingMessageType.VerboseDebugMessage:
@@ -488,7 +501,15 @@ namespace Microsoft.Xna.Framework.Net
                 throw new NetworkSessionJoinException("Connection failed", NetworkSessionJoinError.SessionNotFound);
             }
 
-            Session = new NetworkSession(peer, false, peer.GetConnection(availableSession.remoteEndPoint), availableSession.gamers);
+            bool isHost = false;
+            NetConnection hostConnection = peer.GetConnection(availableSession.remoteEndPoint);
+            int maxGamers = availableSession.maxGamers;
+            int privateGamerSlots = availableSession.privateGamerSlots;
+            NetworkSessionType sessionType = availableSession.sessionType;
+            NetworkSessionProperties sessionProperties = availableSession.SessionProperties;
+            IEnumerable<SignedInGamer> localGamers = availableSession.localGamers;
+
+            Session = new NetworkSession(peer, isHost, hostConnection, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
             return Session;
         }
 
@@ -509,7 +530,7 @@ namespace Microsoft.Xna.Framework.Net
         private IList<NetworkGamer> allGamers;
         private IList<NetworkGamer> allRemoteGamers;
 
-        internal NetworkSession(NetPeer peer, bool isHost, NetConnection hostConnection, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(NetPeer peer, bool isHost, NetConnection hostConnection, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
             this.peer = peer;
             this.machine = new NetworkMachine(true, isHost);
@@ -522,7 +543,23 @@ namespace Microsoft.Xna.Framework.Net
             this.allRemoteGamers = new List<NetworkGamer>();
 
             this.AllGamers = new GamerCollection<NetworkGamer>(this.allGamers);
+            this.AllowHostMigration = false;
+            this.AllowJoinInProgress = false;
+            this.BytesPerSecondReceived = 0;
+            this.BytesPerSecondSent = 0;
+            this.Host = null;
+            this.IsDisposed = false;
+            this.IsEveryoneReady = false;
             this.IsHost = isHost;
+            this.LocalGamers = new GamerCollection<LocalNetworkGamer>(this.machine.localGamers);
+            this.MaxGamers = maxGamers;
+            this.PrivateGamerSlots = privateGamerSlots;
+            this.RemoteGamers = new GamerCollection<NetworkGamer>(this.allRemoteGamers);
+            this.SessionProperties = properties;
+            this.SessionState = NetworkSessionState.Lobby;
+            this.SessionType = type;
+            this.SimulatedLatency = TimeSpan.Zero;
+            this.SimulatedPacketLoss = 0.0f;
 
             // Store machine in peer tag
             this.peer.Tag = this.machine;
@@ -535,21 +572,39 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
-        public bool IsHost { get; }
+        public bool AllowHostMigration { get; set; } // any peer can get, only host can set
+        public bool AllowJoinInProgress { get; set; } // any peer can get, only host can set
+        public int BytesPerSecondReceived { get; } // todo
+        public int BytesPerSecondSent { get; } // todo
         public NetworkGamer Host { get; }
+        public bool IsDisposed { get; private set; }
+        public bool IsEveryoneReady { get; }
+        public bool IsHost { get; }
+        public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
+        public int MaxGamers { get; set; } // only host can set
+        public GamerCollection<NetworkGamer> PreviousGamers { get; }
+        public int PrivateGamerSlots { get; set; } // only host can set
+        public GamerCollection<NetworkGamer> RemoteGamers { get; }
+        public NetworkSessionProperties SessionProperties { get; } // should be synchronized
+        public NetworkSessionState SessionState { get; }
+        public NetworkSessionType SessionType { get; }
 
-        public NetworkGamer FindGamerById(byte gamerId)
+        public TimeSpan SimulatedLatency // TODO: Should be applied even to local messages
         {
-            foreach (NetworkGamer gamer in AllGamers)
-            {
-                if (gamer.Id == gamerId)
-                {
-                    return gamer;
-                }
-            }
-
-            return null;
+            get { return new TimeSpan(0, 0, 0, 0, (int)(peer.Configuration.SimulatedRandomLatency * 1000.0f)); }
+            set { peer.Configuration.SimulatedRandomLatency = (float)(value.TotalMilliseconds * 0.001); }
         }
+
+        public float SimulatedPacketLoss // TODO: Should be applied even to local messages
+        {
+            get { return peer.Configuration.SimulatedLoss; }
+            set { peer.Configuration.SimulatedLoss = value; }
+        }
+
+        internal int CurrentGamerCount { get { return allGamers.Count; } }
+        internal string HostGamertag { get { return machine.localGamers.Count > 0 ? machine.localGamers[0].Gamertag : "Game starting up..."; } }
+        internal int OpenPrivateGamerSlots { get { return PrivateGamerSlots; } }
+        internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - CurrentGamerCount; } }
 
         public event EventHandler<GamerJoinedEventArgs> GamerJoined;
         public event EventHandler<GamerLeftEventArgs> GamerLeft;
@@ -570,6 +625,39 @@ namespace Microsoft.Xna.Framework.Net
         internal void InvokeGamerLeftEvent(GamerLeftEventArgs args)
         {
             GamerLeft?.Invoke(this, args);
+        }
+
+        public void AddLocalGamer(SignedInGamer gamer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void StartGame() // only host
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EndGame() // only host
+        {
+            throw new NotImplementedException();
+        }
+
+        public NetworkGamer FindGamerById(byte gamerId)
+        {
+            foreach (NetworkGamer gamer in AllGamers)
+            {
+                if (gamer.Id == gamerId)
+                {
+                    return gamer;
+                }
+            }
+
+            return null;
+        }
+
+        public void ResetReady() // only host
+        {
+            throw new NotImplementedException();
         }
 
         internal void AddGamer(NetworkGamer gamer)
@@ -702,8 +790,13 @@ namespace Microsoft.Xna.Framework.Net
                     case NetIncomingMessageType.DiscoveryRequest:
                         Debug.WriteLine("Discovery request received");
                         NetOutgoingMessage response = peer.CreateMessage();
-                        string hostName = machine.localGamers.Count > 0 ? machine.localGamers[0].Gamertag : "Game starting up...";
-                        response.Write(hostName);
+                        response.Write((byte)SessionType);
+                        response.Write(MaxGamers);
+                        response.Write(PrivateGamerSlots);
+                        response.Write(CurrentGamerCount);
+                        response.Write(HostGamertag);
+                        response.Write(OpenPrivateGamerSlots);
+                        response.Write(OpenPublicGamerSlots);
                         peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
                         break;
                     // Peer state changes
@@ -763,6 +856,14 @@ namespace Microsoft.Xna.Framework.Net
 
                                         SendMessageToPeer(new ConnectToAllRequestAction(pendingPeer.Value), pendingPeer.Key);
                                     }
+                                }
+                            }
+                            else
+                            {
+                                if (msg.SenderConnection == hostConnection)
+                                {
+                                    // TODO: Host migration
+                                    Dispose();
                                 }
                             }
                         }
@@ -834,6 +935,10 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             peer.Shutdown("Peer done");
+
+            Session = null;
+
+            IsDisposed = true;
         }
     }
 }

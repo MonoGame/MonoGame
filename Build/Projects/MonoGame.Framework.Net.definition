@@ -203,6 +203,12 @@
     <Compile Include="Net\SendDataOptions.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
+    <Compile Include="Net\NetworkSessionState.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\QualityOfService.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
 
 
     <Compile Include="OldNet\AvailableNetworkSessionCollection.cs">
