@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework
         internal readonly Game _game;
         private IntPtr _handle;
         private bool _init, _disposed;
-        private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible;
+        private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible, _hardwareSwitch;
         private string _screenDeviceName;
         private int _winx, _winy, _width, _height;
 
@@ -243,10 +243,11 @@ namespace Microsoft.Xna.Framework
             Sdl.Rectangle displayRect;
             Sdl.Display.GetBounds(displayIndex, out displayRect);
 
-            if (_willBeFullScreen != IsFullScreen)
+            if (_willBeFullScreen != IsFullScreen || _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch)
             {
                 var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
                 Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
+                _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
             }
 
             if (!_willBeFullScreen || _game.graphicsDeviceManager.HardwareModeSwitch)

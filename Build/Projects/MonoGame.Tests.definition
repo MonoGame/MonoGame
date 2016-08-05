@@ -86,6 +86,7 @@
         <Platforms>iOS</Platforms>
     </Compile>
 
+    <Compile Include="Framework\ByteBufferPoolTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\ColorTest.cs" />
 	<Compile Include="Framework\CurveKeyCollectionTest.cs" />
