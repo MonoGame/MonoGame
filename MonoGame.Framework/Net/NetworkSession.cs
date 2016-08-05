@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void DecodeData(NetworkSession session, NetIncomingMessage msg)
         {
-            machine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+            machine = msg.SenderConnection.Tag as NetworkMachine;
             sender = msg.SenderConnection;
         }
 
@@ -276,7 +276,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void DecodeData(NetworkSession session, NetIncomingMessage msg)
         {
-            machine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+            machine = msg.SenderConnection.Tag as NetworkMachine;
             displayName = msg.ReadString();
             gamertag = msg.ReadString();
             id = msg.ReadByte();
@@ -337,7 +337,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public void DecodeData(NetworkSession session, NetIncomingMessage msg)
         {
-            machine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+            machine = msg.SenderConnection.Tag as NetworkMachine;
             id = msg.ReadByte();
         }
 
@@ -719,7 +719,7 @@ namespace Microsoft.Xna.Framework.Net
                         if (status == NetConnectionStatus.Connected)
                         {
                             // Create a pending network machine
-                            msg.SenderConnection.Peer.Tag = new NetworkMachine(false, msg.SenderConnection == hostConnection);
+                            msg.SenderConnection.Tag = new NetworkMachine(false, msg.SenderConnection == hostConnection);
 
                             if (IsHost)
                             {
@@ -735,7 +735,7 @@ namespace Microsoft.Xna.Framework.Net
                         if (status == NetConnectionStatus.Disconnected)
                         {
                             // Remove gamers
-                            NetworkMachine disconnectedMachine = msg.SenderConnection.Peer.Tag as NetworkMachine;
+                            NetworkMachine disconnectedMachine = msg.SenderConnection.Tag as NetworkMachine;
 
                             foreach (NetworkGamer gamer in disconnectedMachine.gamers)
                             {
