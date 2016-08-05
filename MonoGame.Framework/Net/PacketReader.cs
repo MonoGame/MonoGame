@@ -5,10 +5,11 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class PacketReader : BinaryReader
     {
-        public PacketReader() : base(Stream.Null)
-        { }
+        public PacketReader() : base(new MemoryStream())
+        {
+        }
 
-        public PacketReader(int capacity) : base(Stream.Null)
+        public PacketReader(int capacity) : base(new MemoryStream(capacity))
         { }
 
         public int Length { get; }

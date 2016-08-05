@@ -209,6 +209,9 @@
     <Compile Include="Net\QualityOfService.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
+    <Compile Include="Net\PacketPool.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
 
 
     <Compile Include="OldNet\AvailableNetworkSessionCollection.cs">

@@ -4,10 +4,10 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class PacketWriter : BinaryWriter
     {
-        public PacketWriter()
+        public PacketWriter() : base(new MemoryStream())
         { }
 
-        public PacketWriter(int capacity)
+        public PacketWriter(int capacity) : base(new MemoryStream(capacity))
         { }
 
         public int Length { get; }

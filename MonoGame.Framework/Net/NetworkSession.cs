@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Net
         GamerJoinResponse,
         GamerJoined,
         GamerLeft,
-        UserData
+        UserMessage
     }
 
     internal interface INetAction
@@ -28,7 +28,8 @@ namespace Microsoft.Xna.Framework.Net
         int SequenceChannel { get; }
         void EncodeData(NetworkSession session, NetOutgoingMessage msg); // May not run if local message
         void DecodeData(NetworkSession session, NetIncomingMessage msg); // May not run if local message
-        void Perform(NetworkSession session);
+        void Trigger(NetworkSession session);
+        void CleanUp();
     }
 
     internal struct ConnectToAllRequestAction : INetAction // Host to any other peer
@@ -75,7 +76,7 @@ namespace Microsoft.Xna.Framework.Net
             Debug.WriteLine("ConnectToAllRequest received");
         }
 
-        public void Perform(NetworkSession session)
+        public void Trigger(NetworkSession session)
         {
             session.pendingEndPoints = new List<IPEndPoint>();
 
@@ -89,6 +90,9 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
         }
+
+        public void CleanUp()
+        { }
     }
 
     internal struct ConnectToAllSuccessfulAction : INetAction // Any peer to all peers
@@ -115,7 +119,7 @@ namespace Microsoft.Xna.Framework.Net
             sender = msg.SenderConnection;
         }
 
-        public void Perform(NetworkSession session)
+        public void Trigger(NetworkSession session)
         {
             // The local or remote machine is now considered fully connected
             machine.IsPending = false;
@@ -135,6 +139,9 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
         }
+
+        public void CleanUp()
+        { }
     }
 
     internal struct GamerJoinRequestAction : INetAction // Any peer to host
@@ -153,13 +160,16 @@ namespace Microsoft.Xna.Framework.Net
             sender = msg.SenderConnection;
         }
 
-        public void Perform(NetworkSession session)
+        public void Trigger(NetworkSession session)
         {
             if (session.IsHost)
             {
                 session.SendMessageToPeer(new GamerJoinResponseAction(session), sender);
             }
         }
+
+        public void CleanUp()
+        { }
     }
 
     internal struct GamerJoinResponseAction : INetAction // Host to any peer
@@ -203,7 +213,7 @@ namespace Microsoft.Xna.Framework.Net
             id = msg.ReadByte();
         }
 
-        public void Perform(NetworkSession session)
+        public void Trigger(NetworkSession session)
         {
             if (!wasApprovedByHost)
             {
@@ -228,6 +238,9 @@ namespace Microsoft.Xna.Framework.Net
 
             session.SendMessageToEveryone(new GamerJoinedAction(localGamer));
         }
+
+        public void CleanUp()
+        { }
     }
 
     internal struct GamerJoinedAction : INetAction
@@ -291,7 +304,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        public void Perform(NetworkSession session)
+        public void Trigger(NetworkSession session)
         {
             if (localGamer != null)
             {
@@ -309,6 +322,9 @@ namespace Microsoft.Xna.Framework.Net
                 session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(remoteGamer));
             }
         }
+
+        public void CleanUp()
+        { }
     }
 
     internal struct GamerLeftAction : INetAction
@@ -341,7 +357,7 @@ namespace Microsoft.Xna.Framework.Net
             id = msg.ReadByte();
         }
 
-        public void Perform(NetworkSession session)
+        public void Trigger(NetworkSession session)
         {
             if (localGamer != null)
             {
@@ -364,6 +380,89 @@ namespace Microsoft.Xna.Framework.Net
 
                 machine.RemoveRemoteGamer(remoteGamer);
                 session.RemoveGamer(remoteGamer);
+            }
+        }
+
+        public void CleanUp()
+        { }
+    }
+
+    internal struct UserMessageAction : INetAction
+    {
+        private byte senderId;
+        private bool sendToAll;
+        private byte recipientId;
+        private Packet packet;
+
+        private bool shouldCleanUp;
+
+        public UserMessageAction(LocalNetworkGamer sender, NetworkGamer recipient, Packet packet)
+        {
+            this.senderId = sender.Id;
+            this.sendToAll = recipient == null;
+            this.recipientId = recipient != null ? recipient.Id : (byte)255;
+            this.packet = packet;
+
+            this.shouldCleanUp = false;
+        }
+
+        public NetActionIndex Index { get { return NetActionIndex.UserMessage; } }
+        public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
+        public int SequenceChannel { get { return 1; } }
+
+        public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
+        {
+            msg.Write(senderId);
+            msg.Write(sendToAll);
+            msg.Write(recipientId);
+            msg.Write(packet.length);
+            msg.Write(packet.data);
+
+            shouldCleanUp = true;
+        }
+
+        public void DecodeData(NetworkSession session, NetIncomingMessage msg)
+        {
+            senderId = msg.ReadByte();
+            sendToAll = msg.ReadBoolean();
+            recipientId = msg.ReadByte();
+            int length = msg.ReadInt32();
+            packet = session.packetPool.GetPacket(length);
+            msg.ReadBytes(packet.data, 0, length);
+        }
+
+        public void Trigger(NetworkSession session)
+        {
+            shouldCleanUp = false;
+
+            NetworkGamer sender = session.FindGamerById(senderId);
+
+            if (sendToAll)
+            {
+                foreach (LocalNetworkGamer localGamer in session.LocalGamers)
+                {
+                    localGamer.inboundPackets.Add(new PacketSenderPair(packet, sender));
+                }
+            }
+            else
+            {
+                LocalNetworkGamer localGamer = session.FindGamerById(recipientId) as LocalNetworkGamer;
+
+                if (localGamer == null)
+                {
+                    Debug.WriteLine("User message sent to the wrong peer!");
+                    return;
+                }
+
+                localGamer.inboundPackets.Add(new PacketSenderPair(packet, sender));
+            }
+        }
+
+        public void CleanUp()
+        {
+            if (shouldCleanUp)
+            {
+                NetworkSession.Session.packetPool.RecyclePacket(packet);
             }
         }
     }
@@ -520,6 +619,8 @@ namespace Microsoft.Xna.Framework.Net
             return Session;
         }
 
+        internal PacketPool packetPool;
+
         internal NetPeer peer;
         internal NetworkMachine machine;
         internal NetConnection hostConnection;
@@ -539,6 +640,8 @@ namespace Microsoft.Xna.Framework.Net
 
         internal NetworkSession(NetPeer peer, bool isHost, NetConnection hostConnection, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
+            this.packetPool = new PacketPool();
+
             this.peer = peer;
             this.machine = new NetworkMachine(true, isHost);
             this.hostConnection = hostConnection;
@@ -556,7 +659,6 @@ namespace Microsoft.Xna.Framework.Net
             this.BytesPerSecondSent = 0;
             this.Host = null;
             this.IsDisposed = false;
-            this.IsEveryoneReady = false;
             this.IsHost = isHost;
             this.LocalGamers = new GamerCollection<LocalNetworkGamer>(this.machine.localGamers);
             this.MaxGamers = maxGamers;
@@ -585,7 +687,23 @@ namespace Microsoft.Xna.Framework.Net
         public int BytesPerSecondSent { get; } // todo
         public NetworkGamer Host { get; }
         public bool IsDisposed { get; private set; }
-        public bool IsEveryoneReady { get; }
+
+        public bool IsEveryoneReady
+        {
+            get
+            {
+                foreach (NetworkGamer gamer in allGamers)
+                {
+                    if (!gamer.IsReady)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
         public bool IsHost { get; }
         public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
         public int MaxGamers { get; set; } // only host can set
@@ -721,7 +839,9 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Handle self
-            action.Perform(this);
+            action.Trigger(this);
+
+            action.CleanUp();
         }
 
         // To self only
@@ -729,7 +849,9 @@ namespace Microsoft.Xna.Framework.Net
         {
             Debug.WriteLine("Sending " + action.Index + " to self...");
 
-            action.Perform(this);
+            action.Trigger(this);
+
+            action.CleanUp();
         }
 
         // To specific peer
@@ -755,6 +877,8 @@ namespace Microsoft.Xna.Framework.Net
             msg.Write((byte)action.Index);
             action.EncodeData(this, msg);
             peer.SendMessage(msg, recipient, action.DeliveryMethod, action.SequenceChannel);
+
+            action.CleanUp();
         }
 
         private static Type[] actionIndexToTypeMap =
@@ -764,8 +888,8 @@ namespace Microsoft.Xna.Framework.Net
             typeof(GamerJoinRequestAction),
             typeof(GamerJoinResponseAction),
             typeof(GamerJoinedAction),
-            typeof(GamerLeftAction)
-            //actionIndexToTypeMap[(int)ActionType.UserData] = typeof(User),
+            typeof(GamerLeftAction),
+            typeof(UserMessageAction)
         };
 
         private void ReceiveMessage(NetIncomingMessage msg)
@@ -782,7 +906,7 @@ namespace Microsoft.Xna.Framework.Net
 
             INetAction action = (INetAction)Activator.CreateInstance(actionIndexToTypeMap[index]);
             action.DecodeData(this, msg);
-            action.Perform(this);
+            action.Trigger(this);
         }
 
         public void Update()
