@@ -116,7 +116,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 if (existingTouch.Id == touch.Id)
                 {
                     //If we are moving straight from Pressed to Released and we've existed for multiple frames, that means we've never been seen, so just get rid of us
-                    if (existingTouch.State == TouchLocationState.Pressed && touch.State == TouchLocationState.Released && existingTouch.PressTimestamp != touch.Timestamp)
+                    if (touch.State == TouchLocationState.Invalid || 
+                        (existingTouch.State == TouchLocationState.Pressed && touch.State == TouchLocationState.Released && existingTouch.PressTimestamp != touch.Timestamp))
                     {
                         state.RemoveAt(i);
                     }
