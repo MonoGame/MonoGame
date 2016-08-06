@@ -1,12 +1,12 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual
 {
     [TestFixture]
-    internal class ScissorRectangleTest : VisualTestFixtureBase
+    internal class ScissorRectangleTest : GraphicsDeviceTestFixtureBase
     {
         private SpriteBatch _spriteBatch;
         private Texture2D _texture;
@@ -17,50 +17,40 @@ namespace MonoGame.Tests.Visual
         {
             base.SetUp();
 
-            Game.LoadContentWith += (sender, e) =>
-            {
-                _spriteBatch = new SpriteBatch(Game.GraphicsDevice);
-                _texture = Game.Content.Load<Texture2D>(Paths.Texture("Surge"));
-                _extraRenderTarget = new RenderTarget2D(Game.GraphicsDevice, 256, 256);
-            };
-
-            Game.UnloadContentWith += (sender, e) =>
-            {
-                _texture.Dispose();
-                _spriteBatch.Dispose();
-            };
-
-            Game.PreDrawWith += (sender, e) => Game.GraphicsDevice.Clear(Color.CornflowerBlue);
+            _spriteBatch = new SpriteBatch(gd);
+            _texture = content.Load<Texture2D>(Paths.Texture("Surge"));
+            _extraRenderTarget = new RenderTarget2D(gd, 256, 256);
         }
 
         [Test]
         public void Draw_with_render_target_change()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var renderTargets = Game.GraphicsDevice.GetRenderTargets();
-                Game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, 20, 20);
-                Game.GraphicsDevice.SetRenderTarget(_extraRenderTarget);
-                Game.GraphicsDevice.SetRenderTargets(renderTargets);
-                Game.GraphicsDevice.Clear(new Color(68, 34, 136, 255));
-                DrawTexture();
-            };
+            PrepareFrameCapture();
 
-            RunSingleFrameTest();
+            gd.Clear(new Color(68, 34, 136, 255));
+
+            var renderTargets = gd.GetRenderTargets();
+            gd.ScissorRectangle = new Rectangle(0, 0, 20, 20);
+            gd.SetRenderTarget(_extraRenderTarget);
+            gd.SetRenderTargets(renderTargets);
+
+            DrawTexture();
+
+            CheckFrames();
         }
 
         [Test]
         public void Draw_without_render_target_change()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var renderTargets = Game.GraphicsDevice.GetRenderTargets();
-                Game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, 20, 20);
-                Game.GraphicsDevice.SetRenderTargets(renderTargets);
-                DrawTexture();
-            };
+            PrepareFrameCapture();
 
-            RunSingleFrameTest();
+            var renderTargets = gd.GetRenderTargets();
+            gd.ScissorRectangle = new Rectangle(0, 0, 20, 20);
+            gd.SetRenderTargets(renderTargets);
+
+            DrawTexture();
+
+            CheckFrames();
         }
 
         private void DrawTexture()

@@ -2,11 +2,12 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
+using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual {
 	[TestFixture]
-	class SpriteBatchTest : VisualTestFixtureBase {
+	class SpriteBatchTest : GraphicsDeviceTestFixtureBase {
 		private SpriteBatch _spriteBatch;
 		private Texture2D _texture;
         private Texture2D _texture2;
@@ -17,59 +18,47 @@ namespace MonoGame.Tests.Visual {
 		{
 			base.SetUp ();
 
-			Game.LoadContentWith += (sender, e) => {
-				_spriteBatch = new SpriteBatch (Game.GraphicsDevice);
-				_texture = Game.Content.Load<Texture2D> (Paths.Texture ("MonoGameIcon"));
-                _texture2 = Game.Content.Load<Texture2D>(Paths.Texture("Surge"));
-                _texture3 = Game.Content.Load<Texture2D> (Paths.Texture ("Lines-64"));
-			};
-
-			Game.UnloadContentWith += (sender, e) => {
-				_spriteBatch.Dispose ();
-				_spriteBatch = null;
-				_texture = null;
-			};
-
-			Game.PreDrawWith += (sender, e) => {
-				Game.GraphicsDevice.Clear (Color.CornflowerBlue);
-			};
+            _spriteBatch = new SpriteBatch (gd);
+            _texture = content.Load<Texture2D> (Paths.Texture ("MonoGameIcon"));
+            _texture2 = content.Load<Texture2D>(Paths.Texture("Surge"));
+            _texture3 = content.Load<Texture2D> (Paths.Texture ("Lines-64"));
 		}
 
 		[Test]
 		public void Draw_without_blend ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Opaque);
-				_spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Opaque);
+            _spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Draw_with_additive_blend ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Additive);
-				_spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
-				_spriteBatch.Draw (_texture, new Vector2 (30, 30), Color.White);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.Additive);
+            _spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
+            _spriteBatch.Draw (_texture, new Vector2 (30, 30), Color.White);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Draw_normal ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[TestCase(0.5f, 0.5f)]
@@ -78,16 +67,16 @@ namespace MonoGame.Tests.Visual {
 		[TestCase(1.25f, 0.8f)]
 		public void Draw_stretched (float xScale, float yScale)
 		{
-			Game.DrawWith += (sender, e) => {
-				var rect = new Rectangle (
-					30, 50, (int) (_texture.Width * xScale), (int) (_texture.Height * yScale));
+            PrepareFrameCapture();
 
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (_texture, rect, Color.White);
-				_spriteBatch.End ();
-			};
+            var rect = new Rectangle (
+                30, 50, (int) (_texture.Width * xScale), (int) (_texture.Height * yScale));
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (_texture, rect, Color.White);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[TestCase("Red")]
@@ -96,13 +85,13 @@ namespace MonoGame.Tests.Visual {
 		public void Draw_with_filter_color (string colorName)
 		{
 			var color = colorName.ToColor ();
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (_texture, new Vector2 (20, 20), color);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (_texture, new Vector2 (20, 20), color);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[TestCase (0.38f)]
@@ -111,32 +100,32 @@ namespace MonoGame.Tests.Visual {
 		[TestCase (2.81f)]
 		public void Draw_rotated (float rotation)
 		{
-			Game.DrawWith += (sender, e) => {
-				var position = new Vector2 (50, 50);
-				var origin = new Vector2 (_texture.Width / 2, _texture.Height / 2);
+            PrepareFrameCapture();
 
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (
-					_texture, position, null, Color.White,
-					rotation, origin, 1, SpriteEffects.None, 0);
-				_spriteBatch.End ();
-			};
+            var position = new Vector2 (50, 50);
+            var origin = new Vector2 (_texture.Width / 2, _texture.Height / 2);
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (
+                _texture, position, null, Color.White,
+                rotation, origin, 1, SpriteEffects.None, 0);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Draw_with_source_rect ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (
-					_texture, new Vector2 (20, 20),
-					new Rectangle (20, 20, 40, 40), Color.White);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (
+                _texture, new Vector2 (20, 20),
+                new Rectangle (20, 20, 40, 40), Color.White);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[TestCase(10, 10, 40, 40)]
@@ -144,15 +133,15 @@ namespace MonoGame.Tests.Visual {
 		[TestCase(20, 30, 80, 60)]
 		public void Draw_with_source_and_dest_rect (int x, int y, int width, int height)
 		{
+            PrepareFrameCapture();
+
 			var destRect = new Rectangle(x, y, width, height);
 			var sourceRect = new Rectangle(20, 20, 40, 40);
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (_texture, destRect, sourceRect, Color.White);
-				_spriteBatch.End ();
-			};
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (_texture, destRect, sourceRect, Color.White);
+            _spriteBatch.End ();
 
-			RunSingleFrameTest ();
+            CheckFrames();
 		}
 
 		[TestCase("Red", 120)]
@@ -160,17 +149,17 @@ namespace MonoGame.Tests.Visual {
 		[TestCase("GreenYellow", 200)]
 		public void Draw_with_alpha_blending (string colorName, byte alpha)
 		{
+            PrepareFrameCapture();
+
 			var color = colorName.ToColor();
             color = Color.FromNonPremultiplied(color.R, color.G, color.B, alpha);
 
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
-				_spriteBatch.Draw (_texture, new Vector2 (40, 40), color);
-				_spriteBatch.End ();
-			};
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (_texture, new Vector2 (20, 20), Color.White);
+            _spriteBatch.Draw (_texture, new Vector2 (40, 40), color);
+            _spriteBatch.End ();
 
-			RunSingleFrameTest ();
+            CheckFrames();
 		}
 
 		[TestCase (SpriteEffects.FlipHorizontally)]
@@ -178,15 +167,15 @@ namespace MonoGame.Tests.Visual {
 		[TestCase (SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically)]
 		public void Draw_with_SpriteEffects (SpriteEffects effects)
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.Draw (
-					_texture, new Vector2(30, 30), null, Color.White,
-					0.0f, Vector2.Zero, 1.0f, effects, 0);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.Draw (
+                _texture, new Vector2(30, 30), null, Color.White,
+                0.0f, Vector2.Zero, 1.0f, effects, 0);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		private static readonly Matrix [] Matrices = new Matrix [] {
@@ -204,17 +193,17 @@ namespace MonoGame.Tests.Visual {
 		[Test]
 		public void Draw_with_matrix ([Range(0, 4)]int matrixIndex)
 		{
+            PrepareFrameCapture();
+
 			var matrix = Matrices [matrixIndex];
 
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin (
-					SpriteSortMode.Immediate, BlendState.AlphaBlend,
-					null, null, null, null, matrix);
-				_spriteBatch.Draw (_texture, new Vector2(10, 10), Color.White);
-				_spriteBatch.End ();
-			};
+            _spriteBatch.Begin (
+                SpriteSortMode.Immediate, BlendState.AlphaBlend,
+                null, null, null, null, matrix);
+            _spriteBatch.Draw (_texture, new Vector2(10, 10), Color.White);
+            _spriteBatch.End ();
 
-			RunSingleFrameTest ();
+            CheckFrames();
 		}
 
         [TestCase(SpriteSortMode.BackToFront)]
@@ -227,19 +216,19 @@ namespace MonoGame.Tests.Visual {
 #endif
         public void Draw_with_SpriteSortMode(SpriteSortMode sortMode)
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                _spriteBatch.Begin(sortMode, BlendState.AlphaBlend);
-                _spriteBatch.Draw(_texture, new Vector2(110, 110), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
-                _spriteBatch.Draw(_texture2, new Vector2(130, 130), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.2f);
-                _spriteBatch.Draw(_texture3, new Vector2(145, 145), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.3f);
-                _spriteBatch.Draw(_texture, new Vector2(160, 160), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.5f);
-                _spriteBatch.Draw(_texture3, new Vector2(205, 205), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
-                _spriteBatch.Draw(_texture2, new Vector2(190, 190), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.1f);
-                _spriteBatch.End();
-            };
+            Similarity = 0.995f;
+            PrepareFrameCapture();
 
-            RunSingleFrameTest(0.995f); // The sprites are too small to fail the test with standard similarity
+            _spriteBatch.Begin(sortMode, BlendState.AlphaBlend);
+            _spriteBatch.Draw(_texture, new Vector2(110, 110), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.Draw(_texture2, new Vector2(130, 130), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.2f);
+            _spriteBatch.Draw(_texture3, new Vector2(145, 145), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.3f);
+            _spriteBatch.Draw(_texture, new Vector2(160, 160), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.5f);
+            _spriteBatch.Draw(_texture3, new Vector2(205, 205), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(_texture2, new Vector2(190, 190), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.1f);
+            _spriteBatch.End();
+
+            CheckFrames();
         }
 
 		// FIXME: This scissoring code is not valid in XNA. It
@@ -261,137 +250,124 @@ namespace MonoGame.Tests.Visual {
         [Test]
         public void DrawRequiresTexture()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-                Assert.Throws<ArgumentNullException>(() => _spriteBatch.Draw(null, new Vector2(20, 20), Color.White));
-                _spriteBatch.End();
-            };
-            Game.Run();
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            Assert.Throws<ArgumentNullException>(() => _spriteBatch.Draw(null, new Vector2(20, 20), Color.White));
+            _spriteBatch.End();
         }
 
         [Test]
         public void DrawWithTexture()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.Null);
+            Assert.That(gd.Textures[0], Is.Null);
 
-                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-                _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
-                _spriteBatch.End();
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
+            _spriteBatch.End();
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
-            };
-            Game.Run();
+            Assert.That(gd.Textures[0], Is.SameAs(_texture));
         }
 
         [Test]
         public void DrawWithCustomEffectAndTwoTextures()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                var customSpriteEffect = AssetTestUtility.CompileEffect(Game.GraphicsDevice, "CustomSpriteBatchEffect.fx");
-                var texture2 = new Texture2D(Game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            var customSpriteEffect = AssetTestUtility.CompileEffect(gd, "CustomSpriteBatchEffect.fx");
+            var texture2 = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
 
-                customSpriteEffect.Parameters["SourceTexture"].SetValue(texture2);
-                customSpriteEffect.Parameters["OtherTexture"].SetValue(texture2);
+            customSpriteEffect.Parameters["SourceTexture"].SetValue(texture2);
+            customSpriteEffect.Parameters["OtherTexture"].SetValue(texture2);
 
-                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, null, null, null, customSpriteEffect);
-                _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
-                _spriteBatch.End();
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, null, null, null, customSpriteEffect);
+            _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
+            _spriteBatch.End();
 
-                Assert.That(Game.GraphicsDevice.Textures[0], Is.SameAs(_texture));
-                Assert.That(Game.GraphicsDevice.Textures[1], Is.SameAs(texture2));
-            };
-            Game.Run();
+            Assert.That(gd.Textures[0], Is.SameAs(_texture));
+            Assert.That(gd.Textures[1], Is.SameAs(texture2));
         }
 
         [Test]
         public void DrawWithLayerDepth()
         {
-            Game.DrawWith += (sender, e) =>
-            {
-                 // Row 0, column 0: Deferred, no depth test.
-                _spriteBatch.Begin();
-                _spriteBatch.Draw(
-                    _texture, new Vector2(30, 30), null, Color.Red,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(40, 40), null, Color.Green,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(50, 50), null, Color.Blue,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(60, 60), null, Color.White,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
-                _spriteBatch.End();
+            PrepareFrameCapture();
 
-                // Row 0, column 1: Deferred, with depth test.
-                _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, DepthStencilState.Default, null);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(130, 30), null, Color.Red,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(140, 40), null, Color.Green,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(150, 50), null, Color.Blue,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(160, 60), null, Color.White,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
-                _spriteBatch.End();
+             // Row 0, column 0: Deferred, no depth test.
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(
+                _texture, new Vector2(30, 30), null, Color.Red,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(40, 40), null, Color.Green,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(50, 50), null, Color.Blue,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(60, 60), null, Color.White,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+            _spriteBatch.End();
 
-                // Row 1, column 0: BackToFront, no depth test.
-                _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.None, null);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(30, 130), null, Color.Red,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(40, 140), null, Color.Green,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(50, 150), null, Color.Blue,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(60, 160), null, Color.White,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
-                _spriteBatch.End();
+            // Row 0, column 1: Deferred, with depth test.
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, DepthStencilState.Default, null);
+            _spriteBatch.Draw(
+                _texture, new Vector2(130, 30), null, Color.Red,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(140, 40), null, Color.Green,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(150, 50), null, Color.Blue,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(160, 60), null, Color.White,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+            _spriteBatch.End();
 
-                // Row 1, column 1: BackToFront, with depth test.
-                _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.Default, null);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(130, 130), null, Color.Red,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(140, 140), null, Color.Green,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(150, 150), null, Color.Blue,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
-                _spriteBatch.Draw(
-                    _texture, new Vector2(160, 160), null, Color.White,
-                    0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
-                _spriteBatch.End();
-            };
+            // Row 1, column 0: BackToFront, no depth test.
+            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.None, null);
+            _spriteBatch.Draw(
+                _texture, new Vector2(30, 130), null, Color.Red,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(40, 140), null, Color.Green,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(50, 150), null, Color.Blue,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(60, 160), null, Color.White,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+            _spriteBatch.End();
 
-            RunSingleFrameTest();
+            // Row 1, column 1: BackToFront, with depth test.
+            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, DepthStencilState.Default, null);
+            _spriteBatch.Draw(
+                _texture, new Vector2(130, 130), null, Color.Red,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, -1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(140, 140), null, Color.Green,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(150, 150), null, Color.Blue,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            _spriteBatch.Draw(
+                _texture, new Vector2(160, 160), null, Color.White,
+                0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 2.0f);
+            _spriteBatch.End();
+
+            CheckFrames();
         }
 
         [Test]
         public void Draw_many()
         {
-            Game.DrawWith += (sender, e) => {
-                _spriteBatch.Begin();
-                for (int x = 0; x < 99; x++)
-                    for (int y = 0; y < 59; y++)
-                        _spriteBatch.Draw(_texture, new Rectangle(4+x*8, 4+y*8, 4, 4), Color.White);
-                _spriteBatch.End();
-            };
+            PrepareFrameCapture();
 
-            RunSingleFrameTest();
+            _spriteBatch.Begin();
+            for (int x = 0; x < 99; x++)
+                for (int y = 0; y < 59; y++)
+                    _spriteBatch.Draw(_texture, new Rectangle(4+x*8, 4+y*8, 4, 4), Color.White);
+            _spriteBatch.End();
+
+            CheckFrames();
         }
     }
 }

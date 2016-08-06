@@ -17,8 +17,6 @@ namespace MonoGame.Tests.Visual
         [TestCase(31)]
         public void ShouldClearRenderTargetAndGetData(int size)
         {
-            PrepareFrameCapture();
-            
             var dataSize = size * size;
             var renderTargetCube = new RenderTargetCube(gd, size, false, SurfaceFormat.Color, DepthFormat.Depth16);
 
@@ -47,8 +45,6 @@ namespace MonoGame.Tests.Visual
                 for (var j = 0; j < dataSize; j++)
                     Assert.AreEqual(colors[i], readData[j]);
             }
-
-            CheckFrames();
         }
     }
 }

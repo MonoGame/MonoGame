@@ -103,12 +103,12 @@ namespace MonoGame.Tests.Visual
             {
                 var x = i % 4;
                 var pos = offset + new Vector2(x * size.X, 0);
-                ((SpriteBatch)null).Begin(SpriteSortMode.Deferred, samplerState: samplerStates[i]);
-                ((SpriteBatch)null).Draw(texture, 
+                spriteBatch.Begin(SpriteSortMode.Deferred, samplerState: samplerStates[i]);
+                spriteBatch.Draw(texture, 
                     new Rectangle((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y),
                     new Rectangle(-20, -20, texture.Width + 40, texture.Height + 40),
                     Color.White);
-                ((SpriteBatch)null).End();
+                spriteBatch.End();
             }
 
             CheckFrames();

@@ -67,20 +67,15 @@ non-infringement.
 #endregion License
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using NUnit.Framework;
-
-using MonoGame.Tests.Components;
+using MonoGame.Tests.Graphics;
 
 namespace MonoGame.Tests.Visual {
 	[TestFixture]
-	class SpriteFontTest : VisualTestFixtureBase {
+	class SpriteFontTest : GraphicsDeviceTestFixtureBase {
 
 		private SpriteBatch _spriteBatch;
 		private SpriteFont _defaultFont;
@@ -90,62 +85,49 @@ namespace MonoGame.Tests.Visual {
 		{
 			base.SetUp ();
 
-			Game.LoadContentWith += (sender, e) => {
-				_spriteBatch = new SpriteBatch (Game.GraphicsDevice);
-				_defaultFont = Game.Content.Load<SpriteFont> (Paths.Font ("Default"));
-			};
-
-			Game.UnloadContentWith += (sender, e) => {
-				_spriteBatch.Dispose ();
-				_spriteBatch = null;
-
-				_defaultFont = null;
-			};
-
-			Game.PreDrawWith += (sender, e) => {
-				Game.GraphicsDevice.Clear (Color.CornflowerBlue);
-			};
+            _spriteBatch = new SpriteBatch (gd);
+            _defaultFont = content.Load<SpriteFont> (Paths.Font ("Default"));
 		}
 
 		[Test]
 		public void Plain ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.DrawString (
-					_defaultFont, "plain old text", new Vector2 (50, 50), Color.Violet);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.DrawString (
+                _defaultFont, "plain old text", new Vector2 (50, 50), Color.Violet);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Rotated ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.DrawString (
-					_defaultFont, "rotated", new Vector2 (50, 50), Color.Orange,
-					MathHelper.PiOver4, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.DrawString (
+                _defaultFont, "rotated", new Vector2 (50, 50), Color.Orange,
+                MathHelper.PiOver4, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Scaled ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.DrawString (
-					_defaultFont, "scaled", new Vector2 (50, 50), Color.Orange,
-					0, Vector2.Zero, new Vector2(3.0f, 1.5f), SpriteEffects.None, 0.0f);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.DrawString (
+                _defaultFont, "scaled", new Vector2 (50, 50), Color.Orange,
+                0, Vector2.Zero, new Vector2(3.0f, 1.5f), SpriteEffects.None, 0.0f);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[TestCase(SpriteEffects.FlipHorizontally)]
@@ -153,116 +135,117 @@ namespace MonoGame.Tests.Visual {
 		[TestCase(SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically)]
 		public void Draw_with_SpriteEffects (SpriteEffects effects)
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.DrawString (
-					_defaultFont, effects.ToString(), new Vector2 (50, 50), Color.Orange,
-					0, Vector2.Zero, Vector2.One, effects, 0.0f);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.DrawString (
+                _defaultFont, effects.ToString(), new Vector2 (50, 50), Color.Orange,
+                0, Vector2.Zero, Vector2.One, effects, 0.0f);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Origins_rotated ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
+            PrepareFrameCapture();
 
-				var position = new Vector2 (100, 100);
-				var text = "origin";
+            _spriteBatch.Begin ();
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.Orange, MathHelper.PiOver4,
-					new Vector2(0f, 0f), 1.0f, SpriteEffects.None, 0.0f);
+            var position = new Vector2 (100, 100);
+            var text = "origin";
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.Blue, MathHelper.PiOver4,
-					new Vector2(40f, 0f), 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Orange, MathHelper.PiOver4,
+                new Vector2(0f, 0f), 1.0f, SpriteEffects.None, 0.0f);
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.HotPink, MathHelper.PiOver4,
-					new Vector2(0f, 40f), 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Blue, MathHelper.PiOver4,
+                new Vector2(40f, 0f), 1.0f, SpriteEffects.None, 0.0f);
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.Violet, MathHelper.PiOver4,
-					new Vector2(40f, 40f), 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.HotPink, MathHelper.PiOver4,
+                new Vector2(0f, 40f), 1.0f, SpriteEffects.None, 0.0f);
 
-				_spriteBatch.End ();
-			};
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Violet, MathHelper.PiOver4,
+                new Vector2(40f, 40f), 1.0f, SpriteEffects.None, 0.0f);
 
-			RunSingleFrameTest ();
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Origins_scaled ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
+            PrepareFrameCapture();
 
-				var position = new Vector2 (100, 100);
-				var text = "origin";
+            _spriteBatch.Begin ();
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.Orange, 0,
-					new Vector2(0f, 0f), 0.5f, SpriteEffects.None, 0.0f);
+            var position = new Vector2 (100, 100);
+            var text = "origin";
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.Blue, 0,
-					new Vector2(40f, 0f), 2.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Orange, 0,
+                new Vector2(0f, 0f), 0.5f, SpriteEffects.None, 0.0f);
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.HotPink, 0,
-					new Vector2(0f, 40f), 0.75f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Blue, 0,
+                new Vector2(40f, 0f), 2.0f, SpriteEffects.None, 0.0f);
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, position, Color.Violet, 0,
-					new Vector2(40f, 40f), 1.0f, SpriteEffects.None, 0.0f);
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.HotPink, 0,
+                new Vector2(0f, 40f), 0.75f, SpriteEffects.None, 0.0f);
 
-				_spriteBatch.End ();
-			};
+            _spriteBatch.DrawString (
+                _defaultFont, text, position, Color.Violet, 0,
+                new Vector2(40f, 40f), 1.0f, SpriteEffects.None, 0.0f);
 
-			RunSingleFrameTest ();
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Hullabaloo ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.DrawString (
-					_defaultFont, "hullabaloo", new Vector2 (100, 150), Color.HotPink,
-					MathHelper.ToRadians(15), new Vector2(20f, 50f), new Vector2(0.8f, 1.1f),
-					SpriteEffects.FlipHorizontally, 0.0f);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.DrawString (
+                _defaultFont, "hullabaloo", new Vector2 (100, 150), Color.HotPink,
+                MathHelper.ToRadians(15), new Vector2(20f, 50f), new Vector2(0.8f, 1.1f),
+                SpriteEffects.FlipHorizontally, 0.0f);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Hullabaloo2 ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.DrawString (
-					_defaultFont, "hullabaloo2", new Vector2 (100, 150), Color.Yellow,
-					MathHelper.ToRadians(130), new Vector2(40f, 60f), new Vector2(1.8f, 1.1f),
-					SpriteEffects.FlipVertically, 0.0f);
-				_spriteBatch.End ();
-			};
+            PrepareFrameCapture();
 
-			RunSingleFrameTest ();
+            _spriteBatch.Begin ();
+            _spriteBatch.DrawString (
+                _defaultFont, "hullabaloo2", new Vector2 (100, 150), Color.Yellow,
+                MathHelper.ToRadians(130), new Vector2(40f, 60f), new Vector2(1.8f, 1.1f),
+                SpriteEffects.FlipVertically, 0.0f);
+            _spriteBatch.End ();
+
+            CheckFrames();
 		}
 
 		[Test]
 		public void Multiline ()
 		{
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
+            PrepareFrameCapture();
 
-				var text =
+            _spriteBatch.Begin ();
+
+            var text =
 @"A programming genius called Hugh
 Said 'I really must see if it's true.'
 So he wrote a routine
@@ -270,48 +253,39 @@ To ask 'What's it all mean?'
 But the answer was still '42'.
                 R Humphries, Sutton Coldfield";
 
-				_spriteBatch.DrawString (
-					_defaultFont, text, new Vector2 (100, 150), Color.Yellow,
-					MathHelper.ToRadians (20), new Vector2 (40f, 60f), new Vector2 (0.9f, 0.9f),
-					SpriteEffects.None, 0.0f);
-				_spriteBatch.End ();
-			};
+            _spriteBatch.DrawString (
+                _defaultFont, text, new Vector2 (100, 150), Color.Yellow,
+                MathHelper.ToRadians (20), new Vector2 (40f, 60f), new Vector2 (0.9f, 0.9f),
+                SpriteEffects.None, 0.0f);
+            _spriteBatch.End ();
 
-			RunSingleFrameTest ();
+            CheckFrames();
 		}
 
 		[Test]
 		public void Font_spacing_is_respected ()
 		{
+            PrepareFrameCapture();
 			// DataFont has a non-zero Spacing property.
-			SpriteFont font = null;
-			Game.LoadContentWith += (sender, e) => {
-				font = Game.Content.Load<SpriteFont> (Paths.Font ("DataFont"));
-			};
+			var font = content.Load<SpriteFont> (Paths.Font ("DataFont"));
 
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				_spriteBatch.DrawString (
-					font, "Now is the time for all good DataFonts",
-					new Vector2 (50, 50), Color.Violet);
-				_spriteBatch.End ();
-			};
+            _spriteBatch.Begin ();
+            _spriteBatch.DrawString (
+                font, "Now is the time for all good DataFonts",
+                new Vector2 (50, 50), Color.Violet);
+            _spriteBatch.End ();
 
-			RunSingleFrameTest ();
+            CheckFrames();
 		}
 
 		[Test]
 		public void Throws_when_drawing_unavailable_characters ()
 		{
 			const string text = "The rain in España stays mainly in the plain - now in français";
-			Game.DrawWith += (sender, e) => {
-				_spriteBatch.Begin ();
-				Assert.Throws<ArgumentException> (() =>
-					_spriteBatch.DrawString (_defaultFont, text, Vector2.Zero, Color.Violet));
-				_spriteBatch.End ();
-			};
-
-			Game.Run ();
+            _spriteBatch.Begin ();
+            Assert.Throws<ArgumentException> (() =>
+                _spriteBatch.DrawString (_defaultFont, text, Vector2.Zero, Color.Violet));
+            _spriteBatch.End ();
 		}
 	}
 }

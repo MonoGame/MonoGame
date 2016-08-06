@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -35,14 +36,15 @@ namespace MonoGame.Tests.Graphics
         protected float Similarity;
         protected WriteSettings WriteCapture;
         protected WriteSettings WriteDiffs;
-        protected bool CheckNumberSubmits;
+        protected bool ExactNumberSubmits;
+        protected Color ClearColor;
 
         #endregion
 
         #region SetUp and TearDown
 
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
             game = new TestGameBase();
             gdm = new GraphicsDeviceManager(game);
@@ -59,13 +61,14 @@ namespace MonoGame.Tests.Graphics
             Similarity = Constants.StandardRequiredSimilarity;
             WriteCapture = WriteSettings.Always;
             WriteDiffs = WriteSettings.WhenFailed;
-            CheckNumberSubmits = false;
+            ExactNumberSubmits = false;
+            ClearColor = Color.CornflowerBlue;
 
             Paths.SetStandardWorkingDirectory();
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             game.Dispose();
 
@@ -89,6 +92,7 @@ namespace MonoGame.Tests.Graphics
             _submittedFrames = new List<FramePixelData>();
 
 			gd.SetRenderTarget(_captureRenderTarget);
+            gd.Clear(ClearColor);
         }
 
         protected void SubmitFrame()
@@ -123,6 +127,7 @@ namespace MonoGame.Tests.Graphics
             
             var allResults = new List<FrameComparisonResult>();
             var failedResults = new List<FrameComparisonResult>();
+            var noReference = new List<string>();
 
             for (var i = 0; i < _submittedFrames.Count; i++)
             {
@@ -131,8 +136,20 @@ namespace MonoGame.Tests.Graphics
                 var capturedPath = string.Format(capturedImagePath, i + 1);
                 var referencePath = string.Format(referenceImagePath, i + 1);
 
-                var refFrame = FramePixelData.FromFile(referencePath);
+                if (!File.Exists(referencePath))
+                {
+                    // no reference frame is available, so just write the image and track the failure
+                    if (WriteCapture == WriteSettings.Always || WriteCapture == WriteSettings.WhenFailed)
+                    {
+                        Directory.CreateDirectory(outputDirectory);
+                        _writerThread.AddAction(() =>
+                            frame.Save(capturedPath));
+                    }
+                    noReference.Add(referencePath);
+                    continue;
+                }
 
+                var refFrame = FramePixelData.FromFile(referencePath);
                 var frameSimilarity = _frameComparer.Compare(frame, refFrame);
 
                 var failed = frameSimilarity < Similarity;
@@ -169,10 +186,10 @@ namespace MonoGame.Tests.Graphics
             _framesChecked = true;
 
             // write results to console
-            WriteComparisonResultReport(allResults);
+            WriteComparisonResultReport(allResults, noReference);
 
             // now do the actual assertions
-            if (CheckNumberSubmits && _totalFramesExpected != allResults.Count)
+            if (ExactNumberSubmits && _totalFramesExpected != allResults.Count)
             {
 				Assert.Fail (
 					"Expected {0} frame comparison result(s), but found {1}",
@@ -185,14 +202,19 @@ namespace MonoGame.Tests.Graphics
 					"{0} of {1} frames failed the similarity test.",
 					failedResults.Count, allResults.Count);
             }
+
+            if (noReference.Count > 0)
+            {
+                Assert.Fail(
+                    "Did not find reference image(s): " + noReference.Aggregate((s1, s2) => s1 + ", " + s2));
+            }
         }
 
         #endregion
 
         #region ComparisonResults
 
-        private void WriteComparisonResultReport(
-			IEnumerable<FrameComparisonResult> results)
+        private void WriteComparisonResultReport(IEnumerable<FrameComparisonResult> results, List<string> noReference)
 		{
 			Console.WriteLine ("Required similarity: {0:0.####}", Similarity);
 		    foreach (var result in results)
