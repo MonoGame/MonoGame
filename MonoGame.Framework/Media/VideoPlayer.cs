@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Media
         public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets a value that indicates whether the player is playing video in a loop.
+        /// Gets or sets a value that indicates whether the player is playing video in a loop.
         /// </summary>
         public bool IsLooped
         {
