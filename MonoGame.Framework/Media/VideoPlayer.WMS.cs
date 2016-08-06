@@ -132,8 +132,8 @@ namespace Microsoft.Xna.Framework.Media
         {
             switch (_internalState)
             {
-                case InternalState.Playing:
-                    result = MediaState.Playing;
+                case InternalState.Stopped:
+                    result = MediaState.Stopped;
                     return;
 
                 case InternalState.Paused:
@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Media
                     return;
             }
 
-            result = MediaState.Stopped;
+            result = MediaState.Playing;
         }
 
         private void PlatformPause()
