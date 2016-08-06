@@ -230,15 +230,15 @@ namespace MonoGame.Tests.Graphics
 
         protected class FrameComparisonResult
         {
-            public float Similarity { get; }
-            public FramePixelData CapturedData { get; }
-            public FramePixelData ReferenceData { get; }
-            public string CapturedImagePath { get; }
-            public string ReferenceImagePath { get; }
-            public string DiffPath { get; set; }
-            public bool Failed { get; }
-            public bool SaveImage { get; }
-            public bool SaveDiff { get; }
+            public float Similarity;
+            public FramePixelData CapturedData;
+            public FramePixelData ReferenceData;
+            public string CapturedImagePath;
+            public string ReferenceImagePath;
+            public string DiffPath;
+            public bool Failed;
+            public bool SaveImage;
+            public bool SaveDiff;
 
             public FrameComparisonResult(float similarity, FramePixelData captured, FramePixelData reference,
                 string capturedImagePath, string referenceImagePath, bool failed, bool saveImage, bool saveDiff)
