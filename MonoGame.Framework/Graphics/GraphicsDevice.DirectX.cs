@@ -714,7 +714,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     PresentationParameters.MultiSampleCount = maxLevel;
 
                 multisampleDesc.Count = PresentationParameters.MultiSampleCount;
-                multisampleDesc.Quality = qualityLevels - 1;
+                // Get the quality level for the selected multisample count, which may be
+                // lower than the maximum found above.
+                multisampleDesc.Quality = _d3dDevice.CheckMultisampleQualityLevels(format, PresentationParameters.MultiSampleCount) - 1;
             }
 
             int vSyncFrameLatency = PresentationParameters.PresentationInterval.GetFrameLatency();
