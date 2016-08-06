@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Media
         public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets a value that indicates whether the player is playing video in a loop.
+        /// Gets or sets a value that indicates whether the player is playing video in a loop.
         /// </summary>
         public bool IsLooped
         {
@@ -124,6 +124,11 @@ namespace Microsoft.Xna.Framework.Media
             _state = MediaState.Stopped;
 
             PlatformInitialize();
+        }
+
+        ~VideoPlayer()
+        {
+            Dispose(false);
         }
 
         /// <summary>
@@ -296,6 +301,7 @@ namespace Microsoft.Xna.Framework.Media
                 PlatformDispose(disposing);
                 IsDisposed = true;
             }
+            _currentVideo = null;
         }
 
         #endregion

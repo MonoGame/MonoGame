@@ -1,0 +1,20 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin
+/intermediateDir:obj
+/platform:Windows
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+
+#---------------------------------- Content ---------------------------------#
+
+#begin SampleVideo_360x240_5s.mp4
+/importer:H264Importer
+/processor:VideoProcessor
+/build:SampleVideo_360x240_5s.mp4
+
