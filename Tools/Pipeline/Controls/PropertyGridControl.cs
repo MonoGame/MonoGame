@@ -92,7 +92,7 @@ namespace MonoGame.Tools.Pipeline
                 if (!browsable)
                     continue;
 
-                propertyTable.AddEntry(category, p.Name, value, p.GetValue(objects[0], null).GetType(), (sender, e) =>
+                propertyTable.AddEntry(category, p.Name, value, p.PropertyType, (sender, e) =>
                 {
                     var action = new UpdatePropertyAction(MainWindow.Instance, objects, p, sender);
                     PipelineController.Instance.AddAction(action);
