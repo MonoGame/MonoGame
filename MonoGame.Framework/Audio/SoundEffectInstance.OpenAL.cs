@@ -17,6 +17,10 @@ using OpenTK.Audio.OpenAL;
 using OpenAL;
 #endif
 
+#if !MONOMAC && !GLES
+#define SUPPORTS_EFX
+#endif
+
 namespace Microsoft.Xna.Framework.Audio
 {
     public partial class SoundEffectInstance : IDisposable
@@ -28,7 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
 		internal int SourceId;
         private float reverb = 0f;
         bool applyFilter = false;
-#if !MONOMAC
+#if SUPPORTS_EFX
         EfxFilterType filterType;
 #endif
         float filterQ;
@@ -143,10 +147,8 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pitch
 			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
             ALHelper.CheckError("Failed to set source pitch.");
-#if !MONOMAC
-
+#if SUPPORTS_EFX
             ApplyReverb ();
-
             ApplyFilter ();
 #endif
             AL.SourcePlay(SourceId);
@@ -191,15 +193,14 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.SourceStop(SourceId);
                 ALHelper.CheckError("Failed to stop source.");
 
-#if !MONOMAC
+#if SUPPORTS_EFX
                 // Reset the SendFilter to 0 if we are NOT using revert since 
                 // sources are recyled
                 OpenALSoundController.Efx.BindSourceToAuxiliarySlot (SourceId, 0, 0, 0);
                 ALHelper.CheckError ("Failed to unset reverb.");
-#endif
                 AL.Source (SourceId, ALSourcei.EfxDirectFilter, 0);
                 ALHelper.CheckError ("Failed to unset filter.");
-
+#endif
                 AL.Source(SourceId, ALSourcei.Buffer, 0);
                 ALHelper.CheckError("Failed to free source from buffer.");
 
@@ -282,7 +283,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformSetReverbMix(float mix)
         {
-#if !MONOMAC
+#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
             reverb = mix;
@@ -293,7 +294,7 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
-#if !MONOMAC
+#if SUPPORTS_EFX
         void ApplyReverb ()
         {
             if (reverb > 0f && SoundEffect.ReverbSlot != 0) {
@@ -334,7 +335,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
         {
-#if !MONOMAC
+#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
@@ -361,7 +362,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformClearFilter()
         {
-#if !MONOMAC
+#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
