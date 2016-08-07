@@ -19,17 +19,55 @@ and a log of stdout can be found in bin\$(Configuration)\stdout.txt.
 *Note: Currently there is no way to skip or select certain tests to run
 using the custom runner.  This functionality is coming soon.*
 
-## Visual Tests
+## Rendering Tests
+
+Most rendering tests do not require a game loop, but just need a
+GraphicsDevice to be able to render things. These tests can inherit from
+GraphicsDeviceTestFixtureBase and use the supplied GraphicsDevice 'gd'
+to render. Tests that require rendering were formerly implemented with
+the VisualTestFixtureBase (we call these "visual tests"), but this is no
+longer recommended unless the test requires an actual Game loop or tests
+functionality of the Game class itself because these tests are slower
+and harder to implement. When creating a new rendering test, the first
+run will fail because there is no reference image. Running the test will
+capture and save the result. Run the test with the XNA test project to
+get a reference image that checks XNA compatibility, or with MG to make
+sure no regression occurs. After adding the captured frame as a
+reference image, the test should pass.
+
+
+### GraphicsDeviceTestFixtureBase
+
+There are 3 methods in GraphicsDeviceTestFixtureBase that can be used to
+capture a frame and compare it to a reference image.
+
+- `PrepareFrameCapture`: Call this before rendering, so a RenderTarget can be
+prepared and set as the target for the GraphicsDevice. Optionally pass
+in the amount of frames you expect to capture. This is used for naming
+the captures when saving them (i.e. frame1.png or frame001.png) and
+the amount of captured frames will also be checked explicitly unless
+the ExactNumberSubmits flag is set to false.
+- `SubmitFrame`: Store the content of the render target in a list of
+submitted frames
+- `CheckFrames`: Call this when all frames are submitted. Checks all
+submitted frames against reference images if they can be found. Will
+also write out the captured image and a diff of captured image vs
+reference image if required by the WriteCapture and WriteDiffs settings.
+Compared frames get a similarity score between 0 and 1. If this score is
+higher than the set Similarity the test will pass.
+For ease of use, when no frame was submitted but PrepareFrameCapture has
+been called, this will submit a frame. Because of this tests that only
+submit one frame just need to be wrapped in PrepareFrameCapture/CheckFrames
+calls and can render as usual in between.
+
+
+If you still think you need a visual test to properly test a feature,
+read the paragraphs below to get a sense of how to get started.
 
 MonoGame's visual tests are implemented as ```Game```s and
 ```GameComponent```s whose output is captured and compared to known-good
 reference renderings.  Performance is ignored in these tests:  the focus
 here is correct drawing.
-
-New one-off visual tests may be added to ```BasicVisualTest```,
-```IntermediateVisualTest``` and ```AdvancedVisualTest```.  Alternately,
-new sets of related visual tests can be conveniently grouped and
-implemented in a new class derived from ```VisualTestFixtureBase```.
 
 ### Workflow for Implementing a Visual Test
 
