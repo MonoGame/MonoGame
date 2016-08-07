@@ -76,7 +76,6 @@ using Microsoft.Xna.Framework;
 using NUnit.Framework;
 
 using MonoGame.Tests.Components;
-using MonoGame.Tests.Graphics;
 
 namespace MonoGame.Tests.Visual {
 	[TestFixture]
@@ -91,14 +90,6 @@ namespace MonoGame.Tests.Visual {
 
 			Game.Components.Add (new ImplicitDrawOrderComponent (Game));
 			RunMultiFrameTest (captureCount: 5);
-		}
-
-		[Test]
-		public void Colored3DCube ()
-		{
-            // TODO fix this
-			//Game.Components.Add(new Colored3DCubeComponent(Game));
-            Assert.Fail();
 		}
 		
 		[TestCase(true)]

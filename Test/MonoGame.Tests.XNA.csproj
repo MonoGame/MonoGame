@@ -125,6 +125,7 @@
     <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
+    <Compile Include="Framework\Graphics\MiscellaneousTests.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryNonVisualTest.cs" />
     <Compile Include="Framework\Graphics\RasterizerStateNonVisualTest.cs" />
     <Compile Include="Framework\Graphics\SpriteFontNonVisualTest.cs" />

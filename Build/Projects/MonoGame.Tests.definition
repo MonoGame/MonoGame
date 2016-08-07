@@ -142,6 +142,7 @@
     <Compile Include="Framework\Graphics\EffectTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
+    <Compile Include="Framework\Graphics\MiscellaneousTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
     <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
     <Compile Include="Framework\Graphics\OcclusionQueryNonVisualTest.cs" />
