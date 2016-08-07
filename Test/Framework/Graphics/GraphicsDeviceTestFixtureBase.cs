@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -78,7 +79,34 @@ namespace MonoGame.Tests.Graphics
 
         #endregion
 
-        #region Protected API
+        #region Utility Methods
+
+        protected void Sleep(int ms)
+        {
+            Thread.Sleep(ms);
+        }
+
+        /// <summary>
+        /// Simulate a game loop.
+        /// </summary>
+        /// <param name="action">The method to execute in the loop, gets the frame number passed to it.</param>
+        /// <param name="stopCondition">If this is true the loop will end, gets the frame number passed to it.</param>
+        /// <param name="frameTime">Time in ms to sleep after a frame.</param>
+        protected void DoGameLoop(Action<int> action, Predicate<int> stopCondition, int frameTime = 16)
+        {
+            var frame = 0;
+            while (!stopCondition(frame))
+            {
+                action(frame);
+
+                Sleep(frameTime);
+                frame++;
+            }
+        }
+
+        #endregion
+
+        #region Frame capture API
 
         protected void PrepareFrameCapture(int expected = 1)
         {
