@@ -35,10 +35,6 @@ using AudioToolbox;
 using AVFoundation;
 #endif
 
-#if !MONOMAC && !GLES
-#define SUPPORTS_EFX
-#endif
-
 namespace Microsoft.Xna.Framework.Audio
 {
     internal static class ALHelper

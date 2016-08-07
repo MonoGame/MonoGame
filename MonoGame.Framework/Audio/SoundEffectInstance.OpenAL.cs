@@ -17,10 +17,6 @@ using OpenTK.Audio.OpenAL;
 using OpenAL;
 #endif
 
-#if !MONOMAC && !GLES
-#define SUPPORTS_EFX
-#endif
-
 namespace Microsoft.Xna.Framework.Audio
 {
     public partial class SoundEffectInstance : IDisposable

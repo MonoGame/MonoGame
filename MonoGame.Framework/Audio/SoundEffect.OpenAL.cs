@@ -25,10 +25,6 @@ using Foundation;
 #endif
 #endif
 
-#if !MONOMAC && !GLES
-#define SUPPORTS_EFX
-#endif
-
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
