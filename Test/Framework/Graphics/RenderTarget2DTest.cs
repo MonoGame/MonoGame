@@ -4,10 +4,9 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
-namespace MonoGame.Tests.Visual
+namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     class RenderTarget2DTest : GraphicsDeviceTestFixtureBase
@@ -26,11 +25,8 @@ namespace MonoGame.Tests.Visual
 
             PrepareFrameCapture();
 
-            Texture2D texture = null;
-            SpriteBatch spriteBatch = null;
-
-            texture = content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
-            spriteBatch = new SpriteBatch(gd);
+            var texture = content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
+            var spriteBatch = new SpriteBatch(gd);
 
             // Remember original (frame capture) render target.
             var renderTargets = gd.GetRenderTargets();

@@ -68,10 +68,9 @@ non-infringement.
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
-namespace MonoGame.Tests.Visual
+namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     class Texture3DTest : GraphicsDeviceTestFixtureBase

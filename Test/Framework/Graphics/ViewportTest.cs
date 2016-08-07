@@ -2,9 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 
 using NUnit.Framework;
-using MonoGame.Tests.Graphics;
 
-namespace MonoGame.Tests.Visual {
+namespace MonoGame.Tests.Graphics {
 	class ViewportTest : GraphicsDeviceTestFixtureBase {
 		[Test]
 		public void Affects_draw_origin ()

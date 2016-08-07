@@ -3,20 +3,18 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    internal class MiscellaneousTest : GraphicsDeviceTestFixtureBase
+    internal class MiscellaneousTests : GraphicsDeviceTestFixtureBase
     {
-        
-		[Test]
-		public void Colored3DCube ()
-		{
+        [Test]
+        public void Colored3DCube()
+        {
             PrepareFrameCapture();
-			var cube = new Colored3DCubeComponent(gd);
 
+            var cube = new Colored3DCubeComponent(gd);
             cube.LoadContent();
             cube.Draw();
 
             CheckFrames();
-		}
-
+        }
     }
 }

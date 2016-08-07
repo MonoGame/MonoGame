@@ -8,9 +8,8 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.Graphics;
 
-namespace MonoGame.Tests.Visual
+namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     class VertexBufferTest : GraphicsDeviceTestFixtureBase

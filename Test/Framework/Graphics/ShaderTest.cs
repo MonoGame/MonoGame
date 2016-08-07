@@ -69,10 +69,9 @@ non-infringement.
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.Graphics;
 using NUnit.Framework;
 
-namespace MonoGame.Tests.Visual {
+namespace MonoGame.Tests.Graphics {
 	[TestFixture]
 	class ShaderTest : GraphicsDeviceTestFixtureBase {
 		[TestCase ("NoEffect")]
