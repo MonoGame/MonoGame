@@ -27,7 +27,7 @@ namespace MonoGame.Tests.Graphics
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
             {
-                Assert.DoesNotThrow(() => _texture = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream));
+                Assert.DoesNotThrow(() => _texture = Texture2D.FromStream(gd, reader.BaseStream));
             }
             Assert.NotNull(_texture);
             try
@@ -59,15 +59,18 @@ namespace MonoGame.Tests.Graphics
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader(filename))
             {
-                Assert.Throws<InvalidOperationException>(() => _texture = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream));
+                Assert.Throws<InvalidOperationException>(() => _texture = Texture2D.FromStream(gd, reader.BaseStream));
             }
         }
 
         [Test]
         public void FromStreamArgumentNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(game.GraphicsDevice, (Stream) null));
+            Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(gd, (Stream) null));
+#if !XNA
+            // XNA misses this check and throws a NullReferenceException
             Assert.Throws<ArgumentNullException>(() => Texture2D.FromStream(null, new MemoryStream()));
+#endif
         }
 
         [TestCase(25, 23, 1, 1, 0, 1)]
@@ -83,7 +86,7 @@ namespace MonoGame.Tests.Graphics
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
             {
                 Rectangle toReadArea = new Rectangle(rx, ry, rw, rh);
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 Color[] colors = new Color[startIndex + elementsToRead];
                 for (int i = 0; i < colors.Length; i++)
                 {
@@ -103,7 +106,7 @@ namespace MonoGame.Tests.Graphics
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
             {
                 Rectangle toReadArea = new Rectangle(rx, ry, rw, rh);
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 Color[] colors = new Color[startIndex + elementsToRead];
                 for (int i = 0; i < colors.Length; i++)
                 {
@@ -128,7 +131,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 t.SetData(data);
                 t.GetData(written);
@@ -168,7 +171,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(data));
                 t.GetData(written);
@@ -202,7 +205,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 t.SetData(data, startIndex, elements);
                 t.GetData(written);
@@ -252,7 +255,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(data, startIndex, elements));
                 t.GetData(written);
@@ -294,7 +297,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 t.SetData(0, area, data, startIndex, elements);
                 t.GetData(written);
@@ -345,7 +348,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Texture2D t = Texture2D.FromStream(game.GraphicsDevice, reader.BaseStream);
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(0, area, data, startIndex, elements));
                 t.GetData(written);
@@ -357,11 +360,6 @@ namespace MonoGame.Tests.Graphics
                     Assert.AreEqual(reference[i].A, written[i].A, "Bad color written in position:{0};", i);
                 }
             }
-        }
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            game.Dispose();
         }
     }
 }
