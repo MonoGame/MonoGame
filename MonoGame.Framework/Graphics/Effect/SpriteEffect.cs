@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override bool OnApply()
+        protected internal override void OnApply()
         {
             var viewport = GraphicsDevice.Viewport;
 
@@ -67,8 +67,6 @@ namespace Microsoft.Xna.Framework.Graphics
             var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
 
             matrixParam.SetValue(halfPixelOffset * projection);
-
-            return false;
         }
 
 
