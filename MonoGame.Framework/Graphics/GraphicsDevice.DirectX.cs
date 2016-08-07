@@ -1457,5 +1457,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 dxgiDevice3.Trim();
         }
 #endif
+
+        private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
+        {
+            return new Rectangle(x, y, width, height);
+        }
     }
 }
