@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
 	internal sealed class OpenALSoundController : IDisposable
     {
         private static OpenALSoundController _instance = null;
-#if !MONOMAC
+#if SUPPORTS_EFX
         private static EffectsExtension _efx = null;
 #endif
         private IntPtr _device;
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
             Filter = 0;
- #if !MONOMAC
+#if SUPPORTS_EFX
             if (Efx.IsInitialized) {
                 Filter = Efx.GenFilter ();
             }
@@ -298,7 +298,7 @@ namespace Microsoft.Xna.Framework.Audio
 				return _instance;
 			}
 		}
-#if !MONOMAC
+#if SUPPORTS_EFX
         public static EffectsExtension Efx {
             get {
                 if (_efx == null)
@@ -394,10 +394,10 @@ namespace Microsoft.Xna.Framework.Audio
                             AL.DeleteSource(allSourcesArray[i]);
                             ALHelper.CheckError("Failed to delete source.");
                         }
-#if !MONOMAC
+#if SUPPORTS_EFX
                         if (Filter != 0 && Efx.IsInitialized)
                             Efx.DeleteFilter (Filter);
-#endif           
+#endif
                         CleanUpOpenAL();
                     }
                 }

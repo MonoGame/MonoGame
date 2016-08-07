@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
         {
-#if !MONOMAC
+#if SUPPORTS_EFX
             if (!OpenALSoundController.Efx.IsInitialized)
                 return;
 
@@ -252,7 +252,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
-#if !MONOMAC
+#if SUPPORTS_EFX
             if (ReverbEffect != 0) {
                 OpenALSoundController.Efx.DeleteAuxiliaryEffectSlot ((int)ReverbSlot);
                 OpenALSoundController.Efx.DeleteEffect ((int)ReverbEffect);
