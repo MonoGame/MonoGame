@@ -29,7 +29,7 @@ Our [build server](http://teamcity.monogame.net/?guest=1) builds, tests, and pac
 
 ## Supported Platforms
 
-We support a growing list of platforms across the desktop, mobile, and console space.  If there is a platform we don't support, please [make a request](https://github.com/mono/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
+We support a growing list of platforms across the desktop, mobile, and console space.  If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
 - Desktop PCs
  * Windows Store Apps (8, 8.1 and 10)
@@ -49,7 +49,7 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 ## Support and Contributions
 
-If you think you have found a bug or have a feature request, use our [issue tracker](https://github.com/mono/MonoGame/issues). Before opening a new issue, please search to see if your problem has already been reported.  Try to be as detailed as possible in your issue reports.
+If you think you have found a bug or have a feature request, use our [issue tracker](https://github.com/MonoGame/MonoGame/issues). Before opening a new issue, please search to see if your problem has already been reported.  Try to be as detailed as possible in your issue reports.
 
 If you need help using MonoGame or have other questions we suggest you post on our [community forums](http://community.monogame.net).  Please do not use the GitHub issue tracker for personal support requests.
 
@@ -60,7 +60,7 @@ If you are interested in contributing fixes or features to MonoGame, please read
 
 The full source code is available here from GitHub:
 
- * Clone the source: `git clone https://github.com/mono/MonoGame.git`
+ * Clone the source: `git clone https://github.com/MonoGame/MonoGame.git`
  * Setup the submodules: `git submodule update --init`
  * Run Protobuild.exe to generate project files and solutions.
    * If on Linux or Mac, run it with mono: `mono Protobuild.exe`
@@ -88,7 +88,7 @@ A high level breakdown of the components of the framework:
 ## Helpful Links
 
  * The official website is [monogame.net](http://www.monogame.net).
- * Our [issue tracker](https://github.com/mono/MonoGame/issues) is on GitHub.
+ * Our [issue tracker](https://github.com/MonoGame/MonoGame/issues) is on GitHub.
  * Use our [community forums](http://community.monogame.net/) for support questions.
  * You can [chat live](https://gitter.im/mono/MonoGame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) with the core developers and other users.
  * The [official documentation](http://www.monogame.net/documentation/) is on our website.
