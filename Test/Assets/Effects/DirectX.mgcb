@@ -67,3 +67,9 @@
 /processorParam:DebugMode=Auto
 /build:RainbowH.fx
 
+#begin ReallySimpleEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:ReallySimpleEffect.fx
+

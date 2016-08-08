@@ -847,6 +847,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Platforms>Windows</Platforms>
     </Content>
+    <Content Include="Assets\Effects\DirectX\ReallySimpleEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
+    </Content>
     <Content Include="Assets\Textures\GlassPane.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
