@@ -5,27 +5,70 @@ using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework.Net
 {
-    internal struct PacketSenderPair
+    internal struct InboundPacket
     {
         public Packet packet;
         public NetworkGamer sender;
 
-        public PacketSenderPair(Packet packet, NetworkGamer sender)
+        public InboundPacket(Packet packet, NetworkGamer sender)
         {
             this.packet = packet;
             this.sender = sender;
         }
     }
 
+    internal struct OutboundPacket
+    {
+        public Packet packet;
+        public LocalNetworkGamer sender;
+        public NetworkGamer recipient;
+        public SendDataOptions options;
+
+        public OutboundPacket(Packet packet, LocalNetworkGamer sender, NetworkGamer recipient, SendDataOptions options)
+        {
+            this.packet = packet;
+            this.sender = sender;
+            this.recipient = recipient;
+            this.options = options;
+        }
+    }
+
     public sealed class LocalNetworkGamer : NetworkGamer
     {
-        internal IList<PacketSenderPair> inboundPackets = new List<PacketSenderPair>();
+        internal int inboundPacketIndex = 0;
+        internal List<InboundPacket> inboundPackets = new List<InboundPacket>();
+        internal List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
 
         internal LocalNetworkGamer(byte id, bool isGuest, bool isHost, bool isPrivateSlot, NetworkSession session, SignedInGamer signedInGamer) : base(signedInGamer.DisplayName, signedInGamer.Gamertag, id, isGuest, isHost, true, isPrivateSlot, session.machine, session)
         {
             this.SignedInGamer = signedInGamer;
         }
-        
+
+        internal void RecycleInboundPackets()
+        {
+            for (int i = 0; i < inboundPacketIndex; i++)
+            {
+                Session.packetPool.RecyclePacket(inboundPackets[i].packet);
+            }
+
+            if (inboundPacketIndex > 0)
+            {
+                inboundPackets.RemoveRange(0, inboundPacketIndex);
+            }
+
+            inboundPacketIndex = 0;
+        }
+
+        internal void RecycleOutboundPackets()
+        {
+            foreach (OutboundPacket outboundPacket in outboundPackets)
+            {
+                Session.packetPool.RecyclePacket(outboundPacket.packet);
+            }
+
+            outboundPackets.Clear();
+        }
+
         public bool IsDataAvailable { get { return inboundPackets.Count > 0; } }
         public SignedInGamer SignedInGamer { get; }
 
@@ -47,27 +90,23 @@ namespace Microsoft.Xna.Framework.Net
 
         public int ReceiveData(PacketReader data, out NetworkGamer sender)
         {
-            if (inboundPackets.Count == 0)
+            if (inboundPacketIndex >= inboundPackets.Count)
             {
                 sender = null;
                 return 0;
             }
 
-            // Pop packet from stack
-            int lastIndex = inboundPackets.Count - 1;
-            PacketSenderPair pair = inboundPackets[lastIndex];
-            inboundPackets.RemoveAt(lastIndex);
+            // Get one packet from queue
+            InboundPacket pair = inboundPackets[inboundPacketIndex];
+            inboundPacketIndex++;
 
-            // Write to output packet writer
-            int dataLength = pair.packet.length;
-
+            // Write inbound packet data to stream
             data.BaseStream.SetLength(0);
-            data.BaseStream.Write(pair.packet.data, 0, dataLength);
-
-            Session.packetPool.RecyclePacket(pair.packet);
+            data.BaseStream.Write(pair.packet.data, 0, pair.packet.length);
+            data.BaseStream.Position = 0;
 
             sender = pair.sender;
-            return dataLength;
+            return pair.packet.length;
         }
 
         // Sending data
@@ -97,11 +136,24 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new NullReferenceException("data");
             }
+            if (data.Length == 0)
+            {
+                throw new NetworkException("PacketWriter empty");
+            }
             if (Session == null)
             {
                 throw new ObjectDisposedException("NetworkSession");
             }
-            
+
+            // Write stream contents to an outbound packet
+            Packet packet = Session.packetPool.GetPacket(data.Length);
+            data.BaseStream.Position = 0;
+            data.BaseStream.Read(packet.data, 0, packet.length);
+
+            // Reset stream
+            data.BaseStream.SetLength(0);
+
+            outboundPackets.Add(new OutboundPacket(packet, this, null, options));
         }
 
         public void SendData(PacketWriter data, SendDataOptions options, NetworkGamer recipient)

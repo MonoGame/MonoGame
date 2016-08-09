@@ -3,7 +3,6 @@ using System.Net;
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 
 using Microsoft.Xna.Framework.GamerServices;
 using Lidgren.Network;
@@ -29,7 +28,6 @@ namespace Microsoft.Xna.Framework.Net
         void EncodeData(NetworkSession session, NetOutgoingMessage msg); // May not run if local message
         void DecodeData(NetworkSession session, NetIncomingMessage msg); // May not run if local message
         void Trigger(NetworkSession session);
-        void CleanUp();
     }
 
     internal struct ConnectToAllRequestAction : INetAction // Host to any other peer
@@ -90,9 +88,6 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
         }
-
-        public void CleanUp()
-        { }
     }
 
     internal struct ConnectToAllSuccessfulAction : INetAction // Any peer to all peers
@@ -238,9 +233,6 @@ namespace Microsoft.Xna.Framework.Net
 
             session.SendMessageToEveryone(new GamerJoinedAction(localGamer));
         }
-
-        public void CleanUp()
-        { }
     }
 
     internal struct GamerJoinedAction : INetAction
@@ -322,9 +314,6 @@ namespace Microsoft.Xna.Framework.Net
                 session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(remoteGamer));
             }
         }
-
-        public void CleanUp()
-        { }
     }
 
     internal struct GamerLeftAction : INetAction
@@ -382,9 +371,6 @@ namespace Microsoft.Xna.Framework.Net
                 session.RemoveGamer(remoteGamer);
             }
         }
-
-        public void CleanUp()
-        { }
     }
 
     internal struct UserMessageAction : INetAction
@@ -394,20 +380,38 @@ namespace Microsoft.Xna.Framework.Net
         private byte recipientId;
         private Packet packet;
 
-        private bool shouldCleanUp;
-
-        public UserMessageAction(LocalNetworkGamer sender, NetworkGamer recipient, Packet packet)
+        public UserMessageAction(LocalNetworkGamer sender, NetworkGamer recipient, Packet packet, SendDataOptions options)
         {
+            switch (options)
+            {
+                case SendDataOptions.InOrder:
+                    this.DeliveryMethod = NetDeliveryMethod.UnreliableSequenced;
+                    break;
+                case SendDataOptions.Reliable:
+                    this.DeliveryMethod = NetDeliveryMethod.ReliableUnordered;
+                    break;
+                case SendDataOptions.ReliableInOrder:
+                    this.DeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+                    break;
+                case SendDataOptions.Chat:
+                    this.DeliveryMethod = NetDeliveryMethod.ReliableUnordered;
+                    break;
+                case SendDataOptions.Chat & SendDataOptions.InOrder:
+                    this.DeliveryMethod = NetDeliveryMethod.ReliableOrdered;
+                    break;
+                default:
+                    this.DeliveryMethod = NetDeliveryMethod.Unreliable;
+                    break;
+            }
+
             this.senderId = sender.Id;
             this.sendToAll = recipient == null;
             this.recipientId = recipient != null ? recipient.Id : (byte)255;
             this.packet = packet;
-
-            this.shouldCleanUp = false;
         }
 
         public NetActionIndex Index { get { return NetActionIndex.UserMessage; } }
-        public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
+        public NetDeliveryMethod DeliveryMethod { get; }
         public int SequenceChannel { get { return 1; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
@@ -417,8 +421,6 @@ namespace Microsoft.Xna.Framework.Net
             msg.Write(recipientId);
             msg.Write(packet.length);
             msg.Write(packet.data);
-
-            shouldCleanUp = true;
         }
 
         public void DecodeData(NetworkSession session, NetIncomingMessage msg)
@@ -433,15 +435,13 @@ namespace Microsoft.Xna.Framework.Net
 
         public void Trigger(NetworkSession session)
         {
-            shouldCleanUp = false;
-
             NetworkGamer sender = session.FindGamerById(senderId);
 
             if (sendToAll)
             {
                 foreach (LocalNetworkGamer localGamer in session.LocalGamers)
                 {
-                    localGamer.inboundPackets.Add(new PacketSenderPair(packet, sender));
+                    localGamer.inboundPackets.Add(new InboundPacket(packet, sender));
                 }
             }
             else
@@ -454,15 +454,7 @@ namespace Microsoft.Xna.Framework.Net
                     return;
                 }
 
-                localGamer.inboundPackets.Add(new PacketSenderPair(packet, sender));
-            }
-        }
-
-        public void CleanUp()
-        {
-            if (shouldCleanUp)
-            {
-                NetworkSession.Session.packetPool.RecyclePacket(packet);
+                localGamer.inboundPackets.Add(new InboundPacket(packet, sender));
             }
         }
     }
@@ -643,7 +635,7 @@ namespace Microsoft.Xna.Framework.Net
             this.packetPool = new PacketPool();
 
             this.peer = peer;
-            this.machine = new NetworkMachine(true, isHost);
+            this.machine = new NetworkMachine(null, isHost);
             this.hostConnection = hostConnection;
 
             this.pendingSignedInGamers = new List<SignedInGamer>(signedInGamers);
@@ -840,8 +832,6 @@ namespace Microsoft.Xna.Framework.Net
 
             // Handle self
             action.Trigger(this);
-
-            action.CleanUp();
         }
 
         // To self only
@@ -850,8 +840,6 @@ namespace Microsoft.Xna.Framework.Net
             Debug.WriteLine("Sending " + action.Index + " to self...");
 
             action.Trigger(this);
-
-            action.CleanUp();
         }
 
         // To specific peer
@@ -877,8 +865,6 @@ namespace Microsoft.Xna.Framework.Net
             msg.Write((byte)action.Index);
             action.EncodeData(this, msg);
             peer.SendMessage(msg, recipient, action.DeliveryMethod, action.SequenceChannel);
-
-            action.CleanUp();
         }
 
         private static Type[] actionIndexToTypeMap =
@@ -911,7 +897,40 @@ namespace Microsoft.Xna.Framework.Net
 
         public void Update()
         {
-            // Handle incoming messages
+            // Recycle inbound packets from last frame
+            foreach (LocalNetworkGamer localGamer in machine.localGamers)
+            {
+                localGamer.RecycleInboundPackets();
+            }
+
+            // Send accumulated outbound packets -> will create new inbound packets
+            foreach (LocalNetworkGamer localGamer in machine.localGamers)
+            {
+                foreach (OutboundPacket outboundPacket in localGamer.outboundPackets)
+                {
+                    INetAction userAction = new UserMessageAction(outboundPacket.sender, outboundPacket.recipient, outboundPacket.packet, outboundPacket.options);
+
+                    if (outboundPacket.recipient != null)
+                    {
+                        if (outboundPacket.recipient.IsLocal)
+                        {
+                            SendMessageToSelf(userAction);
+                        }
+                        else
+                        {
+                            SendMessageToPeer(userAction, outboundPacket.recipient.Machine.connection);
+                        }
+                    }
+                    else
+                    {
+                        SendMessageToEveryone(userAction);
+                    }
+                }
+
+                localGamer.RecycleOutboundPackets();
+            }
+
+            // Handle incoming messages -> will create new inbound packets
             NetIncomingMessage msg;
             while ((msg = peer.ReadMessage()) != null)
             {
@@ -943,7 +962,7 @@ namespace Microsoft.Xna.Framework.Net
                         if (status == NetConnectionStatus.Connected)
                         {
                             // Create a pending network machine
-                            msg.SenderConnection.Tag = new NetworkMachine(false, msg.SenderConnection == hostConnection);
+                            msg.SenderConnection.Tag = new NetworkMachine(msg.SenderConnection, msg.SenderConnection == hostConnection);
 
                             if (IsHost)
                             {

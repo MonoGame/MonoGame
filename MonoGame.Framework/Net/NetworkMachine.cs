@@ -7,15 +7,18 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkMachine
     {
+        internal NetConnection connection;
         internal IList<LocalNetworkGamer> localGamers;
         internal IList<NetworkGamer> gamers;
 
-        internal NetworkMachine(bool isLocal, bool isHost)
+        internal NetworkMachine(NetConnection connection, bool isHost)
         {
             this.IsPending = true;
-            this.IsLocal = isLocal;
+            this.IsLocal = connection == null;
             this.IsHost = IsHost;
-            this.localGamers = isLocal ? new List<LocalNetworkGamer>() : null;
+
+            this.connection = connection;
+            this.localGamers = this.IsLocal ? new List<LocalNetworkGamer>() : null;
             this.gamers = new List<NetworkGamer>();
 
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
