@@ -139,6 +139,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_sessionState != SessionState.Paused)
                 return;
+            _sessionState = SessionState.Started;
             _mediaEngineEx.Play();
         }
 
