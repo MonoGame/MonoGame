@@ -113,7 +113,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             IsDisposed = false;
             IsCreated = false;
-            IsPrepared = true;            
+            IsPrepared = true;
+            _curSound = null;
         }
 
         /// <summary>Pauses playback.</summary>

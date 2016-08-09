@@ -191,6 +191,20 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.False(cue.IsStopped);
             Assert.False(cue.IsStopping);
 
+            cue.Play ();
+            cue.Stop (AudioStopOptions.Immediate);
+
+            cue = _soundBank.GetCue ("blast_mono");
+
+            // Make sure the initial state is reset
+            Assert.False(cue.IsCreated);
+            Assert.False(cue.IsPreparing);
+            Assert.True(cue.IsPrepared);
+            Assert.False(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+            Assert.False(cue.IsStopping);
+
             cue.Dispose();
 
             // Make sure the disposed state is correct.
