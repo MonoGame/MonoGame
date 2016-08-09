@@ -144,15 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		public Rectangle TitleSafeArea 
 		{
-			get
-			{
-                var safeX = (width + 19) / 20;
-                var safeY = (height + 19) / 20;
-
-                var safeW = width - safeX * 2;
-                var safeH = height - safeY * 2;
-                return new Rectangle(safeX, safeY, safeW, safeH);
-			}
+			get { return GraphicsDevice.GetTitleSafeArea(x, y, width, height); }
 		}
 
         /// <summary>
