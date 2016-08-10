@@ -97,10 +97,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Initialization
 
-        /// <devdoc>
-        /// This is called by <see cref="FrameworkDispatcher.Initialize()"/>
-        /// to ensure that XAudio is initialized on main thread.
-        /// </devdoc>
+        /// <summary>
+        /// Initializes XAudio.
+        /// </summary>
         internal static void InitializeSoundEffect()
         {
             try

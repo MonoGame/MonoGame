@@ -38,18 +38,7 @@ namespace Microsoft.Xna.Framework
         private static void Initialize()
         {
             // Initialize sound system
-#if DIRECTX
             SoundEffect.InitializeSoundEffect();
-#elif OPENGL
-            try
-            {
-                var oal = OpenALSoundController.GetInstance;
-            }
-            catch (DllNotFoundException ex)
-            {
-                throw new NoAudioHardwareException("Failed to init OpenALSoundController", ex);
-            }
-#endif
 
             _initialized = true;
         }
