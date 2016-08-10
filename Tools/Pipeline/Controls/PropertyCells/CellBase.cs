@@ -31,9 +31,9 @@ namespace MonoGame.Tools.Pipeline
 
         protected EventHandler _eventHandler;
         protected Rectangle _lastRec;
-        protected object _type;
+        protected Type _type;
 
-        public void Create(string category, string name, object value, object type, EventHandler eventHandler = null)
+        public void Create(string category, string name, object value, Type type, EventHandler eventHandler = null)
         {
             Category = category;
             Value = value;

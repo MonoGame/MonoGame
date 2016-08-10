@@ -86,6 +86,7 @@
         <Platforms>iOS</Platforms>
     </Compile>
 
+    <Compile Include="Framework\ByteBufferPoolTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\ColorTest.cs" />
 	<Compile Include="Framework\CurveKeyCollectionTest.cs" />
@@ -198,6 +199,9 @@
     <Compile Include="ContentPipeline\Mp3ImporterTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\OggImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -267,6 +271,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Audio\rock_loop_stereo.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Audio\rock_loop_stereo.wav">

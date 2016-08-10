@@ -8,10 +8,10 @@ using MonoGame.Tests.Framework.Components;
 
 namespace MonoGame.Tests.Framework
 {
-    public class GameComponentTest
+    public static class GameComponentTest
     {
         [Test]
-        public void InitializeOrderTest()
+        public static void InitializeOrderTest()
         {
             var game = new TestGameBase();
             var gdm = new GraphicsDeviceManager(game);

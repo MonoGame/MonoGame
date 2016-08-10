@@ -92,7 +92,7 @@ namespace MonoGame.Tools.Pipeline
                 if (!browsable)
                     continue;
 
-                propertyTable.AddEntry(category, p.Name, value, p.GetValue(objects[0], null), (sender, e) =>
+                propertyTable.AddEntry(category, p.Name, value, p.PropertyType, (sender, e) =>
                 {
                     var action = new UpdatePropertyAction(MainWindow.Instance, objects, p, sender);
                     PipelineController.Instance.AddAction(action);
@@ -118,7 +118,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
 
-                propertyTable.AddEntry("Processor Parameters", p.Name, value, objects[0].ProcessorParams[p.Name], (sender, e) =>
+                propertyTable.AddEntry("Processor Parameters", p.Name, value, p.Type, (sender, e) =>
                 {
                     var action = new UpdateProcessorAction(MainWindow.Instance, objects.Cast<ContentItem>().ToList(), p.Name, sender);
                     PipelineController.Instance.AddAction(action);

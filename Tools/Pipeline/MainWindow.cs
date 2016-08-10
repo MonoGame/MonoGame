@@ -30,7 +30,6 @@ namespace MonoGame.Tools.Pipeline
             InitializeComponent();
 
             Instance = this;
-            Style = "MainWindow";
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
@@ -67,6 +66,8 @@ namespace MonoGame.Tools.Pipeline
 
             cmdDebugMode.Checked = PipelineSettings.Default.DebugMode;
             CmdDebugMode_Executed(this, EventArgs.Empty);
+
+            Style = "MainWindow";
         }
 
         public void Invoke(Action action)
@@ -608,7 +609,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdRebuildItem_Executed(object sender, EventArgs e)
         {
-            PipelineController.Instance.RebuildItems(PipelineController.Instance.SelectedItems.ToArray());
+            PipelineController.Instance.RebuildItems();
         }
 
         #endregion
