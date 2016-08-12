@@ -39,6 +39,12 @@ namespace Microsoft.Xna.Framework.Audio
             e.CurveDistanceScaler = SoundEffect.DistanceScale;
             e.DopplerScaler = SoundEffect.DopplerScale;
             e.ChannelCount = _effect._format.Channels;
+            //stereo channel
+            if(e.ChannelCount > 1 )
+            {
+                e.ChannelRadius = 0;
+                e.ChannelAzimuths = new float[] { 0f, 0f };
+            }
 
             // Convert from XNA Listener to a SharpDX Listener
             var l = ToDXListener(listener);
