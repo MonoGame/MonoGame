@@ -11,6 +11,8 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public partial class SoundEffectInstance : IDisposable
     {
+        private static float[] _defaultChannelAzimuths = new float[] { 0f, 0f };
+
         internal SourceVoice _voice;
         internal WaveFormat _format;
 
@@ -39,6 +41,13 @@ namespace Microsoft.Xna.Framework.Audio
             e.CurveDistanceScaler = SoundEffect.DistanceScale;
             e.DopplerScaler = SoundEffect.DopplerScale;
             e.ChannelCount = _effect._format.Channels;
+            
+            //stereo channel
+            if (e.ChannelCount > 1)
+            {
+                e.ChannelRadius = 0;
+                e.ChannelAzimuths = _defaultChannelAzimuths;
+             }
 
             // Convert from XNA Listener to a SharpDX Listener
             var l = ToDXListener(listener);
