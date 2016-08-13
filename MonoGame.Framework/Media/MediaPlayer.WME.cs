@@ -147,6 +147,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_sessionState == SessionState.Stopped)
                 return;
+            _sessionState = SessionState.Stopped;
             _mediaEngineEx.Source = null;
         }
     }
