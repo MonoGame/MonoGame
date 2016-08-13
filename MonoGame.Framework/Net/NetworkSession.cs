@@ -300,7 +300,6 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (localGamer != null)
             {
-                machine.AddLocalGamer(localGamer);
                 session.AddGamer(localGamer);
                 
                 session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(localGamer));
@@ -308,7 +307,6 @@ namespace Microsoft.Xna.Framework.Net
             else
             {
                 NetworkGamer remoteGamer = new NetworkGamer(displayName, gamertag, id, isGuest, isHost, false, isPrivateSlot, machine, session);
-                machine.AddRemoteGamer(remoteGamer);
                 session.AddGamer(remoteGamer);
 
                 session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(remoteGamer));
@@ -351,8 +349,7 @@ namespace Microsoft.Xna.Framework.Net
             if (localGamer != null)
             {
                 session.InvokeGamerLeftEvent(new GamerLeftEventArgs(localGamer));
-
-                machine.RemoveLocalGamer(localGamer);
+                
                 session.RemoveGamer(localGamer);
             }
             else
@@ -367,7 +364,6 @@ namespace Microsoft.Xna.Framework.Net
 
                 session.InvokeGamerLeftEvent(new GamerLeftEventArgs(remoteGamer));
 
-                machine.RemoveRemoteGamer(remoteGamer);
                 session.RemoveGamer(remoteGamer);
             }
         }
@@ -793,8 +789,9 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void AddGamer(NetworkGamer gamer)
         {
-            allGamers.Add(gamer);
+            gamer.Machine.AddGamer(gamer);
 
+            allGamers.Add(gamer);
             if (!gamer.IsLocal)
             {
                 allRemoteGamers.Add(gamer);
@@ -803,8 +800,9 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void RemoveGamer(NetworkGamer gamer)
         {
-            allGamers.Remove(gamer);
+            gamer.Machine.RemoveGamer(gamer);
 
+            allGamers.Remove(gamer);
             if (!gamer.IsLocal)
             {
                 allRemoteGamers.Remove(gamer);
@@ -1093,8 +1091,7 @@ namespace Microsoft.Xna.Framework.Net
                 LocalNetworkGamer localGamer = machine.localGamers[machine.localGamers.Count - 1];
 
                 InvokeGamerLeftEvent(new GamerLeftEventArgs(localGamer));
-
-                machine.RemoveLocalGamer(localGamer);
+                
                 RemoveGamer(localGamer);
             }
 

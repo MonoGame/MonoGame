@@ -29,46 +29,41 @@ namespace Microsoft.Xna.Framework.Net
         internal bool IsHost { get; }
         public GamerCollection<NetworkGamer> Gamers { get; }
 
-        internal void AddLocalGamer(LocalNetworkGamer localGamer)
+        internal void AddGamer(NetworkGamer gamer)
         {
-            if (!IsLocal)
+            if (IsLocal != gamer.IsLocal)
             {
-                throw new InvalidOperationException("This NetworkMachine is remote");
+                throw new InvalidOperationException("Local NetworkMachine can not add remote gamer or vice versa");
             }
 
-            localGamers.Add(localGamer);
-            gamers.Add(localGamer);
-        }
-
-        internal void RemoveLocalGamer(LocalNetworkGamer localGamer)
-        {
-            if (!IsLocal)
-            {
-                throw new InvalidOperationException("This NetworkMachine is remote");
-            }
-
-            localGamers.Remove(localGamer);
-            gamers.Remove(localGamer);
-        }
-
-        internal void AddRemoteGamer(NetworkGamer remoteGamer)
-        {
             if (IsLocal)
             {
-                throw new InvalidOperationException("This NetworkMachine is local");
+                LocalNetworkGamer localGamer = gamer as LocalNetworkGamer;
+
+                if (localGamer == null)
+                {
+                    throw new InvalidOperationException("Non-remote gamer can not be cast to LocalNetworkGamer");
+                }
+
+                localGamers.Add(localGamer);
             }
 
-            gamers.Add(remoteGamer);
+            gamers.Add(gamer);
         }
 
-        internal void RemoveRemoteGamer(NetworkGamer remoteGamer)
+        internal void RemoveGamer(NetworkGamer gamer)
         {
-            if (IsLocal)
+            if (IsLocal != gamer.IsLocal)
             {
-                throw new InvalidOperationException("This NetworkMachine is local");
+                throw new InvalidOperationException("Local NetworkMachine can not remove remote gamer or vice versa");
             }
 
-            gamers.Remove(remoteGamer);
+            if (IsLocal)
+            {
+                localGamers.Remove(gamer as LocalNetworkGamer);
+            }
+
+            gamers.Remove(gamer);
         }
 
         public void RemoveFromSession()

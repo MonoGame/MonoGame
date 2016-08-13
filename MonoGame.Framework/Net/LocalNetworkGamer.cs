@@ -121,16 +121,16 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Get one packet from queue
-            InboundPacket pair = inboundPackets[inboundPacketIndex];
+            InboundPacket inboundPacket = inboundPackets[inboundPacketIndex];
             inboundPacketIndex++;
 
             // Write inbound packet data to stream
             data.BaseStream.SetLength(0);
-            data.BaseStream.Write(pair.packet.data, 0, pair.packet.length);
+            data.BaseStream.Write(inboundPacket.packet.data, 0, inboundPacket.packet.length);
             data.BaseStream.Position = 0;
 
-            sender = pair.sender;
-            return pair.packet.length;
+            sender = inboundPacket.sender;
+            return inboundPacket.packet.length;
         }
 
         // Sending data
