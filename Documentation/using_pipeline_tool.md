@@ -44,7 +44,7 @@ When you select "Existing Item..." you get to select an existing item from disk 
 
 ## Custom Content Processors
 
-Justl ike XNA, the MonoGame content pipeline supports custom content processors.  To use them you need to rebuild them correctly to work against MonoGame.
+Just like XNA, the MonoGame content pipeline supports custom content processors.  To use them you need to rebuild them correctly to work against MonoGame.
 
 The first step is removing all `Microsoft.Xna.Framework.XXX` references and replacing them with references to `MonoGame.Framework` and `MonoGame.Framework.Content.Pipeline`.  This is required as you will no longer be building against Microsoft XNA.
 
@@ -52,14 +52,17 @@ Once you references are working you then need to change your assembly target pla
 
 After you have done these fixes you should be able to add these new processors to the content project "References".
 
+## Building Content
+
+The Pipeline Tool has 3 actions related to building content: Build, Rebuild and Clean. Build will build all content that needs to be built and put the xnb's in the output directory (bin by default). Content will be skipped if it hasn't changed since the last build. The time source content was last edited is saved in the intermediate directory (obj by default) to determine if content changed since the last build. Clean will empty the output and intermediate directories. Rebuild will first Clean and then Build.
 
 ## Linking Content To Your Game
 
-Once you have built your content you have a few different ways to add the XNBs to your game project.
+Once you have built your content you have a few different ways to add the xnb's to your game project. They all have the same goal, to get the built xnb's in your project output folder so a ContentManager can easily find and load them.
 
 ### MonoGameContentReference
 
-The simplest method is to setup your game project from one of the templates that come with the SDK. When you create a new project it will include a Content.mgcb file with its Build Action set to MonoGameContentReference. This build action is defined in the .targets file [here](https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets). MonoGameContentReference is set up so that when the project is built, the mgcb will build any new/modified content and copy the resulting xnb's to the output directory so they can be used in the project. The content files do not need to be added to your project.
+The simplest method is to setup your game project from one of the templates that come with the SDK. When you create a new project it will include a Content.mgcb file with its Build Action set to MonoGameContentReference. This build action is defined in the .targets file [here](https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework.Content.Pipeline/MonoGame.Content.Builder.targets). MonoGameContentReference is set up so that when the project is built, the mgcb will build any new/modified content and copy the resulting xnb's to the project output directory so they can be used in the project. Note that this way you don't even have to manually build the content with the Pipeline Tool. Just add your content to the .mgcb with the Pipeline Tool and the rest will happen when you build your project. The content files do not need to be added to your project.
 
 ### Manual Copy
 
@@ -104,4 +107,4 @@ Then any files you put in a Content folder within your game project will automat
 
 ## Reporting Bugs
 
-If you run into any problems with MGCB or the Pipeline tool them please ask for help on the [community site](http://community.monogame.net/) or submit a [bug report on GitHub](https://github.com/MonoGame/MonoGame/issues).
+If you run into any problems with MGCB or the Pipeline Tool, please ask for help on the [community site](http://community.monogame.net/) or submit a [bug report on GitHub](https://github.com/MonoGame/MonoGame/issues).
