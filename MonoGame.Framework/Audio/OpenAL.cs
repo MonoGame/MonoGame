@@ -495,6 +495,7 @@ namespace OpenAL
         private int StorageHardware;
         private int StorageAccessible;
 
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate bool SetBufferModeDelegate (int n, ref int buffers, int value);
 
         private SetBufferModeDelegate setBufferMode;
@@ -539,20 +540,33 @@ namespace OpenAL
     {
         /* Effect API */
 
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alGenEffectsDelegate (int n, out uint effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alDeleteEffectsDelegate (int n, ref int effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate bool alIsEffectDelegate (uint effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alEffectfDelegate (uint effect, EfxEffectf param, float value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alEffectiDelegate (uint effect, EfxEffecti param, int value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alGenAuxiliaryEffectSlotsDelegate (int n, out uint effectslots);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alDeleteAuxiliaryEffectSlotsDelegate (int n, ref int effectslots);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alAuxiliaryEffectSlotiDelegate (uint slot, EfxEffecti type, uint effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alAuxiliaryEffectSlotfDelegate (uint slot, EfxEffectSlotf param, float value);
 
         /* Filter API */
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private unsafe delegate void alGenFiltersDelegate (int n, [Out] uint* filters);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alFilteriDelegate (uint fid, EfxFilteri param, int value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alFilterfDelegate (uint fid, EfxFilterf param, float value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private unsafe delegate void alDeleteFiltersDelegate (int n, [In] uint* filters);
 
 
