@@ -5,6 +5,8 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkGamer : Gamer
     {
+        protected bool isReady = false;
+
         internal NetworkGamer(string displayName, string gamertag, byte id, bool isGuest, bool isHost, bool isLocal, bool isPrivateSlot, NetworkMachine machine, NetworkSession session) : base()
         {
             this.DisplayName = displayName;
@@ -16,7 +18,6 @@ namespace Microsoft.Xna.Framework.Net
             this.IsHost = isHost;
             this.IsLocal = isLocal;
             this.IsPrivateSlot = isPrivateSlot;
-            this.IsReady = false;
             this.Machine = machine;
             this.RoundtripTime = TimeSpan.Zero;
             this.Session = session;
@@ -30,7 +31,27 @@ namespace Microsoft.Xna.Framework.Net
         public bool IsLocal { get; }
         public bool IsMutedByLocalUser { get { return false; } }
         public bool IsPrivateSlot { get; }
-        public bool IsReady { get; }
+
+        public virtual bool IsReady
+        {
+            get
+            {
+                if (IsDisposed)
+                {
+                    throw new InvalidOperationException("Gamer disposed");
+                }
+
+                if (Session.SessionState != NetworkSessionState.Lobby)
+                {
+                    throw new InvalidOperationException("Session state is not lobby");
+                }
+
+                return isReady;
+            }
+
+            set { throw new InvalidOperationException("Gamer is not local"); }
+        }
+
         public bool IsTalking { get { return false; } }
         public NetworkMachine Machine { get; }
         public TimeSpan RoundtripTime { get; }

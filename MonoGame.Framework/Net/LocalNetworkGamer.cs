@@ -69,7 +69,31 @@ namespace Microsoft.Xna.Framework.Net
             outboundPackets.Clear();
         }
 
-        public bool IsDataAvailable { get { return inboundPackets.Count > 0; } }
+        public bool IsDataAvailable { get { return inboundPacketIndex < inboundPackets.Count; } }
+
+        public override bool IsReady
+        {
+            set
+            {
+                if (IsDisposed)
+                {
+                    throw new InvalidOperationException("Gamer disposed");
+                }
+
+                if (Session.SessionState != NetworkSessionState.Lobby)
+                {
+                    throw new InvalidOperationException("Session state is not lobby");
+                }
+
+                if (isReady != value)
+                {
+                    isReady = value;
+
+                    // TODO: Sync
+                }
+            }
+        }
+
         public SignedInGamer SignedInGamer { get; }
 
         public void EnableSendVoice(NetworkGamer remoteGamer, bool enable)
@@ -130,7 +154,7 @@ namespace Microsoft.Xna.Framework.Net
             throw new NotImplementedException();
         }
 
-        public void SendData(PacketWriter data, SendDataOptions options)
+        private void InternalSendData(PacketWriter data, SendDataOptions options, NetworkGamer recipient)
         {
             if (data == null)
             {
@@ -156,9 +180,19 @@ namespace Microsoft.Xna.Framework.Net
             outboundPackets.Add(new OutboundPacket(packet, this, null, options));
         }
 
+        public void SendData(PacketWriter data, SendDataOptions options)
+        {
+            InternalSendData(data, options, null);
+        }
+
         public void SendData(PacketWriter data, SendDataOptions options, NetworkGamer recipient)
         {
-            throw new NotImplementedException();
+            if (recipient == null)
+            {
+                throw new NullReferenceException("recipient");
+            }
+
+            InternalSendData(data, options, recipient);
         }
 
         public void SendPartyInvites()

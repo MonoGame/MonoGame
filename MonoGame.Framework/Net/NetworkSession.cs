@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetActionIndex Index { get { return NetActionIndex.ConnectToAllRequest; } }
         public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
-        public int SequenceChannel { get { return 0; } }
+        public int SequenceChannel { get { return 1; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
         {
@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetActionIndex Index { get { return NetActionIndex.ConnectToAllSuccessful; } }
         public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
-        public int SequenceChannel { get { return 0; } }
+        public int SequenceChannel { get { return 1; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
         { }
@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetActionIndex Index { get { return NetActionIndex.GamerJoinRequest; } }
         public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
-        public int SequenceChannel { get { return 0; } }
+        public int SequenceChannel { get { return 1; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
         { }
@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetActionIndex Index { get { return NetActionIndex.GamerJoinResponse; } }
         public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
-        public int SequenceChannel { get { return 0; } }
+        public int SequenceChannel { get { return 1; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
         {
@@ -267,7 +267,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetActionIndex Index { get { return NetActionIndex.GamerJoined; } }
         public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
-        public int SequenceChannel { get { return 0; } }
+        public int SequenceChannel { get { return 1; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
         {
@@ -333,7 +333,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetActionIndex Index { get { return NetActionIndex.GamerLeft; } }
         public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
-        public int SequenceChannel { get { return 0; } }
+        public int SequenceChannel { get { return 1; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
         {
@@ -412,7 +412,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public NetActionIndex Index { get { return NetActionIndex.UserMessage; } }
         public NetDeliveryMethod DeliveryMethod { get; }
-        public int SequenceChannel { get { return 1; } }
+        public int SequenceChannel { get { return 0; } }
 
         public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
         {
@@ -649,7 +649,6 @@ namespace Microsoft.Xna.Framework.Net
             this.AllowJoinInProgress = false;
             this.BytesPerSecondReceived = 0;
             this.BytesPerSecondSent = 0;
-            this.Host = null;
             this.IsDisposed = false;
             this.IsHost = isHost;
             this.LocalGamers = new GamerCollection<LocalNetworkGamer>(this.machine.localGamers);
@@ -677,7 +676,22 @@ namespace Microsoft.Xna.Framework.Net
         public bool AllowJoinInProgress { get; set; } // any peer can get, only host can set
         public int BytesPerSecondReceived { get; } // todo
         public int BytesPerSecondSent { get; } // todo
-        public NetworkGamer Host { get; }
+
+        public NetworkGamer Host
+        {
+            get
+            {
+                NetworkMachine hostMachine = IsHost ? machine : hostConnection.Tag as NetworkMachine;
+
+                if (hostMachine == null || hostMachine.Gamers.Count == 0)
+                {
+                    return null;
+                }
+
+                return hostMachine.Gamers[0];
+            }
+        }
+
         public bool IsDisposed { get; private set; }
 
         public bool IsEveryoneReady
