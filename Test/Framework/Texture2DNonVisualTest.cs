@@ -379,5 +379,38 @@ namespace MonoGame.Tests.Framework
         {
             _game.Dispose();
         }
+        [Test]
+        public void TransparentTexture()
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/Transparent.png"))
+            {
+                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Color[] data = new Color[1];
+                t.GetData<Color>(0, new Rectangle(10, 10, 1, 1), data, 0, 1);
+                Color expected = new Color(0, 0, 0, 0);
+                //Console.Error.WriteLine("\nR: {0}, G: {1}, B: {2}, A: {3};", data[0].R, data[0].G, data[0].B, data[0].A);
+                Assert.AreEqual(expected.R, data[0].R,"Red");
+                Assert.AreEqual(expected.G, data[0].G,"Green");
+                Assert.AreEqual(expected.B, data[0].B,"Blue");
+                Assert.AreEqual(expected.A, data[0].A,"Alpha");
+            }
+        }
+        [Test]
+        public void NearlyTransparentTexture()
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/NearlyTransparent.png"))
+            {
+                Texture2D t = Texture2D.FromStream(_game.GraphicsDevice, reader.BaseStream);
+                Color[] data = new Color[1];
+                t.GetData<Color>(0, new Rectangle(10, 10, 1, 1), data, 0, 1);
+                Color expected = new Color(254, 128, 63, 129);
+                Console.Error.WriteLine("\nFound\nR: {0}, G: {1}, B: {2}, A: {3};", data[0].R, data[0].G, data[0].B, data[0].A);
+                Console.Error.WriteLine("Expected\nR: {0}, G: {1}, B: {2}, A: {3};", expected.R, expected.G, expected.B, expected.A);
+                Assert.AreEqual(expected.R, data[0].R, "Red");
+                Assert.AreEqual(expected.G, data[0].G,"Green");
+                Assert.AreEqual(expected.B, data[0].B,"Blue");
+                Assert.AreEqual(expected.A, data[0].A,"Alpha");
+            }
+        }
     }
 }
