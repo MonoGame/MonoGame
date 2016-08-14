@@ -115,7 +115,7 @@ namespace MonoGame.Tests.Graphics
 #endif
 
 #if !XNA
-        [Test]
+        [Test, Ignore]
         public void VisualTestComparisonFunction()
         {
             PrepareFrameCapture();
