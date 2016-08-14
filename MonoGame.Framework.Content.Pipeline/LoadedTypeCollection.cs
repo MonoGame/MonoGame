@@ -21,6 +21,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         public LoadedTypeCollection()
         {
+            // Scan the already loaded assemblies.
+            if (_all == null)
+            {
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var ass in assemblies)
+                    ScanAssembly(ass);
+            }
+
             // Hook into assembly loading events to gather any new
             // enumeration types that are found.
             AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => ScanAssembly(args.LoadedAssembly);            
@@ -55,13 +63,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         public IEnumerator<T> GetEnumerator()
         {
-            if (_all == null)
-            {
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                foreach (var ass in assemblies)
-                    ScanAssembly(ass);
-            }
-
             return _all.GetEnumerator();
         }
 
