@@ -51,12 +51,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void DisposedWhenDisposingInvoked()
         {
-            var game = new TestGameBase();
-            var gdm = new GraphicsDeviceManager(game);
-            ((IGraphicsDeviceManager) gdm).CreateDevice();
-
-            var gd = gdm.GraphicsDevice;
-
             var count = 0;
 
             gd.Disposing += (sender, args) =>
@@ -76,19 +70,8 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void ResetInvokedBeforeDeviceLost()
         {
-            var game = new TestGameBase();
-            var gdm = new GraphicsDeviceManager(game);
-
-            game.InitializeOnly();
-
-            var gd = game.GraphicsDevice;
-
             var resetCount = 0;
             var devLostCount = 0;
-
-            var lostCount = 0;
-            var tex = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
-            tex.ContentLost += (sender, args) => lostCount++;
 
             gd.DeviceReset += (sender, args) =>
             {
@@ -102,30 +85,41 @@ namespace MonoGame.Tests.Graphics
                 Assert.AreEqual(1, resetCount);
             };
 
-#if XNA
             gd.Reset();
-#else
-            gd.Reset(new PresentationParameters());
-#endif
 
-            Assert.AreEqual(1, lostCount);
+            Assert.AreEqual(1, resetCount);
+            Assert.AreEqual(1, devLostCount);
+        }
 
-            tex.Dispose();
+        [Test]
+        public void ContentLostResources()
+        {
+            // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
 
-            game.Dispose();
+            var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
+            var vb = new DynamicVertexBuffer(gd, VertexPositionColor.VertexDeclaration, 1, BufferUsage.None);
+            var ib = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+            var rtc = new RenderTargetCube(gd, 1, false, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            gd.Reset();
+
+            Assert.IsTrue(rt.IsContentLost);
+            Assert.IsFalse(rt.IsDisposed);
+
+            Assert.IsTrue(vb.IsContentLost);
+            Assert.IsFalse(vb.IsDisposed);
+
+            Assert.IsTrue(ib.IsContentLost);
+            Assert.IsFalse(ib.IsDisposed);
+
+            Assert.IsTrue(rtc.IsContentLost);
+            Assert.IsFalse(rtc.IsDisposed);
         }
 
         [Test]
         public void ResetWindowHandleNullThrowsException()
         {
-            var game = new TestGameBase();
-            new GraphicsDeviceManager(game);
-            game.InitializeOnly();
-
-            var gd = game.GraphicsDevice;
             Assert.Throws<ArgumentException>(() => gd.Reset(new PresentationParameters()));
-
-            game.Dispose();
         }
 
 		[Test]
