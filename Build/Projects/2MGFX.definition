@@ -106,6 +106,9 @@
     <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilter.cs">
       <Link>MonoGame.Framework\TextureFilter.cs</Link>
     </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilterMode.cs">
+      <Link>MonoGame.Framework\TextureFilterMode.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs">
       <Link>MonoGame.Framework\VertexElementUsage.cs</Link>
     </Compile>
