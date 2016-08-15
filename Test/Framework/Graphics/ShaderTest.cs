@@ -66,16 +66,14 @@ non-infringement.
 */
 #endregion License
 
-using System;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using NUnit.Framework;
 
-namespace MonoGame.Tests.Visual {
+namespace MonoGame.Tests.Graphics {
 	[TestFixture]
-	class ShaderTest : VisualTestFixtureBase {
+	class ShaderTest : GraphicsDeviceTestFixtureBase {
 		[TestCase ("NoEffect")]
 		[TestCase ("HighContrast")]
 		[TestCase ("Bevels")]
@@ -86,45 +84,31 @@ namespace MonoGame.Tests.Visual {
 		[TestCase ("RainbowH")]
 		public void Shader (string effectName)
 		{
-			SpriteBatch spriteBatch = null;
-			Effect effect = null;
-
-			// A background texture to test that the effect doesn't
-			// mess up other textures
-			Texture2D background = null;
-
-			// The texture to apply the effect to
-			Texture2D surge = null;
-
+            PrepareFrameCapture();
 #if XNA
             effectName = Path.Combine("XNA", effectName);
 #elif WINDOWS
             effectName = Path.Combine("DirectX", effectName);
 #endif
 
-			Game.LoadContentWith += (sender, e) => {
-				spriteBatch = new SpriteBatch (Game.GraphicsDevice);
-				effect = Game.Content.Load<Effect> (Paths.Effect (effectName));
-				background = Game.Content.Load<Texture2D> (Paths.Texture ("fun-background"));
-				surge = Game.Content.Load<Texture2D> (Paths.Texture ("Surge"));
-			};
+            var spriteBatch = new SpriteBatch (gd);
+            var effect = content.Load<Effect> (Paths.Effect (effectName));
+			// A background texture to test that the effect doesn't
+			// mess up other textures
+            var background = content.Load<Texture2D> (Paths.Texture ("fun-background"));
+			// The texture to apply the effect to
+            var surge = content.Load<Texture2D> (Paths.Texture ("Surge"));
 
-			Game.UnloadContentWith += (sender, e) => {
-				spriteBatch.Dispose ();
-			};
+            spriteBatch.Begin (SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Draw (background, Vector2.Zero, Color.White);
 
-			Game.DrawWith += (sender, e) => {
-				spriteBatch.Begin (SpriteSortMode.Immediate, BlendState.AlphaBlend);
-				spriteBatch.Draw (background, Vector2.Zero, Color.White);
+            effect.CurrentTechnique.Passes [0].Apply ();
+            spriteBatch.Draw (
+                surge, new Vector2 (300, 200), null, Color.White,
+                0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0f);
+            spriteBatch.End ();
 
-				effect.CurrentTechnique.Passes [0].Apply ();
-				spriteBatch.Draw (
-					surge, new Vector2 (300, 200), null, Color.White,
-					0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0f);
-				spriteBatch.End ();
-			};
-
-			RunSingleFrameTest ();
+            CheckFrames();
 		}
 	}
 }

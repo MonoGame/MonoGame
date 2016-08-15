@@ -3,16 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NUnit.Framework.Constraints;
 
-namespace MonoGame.Tests.Framework
+namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     public class Texture3DNonVisualTest

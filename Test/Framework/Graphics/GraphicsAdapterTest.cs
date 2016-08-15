@@ -12,7 +12,7 @@ using NUnit.Framework;
 // the GraphicsAdapter API.
 #if XNA || DIRECTX
 
-namespace MonoGame.Tests.Framework
+namespace MonoGame.Tests.Graphics
 {
     class GraphicsAdapterTest
     {
