@@ -118,6 +118,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// When using comparison sampling, also set <see cref="FilterMode"/> to <see cref="TextureFilterMode.Comparison"/>.
+        /// </summary>
         public CompareFunction ComparisonFunction
         {
             get { return _comparisonFunction; }
