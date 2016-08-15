@@ -115,7 +115,7 @@ namespace MonoGame.Tests.Graphics
 #endif
 
 #if !XNA
-        [Test, Ignore]
+        [Test]
         public void VisualTestComparisonFunction()
         {
             PrepareFrameCapture();
@@ -150,7 +150,8 @@ namespace MonoGame.Tests.Graphics
                     AddressU = TextureAddressMode.Clamp,
                     AddressV = TextureAddressMode.Clamp,
                     AddressW = TextureAddressMode.Clamp,
-                    ComparisonFunction = compares[i]
+                    ComparisonFunction = compares[i],
+                    FilterMode = TextureFilterMode.Comparison
                 };
 
             var customEffect = AssetTestUtility.CompileEffect(gd, 

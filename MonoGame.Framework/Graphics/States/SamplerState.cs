@@ -35,6 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _maxAnisotropy;
         private int _maxMipLevel;
         private float _mipMapLevelOfDetailBias;
+        private TextureFilterMode _filterMode;
         private CompareFunction _comparisonFunction;
 
         public TextureAddressMode AddressU
@@ -127,6 +128,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public TextureFilterMode FilterMode
+        {
+            get { return _filterMode; }
+            set
+            {
+                ThrowIfBound();
+                _filterMode = value;
+            }
+        }
+
         internal void BindToGraphicsDevice(GraphicsDevice device)
         {
             if (_defaultStateObject)
@@ -155,6 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
             MaxMipLevel = 0;
             MipMapLevelOfDetailBias = 0.0f;
             ComparisonFunction = CompareFunction.Never;
+            FilterMode = TextureFilterMode.Default;
         }
 
         private SamplerState(string name, TextureFilter filter, TextureAddressMode addressMode)
@@ -180,6 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _maxMipLevel = cloneSource._maxMipLevel;
             _mipMapLevelOfDetailBias = cloneSource._mipMapLevelOfDetailBias;
             _comparisonFunction = cloneSource._comparisonFunction;
+            _filterMode = cloneSource._filterMode;
         }
 
         internal SamplerState Clone()
