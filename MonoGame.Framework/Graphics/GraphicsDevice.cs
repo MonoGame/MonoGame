@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Xna.Framework.Utilities;
+using System.Runtime.InteropServices;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -19,6 +20,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private Color _blendFactor = Color.White;
         private bool _blendFactorDirty;
+
+        private SurfaceFormat _backBufferFormat;
 
         private BlendState _blendState;
         private BlendState _actualBlendState;
@@ -1302,7 +1305,34 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <typeparam name="T">A byte[] of size (ViewPort.Width * ViewPort.Height * 4)</typeparam>
         public void GetBackBufferData<T>(T[] data) where T : struct
         {
-            PlatformGetBackBufferData(data);
+            if (data == null)
+                throw new ArgumentNullException("data");
+            GetBackBufferData(null, data, 0, data.Length);
+        }
+
+        public void GetBackBufferData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            GetBackBufferData(null, data, startIndex, elementCount);
+        }
+
+        public void GetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int elementCount)
+            where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException("startIndex should be larger than zero.");
+
+            Rectangle rectangle;
+            if (rect.HasValue)
+                rectangle = rect.Value;
+            else
+                rectangle = new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+
+            if ((startIndex + elementCount) * Marshal.SizeOf(typeof(T)) < _backBufferFormat.GetSize() * (rectangle.Width + rectangle.Height))
+               throw new ArgumentException("Data buffer is not large enough."); 
+
+            PlatformGetBackBufferData(rectangle, data, startIndex, elementCount);
         }
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)

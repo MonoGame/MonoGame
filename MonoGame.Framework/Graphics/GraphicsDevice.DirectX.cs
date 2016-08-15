@@ -5,6 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Mathematics.Interop;
@@ -1482,42 +1485,72 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformGetBackBufferData<T>(T[] data) where T : struct
+        private void PlatformGetBackBufferData<T>(Rectangle rect, T[] data, int startIndex, int count) where T : struct
         {
-            var dataBytes = data as byte[];
-
-            if (dataBytes == null)
-                throw new Exception("GetBackBufferData only supports byte[]");
-
-            lock (_d3dContext)
-            {
+            // TODO share code with Texture2D.GetData and do pooling for staging textures
+            // first set up a staging texture
+            const SurfaceFormat format = SurfaceFormat.Color;
 #if WINDOWS_PHONE
                 using (var backBufferTexture = new SharpDX.Direct3D11.Texture2D(_renderTargetView.Resource.NativePointer))
 #endif
 #if WINDOWS || WINDOWS_STOREAPP
-                //You can't Map the BackBuffer surface, so we copy to another texture
-                using (var dxgiBackBuffer = _swapChain.GetBackBuffer<Surface>(0))
-                using (var backBufferTexture = dxgiBackBuffer.QueryInterface<SharpDX.Direct3D11.Texture2D>())
+            //You can't Map the BackBuffer surface, so we copy to another texture
+            using (var dxgiBackBuffer = _swapChain.GetBackBuffer<Surface>(0))
+            using (var backBufferTexture = dxgiBackBuffer.QueryInterface<SharpDX.Direct3D11.Texture2D>())
 #endif
+             {
+                var desc = backBufferTexture.Description;
+                desc.BindFlags = BindFlags.None;
+                desc.CpuAccessFlags = CpuAccessFlags.Read;
+                desc.Usage = ResourceUsage.Staging;
+                desc.OptionFlags = ResourceOptionFlags.None;
+
+                using (var stagingTex = new SharpDX.Direct3D11.Texture2D(_d3dDevice, desc))
                 {
-                    var desc = backBufferTexture.Description;
-                    desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
-                    desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
-                    desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
-                    desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
-
-                    using (var texture = new SharpDX.Direct3D11.Texture2D(_d3dDevice, desc))
+                    lock (_d3dContext)
                     {
-                        _d3dContext.CopyResource(backBufferTexture, texture);
-
-                        DataStream dataStream;
-                        var dataBox = _d3dContext.MapSubresource(texture, 0, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out dataStream);
-
-                        //Copy each line one at a time as there may be overhang from Pitch
-                        for (var y = 0; y < _viewport.Height; y++)
+                        // Copy the data from the GPU to the staging texture.
+                        var elementsInRow = rect.Width;
+                        var rows = rect.Height;
+                        using (var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
                         {
-                            dataStream.Seek(y * dataBox.RowPitch, System.IO.SeekOrigin.Begin);
-                            dataStream.Read(dataBytes, y * _viewport.Width * 4, _viewport.Width * 4);
+                            _d3dContext.CopySubresourceRegion(backBuffer, 0,
+                                new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1), stagingTex, 0);
+                        }
+
+                        // Copy the data to the array.
+                        DataStream stream = null;
+                        try
+                        {
+                            var databox = _d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+
+                            var elementSize = format.GetSize();
+                            var rowSize = elementSize * elementsInRow;
+                            if (rowSize == databox.RowPitch)
+                                stream.ReadRange(data, startIndex, count);
+                            else
+                            {
+                                // Some drivers may add pitch to rows.
+                                // We need to copy each row separately and skip trailing zeroes.
+                                stream.Seek(0, SeekOrigin.Begin);
+
+                                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                                for (var row = 0; row < rows; row++)
+                                {
+                                    int i;
+                                    for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                        data[i + startIndex] = stream.Read<T>();
+
+                                    if (i >= count)
+                                        break;
+
+                                    stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            SharpDX.Utilities.Dispose( ref stream);
                         }
                     }
                 }

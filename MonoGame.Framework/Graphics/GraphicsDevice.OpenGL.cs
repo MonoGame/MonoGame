@@ -256,6 +256,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Context.MakeCurrent(windowInfo);
 #endif
+            _backBufferFormat = SurfaceFormat.Color;
 
             MaxTextureSlots = 16;
 
@@ -1204,24 +1205,23 @@ namespace Microsoft.Xna.Framework.Graphics
            return GraphicsProfile.HiDef;
         }
 
-        private void PlatformGetBackBufferData<T>(T[] data) where T : struct
+        private void PlatformGetBackBufferData<T>(Rectangle rect, T[] data, int startIndex, int count) where T : struct
         {
-            var tByteSize = Marshal.SizeOf(typeof(T));
-            Debug.Assert((data.Length * tByteSize) >= (_viewport.Width * _viewport.Height * 4));
+            var tSize = Marshal.SizeOf(typeof(T));
 
-            GL.ReadPixels(0, 0, _viewport.Width, _viewport.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+            GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
 
             //In GL this is upside down (top row is the bottom row), so loop through fixing it up
-            var rowSize = _viewport.Width * 4 / tByteSize;
+            var rowSize = rect.Width * _backBufferFormat.GetSize() / tSize;
             var row = new T[rowSize];
-            for (var y = 0; y < _viewport.Height / 2; y++)
+            for (var y = rect.Y; y < rect.Top / 2; y++)
             {
                 //Copy the top row out
                 Array.Copy(data, y * rowSize, row, 0, rowSize);
                 //Copy the bottom row over the top row
-                Array.Copy(data, (_viewport.Height - y - 1) * rowSize, data, y * rowSize, rowSize);
+                Array.Copy(data, (rect.Top - y - 1) * rowSize, data, y * rowSize, rowSize);
                 //Copy the backup over the bottom row
-                Array.Copy(row, 0, data, (_viewport.Height - y - 1) * rowSize, rowSize);
+                Array.Copy(row, 0, data, (rect.Top - y - 1) * rowSize, rowSize);
             }
         }
 
