@@ -24,11 +24,7 @@ namespace MonoGame.Tests.Graphics
             _game = new Game();
             var graphicsDeviceManager = new GraphicsDeviceManager(_game);
             graphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
-#if XNA
             graphicsDeviceManager.ApplyChanges();
-#else
-            graphicsDeviceManager.CreateDevice();
-#endif
 
             t = new Texture3D(_game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
             for (int layer = 0; layer < d; layer++)
