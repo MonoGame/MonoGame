@@ -165,7 +165,13 @@ namespace Microsoft.Xna.Framework
 	// ARGB
         private uint _packedValue;
 	  
-        private Color(uint packedValue)
+        /// <summary>
+        /// Constructs an RGBA color from a packed value.
+        /// The value is a 32-bit unsigned integer, with R in the least significant octet.
+        /// </summary>
+        /// <param name="packedValue">The packed value.</param>
+        [CLSCompliant(false)]
+        public Color(uint packedValue)
         {
             _packedValue = packedValue;
 			// ARGB
@@ -233,7 +239,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
         /// <param name="r">Red component value from 0.0f to 1.0f.</param>
         /// <param name="g">Green component value from 0.0f to 1.0f.</param>
@@ -249,7 +255,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
+        /// Constructs an RGBA color from scalars representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
         /// <param name="r">Red component value from 0 to 255.</param>
         /// <param name="g">Green component value from 0 to 255.</param>
@@ -264,7 +270,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
+        /// Constructs an RGBA color from scalars representing red, green, blue and alpha values.
         /// </summary>
         /// <param name="r">Red component value from 0 to 255.</param>
         /// <param name="g">Green component value from 0 to 255.</param>
@@ -280,7 +286,26 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
+        /// Constructs an RGBA color from scalars representing red, green, blue and alpha values.
+        /// </summary>
+        /// <remarks>
+        /// This overload sets the values directly without clamping, and may therefore be faster than the other overloads.
+        /// </remarks>
+        /// <param name="r"></param>
+        /// <param name="g"></param>
+        /// <param name="b"></param>
+        /// <param name="alpha"></param>
+        public Color(byte r, byte g, byte b, byte alpha)
+        {
+            _packedValue = 0;
+            R = r;
+            G = g;
+            B = b;
+            A = alpha;
+        }
+
+        /// <summary>
+        /// Constructs an RGBA color from scalars representing red, green, blue and alpha values.
         /// </summary>
         /// <param name="r">Red component value from 0.0f to 1.0f.</param>
         /// <param name="g">Green component value from 0.0f to 1.0f.</param>

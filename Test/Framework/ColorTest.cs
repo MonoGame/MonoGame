@@ -5,6 +5,46 @@ namespace MonoGame.Tests.Framework
 {
     class ColorTest
     {
+        // Contains a test case for each constructor type
+        private object[] _ctorTestCases =
+        {
+#if !XNA
+            new object[] { new Color(new Color(64, 128, 192), 32), 64, 128, 192, 32 },
+            new object[] { new Color(new Color(64, 128, 192), 0.125f), 64, 128, 192, 32 },
+            new object[] { new Color((byte)64, (byte)128, (byte)192, (byte)32), 64, 128, 192, 32 },
+#endif
+            new object[] { new Color(), 0, 0, 0, 0 },
+            new object[] { new Color(64, 128, 192), 64, 128, 192, 255 },
+            new object[] { new Color(64, 128, 192, 32), 64, 128, 192, 32 },
+            new object[] { new Color(0.25f, 0.5f, 0.75f), 64, 128, 192, 255 },
+            new object[] { new Color(0.25f, 0.5f, 0.75f, 0.125f), 64, 128, 192, 32 },
+            new object[] { new Color(new Vector3(0.25f, 0.5f, 0.75f)), 64, 128, 192, 255 },
+            new object[] { new Color(new Vector4(0.25f, 0.5f, 0.75f, 0.125f)), 64, 128, 192, 32 }
+        };
+
+        [Test, TestCaseSource("_ctorTestCases")]
+        public void Ctor_Explicit(Color color, int expectedR, int expectedG, int expectedB, int expectedA)
+        {
+            // Account for rounding differences with float constructors
+            Assert.That(color.R, Is.EqualTo(expectedR).Within(1));
+            Assert.That(color.G, Is.EqualTo(expectedG).Within(1));
+            Assert.That(color.B, Is.EqualTo(expectedB).Within(1));
+            Assert.That(color.A, Is.EqualTo(expectedA).Within(1));
+        }
+
+#if !XNA
+        [Test]
+        public void Ctor_Packed()
+        {
+            var color = new Color(0x20C08040);
+
+            Assert.That(color.R, Is.EqualTo(64));
+            Assert.That(color.G, Is.EqualTo(128));
+            Assert.That(color.B, Is.EqualTo(192));
+            Assert.That(color.A, Is.EqualTo(32));
+        }
+#endif
+
         [Test]
         public void Multiply()
         {
