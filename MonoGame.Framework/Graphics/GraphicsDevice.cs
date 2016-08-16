@@ -1321,16 +1321,19 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
                 throw new ArgumentNullException("data");
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException("startIndex should be larger than zero.");
+                throw new ArgumentOutOfRangeException("startIndex", "startIndex should be larger than zero.");
+            if (startIndex + elementCount < data.Length)
+                throw new ArgumentOutOfRangeException("elementCount",
+                    "elementCount should be larger than startIndex and startIndex + elementCount should be smaller than data.Length.");
+            if (_backBufferFormat.GetSize() % Marshal.SizeOf(typeof(T)) != 0)
+                throw new ArgumentException("T", "Size of T should be a multiple of the size of the backbuffer format.");
+            // TODO more checks? and XNA consistency!
 
             Rectangle rectangle;
             if (rect.HasValue)
                 rectangle = rect.Value;
             else
                 rectangle = new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
-
-            if ((startIndex + elementCount) * Marshal.SizeOf(typeof(T)) < _backBufferFormat.GetSize() * (rectangle.Width + rectangle.Height))
-               throw new ArgumentException("Data buffer is not large enough."); 
 
             PlatformGetBackBufferData(rectangle, data, startIndex, elementCount);
         }

@@ -1208,20 +1208,23 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGetBackBufferData<T>(Rectangle rect, T[] data, int startIndex, int count) where T : struct
         {
             var tSize = Marshal.SizeOf(typeof(T));
+            var buffer = new T[rect.Width*rect.Height*_backBufferFormat.GetSize() / tSize];
+            GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, buffer);
 
-            GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
-
-            //In GL this is upside down (top row is the bottom row), so loop through fixing it up
-            var rowSize = rect.Width * _backBufferFormat.GetSize() / tSize;
-            var row = new T[rowSize];
-            for (var y = rect.Y; y < rect.Top / 2; y++)
+            // buffer is returned upside down, so we swap the rows around when copying over
+            var rowSize = rect.Width*_backBufferFormat.GetSize() / tSize;
+            for (var dy = 0; dy < rect.Height; dy++)
             {
-                //Copy the top row out
-                Array.Copy(data, y * rowSize, row, 0, rowSize);
-                //Copy the bottom row over the top row
-                Array.Copy(data, (rect.Top - y - 1) * rowSize, data, y * rowSize, rowSize);
-                //Copy the backup over the bottom row
-                Array.Copy(row, 0, data, (rect.Top - y - 1) * rowSize, rowSize);
+                if (count == 0)
+                    break;
+                if (count < rowSize)
+                {
+                    Array.Copy(buffer, (rect.Height - dy - 1)*rowSize, data, startIndex + dy*rowSize, count);
+                    break;
+                }
+
+                Array.Copy(buffer, (rect.Height - dy - 1)*rowSize, data, startIndex + dy*rowSize, rowSize);
+                count -= rowSize;
             }
         }
 
