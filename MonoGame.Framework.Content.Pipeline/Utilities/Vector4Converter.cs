@@ -18,7 +18,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         IVector4Converter<short>,
         IVector4Converter<int>,
         IVector4Converter<float>,
-        IVector4Converter<Color>
+        IVector4Converter<Color>,
+        IVector4Converter<Vector4>
     {
         Vector4 IVector4Converter<byte>.ToVector4(byte value)
         {
@@ -48,6 +49,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
             return value.ToVector4();
         }
 
+        Vector4 IVector4Converter<Vector4>.ToVector4(Vector4 value)
+        {
+            return value;
+        }
+
         byte IVector4Converter<byte>.FromVector4(Vector4 value)
         {
             return (byte)(value.X * (float)byte.MaxValue);
@@ -71,6 +77,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         Color IVector4Converter<Color>.FromVector4(Vector4 value)
         {
             return new Color(value);
+        }
+
+        Vector4 IVector4Converter<Vector4>.FromVector4(Vector4 value)
+        {
+            return value;
         }
     }
 }
