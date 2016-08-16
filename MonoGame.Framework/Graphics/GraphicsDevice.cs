@@ -1300,7 +1300,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Gets the Pixel data of what is currently drawn on screen.
-        /// On XNA/OpenGL this is in BGRA format. On DirectX/iOS/Android it is RGBA format.
+        /// The format is whatever the current format of the backbuffer is.
         /// </summary>
         /// <typeparam name="T">A byte[] of size (ViewPort.Width * ViewPort.Height * 4)</typeparam>
         public void GetBackBufferData<T>(T[] data) where T : struct
