@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
             var halfPixelOffset = Matrix.CreateTranslation(0, 0, 0);
 
-            if (NeedsHalfPixelOffset){
+            if (SpriteBatch.NeedsHalfPixelOffset){
                 halfPixelOffset += Matrix.CreateTranslation(-0.5f, -0.5f, 0);
             }
 
