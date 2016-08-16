@@ -649,8 +649,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetHardwareFullscreen()
         {
+            // LPE added         
+            ModeDescription mode = _swapChain.Description.ModeDescription;         
+            _swapChain.ResizeTarget(ref mode); 
+            // /LPE added
+
             // This force to switch to fullscreen mode when hardware mode enabled(working in WindowsDX mode).
-            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);
+            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen, null);            
+          
         }
 
         internal void CreateSizeDependentResources()
@@ -754,7 +760,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINRT
                         Scaling = DisplayModeScaling.Stretched,
 #else
-                        Scaling = DisplayModeScaling.Unspecified,
+                        Scaling = DisplayModeScaling.Stretched, // DisplayModeScaling.Unspecified, // LPE changed this!
 #endif
                         Width = PresentationParameters.BackBufferWidth,
                         Height = PresentationParameters.BackBufferHeight,
@@ -765,7 +771,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
                     SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
-                    IsWindowed = true
+                    IsWindowed = true,
+                     
+                    Flags = SwapChainFlags.AllowModeSwitch // LPE Added this!!
                 };
 
                 // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device
