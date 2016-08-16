@@ -10,16 +10,24 @@ namespace MonoGame.Tests.Framework
         {
 #if !XNA
             new object[] { new Color(new Color(64, 128, 192), 32), 64, 128, 192, 32 },
+            new object[] { new Color(new Color(64, 128, 192), 256), 64, 128, 192, 255 },
             new object[] { new Color(new Color(64, 128, 192), 0.125f), 64, 128, 192, 32 },
+            new object[] { new Color(new Color(64, 128, 192), 1.1f), 64, 128, 192, 255 },
             new object[] { new Color((byte)64, (byte)128, (byte)192, (byte)32), 64, 128, 192, 32 },
 #endif
             new object[] { new Color(), 0, 0, 0, 0 },
             new object[] { new Color(64, 128, 192), 64, 128, 192, 255 },
+            new object[] { new Color(256, 256, -1), 255, 255, 0, 255},
             new object[] { new Color(64, 128, 192, 32), 64, 128, 192, 32 },
+            new object[] { new Color(256, 256, -1, 256), 255, 255, 0, 255},
             new object[] { new Color(0.25f, 0.5f, 0.75f), 64, 128, 192, 255 },
+            new object[] { new Color(1.1f, 1.1f, -0.1f), 255, 255, 0, 255 },
             new object[] { new Color(0.25f, 0.5f, 0.75f, 0.125f), 64, 128, 192, 32 },
+            new object[] { new Color(1.1f, 1.1f, -0.1f, -0.1f), 255, 255, 0, 0 },
             new object[] { new Color(new Vector3(0.25f, 0.5f, 0.75f)), 64, 128, 192, 255 },
-            new object[] { new Color(new Vector4(0.25f, 0.5f, 0.75f, 0.125f)), 64, 128, 192, 32 }
+            new object[] { new Color(new Vector3(1.1f, 1.1f, -0.1f)), 255, 255, 0, 255 },
+            new object[] { new Color(new Vector4(0.25f, 0.5f, 0.75f, 0.125f)), 64, 128, 192, 32 },
+            new object[] { new Color(new Vector4(1.1f, 1.1f, -0.1f, -0.1f)), 255, 255, 0, 0 }
         };
 
         [Test, TestCaseSource("_ctorTestCases")]

@@ -263,10 +263,19 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b)
         {
             _packedValue = 0;
-            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
-            A = (byte)255;
+            if (((r | g | b) & 0xFFFFFF00) != 0)
+            {
+                R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+                G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+                B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
+            }
+            else
+            {
+                R = (byte)r;
+                G = (byte)g;
+                B = (byte)b;
+            }
+            A = 255;
         }
 
         /// <summary>
@@ -279,10 +288,20 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b, int alpha)
         {
             _packedValue = 0;
-            R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
-            G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
-            B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
-            A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
+            if (((r | g | b | alpha) & 0xFFFFFF00) != 0)
+            {
+                R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
+                G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
+                B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
+                A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
+            }
+            else
+            {
+                R = (byte)r;
+                G = (byte)g;
+                B = (byte)b;
+                A = (byte)alpha;
+            }
         }
 
         /// <summary>
