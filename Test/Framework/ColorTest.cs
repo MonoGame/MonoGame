@@ -52,6 +52,50 @@ namespace MonoGame.Tests.Framework
             Assert.That(color.A, Is.EqualTo(32));
         }
 #endif
+        
+        [Test]
+        public void FromNonPremultiplied_Int()
+        {
+            var color = Color.FromNonPremultiplied(255, 128, 64, 128);
+            Assert.That(color.R, Is.EqualTo(128).Within(1));
+            Assert.That(color.G, Is.EqualTo(64).Within(1));
+            Assert.That(color.B, Is.EqualTo(32).Within(1));
+            Assert.That(color.A, Is.EqualTo(128).Within(0));
+
+            var overflow = Color.FromNonPremultiplied(280, 128, -10, 128);
+            Assert.That(overflow.R, Is.EqualTo(140).Within(1));
+            Assert.That(overflow.G, Is.EqualTo(64).Within(1));
+            Assert.That(overflow.B, Is.EqualTo(0).Within(1));
+            Assert.That(overflow.A, Is.EqualTo(128).Within(0));
+
+            var overflow2 = Color.FromNonPremultiplied(255, 128, 64, 280);
+            Assert.That(overflow2.R, Is.EqualTo(255).Within(1));
+            Assert.That(overflow2.G, Is.EqualTo(140).Within(1));
+            Assert.That(overflow2.B, Is.EqualTo(70).Within(1));
+            Assert.That(overflow2.A, Is.EqualTo(255).Within(0));
+        }
+
+        [Test]
+        public void FromNonPremultiplied_Float()
+        {
+            var color = Color.FromNonPremultiplied(new Vector4(1.0f, 0.5f, 0.25f, 0.5f));
+            Assert.That(color.R, Is.EqualTo(128).Within(1));
+            Assert.That(color.G, Is.EqualTo(64).Within(1));
+            Assert.That(color.B, Is.EqualTo(32).Within(1));
+            Assert.That(color.A, Is.EqualTo(128).Within(1));
+
+            var overflow = Color.FromNonPremultiplied(new Vector4(1.1f, 0.5f, -0.1f, 0.5f));
+            Assert.That(overflow.R, Is.EqualTo(140).Within(1));
+            Assert.That(overflow.G, Is.EqualTo(64).Within(1));
+            Assert.That(overflow.B, Is.EqualTo(0).Within(1));
+            Assert.That(overflow.A, Is.EqualTo(128).Within(1));
+
+            var overflow2 = Color.FromNonPremultiplied(new Vector4(1f, 0.5f, 0.25f, 1.1f));
+            Assert.That(overflow2.R, Is.EqualTo(255).Within(1));
+            Assert.That(overflow2.G, Is.EqualTo(140).Within(1));
+            Assert.That(overflow2.B, Is.EqualTo(70).Within(1));
+            Assert.That(overflow2.A, Is.EqualTo(255).Within(1));
+        }
 
         [Test]
         public void Multiply()
