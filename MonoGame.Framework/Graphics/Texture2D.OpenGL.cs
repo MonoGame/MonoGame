@@ -242,7 +242,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
 #if GLES
-            // TODO: check for data size and for non renderable formats (formats that can't be attached to FBO)
+            // TODO: check for for non renderable formats (formats that can't be attached to FBO)
 
             var framebufferId = 0;
 			#if (IOS || ANDROID)
@@ -263,8 +263,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 x = rect.Value.X;
                 y = rect.Value.Y;
-                width = this.Width;
-                height = this.Height;
+                width = rect.Value.Width;
+                height = rect.Value.Height;
             }
             GL.ReadPixels(x, y, width, height, this.glFormat, this.glType, data);
             GraphicsExtensions.CheckGLError();
@@ -289,7 +289,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         for (int x = rect.Value.X; x < rect.Value.X + rect.Value.Width; ++x)
                         {
-                            data[z * rect.Value.Width + w] = temp[(y * width) + x];
+                            data[startIndex + z * rect.Value.Width + w] = temp[(y * width) + x];
                             ++w;
                         }
                         ++z;

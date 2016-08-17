@@ -82,14 +82,39 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
+        private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
 #if OPENGL && (MONOMAC || DESKTOPGL)
-            TextureTarget target = GetGLCubeFace(cubeMapFace);
+            if (glFormat == GLPixelFormat.CompressedTextureFormats)
+                throw new NotImplementedException();
+
+            var target = GetGLCubeFace(cubeMapFace);
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();
-            GL.GetTexImage<T>(target, 0, glFormat, glType, data);
-            GraphicsExtensions.CheckGLError();
+
+            if (rect.HasValue)
+            {
+                var temp = new T[this.size * this.size];
+                GL.GetTexImage(target, level, this.glFormat, this.glType, temp);
+                GraphicsExtensions.CheckGLError();
+                int z = 0, w = 0;
+
+                for (int y = rect.Value.Y; y < rect.Value.Y + rect.Value.Height; ++y)
+                {
+                    for (int x = rect.Value.X; x < rect.Value.X + rect.Value.Width; ++x)
+                    {
+                        data[startIndex + z * rect.Value.Width + w] = temp[y * size + x];
+                        ++w;
+                    }
+                    ++z;
+                    w = 0;
+                }
+            }
+            else
+            {
+                GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
+                GraphicsExtensions.CheckGLError();
+            }
 #else
             throw new NotImplementedException();
 #endif
