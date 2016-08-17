@@ -52,8 +52,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, description);
         }
 
-        private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
+        private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
+            var levelSize = Math.Max(size >> level, 1);
             // Create a temp staging resource for copying the data.
             // 
             // TODO: Like in Texture2D, we should probably be pooling these staging resources
@@ -61,8 +62,8 @@ namespace Microsoft.Xna.Framework.Graphics
             //
             var desc = new Texture2DDescription
             {
-                Width = size,
-                Height = size,
+                Width = levelSize,
+                Height = levelSize,
                 MipLevels = 1,
                 ArraySize = 1,
                 Format = SharpDXHelper.ToFormat(_format),
@@ -79,8 +80,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (d3dContext)
                 {
                     // Copy the data from the GPU to the staging texture.
-                    int subresourceIndex = CalculateSubresourceIndex(cubeMapFace, 0);
-                    d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, null, stagingTex, 0);
+                    int subresourceIndex = CalculateSubresourceIndex(cubeMapFace, level);
+                    int elementsInRow;
+                    int rows;
+                    if (rect.HasValue)
+                    {
+                        elementsInRow = rect.Value.Width;
+                        rows = rect.Value.Height;
+                        var region = new ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1);
+                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, stagingTex, 0);
+                    }
+                    else
+                    {
+                        elementsInRow = levelSize;
+                        rows = levelSize;
+                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, null, stagingTex, 0);
+                    }
 
                     // Copy the data to the array.
                     DataStream stream = null;
@@ -88,11 +103,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
 
-                        const int startIndex = 0;
-                        var elementCount = data.Length;
                         var elementSize = _format.GetSize();
-                        var elementsInRow = size;
-                        var rows = size;
                         var rowSize = elementSize * elementsInRow;
                         if (rowSize == databox.RowPitch)
                             stream.ReadRange(data, startIndex, elementCount);
