@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		public DepthFormat DepthStencilFormat { get; private set; }
 		
-		public int MultiSampleCount { get; private set; }
+	//	public int MultiSampleCount { get; private set; }
 		
 		public RenderTargetUsage RenderTargetUsage { get; private set; }
 		

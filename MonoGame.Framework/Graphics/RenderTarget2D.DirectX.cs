@@ -22,6 +22,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_renderTargetViews != null)
                 return;
 
+            // Setup the multisampling description.
+            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
+            if (MultiSampleCount > 1)
+            {
+                multisampleDesc.Count = MultiSampleCount;
+                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
+            }
+
             // Create a view interface on the rendertarget to use on bind.
             if (ArraySize > 1)
             {
@@ -49,20 +57,24 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture()) };
+                var renderTargetViewDescription = new RenderTargetViewDescription();
+                if (MultiSampleCount > 1)
+                {
+                    renderTargetViewDescription.Dimension = RenderTargetViewDimension.Texture2DMultisampled;                       
+                }
+                else
+                {
+                    renderTargetViewDescription.Dimension = RenderTargetViewDimension.Texture2D;        
+                }
+
+                _renderTargetViews = new[] { new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture(), renderTargetViewDescription) };
             }
 
             // If we don't need a depth buffer then we're done.
             if (DepthStencilFormat == DepthFormat.None)
                 return;
 
-            // Setup the multisampling description.
-            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if (MultiSampleCount > 1)
-            {
-                multisampleDesc.Count = MultiSampleCount;
-                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
+           
 
             // Create a descriptor for the depth/stencil buffer.
             // Allocate a 2-D surface as the depth/stencil buffer.
@@ -78,14 +90,36 @@ namespace Microsoft.Xna.Framework.Graphics
                 BindFlags = BindFlags.DepthStencil,
             }))
             {
-                // Create the view for binding to the device.
-                _depthStencilView = new DepthStencilView(GraphicsDevice._d3dDevice, depthBuffer,
-                    new DepthStencilViewDescription()
+                DepthStencilViewDimension dsvDimension;
+                if (MultiSampleCount > 1)
+                {
+                    dsvDimension = DepthStencilViewDimension.Texture2DMultisampled;
+                }
+                else
+                {
+                    dsvDimension = DepthStencilViewDimension.Texture2D;
+                }
+
+                DepthStencilViewDescription desc = new DepthStencilViewDescription()
                     {
                         Format = SharpDXHelper.ToFormat(DepthStencilFormat),
-                        Dimension = DepthStencilViewDimension.Texture2D
-                    });
+                        Dimension = dsvDimension          
+                    };
+
+
+                // Create the view for binding to the device.
+                _depthStencilView = new DepthStencilView(GraphicsDevice._d3dDevice, depthBuffer,
+                    desc);
             }
+        }
+
+       
+
+        public void ResolveSubresource(RenderTarget2D destination) 
+        {
+            GraphicsDevice._d3dContext.ResolveSubresource(this._texture, 0, destination._texture, 0, 
+                SharpDXHelper.ToFormat(destination._format)); 
+           
         }
 
         private void PlatformGraphicsDeviceResetting()
