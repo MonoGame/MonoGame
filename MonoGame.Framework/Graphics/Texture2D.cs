@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -135,22 +136,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
         public void SetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            Rectangle resizedBounds = new Rectangle(0, 0, Math.Max(Bounds.Width >> level, 1), Math.Max(Bounds.Height >> level, 1));
-            if (level >= LevelCount)
-                throw new ArgumentException("Texture only has "+_levelCount+" levels", "level");
-            if (data == null)
-                throw new ArgumentNullException("data");
-            if ((!rect.HasValue && (data.Length - startIndex < resizedBounds.Width * resizedBounds.Height)) || (rect.HasValue && (rect.Value.Height * rect.Value.Width > data.Length)))
-                throw new ArgumentException("data array is too small");
-            if (elementCount + startIndex > data.Length)
-                throw new ArgumentException("ElementCount must be a valid index in the data array", "elementCount");
-            if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
-                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
-            if (arraySlice >= ArraySize)
-                throw new ArgumentException("Texture array only has "+ArraySize+" textures","arraySlice");
-            if (rect.HasValue && !resizedBounds.Contains(rect.Value))
-                throw new ArgumentException("Rectangle must be inside the Texture Bounds", "rect");
-            PlatformSetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
+            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount);
+            PlatformSetData(level, arraySlice, rect, data, startIndex, elementCount);
         }
         /// <summary>
         /// Changes the pixels of the texture
@@ -182,7 +169,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <typeparam name="T">New data for the texture</typeparam>
         /// <param name="data"></param>
 		public void SetData<T>(T[] data) where T : struct
-        {
+		{
+		    if (data == null)
+		        throw new ArgumentNullException("data");
 			this.SetData(0, null, data, 0, data.Length);
         }
         /// <summary>
@@ -199,15 +188,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of pixels to read</param>
         public void GetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            if (data == null || data.Length == 0)
-                throw new ArgumentException("data cannot be null");
-            if (data.Length < startIndex + elementCount)
-                throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
-            if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
-                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
-            if (rect.HasValue && rect.Value.Width * rect.Value.Height != elementCount)
-                throw new ArgumentException("The size of the data passed in is too large or too small for this resource");
-            PlatformGetData<T>(level, arraySlice, rect, data, startIndex, elementCount);
+            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount);
+            PlatformGetData(level, arraySlice, rect, data, startIndex, elementCount);
         }
         /// <summary>
         /// Retrieves the contents of the texture
@@ -246,6 +228,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">Destination array for the texture data</param>
         public void GetData<T> (T[] data) where T : struct
 		{
+		    if (data == null)
+		        throw new ArgumentNullException("data");
 			this.GetData(0, null, data, 0, data.Length);
 		}
 		
@@ -308,6 +292,32 @@ namespace Microsoft.Xna.Framework.Graphics
                 uint pixel = (uint)pixels[i];
                 pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
             }
+        }
+
+        private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            var textureBounds = new Rectangle(0, 0, Math.Max(width >> level, 1), Math.Max(height >> level, 1));
+            var checkedRect = rect.HasValue ? rect.Value : textureBounds;
+            if (level < 0 || level >= LevelCount)
+                throw new ArgumentException("level");
+            if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
+                throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
+            if (arraySlice < 0 || arraySlice >= ArraySize)
+                throw new ArgumentException("arraySlice");
+            if (!textureBounds.Contains(checkedRect))
+                throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
+            if (data == null)
+                throw new ArgumentNullException("data");
+            var tSize = Marshal.SizeOf(typeof(T));
+            var fSize = Format.GetSize();
+            if (tSize > fSize || fSize % tSize != 0)
+                throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");
+            if (startIndex < 0 || startIndex >= data.Length)
+                throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
+            if (data.Length < startIndex + elementCount)
+                throw new ArgumentException("The data array is too small.");
+            if (elementCount * tSize != checkedRect.Width * checkedRect.Height * fSize)
+                throw new ArgumentException("elementCount is too large or too small.", "elementCount");
         }
 	}
 }
