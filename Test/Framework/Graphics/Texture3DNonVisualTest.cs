@@ -74,10 +74,6 @@ namespace MonoGame.Tests.Graphics
             t.GetData(written);
             Assert.AreEqual(reference, written);
         }
-#if !XNA
-        [TestCase(a, 0, a + 1)]
-        [TestCase(a + 1, 1, a + 1)]
-#endif
 
         [TestCase(a, 0, a)]
         [TestCase(a + 1, 0, a)]
@@ -107,10 +103,8 @@ namespace MonoGame.Tests.Graphics
         [TestCase(a, 0, a - 1)]
         [TestCase(a - 1, 0, a)]
         [TestCase(a, 1, a)]
-#if XNA
         [TestCase(a, 0, a + 1)]
         [TestCase(a + 1, 1, a + 1)]
-#endif
         public void SetData3ParametersExceptionTest(int arrayLength, int startIndex, int elementCount)
         {
             Color[] write = new Color[arrayLength];
