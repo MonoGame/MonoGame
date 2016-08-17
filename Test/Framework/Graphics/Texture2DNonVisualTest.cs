@@ -207,7 +207,7 @@ namespace MonoGame.Tests.Graphics
         [TestCase(SurfaceFormat.Single, (byte)150)]
         [TestCase(SurfaceFormat.Single, (short)(160 << 8 + 120))]
         [TestCase(SurfaceFormat.Single, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
-        public void SetData1FormatTest<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        public void SetDataFormatTest<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
         {
             const int textureSize = 16;
 
@@ -235,7 +235,7 @@ namespace MonoGame.Tests.Graphics
 
         [TestCase(SurfaceFormat.Color, (long)0)]
         [TestCase(SurfaceFormat.HalfSingle, (float)0)]
-        public void SetData1FormatFailingTest<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        public void SetDataFormatFailingTestTBufferTooLarge<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
         {
             const int textureSize = 16;
 
@@ -246,6 +246,29 @@ namespace MonoGame.Tests.Graphics
             var bufferSize = textureSizeBytes / tSizeBytes;
 
             var buffer = new TBuffer[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            Assert.Throws<ArgumentException>(() => t.SetData(buffer));
+
+            t.Dispose();
+        }
+
+        [Test]
+        public void SetDataFormatFailingTestModTBufferNotZero()
+        {
+            const int textureSize = 12;
+            var format = SurfaceFormat.Vector4;
+            var value = new Vector3(20, 15, 18);
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = 12;
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new Vector3[bufferSize];
             for (var i = 0; i < bufferSize; i++)
                 buffer[i] = value;
 
