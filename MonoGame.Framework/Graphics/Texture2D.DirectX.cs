@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities.Png;
+using SharpDX.Direct3D11;
 
 #if WINDOWS_PHONE
 using System.Threading;
@@ -23,6 +24,11 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
     {
+        /// <summary>
+        /// LPE moved this
+        /// </summary>
+        public int MultiSampleCount { get; protected set; }
+
         private bool _shared;
 
         private bool _renderTarget;
@@ -372,6 +378,15 @@ namespace Microsoft.Xna.Framework.Graphics
         internal override SharpDX.Direct3D11.Resource CreateTexture()
 		{
             // TODO: Move this to SetData() if we want to make Immutable textures!
+
+            // LPE added this:
+            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
+            if (MultiSampleCount > 1)
+            {
+                multisampleDesc.Count = MultiSampleCount;
+                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
+            }
+
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
@@ -380,8 +395,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            desc.SampleDescription.Count = 1;
-            desc.SampleDescription.Quality = 0;
+            desc.SampleDescription = multisampleDesc;
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
