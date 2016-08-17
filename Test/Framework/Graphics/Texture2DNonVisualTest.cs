@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -128,10 +129,7 @@ namespace MonoGame.Tests.Graphics
                 t.Dispose();
             }
         }
-#if !XNA
-        [TestCase(2000000)]
-        [TestCase(4097)]
-#endif
+
         [TestCase(4096)]
         public void SetData1ParameterGoodTest(int arraySize)
         {
@@ -169,12 +167,11 @@ namespace MonoGame.Tests.Graphics
                 t.Dispose();
             }
         }
+
         [TestCase(2000)]
         [TestCase(4095)]
-#if XNA
         [TestCase(2000000)]
         [TestCase(4097)]
-#endif
         public void SetData1ParameterExceptionTest(int arraySize)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
@@ -201,11 +198,83 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-#if !XNA
-        [TestCase(4098, 1, 4097)]
-        [TestCase(4097, 0, 4097)]
-        [TestCase(4096, 0, 4095)]
-#endif
+        [TestCase(SurfaceFormat.HalfSingle, (short)(160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Vector4, (long)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+        [TestCase(SurfaceFormat.Vector2, (float)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+        [TestCase(SurfaceFormat.Color, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Color, (byte)150)]
+        [TestCase(SurfaceFormat.Color, (short)(160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Single, (byte)150)]
+        [TestCase(SurfaceFormat.Single, (short)(160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Single, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
+        public void SetData1FormatTest<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        {
+            const int textureSize = 16;
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = Marshal.SizeOf(typeof(TBuffer));
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new TBuffer[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            t.SetData(buffer);
+
+            var buffer2 = new TBuffer[bufferSize];
+            t.GetData(buffer2);
+
+            for (var i = 0; i < buffer.Length; i++)
+                Assert.AreEqual(buffer[i], buffer2[i]);
+
+            t.Dispose();
+        }
+
+        [TestCase(SurfaceFormat.Color, (long)0)]
+        [TestCase(SurfaceFormat.HalfSingle, (float)0)]
+        public void SetData1FormatFailingTest<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        {
+            const int textureSize = 16;
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = Marshal.SizeOf(typeof(TBuffer));
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new TBuffer[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            Assert.Throws<ArgumentException>(() => t.SetData(buffer));
+
+            t.Dispose();
+        }
+
+        public static int GetFormatSize(SurfaceFormat surfaceFormat)
+        {
+            switch (surfaceFormat)
+            {
+                case SurfaceFormat.Alpha8:
+                    return 1;
+                case SurfaceFormat.HalfSingle:
+                    return 2;
+                case SurfaceFormat.Single:
+                case SurfaceFormat.Color:
+                    return 4;
+                case SurfaceFormat.Vector2:
+                    return 8;
+                case SurfaceFormat.Vector4:
+                    return 16;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
         [TestCase(4200, 0, 4096)]
         [TestCase(4097, 1, 4096)]
         [TestCase(4097, 0, 4096)]
@@ -257,11 +326,9 @@ namespace MonoGame.Tests.Graphics
         [TestCase(4095, 0, 4094)]
         [TestCase(4097, 1, 4097)]
         [TestCase(4097, 1, 4098)]
-#if XNA
         [TestCase(4098, 1, 4097)]
         [TestCase(4097, 0, 4097)]
         [TestCase(4096, 0, 4095)]
-#endif
         public void SetData3ParameterExceptionTest(int arraySize, int startIndex, int elements)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
@@ -289,14 +356,6 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-#if !XNA
-        [TestCase(4096, 0, 4096, 1, 1, 63, 63)]
-        [TestCase(4096, 0, 4095, 0, 0, 64, 64)]
-        [TestCase(4096, 0, 3844, 1, 1, 63, 63)]
-        [TestCase(4097, 1, 4096, 1, 1, 63, 63)]
-        [TestCase(4097, 1, 4095, 0, 0, 64, 64)]
-        [TestCase(4097, 1, 3844, 1, 1, 63, 63)]
-#endif
         [TestCase(4096, 0, 4096, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3969, 1, 1, 63, 63)]
         [TestCase(3969, 0, 3969, 1, 1, 63, 63)]
@@ -348,7 +407,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(3969, 0, 4096, 1, 1, 63, 63)]
         [TestCase(3970, 1, 4096, 1, 1, 63, 63)]
         [TestCase(4096, 0, 4096, -1, -1, 65, 65)]
-#if XNA
         [TestCase(4096, 0, 4096, 1, 1, 63, 63)]
         [TestCase(4096, 0, 4095, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3844, 1, 1, 63, 63)]
@@ -356,7 +414,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(4097, 1, 4095, 0, 0, 64, 64)]
         [TestCase(4097, 1, 3844, 1, 1, 63, 63)]
         [TestCase(3970, 1, 4096, 1, 1, 63, 63)]
-#endif
         public void SetData5ParameterExceptionTest(int arraySize, int startIndex, int elements, int x, int y, int w, int h)
         {
             using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
