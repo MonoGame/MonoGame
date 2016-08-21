@@ -213,8 +213,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void Setup()
         {
-			// Initialize the main viewport
-			_viewport = new Viewport (0, 0,
+#if DEBUG
+            if (DisplayMode == null)
+            {
+                throw new ApplicationException(
+                    "Unable to determine the current display mode.  This can indicate that the " +
+                    "game is not configured to be HiDPI aware under Windows 10 or later.  See " +
+                    "https://github.com/MonoGame/MonoGame/issues/5040 for more information.");
+            }
+#endif
+
+            // Initialize the main viewport
+            _viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
