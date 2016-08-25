@@ -42,6 +42,18 @@ namespace MonoGame.Tests.Components {
 			CreateCubeIndexBuffer ();
 		}
 
+	    public void UnloadContent()
+	    {
+            basicEffect.Dispose();
+	        basicEffect = null;
+
+            vertices.Dispose();
+	        vertices = null;
+
+            indices.Dispose();
+	        indices = null;
+	    }
+
 		public void Draw()
 		{
 			graphicsDevice.SetVertexBuffer (vertices);
@@ -136,5 +148,6 @@ namespace MonoGame.Tests.Components {
 			indices.SetData<UInt16> (cubeIndices);
 
 		}
+
 	}
 }

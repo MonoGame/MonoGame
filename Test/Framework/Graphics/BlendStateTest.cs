@@ -29,6 +29,8 @@ namespace MonoGame.Tests.Graphics
             // Even after changing to different BlendState, you still can't mutate a previously-bound object.
             game.GraphicsDevice.BlendState = BlendState.Opaque;
             DoAsserts(blendState, d => Assert.Throws<InvalidOperationException>(d));
+
+            blendState.Dispose();
         }
 
         [Test]
@@ -130,6 +132,10 @@ namespace MonoGame.Tests.Graphics
             }
 
             CheckFrames();
+
+            foreach (var state in blendStates)
+                state.Dispose();
+            spriteBatch.Dispose();
         }
     }
 }
