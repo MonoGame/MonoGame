@@ -585,6 +585,17 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters = presentationParameters;
             Reset();
         }
+#else
+        // TODO: implement these
+        public void Reset()
+        {
+            
+        }
+
+        public void Reset(PresentationParameters presentationParameters)
+        {
+
+        }
 #endif
 
         /*
