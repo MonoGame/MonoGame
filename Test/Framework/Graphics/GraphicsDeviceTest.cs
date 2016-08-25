@@ -68,6 +68,8 @@ namespace MonoGame.Tests.Graphics
 
             // vertexStart + primitiveCount too large.
             Assert.DoesNotThrow(() => gd.DrawPrimitives(PrimitiveType.TriangleList, 1, 1));
+
+            vertexBuffer.Dispose();
         }
 
         [Test]
@@ -124,6 +126,8 @@ namespace MonoGame.Tests.Graphics
 #if !XNA
             Assert.DoesNotThrow(() => gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 1, 1));
 #endif
+            vertexBuffer.Dispose();
+            indexBuffer.Dispose();
         }
 
         // This overload of DrawIndexedPrimitives is not supported on XNA.
@@ -141,7 +145,8 @@ namespace MonoGame.Tests.Graphics
             // No vertex shader or pixel shader.
             Assert.Throws<InvalidOperationException>(() => gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1));
 
-            new BasicEffect(gd).CurrentTechnique.Passes[0].Apply();
+            var effect = new BasicEffect(gd);
+            effect.CurrentTechnique.Passes[0].Apply();
 
             // No vertexBuffer.
             Assert.Throws<InvalidOperationException>(() => gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1));
@@ -170,6 +175,10 @@ namespace MonoGame.Tests.Graphics
 
             // startIndex + primitiveCount too large.
             Assert.DoesNotThrow(() => gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 1, 1));
+
+            effect.Dispose();
+            vertexBuffer.Dispose();
+            indexBuffer.Dispose();
         }
 #endif
 
@@ -217,6 +226,11 @@ namespace MonoGame.Tests.Graphics
 
             // primitiveCount too small / large.
             Assert.Throws<ArgumentOutOfRangeException>(() => gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 3, 0, 0, 10));
+
+            effect.Dispose();
+            vertexBuffer.Dispose();
+            instanceBuffer.Dispose();
+            indexBuffer.Dispose();
         }
 
         [Test]
@@ -290,6 +304,11 @@ namespace MonoGame.Tests.Graphics
             Similarity = 0.98f;
 
             CheckFrames();
+
+            effect.Dispose();
+            vertexBuffer.Dispose();
+            instanceVertexBuffer.Dispose();
+            indexBuffer.Dispose();
         }
 #endif
 
@@ -307,7 +326,8 @@ namespace MonoGame.Tests.Graphics
             // No vertex shader or pixel shader.
             Assert.Throws<InvalidOperationException>(() => gd.DrawUserPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 1));
 
-            new BasicEffect(gd).CurrentTechnique.Passes[0].Apply();
+            var effect = new BasicEffect(gd);
+            effect.CurrentTechnique.Passes[0].Apply();
 
             // Success - "normal" usage.
             Assert.DoesNotThrow(() => gd.DrawUserPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 1));
@@ -331,6 +351,8 @@ namespace MonoGame.Tests.Graphics
 
             // Null vertexDeclaration.
             Assert.Throws<ArgumentNullException>(() => gd.DrawUserPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 1, null));
+
+            effect.Dispose();
         }
 
         private void DoDrawUserPrimitivesAsserts(VertexPositionColorTexture[] vertexData, int vertexOffset, int primitiveCount, Action<TestDelegate> assertMethod)
@@ -356,7 +378,8 @@ namespace MonoGame.Tests.Graphics
             // No vertex shader or pixel shader.
             Assert.Throws<InvalidOperationException>(() => gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty, 0, 1));
 
-            new BasicEffect(gd).CurrentTechnique.Passes[0].Apply();
+            var effect = new BasicEffect(gd);
+            effect.CurrentTechnique.Passes[0].Apply();
 
             // Success - "normal" usage.
             Assert.DoesNotThrow(() => gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty, 0, 1));
@@ -414,6 +437,7 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentOutOfRangeException>(() => gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty, 0, 1, VertexPositionColor.VertexDeclaration));
             Assert.Throws<ArgumentOutOfRangeException>(() => gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertexDataNonEmpty, 0, 3, indexDataNonEmpty.Select(x => (int) x).ToArray(), 0, 1, VertexPositionColor.VertexDeclaration));
 #endif
+            effect.Dispose();
         }
 
         private void DoDrawUserIndexedPrimitivesAsserts(VertexPositionColorTexture[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, Action<TestDelegate> assertMethod)
@@ -538,6 +562,10 @@ namespace MonoGame.Tests.Graphics
                 0, 0, numVertices, 0, numIndices / 3);
 
             CheckFrames();
+
+            effect.Dispose();
+            vertexBuffer.Dispose();
+            indexBuffer.Dispose();
         }
 
         [Test]
@@ -548,6 +576,8 @@ namespace MonoGame.Tests.Graphics
 
             var retrievedSamplerState = gd.VertexSamplerStates[0];
             Assert.That(retrievedSamplerState, Is.SameAs(samplerState));
+
+            samplerState.Dispose();
         }
     }
 }

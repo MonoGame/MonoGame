@@ -20,6 +20,8 @@ namespace MonoGame.Tests.Graphics
             var readData = new short[4];
             indexBuffer.GetData(readData, 0, 4);
             Assert.AreEqual(savedData, readData);
+            
+            indexBuffer.Dispose();
         }
 
         [Test]
@@ -35,6 +37,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(2, readData[1]);
             Assert.AreEqual(0, readData[2]);
             Assert.AreEqual(0, readData[3]);
+
+            indexBuffer.Dispose();
         }
 
         [Test]
@@ -50,6 +54,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, readData[1]);
             Assert.AreEqual(1, readData[2]);
             Assert.AreEqual(2, readData[3]);
+
+            indexBuffer.Dispose();
         }
 
         [Test]
@@ -63,6 +69,8 @@ namespace MonoGame.Tests.Graphics
             indexBuffer.GetData(sizeof(short) * 2, readData, 0, 2);
             Assert.AreEqual(3, readData[0]);
             Assert.AreEqual(4, readData[1]);
+
+            indexBuffer.Dispose();
         }
 
     }
