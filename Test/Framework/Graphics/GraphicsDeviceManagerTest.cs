@@ -322,11 +322,13 @@ namespace MonoGame.Tests.Graphics
         [TestCase(true)]
         public void MSAAEnabled(bool enabled)
         {
+            // TODO create reference image and check against XNA
             var game = new TestGameBase();
             var gdm = new GraphicsDeviceManager(game);
             gdm.PreferMultiSampling = enabled;
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
 
+            // first hook an event to do some checks
             gdm.PreparingDeviceSettings += (sender, args) =>
             {
                 var pp = args.GraphicsDeviceInformation.PresentationParameters;
@@ -339,42 +341,31 @@ namespace MonoGame.Tests.Graphics
                 }
             };
 
-            Texture2D tex = null;
-            SpriteBatch spriteBatch = null;
+            // then create a GraphicsDevice
+            ((IGraphicsDeviceManager) game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            var gd = game.GraphicsDevice;
 
-            game.PreInitializeWith += (sender, args) =>
+            var tex = new Texture2D(game.GraphicsDevice, 1, 1);
+            tex.SetData(new[] { Color.White.PackedValue });
+            var spriteBatch = new SpriteBatch(game.GraphicsDevice);
+
+            if (enabled)
             {
-                tex = new Texture2D(game.GraphicsDevice, 1, 1);
-                tex.SetData(new[] { Color.White.PackedValue });
-                spriteBatch = new SpriteBatch(game.GraphicsDevice);
-            };
+                var pp = game.GraphicsDevice.PresentationParameters;
+                Assert.Less(0, pp.MultiSampleCount);
+                Assert.AreNotEqual(1024, pp.MultiSampleCount);
+            }
 
-            game.PreDrawWith += (sender, args) =>
-            {
-                if (enabled)
-                {
-                    var pp = game.GraphicsDevice.PresentationParameters;
-                    Assert.Less(0, pp.MultiSampleCount);
-                    Assert.AreNotEqual(1024, pp.MultiSampleCount);
-                }
+            gd.Clear(Color.Black);
 
-                game.GraphicsDevice.Clear(Color.Black);
-
-                spriteBatch.Begin();
-                spriteBatch.Draw(tex, new Vector2(800 / 2, 480 / 2), null, Color.White, MathHelper.ToRadians(45), new Vector2(0.5f), 200, SpriteEffects.None, 0);
-                spriteBatch.End();
-            };
+            spriteBatch.Begin();
+            spriteBatch.Draw(tex, new Vector2(800 / 2, 480 / 2), null, Color.White, MathHelper.ToRadians(45), new Vector2(0.5f), 200, SpriteEffects.None, 0);
+            spriteBatch.End();
 
 #if XNA
             var data = new Color[800 * 480];
-            game.DrawWith += (sender, args) =>
-            {
-                game.GraphicsDevice.GetBackBufferData(data);
-            };
+            gd.GetBackBufferData(data);
 #endif
-
-            game.ExitCondition = x => x.DrawNumber > 1;
-            game.Run();
 
 #if XNA
             float black = 0;
