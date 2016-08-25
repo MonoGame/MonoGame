@@ -97,6 +97,8 @@ namespace MonoGame.Tests.Graphics
                 {
                     Assert.AreNotEqual(255, colors[i + startIndex].R, "colors was not overwritten in position {0}", startIndex + i);
                 }
+
+                t.Dispose();
             }
         }
         [TestCase(25, 23, 2, 2, 0, 2)]
@@ -113,6 +115,8 @@ namespace MonoGame.Tests.Graphics
                     colors[i] = Color.White;
                 }
                 Assert.Throws<ArgumentException>(() => t.GetData(0, toReadArea, colors, startIndex, elementsToRead));
+
+                t.Dispose();
             }
         }
 #if !XNA
@@ -152,6 +156,8 @@ namespace MonoGame.Tests.Graphics
                         Assert.AreEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
                     }
                 }
+
+                t.Dispose();
             }
         }
         [TestCase(2000)]
@@ -182,6 +188,7 @@ namespace MonoGame.Tests.Graphics
                     Assert.AreEqual(reference[i].B, written[i].B, "Bad color written in position:{0};", i);
                     Assert.AreEqual(reference[i].A, written[i].A, "Bad color written in position:{0};", i);
                 }
+                t.Dispose();
             }
         }
 
@@ -226,6 +233,8 @@ namespace MonoGame.Tests.Graphics
                         Assert.AreEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
                     }
                 }
+
+                t.Dispose();
             }
         }
 
@@ -266,6 +275,8 @@ namespace MonoGame.Tests.Graphics
                     Assert.AreEqual(reference[i].B, written[i].B, "Bad color written in position:{0};", i);
                     Assert.AreEqual(reference[i].A, written[i].A, "Bad color written in position:{0};", i);
                 }
+
+                t.Dispose();
             }
         }
 
@@ -319,6 +330,8 @@ namespace MonoGame.Tests.Graphics
                         Assert.AreEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
                     }
                 }
+
+                t.Dispose();
             }
         }
         [TestCase(3844, 0, 3844, 1, 1, 63, 63)]
@@ -359,6 +372,8 @@ namespace MonoGame.Tests.Graphics
                     Assert.AreEqual(reference[i].B, written[i].B, "Bad color written in position:{0};", i);
                     Assert.AreEqual(reference[i].A, written[i].A, "Bad color written in position:{0};", i);
                 }
+
+                t.Dispose();
             }
         }
     }

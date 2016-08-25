@@ -92,6 +92,8 @@ namespace MonoGame.Tests.Graphics
             texture2D.GetData(readData);
 
             Assert.AreEqual(savedData, readData);
+
+            texture2D.Dispose();
         }
 
         [TestCase(1, 1)]
@@ -115,6 +117,8 @@ namespace MonoGame.Tests.Graphics
 
                 Assert.AreEqual(savedData, readData);
             }
+
+            texture2D.Dispose();
         }
 
         [Test]
@@ -137,6 +141,8 @@ namespace MonoGame.Tests.Graphics
                 new Color(63, 63, 63)
             };
             Assert.AreEqual(expectedData, readData);
+
+            texture2D.Dispose();
         }
 		
 #if !XNA
@@ -187,6 +193,9 @@ namespace MonoGame.Tests.Graphics
             spriteBatch.End();
 
             CheckFrames();
+
+            spriteBatch.Dispose();
+            texture.Dispose();
         }
 #endif
 
@@ -214,6 +223,8 @@ namespace MonoGame.Tests.Graphics
 
                     Assert.AreEqual(savedData, readData);
                 }
+
+            texture2D.Dispose();
         }
 #endif
 
@@ -259,12 +270,18 @@ namespace MonoGame.Tests.Graphics
 
             // Vertex buffer is not actually used, but currently we need to set a
             // vertex buffer before calling DrawPrimitives.
-            gd.SetVertexBuffer(new VertexBuffer(gd,
-                typeof(VertexPositionColor), 3, BufferUsage.WriteOnly));
+            var vb = new VertexBuffer(gd, typeof(VertexPositionColor), 3, BufferUsage.WriteOnly);
+            gd.SetVertexBuffer(vb);
 
             gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 1);
 
             CheckFrames();
+
+            solidColorTexture.Dispose();
+            spriteBatch.Dispose();
+            textureArray.Dispose();
+            effect.Dispose();
+            vb.Dispose();
         }
 #endif
     }
