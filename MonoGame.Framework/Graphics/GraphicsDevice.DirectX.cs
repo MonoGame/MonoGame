@@ -1492,13 +1492,12 @@ namespace Microsoft.Xna.Framework.Graphics
             const SurfaceFormat format = SurfaceFormat.Color;
 #if WINDOWS_PHONE
                 using (var backBufferTexture = new SharpDX.Direct3D11.Texture2D(_renderTargetView.Resource.NativePointer))
-#endif
-#if WINDOWS || WINDOWS_STOREAPP
+#else
             //You can't Map the BackBuffer surface, so we copy to another texture
             using (var dxgiBackBuffer = _swapChain.GetBackBuffer<Surface>(0))
             using (var backBufferTexture = dxgiBackBuffer.QueryInterface<SharpDX.Direct3D11.Texture2D>())
 #endif
-             {
+            {
                 var desc = backBufferTexture.Description;
                 desc.BindFlags = BindFlags.None;
                 desc.CpuAccessFlags = CpuAccessFlags.Read;
