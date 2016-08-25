@@ -21,7 +21,6 @@
     <Import file="templates/Common/Icon.ico" />
     <Import file="templates/Common/Program.cs" />
     <Import file="templates/Common/Content.mgcb" />
-    <Import file="templates/Common/app.manifest" />
     <Import file="templates/Common/OpenTK.dll.config" />
     <Import file="templates/Common/Tao.Sdl.dll.config" />
     <Import file="templates/Common/MonoGame.Framework.dll.config" />
