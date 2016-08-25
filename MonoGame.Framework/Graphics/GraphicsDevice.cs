@@ -119,15 +119,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
-        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
-        {
-            return
-                DeviceLost != null &&
-                ResourceCreated != null &&
-                ResourceDestroyed != null &&
-                Disposing != null;
-        }
-
         private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
         internal int MaxVertexTextureSlots;
@@ -171,14 +162,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
+            : this(gdi.Adapter, gdi.GraphicsProfile, gdi.PresentationParameters)
         {
-            if (gdi.PresentationParameters == null)
-                throw new ArgumentNullException("presentationParameters");
-            PresentationParameters = gdi.PresentationParameters;
-            Setup();
-            GraphicsCapabilities = new GraphicsCapabilities(this);
-            GraphicsProfile = gdi.GraphicsProfile;
-            Initialize();
         }
 
         internal GraphicsDevice ()
@@ -201,9 +186,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
         public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
         {
-            Adapter = adapter;
+            if (adapter == null)
+                throw new ArgumentNullException("adapter");
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
+            Adapter = adapter;
             PresentationParameters = presentationParameters;
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities(this);
@@ -495,6 +482,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 _isDisposed = true;
+
+                if (Disposing != null)
+                    Disposing(this, EventArgs.Empty);
             }
         }
 
@@ -525,22 +515,34 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             throw new NotImplementedException();
         }
-
-        public void Reset()
-        {
-            // Manually resetting the device is not currently supported.
-            throw new NotImplementedException();
-        }
         */
 
 #if WINDOWS && DIRECTX
-        public void Reset(PresentationParameters presentationParameters)
+        public void Reset()
         {
-            PresentationParameters = presentationParameters;
+            if (DeviceResetting != null)
+                DeviceResetting(this, EventArgs.Empty);
 
             // Update the back buffer.
             CreateSizeDependentResources();
             ApplyRenderTargets(null);
+
+            if (DeviceReset != null)
+                DeviceReset(this, EventArgs.Empty);
+
+            if (DeviceLost != null)
+                DeviceLost(this, EventArgs.Empty);
+        }
+
+        public void Reset(PresentationParameters presentationParameters)
+        {
+            if (presentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero)
+                throw new ArgumentException("PresentationParameters.DeviceWindowHandle must not be null.");
+
+            PresentationParameters = presentationParameters;
+            Reset();
         }
 #endif
 
