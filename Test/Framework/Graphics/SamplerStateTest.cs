@@ -34,6 +34,8 @@ namespace MonoGame.Tests.Graphics
             // Even after changing to different SamplerState, you still can't mutate a previously-bound object.
             gd.SamplerStates[0] = SamplerState.AnisotropicClamp;
             DoAsserts(samplerState, d => Assert.Throws<InvalidOperationException>(d));
+
+            samplerState.Dispose();
         }
 
         [Test]
@@ -111,6 +113,11 @@ namespace MonoGame.Tests.Graphics
             }
 
             CheckFrames();
+
+            spriteBatch.Dispose();
+            texture.Dispose();
+            foreach (var state in samplerStates)
+                state.Dispose();
         }
 #endif
 
@@ -175,6 +182,12 @@ namespace MonoGame.Tests.Graphics
             }
 
             CheckFrames();
+
+            spriteBatch.Dispose();
+            texture.Dispose();
+            customEffect.Dispose();
+            foreach (var state in samplerStates)
+                state.Dispose();
         }
 #endif
     }

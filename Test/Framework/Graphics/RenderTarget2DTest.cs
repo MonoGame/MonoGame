@@ -85,9 +85,14 @@ namespace MonoGame.Tests.Graphics
                     x = 0;
                     y += renderTarget.Height + 1;
                 }
+                samplerState.Dispose();
             }
 
             CheckFrames();
+
+            texture.Dispose();
+            spriteBatch.Dispose();
+            renderTarget.Dispose();
         }
     }
 }

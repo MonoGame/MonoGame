@@ -44,6 +44,8 @@ namespace MonoGame.Tests.Graphics
                 for (var j = 0; j < dataSize; j++)
                     Assert.AreEqual(colors[i], readData[j]);
             }
+
+            renderTargetCube.Dispose();
         }
     }
 }
