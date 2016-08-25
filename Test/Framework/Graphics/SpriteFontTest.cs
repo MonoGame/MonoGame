@@ -88,6 +88,15 @@ namespace MonoGame.Tests.Graphics {
             _defaultFont = content.Load<SpriteFont> (Paths.Font ("Default"));
 		}
 
+	    [TearDown]
+	    public override void TearDown()
+	    {
+            _spriteBatch.Dispose();
+	        _spriteBatch = null;
+
+	        base.TearDown();
+	    }
+
         [TestCase("Default", "The quick brown fox jumps over the lazy dog. 1234567890", 605, 21)]
         [TestCase("Default", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 275, 59)]
         [TestCase("Default", "The quick brown fox jumps over the lazy dog.\r1234567890", 594, 21)]

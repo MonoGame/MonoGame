@@ -23,6 +23,15 @@ namespace MonoGame.Tests.Graphics {
             _texture3 = content.Load<Texture2D> (Paths.Texture ("Lines-64"));
 		}
 
+	    [TearDown]
+	    public override void TearDown()
+	    {
+	        _spriteBatch.Dispose();
+            _texture.Dispose();
+            _texture2.Dispose();
+            _texture3.Dispose();
+	    }
+
 		[Test]
 		public void Draw_without_blend ()
 		{
@@ -281,6 +290,9 @@ namespace MonoGame.Tests.Graphics {
 
             Assert.That(gd.Textures[0], Is.SameAs(_texture));
             Assert.That(gd.Textures[1], Is.SameAs(texture2));
+
+            customSpriteEffect.Dispose();
+            texture2.Dispose();
         }
 
         [Test]
