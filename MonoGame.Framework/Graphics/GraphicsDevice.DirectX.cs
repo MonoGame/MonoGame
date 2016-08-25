@@ -1510,13 +1510,16 @@ namespace Microsoft.Xna.Framework.Graphics
                     lock (_d3dContext)
                     {
                         // Copy the data from the GPU to the staging texture.
-                        var elementsInRow = rect.Width;
-                        var rows = rect.Height;
+#if WINDOWS_PHONE
+                            _d3dContext.CopySubresourceRegion(backBufferTexture, 0,
+                                new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1), stagingTex, 0);
+#else
                         using (var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
                         {
                             _d3dContext.CopySubresourceRegion(backBuffer, 0,
                                 new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1), stagingTex, 0);
                         }
+#endif
 
                         // Copy the data to the array.
                         DataStream stream = null;
@@ -1524,6 +1527,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             var databox = _d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
 
+                            var elementsInRow = rect.Width;
+                            var rows = rect.Height;
                             var elementSize = format.GetSize();
                             var rowSize = elementSize * elementsInRow;
                             if (rowSize == databox.RowPitch)
