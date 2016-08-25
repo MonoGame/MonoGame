@@ -171,12 +171,13 @@ namespace Microsoft.Xna.Framework
             Raise(DeviceDisposing, e);
         }
 
-        protected void OnDeviceResetting(EventArgs e)
+        // TODO these should be made protected, but currently WP calls these in SurfaceUpdateHandler
+        public void OnDeviceResetting(EventArgs e)
         {
             Raise(DeviceResetting, e);
         }
 
-        protected void OnDeviceReset(EventArgs e)
+        public void OnDeviceReset(EventArgs e)
         {
             Raise(DeviceReset, e);
         }
