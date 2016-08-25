@@ -35,6 +35,8 @@ namespace MonoGame.Tests.Graphics
             var readData = new VertexPositionTexture[4];
             vertexBuffer.GetData(readData, 0, 4);
             Assert.AreEqual(savedData, readData);
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -52,6 +54,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(savedData[1], readData[1]);
             Assert.AreEqual(vertexZero, readData[2]);
             Assert.AreEqual(vertexZero, readData[3]);
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -69,6 +73,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(vertexZero, readData[1]);
             Assert.AreEqual(savedData[0], readData[2]);
             Assert.AreEqual(savedData[1], readData[3]);
+
+            vertexBuffer.Dispose();
         }
         
         //[TestCase(true)]
@@ -86,6 +92,8 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.GetData(offsetInBytes, readData, 0, 2, vertexStride);
             Assert.AreEqual(savedData[2], readData[0]);
             Assert.AreEqual(savedData[3], readData[1]);
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -107,6 +115,8 @@ namespace MonoGame.Tests.Graphics
             var readData = new VertexPositionTexture[4];
             vertexBuffer.GetData(readData, 0, 4);
             Assert.AreEqual(savedData, readData);
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -145,6 +155,8 @@ namespace MonoGame.Tests.Graphics
                     savedDataBytes.Skip(startIndex).Take(elementCount).ToArray(),
                     readDataBytes.Skip(startIndex).Take(elementCount).ToArray());
             }
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -180,6 +192,8 @@ namespace MonoGame.Tests.Graphics
                     savedDataBytes.Take(elementCount).ToArray(), 
                     readDataBytes.Take(elementCount).ToArray());
             }
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -209,6 +223,8 @@ namespace MonoGame.Tests.Graphics
                     savedData.Take(elementCount).ToArray(),
                     readData.Take(elementCount).ToArray());
             }
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -227,6 +243,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(savedData[1].Position, readData[1]);
             Assert.AreEqual(savedData[2].Position, readData[2]);
             Assert.AreEqual(savedData[3].Position, readData[3]);
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -252,6 +270,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(savedData[1].Position, readData[1]);
             Assert.AreEqual(savedData[2].Position, readData[2]);
             Assert.AreEqual(savedData[3].Position, readData[3]);
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -271,6 +291,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(savedData[1].TextureCoordinate, readData[1]);
             Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
             Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
+
+            vertexBuffer.Dispose();
         }
 
         //[TestCase(true)]
@@ -297,6 +319,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(savedData[1].TextureCoordinate, readData[1]);
             Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
             Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
+
+            vertexBuffer.Dispose();
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -327,6 +351,8 @@ namespace MonoGame.Tests.Graphics
             effect.CurrentTechnique.Passes[0].Apply();
 
             Assert.DoesNotThrow(() => gd.DrawPrimitives(PrimitiveType.TriangleList, 0, 1));
+
+            vertexBuffer.Dispose();
         }
 
         [Test]
@@ -349,6 +375,8 @@ namespace MonoGame.Tests.Graphics
                 + "required by the current vertex shader. The current vertex declaration includes these elements: " 
                 + "NORMAL0, TEXCOORD0."));
 #endif
+
+            vertexBuffer.Dispose();
         }
     }
 }

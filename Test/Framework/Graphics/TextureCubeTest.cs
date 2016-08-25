@@ -31,6 +31,8 @@ namespace MonoGame.Tests.Graphics
 
                 Assert.AreEqual(savedData, readData);
             }
+
+            textureCube.Dispose();
         }
     }
 }

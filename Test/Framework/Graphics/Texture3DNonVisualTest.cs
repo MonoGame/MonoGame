@@ -18,7 +18,7 @@ namespace MonoGame.Tests.Graphics
         private Game _game;
 
         [TestFixtureSetUp]
-        public void init()
+        public void TestFixtureSetUp()
         {
             reference = new Color[a];
             _game = new Game();
@@ -39,6 +39,14 @@ namespace MonoGame.Tests.Graphics
                 }
             }
         }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
+        {
+            _game.Dispose();
+            t.Dispose();
+        }
+
         [SetUp]
         public void TestSetUp()
         {
@@ -135,12 +143,6 @@ namespace MonoGame.Tests.Graphics
                 write[i] = new Color(23, 23, 23, 23);
             }
             Assert.Throws(Is.InstanceOf<Exception>(), () => t.SetData(0, x, y, x + w, y + h, z, z + d, write, startIndex, elementCount));
-        }
-
-        [TestFixtureTearDown]
-        public void End()
-        {
-            t.Dispose();
         }
     }
 }
