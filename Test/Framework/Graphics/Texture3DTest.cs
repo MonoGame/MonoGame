@@ -90,6 +90,8 @@ namespace MonoGame.Tests.Graphics
             texture3D.GetData(readData);
 
             Assert.AreEqual(savedData, readData);
+
+            texture3D.Dispose();
         }
     }
 }

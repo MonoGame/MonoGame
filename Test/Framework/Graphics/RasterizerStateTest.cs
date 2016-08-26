@@ -34,6 +34,8 @@ namespace MonoGame.Tests.Graphics
             // Even after changing to different RasterizerState, you still can't mutate a previously-bound object.
             gd.RasterizerState = RasterizerState.CullCounterClockwise;
             DoAsserts(rasterizerState, d => Assert.Throws<InvalidOperationException>(d));
+
+            rasterizerState.Dispose();
         }
 
         [Test]
@@ -67,13 +69,18 @@ namespace MonoGame.Tests.Graphics
             var cube = new Colored3DCubeComponent(gd);
             cube.LoadContent();
 
-            gd.RasterizerState = new RasterizerState
+            var rasterizerState = new RasterizerState
             {
                 CullMode = cullMode
             };
+            gd.RasterizerState = rasterizerState;
+
             cube.Draw();
 
             CheckFrames();
+
+            cube.UnloadContent();
+            rasterizerState.Dispose();
         }
 
         [TestCase(FillMode.Solid)]
@@ -85,13 +92,18 @@ namespace MonoGame.Tests.Graphics
             var cube = new Colored3DCubeComponent(gd);
             cube.LoadContent();
 
-            gd.RasterizerState = new RasterizerState
+            var rasterizerState = new RasterizerState
             {
                 FillMode = fillMode
             };
+            gd.RasterizerState = rasterizerState;
+
             cube.Draw();
 
             CheckFrames();
+
+            cube.UnloadContent();
+            rasterizerState.Dispose();
         }
 
         [TestCase(false)]
@@ -103,10 +115,11 @@ namespace MonoGame.Tests.Graphics
             var cube = new Colored3DCubeComponent(gd);
             cube.LoadContent();
 
-            gd.RasterizerState = new RasterizerState
+            var rasterizerstate = new RasterizerState
             {
                 ScissorTestEnable = scissorTestEnable
             };
+            gd.RasterizerState = rasterizerstate;
 
             var viewport = gd.Viewport;
             gd.ScissorRectangle = new Rectangle(0, 0,
@@ -115,6 +128,9 @@ namespace MonoGame.Tests.Graphics
             cube.Draw();
 
             CheckFrames();
+
+            cube.UnloadContent();
+            rasterizerstate.Dispose();
         }
 
 #if !XNA
@@ -130,13 +146,18 @@ namespace MonoGame.Tests.Graphics
             };
             cube.LoadContent();
 
-            gd.RasterizerState = new RasterizerState
+            var rasterizerstate = new RasterizerState
             {
                 DepthClipEnable = depthClipEnable
             };
+            gd.RasterizerState = rasterizerstate;
+
             cube.Draw();
 
             CheckFrames();
+
+            cube.UnloadContent();
+            rasterizerstate.Dispose();
         }
 #endif
     }

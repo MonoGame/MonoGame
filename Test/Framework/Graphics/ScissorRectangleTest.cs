@@ -21,6 +21,21 @@ namespace MonoGame.Tests.Graphics
             _extraRenderTarget = new RenderTarget2D(gd, 256, 256);
         }
 
+        [TearDown]
+        public override void TearDown()
+        {
+            _spriteBatch.Dispose();
+            _spriteBatch = null;
+
+            _texture.Dispose();
+            _texture = null;
+
+            _extraRenderTarget.Dispose();
+            _extraRenderTarget = null;
+
+            base.TearDown();
+        }
+
         [Test]
         public void Draw_with_render_target_change()
         {
@@ -55,9 +70,12 @@ namespace MonoGame.Tests.Graphics
         private void DrawTexture()
         {
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            _spriteBatch.GraphicsDevice.RasterizerState = new RasterizerState { ScissorTestEnable = true };
+            var rasterizerState = new RasterizerState {ScissorTestEnable = true};
+            _spriteBatch.GraphicsDevice.RasterizerState = rasterizerState;
             _spriteBatch.Draw(_texture, new Vector2(0, 0), Color.White);
             _spriteBatch.End();
+
+            rasterizerState.Dispose();
         }
     }
 }

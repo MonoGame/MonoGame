@@ -109,6 +109,11 @@ namespace MonoGame.Tests.Graphics {
             spriteBatch.End ();
 
             CheckFrames();
+
+            spriteBatch.Dispose();
+            effect.Dispose();
+            background.Dispose();
+            surge.Dispose();
 		}
 	}
 }

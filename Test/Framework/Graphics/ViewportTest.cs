@@ -21,6 +21,9 @@ namespace MonoGame.Tests.Graphics {
             spriteBatch.End ();
 
             CheckFrames();
+
+            spriteBatch.Dispose();
+            swatch.Dispose();
 		}
 
 		[Test]
@@ -60,6 +63,9 @@ namespace MonoGame.Tests.Graphics {
             spriteBatch.End ();
 
             CheckFrames();
+
+            spriteBatch.Dispose();
+            swatch.Dispose();
 		}
 	}
 }

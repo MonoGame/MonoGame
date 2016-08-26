@@ -25,6 +25,8 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<InvalidOperationException>(
                 () => { var n = occlusionQuery.PixelCount; },
                 "PixelCount throws when query not yet started.");
+
+            occlusionQuery.Dispose();
         }
 
         [Test]
@@ -36,6 +38,8 @@ namespace MonoGame.Tests.Graphics
 
             occlusionQuery.Begin();
             Assert.Throws<InvalidOperationException>(() => occlusionQuery.Begin());
+
+            occlusionQuery.Dispose();
         }
 
         [Test]
@@ -119,6 +123,10 @@ namespace MonoGame.Tests.Graphics
             Predicate<int> exitCondition = frame => state == 4 || frame > 15;
             
             DoGameLoop(action, exitCondition);
+
+            spriteBatch.Dispose();
+            whiteTexture.Dispose();
+            occlusionQuery.Dispose();
         }
     }
 }

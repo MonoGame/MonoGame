@@ -27,6 +27,9 @@ namespace MonoGame.Tests.Graphics
             effectPass.Apply();
 
             Assert.That(game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+
+            texture.Dispose();
+            effect.Dispose();
         }
 
         [Test]
@@ -52,6 +55,9 @@ namespace MonoGame.Tests.Graphics
             effectPass.Apply();
 
             Assert.That(game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+
+            texture.Dispose();
+            effect.Dispose();
         }
 
         [Test]
@@ -70,6 +76,9 @@ namespace MonoGame.Tests.Graphics
             effectPass.Apply();
 
             Assert.That(game.GraphicsDevice.Textures[0], Is.Null);
+
+            texture.Dispose();
+            effect.Dispose();
         }
 
         [Test]
@@ -87,6 +96,9 @@ namespace MonoGame.Tests.Graphics
             effectPass.Apply();
 
             Assert.That(game.GraphicsDevice.Textures[0], Is.Null);
+
+            texture.Dispose();
+            effect.Dispose();
         }
     }
 }

@@ -13,6 +13,7 @@ namespace MonoGame.Tests.Graphics
             var cube = new Colored3DCubeComponent(gd);
             cube.LoadContent();
             cube.Draw();
+            cube.UnloadContent();
 
             CheckFrames();
         }

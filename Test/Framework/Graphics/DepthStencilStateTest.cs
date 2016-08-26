@@ -34,6 +34,8 @@ namespace MonoGame.Tests.Graphics
             // Even after changing to different RasterizerState, you still can't mutate a previously-bound object.
             gd.DepthStencilState = DepthStencilState.Default;
             DoAsserts(depthStencilState, d => Assert.Throws<InvalidOperationException>(d));
+
+            depthStencilState.Dispose();
         }
 
         [Test]
@@ -88,12 +90,13 @@ namespace MonoGame.Tests.Graphics
             cube.Draw();
 
             CheckFrames();
+
+            cube.UnloadContent();
         }
 
         [Test]
         public void VisualTestStencilBuffer()
         {
-            WriteDiffs = WriteSettings.Always;
             PrepareFrameCapture();
             var cube = new Simple3DCubeComponent(gd);
             cube.LoadContent();
@@ -102,7 +105,7 @@ namespace MonoGame.Tests.Graphics
                 ClearOptions.DepthBuffer | ClearOptions.Stencil | ClearOptions.Target,
                 Color.CornflowerBlue, 1, 0);
 
-            gd.DepthStencilState = new DepthStencilState
+            var depthStencilState = new DepthStencilState
             {
                 ReferenceStencil = 1,
                 StencilEnable = true,
@@ -110,11 +113,13 @@ namespace MonoGame.Tests.Graphics
                 StencilPass = StencilOperation.Replace,
                 DepthBufferEnable = false
             };
+            gd.DepthStencilState = depthStencilState;
 
             cube.CubeColor = Color.Red;
             cube.Draw();
 
-            gd.DepthStencilState = new DepthStencilState
+            depthStencilState.Dispose();
+            depthStencilState = new DepthStencilState
             {
                 ReferenceStencil = 0,
                 StencilEnable = true,
@@ -122,12 +127,16 @@ namespace MonoGame.Tests.Graphics
                 StencilPass = StencilOperation.Keep,
                 DepthBufferEnable = false
             };
+            gd.DepthStencilState = depthStencilState;
 
             cube.CubePosition = new Vector3(0.4f, 0, 0);
             cube.CubeColor = Color.Green;
             cube.Draw();
 
             CheckFrames();
+
+            depthStencilState.Dispose();
+            cube.UnloadContent();
         }
     }
 }
