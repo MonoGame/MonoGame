@@ -1208,7 +1208,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGetBackBufferData<T>(Rectangle rect, T[] data, int startIndex, int count) where T : struct
         {
             var tSize = Marshal.SizeOf(typeof(T));
-            GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+            var flippedY = PresentationParameters.BackBufferHeight - rect.Y - rect.Height;
+            GL.ReadPixels(rect.X, flippedY, rect.Width, rect.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
 
             // buffer is returned upside down, so we swap the rows around when copying over
             var rowSize = rect.Width*_backBufferFormat.GetSize() / tSize;
