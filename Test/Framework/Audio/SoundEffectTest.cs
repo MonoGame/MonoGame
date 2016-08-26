@@ -4,10 +4,11 @@
 
 using System;
 using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
 
-namespace MonoGame.Tests.Framework.Audio
+namespace MonoGame.Tests.Audio
 {
     public class SoundEffectTests
     {
@@ -266,6 +267,21 @@ namespace MonoGame.Tests.Framework.Audio
             Assert.DoesNotThrow(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, 1));
             Assert.Throws<ArgumentException>(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, 2));
             Assert.Throws<ArgumentException>(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, int.MaxValue));
+        }
+
+        public void InstanceNotDisposedWhenGameDisposed()
+        {
+            var game = new Game();
+            var s = new SoundEffectInstance();
+            var d = new DynamicSoundEffectInstance(44100, AudioChannels.Stereo);
+
+            game.Dispose();
+
+            Assert.IsFalse(s.IsDisposed);
+            Assert.IsFalse(d.IsDisposed);
+
+            s.Dispose();
+            d.Dispose();
         }
 
         private byte[] LoadRiff(string filename, out int sampleRate, out AudioChannels channels)

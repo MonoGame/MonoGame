@@ -339,8 +339,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
-            SoundEffectInstancePool.Shutdown();
-
             if (_reverbVoice != null)
             {
                 _reverbVoice.DestroyVoice();
@@ -350,7 +348,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (MasterVoice != null)
             {
-                MasterVoice.DestroyVoice();
                 MasterVoice.Dispose();
                 MasterVoice = null;
             }

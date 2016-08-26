@@ -155,23 +155,5 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal static void Shutdown()
-        {
-            // We need to dispose all SoundEffectInstances before shutdown,
-            // so as to destroy all SourceVoice instances,
-            // before we can destroy our XAudio MasterVoice instance.
-            // Otherwise XAudio shutdown fails, causing intermittent crashes.
-            foreach (var inst in _playingInstances)
-            {
-                inst.Dispose();
-            }
-            _playingInstances.Clear();
-
-            foreach (var inst in _pooledInstances)
-            {
-                inst.Dispose();
-            }
-            _pooledInstances.Clear();
-        }
     }
 }
