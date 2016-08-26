@@ -99,7 +99,18 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice != null)
                 return;
 
-            Initialize();
+            try
+            {
+                Initialize();
+            }
+            catch (NoSuitableGraphicsDeviceException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new NoSuitableGraphicsDeviceException("Failed to create graphics device!", ex);
+            }
 
             OnDeviceCreated(EventArgs.Empty);
         }
