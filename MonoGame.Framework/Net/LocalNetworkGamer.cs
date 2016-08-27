@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework.Net
             // Reset stream
             data.BaseStream.SetLength(0);
 
-            outboundPackets.Add(new OutboundPacket(packet, this, null, options));
+            outboundPackets.Add(new OutboundPacket(packet, this, recipient, options));
         }
 
         public void SendData(PacketWriter data, SendDataOptions options)
