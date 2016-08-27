@@ -531,7 +531,7 @@ namespace Microsoft.Xna.Framework
 			{
 				foreach(char c in theEvent.Characters)
 				{
-					OnTextInput(new TextInputEventArgs(c));
+					OnTextInput(new TextInputEventArgs(c, Keys.None));
 				}
 			}
 

@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework
 
 		private void Window_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
 		{
-			OnTextInput(sender, new TextInputEventArgs((char)args.KeyCode));
+			OnTextInput(sender, new TextInputEventArgs((char)args.KeyCode, _windowEvents.LastKey));
 		}
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
