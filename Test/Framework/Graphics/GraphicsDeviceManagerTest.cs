@@ -215,7 +215,7 @@ namespace MonoGame.Tests.Graphics
                 invoked = true;
             };
 
-            Assert.Throws<NullReferenceException>(() => game.InitializeOnly());
+            Assert.Throws(Is.InstanceOf(typeof(Exception)), () => game.InitializeOnly());
             Assert.That(invoked);
 
             game.Dispose();
