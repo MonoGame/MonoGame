@@ -11,21 +11,35 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    class DxtDataHandler
+    class DxtDataHandler: IDisposable
     {
         private BitmapContent _content;
         byte[] _buffer;
         int _offset;
+        
+        GCHandle delegateHandleBeginImage;
+        GCHandle delegateHandleWriteData;
 
         public OutputOptions.WriteDataDelegate WriteData { get; private set; }
         public OutputOptions.ImageDelegate BeginImage { get; private set; }
 
-        public DxtDataHandler(BitmapContent content)
+        public DxtDataHandler(BitmapContent content, OutputOptions outputOptions)
         {
             _content = content;
 
             WriteData = new OutputOptions.WriteDataDelegate(WriteDataInternal);
             BeginImage = new OutputOptions.ImageDelegate(BeginImageInternal);
+
+            // Keep the delegate from being re-located or collected by the garbage collector.
+            delegateHandleBeginImage = GCHandle.Alloc(BeginImage);
+            delegateHandleWriteData = GCHandle.Alloc(WriteData);
+
+            outputOptions.SetOutputHandler(BeginImage, WriteData);
+        }
+
+        ~DxtDataHandler()
+        {
+           Dispose(false);
         }
 
         void BeginImageInternal(int size, int width, int height, int depth, int face, int miplevel)
@@ -42,6 +56,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 _content.SetPixelData(_buffer);
             return true;
         }
+
+        #region IDisposable Support
+        private bool disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    // Release managed objects
+                    // ...
+                }
+
+                // Release native objects
+                delegateHandleBeginImage.Free();
+                delegateHandleWriteData.Free();
+
+                disposed = true;
+            }
+        }
+        
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 
     public abstract class DxtBitmapContent : BitmapContent
@@ -168,18 +212,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
                 inputOptions.SetMipmapGeneration(false);
                 inputOptions.SetGamma(1.0f, 1.0f);
-
-                var outputOptions = new OutputOptions();
-                outputOptions.SetOutputHeader(false);
-
-                var handler = new DxtDataHandler(this);
-                outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
-
+                
                 var compressionOptions = new CompressionOptions();
                 compressionOptions.SetFormat(outputFormat);
                 compressionOptions.SetQuality(Quality.Normal);
 
-                dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+                var outputOptions = new OutputOptions();
+                outputOptions.SetOutputHeader(false);
+
+                using (var handler = new DxtDataHandler(this, outputOptions))
+                {                    
+                    dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+                }
             }
             finally
             {
