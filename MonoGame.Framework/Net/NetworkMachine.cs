@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             this.IsPending = true;
             this.IsLocal = connection == null;
-            this.IsHost = IsHost;
+            this.IsHost = isHost;
 
             this.connection = connection;
             this.localGamers = this.IsLocal ? new List<LocalNetworkGamer>() : null;
