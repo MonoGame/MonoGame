@@ -105,6 +105,7 @@
     <Compile Include="Graphics\Etc1BitmapContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
+    <Compile Include="Graphics\LocalizedFontDescription.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
     <Compile Include="Graphics\Font\Glyph.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Processors\EffectProcessor.cs" />
     <Compile Include="Processors\EffectProcessorDebugMode.cs" />
     <Compile Include="Processors\FontDescriptionProcessor.cs" />
+    <Compile Include="Processors\LocalizedFontProcessor.cs" />
     <Compile Include="Processors\FontTextureProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
