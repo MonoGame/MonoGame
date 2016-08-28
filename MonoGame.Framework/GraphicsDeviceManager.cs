@@ -129,7 +129,6 @@ namespace Microsoft.Xna.Framework
 
             _graphicsDevice = new GraphicsDevice(gdi);
             _shouldApplyChanges = false;
->>>>>>> 81b8309... Fixes to GraphicsDeviceManager and GraphicsDevice to improve consistency with XNA
 
             OnDeviceCreated(EventArgs.Empty);
         }
