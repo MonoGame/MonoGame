@@ -143,6 +143,8 @@
     <Compile Include="Framework\Graphics\TextureCubeTest.cs" />
     <Compile Include="Framework\Graphics\VertexBufferTest.cs" />
     <Compile Include="Framework\Graphics\ViewportTest.cs" />
+    <Compile Include="Framework\Input\KeyboardTest.cs" />
+    <Compile Include="Framework\Input\MouseTest.cs" />
     <Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
