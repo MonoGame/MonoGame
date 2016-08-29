@@ -1,4 +1,7 @@
-using System;
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
 
@@ -30,13 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public override int GetHashCode()
-		{
-			// TODO: Fix gethashcode
-			return 0;
-		}
-
-		public override string ToString()
+        public override string ToString()
 		{
             return "{{Position:" + this.Position + " Color:" + this.Color + "}}";
 		}
@@ -61,6 +58,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			return (this == ((VertexPositionColor)obj));
 		}
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Position.GetHashCode()*397) ^ Color.GetHashCode();
+            }
+        }
 
 		static VertexPositionColor()
 		{

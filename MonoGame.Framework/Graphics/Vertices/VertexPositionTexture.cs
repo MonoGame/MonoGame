@@ -1,4 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -21,11 +25,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return VertexDeclaration;
             }
         }
-        public override int GetHashCode()
-        {
-            // TODO: Fix get hashcode
-            return 0;
-        }
 
         public override string ToString()
         {
@@ -34,7 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool operator ==(VertexPositionTexture left, VertexPositionTexture right)
         {
-            return ((left.Position == right.Position) && (left.TextureCoordinate == right.TextureCoordinate));
+            return (left.Position == right.Position) && (left.TextureCoordinate == right.TextureCoordinate);
         }
 
         public static bool operator !=(VertexPositionTexture left, VertexPositionTexture right)
@@ -52,7 +51,15 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 return false;
             }
-            return (this == ((VertexPositionTexture)obj));
+            return this == (VertexPositionTexture)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Position.GetHashCode()*397) ^ TextureCoordinate.GetHashCode();
+            }
         }
 
         static VertexPositionTexture()

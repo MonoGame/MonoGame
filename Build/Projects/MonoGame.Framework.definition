@@ -927,6 +927,8 @@
     <Compile Include="Graphics\Vertices\VertexPosition.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionNormalColor.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionNormalColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Graphics\Viewport.cs" />
