@@ -10,84 +10,6 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net
 {
-    /*
-    internal enum NetActionIndex
-    {
-        ConnectToAllRequest,
-        ConnectToAllSuccessful,
-        GamerJoinRequest,
-        GamerJoinResponse,
-        GamerJoined,
-        GamerLeft,
-        UserMessage
-    }
-
-    internal interface INetAction
-    {
-        NetActionIndex Index { get; }
-        NetDeliveryMethod DeliveryMethod { get; }
-        int SequenceChannel { get; }
-        void EncodeData(NetworkSession session, NetOutgoingMessage msg); // May not run if local message
-        void DecodeData(NetworkSession session, NetIncomingMessage msg); // May not run if local message
-        void Trigger(NetworkSession session);
-    }
-    
-
-    internal struct GamerLeftAction : INetAction
-    {
-        internal LocalNetworkGamer localGamer;
-
-        internal NetworkMachine machine;
-        internal byte id;
-
-        public GamerLeftAction(LocalNetworkGamer localGamer)
-        {
-            this.localGamer = localGamer;
-
-            this.machine = localGamer.Machine;
-            this.id = localGamer.Id;
-        }
-
-        public NetActionIndex Index { get { return NetActionIndex.GamerLeft; } }
-        public NetDeliveryMethod DeliveryMethod { get { return NetDeliveryMethod.ReliableOrdered; } }
-        public int SequenceChannel { get { return 1; } }
-
-        public void EncodeData(NetworkSession session, NetOutgoingMessage msg)
-        {
-            msg.Write(id);
-        }
-
-        public void DecodeData(NetworkSession session, NetIncomingMessage msg)
-        {
-            machine = msg.SenderConnection.Tag as NetworkMachine;
-            id = msg.ReadByte();
-        }
-
-        public void Trigger(NetworkSession session)
-        {
-            if (localGamer != null)
-            {
-                session.InvokeGamerLeftEvent(new GamerLeftEventArgs(localGamer));
-                
-                session.RemoveGamer(localGamer);
-            }
-            else
-            {
-                NetworkGamer remoteGamer = session.FindGamerById(id);
-
-                if (remoteGamer == null)
-                {
-                    Debug.Write("GamerLeftAction provided incorrect remote gamer id");
-                    return;
-                }
-
-                session.InvokeGamerLeftEvent(new GamerLeftEventArgs(remoteGamer));
-
-                session.RemoveGamer(remoteGamer);
-            }
-        }
-    }
-    */
     public sealed class NetworkSession : IDisposable
     {
         private const int Port = 14242;
@@ -257,6 +179,8 @@ namespace Microsoft.Xna.Framework.Net
         
         private IList<NetworkGamer> allGamers;
         private IList<NetworkGamer> allRemoteGamers;
+
+        private NetBuffer internalBuffer;
 
         internal NetworkSession(NetPeer peer, NetConnection hostConnection, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
@@ -466,94 +390,27 @@ namespace Microsoft.Xna.Framework.Net
         {
             return peer.GetConnection(endPoint) != null;
         }
-        
-        private NetBuffer internalBuffer;
 
-        private static Type[] messageToReceiverTypeMap =
+        private string MachineOwnerName(NetworkMachine machine)
         {
-            typeof(ConnectToAllRequestMessageReceiver),
-            typeof(ConnectToAllSuccessfulMessageReceiver),
-            typeof(GamerJoinRequestMessageReceiver),
-            typeof(GamerJoinResponseMessageReceiver),
-            typeof(GamerJoinedMessageReceiver),
-            typeof(GamerLeftMessageReceiver),
-            typeof(UserMessageReceiver)
-        };
-
-        internal void Receive(NetBuffer input, NetworkMachine senderMachine)
-        {
-            InternalMessageType messageType = (InternalMessageType)input.ReadByte();
-
-            if (senderMachine.IsHost)
+            if (machine.IsLocal)
             {
-                Debug.WriteLine("Receiving " + messageType + " from host...");
+                if (machine.IsHost)
+                {
+                    return "self (host)";
+                }
+                else
+                {
+                    return "self";
+                }
+            }
+            else if (machine.IsHost)
+            {
+                return "host";
             }
             else
             {
-                Debug.WriteLine("Receiving " + messageType + " from peer...");
-            }
-
-            Type receiverToInstantiate = messageToReceiverTypeMap[(byte)messageType];
-            IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
-            receiver.Receive(input, machine, senderMachine);
-        }
-
-        internal void EncodeMessage(IInternalMessageSender message, NetBuffer output)
-        {
-            output.Write((byte)message.MessageType);
-
-            message.Send(output, machine);
-        }
-
-        internal void Send(IInternalMessageSender message)
-        {
-            // Send to self
-            Send(message, machine);
-
-            Debug.WriteLine("Sending " + message.MessageType + " to everyone else...");
-
-            // Send to all peers
-            if (peer.Connections.Count > 0)
-            {
-                NetOutgoingMessage msg = peer.CreateMessage();
-                EncodeMessage(message, msg);
-                peer.SendMessage(msg, peer.Connections, ToDeliveryMethod(message.Options), message.SequenceChannel);
-            }
-        }
-
-        internal void Send(IInternalMessageSender message, NetworkMachine recipient)
-        {
-            if (recipient == null)
-            {
-                throw new ArgumentNullException("recipient");
-            }
-
-            if (recipient.IsLocal)
-            {
-                Debug.WriteLine("Sending " + message.MessageType + " to self...");
-            }
-            else if (recipient.IsHost)
-            {
-                Debug.WriteLine("Sending " + message.MessageType + " to host...");
-            }
-            else
-            {
-                Debug.WriteLine("Sending " + message.MessageType + " to peer...");
-            }
-
-            if (recipient.IsLocal)
-            {
-                internalBuffer.LengthBits = 0;
-                EncodeMessage(message, internalBuffer);
-
-                internalBuffer.Position = 0;
-                Receive(internalBuffer, machine);
-            }
-            else
-            {
-                NetOutgoingMessage msg = peer.CreateMessage();
-                EncodeMessage(message, msg);
-                peer.SendMessage(msg, recipient.connection, ToDeliveryMethod(message.Options), message.SequenceChannel);
+                return "peer";
             }
         }
 
@@ -574,6 +431,76 @@ namespace Microsoft.Xna.Framework.Net
                 default:
                     throw new InvalidOperationException("Could not convert SendDataOptions!");
             }
+        }
+
+        internal void EncodeMessage(IInternalMessageSender message, NetBuffer output)
+        {
+            output.Write((byte)message.MessageType);
+
+            message.Send(output, machine);
+        }
+
+        internal void Send(IInternalMessageSender message)
+        {
+            Debug.WriteLine("Sending " + message.MessageType + " to all peers...");
+
+            // Send to all peers
+            if (peer.Connections.Count > 0)
+            {
+                NetOutgoingMessage msg = peer.CreateMessage();
+                EncodeMessage(message, msg);
+                peer.SendMessage(msg, peer.Connections, ToDeliveryMethod(message.Options), message.SequenceChannel);
+            }
+
+            // Send to self (Should be done last since then all Send() calls happen before any Receive() call)
+            Send(message, machine);
+        }
+
+        internal void Send(IInternalMessageSender message, NetworkMachine recipient)
+        {
+            if (recipient == null)
+            {
+                throw new ArgumentNullException("recipient");
+            }
+
+            Debug.WriteLine("Sending " + message.MessageType + " to " + MachineOwnerName(recipient) + "...");
+
+            if (recipient.IsLocal)
+            {
+                internalBuffer.LengthBits = 0;
+                EncodeMessage(message, internalBuffer);
+
+                internalBuffer.Position = 0;
+                Receive(internalBuffer, machine);
+            }
+            else
+            {
+                NetOutgoingMessage msg = peer.CreateMessage();
+                EncodeMessage(message, msg);
+                peer.SendMessage(msg, recipient.connection, ToDeliveryMethod(message.Options), message.SequenceChannel);
+            }
+        }
+
+        private static Type[] messageToReceiverTypeMap =
+        {
+            typeof(ConnectToAllRequestMessageReceiver),
+            typeof(ConnectToAllSuccessfulMessageReceiver),
+            typeof(GamerJoinRequestMessageReceiver),
+            typeof(GamerJoinResponseMessageReceiver),
+            typeof(GamerJoinedMessageReceiver),
+            typeof(GamerLeftMessageReceiver),
+            typeof(UserMessageReceiver)
+        };
+
+        internal void Receive(NetBuffer input, NetworkMachine sender)
+        {
+            InternalMessageType messageType = (InternalMessageType)input.ReadByte();
+
+            Debug.WriteLine("Receiving " + messageType + " from " + MachineOwnerName(sender) + "...");
+
+            Type receiverToInstantiate = messageToReceiverTypeMap[(byte)messageType];
+            IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
+            receiver.Receive(input, machine, sender);
         }
 
         public void Update()
@@ -638,6 +565,12 @@ namespace Microsoft.Xna.Framework.Net
                             // Create a pending network machine
                             NetworkMachine senderMachine = new NetworkMachine(msg.SenderConnection, msg.SenderConnection == hostConnection);
                             msg.SenderConnection.Tag = senderMachine;
+
+                            // TODO: Examine this solution...
+                            if (!machine.IsPending)
+                            {
+                                Send(new ConnectToAllSuccessfulMessageSender(), senderMachine);
+                            }
 
                             if (IsHost)
                             {

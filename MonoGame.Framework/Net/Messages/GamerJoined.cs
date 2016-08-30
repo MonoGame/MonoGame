@@ -40,8 +40,19 @@ namespace Microsoft.Xna.Framework.Net.Message
 
             if (!senderMachine.IsLocal && currentMachine.IsHost && isHost)
             {
-                // New gamer is claiming to be host but we know we are, kick their machine
+                // New gamer is claiming to be host but we know we are, let them
+                // join (to keep gamer lists in sync) but kick them asap
                 senderMachine.RemoveFromSession();
+            }
+
+            if (!senderMachine.IsLocal && NetworkSession.Session.FindGamerById(id) != null)
+            {
+                // New gamer is trying to use an id that is already being used
+                if (currentMachine.IsHost)
+                {
+                    senderMachine.RemoveFromSession();
+                }
+
                 return;
             }
 
@@ -51,7 +62,7 @@ namespace Microsoft.Xna.Framework.Net.Message
 
                 if (!localGamer.IsLocal)
                 {
-                    throw new InvalidOperationException("Remote gamer joined from local machine!");
+                    throw new NetworkException("Remote gamer joined from local machine");
                 }
 
                 NetworkSession.Session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(localGamer));
@@ -59,8 +70,8 @@ namespace Microsoft.Xna.Framework.Net.Message
             else
             {
                 NetworkGamer remoteGamer = new NetworkGamer(displayName, gamertag, id, isGuest, isHost, false, isPrivateSlot, senderMachine, NetworkSession.Session);
-                NetworkSession.Session.AddGamer(remoteGamer);
 
+                NetworkSession.Session.AddGamer(remoteGamer);
                 NetworkSession.Session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(remoteGamer));
             }
         }

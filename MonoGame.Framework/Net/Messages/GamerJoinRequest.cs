@@ -1,5 +1,6 @@
 ﻿using Lidgren.Network;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Message
 {
@@ -17,10 +18,13 @@ namespace Microsoft.Xna.Framework.Net.Message
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            if (currentMachine.IsHost)
+            if (!currentMachine.IsHost)
             {
-                NetworkSession.Session.Send(new GamerJoinResponseMessageSender(), senderMachine);
+                Debug.WriteLine("Warning: Received GamerJoinRequest when not host!");
+                return;
             }
+
+            NetworkSession.Session.Send(new GamerJoinResponseMessageSender(), senderMachine);
         }
     }
 }

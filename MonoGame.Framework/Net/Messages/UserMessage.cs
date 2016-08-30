@@ -25,6 +25,11 @@ namespace Microsoft.Xna.Framework.Net.Message
 
         public void Send(NetBuffer output, NetworkMachine currentMachine)
         {
+            if (currentMachine.IsPending)
+            {
+                throw new NetworkException("User message from pending machine");
+            }
+
             bool sendToAll = recipient == null;
 
             output.Write(sender.Id);
@@ -39,7 +44,7 @@ namespace Microsoft.Xna.Framework.Net.Message
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            if (NetworkSession.Session.machine.IsPending)
+            if (currentMachine.IsPending || senderMachine.IsPending)
             {
                 return;
             }
@@ -66,7 +71,7 @@ namespace Microsoft.Xna.Framework.Net.Message
 
                 if (localGamer == null)
                 {
-                    Debug.WriteLine("User message sent to the wrong peer!");
+                    Debug.WriteLine("Warning: User message sent to the wrong peer!");
                     return;
                 }
 

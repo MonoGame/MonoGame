@@ -10,13 +10,23 @@ namespace Microsoft.Xna.Framework.Net.Message
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
         public void Send(NetBuffer output, NetworkMachine currentMachine)
-        { }
+        {
+            if (!currentMachine.IsPending)
+            {
+                throw new NetworkException("ConnectToAllSuccessful can only be sent from a pending machine");
+            }
+        }
     }
 
     internal struct ConnectToAllSuccessfulMessageReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
+            if (!senderMachine.IsPending)
+            {
+                return;
+            }            
+
             // The sender machine is now considered fully connected
             senderMachine.IsPending = false;
 

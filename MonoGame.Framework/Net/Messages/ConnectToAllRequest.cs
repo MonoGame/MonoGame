@@ -39,9 +39,14 @@ namespace Microsoft.Xna.Framework.Net.Message
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
+            if (!senderMachine.IsHost)
+            {
+                return;
+            }
+
             if (senderMachine.IsLocal)
             {
-                throw new InvalidOperationException("ConnectToAllRequest should never be sent to self!");
+                throw new NetworkException("ConnectToAllRequest should never be sent to self");
             }
 
             int requestedConnectionCount = input.ReadInt32();
@@ -51,7 +56,6 @@ namespace Microsoft.Xna.Framework.Net.Message
             for (int i = 0; i < requestedConnectionCount; i++)
             {
                 IPEndPoint endPoint = input.ReadIPEndPoint();
-
                 NetworkSession.Session.pendingEndPoints.Add(endPoint);
 
                 if (!NetworkSession.Session.IsConnectedToEndPoint(endPoint))
