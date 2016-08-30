@@ -21,8 +21,9 @@ namespace MonoGame.Tests
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
             {
                 var keyDown = keys.Contains(key);
-                Assert.AreEqual(state.IsKeyDown(key), keyDown);
-                Assert.AreEqual(state.IsKeyUp(key), !keyDown);
+                Assert.AreEqual(keyDown ? KeyState.Down : KeyState.Up, state[key]);
+                Assert.AreEqual(keyDown, state.IsKeyDown(key));
+                Assert.AreEqual(!keyDown, state.IsKeyUp(key));
             }
         }
 

@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Input
             else
                 ApplySquareClamp();
 
-            SetVirtualButtons(leftPosition, rightPosition);
+            SetVirtualButtons(left, right);
         }
 
         private void ApplySquareClamp()
@@ -126,24 +126,25 @@ namespace Microsoft.Xna.Framework.Input
         {
             VirtualButtons = 0;
 
-            if (leftPosition.X < -leftThumbDeadZone)
+            // deadzone is already applied so if e.g. leftPosition.X < leftThumbDeadZone then leftPosition.X == 0 right now
+            if (leftPosition.X < 0)
                 VirtualButtons |= Buttons.LeftThumbstickLeft;
-            else if (leftPosition.X > leftThumbDeadZone)
+            else if (leftPosition.X > 0)
                 VirtualButtons |= Buttons.LeftThumbstickRight;
 
-            if (leftPosition.Y < -leftThumbDeadZone)
+            if (leftPosition.Y < 0)
                 VirtualButtons |= Buttons.LeftThumbstickDown;
-            else if (leftPosition.Y > leftThumbDeadZone)
+            else if (leftPosition.Y > 0)
                 VirtualButtons |= Buttons.LeftThumbstickUp;
 
-            if (rightPosition.X < -rightThumbDeadZone)
+            if (rightPosition.X < 0)
                 VirtualButtons |= Buttons.RightThumbstickLeft;
-            else if (rightPosition.X > rightThumbDeadZone)
+            else if (rightPosition.X > 0)
                 VirtualButtons |= Buttons.RightThumbstickRight;
 
-            if (rightPosition.Y < -rightThumbDeadZone)
+            if (rightPosition.Y < 0)
                 VirtualButtons |= Buttons.RightThumbstickDown;
-            else if (rightPosition.Y > rightThumbDeadZone)
+            else if (rightPosition.Y > 0)
                 VirtualButtons |= Buttons.RightThumbstickUp;
         }
 

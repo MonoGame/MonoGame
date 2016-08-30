@@ -15,6 +15,24 @@ namespace MonoGame.Tests
     public class GamePadTest
     {
 
+        [TestCaseSource("GetButtons")]
+        public void GamePadButtonsTest(params Buttons[] buttons)
+        {
+            var gpb = new GamePadButtons(buttons);
+
+            Assert.AreEqual(buttons.Contains(Buttons.A) ? ButtonState.Pressed : ButtonState.Released, gpb.A);
+            Assert.AreEqual(buttons.Contains(Buttons.B) ? ButtonState.Pressed : ButtonState.Released, gpb.B);
+            Assert.AreEqual(buttons.Contains(Buttons.Back) ? ButtonState.Pressed : ButtonState.Released, gpb.Back);
+            Assert.AreEqual(buttons.Contains(Buttons.X) ? ButtonState.Pressed : ButtonState.Released, gpb.X);
+            Assert.AreEqual(buttons.Contains(Buttons.Y) ? ButtonState.Pressed : ButtonState.Released, gpb.Y);
+            Assert.AreEqual(buttons.Contains(Buttons.Start) ? ButtonState.Pressed : ButtonState.Released, gpb.Start);
+            Assert.AreEqual(buttons.Contains(Buttons.LeftShoulder) ? ButtonState.Pressed : ButtonState.Released, gpb.LeftShoulder);
+            Assert.AreEqual(buttons.Contains(Buttons.LeftStick) ? ButtonState.Pressed : ButtonState.Released, gpb.LeftStick);
+            Assert.AreEqual(buttons.Contains(Buttons.RightShoulder) ? ButtonState.Pressed : ButtonState.Released, gpb.RightShoulder);
+            Assert.AreEqual(buttons.Contains(Buttons.RightStick) ? ButtonState.Pressed : ButtonState.Released, gpb.RightStick);
+            Assert.AreEqual(buttons.Contains(Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released, gpb.BigButton);
+        }
+
         [TestCase(ButtonState.Pressed, ButtonState.Pressed, ButtonState.Pressed, ButtonState.Pressed)]
         [TestCase(ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released)]
         [TestCase(ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed, ButtonState.Released)]
@@ -50,6 +68,53 @@ namespace MonoGame.Tests
                 Right = right
             };
             Assert.AreEqual(triggers, triggers2);
+            Assert.AreEqual(triggers.GetHashCode(), triggers2.GetHashCode());
+        }
+
+        [Test]
+        public void ThumbsticksDeadZone()
+        {
+            var left = new Vector2(0.01f, 0.01f);
+            var right = new Vector2(-0.01f, -0.01f);
+
+            var thumbsticks = new GamePadThumbSticks(left, right, GamePadDeadZone.Circular);
+            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.LeftThumbstickRight));
+            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.RightThumbstickLeft));
+
+            // we can't differentiate between circular and independent axes because we'd have
+            // to hardcode specific deadzone values, but these are gamepad specific
+            thumbsticks = new GamePadThumbSticks(left, right, GamePadDeadZone.IndependentAxes);
+            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.LeftThumbstickRight));
+            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.RightThumbstickLeft));
+
+            thumbsticks = new GamePadThumbSticks(left, right, GamePadDeadZone.None);
+            Assert.AreEqual(Buttons.LeftThumbstickRight, thumbsticks.VirtualButtons & Buttons.LeftThumbstickRight);
+            Assert.AreEqual(Buttons.RightThumbstickLeft, thumbsticks.VirtualButtons & Buttons.RightThumbstickLeft);
+        }
+
+        [Test]
+        public void ThumbsticksCircularDeadZoneClamping()
+        {
+            var left = Vector2.One;
+            var right = Vector2.One;
+
+            var sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.None);
+            Assert.AreEqual(sticks.Left.X, 1);
+            Assert.AreEqual(sticks.Left.Y, 1);
+            Assert.AreEqual(sticks.Right.X, 1);
+            Assert.AreEqual(sticks.Right.Y, 1);
+
+            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.IndependentAxes);
+            Assert.AreEqual(sticks.Left.X, 1);
+            Assert.AreEqual(sticks.Left.Y, 1);
+            Assert.AreEqual(sticks.Right.X, 1);
+            Assert.AreEqual(sticks.Right.Y, 1);
+
+            sticks = new GamePadThumbSticks(left, right, GamePadDeadZone.Circular);
+            Assert.Less(sticks.Left.X, 1);
+            Assert.Less(sticks.Left.Y, 1);
+            Assert.Less(sticks.Right.X, 1);
+            Assert.Less(sticks.Right.Y, 1);
         }
 
         #region State
