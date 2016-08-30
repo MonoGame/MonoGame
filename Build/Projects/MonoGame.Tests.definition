@@ -138,7 +138,7 @@
     <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
     <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
 
-    <Compile Include="Framework\Graphics\Effect\BasicEffectTests.cs" />
+    <Compile Include="Framework\Graphics\Effect\BasicEffectTest.cs" />
     <Compile Include="Framework\Graphics\Effect\BoxHelpers.cs" />
 
     <Compile Include="Framework\Graphics\BlendStateTest.cs" />

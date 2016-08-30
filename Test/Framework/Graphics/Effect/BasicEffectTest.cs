@@ -64,6 +64,7 @@ namespace MonoGame.Tests.Graphics.Effect
             _cubeRotX = 40;
             _cubeRotY = 25;
 
+            // we're fitting a lot in one test so it's alright to go full hd here
             PrepareFrameCapture(width: 1920, height: 1080);
 
             gd.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
