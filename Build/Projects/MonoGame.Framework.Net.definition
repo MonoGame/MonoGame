@@ -216,7 +216,7 @@
     <Compile Include="Net\Messages\ConnectToAllRequest.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Messages\ConnectToAllSuccessful.cs">
+    <Compile Include="Net\Messages\NoLongerPending.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Messages\GamerJoined.cs">
