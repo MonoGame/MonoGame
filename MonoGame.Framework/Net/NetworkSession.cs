@@ -493,7 +493,7 @@ namespace Microsoft.Xna.Framework.Net
                 Debug.WriteLine("Receiving " + messageType + " from peer...");
             }
 
-            Type receiverToInstantiate = messageToReceiverTypeMap[(int)messageType];
+            Type receiverToInstantiate = messageToReceiverTypeMap[(byte)messageType];
             IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
             receiver.Receive(input, machine, senderMachine);
         }
@@ -507,10 +507,10 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void Send(IInternalMessageSender message)
         {
-            Debug.WriteLine("Sending " + message.MessageType + " to everyone...");
-
             // Send to self
             Send(message, machine);
+
+            Debug.WriteLine("Sending " + message.MessageType + " to everyone else...");
 
             // Send to all peers
             if (peer.Connections.Count > 0)
@@ -543,7 +543,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (recipient.IsLocal)
             {
-                internalBuffer.Position = 0;
+                internalBuffer.LengthBits = 0;
                 EncodeMessage(message, internalBuffer);
 
                 internalBuffer.Position = 0;
