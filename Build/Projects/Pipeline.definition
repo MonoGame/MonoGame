@@ -126,6 +126,7 @@
 	<!-- GUI Controls -->
 	<Compile Include="Controls\PropertyCells\CellBase.cs" />
 	<Compile Include="Controls\PropertyCells\CellBool.cs" />
+	<Compile Include="Controls\PropertyCells\CellChar.cs" />
 	<Compile Include="Controls\PropertyCells\CellColor.cs" />
 	<Compile Include="Controls\PropertyCells\CellCombo.cs" />
 	<Compile Include="Controls\PropertyCells\CellNumber.cs" />

@@ -47,9 +47,9 @@ namespace Microsoft.Xna.Framework.Audio
         {
             for (int i = _playingInstances.Count - 1; i >= 0; i--)
             {
-                if (_playingInstances[i].IsAlive)
+                var target = _playingInstances[i].Target as DynamicSoundEffectInstance;
+                if (target != null)
                 {
-                    var target = (DynamicSoundEffectInstance)_playingInstances[i].Target;
                     if (!target.IsDisposed)
                         target.UpdateQueue();
                 }

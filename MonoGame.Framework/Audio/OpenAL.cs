@@ -136,6 +136,11 @@ namespace OpenAL
         SlotEffect = 0x0001,
     }
 
+    public enum EfxEffectSlotf
+    {
+        EffectSlotGain = 0x0002,
+    }
+
     public enum EfxEffectf
     {
         EaxReverbDensity = 0x0001,
@@ -490,6 +495,7 @@ namespace OpenAL
         private int StorageHardware;
         private int StorageAccessible;
 
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate bool SetBufferModeDelegate (int n, ref int buffers, int value);
 
         private SetBufferModeDelegate setBufferMode;
@@ -534,19 +540,33 @@ namespace OpenAL
     {
         /* Effect API */
 
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alGenEffectsDelegate (int n, out uint effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alDeleteEffectsDelegate (int n, ref int effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate bool alIsEffectDelegate (uint effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alEffectfDelegate (uint effect, EfxEffectf param, float value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alEffectiDelegate (uint effect, EfxEffecti param, int value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alGenAuxiliaryEffectSlotsDelegate (int n, out uint effectslots);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alDeleteAuxiliaryEffectSlotsDelegate (int n, ref int effectslots);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alAuxiliaryEffectSlotiDelegate (uint slot, EfxEffecti type, uint effect);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        private delegate void alAuxiliaryEffectSlotfDelegate (uint slot, EfxEffectSlotf param, float value);
 
         /* Filter API */
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private unsafe delegate void alGenFiltersDelegate (int n, [Out] uint* filters);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alFilteriDelegate (uint fid, EfxFilteri param, int value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private delegate void alFilterfDelegate (uint fid, EfxFilterf param, float value);
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         private unsafe delegate void alDeleteFiltersDelegate (int n, [In] uint* filters);
 
 
@@ -558,6 +578,7 @@ namespace OpenAL
         private alGenAuxiliaryEffectSlotsDelegate alGenAuxiliaryEffectSlots;
         private alDeleteAuxiliaryEffectSlotsDelegate alDeleteAuxiliaryEffectSlots;
         private alAuxiliaryEffectSlotiDelegate alAuxiliaryEffectSloti;
+        private alAuxiliaryEffectSlotfDelegate alAuxiliaryEffectSlotf;
         private alGenFiltersDelegate alGenFilters;
         private alFilteriDelegate alFilteri;
         private alFilterfDelegate alFilterf;
@@ -587,6 +608,7 @@ namespace OpenAL
             alGenAuxiliaryEffectSlots = (alGenAuxiliaryEffectSlotsDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alGenAuxiliaryEffectSlots"), typeof (alGenAuxiliaryEffectSlotsDelegate));
             alDeleteAuxiliaryEffectSlots = (alDeleteAuxiliaryEffectSlotsDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alDeleteAuxiliaryEffectSlots"), typeof (alDeleteAuxiliaryEffectSlotsDelegate));
             alAuxiliaryEffectSloti = (alAuxiliaryEffectSlotiDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alAuxiliaryEffectSloti"), typeof (alAuxiliaryEffectSlotiDelegate));
+            alAuxiliaryEffectSlotf = (alAuxiliaryEffectSlotfDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alAuxiliaryEffectSlotf"), typeof (alAuxiliaryEffectSlotfDelegate));
 
             alGenFilters = (alGenFiltersDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alGenFilters"), typeof (alGenFiltersDelegate));
             alFilteri = (alFilteriDelegate)Marshal.GetDelegateForFunctionPointer (AL.GetProcAddress ("alFilteri"), typeof (alFilteriDelegate));
@@ -628,10 +650,16 @@ alEffecti (effect, EfxEffecti.FilterType, (int)EfxEffectType.Reverb);
             alDeleteEffects (1, ref effect);
         }
 
-        public void BindEffectToAuxiliarySlot (uint effect, uint slot)
+        public void BindEffectToAuxiliarySlot (uint slot, uint effect)
         {
             alAuxiliaryEffectSloti (slot,EfxEffecti.SlotEffect, effect);
             ALHelper.CheckError ("Failed to bind Effect");
+        }
+
+        public void AuxiliaryEffectSlot (uint slot, EfxEffectSlotf param, float value)
+        {
+            alAuxiliaryEffectSlotf (slot, param, value);
+            ALHelper.CheckError ("Failes to set " + param + " " + value);
         }
 
         public void BindSourceToAuxiliarySlot (int SounceId, int slot, int slotnumber, int filter)

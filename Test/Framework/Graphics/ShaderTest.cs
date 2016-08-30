@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
@@ -66,35 +66,54 @@ non-infringement.
 */
 #endregion License
 
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using NUnit.Framework;
 
-namespace MonoGame.Tests.Visual
-{
-    [TestFixture]
-    class Texture3DTest : VisualTestFixtureBase
-    {
-        [TestCase(1, 1, 1)]
-        [TestCase(8, 8, 8)]
-        [TestCase(31, 7, 13)]
-        public void ShouldSetAndGetData(int width, int height, int depth)
-        {
-            Game.DrawWith += (sender, e) =>
-            {
-                var dataSize = width * height * depth;
-                var texture3D = new Texture3D(Game.GraphicsDevice, width, height, depth, false, SurfaceFormat.Color);
-                var savedData = new Color[dataSize];
-                for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index, index, index);
-                texture3D.SetData(savedData);
+namespace MonoGame.Tests.Graphics {
+	[TestFixture]
+	class ShaderTest : GraphicsDeviceTestFixtureBase {
+		[TestCase ("NoEffect")]
+		[TestCase ("HighContrast")]
+		[TestCase ("Bevels")]
+		[TestCase ("Grayscale")]
+		[TestCase ("ColorFlip")]
+		[TestCase ("Invert")]
+		[TestCase ("BlackOut")]
+		[TestCase ("RainbowH")]
+		public void Shader (string effectName)
+		{
+            PrepareFrameCapture();
+#if XNA
+            effectName = Path.Combine("XNA", effectName);
+#elif WINDOWS
+            effectName = Path.Combine("DirectX", effectName);
+#endif
 
-                var readData = new Color[dataSize];
-                texture3D.GetData(readData);
+            var spriteBatch = new SpriteBatch (gd);
+            var effect = content.Load<Effect> (Paths.Effect (effectName));
+			// A background texture to test that the effect doesn't
+			// mess up other textures
+            var background = content.Load<Texture2D> (Paths.Texture ("fun-background"));
+			// The texture to apply the effect to
+            var surge = content.Load<Texture2D> (Paths.Texture ("Surge"));
 
-                Assert.AreEqual(savedData, readData);
-            };
-            Game.Run();
-        }
-    }
+            spriteBatch.Begin (SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            spriteBatch.Draw (background, Vector2.Zero, Color.White);
+
+            effect.CurrentTechnique.Passes [0].Apply ();
+            spriteBatch.Draw (
+                surge, new Vector2 (300, 200), null, Color.White,
+                0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0f);
+            spriteBatch.End ();
+
+            CheckFrames();
+
+            spriteBatch.Dispose();
+            effect.Dispose();
+            background.Dispose();
+            surge.Dispose();
+		}
+	}
 }

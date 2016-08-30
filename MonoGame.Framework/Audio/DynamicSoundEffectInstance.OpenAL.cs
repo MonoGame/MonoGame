@@ -104,8 +104,10 @@ namespace Microsoft.Xna.Framework.Audio
             ALHelper.CheckError();
             _queuedBuffers.Enqueue(oalBuffer);
 
+
             // If the source has run out of buffers, restart it
-            if (_state == SoundState.Playing)
+            var sourceState = AL.GetSourceState(SourceId);
+            if (_state == SoundState.Playing && sourceState == ALSourceState.Stopped)
             {
                 AL.SourcePlay(SourceId);
                 ALHelper.CheckError("Failed to resume source playback.");

@@ -23,18 +23,25 @@ namespace Microsoft.Xna.Framework.Content
             else
                 textureCube = existingInstance;
 
-            for (int face = 0; face < 6; face++) 
+#if OPENGL
+            Threading.BlockOnUIThread(() =>
             {
-                for (int i=0; i<levels; i++) 
+#endif
+                for (int face = 0; face < 6; face++)
                 {
-                    int faceSize = reader.ReadInt32();
-                    byte[] faceData = reader.ContentManager.GetScratchBuffer(faceSize);
-                    reader.Read(faceData, 0, faceSize);
-                    textureCube.SetData<byte>((CubeMapFace)face, i, null, faceData, 0, faceSize);
+                    for (int i = 0; i < levels; i++)
+                    {
+                        int faceSize = reader.ReadInt32();
+                        byte[] faceData = reader.ContentManager.GetScratchBuffer(faceSize);
+                        reader.Read(faceData, 0, faceSize);
+                        textureCube.SetData<byte>((CubeMapFace)face, i, null, faceData, 0, faceSize);
+                    }
                 }
-            }
-            
-            return textureCube;
+#if OPENGL
+            });
+#endif
+
+             return textureCube;
         }
     }
 }

@@ -12,7 +12,7 @@ using NUnit.Framework;
 // the GraphicsAdapter API.
 #if XNA || DIRECTX
 
-namespace MonoGame.Tests.Framework
+namespace MonoGame.Tests.Graphics
 {
     class GraphicsAdapterTest
     {
@@ -47,7 +47,7 @@ namespace MonoGame.Tests.Framework
                 Assert.AreNotEqual(0, adapter.DeviceId);
                 Assert.AreNotEqual(IntPtr.Zero, adapter.MonitorHandle);
                 Assert.AreNotEqual(0, adapter.VendorId);
-                Assert.GreaterOrEqual(adapter.SubSystemId, 0);
+                Assert.AreNotEqual(adapter.SubSystemId, 0);
                 Assert.GreaterOrEqual(adapter.Revision, 0);
 
                 Assert.IsNotNull(adapter.CurrentDisplayMode); 

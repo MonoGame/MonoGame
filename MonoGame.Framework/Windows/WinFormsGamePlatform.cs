@@ -3,14 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using Microsoft.Xna.Framework;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input;
-using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
-
 
 namespace MonoGame.Framework
 {
@@ -19,16 +16,11 @@ namespace MonoGame.Framework
         //internal static string LaunchParameters;
 
         private WinFormsGameWindow _window;
-        private readonly List<XnaKeys> _keyState;
 
         public WinFormsGamePlatform(Game game)
             : base(game)
         {
-            _keyState = new List<XnaKeys>();
-            Keyboard.SetKeys(_keyState);
-
             _window = new WinFormsGameWindow(this);
-            _window.KeyState = _keyState;
 
             Mouse.Window = _window._form;
 
@@ -187,7 +179,6 @@ namespace MonoGame.Framework
                 }
                 Microsoft.Xna.Framework.Media.MediaManagerState.CheckShutdown();
             }
-            Keyboard.SetKeys(null);
 
             base.Dispose(disposing);
         }

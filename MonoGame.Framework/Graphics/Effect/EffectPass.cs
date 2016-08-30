@@ -63,12 +63,10 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Apply()
         {
             // Set/get the correct shader handle/cleanups.
-            //
-            // TODO: This "reapply" if the shader index changes
-            // trick is sort of ugly.  We should probably rework
-            // this to use some sort of "technique/pass redirect".
-            //
-            if (_effect.OnApply())
+
+            var current = _effect.CurrentTechnique;
+            _effect.OnApply();
+            if (_effect.CurrentTechnique != current)
             {
                 _effect.CurrentTechnique.Passes[0].Apply();
                 return;

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
@@ -102,6 +103,7 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
+                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
 
@@ -141,17 +143,23 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {
-                    string text;
+                    int len = 0;
+                    string text = String.Empty;
                     unsafe
                     {
-                        text = new string((char*)ev.Text.Text);
+                        while (Marshal.ReadByte ((IntPtr)ev.Text.Text, len) != 0) {
+                            len++;
+                        }
+                        var buffer = new byte [len];
+                        Marshal.Copy ((IntPtr)ev.Text.Text, buffer, 0, len);
+                        text = System.Text.Encoding.UTF8.GetString (buffer);
                     }
                     if (text.Length == 0)
                         continue;
                     foreach (var c in text)
                     {
-                        var key = KeyboardUtil.ToXna ((int)c);
-                        _view.CallTextInput (c, key);
+                        var key = KeyboardUtil.ToXna((int)c);
+                        _view.CallTextInput(c, key);
                     }
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)

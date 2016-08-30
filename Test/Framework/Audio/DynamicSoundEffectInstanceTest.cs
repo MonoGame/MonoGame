@@ -151,18 +151,27 @@ namespace MonoGame.Tests.Audio
         {
             // Valid sample rates
             var instance = new DynamicSoundEffectInstance(48000, AudioChannels.Stereo);
+            instance.Dispose();
             instance = new DynamicSoundEffectInstance(8000, AudioChannels.Stereo);
+            instance.Dispose();
 
             // Invalid sample rates
             Assert.Throws<ArgumentOutOfRangeException>(() => { instance = new DynamicSoundEffectInstance(7999, AudioChannels.Stereo); });
+            if (instance != null) instance.Dispose();
             Assert.Throws<ArgumentOutOfRangeException>(() => { instance = new DynamicSoundEffectInstance(48001, AudioChannels.Stereo); });
+            if (instance != null) instance.Dispose();
 
             // Valid channel counts
             instance = new DynamicSoundEffectInstance(44100, AudioChannels.Mono);
+            instance.Dispose();
+
             instance = new DynamicSoundEffectInstance(44100, AudioChannels.Stereo);
+            instance.Dispose();
 
             // Invalid channel count
             Assert.Throws<ArgumentOutOfRangeException>(() => { instance = new DynamicSoundEffectInstance(44100, (AudioChannels)123); });
+            if (instance != null) instance.Dispose();
+
         }
 
         [Test]
@@ -188,6 +197,8 @@ namespace MonoGame.Tests.Audio
             // Disposed
             monoInstance.Dispose();
             Assert.Throws<ObjectDisposedException>(() => { monoInstance.GetSampleDuration(0); });
+
+            stereoInstance.Dispose();
         }
 
         [Test]
@@ -210,6 +221,8 @@ namespace MonoGame.Tests.Audio
             // Disposed
             monoInstance.Dispose();
             Assert.Throws<ObjectDisposedException>(() => { monoInstance.GetSampleSizeInBytes(TimeSpan.Zero); });
+
+            stereoInstance.Dispose();
         }
 
         [Test]

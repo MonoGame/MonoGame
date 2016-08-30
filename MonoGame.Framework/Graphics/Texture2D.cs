@@ -256,6 +256,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns></returns>
 		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
 		{
+            if (graphicsDevice == null)
+                throw new ArgumentNullException("graphicsDevice");
+            if (stream == null)
+                throw new ArgumentNullException("stream");
+
             try
             {
                 return PlatformFromStream(graphicsDevice, stream);

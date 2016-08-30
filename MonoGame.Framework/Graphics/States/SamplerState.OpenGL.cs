@@ -164,17 +164,20 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
             GraphicsExtensions.CheckGLError();
             // Comparison samplers are not supported in OpenGL ES 2.0 (without an extension, anyway)
-            if (ComparisonFunction != CompareFunction.Never)
+            switch (FilterMode)
             {
-                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.CompareRefToTexture);
-                GraphicsExtensions.CheckGLError();
-                GL.TexParameter(target, TextureParameterName.TextureCompareFunc, (int) ComparisonFunction.GetDepthFunction());
-                GraphicsExtensions.CheckGLError();
-            }
-            else
-            {
-                GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.None);
-                GraphicsExtensions.CheckGLError();
+                case TextureFilterMode.Comparison:
+                    GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.CompareRefToTexture);
+                    GraphicsExtensions.CheckGLError();
+                    GL.TexParameter(target, TextureParameterName.TextureCompareFunc, (int) ComparisonFunction.GetDepthFunction());
+                    GraphicsExtensions.CheckGLError();
+                    break;
+                case TextureFilterMode.Default:
+                    GL.TexParameter(target, TextureParameterName.TextureCompareMode, (int) TextureCompareMode.None);
+                    GraphicsExtensions.CheckGLError();
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid filter mode!");
             }
 #endif
             if (GraphicsDevice.GraphicsCapabilities.SupportsTextureMaxLevel)

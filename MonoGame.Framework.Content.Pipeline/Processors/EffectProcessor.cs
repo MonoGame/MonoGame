@@ -200,7 +200,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     if (identity == null)
                     {
                         identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                        allErrorsAndWarnings = message + Environment.NewLine;
+                        allErrorsAndWarnings = errorsAndWarningArray[i] + Environment.NewLine;
                     }
                     else
                         allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
