@@ -1,4 +1,5 @@
 ﻿using Lidgren.Network;
+using System;
 
 namespace Microsoft.Xna.Framework.Net.Message
 {
@@ -10,7 +11,27 @@ namespace Microsoft.Xna.Framework.Net.Message
         GamerJoinResponse,
         GamerJoined,
         GamerLeft,
+        GamerStateChange,
+        StartGame,
+        EndGame,
         User
+    }
+
+    internal static class InternalMessage
+    {
+        public static Type[] MessageToReceiverTypeMap = new Type[]
+        {
+            typeof(ConnectToAllRequestMessageReceiver),
+            typeof(NoLongerPendingMessageReceiver),
+            typeof(GamerJoinRequestMessageReceiver),
+            typeof(GamerJoinResponseMessageReceiver),
+            typeof(GamerJoinedMessageReceiver),
+            typeof(GamerLeftMessageReceiver),
+            typeof(GamerStateChangeMessageReceiver),
+            typeof(StartGameMessageReceiver),
+            typeof(EndGameMessageReceiver),
+            typeof(UserMessageReceiver)
+        };
     }
 
     internal interface IInternalMessageSender

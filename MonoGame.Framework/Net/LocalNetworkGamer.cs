@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Net.Message;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -35,13 +36,48 @@ namespace Microsoft.Xna.Framework.Net
 
     public sealed class LocalNetworkGamer : NetworkGamer
     {
-        internal int inboundPacketIndex = 0;
-        internal List<InboundPacket> inboundPackets = new List<InboundPacket>();
-        internal List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
+        private int inboundPacketIndex = 0;
+        private List<InboundPacket> inboundPackets = new List<InboundPacket>();
+        private List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
 
         internal LocalNetworkGamer(byte id, bool isGuest, bool isHost, bool isPrivateSlot, NetworkSession session, SignedInGamer signedInGamer) : base(signedInGamer.DisplayName, signedInGamer.Gamertag, id, isGuest, isHost, true, isPrivateSlot, session.machine, session)
         {
             this.SignedInGamer = signedInGamer;
+        }
+
+        internal IList<InboundPacket> InboundPackets { get { return inboundPackets; } }
+        internal IList<OutboundPacket> OutboundPackets { get { return outboundPackets; } }
+
+        public bool IsDataAvailable { get { return inboundPacketIndex < inboundPackets.Count; } }
+
+        public override bool IsReady
+        {
+            set
+            {
+                if (IsDisposed)
+                {
+                    throw new InvalidOperationException("Gamer disposed");
+                }
+
+                if (Session.SessionState != NetworkSessionState.Lobby)
+                {
+                    throw new InvalidOperationException("Session state is not lobby");
+                }
+
+                if (isReady != value)
+                {
+                    isReady = value;
+
+                    Session.Send(new GamerStateChangeMessageSender(this, false, true));
+                }
+            }
+        }
+
+        public SignedInGamer SignedInGamer { get; }
+
+        public void EnableSendVoice(NetworkGamer remoteGamer, bool enable)
+        {
+            throw new NotImplementedException();
         }
 
         internal void RecycleInboundPackets()
@@ -67,38 +103,6 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             outboundPackets.Clear();
-        }
-
-        public bool IsDataAvailable { get { return inboundPacketIndex < inboundPackets.Count; } }
-
-        public override bool IsReady
-        {
-            set
-            {
-                if (IsDisposed)
-                {
-                    throw new InvalidOperationException("Gamer disposed");
-                }
-
-                if (Session.SessionState != NetworkSessionState.Lobby)
-                {
-                    throw new InvalidOperationException("Session state is not lobby");
-                }
-
-                if (isReady != value)
-                {
-                    isReady = value;
-
-                    // TODO: Sync
-                }
-            }
-        }
-
-        public SignedInGamer SignedInGamer { get; }
-
-        public void EnableSendVoice(NetworkGamer remoteGamer, bool enable)
-        {
-            throw new NotImplementedException();
         }
 
         // Receiving data

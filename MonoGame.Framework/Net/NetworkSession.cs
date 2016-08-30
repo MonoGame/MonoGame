@@ -202,7 +202,6 @@ namespace Microsoft.Xna.Framework.Net
             this.BytesPerSecondReceived = 0;
             this.BytesPerSecondSent = 0;
             this.IsDisposed = false;
-            this.IsHost = hostConnection == null;
             this.LocalGamers = new GamerCollection<LocalNetworkGamer>(this.machine.localGamers);
             this.MaxGamers = maxGamers;
             this.PrivateGamerSlots = privateGamerSlots;
@@ -269,14 +268,14 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        public bool IsHost { get; }
+        public bool IsHost { get { return machine.IsHost; } }
         public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
         public int MaxGamers { get; set; } // only host can set
         public GamerCollection<NetworkGamer> PreviousGamers { get; }
         public int PrivateGamerSlots { get; set; } // only host can set
         public GamerCollection<NetworkGamer> RemoteGamers { get; }
         public NetworkSessionProperties SessionProperties { get; } // should be synchronized
-        public NetworkSessionState SessionState { get; }
+        public NetworkSessionState SessionState { get; internal set; }
         public NetworkSessionType SessionType { get; }
 
         public TimeSpan SimulatedLatency // TODO: Should be applied even to local messages
@@ -317,19 +316,59 @@ namespace Microsoft.Xna.Framework.Net
             GamerLeft?.Invoke(this, args);
         }
 
+        internal void InvokeGameStartedEvent(GameStartedEventArgs args)
+        {
+            GameStarted?.Invoke(this, args);
+        }
+
+        internal void InvokeGameEndedEvent(GameEndedEventArgs args)
+        {
+            GameEnded?.Invoke(this, args);
+        }
+
         public void AddLocalGamer(SignedInGamer gamer)
         {
             throw new NotImplementedException();
         }
 
-        public void StartGame() // only host
+        public void StartGame()
         {
-            throw new NotImplementedException();
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException("NetworkSession");
+            }
+            if (!IsHost)
+            {
+                throw new InvalidOperationException("Only the host can perform this action");
+            }
+            if (SessionState != NetworkSessionState.Lobby)
+            {
+                throw new InvalidOperationException("The game can only be started from the lobby state");
+            }
+            if (!IsEveryoneReady)
+            {
+                throw new InvalidOperationException("Not all players are ready"); // TODO: See if this is the expected behavior
+            }
+
+            Send(new StartGameMessageSender());
         }
 
-        public void EndGame() // only host
+        public void EndGame()
         {
-            throw new NotImplementedException();
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException("NetworkSession");
+            }
+            if (!IsHost)
+            {
+                throw new InvalidOperationException("Only the host can perform this action");
+            }
+            if (SessionState != NetworkSessionState.Playing)
+            {
+                throw new InvalidOperationException("The game can only end from the playing state");
+            }
+
+            Send(new EndGameMessageSender());
         }
 
         public void ResetReady() // only host
@@ -414,7 +453,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal NetDeliveryMethod ToDeliveryMethod(SendDataOptions options)
+        private NetDeliveryMethod ToDeliveryMethod(SendDataOptions options)
         {
             switch (options)
             {
@@ -433,7 +472,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void EncodeMessage(IInternalMessageSender message, NetBuffer output)
+        private void EncodeMessage(IInternalMessageSender message, NetBuffer output)
         {
             output.Write((byte)message.MessageType);
 
@@ -481,24 +520,13 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        private static Type[] messageToReceiverTypeMap =
-        {
-            typeof(ConnectToAllRequestMessageReceiver),
-            typeof(NoLongerPendingMessageReceiver),
-            typeof(GamerJoinRequestMessageReceiver),
-            typeof(GamerJoinResponseMessageReceiver),
-            typeof(GamerJoinedMessageReceiver),
-            typeof(GamerLeftMessageReceiver),
-            typeof(UserMessageReceiver)
-        };
-
         internal void Receive(NetBuffer input, NetworkMachine sender)
         {
-            InternalMessageType messageType = (InternalMessageType)input.ReadByte();
+            byte messageType = input.ReadByte();
 
-            Debug.WriteLine("Receiving " + messageType + " from " + MachineOwnerName(sender) + "...");
+            Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(sender) + "...");
 
-            Type receiverToInstantiate = messageToReceiverTypeMap[(byte)messageType];
+            Type receiverToInstantiate = InternalMessage.MessageToReceiverTypeMap[messageType];
             IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
             receiver.Receive(input, machine, sender);
         }
@@ -514,7 +542,7 @@ namespace Microsoft.Xna.Framework.Net
             // Send accumulated outbound packets -> will create new inbound packets
             foreach (LocalNetworkGamer localGamer in machine.localGamers)
             {
-                foreach (OutboundPacket outboundPacket in localGamer.outboundPackets)
+                foreach (OutboundPacket outboundPacket in localGamer.OutboundPackets)
                 {
                     IInternalMessageSender userMessage = new UserMessageSender(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
 
@@ -565,8 +593,7 @@ namespace Microsoft.Xna.Framework.Net
                             // Create a pending network machine
                             NetworkMachine senderMachine = new NetworkMachine(msg.SenderConnection, msg.SenderConnection == hostConnection);
                             msg.SenderConnection.Tag = senderMachine;
-
-                            // TODO: Examine this solution...
+                            
                             if (!machine.IsPending)
                             {
                                 Send(new NoLongerPendingMessageSender(), senderMachine);

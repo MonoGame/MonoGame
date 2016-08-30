@@ -26,11 +26,11 @@ namespace Microsoft.Xna.Framework.Net
         public bool HasLeftSession { get; }
         public bool HasVoice { get { return false; } }
         public byte Id { get; }
-        public bool IsGuest { get; }
-        public bool IsHost { get; }
+        public bool IsGuest { get; internal set; }
+        public bool IsHost { get; internal set; }
         public bool IsLocal { get; }
         public bool IsMutedByLocalUser { get { return false; } }
-        public bool IsPrivateSlot { get; }
+        public bool IsPrivateSlot { get; internal set; }
 
         public virtual bool IsReady
         {
@@ -41,15 +41,20 @@ namespace Microsoft.Xna.Framework.Net
                     throw new InvalidOperationException("Gamer disposed");
                 }
 
-                if (Session.SessionState != NetworkSessionState.Lobby)
-                {
-                    throw new InvalidOperationException("Session state is not lobby");
-                }
-
                 return isReady;
             }
 
             set { throw new InvalidOperationException("Gamer is not local"); }
+        }
+
+        internal void SetReadyState(bool state)
+        {
+            if (IsLocal)
+            {
+                throw new InvalidOperationException("Gamer is not remote");
+            }
+
+            isReady = state;
         }
 
         public bool IsTalking { get { return false; } }

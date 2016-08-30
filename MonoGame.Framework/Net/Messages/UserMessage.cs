@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Net.Message
             {
                 foreach (LocalNetworkGamer localGamer in NetworkSession.Session.LocalGamers)
                 {
-                    localGamer.inboundPackets.Add(new InboundPacket(packet, sender));
+                    localGamer.InboundPackets.Add(new InboundPacket(packet, sender));
                 }
             }
             else
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Net.Message
                     return;
                 }
 
-                localGamer.inboundPackets.Add(new InboundPacket(packet, sender));
+                localGamer.InboundPackets.Add(new InboundPacket(packet, sender));
             }
         }
     }
