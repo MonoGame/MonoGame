@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Net.Message
     internal enum InternalMessageType
     {
         ConnectToAllRequest,
-        ConnectToAllSuccessful,
+        NoLongerPending,
         GamerJoinRequest,
         GamerJoinResponse,
         GamerJoined,

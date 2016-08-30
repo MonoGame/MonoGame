@@ -3,22 +3,17 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Message
 {
-    internal struct ConnectToAllSuccessfulMessageSender : IInternalMessageSender
+    internal struct NoLongerPendingMessageSender : IInternalMessageSender
     {
-        public InternalMessageType MessageType { get { return InternalMessageType.ConnectToAllSuccessful; } }
+        public InternalMessageType MessageType { get { return InternalMessageType.NoLongerPending; } }
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
         public void Send(NetBuffer output, NetworkMachine currentMachine)
-        {
-            if (!currentMachine.IsPending)
-            {
-                throw new NetworkException("ConnectToAllSuccessful can only be sent from a pending machine");
-            }
-        }
+        { }
     }
 
-    internal struct ConnectToAllSuccessfulMessageReceiver : IInternalMessageReceiver
+    internal struct NoLongerPendingMessageReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {

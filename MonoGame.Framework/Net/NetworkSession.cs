@@ -484,7 +484,7 @@ namespace Microsoft.Xna.Framework.Net
         private static Type[] messageToReceiverTypeMap =
         {
             typeof(ConnectToAllRequestMessageReceiver),
-            typeof(ConnectToAllSuccessfulMessageReceiver),
+            typeof(NoLongerPendingMessageReceiver),
             typeof(GamerJoinRequestMessageReceiver),
             typeof(GamerJoinResponseMessageReceiver),
             typeof(GamerJoinedMessageReceiver),
@@ -569,7 +569,7 @@ namespace Microsoft.Xna.Framework.Net
                             // TODO: Examine this solution...
                             if (!machine.IsPending)
                             {
-                                Send(new ConnectToAllSuccessfulMessageSender(), senderMachine);
+                                Send(new NoLongerPendingMessageSender(), senderMachine);
                             }
 
                             if (IsHost)
@@ -669,7 +669,7 @@ namespace Microsoft.Xna.Framework.Net
 
                 if (done)
                 {
-                    Send(new ConnectToAllSuccessfulMessageSender());
+                    Send(new NoLongerPendingMessageSender());
 
                     // Handle pending signed in gamers
                     if (pendingSignedInGamers.Count > 0)
