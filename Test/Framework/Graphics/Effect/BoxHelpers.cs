@@ -5,7 +5,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MonoGameTest.Framework
+namespace MonoGame.Tests.Graphics.Effect
 {
     static class BoxHelpers
     {

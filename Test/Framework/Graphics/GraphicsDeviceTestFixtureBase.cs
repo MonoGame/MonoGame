@@ -108,14 +108,18 @@ namespace MonoGame.Tests.Graphics
 
         #region Frame capture API
 
-        protected void PrepareFrameCapture(int expected = 1)
+        protected void PrepareFrameCapture(int expected = 1, int? width = null, int? height = null)
         {
             if (_framePrepared)
                 throw new Exception("PrepareFrameCapture should only be called once.");
             _framePrepared = true;
+
+            var checkedWidth = width.GetValueOrDefault(gd.Viewport.Width);
+            var checkedHeight = height.GetValueOrDefault(gd.Viewport.Height);
+
             _totalFramesExpected = expected;
 			_captureRenderTarget = new RenderTarget2D(
-				gd, gd.Viewport.Width, gd.Viewport.Height,
+				gd, checkedWidth, checkedHeight,
 				false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
             _submittedFrames = new List<FramePixelData>();
 

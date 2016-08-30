@@ -122,6 +122,10 @@
     <Compile Include="Framework\GamePadThumbSticksTest.cs" />
     <Compile Include="Framework\Graphics\DepthStencilStateTest.cs" />
     <Compile Include="Framework\Graphics\EffectTest.cs" />
+    <Compile Include="Framework\Graphics\Effect\BasicEffectTest.cs" />
+    <Compile Include="Framework\Graphics\Effect\BoxHelpers.cs" />
+    <Compile Include="Framework\Graphics\Effect\VertexPositionNormalColor.cs" />
+    <Compile Include="Framework\Graphics\Effect\VertexPositionNormalColorTexture.cs" />
     <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceManagerTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
@@ -602,6 +606,9 @@
     <Content Include="Assets\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Textures\grid-512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Textures\lines-128.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -814,6 +821,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Assets\Fonts\SegoeKeycaps.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Textures\grid-512.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
