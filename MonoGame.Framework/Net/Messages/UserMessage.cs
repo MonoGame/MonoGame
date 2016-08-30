@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.Xna.Framework.Net.Message
+namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal struct UserMessageSender : IInternalMessageSender
     {

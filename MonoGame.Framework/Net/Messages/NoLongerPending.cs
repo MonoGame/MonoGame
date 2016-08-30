@@ -1,7 +1,7 @@
 ﻿using System;
 using Lidgren.Network;
 
-namespace Microsoft.Xna.Framework.Net.Message
+namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal struct NoLongerPendingMessageSender : IInternalMessageSender
     {

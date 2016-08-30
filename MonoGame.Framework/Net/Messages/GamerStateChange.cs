@@ -1,7 +1,7 @@
 ﻿using Lidgren.Network;
 using System;
 
-namespace Microsoft.Xna.Framework.Net.Message
+namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal struct GamerStateChangeMessageSender : IInternalMessageSender
     {

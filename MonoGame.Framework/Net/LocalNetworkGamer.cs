@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Net.Message;
+using Microsoft.Xna.Framework.Net.Messages;
 
 namespace Microsoft.Xna.Framework.Net
 {

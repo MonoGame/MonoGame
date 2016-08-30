@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
 
-using Microsoft.Xna.Framework.Net.Message;
+using Microsoft.Xna.Framework.Net.Messages;
 using Microsoft.Xna.Framework.GamerServices;
 using Lidgren.Network;
 

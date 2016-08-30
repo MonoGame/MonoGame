@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 using Lidgren.Network;
 
-namespace Microsoft.Xna.Framework.Net.Message
+namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal struct ConnectToAllRequestMessageSender : IInternalMessageSender
     {
