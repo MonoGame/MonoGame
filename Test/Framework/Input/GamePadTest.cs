@@ -10,10 +10,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using NUnit.Framework;
 
-namespace MonoGame.Tests
+namespace MonoGame.Tests.Input
 {
     public class GamePadTest
     {
+        #region GamePadButtons
 
         [TestCaseSource("GetButtons")]
         public void GamePadButtonsTest(params Buttons[] buttons)
@@ -33,9 +34,15 @@ namespace MonoGame.Tests
             Assert.AreEqual(buttons.Contains(Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released, gpb.BigButton);
         }
 
-        [TestCase(ButtonState.Pressed, ButtonState.Pressed, ButtonState.Pressed, ButtonState.Pressed)]
+        #endregion
+
+        #region DPad
+
         [TestCase(ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released)]
-        [TestCase(ButtonState.Pressed, ButtonState.Released, ButtonState.Pressed, ButtonState.Released)]
+        [TestCase(ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Released)]
+        [TestCase(ButtonState.Released, ButtonState.Pressed, ButtonState.Released, ButtonState.Released)]
+        [TestCase(ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Released)]
+        [TestCase(ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Pressed)]
         public void DpadTest(ButtonState up, ButtonState down, ButtonState left, ButtonState right)
         {
             var pad = new GamePadDPad(up, down, left, right);
@@ -53,14 +60,29 @@ namespace MonoGame.Tests
             };
 
             Assert.AreEqual(pad, pad2);
+            Assert.AreEqual(pad.GetHashCode(), pad2.GetHashCode());
+
+            var buttons = (Buttons) 0;
+            if (up == ButtonState.Pressed) buttons |= Buttons.DPadUp;
+            if (down == ButtonState.Pressed) buttons |= Buttons.DPadDown;
+            if (left == ButtonState.Pressed) buttons |= Buttons.DPadLeft;
+            if (right == ButtonState.Pressed) buttons |= Buttons.DPadRight;
+
+            var pad3 = new GamePadDPad(buttons);
+            Assert.AreEqual(pad, pad3);
+            Assert.AreEqual(pad.GetHashCode(), pad3.GetHashCode());
         }
 
+        #endregion
+
+        #region Triggers
+
         [Test]
-        public void TriggersTest([Range(0f, 1f, 0.5f)] float left, [Range(0f, 1f, 0.5f)] float right)
+        public void TriggersTest([Range(-0.5f, 1.5f, 0.5f)] float left, [Range(1.5f, -0.5f, -0.5f)] float right)
         {
             var triggers = new GamePadTriggers(left, right);
-            Assert.AreEqual(left, triggers.Left);
-            Assert.AreEqual(right, triggers.Right);
+            Assert.AreEqual(MathHelper.Clamp(left, 0f, 1f), triggers.Left);
+            Assert.AreEqual(MathHelper.Clamp(right, 0f, 1f), triggers.Right);
 
             var triggers2 = new GamePadTriggers
             {
@@ -71,25 +93,54 @@ namespace MonoGame.Tests
             Assert.AreEqual(triggers.GetHashCode(), triggers2.GetHashCode());
         }
 
-        [Test]
-        public void ThumbsticksDeadZone()
+        #endregion
+
+        #region Thumbsticks
+
+        [TestCaseSource("ThumbStickVirtualButtonsIgnoreDeadZoneTestCases")]
+        public void ThumbStickVirtualButtonsIgnoreDeadZone(Vector2 left, Vector2 right, GamePadDeadZone deadZone, Buttons expectedButtons)
         {
-            var left = new Vector2(0.01f, 0.01f);
-            var right = new Vector2(-0.01f, -0.01f);
+            var state = new GamePadState(new GamePadThumbSticks(left, right, deadZone), new GamePadTriggers(), new GamePadButtons(), new GamePadDPad());
 
-            var thumbsticks = new GamePadThumbSticks(left, right, GamePadDeadZone.Circular);
-            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.LeftThumbstickRight));
-            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.RightThumbstickLeft));
+            Assert.AreEqual(expectedButtons, GetAllPressedButtons(state));
+        }
 
-            // we can't differentiate between circular and independent axes because we'd have
-            // to hardcode specific deadzone values, but these are gamepad specific
-            thumbsticks = new GamePadThumbSticks(left, right, GamePadDeadZone.IndependentAxes);
-            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.LeftThumbstickRight));
-            Assert.AreEqual(0, (int) (thumbsticks.VirtualButtons & Buttons.RightThumbstickLeft));
+        private static IEnumerable<TestCaseData> ThumbStickVirtualButtonsIgnoreDeadZoneTestCases
+        {
+            get
+            {
+                yield return new TestCaseData(
+                    Vector2.Zero, Vector2.Zero, GamePadDeadZone.Circular,
+                    (Buttons)0);
 
-            thumbsticks = new GamePadThumbSticks(left, right, GamePadDeadZone.None);
-            Assert.AreEqual(Buttons.LeftThumbstickRight, thumbsticks.VirtualButtons & Buttons.LeftThumbstickRight);
-            Assert.AreEqual(Buttons.RightThumbstickLeft, thumbsticks.VirtualButtons & Buttons.RightThumbstickLeft);
+                yield return new TestCaseData(
+                    new Vector2(1f, 0.1f), new Vector2(0.1f, 1f), GamePadDeadZone.Circular,
+                    Buttons.LeftThumbstickRight | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(1f, 0.1f), new Vector2(0.1f, 1f), GamePadDeadZone.None,
+                    Buttons.LeftThumbstickRight | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(1f, 0.1f), new Vector2(0.1f, 1f), GamePadDeadZone.IndependentAxes,
+                    Buttons.LeftThumbstickRight | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(0.5f, -0.5f), new Vector2(-0.5f, 0.5f), GamePadDeadZone.Circular,
+                    Buttons.LeftThumbstickRight | Buttons.LeftThumbstickDown | Buttons.RightThumbstickLeft | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(0.1f, -0.1f), new Vector2(-0.1f, 0.1f), GamePadDeadZone.None,
+                    (Buttons)0);
+            }
+        }
+
+        private static Buttons GetAllPressedButtons(GamePadState state)
+        {
+            Buttons buttons = 0;
+            foreach (var button in Enum.GetValues(typeof(Buttons)).Cast<Buttons>().Where(state.IsButtonDown))
+                buttons |= button;
+            return buttons;
         }
 
         [Test]
@@ -117,7 +168,61 @@ namespace MonoGame.Tests
             Assert.Less(sticks.Right.Y, 1);
         }
 
+        [TestCaseSource("PublicConstructorClampsValuesTestCases")]
+        public void PublicConstructorClampsValues(Vector2 left, Vector2 right, Vector2 expectedLeft, Vector2 expectedRight)
+        {
+            var gamePadThumbSticks = new GamePadThumbSticks(left, right);
+            Assert.That(gamePadThumbSticks.Left, Is.EqualTo(expectedLeft).Using(Vector2Comparer.Epsilon));
+            Assert.That(gamePadThumbSticks.Right, Is.EqualTo(expectedRight).Using(Vector2Comparer.Epsilon));
+        }
+
+        private static IEnumerable<TestCaseData> PublicConstructorClampsValuesTestCases
+        {
+            get
+            {
+                yield return new TestCaseData(
+                    Vector2.Zero, Vector2.Zero,
+                    Vector2.Zero, Vector2.Zero);
+
+                yield return new TestCaseData(
+                    Vector2.One, Vector2.One,
+                    Vector2.One, Vector2.One);
+
+                yield return new TestCaseData(
+                    -Vector2.One, -Vector2.One,
+                    -Vector2.One, -Vector2.One);
+
+                yield return new TestCaseData(
+                    new Vector2(-2.7f, 5.6f), new Vector2(3.5f, -4.8f),
+                    new Vector2(-1f, 1f), new Vector2(1f, -1f));
+
+                yield return new TestCaseData(
+                    new Vector2(34f, 65f), new Vector2(-33f, -17f),
+                    new Vector2(1f, 1f), new Vector2(-1f, -1f));
+            }
+        }
+
+        #endregion
+
         #region State
+
+        [TestCase((Buttons)0, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released })]
+        [TestCase(Buttons.DPadDown, new[] { ButtonState.Pressed, ButtonState.Released, ButtonState.Released, ButtonState.Released })]
+        [TestCase(Buttons.DPadLeft, new[] { ButtonState.Released, ButtonState.Pressed, ButtonState.Released, ButtonState.Released })]
+        [TestCase(Buttons.DPadRight, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Pressed, ButtonState.Released })]
+        [TestCase(Buttons.DPadUp, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Pressed })]
+        public void ConstructDPadState(Buttons button, ButtonState[] expectedDPadButtonStates)
+        {
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, 0f, 0f, button != 0 ? button : new Buttons());
+
+            if (button != 0)
+                Assert.True(state.IsButtonDown(button));
+
+            Assert.AreEqual(expectedDPadButtonStates[0], state.DPad.Down, "DPad.Down Pressed or Released");
+            Assert.AreEqual(expectedDPadButtonStates[1], state.DPad.Left, "DPad.Left Pressed or Released");
+            Assert.AreEqual(expectedDPadButtonStates[2], state.DPad.Right, "DPad.Right Pressed or Released");
+            Assert.AreEqual(expectedDPadButtonStates[3], state.DPad.Up, "DPad.Up Pressed or Released");
+        }
 
         private const int Count = 6;
         public static IEnumerable<Buttons[]> GetButtons()

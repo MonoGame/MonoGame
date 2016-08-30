@@ -7,7 +7,7 @@ using System.Linq;
 using Microsoft.Xna.Framework.Input;
 using NUnit.Framework;
 
-namespace MonoGame.Tests
+namespace MonoGame.Tests.Input
 {
     class KeyboardTest
     {

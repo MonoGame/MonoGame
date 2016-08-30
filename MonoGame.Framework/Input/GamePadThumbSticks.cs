@@ -126,25 +126,26 @@ namespace Microsoft.Xna.Framework.Input
         {
             VirtualButtons = 0;
 
-            // deadzone is already applied so if e.g. leftPosition.X < leftThumbDeadZone then leftPosition.X == 0 right now
-            if (leftPosition.X < 0)
+            // VirtualButtons should always behave like deadzone is IndependentAxes. 
+            // This is consistent with XNA behaviour and generally most convenient (e.g. for menu navigation)
+            if (leftPosition.X < -leftThumbDeadZone)
                 VirtualButtons |= Buttons.LeftThumbstickLeft;
-            else if (leftPosition.X > 0)
+            else if (leftPosition.X > leftThumbDeadZone)
                 VirtualButtons |= Buttons.LeftThumbstickRight;
 
-            if (leftPosition.Y < 0)
+            if (leftPosition.Y < -leftThumbDeadZone)
                 VirtualButtons |= Buttons.LeftThumbstickDown;
-            else if (leftPosition.Y > 0)
+            else if (leftPosition.Y > leftThumbDeadZone)
                 VirtualButtons |= Buttons.LeftThumbstickUp;
 
-            if (rightPosition.X < 0)
+            if (rightPosition.X < -rightThumbDeadZone)
                 VirtualButtons |= Buttons.RightThumbstickLeft;
-            else if (rightPosition.X > 0)
+            else if (rightPosition.X > rightThumbDeadZone)
                 VirtualButtons |= Buttons.RightThumbstickRight;
 
-            if (rightPosition.Y < 0)
+            if (rightPosition.Y < -rightThumbDeadZone)
                 VirtualButtons |= Buttons.RightThumbstickDown;
-            else if (rightPosition.Y > 0)
+            else if (rightPosition.Y > rightThumbDeadZone)
                 VirtualButtons |= Buttons.RightThumbstickUp;
         }
 
