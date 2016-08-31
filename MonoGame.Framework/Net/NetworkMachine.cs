@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Net
             this.localGamers = this.IsLocal ? new List<LocalNetworkGamer>() : null;
             this.gamers = new List<NetworkGamer>();
 
-            this.LocalGamers = new GamerCollection<LocalNetworkGamer>(localGamers);
+            this.LocalGamers = this.IsLocal ? new GamerCollection<LocalNetworkGamer>(localGamers) : null;
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
         }
 
