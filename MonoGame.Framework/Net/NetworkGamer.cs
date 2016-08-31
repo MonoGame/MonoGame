@@ -19,7 +19,6 @@ namespace Microsoft.Xna.Framework.Net
             this.IsLocal = isLocal;
             this.IsPrivateSlot = isPrivateSlot;
             this.Machine = machine;
-            this.RoundtripTime = TimeSpan.Zero;
             this.Session = session;
         }
 
@@ -54,7 +53,15 @@ namespace Microsoft.Xna.Framework.Net
 
         public bool IsTalking { get { return false; } }
         public NetworkMachine Machine { get; }
-        public TimeSpan RoundtripTime { get; }
+
+        public TimeSpan RoundtripTime
+        {
+            get
+            {
+                return TimeSpan.FromSeconds(Machine.connection.AverageRoundtripTime);
+            }
+        }
+
         public NetworkSession Session { get; }
     }
 }

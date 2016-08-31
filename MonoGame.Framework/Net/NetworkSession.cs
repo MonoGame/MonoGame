@@ -280,8 +280,8 @@ namespace Microsoft.Xna.Framework.Net
 
         public TimeSpan SimulatedLatency // TODO: Should be applied even to local messages
         {
-            get { return new TimeSpan(0, 0, 0, 0, (int)(peer.Configuration.SimulatedRandomLatency * 1000.0f)); }
-            set { peer.Configuration.SimulatedRandomLatency = (float)(value.TotalMilliseconds * 0.001); }
+            get { return TimeSpan.FromSeconds(peer.Configuration.SimulatedRandomLatency); }
+            set { peer.Configuration.SimulatedRandomLatency = (float)value.TotalSeconds; }
         }
 
         public float SimulatedPacketLoss // TODO: Should be applied even to local messages
