@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal enum InternalMessageType
     {
-        ConnectToAllRequest,
+        InitializePending,
         NoLongerPending,
         GamerJoinRequest,
         GamerJoinResponse,
@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public static Type[] MessageToReceiverTypeMap = new Type[]
         {
-            typeof(ConnectToAllRequestMessageReceiver),
+            typeof(InitializePendingMessageReceiver),
             typeof(NoLongerPendingMessageReceiver),
             typeof(GamerJoinRequestMessageReceiver),
             typeof(GamerJoinResponseMessageReceiver),

@@ -625,7 +625,7 @@ namespace Microsoft.Xna.Framework.Net
                                 requestedConnections.Remove(msg.SenderConnection);
                                 pendingPeerConnections.Add(msg.SenderConnection, requestedConnections);
 
-                                Send(new ConnectToAllRequestMessageSender(requestedConnections), senderMachine);
+                                Send(new InitializePendingMessageSender(requestedConnections), senderMachine);
                             }
                         }
 
@@ -658,7 +658,7 @@ namespace Microsoft.Xna.Framework.Net
                                     {
                                         pendingPeer.Value.Remove(msg.SenderConnection);
 
-                                        Send(new ConnectToAllRequestMessageSender(pendingPeer.Value), pendingMachine);
+                                        Send(new InitializePendingMessageSender(pendingPeer.Value), pendingMachine);
                                     }
                                 }
                             }

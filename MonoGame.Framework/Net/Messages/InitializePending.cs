@@ -7,16 +7,16 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct ConnectToAllRequestMessageSender : IInternalMessageSender
+    internal struct InitializePendingMessageSender : IInternalMessageSender
     {
         private ICollection<NetConnection> requestedConnections;
 
-        public ConnectToAllRequestMessageSender(ICollection<NetConnection> requestedConnections)
+        public InitializePendingMessageSender(ICollection<NetConnection> requestedConnections)
         {
             this.requestedConnections = requestedConnections;
         }
 
-        public InternalMessageType MessageType { get { return InternalMessageType.ConnectToAllRequest; } }
+        public InternalMessageType MessageType { get { return InternalMessageType.InitializePending; } }
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
@@ -24,9 +24,13 @@ namespace Microsoft.Xna.Framework.Net.Messages
         {
             if (!currentMachine.IsHost)
             {
-                throw new NetworkException("Only host should send ConnectToAllRequest");
+                throw new NetworkException("Only host can send InitializePending");
             }
 
+            // Session state
+            output.Write((byte)NetworkSession.Session.SessionState);
+
+            // Requested connections
             output.Write((int)requestedConnections.Count);
             foreach (NetConnection c in requestedConnections)
             {
@@ -35,7 +39,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct ConnectToAllRequestMessageReceiver : IInternalMessageReceiver
+    internal struct InitializePendingMessageReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
@@ -46,13 +50,16 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             if (senderMachine.IsLocal)
             {
-                throw new NetworkException("ConnectToAllRequest should never be sent to self");
+                throw new NetworkException("InitializePending should never be sent to self");
             }
 
+            // Session state
+            NetworkSession.Session.SessionState = (NetworkSessionState)input.ReadByte();
+
+            // Requested connections
             int requestedConnectionCount = input.ReadInt32();
 
             NetworkSession.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
-
             for (int i = 0; i < requestedConnectionCount; i++)
             {
                 IPEndPoint endPoint = input.ReadIPEndPoint();
