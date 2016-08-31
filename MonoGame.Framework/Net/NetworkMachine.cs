@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Lidgren.Network;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -30,6 +31,24 @@ namespace Microsoft.Xna.Framework.Net
         internal bool IsHost { get; }
         internal GamerCollection<LocalNetworkGamer> LocalGamers { get; }
         public GamerCollection<NetworkGamer> Gamers { get; }
+
+        internal LocalNetworkGamer FindLocalGamerBySignedInGamer(SignedInGamer signedInGamer)
+        {
+            if (!IsLocal)
+            {
+                return null;
+            }
+
+            foreach (LocalNetworkGamer localGamer in localGamers)
+            {
+                if (localGamer.SignedInGamer == signedInGamer)
+                {
+                    return localGamer;
+                }
+            }
+
+            return null;
+        }
 
         internal void AddGamer(NetworkGamer gamer)
         {

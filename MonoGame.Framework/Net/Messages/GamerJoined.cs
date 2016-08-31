@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
             else
             {
-                NetworkGamer remoteGamer = new NetworkGamer(displayName, gamertag, id, isGuest, isHost, false, isPrivateSlot, isReady, senderMachine, NetworkSession.Session);
+                NetworkGamer remoteGamer = new NetworkGamer(isReady, displayName, gamertag, id, isPrivateSlot, senderMachine, NetworkSession.Session);
 
                 NetworkSession.Session.AddGamer(remoteGamer);
                 NetworkSession.Session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(remoteGamer));

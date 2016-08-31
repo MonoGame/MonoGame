@@ -34,8 +34,6 @@ namespace Microsoft.Xna.Framework.Net.Messages
             output.Write(sendFlags);
             if (sendFlags)
             {
-                output.Write(localGamer.IsGuest);
-                output.Write(localGamer.IsHost);
                 output.Write(localGamer.IsPrivateSlot);
                 output.Write(localGamer.IsReady);
             }
@@ -69,20 +67,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool readFlags = input.ReadBoolean();
             if (readFlags)
             {
-                bool isGuest = input.ReadBoolean();
-                bool isHost = input.ReadBoolean();
-                bool isPrivateSlot = input.ReadBoolean();
-                bool isReady = input.ReadBoolean();
-
-                remoteGamer.IsGuest = isGuest;
-
-                if (!isHost || (isHost && senderMachine.IsHost))
-                {
-                    remoteGamer.IsHost = isHost;
-                }
-
-                remoteGamer.IsPrivateSlot = isPrivateSlot;
-                remoteGamer.SetReadyState(isReady);
+                remoteGamer.IsPrivateSlot = input.ReadBoolean();
+                remoteGamer.SetReadyState(input.ReadBoolean());
             }
         }
     }

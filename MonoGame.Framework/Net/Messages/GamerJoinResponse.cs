@@ -51,13 +51,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Host approved request, now possible to create network gamer
-            bool isFirstSignedInGamer = NetworkSession.Session.pendingSignedInGamers.Count == NetworkSession.Session.initiallyPendingSignedInGamersCount;
             SignedInGamer signedInGamer = NetworkSession.Session.pendingSignedInGamers[0];
             NetworkSession.Session.pendingSignedInGamers.RemoveAt(0);
-
-            bool isGuest = !isFirstSignedInGamer;
-            bool isHost = currentMachine.IsHost && isFirstSignedInGamer;
-            LocalNetworkGamer localGamer = new LocalNetworkGamer(id, isGuest, isHost, false, NetworkSession.Session, signedInGamer);
+            LocalNetworkGamer localGamer = new LocalNetworkGamer(id, false, NetworkSession.Session, signedInGamer);
 
             NetworkSession.Session.AddGamer(localGamer);
 

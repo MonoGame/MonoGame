@@ -7,20 +7,15 @@ namespace Microsoft.Xna.Framework.Net
     {
         protected bool isReady;
 
-        internal NetworkGamer(string displayName, string gamertag, byte id, bool isGuest, bool isHost, bool isLocal, bool isPrivateSlot, bool isReady, NetworkMachine machine, NetworkSession session) : base()
+        internal NetworkGamer(bool isReady, string displayName, string gamertag, byte id, bool isPrivateSlot, NetworkMachine machine, NetworkSession session) : base()
         {
-            this.DisplayName = displayName;
-            this.Gamertag = gamertag;
-
-            this.HasLeftSession = false;
-            this.Id = id;
-            this.IsGuest = isGuest;
-            this.IsHost = isHost;
-            this.IsLocal = isLocal;
-            this.IsPrivateSlot = isPrivateSlot;
-
             this.isReady = isReady;
 
+            this.DisplayName = displayName;
+            this.Gamertag = gamertag;
+            this.HasLeftSession = false;
+            this.Id = id;
+            this.IsPrivateSlot = isPrivateSlot;
             this.Machine = machine;
             this.Session = session;
         }
@@ -28,9 +23,9 @@ namespace Microsoft.Xna.Framework.Net
         public bool HasLeftSession { get; }
         public bool HasVoice { get { return false; } }
         public byte Id { get; }
-        public bool IsGuest { get; internal set; }
-        public bool IsHost { get; internal set; }
-        public bool IsLocal { get; }
+        public bool IsGuest { get { return Machine.Gamers[0] != this; } }
+        public bool IsHost { get { return Machine.IsHost && Machine.Gamers[0] == this; } }
+        public bool IsLocal { get { return Machine.IsLocal; } }
         public bool IsMutedByLocalUser { get { return false; } }
         public bool IsPrivateSlot { get; internal set; }
 

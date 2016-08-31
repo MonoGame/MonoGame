@@ -168,7 +168,6 @@ namespace Microsoft.Xna.Framework.Net
         internal NetConnection hostConnection;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
-        internal int initiallyPendingSignedInGamersCount;
 
         internal ICollection<IPEndPoint> pendingEndPoints;
 
@@ -191,7 +190,6 @@ namespace Microsoft.Xna.Framework.Net
             this.hostConnection = hostConnection;
 
             this.pendingSignedInGamers = new List<SignedInGamer>(signedInGamers);
-            this.initiallyPendingSignedInGamersCount = this.pendingSignedInGamers.Count;
 
             this.allGamers = new List<NetworkGamer>();
             this.allRemoteGamers = new List<NetworkGamer>();
@@ -331,9 +329,16 @@ namespace Microsoft.Xna.Framework.Net
             SessionEnded?.Invoke(this, args);
         }
 
-        public void AddLocalGamer(SignedInGamer gamer)
+        public void AddLocalGamer(SignedInGamer signedInGamer)
         {
-            throw new NotImplementedException();
+            if (machine.FindLocalGamerBySignedInGamer(signedInGamer) != null)
+            {
+                return;
+            }
+
+            pendingSignedInGamers.Add(signedInGamer);
+
+            Send(new GamerJoinRequestMessageSender(), HostMachine);
         }
 
         public void StartGame()
