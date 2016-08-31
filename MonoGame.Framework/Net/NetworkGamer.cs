@@ -5,9 +5,9 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkGamer : Gamer
     {
-        protected bool isReady = false;
+        protected bool isReady;
 
-        internal NetworkGamer(string displayName, string gamertag, byte id, bool isGuest, bool isHost, bool isLocal, bool isPrivateSlot, NetworkMachine machine, NetworkSession session) : base()
+        internal NetworkGamer(string displayName, string gamertag, byte id, bool isGuest, bool isHost, bool isLocal, bool isPrivateSlot, bool isReady, NetworkMachine machine, NetworkSession session) : base()
         {
             this.DisplayName = displayName;
             this.Gamertag = gamertag;
@@ -18,6 +18,9 @@ namespace Microsoft.Xna.Framework.Net
             this.IsHost = isHost;
             this.IsLocal = isLocal;
             this.IsPrivateSlot = isPrivateSlot;
+
+            this.isReady = isReady;
+
             this.Machine = machine;
             this.Session = session;
         }

@@ -24,6 +24,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             output.Write(localGamer.IsGuest);
             output.Write(localGamer.IsHost);
             output.Write(localGamer.IsPrivateSlot);
+            output.Write(localGamer.IsReady);
         }
     }
 
@@ -37,6 +38,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool isGuest = input.ReadBoolean();
             bool isHost = input.ReadBoolean();
             bool isPrivateSlot = input.ReadBoolean();
+            bool isReady = input.ReadBoolean();
 
             if (!senderMachine.IsLocal && currentMachine.IsHost && isHost)
             {
@@ -69,7 +71,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
             else
             {
-                NetworkGamer remoteGamer = new NetworkGamer(displayName, gamertag, id, isGuest, isHost, false, isPrivateSlot, senderMachine, NetworkSession.Session);
+                NetworkGamer remoteGamer = new NetworkGamer(displayName, gamertag, id, isGuest, isHost, false, isPrivateSlot, isReady, senderMachine, NetworkSession.Session);
 
                 NetworkSession.Session.AddGamer(remoteGamer);
                 NetworkSession.Session.InvokeGamerJoinedEvent(new GamerJoinedEventArgs(remoteGamer));
