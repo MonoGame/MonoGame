@@ -20,13 +20,13 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!senderMachine.IsPending)
             {
                 return;
-            }            
+            }
 
             // The sender machine is now considered fully connected
             senderMachine.IsPending = false;
 
             // Remote peer?
-            if (!senderMachine.IsLocal)
+            if (!currentMachine.IsPending && !senderMachine.IsLocal)
             {
                 if (currentMachine.IsHost)
                 {

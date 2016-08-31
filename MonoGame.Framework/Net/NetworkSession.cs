@@ -161,24 +161,21 @@ namespace Microsoft.Xna.Framework.Net
             return Session;
         }
 
-        internal PacketPool packetPool;
-
         internal NetPeer peer;
         internal NetworkMachine machine;
         internal NetConnection hostConnection;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
-
         internal ICollection<IPEndPoint> pendingEndPoints;
 
         // Host stores which connections were open when a particular peer connected
         internal Dictionary<NetConnection, ICollection<NetConnection>> pendingPeerConnections = new Dictionary<NetConnection, ICollection<NetConnection>>();
 
         private byte uniqueIdCount;
-
         private IList<NetworkGamer> allGamers;
         private IList<NetworkGamer> allRemoteGamers;
 
+        internal PacketPool packetPool;
         private NetBuffer internalBuffer;
         private DateTime lastTime;
         private int lastReceivedBytes;
@@ -186,13 +183,17 @@ namespace Microsoft.Xna.Framework.Net
 
         internal NetworkSession(NetPeer peer, NetConnection hostConnection, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
-            this.packetPool = new PacketPool();
-
             this.peer = peer;
             this.machine = new NetworkMachine(this, null, hostConnection == null);
             this.hostConnection = hostConnection;
 
             this.pendingSignedInGamers = new List<SignedInGamer>(signedInGamers);
+
+            if (hostConnection == null)
+            {
+                // Initialize empty pending end point list so that the host is approved automatically
+                this.pendingEndPoints = new List<IPEndPoint>();
+            }
 
             this.allGamers = new List<NetworkGamer>();
             this.allRemoteGamers = new List<NetworkGamer>();
@@ -213,19 +214,14 @@ namespace Microsoft.Xna.Framework.Net
             this.SimulatedLatency = TimeSpan.Zero;
             this.SimulatedPacketLoss = 0.0f;
 
-            // Store machine in peer tag
-            this.peer.Tag = this.machine;
-
-            if (hostConnection == null)
-            {
-                // Initialize empty pending end point list so that the host is approved automatically
-                this.pendingEndPoints = new List<IPEndPoint>();
-            }
-
+            this.packetPool = new PacketPool();
             this.internalBuffer = new NetBuffer();
             this.lastTime = DateTime.Now;
             this.lastReceivedBytes = this.peer.Statistics.ReceivedBytes;
             this.lastSentBytes = this.peer.Statistics.SentBytes;
+
+            // Store machine in peer tag
+            this.peer.Tag = this.machine;
         }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
@@ -765,6 +761,11 @@ namespace Microsoft.Xna.Framework.Net
 
                 Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
                 Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
+                
+                foreach (NetworkGamer gamer in AllGamers)
+                {
+                    Debug.WriteLine("Gamer: " + gamer.DisplayName + "(" + gamer.Id + ")");
+                }
             }
         }
 
