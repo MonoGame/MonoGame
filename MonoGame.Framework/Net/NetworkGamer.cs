@@ -7,19 +7,19 @@ namespace Microsoft.Xna.Framework.Net
     {
         protected bool isReady;
 
-        internal NetworkGamer(bool isReady, string displayName, string gamertag, byte id, bool isPrivateSlot, NetworkMachine machine) : base()
+        internal NetworkGamer(NetworkMachine machine, string displayName, string gamertag, byte id, bool isPrivateSlot, bool isReady) : base()
         {
-            this.isReady = isReady;
-
+            this.Machine = machine;
             this.DisplayName = displayName;
             this.Gamertag = gamertag;
-            this.HasLeftSession = false;
             this.Id = id;
             this.IsPrivateSlot = isPrivateSlot;
-            this.Machine = machine;
+
+            this.isReady = isReady;
         }
 
-        public bool HasLeftSession { get; }
+        public NetworkMachine Machine { get; }
+        public bool HasLeftSession { get { return false; } }
         public bool HasVoice { get { return false; } }
         public byte Id { get; }
         public bool IsGuest { get { return Machine.Gamers[0] != this; } }
@@ -49,7 +49,6 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         public bool IsTalking { get { return false; } }
-        public NetworkMachine Machine { get; }
 
         public TimeSpan RoundtripTime
         {

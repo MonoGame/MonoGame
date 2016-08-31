@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Net
         private List<InboundPacket> inboundPackets = new List<InboundPacket>();
         private List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
 
-        internal LocalNetworkGamer(byte id, bool isPrivateSlot, NetworkSession session, SignedInGamer signedInGamer) : base(false, signedInGamer.DisplayName, signedInGamer.Gamertag, id, isPrivateSlot, session.machine)
+        internal LocalNetworkGamer(NetworkMachine machine, SignedInGamer signedInGamer, byte id, bool isPrivateSlot) : base(machine, signedInGamer.DisplayName, signedInGamer.Gamertag, id, isPrivateSlot, false)
         {
             this.SignedInGamer = signedInGamer;
         }

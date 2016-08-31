@@ -50,10 +50,16 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
+            if (NetworkSession.Session.FindGamerById(id) != null)
+            {
+                Debug.WriteLine("Warning: GamerJoinResponse received from host with colliding id!");
+                return;
+            }
+
             // Host approved request, now possible to create network gamer
             SignedInGamer signedInGamer = NetworkSession.Session.pendingSignedInGamers[0];
             NetworkSession.Session.pendingSignedInGamers.RemoveAt(0);
-            LocalNetworkGamer localGamer = new LocalNetworkGamer(id, false, NetworkSession.Session, signedInGamer);
+            LocalNetworkGamer localGamer = new LocalNetworkGamer(currentMachine, signedInGamer, id, false);
 
             NetworkSession.Session.AddGamer(localGamer);
             NetworkSession.Session.Send(new GamerJoinedMessageSender(localGamer));
