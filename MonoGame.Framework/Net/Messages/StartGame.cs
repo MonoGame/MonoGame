@@ -27,6 +27,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
+            // Reset ready state for esthetic reasons only, the code that matters is in EndGameMessage!
+            foreach (LocalNetworkGamer localGamer in currentMachine.LocalGamers)
+            {
+                localGamer.IsReady = false;
+            }
+
             NetworkSession.Session.SessionState = NetworkSessionState.Playing;
             NetworkSession.Session.InvokeGameStartedEvent(new GameStartedEventArgs());
         }

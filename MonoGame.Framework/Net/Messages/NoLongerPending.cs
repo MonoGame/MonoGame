@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 }
 
                 // Send gamer joined messages to the newly fully connected remote peer
-                foreach (LocalNetworkGamer localGamer in currentMachine.localGamers)
+                foreach (LocalNetworkGamer localGamer in currentMachine.LocalGamers)
                 {
                     NetworkSession.Session.Send(new GamerJoinedMessageSender(localGamer), senderMachine);
                 }

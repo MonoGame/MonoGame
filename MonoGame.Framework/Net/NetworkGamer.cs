@@ -49,11 +49,6 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SetReadyState(bool state)
         {
-            if (IsLocal)
-            {
-                throw new InvalidOperationException("Gamer is not remote");
-            }
-
             isReady = state;
         }
 

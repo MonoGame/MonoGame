@@ -27,10 +27,20 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            // TODO: How to handle ready flag?
-            foreach (NetworkGamer gamer in NetworkSession.Session.AllGamers)
+            // Make sure that the host can not accidentaly start the game too early
+            if (currentMachine.IsHost)
             {
-                gamer.SetReadyState(false);
+                foreach (NetworkGamer gamer in NetworkSession.Session.AllGamers)
+                {
+                    // Safe because any ready state change from a remote gamer will happen after the scope of this Receive() call
+                    gamer.SetReadyState(false);
+                }
+            }
+
+            // Tell everyone that our local gamers are not yet ready
+            foreach (LocalNetworkGamer localGamer in currentMachine.LocalGamers)
+            {
+                localGamer.IsReady = false;
             }
             
             NetworkSession.Session.SessionState = NetworkSessionState.Lobby;

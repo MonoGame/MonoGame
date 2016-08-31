@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework.Net
             this.BytesPerSecondReceived = 0;
             this.BytesPerSecondSent = 0;
             this.IsDisposed = false;
-            this.LocalGamers = new GamerCollection<LocalNetworkGamer>(this.machine.localGamers);
+            this.LocalGamers = this.machine.LocalGamers;
             this.MaxGamers = maxGamers;
             this.PrivateGamerSlots = privateGamerSlots;
             this.RemoteGamers = new GamerCollection<NetworkGamer>(this.allRemoteGamers);
@@ -291,7 +291,7 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         internal int CurrentGamerCount { get { return allGamers.Count; } }
-        internal string HostGamertag { get { return machine.localGamers.Count > 0 ? machine.localGamers[0].Gamertag : "Game starting up..."; } }
+        internal string HostGamertag { get { return machine.LocalGamers.Count > 0 ? machine.LocalGamers[0].Gamertag : "Game starting up..."; } }
         internal int OpenPrivateGamerSlots { get { return PrivateGamerSlots; } }
         internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - CurrentGamerCount; } }
 
@@ -534,13 +534,13 @@ namespace Microsoft.Xna.Framework.Net
         public void Update()
         {
             // Recycle inbound packets from last frame
-            foreach (LocalNetworkGamer localGamer in machine.localGamers)
+            foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
             {
                 localGamer.RecycleInboundPackets();
             }
 
             // Send accumulated outbound packets -> will create new inbound packets
-            foreach (LocalNetworkGamer localGamer in machine.localGamers)
+            foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
             {
                 foreach (OutboundPacket outboundPacket in localGamer.OutboundPackets)
                 {
@@ -615,7 +615,7 @@ namespace Microsoft.Xna.Framework.Net
                             // Remove gamers
                             NetworkMachine disconnectedMachine = msg.SenderConnection.Tag as NetworkMachine;
 
-                            foreach (NetworkGamer gamer in disconnectedMachine.gamers)
+                            foreach (NetworkGamer gamer in disconnectedMachine.Gamers)
                             {
                                 InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
                             }
@@ -709,9 +709,9 @@ namespace Microsoft.Xna.Framework.Net
 
         public void Dispose()
         {
-            while (machine.localGamers.Count > 0)
+            while (machine.LocalGamers.Count > 0)
             {
-                LocalNetworkGamer localGamer = machine.localGamers[machine.localGamers.Count - 1];
+                LocalNetworkGamer localGamer = machine.LocalGamers[machine.LocalGamers.Count - 1];
 
                 InvokeGamerLeftEvent(new GamerLeftEventArgs(localGamer));
                 
