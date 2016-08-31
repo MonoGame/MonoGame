@@ -481,7 +481,10 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void Send(IInternalMessageSender message)
         {
-            Debug.WriteLine("Sending " + message.MessageType + " to all peers...");
+            if (message.MessageType != InternalMessageType.User)
+            {
+                Debug.WriteLine("Sending " + message.MessageType + " to all peers...");
+            }
 
             // Send to all peers
             if (peer.Connections.Count > 0)
@@ -502,7 +505,10 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ArgumentNullException("recipient");
             }
 
-            Debug.WriteLine("Sending " + message.MessageType + " to " + MachineOwnerName(recipient) + "...");
+            if (message.MessageType != InternalMessageType.User)
+            {
+                Debug.WriteLine("Sending " + message.MessageType + " to " + MachineOwnerName(recipient) + "...");
+            }
 
             if (recipient.IsLocal)
             {
@@ -524,7 +530,10 @@ namespace Microsoft.Xna.Framework.Net
         {
             byte messageType = input.ReadByte();
 
-            Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(sender) + "...");
+            if ((InternalMessageType)messageType != InternalMessageType.User)
+            {
+                Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(sender) + "...");
+            }
 
             Type receiverToInstantiate = InternalMessage.MessageToReceiverTypeMap[messageType];
             IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
