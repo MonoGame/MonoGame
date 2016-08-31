@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new NetworkSessionJoinException("Connection failed", NetworkSessionJoinError.SessionNotFound);
             }
-            
+
             NetConnection hostConnection = peer.GetConnection(availableSession.remoteEndPoint);
             int maxGamers = availableSession.maxGamers;
             int privateGamerSlots = availableSession.privateGamerSlots;
@@ -169,14 +169,14 @@ namespace Microsoft.Xna.Framework.Net
 
         internal IList<SignedInGamer> pendingSignedInGamers;
         internal int initiallyPendingSignedInGamersCount;
-        
+
         internal ICollection<IPEndPoint> pendingEndPoints;
 
         // Host stores which connections were open when a particular peer connected
         internal Dictionary<NetConnection, ICollection<NetConnection>> pendingPeerConnections = new Dictionary<NetConnection, ICollection<NetConnection>>();
 
         private byte uniqueIdCount;
-        
+
         private IList<NetworkGamer> allGamers;
         private IList<NetworkGamer> allRemoteGamers;
 
@@ -227,8 +227,8 @@ namespace Microsoft.Xna.Framework.Net
         public GamerCollection<NetworkGamer> AllGamers { get; }
         public bool AllowHostMigration { get; set; } // any peer can get, only host can set
         public bool AllowJoinInProgress { get; set; } // any peer can get, only host can set
-        public int BytesPerSecondReceived { get; } // todo
-        public int BytesPerSecondSent { get; } // todo
+        public int BytesPerSecondReceived { get; } // TODO
+        public int BytesPerSecondSent { get; } // TODO
 
         internal NetworkMachine HostMachine
         {
@@ -324,6 +324,11 @@ namespace Microsoft.Xna.Framework.Net
         internal void InvokeGameEndedEvent(GameEndedEventArgs args)
         {
             GameEnded?.Invoke(this, args);
+        }
+
+        internal void InvokeSessionEnded(NetworkSessionEndedEventArgs args)
+        {
+            SessionEnded?.Invoke(this, args);
         }
 
         public void AddLocalGamer(SignedInGamer gamer)
@@ -602,7 +607,7 @@ namespace Microsoft.Xna.Framework.Net
                             // Create a pending network machine
                             NetworkMachine senderMachine = new NetworkMachine(msg.SenderConnection, msg.SenderConnection == hostConnection);
                             msg.SenderConnection.Tag = senderMachine;
-                            
+
                             if (!machine.IsPending)
                             {
                                 Send(new NoLongerPendingMessageSender(), senderMachine);
@@ -657,7 +662,7 @@ namespace Microsoft.Xna.Framework.Net
                                 if (msg.SenderConnection == hostConnection)
                                 {
                                     // TODO: Host migration
-                                    Dispose();
+                                    End(NetworkSessionEndReason.HostEndedSession);
                                 }
                             }
                         }
@@ -716,22 +721,30 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        public void Dispose()
+        internal void End(NetworkSessionEndReason reason)
         {
-            while (machine.LocalGamers.Count > 0)
+            if (IsDisposed)
             {
-                LocalNetworkGamer localGamer = machine.LocalGamers[machine.LocalGamers.Count - 1];
+                return;
+            }
 
-                InvokeGamerLeftEvent(new GamerLeftEventArgs(localGamer));
-                
-                RemoveGamer(localGamer);
+            while (AllGamers.Count > 0)
+            {
+                NetworkGamer gamer = AllGamers[AllGamers.Count - 1];
+                InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
+                RemoveGamer(gamer);
             }
 
             peer.Shutdown("Peer done");
-
+            IsDisposed = true;
             Session = null;
 
-            IsDisposed = true;
+            InvokeSessionEnded(new NetworkSessionEndedEventArgs(reason));
+        }
+
+        public void Dispose()
+        {
+            End(NetworkSessionEndReason.ClientSignedOut);
         }
     }
 }
