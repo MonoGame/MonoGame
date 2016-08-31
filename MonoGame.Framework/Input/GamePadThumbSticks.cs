@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Input
             else
                 ApplySquareClamp();
 
-            SetVirtualButtons(left, right);
+            SetVirtualButtons(leftPosition, rightPosition);
         }
 
         private void ApplySquareClamp()

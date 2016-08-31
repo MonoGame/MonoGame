@@ -16,6 +16,7 @@ namespace MonoGame.Tests.Input
     {
         #region GamePadButtons
 
+#if !XNA
         [TestCaseSource("GetButtons")]
         public void GamePadButtonsTest(params Buttons[] buttons)
         {
@@ -33,6 +34,7 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(buttons.Contains(Buttons.RightStick) ? ButtonState.Pressed : ButtonState.Released, gpb.RightStick);
             Assert.AreEqual(buttons.Contains(Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released, gpb.BigButton);
         }
+#endif
 
         #endregion
 
@@ -51,6 +53,7 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(left, pad.Left);
             Assert.AreEqual(right, pad.Right);
 
+#if !XNA
             var pad2 = new GamePadDPad
             {
                 Up = up,
@@ -71,6 +74,7 @@ namespace MonoGame.Tests.Input
             var pad3 = new GamePadDPad(buttons);
             Assert.AreEqual(pad, pad3);
             Assert.AreEqual(pad.GetHashCode(), pad3.GetHashCode());
+#endif
         }
 
         #endregion
@@ -84,6 +88,7 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(MathHelper.Clamp(left, 0f, 1f), triggers.Left);
             Assert.AreEqual(MathHelper.Clamp(right, 0f, 1f), triggers.Right);
 
+#if !XNA
             var triggers2 = new GamePadTriggers
             {
                 Left = left,
@@ -91,12 +96,14 @@ namespace MonoGame.Tests.Input
             };
             Assert.AreEqual(triggers, triggers2);
             Assert.AreEqual(triggers.GetHashCode(), triggers2.GetHashCode());
+#endif
         }
 
         #endregion
 
         #region Thumbsticks
 
+#if !XNA
         [TestCaseSource("ThumbStickVirtualButtonsIgnoreDeadZoneTestCases")]
         public void ThumbStickVirtualButtonsIgnoreDeadZone(Vector2 left, Vector2 right, GamePadDeadZone deadZone, Buttons expectedButtons)
         {
@@ -104,6 +111,7 @@ namespace MonoGame.Tests.Input
 
             Assert.AreEqual(expectedButtons, GetAllPressedButtons(state));
         }
+#endif
 
         private static IEnumerable<TestCaseData> ThumbStickVirtualButtonsIgnoreDeadZoneTestCases
         {
@@ -132,6 +140,14 @@ namespace MonoGame.Tests.Input
                 yield return new TestCaseData(
                     new Vector2(0.1f, -0.1f), new Vector2(-0.1f, 0.1f), GamePadDeadZone.None,
                     (Buttons)0);
+
+                yield return new TestCaseData(
+                    new Vector2(0.4f, -0.4f), new Vector2(-0.4f, 0.4f), GamePadDeadZone.IndependentAxes,
+                    Buttons.LeftThumbstickRight | Buttons.LeftThumbstickDown | Buttons.RightThumbstickLeft | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(0.4f, 0f), new Vector2(0f, 0.4f), GamePadDeadZone.Circular,
+                    Buttons.LeftThumbstickRight | Buttons.RightThumbstickUp);
             }
         }
 
@@ -142,6 +158,8 @@ namespace MonoGame.Tests.Input
                 buttons |= button;
             return buttons;
         }
+
+#if !XNA
 
         [Test]
         public void ThumbsticksCircularDeadZoneClamping()
@@ -167,6 +185,8 @@ namespace MonoGame.Tests.Input
             Assert.Less(sticks.Right.X, 1);
             Assert.Less(sticks.Right.Y, 1);
         }
+
+#endif
 
         [TestCaseSource("PublicConstructorClampsValuesTestCases")]
         public void PublicConstructorClampsValues(Vector2 left, Vector2 right, Vector2 expectedLeft, Vector2 expectedRight)
@@ -257,8 +277,10 @@ namespace MonoGame.Tests.Input
                     allButtons |= button;
 
             var state = new GamePadState(leftStick, rightStick, leftTrigger, rightTrigger, allButtons);
+#if !XNA
             state.IsConnected = isConnected;
             Assert.AreEqual(isConnected, state.IsConnected);
+#endif
             
             Assert.AreEqual(leftStick, state.ThumbSticks.Left);
             Assert.AreEqual(rightStick, state.ThumbSticks.Right);
@@ -273,8 +295,10 @@ namespace MonoGame.Tests.Input
             foreach (var button in pressedButtons)
                 joinedButtons |= button;
 
+#if !XNA
             var gamePadButtons = state.Buttons;
             Assert.AreEqual(joinedButtons, gamePadButtons.buttons);
+#endif
 
             // all buttons except for thumbstick position buttons and triggers (they're not controlled via buttons here)
             var allButtons = Enum.GetValues(typeof(Buttons)).OfType<Buttons>()
