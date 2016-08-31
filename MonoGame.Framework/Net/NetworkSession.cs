@@ -180,6 +180,9 @@ namespace Microsoft.Xna.Framework.Net
         private IList<NetworkGamer> allRemoteGamers;
 
         private NetBuffer internalBuffer;
+        private DateTime lastTime;
+        private int lastReceivedBytes;
+        private int lastSentBytes;
 
         internal NetworkSession(NetPeer peer, NetConnection hostConnection, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
@@ -220,13 +223,16 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             this.internalBuffer = new NetBuffer();
+            this.lastTime = DateTime.Now;
+            this.lastReceivedBytes = this.peer.Statistics.ReceivedBytes;
+            this.lastSentBytes = this.peer.Statistics.SentBytes;
         }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
         public bool AllowHostMigration { get; set; } // any peer can get, only host can set
         public bool AllowJoinInProgress { get; set; } // any peer can get, only host can set
-        public int BytesPerSecondReceived { get; } // TODO
-        public int BytesPerSecondSent { get; } // TODO
+        public int BytesPerSecondReceived { get; internal set; }
+        public int BytesPerSecondSent { get; internal set; }
 
         internal NetworkMachine HostMachine
         {
@@ -552,7 +558,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void Receive(NetBuffer input, NetworkMachine sender)
+        private void Receive(NetBuffer input, NetworkMachine sender)
         {
             byte messageType = input.ReadByte();
 
@@ -736,6 +742,29 @@ namespace Microsoft.Xna.Framework.Net
                         Send(new GamerJoinRequestMessageSender(), HostMachine);
                     }
                 }
+            }
+
+            UpdateStatistics();
+        }
+
+        private void UpdateStatistics()
+        {
+            DateTime currentTime = DateTime.Now;
+            int receivedBytes = peer.Statistics.ReceivedBytes;
+            int sentBytes = peer.Statistics.SentBytes;
+            double elapsedSeconds = (currentTime - lastTime).TotalSeconds;
+
+            if (elapsedSeconds >= 1.0)
+            {
+                BytesPerSecondReceived = (int)Math.Round((receivedBytes - lastReceivedBytes) / elapsedSeconds);
+                BytesPerSecondSent = (int)Math.Round((sentBytes - lastSentBytes) / elapsedSeconds);
+
+                lastTime = currentTime;
+                lastReceivedBytes = receivedBytes;
+                lastSentBytes = sentBytes;
+
+                Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
+                Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
             }
         }
 
