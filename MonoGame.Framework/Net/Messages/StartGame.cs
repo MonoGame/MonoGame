@@ -27,14 +27,17 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
+            // Reset state after exiting lobby
+            NetworkSession.Session.SessionState = NetworkSessionState.Playing;
+            NetworkSession.Session.InvokeGameStartedEvent(new GameStartedEventArgs());
+
             // Reset ready state for esthetic reasons only, the code that matters is in EndGameMessage!
             foreach (LocalNetworkGamer localGamer in currentMachine.LocalGamers)
             {
-                localGamer.IsReady = false;
-            }
+                localGamer.SetReadyState(false);
 
-            NetworkSession.Session.SessionState = NetworkSessionState.Playing;
-            NetworkSession.Session.InvokeGameStartedEvent(new GameStartedEventArgs());
+                NetworkSession.Session.Send(new GamerStateChangeMessageSender(localGamer, false, true));
+            }
         }
     }
 }

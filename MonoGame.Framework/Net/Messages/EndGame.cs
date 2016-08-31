@@ -40,9 +40,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Tell everyone that our local gamers are not yet ready
             foreach (LocalNetworkGamer localGamer in currentMachine.LocalGamers)
             {
-                localGamer.IsReady = false;
+                localGamer.SetReadyState(false);
+
+                NetworkSession.Session.Send(new GamerStateChangeMessageSender(localGamer, false, true));
             }
-            
+
+            // Reset state before going into lobby
             NetworkSession.Session.SessionState = NetworkSessionState.Lobby;
             NetworkSession.Session.InvokeGameStartedEvent(new GameStartedEventArgs());
         }
