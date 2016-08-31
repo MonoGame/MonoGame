@@ -43,14 +43,19 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            if (!senderMachine.IsHost)
-            {
-                return;
-            }
-
             if (senderMachine.IsLocal)
             {
                 throw new NetworkException("InitializePending should never be sent to self");
+            }
+            if (!senderMachine.IsHost)
+            {
+                Debug.WriteLine("Warning: Received InitializePending from non-host!");
+                return;
+            }
+            if (!currentMachine.IsPending)
+            {
+                Debug.WriteLine("Warning: Received InitializePending when not pending!");
+                return;
             }
 
             // Session state

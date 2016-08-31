@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             // Reset state before going into lobby
             NetworkSession.Session.SessionState = NetworkSessionState.Lobby;
-            NetworkSession.Session.InvokeGameStartedEvent(new GameStartedEventArgs());
+            NetworkSession.Session.InvokeGameEndedEvent(new GameEndedEventArgs());
         }
     }
 }
