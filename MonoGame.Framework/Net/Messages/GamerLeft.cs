@@ -26,26 +26,20 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            byte id = input.ReadByte();
-
             if (senderMachine.IsLocal)
             {
-                NetworkGamer localGamer = NetworkSession.Session.FindGamerById(id);
-
-                if (!localGamer.IsLocal)
-                {
-                    throw new NetworkException("Remote gamer left from local machine");
-                }
-
-                NetworkSession.Session.InvokeGamerLeftEvent(new GamerLeftEventArgs(localGamer));
+                return;
             }
-            else
+
+            byte id = input.ReadByte();
+            NetworkGamer remoteGamer = NetworkSession.Session.FindGamerById(id);
+
+            if (remoteGamer.Machine != senderMachine)
             {
-                NetworkGamer remoteGamer = NetworkSession.Session.FindGamerById(id);
-
-                NetworkSession.Session.InvokeGamerLeftEvent(new GamerLeftEventArgs(remoteGamer));
-                NetworkSession.Session.RemoveGamer(remoteGamer);
+                return;
             }
+
+            NetworkSession.Session.RemoveGamer(remoteGamer);
         }
     }
 }

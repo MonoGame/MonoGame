@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Net
     {
         protected bool isReady;
 
-        internal NetworkGamer(bool isReady, string displayName, string gamertag, byte id, bool isPrivateSlot, NetworkMachine machine, NetworkSession session) : base()
+        internal NetworkGamer(bool isReady, string displayName, string gamertag, byte id, bool isPrivateSlot, NetworkMachine machine) : base()
         {
             this.isReady = isReady;
 
@@ -17,7 +17,6 @@ namespace Microsoft.Xna.Framework.Net
             this.Id = id;
             this.IsPrivateSlot = isPrivateSlot;
             this.Machine = machine;
-            this.Session = session;
         }
 
         public bool HasLeftSession { get; }
@@ -60,6 +59,6 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        public NetworkSession Session { get; }
+        public NetworkSession Session { get { return Machine.Session; } }
     }
 }

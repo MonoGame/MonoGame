@@ -12,8 +12,10 @@ namespace Microsoft.Xna.Framework.Net
         private IList<LocalNetworkGamer> localGamers;
         private IList<NetworkGamer> gamers;
 
-        internal NetworkMachine(NetConnection connection, bool isHost)
+        internal NetworkMachine(NetworkSession session, NetConnection connection, bool isHost)
         {
+            this.Session = session;
+
             this.IsPending = true;
             this.IsLocal = connection == null;
             this.IsHost = isHost;
@@ -26,6 +28,7 @@ namespace Microsoft.Xna.Framework.Net
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
         }
 
+        internal NetworkSession Session { get; }
         internal bool IsPending { get; set; }
         internal bool IsLocal { get; }
         internal bool IsHost { get; }
@@ -85,6 +88,14 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             gamers.Remove(gamer);
+        }
+
+        internal void RemoveGamersLocally()
+        {
+            for (int i = gamers.Count - 1; i >= 0; i--)
+            {
+                Session.RemoveGamer(gamers[i]);
+            }
         }
 
         public void RemoveFromSession()

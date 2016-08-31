@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             bool wasApprovedByHost = input.ReadBoolean();
             byte id = input.ReadByte();
-            
+
             if (!wasApprovedByHost)
             {
                 Debug.WriteLine("Warning: GamerJoinResponse received, GamerJoinRequest declined by host!");
@@ -56,7 +56,6 @@ namespace Microsoft.Xna.Framework.Net.Messages
             LocalNetworkGamer localGamer = new LocalNetworkGamer(id, false, NetworkSession.Session, signedInGamer);
 
             NetworkSession.Session.AddGamer(localGamer);
-
             NetworkSession.Session.Send(new GamerJoinedMessageSender(localGamer));
         }
     }

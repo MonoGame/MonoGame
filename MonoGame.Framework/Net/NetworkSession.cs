@@ -186,7 +186,7 @@ namespace Microsoft.Xna.Framework.Net
             this.packetPool = new PacketPool();
 
             this.peer = peer;
-            this.machine = new NetworkMachine(null, hostConnection == null);
+            this.machine = new NetworkMachine(this, null, hostConnection == null);
             this.hostConnection = hostConnection;
 
             this.pendingSignedInGamers = new List<SignedInGamer>(signedInGamers);
@@ -408,6 +408,8 @@ namespace Microsoft.Xna.Framework.Net
             {
                 allRemoteGamers.Add(gamer);
             }
+
+            InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
         }
 
         internal void RemoveGamer(NetworkGamer gamer)
@@ -418,6 +420,20 @@ namespace Microsoft.Xna.Framework.Net
             if (!gamer.IsLocal)
             {
                 allRemoteGamers.Remove(gamer);
+            }
+
+            InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
+        }
+
+        internal void RemoveGamersLocally()
+        {
+            machine.RemoveGamersLocally();
+
+            foreach (NetConnection connection in peer.Connections)
+            {
+                NetworkMachine remoteMachine = connection.Tag as NetworkMachine;
+
+                remoteMachine.RemoveGamersLocally();
             }
         }
 
@@ -610,7 +626,7 @@ namespace Microsoft.Xna.Framework.Net
                         if (status == NetConnectionStatus.Connected)
                         {
                             // Create a pending network machine
-                            NetworkMachine senderMachine = new NetworkMachine(msg.SenderConnection, msg.SenderConnection == hostConnection);
+                            NetworkMachine senderMachine = new NetworkMachine(this, msg.SenderConnection, msg.SenderConnection == hostConnection);
                             msg.SenderConnection.Tag = senderMachine;
 
                             if (!machine.IsPending)
@@ -634,10 +650,7 @@ namespace Microsoft.Xna.Framework.Net
                             // Remove gamers
                             NetworkMachine disconnectedMachine = msg.SenderConnection.Tag as NetworkMachine;
 
-                            foreach (NetworkGamer gamer in disconnectedMachine.Gamers)
-                            {
-                                InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
-                            }
+                            disconnectedMachine.RemoveGamersLocally();
 
                             if (IsHost)
                             {
@@ -733,14 +746,10 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            while (AllGamers.Count > 0)
-            {
-                NetworkGamer gamer = AllGamers[AllGamers.Count - 1];
-                InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
-                RemoveGamer(gamer);
-            }
+            RemoveGamersLocally();
 
             peer.Shutdown("Peer done");
+
             IsDisposed = true;
             Session = null;
 
