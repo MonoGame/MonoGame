@@ -213,7 +213,7 @@
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
 
-    <Compile Include="Net\Messages\ConnectToAllRequest.cs">
+    <Compile Include="Net\Messages\InitializePending.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Messages\NoLongerPending.cs">
