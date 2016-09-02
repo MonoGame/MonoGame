@@ -145,12 +145,12 @@ namespace Microsoft.Xna.Framework.Net
 
             Thread.Sleep(JoinTime);
 
-            if (peer.ConnectionsCount == 0)
+            if (peer.ConnectionsCount != 1)
             {
                 throw new NetworkSessionJoinException("Connection failed", NetworkSessionJoinError.SessionNotFound);
             }
 
-            NetConnection hostConnection = peer.GetConnection(availableSession.remoteEndPoint);
+            NetConnection hostConnection = peer.Connections[0];
             int maxGamers = availableSession.maxGamers;
             int privateGamerSlots = availableSession.privateGamerSlots;
             NetworkSessionType sessionType = availableSession.sessionType;
@@ -219,9 +219,6 @@ namespace Microsoft.Xna.Framework.Net
             this.lastTime = DateTime.Now;
             this.lastReceivedBytes = this.peer.Statistics.ReceivedBytes;
             this.lastSentBytes = this.peer.Statistics.SentBytes;
-
-            // Store machine in peer tag
-            this.peer.Tag = this.machine;
         }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
@@ -554,18 +551,18 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        private void Receive(NetBuffer input, NetworkMachine sender)
+        private void Receive(NetBuffer input, NetworkMachine senderMachine)
         {
             byte messageType = input.ReadByte();
 
             if ((InternalMessageType)messageType != InternalMessageType.User)
             {
-                Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(sender) + "...");
+                Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(senderMachine) + "...");
             }
 
             Type receiverToInstantiate = InternalMessage.MessageToReceiverTypeMap[messageType];
             IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
-            receiver.Receive(input, machine, sender);
+            receiver.Receive(input, machine, senderMachine);
         }
 
         public void Update()
@@ -733,7 +730,7 @@ namespace Microsoft.Xna.Framework.Net
                     Send(new NoLongerPendingMessageSender());
 
                     // Handle pending signed in gamers
-                    if (pendingSignedInGamers.Count > 0)
+                    for (int i = 0; i < pendingSignedInGamers.Count; i++)
                     {
                         Send(new GamerJoinRequestMessageSender(), HostMachine);
                     }
@@ -759,6 +756,7 @@ namespace Microsoft.Xna.Framework.Net
                 lastReceivedBytes = receivedBytes;
                 lastSentBytes = sentBytes;
 
+                /*
                 Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
                 Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
                 
@@ -766,6 +764,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     Debug.WriteLine("Gamer: " + gamer.DisplayName + "(" + gamer.Id + ")");
                 }
+                */
             }
         }
 

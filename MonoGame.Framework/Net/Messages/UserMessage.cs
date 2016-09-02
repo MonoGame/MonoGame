@@ -58,6 +58,18 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             NetworkGamer sender = NetworkSession.Session.FindGamerById(senderId);
 
+            // Sender gamer might not yet have been added
+            if (sender == null)
+            {
+                return;
+            }
+
+            if (sender.Machine != senderMachine)
+            {
+                Debug.WriteLine("Warning: User message sender does not belong to the sender machine!");
+                return;
+            }
+
             if (sendToAll)
             {
                 foreach (LocalNetworkGamer localGamer in NetworkSession.Session.LocalGamers)
@@ -67,13 +79,21 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
             else
             {
-                LocalNetworkGamer localGamer = NetworkSession.Session.FindGamerById(recipientId) as LocalNetworkGamer;
+                NetworkGamer recipient = NetworkSession.Session.FindGamerById(recipientId);
 
-                if (localGamer == null)
+                // Recipient gamer might not yet have been added
+                if (recipient == null)
+                {
+                    return;
+                }
+
+                if (!recipient.IsLocal)
                 {
                     Debug.WriteLine("Warning: User message sent to the wrong peer!");
                     return;
                 }
+
+                LocalNetworkGamer localGamer = recipient as LocalNetworkGamer;
 
                 localGamer.InboundPackets.Add(new InboundPacket(packet, sender));
             }
