@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     isReady = value;
 
-                    Session.Send(new GamerStateChangeMessageSender(this, false, true));
+                    Session.Send(new GamerStateChangedSender(this, false, true));
                 }
             }
         }

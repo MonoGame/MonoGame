@@ -7,16 +7,16 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct InitializePendingMessageSender : IInternalMessageSender
+    internal struct ConnectToAllRequestSender : IInternalMessageSender
     {
         private ICollection<NetConnection> requestedConnections;
 
-        public InitializePendingMessageSender(ICollection<NetConnection> requestedConnections)
+        public ConnectToAllRequestSender(ICollection<NetConnection> requestedConnections)
         {
             this.requestedConnections = requestedConnections;
         }
 
-        public InternalMessageType MessageType { get { return InternalMessageType.InitializePending; } }
+        public InternalMessageType MessageType { get { return InternalMessageType.ConnectToAllRequest; } }
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
@@ -24,13 +24,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
         {
             if (!currentMachine.IsHost)
             {
-                throw new NetworkException("Only host can send InitializePending");
+                throw new NetworkException("Only host can send ConnectToAllRequest");
             }
-
-            // Session state
-            output.Write((byte)NetworkSession.Session.SessionState);
-
-            // Requested connections
+            
             output.Write((int)requestedConnections.Count);
             foreach (NetConnection c in requestedConnections)
             {
@@ -39,40 +35,38 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct InitializePendingMessageReceiver : IInternalMessageReceiver
+    internal struct ConnectToAllRequestReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
-                throw new NetworkException("InitializePending should never be sent to self");
+                throw new NetworkException("ConnectToAllRequest should never be sent to self");
             }
             if (!senderMachine.IsHost)
             {
-                Debug.WriteLine("Warning: Received InitializePending from non-host!");
+                // TODO: SuspiciousHostClaim
+                Debug.WriteLine("Warning: Received ConnectToAllRequest from non-host!");
                 return;
             }
-            if (!currentMachine.IsPending)
+            if (currentMachine.IsFullyConnected)
             {
-                Debug.WriteLine("Warning: Received InitializePending when not pending!");
+                // TODO: SuspiciousRepeatedInfo
+                Debug.WriteLine("Warning: Received ConnectToAllRequest when already fully connected!");
                 return;
             }
 
-            // Session state
-            NetworkSession.Session.SessionState = (NetworkSessionState)input.ReadByte();
-
-            // Requested connections
             int requestedConnectionCount = input.ReadInt32();
 
-            NetworkSession.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
+            currentMachine.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
             for (int i = 0; i < requestedConnectionCount; i++)
             {
                 IPEndPoint endPoint = input.ReadIPEndPoint();
-                NetworkSession.Session.pendingEndPoints.Add(endPoint);
+                currentMachine.Session.pendingEndPoints.Add(endPoint);
 
-                if (!NetworkSession.Session.IsConnectedToEndPoint(endPoint))
+                if (!currentMachine.Session.IsConnectedToEndPoint(endPoint))
                 {
-                    NetworkSession.Session.peer.Connect(endPoint);
+                    currentMachine.Session.peer.Connect(endPoint);
                 }
             }
         }

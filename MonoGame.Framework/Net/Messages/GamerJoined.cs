@@ -3,11 +3,11 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerJoinedMessageSender : IInternalMessageSender
+    internal struct GamerJoinedSender : IInternalMessageSender
     {
         private LocalNetworkGamer localGamer;
 
-        public GamerJoinedMessageSender(LocalNetworkGamer localGamer)
+        public GamerJoinedSender(LocalNetworkGamer localGamer)
         {
             this.localGamer = localGamer;
         }
@@ -26,12 +26,17 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct GamerJoinedMessageReceiver : IInternalMessageReceiver
+    internal struct GamerJoinedReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
+                return;
+            }
+            if (!senderMachine.IsFullyConnected)
+            {
+                // TODO: SuspiciousUnexpectedMessage
                 return;
             }
 
@@ -41,28 +46,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool isPrivateSlot = input.ReadBoolean();
             bool isReady = input.ReadBoolean();
 
-            /*
-            if (currentMachine.IsHost && isHost)
+            if (currentMachine.Session.FindGamerById(id) != null)
             {
-                // New gamer is claiming to be host but we know we are, let them
-                // join (to keep gamer lists in sync) but kick them asap
-                senderMachine.RemoveFromSession();
-            }
-            */
-
-            if (NetworkSession.Session.FindGamerById(id) != null)
-            {
-                // New gamer is trying to use an id that is already being used
-                if (currentMachine.IsHost)
-                {
-                    senderMachine.RemoveFromSession();
-                }
-
+                // TODO: SuspiciousGamerIdCollision
                 return;
             }
 
             NetworkGamer remoteGamer = new NetworkGamer(senderMachine, displayName, gamertag, id, isPrivateSlot, isReady);
-            NetworkSession.Session.AddGamer(remoteGamer);
+            currentMachine.Session.AddGamer(remoteGamer);
         }
     }
 }

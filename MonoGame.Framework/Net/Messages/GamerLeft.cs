@@ -3,11 +3,11 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerLeftMessageSender : IInternalMessageSender
+    internal struct GamerLeftSender : IInternalMessageSender
     {
         private LocalNetworkGamer localGamer;
 
-        public GamerLeftMessageSender(LocalNetworkGamer localGamer)
+        public GamerLeftSender(LocalNetworkGamer localGamer)
         {
             this.localGamer = localGamer;
         }
@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct GamerLeftMessageReceiver : IInternalMessageReceiver
+    internal struct GamerLeftReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
@@ -30,16 +30,22 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 return;
             }
-
-            byte id = input.ReadByte();
-            NetworkGamer remoteGamer = NetworkSession.Session.FindGamerById(id);
-
-            if (remoteGamer.Machine != senderMachine)
+            if (!senderMachine.IsFullyConnected)
             {
+                // TODO: SuspiciousUnexpectedMessage
                 return;
             }
 
-            NetworkSession.Session.RemoveGamer(remoteGamer);
+            byte id = input.ReadByte();
+            NetworkGamer remoteGamer = currentMachine.Session.FindGamerById(id);
+
+            if (remoteGamer.Machine != senderMachine)
+            {
+                // TODO: SuspiciousUnexpectedMessage
+                return;
+            }
+
+            currentMachine.Session.RemoveGamer(remoteGamer);
         }
     }
 }

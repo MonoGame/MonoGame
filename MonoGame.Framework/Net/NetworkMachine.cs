@@ -16,7 +16,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             this.Session = session;
 
-            this.IsPending = true;
+            this.IsFullyConnected = false;
+            this.HasAcknowledgedLocalMachine = false;
             this.IsLocal = connection == null;
             this.IsHost = isHost;
 
@@ -29,7 +30,8 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         internal NetworkSession Session { get; }
-        internal bool IsPending { get; set; }
+        internal bool IsFullyConnected { get; set; }
+        internal bool HasAcknowledgedLocalMachine { get; set; }
         internal bool IsLocal { get; }
         internal bool IsHost { get; }
         internal GamerCollection<LocalNetworkGamer> LocalGamers { get; }

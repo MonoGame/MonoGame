@@ -3,20 +3,20 @@ using System;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerStateChangeMessageSender : IInternalMessageSender
+    internal struct GamerStateChangedSender : IInternalMessageSender
     {
         private LocalNetworkGamer localGamer;
         private bool sendNames;
         private bool sendFlags;
 
-        public GamerStateChangeMessageSender(LocalNetworkGamer localGamer, bool sendNames, bool sendFlags)
+        public GamerStateChangedSender(LocalNetworkGamer localGamer, bool sendNames, bool sendFlags)
         {
             this.localGamer = localGamer;
             this.sendNames = sendNames;
             this.sendFlags = sendFlags;
         }
 
-        public InternalMessageType MessageType { get { return InternalMessageType.GamerStateChange; } }
+        public InternalMessageType MessageType { get { return InternalMessageType.GamerStateChanged; } }
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct GamerStateChangeMessageReceiver : IInternalMessageReceiver
+    internal struct GamerStateChangedReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
@@ -50,10 +50,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             byte id = input.ReadByte();
-            NetworkGamer remoteGamer = NetworkSession.Session.FindGamerById(id);
+            NetworkGamer remoteGamer = currentMachine.Session.FindGamerById(id);
 
             if (remoteGamer.Machine != senderMachine)
             {
+                // TODO: SuspiciousUnexpectedMessage
                 return;
             }
 

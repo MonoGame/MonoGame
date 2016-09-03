@@ -19,15 +19,15 @@ namespace Microsoft.Xna.Framework.Net.Messages
             this.packet = packet;
         }
 
-        public InternalMessageType MessageType { get { return InternalMessageType.User; } }
+        public InternalMessageType MessageType { get { return InternalMessageType.UserMessage; } }
         public int SequenceChannel { get { return 0; } }
         public SendDataOptions Options { get { return options; } }
 
         public void Send(NetBuffer output, NetworkMachine currentMachine)
         {
-            if (currentMachine.IsPending)
+            if (!currentMachine.IsFullyConnected)
             {
-                throw new NetworkException("User message from pending machine");
+                throw new NetworkException("UserMessage from not fully connected peer");
             }
 
             bool sendToAll = recipient == null;
@@ -44,8 +44,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            if (currentMachine.IsPending || senderMachine.IsPending)
+            if (!currentMachine.IsFullyConnected)
             {
+                // TODO: SuspiciousUnexpectedMessage
+                return;
+            }
+            if (!senderMachine.IsFullyConnected)
+            {
+                // TODO: SuspiciousUnexpectedMessage
                 return;
             }
 
@@ -53,20 +59,21 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool sendToAll = input.ReadBoolean();
             byte recipientId = input.ReadByte();
             int length = input.ReadInt32();
-            Packet packet = NetworkSession.Session.packetPool.GetPacket(length);
+            Packet packet = currentMachine.Session.packetPool.GetPacket(length);
             input.ReadBytes(packet.data, 0, length);
 
-            NetworkGamer sender = NetworkSession.Session.FindGamerById(senderId);
+            NetworkGamer sender = currentMachine.Session.FindGamerById(senderId);
 
-            // Sender gamer might not yet have been added
             if (sender == null)
             {
+                // TODO: Check previous gamers in case the remove message came before this, otherwise:
+                // TODO: SuspiciousInvalidGamerId
                 return;
             }
-
             if (sender.Machine != senderMachine)
             {
                 Debug.WriteLine("Warning: User message sender does not belong to the sender machine!");
+                // TODO: SuspiciousInvalidGamerId
                 return;
             }
 
@@ -81,20 +88,20 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 NetworkGamer recipient = NetworkSession.Session.FindGamerById(recipientId);
 
-                // Recipient gamer might not yet have been added
                 if (recipient == null)
                 {
+                    // TODO: Check previous gamers in case the remove message came before this, otherwise:
+                    // TODO: SuspiciousInvalidGamerId
                     return;
                 }
-
                 if (!recipient.IsLocal)
                 {
                     Debug.WriteLine("Warning: User message sent to the wrong peer!");
+                    // TODO: SuspiciousInvalidGamerId
                     return;
                 }
 
                 LocalNetworkGamer localGamer = recipient as LocalNetworkGamer;
-
                 localGamer.InboundPackets.Add(new InboundPacket(packet, sender));
             }
         }

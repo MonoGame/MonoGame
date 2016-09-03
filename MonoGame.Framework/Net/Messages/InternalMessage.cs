@@ -5,31 +5,33 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal enum InternalMessageType
     {
-        InitializePending,
-        NoLongerPending,
-        GamerJoinRequest,
-        GamerJoinResponse,
+        ConnectionAcknowledged,
+        ConnectToAllRequest,
+        FullyConnected,
+        GamerIdRequest,
+        GamerIdResponse,
         GamerJoined,
         GamerLeft,
-        GamerStateChange,
-        StartGame,
-        EndGame,
-        User
+        GamerStateChanged,
+        GameStarted,
+        GameEnded,
+        UserMessage
     }
 
     internal static class InternalMessage
     {
         public static Type[] MessageToReceiverTypeMap = new Type[]
         {
-            typeof(InitializePendingMessageReceiver),
-            typeof(NoLongerPendingMessageReceiver),
-            typeof(GamerJoinRequestMessageReceiver),
-            typeof(GamerJoinResponseMessageReceiver),
-            typeof(GamerJoinedMessageReceiver),
-            typeof(GamerLeftMessageReceiver),
-            typeof(GamerStateChangeMessageReceiver),
-            typeof(StartGameMessageReceiver),
-            typeof(EndGameMessageReceiver),
+            typeof(ConnectionAcknowledgedReceiver),
+            typeof(ConnectToAllRequestReceiver),
+            typeof(FullyConnectedReceiver),
+            typeof(GamerIdRequestReceiver),
+            typeof(GamerIdResponseReceiver),
+            typeof(GamerJoinedReceiver),
+            typeof(GamerLeftReceiver),
+            typeof(GamerStateChangedReceiver),
+            typeof(GameStartedReceiver),
+            typeof(GameEndedReceiver),
             typeof(UserMessageReceiver)
         };
     }

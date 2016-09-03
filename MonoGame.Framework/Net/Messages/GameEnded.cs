@@ -1,11 +1,12 @@
 ﻿using Lidgren.Network;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct EndGameMessageSender : IInternalMessageSender
+    internal struct GameEndedSender : IInternalMessageSender
     {
-        public InternalMessageType MessageType { get { return InternalMessageType.EndGame; } }
+        public InternalMessageType MessageType { get { return InternalMessageType.GameEnded; } }
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
@@ -18,19 +19,21 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct EndGameMessageReceiver : IInternalMessageReceiver
+    internal struct GameEndedReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
+                // TODO: SuspiciousHostClaim
+                Debug.WriteLine("Warning: Received GameEnded from non-host!");
                 return;
             }
 
             // Make sure that the host can not accidentaly start the game too early
             if (currentMachine.IsHost)
             {
-                foreach (NetworkGamer gamer in NetworkSession.Session.AllGamers)
+                foreach (NetworkGamer gamer in currentMachine.Session.AllGamers)
                 {
                     // Safe because any ready state change from a remote gamer will happen after the scope of this Receive() call
                     gamer.SetReadyState(false);
@@ -42,12 +45,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 localGamer.SetReadyState(false);
 
-                NetworkSession.Session.Send(new GamerStateChangeMessageSender(localGamer, false, true));
+                currentMachine.Session.Send(new GamerStateChangedSender(localGamer, false, true));
             }
 
             // Reset state before going into lobby
-            NetworkSession.Session.SessionState = NetworkSessionState.Lobby;
-            NetworkSession.Session.InvokeGameEndedEvent(new GameEndedEventArgs());
+            currentMachine.Session.SessionState = NetworkSessionState.Lobby;
+            currentMachine.Session.InvokeGameEndedEvent(new GameEndedEventArgs());
         }
     }
 }

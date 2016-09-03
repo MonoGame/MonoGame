@@ -337,7 +337,7 @@ namespace Microsoft.Xna.Framework.Net
 
             pendingSignedInGamers.Add(signedInGamer);
 
-            Send(new GamerJoinRequestMessageSender(), HostMachine);
+            Send(new GamerIdRequestSender(), HostMachine);
         }
 
         public void StartGame()
@@ -359,7 +359,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("Not all players are ready"); // TODO: See if this is the expected behavior
             }
 
-            Send(new StartGameMessageSender());
+            Send(new GameStartedSender());
         }
 
         public void EndGame()
@@ -377,7 +377,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("The game can only end from the playing state");
             }
 
-            Send(new EndGameMessageSender());
+            Send(new GameEndedSender());
         }
 
         public void ResetReady() // only host
@@ -506,7 +506,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void Send(IInternalMessageSender message)
         {
-            if (message.MessageType != InternalMessageType.User)
+            if (message.MessageType != InternalMessageType.UserMessage)
             {
                 Debug.WriteLine("Sending " + message.MessageType + " to all peers...");
             }
@@ -530,7 +530,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ArgumentNullException("recipient");
             }
 
-            if (message.MessageType != InternalMessageType.User)
+            if (message.MessageType != InternalMessageType.UserMessage)
             {
                 Debug.WriteLine("Sending " + message.MessageType + " to " + MachineOwnerName(recipient) + "...");
             }
@@ -555,7 +555,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             byte messageType = input.ReadByte();
 
-            if ((InternalMessageType)messageType != InternalMessageType.User)
+            if ((InternalMessageType)messageType != InternalMessageType.UserMessage)
             {
                 Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(senderMachine) + "...");
             }
@@ -628,9 +628,9 @@ namespace Microsoft.Xna.Framework.Net
                             NetworkMachine senderMachine = new NetworkMachine(this, msg.SenderConnection, msg.SenderConnection == hostConnection);
                             msg.SenderConnection.Tag = senderMachine;
 
-                            if (!machine.IsPending)
+                            if (!machine.IsFullyConnected)
                             {
-                                Send(new NoLongerPendingMessageSender(), senderMachine);
+                                Send(new FullyConnectedSender(), senderMachine);
                             }
 
                             if (IsHost)
@@ -640,7 +640,7 @@ namespace Microsoft.Xna.Framework.Net
                                 requestedConnections.Remove(msg.SenderConnection);
                                 pendingPeerConnections.Add(msg.SenderConnection, requestedConnections);
 
-                                Send(new InitializePendingMessageSender(requestedConnections), senderMachine);
+                                Send(new ConnectToAllRequestSender(requestedConnections), senderMachine);
                             }
                         }
 
@@ -661,7 +661,7 @@ namespace Microsoft.Xna.Framework.Net
                                 {
                                     NetworkMachine pendingMachine = pendingPeer.Key.Tag as NetworkMachine;
 
-                                    if (!pendingMachine.IsPending)
+                                    if (!pendingMachine.IsFullyConnected)
                                     {
                                         continue;
                                     }
@@ -670,7 +670,7 @@ namespace Microsoft.Xna.Framework.Net
                                     {
                                         pendingPeer.Value.Remove(msg.SenderConnection);
 
-                                        Send(new InitializePendingMessageSender(pendingPeer.Value), pendingMachine);
+                                        Send(new ConnectToAllRequestSender(pendingPeer.Value), pendingMachine);
                                     }
                                 }
                             }
@@ -713,13 +713,14 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Handle pending machine
-            if (machine.IsPending && pendingEndPoints != null)
+            if (machine.IsFullyConnected && pendingEndPoints != null)
             {
                 bool done = true;
 
                 foreach (IPEndPoint endPoint in pendingEndPoints)
                 {
-                    if (!IsConnectedToEndPoint(endPoint))
+                    if (!(IsConnectedToEndPoint(endPoint) &&
+                        (peer.GetConnection(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
                     {
                         done = false;
                     }
@@ -727,12 +728,12 @@ namespace Microsoft.Xna.Framework.Net
 
                 if (done)
                 {
-                    Send(new NoLongerPendingMessageSender());
+                    Send(new FullyConnectedSender());
 
                     // Handle pending signed in gamers
                     for (int i = 0; i < pendingSignedInGamers.Count; i++)
                     {
-                        Send(new GamerJoinRequestMessageSender(), HostMachine);
+                        Send(new GamerIdRequestSender(), HostMachine);
                     }
                 }
             }
