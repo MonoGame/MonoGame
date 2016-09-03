@@ -272,15 +272,12 @@ namespace MonoGame.Tests.Audio
         public void InstanceNotDisposedWhenGameDisposed()
         {
             var game = new Game();
-            var s = new SoundEffectInstance();
             var d = new DynamicSoundEffectInstance(44100, AudioChannels.Stereo);
 
             game.Dispose();
 
-            Assert.IsFalse(s.IsDisposed);
             Assert.IsFalse(d.IsDisposed);
 
-            s.Dispose();
             d.Dispose();
         }
 
