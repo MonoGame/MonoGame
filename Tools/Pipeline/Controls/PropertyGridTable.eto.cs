@@ -33,7 +33,6 @@ namespace MonoGame.Tools.Pipeline
             drawable.MouseUp += Drawable_MouseUp;
             drawable.MouseMove += Drawable_MouseMove;
             drawable.MouseLeave += Drawable_MouseLeave;
-            drawable.MouseDoubleClick += Drawable_MouseDoubleClick;
             SizeChanged += PropertyGridTable_SizeChanged;
         }
     }

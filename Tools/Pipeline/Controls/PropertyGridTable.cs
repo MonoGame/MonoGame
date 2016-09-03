@@ -64,6 +64,7 @@ namespace MonoGame.Tools.Pipeline
         private int _separatorPos;
         private int _moveSeparator;
         private int _height;
+        private bool _skipEdit;
 
         public PropertyGridTable()
         {
@@ -74,6 +75,7 @@ namespace MonoGame.Tools.Pipeline
             _mouseLocation = new Point(-1, -1);
             _cells = new List<CellBase>();
             _moveSeparator = -_separatorWidth / 2 - 1;
+            _skipEdit = false;
 
             Group = true;
         }
@@ -84,9 +86,10 @@ namespace MonoGame.Tools.Pipeline
             ClearChildren();
         }
 
-        private void ClearChildren()
+        private bool ClearChildren()
         {
             var children = pixel1.Children.ToList();
+            var ret = children.Count > 1;
 
             foreach (var control in children)
             {
@@ -98,6 +101,8 @@ namespace MonoGame.Tools.Pipeline
                     pixel1.Remove(control);
                 }
             }
+
+            return ret;
         }
 
         private Type GetCellType(IEnumerable<Type> types, string name, Type type)
@@ -229,7 +234,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void Drawable_MouseDown(object sender, MouseEventArgs e)
         {
-            ClearChildren();
+            _skipEdit = ClearChildren();
             if (_currentCursor == CursorType.VerticalSplit)
                 _moveSeparator = (int)e.Location.X - _separatorPos;
         }
@@ -237,6 +242,18 @@ namespace MonoGame.Tools.Pipeline
         private void Drawable_MouseUp(object sender, MouseEventArgs e)
         {
             _moveSeparator = - _separatorWidth / 2 - 1;
+
+            if (e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable && !_skipEdit)
+            {
+                var action = new Action(() => _selectedCell.Edit(pixel1));
+
+#if WINDOWS
+                (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action, 
+                    System.Windows.Threading.DispatcherPriority.ContextIdle, null);
+#else
+                action.Invoke();
+#endif
+            }
         }
 
         private void Drawable_MouseMove(object sender, MouseEventArgs e)
@@ -254,22 +271,7 @@ namespace MonoGame.Tools.Pipeline
             _mouseLocation = new Point(-1, -1);
             drawable.Invalidate();
 
-            Drawable_MouseUp(sender, e);
-        }
-
-        private void Drawable_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            if (e.Location.X >= _separatorPos && _selectedCell != null && _selectedCell.Editable)
-            {
-                var action = new Action(() => _selectedCell.Edit(pixel1));
-
-#if WINDOWS
-                (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action, 
-                    System.Windows.Threading.DispatcherPriority.ContextIdle, null);
-#else
-                action.Invoke();
-#endif
-            }
+            _moveSeparator = -_separatorWidth / 2 - 1;
         }
 
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
