@@ -269,15 +269,22 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<ArgumentException>(() => new SoundEffect(new byte[2], 0, 2, 8000, AudioChannels.Mono, 0, int.MaxValue));
         }
 
+        // TODO creating/disposing a Game should not create/dispose the master voice
+        [Test]
         public void InstanceNotDisposedWhenGameDisposed()
         {
             var game = new Game();
+
+            var se = new SoundEffect(new byte[16000], 8000, AudioChannels.Mono);
+            var s = se.CreateInstance();
             var d = new DynamicSoundEffectInstance(44100, AudioChannels.Stereo);
 
             game.Dispose();
 
+            Assert.IsFalse(s.IsDisposed);
             Assert.IsFalse(d.IsDisposed);
 
+            s.Dispose();
             d.Dispose();
         }
 
