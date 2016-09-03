@@ -79,14 +79,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             if (sendToAll)
             {
-                foreach (LocalNetworkGamer localGamer in NetworkSession.Session.LocalGamers)
+                foreach (LocalNetworkGamer localGamer in currentMachine.Session.LocalGamers)
                 {
                     localGamer.InboundPackets.Add(new InboundPacket(packet, sender));
                 }
             }
             else
             {
-                NetworkGamer recipient = NetworkSession.Session.FindGamerById(recipientId);
+                NetworkGamer recipient = currentMachine.Session.FindGamerById(recipientId);
 
                 if (recipient == null)
                 {

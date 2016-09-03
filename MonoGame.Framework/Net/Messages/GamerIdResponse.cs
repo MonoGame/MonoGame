@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             byte id;
-            bool wasApprovedByHost = NetworkSession.Session.GetNewUniqueId(out id);
+            bool wasApprovedByHost = currentMachine.Session.GetNewUniqueId(out id);
 
             output.Write(wasApprovedByHost);
             output.Write(id);
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Host approved request, now possible to create network gamer
-            SignedInGamer signedInGamer = NetworkSession.Session.pendingSignedInGamers[0];
+            SignedInGamer signedInGamer = currentMachine.Session.pendingSignedInGamers[0];
             currentMachine.Session.pendingSignedInGamers.RemoveAt(0);
 
             LocalNetworkGamer localGamer = new LocalNetworkGamer(currentMachine, signedInGamer, id, false);

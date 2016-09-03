@@ -213,37 +213,40 @@
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
 
-    <Compile Include="Net\Messages\InitializePending.cs">
+    <Compile Include="Net\Messages\ConnectionAcknowledged.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Messages\NoLongerPending.cs">
+    <Compile Include="Net\Messages\ConnectToAllRequest.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Messages\FullyConnected.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Messages\GameEnded.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Messages\GamerIdRequest.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Messages\GamerIdResponse.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Messages\GamerJoined.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Messages\GamerJoinRequest.cs">
-      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GamerJoinResponse.cs">
-      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
-    </Compile>
     <Compile Include="Net\Messages\GamerLeft.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Messages\GamerStateChanged.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Messages\GameStarted.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Messages\InternalMessage.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Messages\UserMessage.cs">
-      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\GamerStateChange.cs">
-      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\StartGame.cs">
-      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
-    </Compile>
-    <Compile Include="Net\Messages\EndGame.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
 

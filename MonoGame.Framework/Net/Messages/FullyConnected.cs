@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Remote peer?
             if (currentMachine.IsHost && !senderMachine.IsLocal)
             {
-                NetworkSession.Session.pendingPeerConnections.Remove(senderMachine.connection);
+                currentMachine.Session.pendingPeerConnections.Remove(senderMachine.connection);
             }
         }
     }
