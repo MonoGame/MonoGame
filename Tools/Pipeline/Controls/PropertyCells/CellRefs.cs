@@ -23,7 +23,10 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new ReferenceDialog(PipelineController.Instance, (Value as List<string>).ToArray());
             if (dialog.Run(control) == DialogResult.Ok && _eventHandler != null)
+            {
                 _eventHandler(dialog.References, EventArgs.Empty);
+                PipelineController.Instance.OnReferencesModified();
+            }
         }
     }
 }
