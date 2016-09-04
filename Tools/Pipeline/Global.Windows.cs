@@ -37,25 +37,7 @@ namespace MonoGame.Tools.Pipeline
             return System.Drawing.Icon.FromHandle(large);
         }
 
-        private static BitmapSource Convert(System.Drawing.Bitmap bitmap)
-        {
-            var ret = new BitmapImage();
-
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
-                memory.Position = 0;
-
-                ret.BeginInit();
-                ret.StreamSource = memory;
-                ret.CacheOption = BitmapCacheOption.OnLoad;
-                ret.EndInit();
-            }
-
-            return ret;
-        }
-
-        private static Image PlatformGetDirectoryIcon(bool exists)
+        private static System.Drawing.Bitmap PlatformGetDirectoryIcon(bool exists)
         {
             System.Drawing.Bitmap icon;
 
@@ -64,10 +46,10 @@ namespace MonoGame.Tools.Pipeline
             else
                 icon = ExtractIcon(234).ToBitmap();
 
-            return new Bitmap(new BitmapHandler(Convert(icon)));
+            return icon;
         }
 
-        private static Image PlatformGetFileIcon(string path, bool exists)
+        private static System.Drawing.Bitmap PlatformGetFileIcon(string path, bool exists)
         {
             System.Drawing.Bitmap icon;
 
@@ -85,7 +67,39 @@ namespace MonoGame.Tools.Pipeline
             else
                 icon = ExtractIcon(271).ToBitmap();
 
-            return new Bitmap(new BitmapHandler(Convert(icon)));
+            return icon;
+        }
+
+        private static Bitmap ToEtoImage(System.Drawing.Bitmap bitmap)
+        {
+            var ret = new BitmapImage();
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                stream.Position = 0;
+
+                ret.BeginInit();
+                ret.StreamSource = stream;
+                ret.CacheOption = BitmapCacheOption.OnLoad;
+                ret.EndInit();
+            }
+
+            return new Bitmap(new BitmapHandler(ret));
+        }
+
+        private static Xwt.Drawing.Image ToXwtImage(System.Drawing.Bitmap bitmap)
+        {
+            Xwt.Drawing.Image ret;
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                stream.Position = 0;
+                ret = Xwt.Drawing.Image.FromStream(stream);
+            }
+           
+            return ret.Scale(0.5);
         }
 
         private static void PlatformShowOpenWithDialog(string filePath)

@@ -54,7 +54,7 @@ namespace MonoGame.Tools.Pipeline
         public void ShowContextMenu()
         {
             if (PipelineController.Instance.ProjectOpen)
-                _contextMenu.Show(projectControl);
+                _contextMenu.Show(projectControl.ToEto());
         }
 
         #region IView implements
@@ -167,7 +167,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void EndTreeUpdate()
         {
-            projectControl.RefreshData();
+            
         }
 
         public void UpdateProperties()

@@ -3,8 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Eto.Forms;
-using Eto.Drawing;
+using Xwt;
+using Xwt.Drawing;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -14,13 +14,16 @@ namespace MonoGame.Tools.Pipeline
         {
             set
             {
-                this.Content = value ? (Control)treeView : textArea;
+                this.Content = value ? treeView.ToEto() : textArea;
             }
         }
 
         private OutputParser _output;
-        private TreeItem _root, _last;
-        private Icon _iconClean, _iconFail, _iconProcessing, _iconSkip, _iconStartEnd, _iconSucceed;
+        private TreeStore _treeStore;
+        private readonly DataField<Image> _dataImage;
+        private readonly DataField<string> _dataText;
+        private TreePosition _last;
+        private Image _iconClean, _iconFail, _iconProcessing, _iconSkip, _iconStartEnd, _iconSucceed;
 
         public BuildOutput()
         {
@@ -28,20 +31,26 @@ namespace MonoGame.Tools.Pipeline
 
             _output = new OutputParser();
 
-            _iconClean = Icon.FromResource("Build.Clean.png");
-            _iconFail = Icon.FromResource("Build.Fail.png");
-            _iconProcessing = Icon.FromResource("Build.Processing.png");
-            _iconSkip = Icon.FromResource("Build.Skip.png");
-            _iconStartEnd = Icon.FromResource("Build.StartEnd.png");
-            _iconSucceed = Icon.FromResource("Build.Succeed.png");
+            _iconClean = Image.FromResource("Build.Clean.png");
+            _iconFail = Image.FromResource("Build.Fail.png");
+            _iconProcessing = Image.FromResource("Build.Processing.png");
+            _iconSkip = Image.FromResource("Build.Skip.png");
+            _iconStartEnd = Image.FromResource("Build.StartEnd.png");
+            _iconSucceed = Image.FromResource("Build.Succeed.png");
 
-            treeView.DataStore = _root = new TreeItem();
+            _dataImage = new DataField<Image>();
+            _dataText = new DataField<string>();
+
+            _treeStore = new TreeStore(_dataImage, _dataText);
+
+            treeView.DataSource = _treeStore;
+            treeView.Columns.Add("", _dataImage, _dataText);
         }
 
         public void ClearOutput()
         {
             textArea.Text = "";
-            treeView.DataStore = _root = new TreeItem();
+            _treeStore.Clear();
         }
 
         public void WriteLine(string line)
@@ -72,7 +81,7 @@ namespace MonoGame.Tools.Pipeline
                     AddItem(line);
                     break;
                 case OutputState.BuildError:
-                    _last.Image = _iconFail;
+                    _treeStore.GetNavigatorAt(_last).SetValue(_dataImage, _iconFail);
                     AddItem(_output.ErrorMessage);
                     break;
                 case OutputState.BuildErrorContinue:
@@ -82,43 +91,29 @@ namespace MonoGame.Tools.Pipeline
                     AddItem(_iconStartEnd, line);
                     break;
                 case OutputState.BuildTime:
-                    _last.Text = _last.Text.TrimEnd(new[] { '.', ' ' }) + ", " + line;
-                    treeView.RefreshItem(_last);
+                    var text = _treeStore.GetNavigatorAt(_last).GetValue(_dataText);
+                    _treeStore.GetNavigatorAt(_last).SetValue(_dataText, text.TrimEnd(new[] { '.', ' ' }) + ", " + line);
                     break;
             }
         }
 
-        private void AddItem(Icon icon, string text)
+        private void AddItem(Image image, string text)
         {
-            var item = new TreeItem();
-            item.Image = icon;
-            item.Text = text;
+            var item = _treeStore.AddNode();
+            item.SetValue(_dataImage, image);
+            item.SetValue(_dataText, text);
 
-            if (_last != null && _last.Image == _iconProcessing)
-            {
-                _last.Image = _iconSucceed;
-                treeView.RefreshItem(_last);
-            }
+            if (_last != null && _treeStore.GetNavigatorAt(_last).GetValue(_dataImage) == _iconProcessing)
+                _treeStore.GetNavigatorAt(_last).SetValue(_dataImage, _iconSucceed);
 
-            _last = item;
-            _root.Children.Add(item);
+            treeView.ScrollToRow(item.CurrentPosition);
 
-#if WINDOWS
-            treeView.RefreshData();
-#else
-            treeView.RefreshItem(item);
-#endif
-
-            treeView.Style = "Scroll";
-            treeView.Style = "";
+            _last = item.CurrentPosition;
         }
 
         private void AddItem(string text)
         {
-            var item = new TreeItem();
-            item.Text = text;
-
-            _last.Children.Add(item);
+            _treeStore.GetNavigatorAt(_last).AddChild().SetValue(_dataText, text);
         }
     }
 }
