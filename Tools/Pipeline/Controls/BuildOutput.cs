@@ -87,6 +87,9 @@ namespace MonoGame.Tools.Pipeline
                 case OutputState.BuildErrorContinue:
                     AddItem(_output.ErrorMessage);
                     break;
+                case OutputState.BuildWarning:
+                    AddItem(_output.ErrorMessage);
+                    break;
                 case OutputState.BuildEnd:
                     AddItem(_iconStartEnd, line);
                     break;
