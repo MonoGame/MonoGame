@@ -33,6 +33,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (packet != null)
             {
+                freePackets.Remove(packet);
                 return packet;
             }
             
@@ -41,6 +42,11 @@ namespace Microsoft.Xna.Framework.Net
 
         public void RecyclePacket(Packet packet)
         {
+            for (int i = 0; i < packet.length; i++)
+            {
+                packet.data[i] = 255;
+            }
+
             freePackets.Add(packet);
         }
     }

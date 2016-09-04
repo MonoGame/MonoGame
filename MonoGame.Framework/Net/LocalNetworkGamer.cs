@@ -206,7 +206,10 @@ namespace Microsoft.Xna.Framework.Net
 
             // Write inbound packet data to stream
             data.BaseStream.SetLength(0);
+            data.BaseStream.Position = 0;
             data.BaseStream.Write(inboundPacket.packet.data, 0, inboundPacket.packet.length);
+
+            // Prepare for reading
             data.BaseStream.Position = 0;
 
             sender = inboundPacket.sender;
@@ -254,8 +257,9 @@ namespace Microsoft.Xna.Framework.Net
             data.BaseStream.Position = 0;
             data.BaseStream.Read(packet.data, 0, packet.length);
 
-            // Reset stream
+            // Prepare for writing again
             data.BaseStream.SetLength(0);
+            data.BaseStream.Position = 0;
 
             outboundPackets.Add(new OutboundPacket(packet, this, recipient, options));
         }
