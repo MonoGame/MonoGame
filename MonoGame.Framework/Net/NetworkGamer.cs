@@ -1,10 +1,21 @@
 ﻿using Microsoft.Xna.Framework.GamerServices;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Net
 {
+    internal class NetworkGamerIdComparer : IComparer<NetworkGamer>
+    {
+        public int Compare(NetworkGamer x, NetworkGamer y)
+        {
+            return x.Id.CompareTo(y.Id);
+        }
+    }
+
     public class NetworkGamer : Gamer
     {
+        internal static IComparer<NetworkGamer> Comparer = new NetworkGamerIdComparer();
+
         protected bool isReady;
 
         internal NetworkGamer(NetworkMachine machine, string displayName, string gamertag, byte id, bool isPrivateSlot, bool isReady) : base()

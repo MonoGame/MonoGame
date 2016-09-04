@@ -172,8 +172,8 @@ namespace Microsoft.Xna.Framework.Net
         internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
 
         private byte uniqueIdCount;
-        private IList<NetworkGamer> allGamers;
-        private IList<NetworkGamer> remoteGamers;
+        private List<NetworkGamer> allGamers;
+        private List<NetworkGamer> remoteGamers;
 
         internal PacketPool packetPool;
         private NetBuffer internalBuffer;
@@ -289,9 +289,32 @@ namespace Microsoft.Xna.Framework.Net
             set { peer.Configuration.SimulatedLoss = value; }
         }
 
+        // For discovery response
         internal int CurrentGamerCount { get { return allGamers.Count; } }
-        internal string HostGamertag { get { return machine.LocalGamers.Count > 0 ? machine.LocalGamers[0].Gamertag : "Game starting up..."; } }
-        internal int OpenPrivateGamerSlots { get { return PrivateGamerSlots; } }
+        internal string HostGamertag
+        {
+            get
+            {
+                return Host != null || Host.Gamertag == string.Empty ? Host.Gamertag : "Game starting...";
+            }
+        }
+        internal int OpenPrivateGamerSlots
+        {
+            get
+            {
+                int usedSlots = 0;
+
+                foreach (NetworkGamer gamer in AllGamers)
+                {
+                    if (gamer.IsPrivateSlot)
+                    {
+                        usedSlots++;
+                    }
+                }
+
+                return PrivateGamerSlots - usedSlots;
+            }
+        }
         internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - CurrentGamerCount; } }
 
         public event EventHandler<GamerJoinedEventArgs> GamerJoined;
@@ -405,9 +428,12 @@ namespace Microsoft.Xna.Framework.Net
             gamer.Machine.AddGamer(gamer);
 
             allGamers.Add(gamer);
+            allGamers.Sort(NetworkGamer.Comparer);
+
             if (!gamer.IsLocal)
             {
                 remoteGamers.Add(gamer);
+                remoteGamers.Sort(NetworkGamer.Comparer);
             }
 
             InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
@@ -418,6 +444,7 @@ namespace Microsoft.Xna.Framework.Net
             gamer.Machine.RemoveGamer(gamer);
 
             allGamers.Remove(gamer);
+
             if (!gamer.IsLocal)
             {
                 remoteGamers.Remove(gamer);
@@ -607,6 +634,10 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     // Discovery
                     case NetIncomingMessageType.DiscoveryRequest:
+                        if (!IsHost)
+                        {
+                            throw new NetworkException("Discovery request received when not host");
+                        }
                         Debug.WriteLine("Discovery request received");
                         NetOutgoingMessage response = peer.CreateMessage();
                         response.Write((byte)SessionType);
