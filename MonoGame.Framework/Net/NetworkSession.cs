@@ -169,11 +169,11 @@ namespace Microsoft.Xna.Framework.Net
         internal ICollection<IPEndPoint> pendingEndPoints;
 
         // Host stores which connections were open when a particular peer connected
-        internal Dictionary<NetConnection, ICollection<NetConnection>> pendingPeerConnections = new Dictionary<NetConnection, ICollection<NetConnection>>();
+        internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
 
         private byte uniqueIdCount;
         private IList<NetworkGamer> allGamers;
-        private IList<NetworkGamer> allRemoteGamers;
+        private IList<NetworkGamer> remoteGamers;
 
         internal PacketPool packetPool;
         private NetBuffer internalBuffer;
@@ -196,8 +196,9 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             this.allGamers = new List<NetworkGamer>();
-            this.allRemoteGamers = new List<NetworkGamer>();
+            this.remoteGamers = new List<NetworkGamer>();
 
+            this.RemoteMachines = new List<NetworkMachine>();
             this.AllGamers = new GamerCollection<NetworkGamer>(this.allGamers);
             this.AllowHostMigration = false;
             this.AllowJoinInProgress = false;
@@ -207,7 +208,7 @@ namespace Microsoft.Xna.Framework.Net
             this.LocalGamers = this.machine.LocalGamers;
             this.MaxGamers = maxGamers;
             this.PrivateGamerSlots = privateGamerSlots;
-            this.RemoteGamers = new GamerCollection<NetworkGamer>(this.allRemoteGamers);
+            this.RemoteGamers = new GamerCollection<NetworkGamer>(this.remoteGamers);
             this.SessionProperties = properties;
             this.SessionState = NetworkSessionState.Lobby;
             this.SessionType = type;
@@ -221,6 +222,7 @@ namespace Microsoft.Xna.Framework.Net
             this.lastSentBytes = this.peer.Statistics.SentBytes;
         }
 
+        internal IList<NetworkMachine> RemoteMachines { get; }
         public GamerCollection<NetworkGamer> AllGamers { get; }
         public bool AllowHostMigration { get; set; } // any peer can get, only host can set
         public bool AllowJoinInProgress { get; set; } // any peer can get, only host can set
@@ -405,7 +407,7 @@ namespace Microsoft.Xna.Framework.Net
             allGamers.Add(gamer);
             if (!gamer.IsLocal)
             {
-                allRemoteGamers.Add(gamer);
+                remoteGamers.Add(gamer);
             }
 
             InvokeGamerJoinedEvent(new GamerJoinedEventArgs(gamer));
@@ -418,7 +420,7 @@ namespace Microsoft.Xna.Framework.Net
             allGamers.Remove(gamer);
             if (!gamer.IsLocal)
             {
-                allRemoteGamers.Remove(gamer);
+                remoteGamers.Remove(gamer);
             }
 
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
@@ -428,10 +430,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             machine.RemoveGamersLocally();
 
-            foreach (NetConnection connection in peer.Connections)
+            foreach (NetworkMachine remoteMachine in RemoteMachines)
             {
-                NetworkMachine remoteMachine = connection.Tag as NetworkMachine;
-
                 remoteMachine.RemoveGamersLocally();
             }
         }
@@ -511,12 +511,12 @@ namespace Microsoft.Xna.Framework.Net
                 Debug.WriteLine("Sending " + message.MessageType + " to all peers...");
             }
 
-            // Send to all peers
-            if (peer.Connections.Count > 0)
+            // Send to all remote machines
+            foreach (NetworkMachine remoteMachine in RemoteMachines)
             {
                 NetOutgoingMessage msg = peer.CreateMessage();
                 EncodeMessage(message, msg);
-                peer.SendMessage(msg, peer.Connections, ToDeliveryMethod(message.Options), message.SequenceChannel);
+                peer.SendMessage(msg, remoteMachine.connection, ToDeliveryMethod(message.Options), message.SequenceChannel);
             }
 
             // Send to self (Should be done last since then all Send() calls happen before any Receive() call)
@@ -573,7 +573,13 @@ namespace Microsoft.Xna.Framework.Net
                 localGamer.RecycleInboundPackets();
             }
 
-            // Send accumulated outbound packets -> will create new inbound packets
+            // Try to receive delayed inbound packets -> Will create new inbound packets
+            foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
+            {
+                localGamer.TryReceiveDelayedInboundPackets();
+            }
+
+            // Send accumulated outbound packets -> Will create new inbound packets
             foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
             {
                 foreach (OutboundPacket outboundPacket in localGamer.OutboundPackets)
@@ -626,19 +632,21 @@ namespace Microsoft.Xna.Framework.Net
                         {
                             // Create a pending network machine
                             NetworkMachine senderMachine = new NetworkMachine(this, msg.SenderConnection, msg.SenderConnection == hostConnection);
-                            msg.SenderConnection.Tag = senderMachine;
+                            RemoteMachines.Add(senderMachine);
 
-                            if (!machine.IsFullyConnected)
+                            if (machine.IsFullyConnected)
                             {
                                 Send(new FullyConnectedSender(), senderMachine);
                             }
 
+                            Send(new ConnectionAcknowledgedSender(), senderMachine);
+
                             if (IsHost)
                             {
-                                // Save snapshot of current connections and send them to new peer
-                                ICollection<NetConnection> requestedConnections = new HashSet<NetConnection>(peer.Connections);
-                                requestedConnections.Remove(msg.SenderConnection);
-                                pendingPeerConnections.Add(msg.SenderConnection, requestedConnections);
+                                // Save snapshot of current connections and send them to the new peer
+                                ICollection<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
+                                requestedConnections.Remove(senderMachine);
+                                pendingPeerConnections.Add(senderMachine, requestedConnections);
 
                                 Send(new ConnectToAllRequestSender(requestedConnections), senderMachine);
                             }
@@ -648,29 +656,24 @@ namespace Microsoft.Xna.Framework.Net
                         {
                             // Remove gamers
                             NetworkMachine disconnectedMachine = msg.SenderConnection.Tag as NetworkMachine;
+                            RemoteMachines.Remove(disconnectedMachine);
 
                             disconnectedMachine.RemoveGamersLocally();
 
                             if (IsHost)
                             {
-                                // If disconnected peer was pending, remove it
-                                pendingPeerConnections.Remove(msg.SenderConnection);
-
                                 // Update pending peers
-                                foreach (var pendingPeer in pendingPeerConnections)
+                                pendingPeerConnections.Remove(disconnectedMachine);
+
+                                foreach (var pendingPair in pendingPeerConnections)
                                 {
-                                    NetworkMachine pendingMachine = pendingPeer.Key.Tag as NetworkMachine;
+                                    NetworkMachine pendingMachine = pendingPair.Key;
 
-                                    if (!pendingMachine.IsFullyConnected)
+                                    if (pendingPair.Value.Contains(disconnectedMachine))
                                     {
-                                        continue;
-                                    }
+                                        pendingPair.Value.Remove(disconnectedMachine);
 
-                                    if (pendingPeer.Value.Contains(msg.SenderConnection))
-                                    {
-                                        pendingPeer.Value.Remove(msg.SenderConnection);
-
-                                        Send(new ConnectToAllRequestSender(pendingPeer.Value), pendingMachine);
+                                        Send(new ConnectToAllRequestSender(pendingPair.Value), pendingMachine);
                                     }
                                 }
                             }
@@ -713,14 +716,13 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Handle pending machine
-            if (machine.IsFullyConnected && pendingEndPoints != null)
+            if (!machine.IsFullyConnected && pendingEndPoints != null)
             {
                 bool done = true;
 
                 foreach (IPEndPoint endPoint in pendingEndPoints)
                 {
-                    if (!(IsConnectedToEndPoint(endPoint) &&
-                        (peer.GetConnection(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
+                    if (!(IsConnectedToEndPoint(endPoint) && (peer.GetConnection(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
                     {
                         done = false;
                     }
@@ -761,11 +763,10 @@ namespace Microsoft.Xna.Framework.Net
                 Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
                 Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
                 
-                foreach (NetworkGamer gamer in AllGamers)
+                foreach (LocalNetworkGamer gamer in LocalGamers)
                 {
                     Debug.WriteLine("Gamer: " + gamer.DisplayName + "(" + gamer.Id + ")");
-                }
-                */
+                }*/
             }
         }
 

@@ -9,9 +9,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal struct ConnectToAllRequestSender : IInternalMessageSender
     {
-        private ICollection<NetConnection> requestedConnections;
+        private ICollection<NetworkMachine> requestedConnections;
 
-        public ConnectToAllRequestSender(ICollection<NetConnection> requestedConnections)
+        public ConnectToAllRequestSender(ICollection<NetworkMachine> requestedConnections)
         {
             this.requestedConnections = requestedConnections;
         }
@@ -26,11 +26,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 throw new NetworkException("Only host can send ConnectToAllRequest");
             }
-            
+
             output.Write((int)requestedConnections.Count);
-            foreach (NetConnection c in requestedConnections)
+            foreach (NetworkMachine machine in requestedConnections)
             {
-                output.Write(c.RemoteEndPoint);
+                output.Write(machine.connection.RemoteEndPoint);
             }
         }
     }
@@ -57,7 +57,6 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             int requestedConnectionCount = input.ReadInt32();
-
             currentMachine.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
             for (int i = 0; i < requestedConnectionCount; i++)
             {

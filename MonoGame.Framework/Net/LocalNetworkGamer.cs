@@ -36,6 +36,9 @@ namespace Microsoft.Xna.Framework.Net
 
     public sealed class LocalNetworkGamer : NetworkGamer
     {
+        private IDictionary<byte, IList<Packet>> delayedUnordered = new Dictionary<byte, IList<Packet>>();
+        private IDictionary<byte, IList<Packet>> delayedOrdered = new Dictionary<byte, IList<Packet>>();
+
         private int inboundPacketIndex = 0;
         private List<InboundPacket> inboundPackets = new List<InboundPacket>();
         private List<OutboundPacket> outboundPackets = new List<OutboundPacket>();
@@ -44,10 +47,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             this.SignedInGamer = signedInGamer;
         }
-
-        internal IList<InboundPacket> InboundPackets { get { return inboundPackets; } }
+        
         internal IList<OutboundPacket> OutboundPackets { get { return outboundPackets; } }
-
         public bool IsDataAvailable { get { return inboundPacketIndex < inboundPackets.Count; } }
 
         public override bool IsReady
@@ -103,6 +104,81 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             outboundPackets.Clear();
+        }
+
+        internal void AddInboundPacket(Packet packet, byte senderId, SendDataOptions options)
+        {
+            NetworkGamer sender = Session.FindGamerById(senderId);
+
+            if (options == SendDataOptions.InOrder || options == SendDataOptions.ReliableInOrder)
+            {
+                bool packetsInQueue = delayedOrdered.ContainsKey(senderId) && delayedOrdered[senderId].Count > 0;
+
+                if (sender == null || packetsInQueue)
+                {
+                    if (!delayedOrdered.ContainsKey(senderId))
+                    {
+                        delayedOrdered.Add(senderId, new List<Packet>());
+                    }
+                    delayedOrdered[senderId].Add(packet);
+                }
+                else
+                {
+                    inboundPackets.Add(new InboundPacket(packet, sender));
+                }
+            }
+            else
+            {
+                if (sender == null)
+                {
+                    if (!delayedUnordered.ContainsKey(senderId))
+                    {
+                        delayedUnordered.Add(senderId, new List<Packet>());
+                    }
+                    delayedUnordered[senderId].Add(packet);
+                }
+                else
+                {
+                    inboundPackets.Add(new InboundPacket(packet, sender));
+                }
+            }
+        }
+
+        internal void TryReceiveDelayedInboundPackets()
+        {
+            // Unordered
+            foreach (var pair in delayedUnordered)
+            {
+                byte senderId = pair.Key;
+                IList<Packet> delayedPackets = pair.Value;
+                NetworkGamer sender = Session.FindGamerById(senderId);
+
+                if (sender != null)
+                {
+                    foreach (Packet delayedPacket in delayedPackets)
+                    {
+                        inboundPackets.Add(new InboundPacket(delayedPacket, sender));
+                    }
+                    delayedPackets.Clear();
+                }
+            }
+
+            // Ordered
+            foreach (var pair in delayedOrdered)
+            {
+                byte senderId = pair.Key;
+                IList<Packet> delayedPackets = pair.Value;
+                NetworkGamer sender = Session.FindGamerById(senderId);
+
+                if (sender != null)
+                {
+                    foreach (Packet delayedPacket in delayedPackets)
+                    {
+                        inboundPackets.Add(new InboundPacket(delayedPacket, sender));
+                    }
+                    delayedPackets.Clear();
+                }
+            }
         }
 
         // Receiving data

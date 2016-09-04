@@ -1,5 +1,5 @@
-﻿using Lidgren.Network;
-using System;
+﻿using System;
+using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {

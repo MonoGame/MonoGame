@@ -27,6 +27,11 @@ namespace Microsoft.Xna.Framework.Net
 
             this.LocalGamers = this.IsLocal ? new GamerCollection<LocalNetworkGamer>(localGamers) : null;
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
+
+            if (this.connection != null)
+            {
+                this.connection.Tag = this;
+            }
         }
 
         internal NetworkSession Session { get; }

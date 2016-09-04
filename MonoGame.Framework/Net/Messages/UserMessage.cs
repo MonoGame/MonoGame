@@ -35,6 +35,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             output.Write(sender.Id);
             output.Write(sendToAll);
             output.Write((byte)(sendToAll ? 255 : recipient.Id));
+            output.Write((byte)options);
             output.Write(packet.length);
             output.Write(packet.data);
         }
@@ -44,12 +45,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            if (!currentMachine.IsFullyConnected)
-            {
-                // TODO: SuspiciousUnexpectedMessage
-                return;
-            }
-            if (!senderMachine.IsFullyConnected)
+            if (!currentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousUnexpectedMessage
                 return;
@@ -58,22 +54,17 @@ namespace Microsoft.Xna.Framework.Net.Messages
             byte senderId = input.ReadByte();
             bool sendToAll = input.ReadBoolean();
             byte recipientId = input.ReadByte();
+            SendDataOptions options = (SendDataOptions)input.ReadByte();
             int length = input.ReadInt32();
             Packet packet = currentMachine.Session.packetPool.GetPacket(length);
             input.ReadBytes(packet.data, 0, length);
 
             NetworkGamer sender = currentMachine.Session.FindGamerById(senderId);
 
-            if (sender == null)
+            if (sender != null && sender.Machine != senderMachine)
             {
-                // TODO: Check previous gamers in case the remove message came before this, otherwise:
                 // TODO: SuspiciousInvalidGamerId
-                return;
-            }
-            if (sender.Machine != senderMachine)
-            {
                 Debug.WriteLine("Warning: User message sender does not belong to the sender machine!");
-                // TODO: SuspiciousInvalidGamerId
                 return;
             }
 
@@ -81,7 +72,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 foreach (LocalNetworkGamer localGamer in currentMachine.Session.LocalGamers)
                 {
-                    localGamer.InboundPackets.Add(new InboundPacket(packet, sender));
+                    localGamer.AddInboundPacket(packet, senderId, options);
                 }
             }
             else
@@ -91,7 +82,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 if (recipient == null)
                 {
                     // TODO: Check previous gamers in case the remove message came before this, otherwise:
-                    // TODO: SuspiciousInvalidGamerId
+                    // SuspiciousInvalidGamerId
                     return;
                 }
                 if (!recipient.IsLocal)
@@ -102,7 +93,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 }
 
                 LocalNetworkGamer localGamer = recipient as LocalNetworkGamer;
-                localGamer.InboundPackets.Add(new InboundPacket(packet, sender));
+                localGamer.AddInboundPacket(packet, senderId, options);
             }
         }
     }

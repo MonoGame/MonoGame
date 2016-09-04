@@ -45,7 +45,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 // TODO: SuspiciousRepeatedInfo
                 return;
             }
+
             bool isHost = input.ReadBoolean();
+
             if (isHost && !senderMachine.IsHost)
             {
                 // TODO: SuspiciousHostClaim

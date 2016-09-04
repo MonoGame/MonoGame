@@ -19,16 +19,16 @@ namespace Microsoft.Xna.Framework.Net.Messages
         {
             if (senderMachine.IsFullyConnected)
             {
+                // TODO: SuspiciousRepeatedInfo
                 return;
             }
 
             // The sender machine is now considered fully connected
             senderMachine.IsFullyConnected = true;
-
-            // Remote peer?
+            
             if (currentMachine.IsHost && !senderMachine.IsLocal)
             {
-                currentMachine.Session.pendingPeerConnections.Remove(senderMachine.connection);
+                currentMachine.Session.pendingPeerConnections.Remove(senderMachine);
             }
         }
     }

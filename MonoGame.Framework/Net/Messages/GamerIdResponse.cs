@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             LocalNetworkGamer localGamer = new LocalNetworkGamer(currentMachine, signedInGamer, id, false);
             currentMachine.Session.AddGamer(localGamer);
+
             currentMachine.Session.Send(new GamerJoinedSender(localGamer));
         }
     }
