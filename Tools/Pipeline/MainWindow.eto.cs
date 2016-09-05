@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using Eto;
 using Eto.Forms;
 using Eto.Drawing;
@@ -11,13 +15,13 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdUndo, cmdRedo, cmdAdd, cmdExclude, cmdRename, cmdDelete;
         public Command cmdNewItem, cmdNewFolder, cmdExistingItem, cmdExistingFolder;
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
-        public CheckCommand cmdDebugMode, cmdFilterOutput;
+        public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
         public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdRebuildItem;
 
         MenuBar menubar;
         ToolBar toolbar;
-        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuBuild, menuHelp;
+        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuPads, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
         MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmRebuildItem, cmExclude, cmRename, cmDelete;
         ButtonMenuItem cmAdd;
@@ -50,19 +54,22 @@ namespace MonoGame.Tools.Pipeline
             splitterVertical.FixedPanel = SplitterFixedPanel.None;
 
             projectControl = new ProjectControl();
-            splitterVertical.Panel1 = projectControl.ToEto();
+            _pads.Add(projectControl);
+            splitterVertical.Panel1 = projectControl;
 
             propertyGridControl = new PropertyGridControl();
+            _pads.Add(propertyGridControl);
             splitterVertical.Panel2 = propertyGridControl;
 
             splitterHorizontal.Panel1 = splitterVertical;
 
             buildOutput = new BuildOutput();
+            _pads.Add(buildOutput);
             splitterHorizontal.Panel2 = buildOutput;
 
             Content = splitterHorizontal;
 
-            projectControl.RowActivated += CmdOpenItem_Executed;
+            projectControl.TreeView.RowActivated += CmdOpenItem_Executed;
 
             cmdNew.Executed += CmdNew_Executed;
             cmdOpen.Executed += CmdOpen_Executed;
@@ -88,7 +95,6 @@ namespace MonoGame.Tools.Pipeline
             cmdClean.Executed += CmdClean_Executed;
             cmdCancelBuild.Executed += CmdCancelBuild_Executed;
             cmdDebugMode.CheckedChanged += CmdDebugMode_Executed;
-            cmdFilterOutput.CheckedChanged += CmdFilterOutput_Executed;
 
             cmdHelp.Executed += CmdHelp_Executed;
             cmdAbout.Executed += CmdAbout_Executed;
@@ -196,11 +202,6 @@ namespace MonoGame.Tools.Pipeline
             cmdDebugMode = new CheckCommand();
             cmdDebugMode.MenuText = "Debug Mode";
 
-            cmdFilterOutput = new CheckCommand();
-            cmdFilterOutput.MenuText = "Filter Output";
-            cmdFilterOutput.ToolTip = "Filter Output";
-            cmdFilterOutput.Checked = true;
-
             // Help Commands
 
             cmdHelp = new Command();
@@ -251,7 +252,6 @@ namespace MonoGame.Tools.Pipeline
             Global.SetIcon(cmdClean);
             Global.SetIcon(cmdCancelBuild);
             Global.SetIcon(cmdDebugMode);
-            Global.SetIcon(cmdFilterOutput);
             Global.SetIcon(cmdHelp);
             Global.SetIcon(cmdAbout);
             Global.SetIcon(cmdOpenItem);
@@ -303,6 +303,12 @@ namespace MonoGame.Tools.Pipeline
             menuEdit.Items.Add(cmdDelete);
             Menu.Items.Add(menuEdit);
 
+            //Pads Commands
+
+            menuPads = new ButtonMenuItem();
+            menuPads.Text = "Pads";
+            Menu.Items.Add(menuPads);
+
             menuBuild = new ButtonMenuItem();
             menuBuild.Text = "Build";
             menuBuild.Items.Add(cmdBuild);
@@ -311,7 +317,6 @@ namespace MonoGame.Tools.Pipeline
             menuBuild.Items.Add(cmdCancelBuild);
             menuBuild.Items.Add(new SeparatorMenuItem());
             menuBuild.Items.Add(cmdDebugMode);
-            menuBuild.Items.Add(cmdFilterOutput);
             Menu.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
@@ -367,7 +372,6 @@ namespace MonoGame.Tools.Pipeline
             ToolBar.Items.Add(toolRebuild);
             ToolBar.Items.Add(toolClean);
             ToolBar.Items.Add(new SeparatorToolItem());
-            ToolBar.Items.Add(cmdFilterOutput);
         }
     }
 }

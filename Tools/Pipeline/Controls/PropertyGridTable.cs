@@ -277,6 +277,16 @@ namespace MonoGame.Tools.Pipeline
         private void PropertyGridTable_SizeChanged(object sender, EventArgs e)
         {
             SetWidth();
+
+#if LINUX
+            // force size realocation
+            drawable.Width = pixel1.Width - 2;
+#endif
+
+            foreach (var child in pixel1.Children)
+                if (child != drawable)
+                    child.Width = drawable.Width - _separatorPos;
+
             drawable.Invalidate();
         }
 

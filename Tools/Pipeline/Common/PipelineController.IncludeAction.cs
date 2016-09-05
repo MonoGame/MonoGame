@@ -77,6 +77,9 @@ namespace MonoGame.Tools.Pipeline
                     _files[i] = item.OriginalPath;
 
                     _con.View.AddTreeItem(item);
+
+                    item.ExpandToThis = true;
+                    _con.View.UpdateTreeItem(item);
                 }
 
                 _con.View.EndTreeUpdate();

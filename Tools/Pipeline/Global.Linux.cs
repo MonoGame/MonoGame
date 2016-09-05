@@ -191,9 +191,6 @@ namespace MonoGame.Tools.Pipeline
                     case "Clean":
                         iconInfo = _theme.LookupIcon("edit-clear-symbolic", 16, 0);
                         break;
-                    case "Filter Output":
-                        iconInfo = _theme.LookupIcon("format-indent-more-symbolic", 16, 0);
-                        break;
                 }
 
                 if (iconInfo != null)
