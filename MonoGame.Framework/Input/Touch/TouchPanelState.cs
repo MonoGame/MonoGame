@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
-    public class TouchPanelState
+    public partial class TouchPanelState
     {
         /// <summary>
         /// The reserved touchId for all mouse touch points.
@@ -158,6 +158,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         internal void AddEvent(int id, TouchLocationState state, Vector2 position, bool isMouse)
         {
+            PlatformAddEvent(id, state, position, isMouse);
+        }
+
+        private void AddEventInternal(int id, TouchLocationState state, Vector2 position, bool isMouse)
+        {
             // Different platforms return different touch identifiers
             // based on the specifics of their implementation and the
             // system drivers.
@@ -220,6 +225,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // If this is a release unmap the hardware id.
             if (state == TouchLocationState.Released)
                 _touchIds.Remove(id);
+        }
+
+        internal void ProcessQueued()
+        {
+            PlatformProcessQueued();
         }
 
         private void UpdateTouchScale()

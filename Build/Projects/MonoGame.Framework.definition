@@ -1044,7 +1044,10 @@
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
-    <Compile Include="Input\Touch\TouchQueue.cs">
+    <Compile Include="Input\Touch\TouchPanelState.Default.cs">
+      <ExcludePlatforms>Windows8,WindowsPhone81,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Input\Touch\TouchPanelState.WinRT.cs">
 			<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
 	</Compile>
 

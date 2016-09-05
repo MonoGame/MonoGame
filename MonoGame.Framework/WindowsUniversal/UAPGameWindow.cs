@@ -98,10 +98,10 @@ namespace Microsoft.Xna.Framework
             Instance = new UAPGameWindow();
         }
 
-        public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
+        public void Initialize(CoreWindow coreWindow, UIElement inputElement)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
+            _windowEvents = new InputEvents(_coreWindow, inputElement);
 
 			_dinfo = DisplayInformation.GetForCurrentView();
             _appView = ApplicationView.GetForCurrentView();

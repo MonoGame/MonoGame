@@ -16,7 +16,6 @@ using Windows.Graphics.Display;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
@@ -100,10 +99,10 @@ namespace Microsoft.Xna.Framework
             Instance = new MetroGameWindow();
         }
 
-        public void Initialize(CoreWindow coreWindow, UIElement inputElement, TouchQueue touchQueue)
+        public void Initialize(CoreWindow coreWindow, UIElement inputElement)
         {
             _coreWindow = coreWindow;
-            _windowEvents = new InputEvents(_coreWindow, inputElement, touchQueue);
+            _windowEvents = new InputEvents(_coreWindow, inputElement);
 
             _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
             DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;

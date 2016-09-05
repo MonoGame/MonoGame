@@ -26,8 +26,6 @@ namespace Microsoft.Xna.Framework
     {
         internal static string LaunchParameters;
 
-        internal static readonly TouchQueue TouchQueue = new TouchQueue();
-
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
         public UAPGamePlatform(Game game)
@@ -150,7 +148,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-            TouchQueue.ProcessQueued();
+            Window.TouchPanelState.ProcessQueued();
             return true;
         }
 

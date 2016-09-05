@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -144,7 +148,7 @@ namespace Microsoft.Xna.Framework
 
             // Do we need to initialize the window event handlers?
             if (_windowEvents == null && Window.Current != null)
-                _windowEvents = new InputEvents(Window.Current.CoreWindow, SharedGraphicsDeviceManager.Current.SwapChainBackgroundPanel, MetroGamePlatform.TouchQueue);
+                _windowEvents = new InputEvents(Window.Current.CoreWindow, SharedGraphicsDeviceManager.Current.SwapChainBackgroundPanel);
             if (_windowEvents != null)
                 _windowEvents.UpdateState();
 

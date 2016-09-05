@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework
         public void SetWindow(CoreWindow window)
         {
             // Initialize the singleton window.
-            MetroGameWindow.Instance.Initialize(window, null, MetroGamePlatform.TouchQueue);
+            MetroGameWindow.Instance.Initialize(window, null);
         }
 
         public void Uninitialize()
