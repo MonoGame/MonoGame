@@ -679,7 +679,7 @@ namespace Microsoft.Xna.Framework.Net
 
             RemoveGamersLocally();
 
-            peer.Shutdown("Peer done");
+            peer.Shutdown("Done");
 
             IsDisposed = true;
             Session = null;

@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Net
                 discoverPeer.Recycle(msg);
             }
 
-            discoverPeer.Shutdown("Discovery peer done");
+            discoverPeer.Shutdown("Discovery complete");
 
             return new AvailableNetworkSessionCollection(availableSessions);
         }
@@ -150,6 +150,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (peer.ConnectionsCount != 1)
             {
+                peer.Shutdown("Connection failed");
                 throw new NetworkSessionJoinException("Connection failed", NetworkSessionJoinError.SessionNotFound);
             }
 
