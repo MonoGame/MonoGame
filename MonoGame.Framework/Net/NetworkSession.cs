@@ -206,6 +206,7 @@ namespace Microsoft.Xna.Framework.Net
         }
         internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - CurrentGamerCount; } }
 
+        // Events
         public event EventHandler<GamerJoinedEventArgs> GamerJoined;
         public event EventHandler<GamerLeftEventArgs> GamerLeft;
         public event EventHandler<GameStartedEventArgs> GameStarted;
@@ -489,13 +490,13 @@ namespace Microsoft.Xna.Framework.Net
                 localGamer.RecycleInboundPackets();
             }
 
-            // Try to receive delayed inbound packets -> Will create new inbound packets
+            // Try to receive delayed inbound packets -> Might create new inbound packets
             foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
             {
                 localGamer.TryReceiveDelayedInboundPackets();
             }
 
-            // Send accumulated outbound packets -> Will create new inbound packets
+            // Send accumulated outbound packets -> Might create new inbound packets
             foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
             {
                 foreach (OutboundPacket outboundPacket in localGamer.OutboundPackets)
@@ -515,7 +516,7 @@ namespace Microsoft.Xna.Framework.Net
                 localGamer.RecycleOutboundPackets();
             }
 
-            // Handle incoming messages -> will create new inbound packets
+            // Handle incoming messages -> Might create new inbound packets
             NetIncomingMessage msg;
             while ((msg = peer.ReadMessage()) != null)
             {
