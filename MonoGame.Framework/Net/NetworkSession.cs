@@ -12,170 +12,44 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed class NetworkSession : IDisposable
     {
-        private const int Port = 14242;
-        private const int DiscoveryTime = 1000;
-        private const int JoinTime = 1000;
+        internal const int Port = 14242;
+        internal const int DiscoveryTime = 1000;
+        internal const int JoinTime = 1000;
+
         public const int MaxPreviousGamers = 10;
         public const int MaxSupportedGamers = 64;
 
         internal static NetworkSession Session = null;
 
-        internal static NetPeerConfiguration CreateNetPeerConfig(bool specifyPort)
-        {
-            NetPeerConfiguration config = new NetPeerConfiguration("MonoGameApp");
-
-            config.Port = specifyPort ? Port : 0;
-            config.AcceptIncomingConnections = true;
-
-            config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
-            config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
-            config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
-            config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
-
-            return config;
-        }
-
         public static NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            if (Session != null)
-            {
-                throw new InvalidOperationException("Only one NetworkSession allowed");
-            }
-            if (maxGamers < 2 || maxGamers > MaxSupportedGamers)
-            {
-                throw new ArgumentOutOfRangeException("maxGamers must be in the range [2, " + MaxSupportedGamers + "]");
-            }
-            if (privateGamerSlots < 0 || privateGamerSlots > maxGamers)
-            {
-                throw new ArgumentOutOfRangeException("privateGamerSlots must be in the range[0, maxGamers]");
-            }
-
-            NetPeer peer = new NetPeer(CreateNetPeerConfig(true));
-
-            try
-            {
-                peer.Start();
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException("Internal error", e);
-            }
-
-            Session = new NetworkSession(peer, null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
-            return Session;
+            return NetworkSessionCreation.Create(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties);
         }
-
-        // ArgumentOutOfRangeException if maxLocalGamers is < 1 or > 4
         public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
-            if (sessionType == NetworkSessionType.Local)
-            {
-                throw new ArgumentException("Find cannot be used with NetworkSessionType.Local");
-            }
-
-            // Send discover requests on subnet
-            NetPeer discoverPeer = new NetPeer(CreateNetPeerConfig(false));
-            discoverPeer.Start();
-            discoverPeer.DiscoverLocalPeers(Port);
-
-            Thread.Sleep(DiscoveryTime);
-
-            // Get list of answers
-            List<AvailableNetworkSession> availableSessions = new List<AvailableNetworkSession>();
-
-            NetIncomingMessage msg;
-            while ((msg = discoverPeer.ReadMessage()) != null)
-            {
-                switch (msg.MessageType)
-                {
-                    case NetIncomingMessageType.DiscoveryRequest:
-                        // Ignore own message
-                        break;
-                    case NetIncomingMessageType.DiscoveryResponse:
-                        NetworkSessionType remoteSessionType = (NetworkSessionType)msg.ReadByte();
-
-                        int maxGamers = msg.ReadInt32();
-                        int privateGamerSlots = msg.ReadInt32();
-                        int currentGamerCount = msg.ReadInt32();
-                        string hostGamertag = msg.ReadString();
-                        int openPrivateGamerSlots = msg.ReadInt32();
-                        int openPublicGamerSlots = msg.ReadInt32();
-                        NetworkSessionProperties sessionProperties = null;
-
-                        if (remoteSessionType == sessionType)
-                        {
-                            availableSessions.Add(new AvailableNetworkSession(msg.SenderEndPoint, localGamers, maxGamers, privateGamerSlots, sessionType, currentGamerCount, hostGamertag, openPrivateGamerSlots, openPublicGamerSlots, sessionProperties));
-                        }
-                        break;
-                    // Error checking
-                    case NetIncomingMessageType.VerboseDebugMessage:
-                    case NetIncomingMessageType.DebugMessage:
-                    case NetIncomingMessageType.WarningMessage:
-                    case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine("Lidgren: " + msg.ReadString());
-                        break;
-                    default:
-                        Debug.WriteLine("Unhandled type: " + msg.MessageType);
-                        break;
-                }
-
-                discoverPeer.Recycle(msg);
-            }
-
-            discoverPeer.Shutdown("Discovery peer done");
-
-            return new AvailableNetworkSessionCollection(availableSessions);
+            return NetworkSessionCreation.Find(sessionType, localGamers, searchProperties);
         }
-
         public static NetworkSession Join(AvailableNetworkSession availableSession)
         {
-            if (Session != null)
-            {
-                throw new InvalidOperationException("Only one NetworkSession allowed");
-            }
-            if (availableSession == null)
-            {
-                throw new ArgumentNullException("availableSession");
-            }
-            // TODO: NetworkSessionJoinException if availableSession full/not joinable/cannot be found
-
-            NetPeer peer = new NetPeer(CreateNetPeerConfig(false));
-            peer.Start();
-            peer.Connect(availableSession.remoteEndPoint);
-
-            Thread.Sleep(JoinTime);
-
-            if (peer.ConnectionsCount != 1)
-            {
-                throw new NetworkSessionJoinException("Connection failed", NetworkSessionJoinError.SessionNotFound);
-            }
-
-            NetConnection hostConnection = peer.Connections[0];
-            int maxGamers = availableSession.maxGamers;
-            int privateGamerSlots = availableSession.privateGamerSlots;
-            NetworkSessionType sessionType = availableSession.sessionType;
-            NetworkSessionProperties sessionProperties = availableSession.SessionProperties;
-            IEnumerable<SignedInGamer> localGamers = availableSession.localGamers;
-
-            Session = new NetworkSession(peer, hostConnection, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
-            return Session;
+            return NetworkSessionCreation.Join(availableSession);
         }
 
+        internal PacketPool packetPool;
+
         internal NetPeer peer;
-        internal NetworkMachine machine;
-        internal NetConnection hostConnection;
+        private NetworkMachine machine;
+        private NetConnection hostConnection;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
         internal ICollection<IPEndPoint> pendingEndPoints;
 
-        // Host stores which connections were open when a particular peer connected
+        // Host stores which remote machines existed before a particular machine connected
         internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
 
         private byte uniqueIdCount;
         private List<NetworkGamer> allGamers;
         private List<NetworkGamer> remoteGamers;
 
-        internal PacketPool packetPool;
         private NetBuffer internalBuffer;
         private DateTime lastTime;
         private int lastReceivedBytes;
@@ -209,7 +83,7 @@ namespace Microsoft.Xna.Framework.Net
             this.MaxGamers = maxGamers;
             this.PrivateGamerSlots = privateGamerSlots;
             this.RemoteGamers = new GamerCollection<NetworkGamer>(this.remoteGamers);
-            this.SessionProperties = properties;
+            this.SessionProperties = properties != null ? properties : new NetworkSessionProperties();
             this.SessionState = NetworkSessionState.Lobby;
             this.SessionType = type;
             this.SimulatedLatency = TimeSpan.Zero;
@@ -647,6 +521,7 @@ namespace Microsoft.Xna.Framework.Net
                         response.Write(HostGamertag);
                         response.Write(OpenPrivateGamerSlots);
                         response.Write(OpenPublicGamerSlots);
+                        SessionProperties.Send(response);
                         peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
                         break;
                     // Peer state changes
@@ -786,18 +661,12 @@ namespace Microsoft.Xna.Framework.Net
                 BytesPerSecondReceived = (int)Math.Round((receivedBytes - lastReceivedBytes) / elapsedSeconds);
                 BytesPerSecondSent = (int)Math.Round((sentBytes - lastSentBytes) / elapsedSeconds);
 
+                //Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
+                //Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
+
                 lastTime = currentTime;
                 lastReceivedBytes = receivedBytes;
                 lastSentBytes = sentBytes;
-
-                /*
-                Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
-                Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
-                
-                foreach (LocalNetworkGamer gamer in LocalGamers)
-                {
-                    Debug.WriteLine("Gamer: " + gamer.DisplayName + "(" + gamer.Id + ")");
-                }*/
             }
         }
 
