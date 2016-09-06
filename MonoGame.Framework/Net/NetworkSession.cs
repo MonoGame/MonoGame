@@ -21,14 +21,29 @@ namespace Microsoft.Xna.Framework.Net
 
         internal static NetworkSession Session = null;
 
+        // Create
         public static NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
             return NetworkSessionCreation.Create(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties);
         }
+        public static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers)
+        {
+            return NetworkSessionCreation.Create(sessionType, maxLocalGamers, maxGamers);
+        }
+        public static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
+        {
+            return NetworkSessionCreation.Create(sessionType, maxLocalGamers, maxGamers, privateGamerSlots, sessionProperties);
+        }
+        // Find
         public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
             return NetworkSessionCreation.Find(sessionType, localGamers, searchProperties);
         }
+        public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties)
+        {
+            return NetworkSessionCreation.Find(sessionType, maxLocalGamers, searchProperties);
+        }
+        // Join
         public static NetworkSession Join(AvailableNetworkSession availableSession)
         {
             return NetworkSessionCreation.Join(availableSession);

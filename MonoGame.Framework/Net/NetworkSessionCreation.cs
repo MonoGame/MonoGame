@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Net
 {
     internal static class NetworkSessionCreation
     {
-        internal static NetPeerConfiguration CreateNetPeerConfig(bool specifyPort)
+        private static NetPeerConfiguration CreateNetPeerConfig(bool specifyPort)
         {
             NetPeerConfiguration config = new NetPeerConfiguration("MonoGameApp");
 
@@ -57,6 +57,16 @@ namespace Microsoft.Xna.Framework.Net
 
             NetworkSession.Session = new NetworkSession(peer, null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
             return NetworkSession.Session;
+        }
+
+        internal static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
+        {
+            throw new NotImplementedException();
         }
 
         // ArgumentOutOfRangeException if maxLocalGamers is < 1 or > 4
@@ -128,6 +138,11 @@ namespace Microsoft.Xna.Framework.Net
             discoverPeer.Shutdown("Discovery complete");
 
             return new AvailableNetworkSessionCollection(availableSessions);
+        }
+
+        public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties)
+        {
+            throw new NotImplementedException();
         }
 
         public static NetworkSession Join(AvailableNetworkSession availableSession)
