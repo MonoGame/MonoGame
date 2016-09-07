@@ -97,14 +97,6 @@ namespace Microsoft.Xna.Framework.Net
             gamers.Remove(gamer);
         }
 
-        internal void RemoveGamersLocally()
-        {
-            for (int i = gamers.Count - 1; i >= 0; i--)
-            {
-                Session.RemoveGamer(gamers[i]);
-            }
-        }
-
         public void RemoveFromSession()
         {
             // ObjectDisposedException if no gamers or gamer is no longer valid

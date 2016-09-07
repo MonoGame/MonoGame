@@ -52,10 +52,12 @@ namespace Microsoft.Xna.Framework.Net
         internal PacketPool packetPool;
 
         internal NetPeer peer;
-        private NetworkMachine machine;
+        private NetworkMachine localMachine;
         private NetConnection hostConnection;
 
-        internal IList<SignedInGamer> pendingSignedInGamers;
+        private IList<SignedInGamer> pendingSignedInGamers;
+        internal IList<SignedInGamer> joiningSignedInGamers;
+        internal IList<SignedInGamer> leavingSignedInGamers;
         internal ICollection<IPEndPoint> pendingEndPoints;
 
         // Host stores which remote machines existed before a particular machine connected
@@ -64,6 +66,7 @@ namespace Microsoft.Xna.Framework.Net
         private byte uniqueIdCount;
         private List<NetworkGamer> allGamers;
         private List<NetworkGamer> remoteGamers;
+        private List<NetworkGamer> previousGamers;
 
         private NetBuffer internalBuffer;
         private DateTime lastTime;
@@ -73,10 +76,12 @@ namespace Microsoft.Xna.Framework.Net
         internal NetworkSession(NetPeer peer, NetConnection hostConnection, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
             this.peer = peer;
-            this.machine = new NetworkMachine(this, null, hostConnection == null);
+            this.localMachine = new NetworkMachine(this, null, hostConnection == null);
             this.hostConnection = hostConnection;
 
             this.pendingSignedInGamers = new List<SignedInGamer>(signedInGamers);
+            this.joiningSignedInGamers = new List<SignedInGamer>();
+            this.leavingSignedInGamers = new List<SignedInGamer>();
 
             if (hostConnection == null)
             {
@@ -86,6 +91,7 @@ namespace Microsoft.Xna.Framework.Net
 
             this.allGamers = new List<NetworkGamer>();
             this.remoteGamers = new List<NetworkGamer>();
+            this.previousGamers = new List<NetworkGamer>();
 
             this.RemoteMachines = new List<NetworkMachine>();
             this.AllGamers = new GamerCollection<NetworkGamer>(this.allGamers);
@@ -94,8 +100,9 @@ namespace Microsoft.Xna.Framework.Net
             this.BytesPerSecondReceived = 0;
             this.BytesPerSecondSent = 0;
             this.IsDisposed = false;
-            this.LocalGamers = this.machine.LocalGamers;
+            this.LocalGamers = this.localMachine.LocalGamers;
             this.MaxGamers = maxGamers;
+            this.PreviousGamers = new GamerCollection<NetworkGamer>(this.previousGamers);
             this.PrivateGamerSlots = privateGamerSlots;
             this.RemoteGamers = new GamerCollection<NetworkGamer>(this.remoteGamers);
             this.SessionProperties = properties != null ? properties : new NetworkSessionProperties();
@@ -109,6 +116,8 @@ namespace Microsoft.Xna.Framework.Net
             this.lastTime = DateTime.Now;
             this.lastReceivedBytes = this.peer.Statistics.ReceivedBytes;
             this.lastSentBytes = this.peer.Statistics.SentBytes;
+
+            SignedInGamer.SignedOut += LocalGamerSignedOut;
         }
 
         internal IList<NetworkMachine> RemoteMachines { get; }
@@ -120,7 +129,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal NetworkMachine HostMachine
         {
-            get { return IsHost ? machine : hostConnection.Tag as NetworkMachine; }
+            get { return IsHost ? localMachine : hostConnection.Tag as NetworkMachine; }
         }
 
         public NetworkGamer Host
@@ -156,7 +165,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        public bool IsHost { get { return machine.IsHost; } }
+        public bool IsHost { get { return localMachine.IsHost; } }
         public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
         public int MaxGamers { get; set; } // only host can set
         public GamerCollection<NetworkGamer> PreviousGamers { get; }
@@ -245,14 +254,12 @@ namespace Microsoft.Xna.Framework.Net
 
         public void AddLocalGamer(SignedInGamer signedInGamer)
         {
-            if (machine.FindLocalGamerBySignedInGamer(signedInGamer) != null)
+            if (localMachine.FindLocalGamerBySignedInGamer(signedInGamer) != null)
             {
                 return;
             }
 
             pendingSignedInGamers.Add(signedInGamer);
-
-            Send(new GamerIdRequestSender(), HostMachine);
         }
 
         public void StartGame()
@@ -313,13 +320,44 @@ namespace Microsoft.Xna.Framework.Net
             return null;
         }
 
+        internal void AddMachine(NetworkMachine machine)
+        {
+            if (!machine.IsLocal)
+            {
+                RemoteMachines.Add(machine);
+            }
+        }
+
+        internal void RemoveMachine(NetworkMachine machine)
+        {
+            // Remove gamers
+            for (int i = machine.Gamers.Count - 1; i >= 0; i--)
+            {
+                RemoveGamer(machine.Gamers[i]);
+            }
+
+            // Remove machine
+            if (!machine.IsLocal)
+            {
+                RemoteMachines.Remove(machine);
+            }
+        }
+
+        internal void RemoveAllMachines()
+        {
+            RemoveMachine(localMachine);
+
+            for (int i = RemoteMachines.Count - 1; i >= 0; i--)
+            {
+                RemoveMachine(RemoteMachines[i]);
+            }
+        }
+
         internal void AddGamer(NetworkGamer gamer)
         {
             gamer.Machine.AddGamer(gamer);
-
             allGamers.Add(gamer);
             allGamers.Sort(NetworkGamer.Comparer);
-
             if (!gamer.IsLocal)
             {
                 remoteGamers.Add(gamer);
@@ -331,26 +369,35 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void RemoveGamer(NetworkGamer gamer)
         {
+            gamer.HasLeftSession = true;
+
             gamer.Machine.RemoveGamer(gamer);
-
             allGamers.Remove(gamer);
-
             if (!gamer.IsLocal)
             {
                 remoteGamers.Remove(gamer);
             }
+            
+            AddPreviousGamer(gamer);
 
             InvokeGamerLeftEvent(new GamerLeftEventArgs(gamer));
         }
 
-        internal void RemoveGamersLocally()
+        private void AddPreviousGamer(NetworkGamer gamer)
         {
-            machine.RemoveGamersLocally();
+            previousGamers.Add(gamer);
 
-            foreach (NetworkMachine remoteMachine in RemoteMachines)
+            if (previousGamers.Count > MaxPreviousGamers)
             {
-                remoteMachine.RemoveGamersLocally();
+                previousGamers.RemoveAt(0);
             }
+        }
+
+        private void LocalGamerSignedOut(object sender, SignedOutEventArgs args)
+        {
+            pendingSignedInGamers.Remove(args.Gamer);
+            joiningSignedInGamers.Remove(args.Gamer);
+            leavingSignedInGamers.Add(args.Gamer);
         }
 
         internal bool GetNewUniqueId(out byte id)
@@ -418,7 +465,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             output.Write((byte)message.MessageType);
 
-            message.Send(output, machine);
+            message.Send(output, localMachine);
         }
 
         internal void Send(IInternalMessageSender message)
@@ -437,7 +484,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Send to self (Should be done last since then all Send() calls happen before any Receive() call)
-            Send(message, machine);
+            Send(message, localMachine);
         }
 
         internal void Send(IInternalMessageSender message, NetworkMachine recipient)
@@ -458,7 +505,7 @@ namespace Microsoft.Xna.Framework.Net
                 EncodeMessage(message, internalBuffer);
 
                 internalBuffer.Position = 0;
-                Receive(internalBuffer, machine);
+                Receive(internalBuffer, localMachine);
             }
             else
             {
@@ -479,25 +526,25 @@ namespace Microsoft.Xna.Framework.Net
 
             Type receiverToInstantiate = InternalMessage.MessageToReceiverTypeMap[messageType];
             IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
-            receiver.Receive(input, machine, senderMachine);
+            receiver.Receive(input, localMachine, senderMachine);
         }
 
         public void Update()
         {
             // Recycle inbound packets from last frame
-            foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {
                 localGamer.RecycleInboundPackets();
             }
 
             // Try to receive delayed inbound packets -> Might create new inbound packets
-            foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {
                 localGamer.TryReceiveDelayedInboundPackets();
             }
 
             // Send accumulated outbound packets -> Might create new inbound packets
-            foreach (LocalNetworkGamer localGamer in machine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {
                 foreach (OutboundPacket outboundPacket in localGamer.OutboundPackets)
                 {
@@ -554,9 +601,9 @@ namespace Microsoft.Xna.Framework.Net
                         {
                             // Create a pending network machine
                             NetworkMachine senderMachine = new NetworkMachine(this, msg.SenderConnection, msg.SenderConnection == hostConnection);
-                            RemoteMachines.Add(senderMachine);
+                            AddMachine(senderMachine);
 
-                            if (machine.IsFullyConnected)
+                            if (localMachine.IsFullyConnected)
                             {
                                 Send(new FullyConnectedSender(), senderMachine);
                             }
@@ -578,9 +625,7 @@ namespace Microsoft.Xna.Framework.Net
                         {
                             // Remove gamers
                             NetworkMachine disconnectedMachine = msg.SenderConnection.Tag as NetworkMachine;
-                            RemoteMachines.Remove(disconnectedMachine);
-
-                            disconnectedMachine.RemoveGamersLocally();
+                            RemoveMachine(disconnectedMachine);
 
                             if (IsHost)
                             {
@@ -637,28 +682,57 @@ namespace Microsoft.Xna.Framework.Net
                 peer.Recycle(msg);
             }
 
-            // Handle pending machine
-            if (!machine.IsFullyConnected && pendingEndPoints != null)
+            if (!localMachine.IsFullyConnected)
             {
-                bool done = true;
-
-                foreach (IPEndPoint endPoint in pendingEndPoints)
+                // Check if fully connected
+                if (pendingEndPoints != null)
                 {
-                    if (!(IsConnectedToEndPoint(endPoint) && (peer.GetConnection(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
+                    bool done = true;
+
+                    foreach (IPEndPoint endPoint in pendingEndPoints)
                     {
-                        done = false;
+                        if (!(IsConnectedToEndPoint(endPoint) && (peer.GetConnection(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
+                        {
+                            done = false;
+                        }
+                    }
+
+                    if (done)
+                    {
+                        Send(new FullyConnectedSender());
                     }
                 }
+            }
 
-                if (done)
+            if (localMachine.IsFullyConnected)
+            {
+                // Handle leaving signed in gamers
+                if (leavingSignedInGamers.Count > 0)
                 {
-                    Send(new FullyConnectedSender());
-
-                    // Handle pending signed in gamers
-                    for (int i = 0; i < pendingSignedInGamers.Count; i++)
+                    foreach (SignedInGamer leavingGamer in leavingSignedInGamers)
                     {
+                        LocalNetworkGamer localGamer = localMachine.FindLocalGamerBySignedInGamer(leavingGamer);
+
+                        if (localGamer != null)
+                        {
+                            RemoveGamer(localGamer);
+                            Send(new GamerLeftSender(localGamer));
+                        }
+                    }
+
+                    leavingSignedInGamers.Clear();
+                }
+
+                // Handle pending signed in gamers
+                if (pendingSignedInGamers.Count > 0)
+                {
+                    foreach (SignedInGamer pendingGamer in pendingSignedInGamers)
+                    {
+                        joiningSignedInGamers.Add(pendingGamer);
                         Send(new GamerIdRequestSender(), HostMachine);
                     }
+
+                    pendingSignedInGamers.Clear();
                 }
             }
 
@@ -693,7 +767,7 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            RemoveGamersLocally();
+            RemoveAllMachines();
 
             peer.Shutdown("Done");
 

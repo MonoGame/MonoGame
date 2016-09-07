@@ -16,21 +16,22 @@ namespace Microsoft.Xna.Framework.Net
     {
         internal static IComparer<NetworkGamer> Comparer = new NetworkGamerIdComparer();
 
-        protected bool isReady;
+        protected bool ready;
 
         internal NetworkGamer(NetworkMachine machine, string displayName, string gamertag, byte id, bool isPrivateSlot, bool isReady) : base()
         {
             this.Machine = machine;
             this.DisplayName = displayName;
             this.Gamertag = gamertag;
+            this.HasLeftSession = false;
             this.Id = id;
             this.IsPrivateSlot = isPrivateSlot;
 
-            this.isReady = isReady;
+            this.ready = isReady;
         }
 
         public NetworkMachine Machine { get; }
-        public bool HasLeftSession { get { return false; } }
+        public bool HasLeftSession { get; internal set; }
         public bool HasVoice { get { return false; } }
         public byte Id { get; }
         public bool IsGuest { get { return Machine.Gamers[0] != this; } }
@@ -48,7 +49,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new InvalidOperationException("Gamer disposed");
                 }
 
-                return isReady;
+                return ready;
             }
 
             set { throw new InvalidOperationException("Gamer is not local"); }
@@ -56,7 +57,7 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void SetReadyState(bool state)
         {
-            isReady = state;
+            ready = state;
         }
 
         public bool IsTalking { get { return false; } }

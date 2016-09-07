@@ -65,9 +65,9 @@ namespace Microsoft.Xna.Framework.Net
                     throw new InvalidOperationException("Session state is not lobby");
                 }
 
-                if (isReady != value)
+                if (ready != value)
                 {
-                    isReady = value;
+                    ready = value;
 
                     Session.Send(new GamerStateChangedSender(this, false, true));
                 }

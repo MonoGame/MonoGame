@@ -46,30 +46,30 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool wasApprovedByHost = input.ReadBoolean();
             byte id = input.ReadByte();
 
-            if (!wasApprovedByHost)
-            {
-                Debug.WriteLine("Warning: GamerIdResponse received, GamerIdRequest declined by host!");
-                return;
-            }
             if (currentMachine.Session.FindGamerById(id) != null)
             {
                 // TODO: SuspiciousGamerIdCollision
                 Debug.WriteLine("Warning: GamerIdResponse received with colliding id!");
                 return;
             }
-            if (currentMachine.Session.pendingSignedInGamers.Count == 0)
+            if (currentMachine.Session.joiningSignedInGamers.Count == 0)
             {
-                Debug.WriteLine("Warning: GamerIdResponse received but no pending signed in gamers exist!");
+                Debug.WriteLine("Warning: GamerIdResponse received but no signed in gamers waiting to join!");
                 return;
             }
 
             // Host approved request, now possible to create network gamer
-            SignedInGamer signedInGamer = currentMachine.Session.pendingSignedInGamers[0];
-            currentMachine.Session.pendingSignedInGamers.RemoveAt(0);
+            SignedInGamer signedInGamer = currentMachine.Session.joiningSignedInGamers[0];
+            currentMachine.Session.joiningSignedInGamers.RemoveAt(0);
+
+            if (!wasApprovedByHost)
+            {
+                Debug.WriteLine("Warning: GamerIdResponse received, GamerIdRequest declined by host!");
+                return;
+            }
 
             LocalNetworkGamer localGamer = new LocalNetworkGamer(currentMachine, signedInGamer, id, false);
             currentMachine.Session.AddGamer(localGamer);
-
             currentMachine.Session.Send(new GamerJoinedSender(localGamer));
         }
     }
