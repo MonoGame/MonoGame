@@ -55,6 +55,8 @@ namespace Microsoft.Xna.Framework.Net
         private NetworkMachine localMachine;
         private NetConnection hostConnection;
 
+        internal IList<NetworkMachine> forceRemovedMachines;
+
         private IList<SignedInGamer> pendingSignedInGamers;
         internal IList<SignedInGamer> joiningSignedInGamers;
         internal IList<SignedInGamer> leavingSignedInGamers;
@@ -78,6 +80,8 @@ namespace Microsoft.Xna.Framework.Net
             this.peer = peer;
             this.localMachine = new NetworkMachine(this, null, hostConnection == null);
             this.hostConnection = hostConnection;
+
+            this.forceRemovedMachines = new List<NetworkMachine>();
 
             this.pendingSignedInGamers = new List<SignedInGamer>(signedInGamers);
             this.joiningSignedInGamers = new List<SignedInGamer>();
@@ -259,7 +263,10 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            pendingSignedInGamers.Add(signedInGamer);
+            if (!pendingSignedInGamers.Contains(signedInGamer))
+            {
+                pendingSignedInGamers.Add(signedInGamer);
+            }
         }
 
         public void StartGame()
@@ -330,6 +337,8 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void RemoveMachine(NetworkMachine machine)
         {
+            machine.HasLeftSession = true;
+
             // Remove gamers
             for (int i = machine.Gamers.Count - 1; i >= 0; i--)
             {
@@ -541,6 +550,17 @@ namespace Microsoft.Xna.Framework.Net
 
         public void Update()
         {
+            // Handle force removal of machines
+            if (forceRemovedMachines.Count > 0)
+            {
+                foreach (NetworkMachine machine in forceRemovedMachines)
+                {
+                    Send(new RemoveMachineSender(machine));
+                }
+
+                forceRemovedMachines.Clear();
+            }
+
             // Recycle inbound packets from last frame
             foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {

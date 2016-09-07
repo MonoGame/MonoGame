@@ -15,7 +15,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
         GamerStateChanged,
         GameStarted,
         GameEnded,
-        UserMessage
+        UserMessage,
+        RemoveMachine
     }
 
     internal static class InternalMessage
@@ -32,7 +33,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
             typeof(GamerStateChangedReceiver),
             typeof(GameStartedReceiver),
             typeof(GameEndedReceiver),
-            typeof(UserMessageReceiver)
+            typeof(UserMessageReceiver),
+            typeof(RemoveMachineReceiver)
         };
     }
 

@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             this.Session = session;
 
+            this.HasLeftSession = false;
             this.IsFullyConnected = false;
             this.HasAcknowledgedLocalMachine = false;
             this.IsLocal = connection == null;
@@ -35,6 +36,7 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         internal NetworkSession Session { get; }
+        internal bool HasLeftSession { get; set; }
         internal bool IsFullyConnected { get; set; }
         internal bool HasAcknowledgedLocalMachine { get; set; }
         internal bool IsLocal { get; }
@@ -99,9 +101,26 @@ namespace Microsoft.Xna.Framework.Net
 
         public void RemoveFromSession()
         {
-            // ObjectDisposedException if no gamers or gamer is no longer valid
-            // InvalidOperationException if not called by host or the local machine (self)
-            throw new NotImplementedException();
+            if (!IsLocal && !Session.IsHost)
+            {
+                throw new InvalidOperationException("Can only be called by the host or the owner of the machine");
+            }
+            if (HasLeftSession)
+            {
+                throw new ObjectDisposedException("NetworkMachine");
+            }
+
+            if (IsLocal)
+            {
+                Session.End(NetworkSessionEndReason.Disconnected);
+            }
+            else
+            {
+                if (!Session.forceRemovedMachines.Contains(this))
+                {
+                    Session.forceRemovedMachines.Add(this);
+                }
+            }
         }
     }
 }
