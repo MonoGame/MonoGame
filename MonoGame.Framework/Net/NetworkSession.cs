@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Net
         // Host stores which remote machines existed before a particular machine connected
         internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
 
-        private byte uniqueIdCount;
+        private int uniqueIdCount;
         private List<NetworkGamer> allGamers;
         private List<NetworkGamer> remoteGamers;
         private List<NetworkGamer> previousGamers;
@@ -402,16 +402,26 @@ namespace Microsoft.Xna.Framework.Net
 
         internal bool GetNewUniqueId(out byte id)
         {
-            // TODO: Make foolproof
-            if (uniqueIdCount >= 255)
+            // Cycle through all 0-255 values before re-using an old id
+            for (int i = 0; i < 256; i++)
             {
-                id = 255;
-                return false;
+                byte candidateId = (byte)uniqueIdCount;
+
+                uniqueIdCount++;
+                if (uniqueIdCount > 255)
+                {
+                    uniqueIdCount = 0;
+                }
+
+                if (FindGamerById(candidateId) == null)
+                {
+                    id = candidateId;
+                    return true;
+                }
             }
 
-            id = uniqueIdCount;
-            uniqueIdCount++;
-            return true;
+            id = 255;
+            return false;
         }
 
         internal bool IsConnectedToEndPoint(IPEndPoint endPoint)
