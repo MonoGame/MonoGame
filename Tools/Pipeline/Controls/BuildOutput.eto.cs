@@ -6,14 +6,19 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class BuildOutput : Panel
+    public partial class BuildOutput : Pad
     {
+        Panel panel;
         TextArea textArea;
 
         Xwt.TreeView treeView;
 
         private void InitializeComponent()
         {
+            Title = "Build Output";
+
+            panel = new Panel();
+
             textArea = new TextArea();
             textArea.Wrap = false;
             textArea.ReadOnly = true;
@@ -21,7 +26,8 @@ namespace MonoGame.Tools.Pipeline
             treeView = new Xwt.TreeView();
             treeView.HeadersVisible = false;
 
-            Content = textArea;
+            panel.Content = textArea;
+            CreateContent(panel);
         }
     }
 }

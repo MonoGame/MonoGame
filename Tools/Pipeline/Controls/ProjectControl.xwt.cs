@@ -6,12 +6,19 @@ using Xwt;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class ProjectControl : TreeView
+    partial class ProjectControl : Pad
     {
+        public TreeView TreeView;
+
         private void InitializeComponent()
         {
-            HeadersVisible = false;
-            SelectionMode = SelectionMode.Multiple;
+            Title = "Project";
+
+            TreeView = new TreeView();
+            TreeView.HeadersVisible = false;
+            TreeView.SelectionMode = SelectionMode.Multiple;
+
+            CreateContent(TreeView.ToEto());
         }
     }
 }

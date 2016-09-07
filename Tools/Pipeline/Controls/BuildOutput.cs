@@ -10,20 +10,13 @@ namespace MonoGame.Tools.Pipeline
 {
     public partial class BuildOutput
     {
-        public bool Filtered
-        {
-            set
-            {
-                this.Content = value ? treeView.ToEto() : textArea;
-            }
-        }
-
         private OutputParser _output;
         private TreeStore _treeStore;
         private readonly DataField<Image> _dataImage;
         private readonly DataField<string> _dataText;
         private TreePosition _last;
         private Image _iconClean, _iconFail, _iconProcessing, _iconSkip, _iconStartEnd, _iconSucceed;
+        private Eto.Forms.CheckCommand _cmdFilterOutput, _cmdAutoScroll;
 
         public BuildOutput()
         {
@@ -43,8 +36,35 @@ namespace MonoGame.Tools.Pipeline
 
             _treeStore = new TreeStore(_dataImage, _dataText);
 
+            _cmdFilterOutput = new Eto.Forms.CheckCommand();
+            _cmdFilterOutput.MenuText = "Filter Output";
+            _cmdFilterOutput.CheckedChanged += CmdFilterOutput_CheckedChanged;
+            AddCommand(_cmdFilterOutput);
+
+            _cmdAutoScroll = new Eto.Forms.CheckCommand();
+            _cmdAutoScroll.MenuText = "Auto Scroll";
+            _cmdAutoScroll.CheckedChanged += CmdAutoScroll_CheckedChanged;
+            AddCommand(_cmdAutoScroll);
+
             treeView.DataSource = _treeStore;
             treeView.Columns.Add("", _dataImage, _dataText);
+        }
+
+        public override void LoadSettings()
+        {
+            _cmdFilterOutput.Checked = PipelineSettings.Default.FilterOutput;
+            _cmdAutoScroll.Checked = PipelineSettings.Default.AutoScrollBuildOutput;
+        }
+
+        private void CmdFilterOutput_CheckedChanged(object sender, EventArgs e)
+        {
+            panel.Content = _cmdFilterOutput.Checked ? treeView.ToEto() : textArea;
+            PipelineSettings.Default.FilterOutput = _cmdFilterOutput.Checked;
+        }
+
+        private void CmdAutoScroll_CheckedChanged(object sender, EventArgs e)
+        {
+            PipelineSettings.Default.AutoScrollBuildOutput = _cmdAutoScroll.Checked;
         }
 
         public void ClearOutput()
@@ -55,7 +75,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void WriteLine(string line)
         {
-            textArea.Append(line + Environment.NewLine, true);
+            textArea.Append(line + Environment.NewLine, _cmdAutoScroll.Checked);
 
             if (string.IsNullOrEmpty(line))
                 return;
@@ -109,7 +129,8 @@ namespace MonoGame.Tools.Pipeline
             if (_last != null && _treeStore.GetNavigatorAt(_last).GetValue(_dataImage) == _iconProcessing)
                 _treeStore.GetNavigatorAt(_last).SetValue(_dataImage, _iconSucceed);
 
-            treeView.ScrollToRow(item.CurrentPosition);
+            if (_cmdAutoScroll.Checked)
+                treeView.ScrollToRow(item.CurrentPosition);
 
             _last = item.CurrentPosition;
         }

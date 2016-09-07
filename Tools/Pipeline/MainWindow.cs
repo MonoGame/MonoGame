@@ -17,6 +17,7 @@ namespace MonoGame.Tools.Pipeline
         public const string TitleBase = "MonoGame Pipeline Tool";
         public static MainWindow Instance;
 
+        private List<Pad> _pads;
         private ContextMenu _contextMenu;
         private FileDialogFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
         private string[] monoLocations = {
@@ -27,9 +28,26 @@ namespace MonoGame.Tools.Pipeline
 
         public MainWindow()
         {
+            _pads = new List<Pad>();
+
             InitializeComponent();
 
             Instance = this;
+
+            // Fill in Pad menu
+            foreach (var pad in _pads)
+            {
+                if (pad.Commands.Count > 0)
+                {
+                    var menu = new ButtonMenuItem();
+                    menu.Text = pad.Title;
+
+                    foreach (var com in pad.Commands)
+                        menu.Items.Add(com.CreateMenuItem());
+
+                    menuPads.Items.Add(menu);
+                }
+            }
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
@@ -54,18 +72,20 @@ namespace MonoGame.Tools.Pipeline
         public void ShowContextMenu()
         {
             if (PipelineController.Instance.ProjectOpen)
-                _contextMenu.Show(projectControl.ToEto());
+                _contextMenu.Show(projectControl.TreeView.ToEto());
         }
 
         #region IView implements
 
         public void Attach(IController controller)
         {
-            cmdFilterOutput.Checked = PipelineSettings.Default.FilterOutput;
-            CmdFilterOutput_Executed(this, EventArgs.Empty);
+            PipelineController.Instance.OnProjectLoaded += () => projectControl.ExpandBase();
 
             cmdDebugMode.Checked = PipelineSettings.Default.DebugMode;
             CmdDebugMode_Executed(this, EventArgs.Empty);
+
+            foreach (var control in _pads)
+                control.LoadSettings();
 
             Style = "MainWindow";
         }
@@ -570,12 +590,6 @@ namespace MonoGame.Tools.Pipeline
         {
             PipelineSettings.Default.DebugMode = cmdDebugMode.Checked;
             PipelineController.Instance.LaunchDebugger = cmdDebugMode.Checked;
-        }
-
-        private void CmdFilterOutput_Executed(object sender, EventArgs e)
-        {
-            PipelineSettings.Default.FilterOutput = cmdFilterOutput.Checked;
-            buildOutput.Filtered = cmdFilterOutput.Checked;
         }
 
         private void CmdHelp_Executed(object sender, EventArgs e)

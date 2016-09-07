@@ -422,10 +422,6 @@ namespace MonoGame.Tools.Pipeline
                         items.Add(subitem);
             }
 
-            // Make sure we save first!
-            if (!AskSaveProject())
-                return;
-
             // Create a unique file within the same folder as
             // the normal project to store this incremental build.
             var uniqueName = Guid.NewGuid().ToString();
@@ -454,9 +450,8 @@ namespace MonoGame.Tools.Pipeline
         {
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
-            // Make sure we save first!
-            if (!AskSaveProject())
-                return;
+            if (ProjectDirty)
+                SaveProject(false);
 
             View.OutputClear();
 

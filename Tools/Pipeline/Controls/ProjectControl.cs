@@ -9,7 +9,7 @@ using Xwt.Drawing;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class ProjectControl : TreeView
+    public partial class ProjectControl
     {
         private readonly DataField<Image> _dataImage;
         private readonly DataField<string> _dataText;
@@ -35,28 +35,28 @@ namespace MonoGame.Tools.Pipeline
 
             _treeStore = new TreeStore(_dataImage, _dataText, _dataTag);
 
-            DataSource = _treeStore;
-            Columns.Add("", _dataImage, _dataText);
+            TreeView.DataSource = _treeStore;
+            TreeView.Columns.Add("", _dataImage, _dataText);
 
 #if LINUX
-            (Xwt.Toolkit.CurrentEngine.GetNativeWidget(this) as Gtk.ScrolledWindow).Child.ButtonPressEvent += Styles.TreeView_ButtonPressEvent;
+            (Xwt.Toolkit.CurrentEngine.GetNativeWidget(TreeView) as Gtk.ScrolledWindow).Child.ButtonPressEvent += Styles.TreeView_ButtonPressEvent;
 #endif
 
-            ButtonReleased += Handle_ButtonReleased;
-            SelectionChanged += ProjectControl_SelectionChanged;
+            TreeView.ButtonReleased += Handle_ButtonReleased;
+            TreeView.SelectionChanged += ProjectControl_SelectionChanged;
         }
 
         private void Handle_ButtonReleased(object sender, ButtonEventArgs e)
         {
             if (e.Button == PointerButton.Right && _showContextMenu && _contextMenu.Items.Count > 0)
-                _contextMenu.Show(this.ToEto());
+                _contextMenu.Show(TreeView.ToEto());
         }
 
         private void ProjectControl_SelectionChanged(object sender, System.EventArgs e)
         {
             var items = new List<IProjectItem>();
 
-            foreach (var row in SelectedRows)
+            foreach (var row in TreeView.SelectedRows)
                 items.Add(_treeStore.GetNavigatorAt(row).GetValue(_dataTag) as IProjectItem);
 
             PipelineController.Instance.SelectionChanged(items);
@@ -65,6 +65,12 @@ namespace MonoGame.Tools.Pipeline
         public void SetContextMenu(Eto.Forms.ContextMenu contextMenu)
         {
             _contextMenu = contextMenu;
+        }
+
+        public void ExpandBase()
+        {
+            if (_rootExists)
+                TreeView.ExpandRow(_treeRoot.CurrentPosition, false);
         }
 
         public void SetRoot(IProjectItem item)
@@ -88,8 +94,6 @@ namespace MonoGame.Tools.Pipeline
             _treeRoot.SetValue(_dataImage, _iconRoot);
             _treeRoot.SetValue(_dataText, item.Name);
             _treeRoot.SetValue(_dataTag, item);
-
-            //this.ExpandRow(_treeRoot.CurrentPosition, false);
 
             _showContextMenu = true;
         }
@@ -122,7 +126,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (item.ExpandToThis)
                 {
-                    ExpandToRow(titem.CurrentPosition);
+                    TreeView.ExpandToRow(titem.CurrentPosition);
                     item.ExpandToThis = false;
                 }
 
@@ -130,7 +134,7 @@ namespace MonoGame.Tools.Pipeline
 
                 if (item.SelectThis)
                 {
-                    SelectRow(titem.CurrentPosition);
+                    TreeView.SelectRow(titem.CurrentPosition);
                     item.SelectThis = false;
                 }
             }

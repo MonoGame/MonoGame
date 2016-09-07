@@ -122,6 +122,10 @@
 	<Compile Include="Controls\PropertyCells\CellPath.cs" />
 	<Compile Include="Controls\PropertyCells\CellRefs.cs" />
 	<Compile Include="Controls\PropertyCells\CellText.cs" />
+	<Compile Include="Controls\Pad.cs" />
+	<Compile Include="Controls\Pad.eto.cs">
+      <DependentUpon>Pad.cs</DependentUpon>
+    </Compile>
 	<Compile Include="Controls\BuildOutput.cs" />
 	<Compile Include="Controls\BuildOutput.eto.cs">
       <DependentUpon>BuildOutput.cs</DependentUpon>
@@ -177,6 +181,9 @@
     <EmbeddedResource Include="App.ico" />
     <EmbeddedResource Include="Icons\monogame.png">
       <LogicalName>Icons.monogame.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Settings.png">
+      <LogicalName>Icons.Settings.png</LogicalName>
     </EmbeddedResource>
 	
 	<!--- The resources for treeview -->

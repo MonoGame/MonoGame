@@ -139,7 +139,7 @@ namespace MonoGame.Tools.Pipeline
                 Connect(builder.GetObject("redo_button").Handle, MainWindow.Instance.cmdRedo);
                 Connect(builder.GetObject("close_button").Handle, MainWindow.Instance.cmdClose);
                 Connect(builder.GetObject("clean_button").Handle, MainWindow.Instance.cmdClean);
-                Connect(builder.GetObject("filteroutput_button").Handle, MainWindow.Instance.cmdFilterOutput);
+                //Connect(builder.GetObject("filteroutput_button").Handle, MainWindow.Instance.cmdFilterOutput);
                 Connect(builder.GetObject("debugmode_button").Handle, MainWindow.Instance.cmdDebugMode);
 
                 MainWindow.Instance.cmdBuild.EnabledChanged += (sender, e) =>
