@@ -371,7 +371,7 @@ namespace MonoGame.Tools.Pipeline
             ToolBar.Items.Add(toolBuild);
             ToolBar.Items.Add(toolRebuild);
             ToolBar.Items.Add(toolClean);
-            ToolBar.Items.Add(new SeparatorToolItem());
+            toolbar.Items.Add(toolCancelBuild);
         }
     }
 }

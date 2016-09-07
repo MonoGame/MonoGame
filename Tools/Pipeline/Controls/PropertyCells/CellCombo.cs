@@ -67,7 +67,7 @@ namespace MonoGame.Tools.Pipeline
                     return;
 
                 if (_type.IsSubclassOf(typeof(Enum)))
-                    _eventHandler(Enum.Parse(Value.GetType(), combo.SelectedValue.ToString()), EventArgs.Empty);
+                    _eventHandler(Enum.Parse(_type, combo.SelectedValue.ToString()), EventArgs.Empty);
                 else if (_type == typeof(ImporterTypeDescription))
                     _eventHandler(PipelineTypes.Importers[combo.SelectedIndex], EventArgs.Empty);
                 else

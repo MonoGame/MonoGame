@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xwt;
 using Xwt.Drawing;
 
@@ -48,8 +49,25 @@ namespace MonoGame.Tools.Pipeline
 
         private void Handle_ButtonReleased(object sender, ButtonEventArgs e)
         {
-            if (e.Button == PointerButton.Right && _showContextMenu && _contextMenu.Items.Count > 0)
-                _contextMenu.Show(TreeView.ToEto());
+            if (e.Button == PointerButton.Right)
+            {
+#if WINDOWS
+                var crow = TreeView.GetRowAtPosition(e.X, e.Y);
+
+                if (crow == null)
+                    return;
+
+                if (!TreeView.SelectedRows.ToList().Contains(crow))
+                {
+                    TreeView.UnselectAll();
+                    TreeView.SelectRow(crow);
+                    TreeView.FocusedRow = crow;
+                }
+#endif
+
+                if (_showContextMenu && _contextMenu.Items.Count > 0)
+                    _contextMenu.Show(TreeView.ToEto());
+            }
         }
 
         private void ProjectControl_SelectionChanged(object sender, System.EventArgs e)
@@ -81,6 +99,8 @@ namespace MonoGame.Tools.Pipeline
                 _rootExists = false;
 
                 _showContextMenu = false;
+                PipelineController.Instance.SelectionChanged(new List<IProjectItem>());
+
                 return;
             }
 

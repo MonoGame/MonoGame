@@ -274,7 +274,7 @@ namespace MonoGame.Tools.Pipeline
 
             Style.Add<DropDownHandler>("OverrideSize", h =>
             {
-                var cell = (h.Control.Child as Gtk.ComboBox).Cells[0] as Gtk.CellRendererText;
+                var cell = (h.Control.Child as Gtk.CellView).Cells[0] as Gtk.CellRendererText;
                 cell.Ellipsize = Pango.EllipsizeMode.End;
             });
 
