@@ -660,19 +660,19 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ObjectDisposedException("NetworkSession");
             }
 
-            // Recycle inbound packets from last frame
+            // Recycle inbound packets that the user has read from the last frame
             foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {
                 localGamer.RecycleInboundPackets();
             }
 
-            // Try to receive delayed inbound packets -> Might create new inbound packets
+            // Add delayed inbound packets if sender has joined (Might add new inbound packets)
             foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {
-                localGamer.TryReceiveDelayedInboundPackets();
+                localGamer.TryAddDelayedInboundPackets();
             }
 
-            // Handle incoming messages -> Might create new inbound packets
+            // Handle incoming internal messages (Might add new inbound packets)
             NetIncomingMessage msg;
             while ((msg = peer.ReadMessage()) != null)
             {
@@ -770,11 +770,7 @@ namespace Microsoft.Xna.Framework.Net
                             }
                         }
                         break;
-                    // Unconnected data
-                    case NetIncomingMessageType.UnconnectedData:
-                        Debug.WriteLine("Unconnected data received!");
-                        break;
-                    // Custom data
+                    // Internal messages
                     case NetIncomingMessageType.Data:
                         if (msg.SenderConnection == null)
                         {
@@ -782,6 +778,10 @@ namespace Microsoft.Xna.Framework.Net
                         }
 
                         Receive(msg, msg.SenderConnection.Tag as NetworkMachine);
+                        break;
+                    // Unconnected data
+                    case NetIncomingMessageType.UnconnectedData:
+                        Debug.WriteLine("Unconnected data received!");
                         break;
                     // Error checking
                     case NetIncomingMessageType.VerboseDebugMessage:
@@ -805,22 +805,10 @@ namespace Microsoft.Xna.Framework.Net
 
             HandleInitialConnection();
 
-            // Send accumulated outbound packets -> Might create new inbound packets
+            // Queue outbound packets as internal messages
             foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {
-                foreach (OutboundPacket outboundPacket in localGamer.OutboundPackets)
-                {
-                    IInternalMessageContent userMessage = new UserMessageSender(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
-
-                    if (outboundPacket.recipient == null)
-                    {
-                        QueueMessage(userMessage);
-                    }
-                    else
-                    {
-                        QueueMessage(userMessage, outboundPacket.recipient.Machine);
-                    }
-                }
+                localGamer.QueueOutboundPackets();
             }
 
             SendInternalMessages();

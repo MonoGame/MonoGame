@@ -48,7 +48,6 @@ namespace Microsoft.Xna.Framework.Net
             this.SignedInGamer = signedInGamer;
         }
         
-        internal IList<OutboundPacket> OutboundPackets { get { return outboundPackets; } }
         public bool IsDataAvailable { get { return inboundPacketIndex < inboundPackets.Count; } }
 
         public override bool IsReady
@@ -144,7 +143,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void TryReceiveDelayedInboundPackets()
+        internal void TryAddDelayedInboundPackets()
         {
             // Unordered
             foreach (var pair in delayedUnordered)
@@ -177,6 +176,23 @@ namespace Microsoft.Xna.Framework.Net
                         inboundPackets.Add(new InboundPacket(delayedPacket, sender));
                     }
                     delayedPackets.Clear();
+                }
+            }
+        }
+
+        internal void QueueOutboundPackets()
+        {
+            foreach (OutboundPacket outboundPacket in outboundPackets)
+            {
+                IInternalMessageContent userMessage = new UserMessageSender(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
+
+                if (outboundPacket.recipient == null)
+                {
+                    Session.QueueMessage(userMessage);
+                }
+                else
+                {
+                    Session.QueueMessage(userMessage, outboundPacket.recipient.Machine);
                 }
             }
         }
