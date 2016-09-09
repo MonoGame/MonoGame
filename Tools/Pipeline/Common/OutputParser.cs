@@ -39,8 +39,9 @@ namespace MonoGame.Tools.Pipeline
         Regex _reSkipping = new Regex(@"^(Skipping)\W(?<filename>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildAsset = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?:\W*?error\W*?:\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reFileErrorWithLineNum   = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)(-(?<columnEnd>[0-9]+))?\))?:\W*?(error)\W*(?<errorCode>[A-Z][0-9]+):\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        Regex _reFileWarningWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)(-(?<columnEnd>[0-9]+))?\))?:\W*?(warning)\W*(?<warningCode>[A-Z][0-9]+):\W*(?<warningMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        Regex _reFileWarning = new Regex(@"^(?<filename>.+?):\W*?(warning)\W*:\W*(?<warningMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        Regex _reFileErrorWithLineNum   = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)(-(?<columnEnd>[0-9]+))?\))?:\W*?(error)\W*(?<errorCode>[A-Z][0-9]+)\W*:\W*(?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        Regex _reFileWarningWithLineNum = new Regex(@"^(?<filename>.+?)(\((?<line>[0-9]+),(?<column>[0-9]+)(-(?<columnEnd>[0-9]+))?\))?:\W*?(warning)\W*(?<warningCode>[A-Z][0-9]+)\W*:\W*(?<warningMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reFileError = new Regex(@"^(?<filename>([a-zA-Z]:)?/.+?)\W*?: (?<errorMessage>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildEnd = new Regex(@"^(Build)\W+(?<buildInfo>.*?)\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         Regex _reBuildTime = new Regex(@"^(Time elapsed)\W+(?<buildElapsedTime>.*?)\.\r?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -165,6 +166,13 @@ namespace MonoGame.Tools.Pipeline
                 var errorCode = m.Groups["warningCode"];
                 Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
                 ErrorMessage = string.Format("{0} ({1},{2}): {3}", errorCode, lineNum, column, m.Groups["warningMessage"].Value);
+            }
+            else if (_reFileWarning.IsMatch(line))
+            {
+                State = OutputState.BuildWarning;
+                var m = _reFileWarning.Match(line);
+                Filename = m.Groups["filename"].Value.Replace("\\\\", "/").Replace("\\", "/");
+                ErrorMessage = m.Groups["warningMessage"].Value;
             }
             else if (_reFileError.IsMatch(line))
             {
