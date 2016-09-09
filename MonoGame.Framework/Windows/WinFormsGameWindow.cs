@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework.Windows;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using XnaKey = Microsoft.Xna.Framework.Input.Keys;
 using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
@@ -228,6 +229,30 @@ namespace MonoGame.Framework
             Keyboard.SetActive(false);
         }
 
+        private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
+        {
+            var key = (XnaKey)keyEventArgs.KeyCode;
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyDown;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
+        {
+            var key = (XnaKey)keyEventArgs.KeyCode;
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyUp;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
+        }
+
         private void OnMouseScroll(object sender, MouseEventArgs mouseEventArgs)
         {
             MouseState.ScrollWheelValue += mouseEventArgs.Delta;
@@ -269,36 +294,6 @@ namespace MonoGame.Framework
 
             if (touchState.HasValue)
                 TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
-        } 
-
-        private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
-        {
-            var key = (XnaKey)keyEventArgs.KeyCode;
-
-            if (KeyState != null && !KeyState.Contains(key))
-                KeyState.Add(key);
-
-            // Amendment: raise our added event.
-            EventHandler<KeysEventArgs> handler = TSKeyDown;
-            if (handler != null)
-            {
-                handler(this, new KeysEventArgs(key));
-            }
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
-        {
-            var key = (XnaKey)keyEventArgs.KeyCode;
-
-            if (KeyState != null)
-                KeyState.Remove(key);
-
-            // Amendment: raise our added event.
-            EventHandler<KeysEventArgs> handler = TSKeyUp;
-            if (handler != null)
-            {
-                handler(this, new KeysEventArgs(key));
-            }
         }
 
         private void OnMouseEnter(object sender, EventArgs e)
