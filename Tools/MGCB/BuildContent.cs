@@ -336,22 +336,26 @@ namespace MGCB
                         message = ex.ContentIdentity.SourceFilename;
                         if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
                             message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
-                        message += ": error: ";
+                        else
+                            message += " ";
                     }
+                    else
+                        message = c.SourceFile + " ";
+                    message += ": error : ";
                     message += ex.Message;
                     Console.WriteLine(message);
                     ++errorCount;
                 }
                 catch (PipelineException ex)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    Console.Error.WriteLine("{0} : error : {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)
                         Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    Console.Error.WriteLine("{0} : error : {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)
                         Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
