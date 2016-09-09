@@ -63,6 +63,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
+        /// Gets the the current PushFile for use in warning and error messages.
+        /// </summary>
+        /// <returns>Name of the file being processed.</returns>
+        protected string PeekFile()
+        {
+            if (filenames.Count == 0)
+                throw new InvalidOperationException("'filenames' is empty.\r\nCalls to PopFile() has to be paired with calls to PushFile().");
+            return filenames.Peek();
+        }
+
+        /// <summary>
         /// Outputs a high-priority status message from a content importer or processor.
         /// </summary>
         /// <param name="message">Message being reported.</param>

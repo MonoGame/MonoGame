@@ -28,8 +28,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 warning = contentIdentity.SourceFilename;
                 if (!string.IsNullOrEmpty(contentIdentity.FragmentIdentifier))
                     warning += "(" + contentIdentity.FragmentIdentifier + ")";
-                warning += ": warning : ";
+                else
+                    warning += " ";
             }
+            else
+                warning = PeekFile() + " "; 
+            warning += ": warning : ";
             
             if (messageArgs != null && messageArgs.Length != 0)
                 warning += string.Format(message, messageArgs);
