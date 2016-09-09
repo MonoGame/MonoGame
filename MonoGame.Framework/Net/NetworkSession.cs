@@ -144,7 +144,14 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                return IsHost ? localMachine : hostConnection.Tag as NetworkMachine;
+                NetworkMachine hostMachine = IsHost ? localMachine : hostConnection.Tag as NetworkMachine;
+
+                if (hostMachine == null)
+                {
+                    throw new NetworkException("Host machine is null at this time");
+                }
+
+                return hostMachine;
             }
         }
 
@@ -159,9 +166,9 @@ namespace Microsoft.Xna.Framework.Net
 
                 NetworkMachine hostMachine = HostMachine;
 
-                if (hostMachine == null || hostMachine.Gamers.Count == 0)
+                if (hostMachine.Gamers.Count == 0)
                 {
-                    return null;
+                    throw new NetworkException("NetworkSession not ready for use yet. Bug in internal session creation, gamer leaving or host migration code.");
                 }
 
                 return hostMachine.Gamers[0];
