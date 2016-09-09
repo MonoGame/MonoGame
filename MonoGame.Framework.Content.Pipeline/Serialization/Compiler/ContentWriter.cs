@@ -50,11 +50,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'X', // MacOSX
             'W', // WindowsStoreApp
             'n', // NativeClient
-            'u', // Ouya
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
+            'v', // PSVita
+            'O', // XboxOne
         };
 
         /// <summary>
@@ -265,19 +266,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 			    typeWriterMap.Add(typeWriter.GetType(), index);
                 typeMap.Add(type, typeWriter);
 
-                // TODO: This is kinda messy.. seems like there could
-                // be a better way for generics and arrays to register
-                // their inner types with the typeWriterMap.
-                if (type.IsGenericType)
-                {
-                    var args = type.GetGenericArguments();
-                    foreach (var arg in args)
-                        GetTypeWriter(arg);
-                }
-                else if (type.IsArray)
-                {
-                    GetTypeWriter(type.GetElementType());
-                }
+                typeWriter.OnAddedToContentWriter(this);
             }
             return typeWriter;
         }

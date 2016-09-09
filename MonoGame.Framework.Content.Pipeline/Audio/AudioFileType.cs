@@ -23,5 +23,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// The WMA format
         /// </summary>
         Wma,
+
+        /// <summary>
+        /// The Ogg format
+        /// </summary>
+        Ogg,
     }
 }

@@ -175,7 +175,11 @@ namespace MonoGame.Tests.ContentPipeline
             {
                 a = null,
                 b = null,
-                c = string.Empty
+                c = string.Empty,
+                d = null,
+                e = CullMode.CullClockwiseFace,
+                f = CullMode.CullCounterClockwiseFace,
+                g = CullMode.CullClockwiseFace
             });
         }
 
@@ -205,7 +209,9 @@ namespace MonoGame.Tests.ContentPipeline
                     new Color(0x91, 0x6B, 0x46, 0xFF),
                     new Color(0x91, 0x7B, 0x46, 0xFF),
                     new Color(0x88, 0x65, 0x43, 0xFF)
-                }
+                },
+                CustomItemList = new List<CustomItem>(),
+                CustomItemInheritedList = new List<CustomItemInherited>()
             });
         }
 
@@ -457,7 +463,8 @@ namespace MonoGame.Tests.ContentPipeline
             SerializeAndAssert("24_GenericTypes.xml", new GenericTypes
             {
                 A = new GenericClass<int> { Value = 3 },
-                B = new GenericClass<float> { Value = 4.2f }
+                B = new GenericClass<float> { Value = 4.2f },
+                C = new GenericClass<GenericArg> { Value = new GenericArg { Value = 5 } }
             });
         }
 
@@ -471,6 +478,20 @@ namespace MonoGame.Tests.ContentPipeline
                     new ChildCollectionChild { Name = "Foo" },
                     new ChildCollectionChild { Name = "Bar" }
                 }
+            });
+        }
+
+        [Test]
+        public void Colors()
+        {
+            SerializeAndAssert("27_Colors.xml", new Colors()
+            {
+                White = Color.White,
+                Black = Color.Black,
+                Transparent = Color.Transparent,
+                Red = Color.Red,
+                Green = Color.Green,
+                Blue = Color.Blue
             });
         }
     }

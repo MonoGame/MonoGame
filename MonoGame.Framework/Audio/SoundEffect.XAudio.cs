@@ -12,8 +12,20 @@ using SharpDX.X3DAudio;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffect : IDisposable
+    partial class SoundEffect
     {
+#if WINDOWS || (WINRT && !WINDOWS_PHONE)
+
+        // These platforms are only limited by memory.
+        internal const int MAX_PLAYING_INSTANCES = int.MaxValue;
+
+#elif WINDOWS_PHONE
+
+        // Reference: http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.audio.instanceplaylimitexception.aspx
+        internal const int MAX_PLAYING_INSTANCES = 64;
+
+#endif
+
         #region Static Fields & Properties
 
         internal static XAudio2 Device { get; private set; }
@@ -50,6 +62,29 @@ namespace Microsoft.Xna.Framework.Audio
                 }
 
                 return _device3D;
+            }
+        }
+
+
+        private static SubmixVoice _reverbVoice;
+
+        internal static SubmixVoice ReverbVoice
+        {
+            get
+            {
+                if (_reverbVoice == null)
+                {
+                    var details = MasterVoice.VoiceDetails;
+                    _reverbVoice = new SubmixVoice(Device, details.InputChannelCount, details.InputSampleRate);
+
+                    var reverb = new SharpDX.XAudio2.Fx.Reverb();
+                    var desc = new EffectDescriptor(reverb);
+                    desc.InitialState = true;
+                    desc.OutputChannelCount = details.InputChannelCount;
+                    _reverbVoice.SetEffectChain(desc);
+                }
+
+                return _reverbVoice;
             }
         }
 
@@ -123,31 +158,74 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
+        private static DataStream ToDataStream(int offset, byte[] buffer, int length)
         {
-            CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
-                            DataStream.Create(buffer, true, false),
-                            0, 
-                            buffer.Length);
+            // NOTE: We make a copy here because old versions of 
+            // DataStream.Create didn't work correctly for offsets.
+            var data = new byte[length - offset];
+            Buffer.BlockCopy(buffer, offset, data, 0, length - offset);
+
+            return DataStream.Create(data, true, false);
         }
 
-        private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
+        private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
-                            DataStream.Create(buffer, true, false, offset),
+                            ToDataStream(offset, buffer, count),
                             loopStart, 
                             loopLength);
         }
 
-        private void PlatformLoadAudioStream(Stream s)
+        private void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
+        {
+            var format = BitConverter.ToInt16(header, 0);
+            var channels = BitConverter.ToInt16(header, 2);
+            var sampleRate = BitConverter.ToInt32(header, 4);
+            var blockAlignment = BitConverter.ToInt16(header, 12);
+
+            WaveFormat waveFormat;
+            if (format == 1)
+                waveFormat = new WaveFormat(sampleRate, channels);
+            else if (format == 2)
+                waveFormat = new WaveFormatAdpcm(sampleRate, channels, blockAlignment);
+            else
+                throw new NotSupportedException("Unsupported wave format!");
+
+            CreateBuffers(  waveFormat,
+                            ToDataStream(0, buffer, bufferSize),
+                            loopStart,
+                            loopLength);
+        }
+
+        private void PlatformInitializeXact(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength, out TimeSpan duration)
+        {
+            if (codec == MiniFormatTag.Adpcm)
+            {
+                duration = TimeSpan.FromSeconds((float)loopLength / sampleRate);
+
+                CreateBuffers(  new WaveFormatAdpcm(sampleRate, channels, blockAlignment),
+                                ToDataStream(0, buffer, buffer.Length),
+                                loopStart,
+                                loopLength);
+
+                return;
+            }
+
+            throw new NotSupportedException("Unsupported sound format!");
+        }
+
+        private void PlatformLoadAudioStream(Stream s, out TimeSpan duration)
         {
             var soundStream = new SoundStream(s);
+            if (soundStream.Format.Encoding != WaveFormatEncoding.Pcm)
+                throw new ArgumentException("Ensure that the specified stream contains valid PCM mono or stereo wave data.");
+
             var dataStream = soundStream.ToDataStream();
-            var sampleLength = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
-            CreateBuffers(  soundStream.Format,
-                            dataStream,
-                            0,
-                            sampleLength);
+            var sampleCount = (int)(dataStream.Length / ((soundStream.Format.Channels * soundStream.Format.BitsPerSample) / 8));
+
+            CreateBuffers(soundStream.Format, dataStream, 0, sampleCount);
+
+            duration = TimeSpan.FromSeconds((float)sampleCount / soundStream.Format.SampleRate);
         }
 
         private void CreateBuffers(WaveFormat format, DataStream dataStream, int loopStart, int loopLength)
@@ -179,14 +257,75 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-            SourceVoice voice = null;
-            if (Device != null)
-                voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
+            // If the instance came from the pool then it could
+            // already have a valid voice assigned.
+            var voice = inst._voice;
+
+            if (voice != null)
+            {
+                // TODO: This really shouldn't be here.  Instead we should fix the 
+                // SoundEffectInstancePool to internally to look for a compatible
+                // instance or return a new instance without a voice.
+                //
+                // For now we do the same test that the pool should be doing here.
+             
+                if (!ReferenceEquals(inst._format, _format))
+                {
+                    if (inst._format.Encoding != _format.Encoding ||
+                        inst._format.Channels != _format.Channels ||
+                        inst._format.SampleRate != _format.SampleRate ||
+                        inst._format.BitsPerSample != _format.BitsPerSample)
+                    {
+                        voice.DestroyVoice();
+                        voice.Dispose();
+                        voice = null;
+                    }
+                }
+            }
+
+            if (voice == null && Device != null)
+                voice = new SourceVoice(Device, _format, VoiceFlags.UseFilter, XAudio2.MaximumFrequencyRatio);
 
             inst._voice = voice;
+            inst._format = _format;
         }
 
         #endregion
+
+        internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
+        {
+            // All parameters related to sampling rate or time are relative to a 48kHz 
+            // voice and must be scaled for use with other sampling rates.
+            var timeScale = 48000.0f / ReverbVoice.VoiceDetails.InputSampleRate;
+
+            var settings = new SharpDX.XAudio2.Fx.ReverbParameters
+            {
+                ReflectionsGain = reverbSettings.ReflectionsGainDb,
+                ReverbGain = reverbSettings.ReverbGainDb,
+                DecayTime = reverbSettings.DecayTimeSec,
+                ReflectionsDelay = (byte)(reverbSettings.ReflectionsDelayMs * timeScale),
+                ReverbDelay = (byte)(reverbSettings.ReverbDelayMs * timeScale),
+                RearDelay = (byte)(reverbSettings.RearDelayMs * timeScale),
+                RoomSize = reverbSettings.RoomSizeFeet,
+                Density = reverbSettings.DensityPct,
+                LowEQGain = (byte)reverbSettings.LowEqGain,
+                LowEQCutoff = (byte)reverbSettings.LowEqCutoff,
+                HighEQGain = (byte)reverbSettings.HighEqGain,
+                HighEQCutoff = (byte)reverbSettings.HighEqCutoff,
+                PositionLeft = (byte)reverbSettings.PositionLeft,
+                PositionRight = (byte)reverbSettings.PositionRight,
+                PositionMatrixLeft = (byte)reverbSettings.PositionLeftMatrix,
+                PositionMatrixRight = (byte)reverbSettings.PositionRightMatrix,
+                EarlyDiffusion = (byte)reverbSettings.EarlyDiffusion,
+                LateDiffusion = (byte)reverbSettings.LateDiffusion,
+                RoomFilterMain = reverbSettings.RoomFilterMainDb,
+                RoomFilterFreq = reverbSettings.RoomFilterFrequencyHz * timeScale,
+                RoomFilterHF = reverbSettings.RoomFilterHighFrequencyDb,
+                WetDryMix = reverbSettings.WetDryMixPct
+            };
+
+            ReverbVoice.SetEffectParameters(0, settings);
+        }
 
         private void PlatformDispose(bool disposing)
         {
@@ -200,11 +339,15 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
-            SoundEffectInstancePool.Shutdown();
+            if (_reverbVoice != null)
+            {
+                _reverbVoice.DestroyVoice();
+                _reverbVoice.Dispose();
+                _reverbVoice = null;
+            }
 
             if (MasterVoice != null)
             {
-                MasterVoice.DestroyVoice();
                 MasterVoice.Dispose();
                 MasterVoice = null;
             }

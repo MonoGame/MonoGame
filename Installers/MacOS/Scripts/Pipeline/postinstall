@@ -1,4 +1,11 @@
 #!/bin/bash
+
+#fix permissions
+chmod +x /Applications/Pipeline.app/Contents/MacOS/Pipeline   
+chmod +x /Applications/Pipeline.app/Contents/MonoBundle/ffmpeg
+chmod +x /Applications/Pipeline.app/Contents/MonoBundle/ffprobe
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -v -f /Applications/Pipeline.app
+
 #mgcb terminal command
 if [ ! -d /usr/local/bin ]
 then

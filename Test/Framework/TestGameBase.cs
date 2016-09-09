@@ -117,6 +117,7 @@ namespace MonoGame.Tests {
 		public event EventHandler<FrameInfoEventArgs> UpdateWith;
 		public event EventHandler<FrameInfoEventArgs> UpdateOncePerDrawWith;
 
+		public event EventHandler<FrameInfoEventArgs> PreInitializeWith;
 		public event EventHandler<FrameInfoEventArgs> PreLoadContentWith;
 		public event EventHandler<FrameInfoEventArgs> PreUnloadContentWith;
 		public event EventHandler<FrameInfoEventArgs> PreDrawWith;
@@ -131,6 +132,7 @@ namespace MonoGame.Tests {
 			UpdateWith = null;
 			UpdateOncePerDrawWith = null;
 
+			PreInitializeWith = null;
 			PreLoadContentWith = null;
 			PreUnloadContentWith = null;
 			PreDrawWith = null;
@@ -145,8 +147,9 @@ namespace MonoGame.Tests {
 
 		protected override void Initialize ()
 		{
-			SafeRaise (InitializeWith);
+			SafeRaise (PreInitializeWith);
 			base.Initialize ();
+			SafeRaise (InitializeWith);
 		}
 
 		protected override void LoadContent ()

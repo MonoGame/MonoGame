@@ -4,12 +4,25 @@
 
 using System;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif DESKTOPGL
+using GLPixelFormat = MonoMac.OpenGL.All;
+using Bool = MonoMac.OpenGL.Boolean;
+#endif
+#if (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenTK.Graphics.OpenGL;
-#elif GLES
+using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
+using Bool = OpenTK.Graphics.OpenGL.Boolean;
+#endif
+#if DESKTOPGL
+using OpenGL;
+using GLPixelFormat = OpenGL.PixelFormat;
+using PixelFormat = OpenGL.PixelFormat;
+#endif
+#if GLES
 using OpenTK.Graphics.ES20;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -23,29 +36,21 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
 			GL.GenTextures(1, out this.glTexture);
-            GraphicsExtensions.CheckGLError();
-
-                TextureMinFilter newMinFilter = mipMap ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear;
-                TextureMagFilter newMagFilter = TextureMagFilter.Linear;
-
-            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
-            GraphicsExtensions.CheckGLError();
-
-					GL.TexParameter(glTarget, TextureParameterName.TextureMinFilter, (int)newMinFilter);
-					GraphicsExtensions.CheckGLError();
-					_lastTextureMinFilter = (int)newMinFilter;
-
-					GL.TexParameter(glTarget, TextureParameterName.TextureMagFilter, (int)newMagFilter);
-					GraphicsExtensions.CheckGLError();
-					_lastTextureMagFilter = (int)newMagFilter;
-
-					GL.TexParameter(glTarget, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-					GraphicsExtensions.CheckGLError();
-					_lastTextureWrapS = (int)TextureWrapMode.ClampToEdge;
-
-					GL.TexParameter(glTarget, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-					GraphicsExtensions.CheckGLError();
-					_lastTextureWrapT = (int)TextureWrapMode.ClampToEdge;
+                GraphicsExtensions.CheckGLError();
+                GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,
+                                mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter,
+                                (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
+                                (int)TextureWrapMode.ClampToEdge);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
+                                (int)TextureWrapMode.ClampToEdge);
+                GraphicsExtensions.CheckGLError();
 
             format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
@@ -53,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 TextureTarget target = GetGLCubeFace((CubeMapFace)i);
 
-                if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+                    if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                 {
                     throw new NotImplementedException();
                 }
@@ -69,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS || ANDROID
 				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
+                    GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)Bool.True);
 #endif
                 GraphicsExtensions.CheckGLError();
             }
@@ -78,15 +83,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
-#if OPENGL && MONOMAC
+#if OPENGL && (MONOMAC || DESKTOPGL)
             TextureTarget target = GetGLCubeFace(cubeMapFace);
-            GL.BindTexture(target, this.glTexture);
-            // 4 bytes per pixel
-            if (data.Length < size * size * 4)
-                throw new ArgumentException("data");
-
-            GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
-                PixelType.UnsignedByte, data);
+            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+            GraphicsExtensions.CheckGLError();
+            GL.GetTexImage<T>(target, 0, glFormat, glType, data);
+            GraphicsExtensions.CheckGLError();
 #else
             throw new NotImplementedException();
 #endif
@@ -100,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             TextureTarget target = GetGLCubeFace(face);
-            if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+                if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
             {
                 throw new NotImplementedException();
             }

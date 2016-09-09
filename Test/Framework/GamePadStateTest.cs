@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using NUnit.Framework;
@@ -42,7 +44,7 @@ namespace MonoGame.Tests.Framework
         [TestCase(Buttons.DPadUp, new[] { ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Pressed })]
         public void ConstructDPadState(Buttons button, ButtonState[] expectedDPadButtonStates)
         {
-            var state = new GamePadState(Vector2.Zero, Vector2.Zero, 0f, 0f, button != 0 ? new Buttons[] { button } : new Buttons[] { });
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, 0f, 0f, button != 0 ? button : new Buttons());
 
             if (button != 0)
                 Assert.True(state.IsButtonDown(button));
@@ -52,5 +54,53 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(expectedDPadButtonStates[2], state.DPad.Right, "DPad.Right Pressed or Released");
             Assert.AreEqual(expectedDPadButtonStates[3], state.DPad.Up, "DPad.Up Pressed or Released");
         }
+
+#if !XNA
+        [TestCaseSource("ThumbStickVirtualButtonsIgnoreDeadZoneTestCases")]
+        public void ThumbStickVirtualButtonsIgnoreDeadZone(Vector2 left, Vector2 right, GamePadDeadZone deadZone, Buttons expectedButtons)
+        {
+            var state = new GamePadState(new GamePadThumbSticks(left, right, deadZone), new GamePadTriggers(), new GamePadButtons(), new GamePadDPad());
+
+            Assert.AreEqual(expectedButtons, GetAllPressedButtons(state));
+        }
+
+        private static IEnumerable<TestCaseData> ThumbStickVirtualButtonsIgnoreDeadZoneTestCases
+        {
+            get
+            {
+                yield return new TestCaseData(
+                    Vector2.Zero, Vector2.Zero, GamePadDeadZone.Circular,
+                    (Buttons)0);
+
+                yield return new TestCaseData(
+                    new Vector2(1f, 0.1f), new Vector2(0.1f, 1f), GamePadDeadZone.Circular,
+                    Buttons.LeftThumbstickRight | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(1f, 0.1f), new Vector2(0.1f, 1f), GamePadDeadZone.None,
+                    Buttons.LeftThumbstickRight | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(1f, 0.1f), new Vector2(0.1f, 1f), GamePadDeadZone.IndependentAxes,
+                    Buttons.LeftThumbstickRight | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(0.5f, -0.5f), new Vector2(-0.5f, 0.5f), GamePadDeadZone.Circular,
+                    Buttons.LeftThumbstickRight | Buttons.LeftThumbstickDown | Buttons.RightThumbstickLeft | Buttons.RightThumbstickUp);
+
+                yield return new TestCaseData(
+                    new Vector2(0.1f, -0.1f), new Vector2(-0.1f, 0.1f), GamePadDeadZone.None,
+                    (Buttons)0);
+            }
+        }
+
+        private static Buttons GetAllPressedButtons(GamePadState state)
+        {
+            Buttons buttons = 0;
+            foreach (var button in Enum.GetValues(typeof(Buttons)).Cast<Buttons>().Where(state.IsButtonDown))
+                buttons |= button;
+            return buttons;
+        }
+#endif
     }
 }

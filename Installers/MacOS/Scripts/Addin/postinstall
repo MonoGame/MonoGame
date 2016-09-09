@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ -d "/Applications/Xamarin Studio.app" ]
 then
-	CONSOLE_USER=$(ps aux | grep console | grep -v grep | cut -d' ' -f1)
+	CONSOLE_USER=$(stat -f '%Su' /dev/console)
 	sudo -u $CONSOLE_USER /Applications/Xamarin\ Studio.app/Contents/MacOS/mdtool setup install /tmp/MonoDevelop.MonoGame_*.mpack -y
 fi
 sudo rm /tmp/MonoDevelop.MonoGame_*.mpack

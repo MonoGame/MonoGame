@@ -82,6 +82,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #endif
 
 			context.Logger.LogMessage ("Building Font {0}", fontName);
+            
+            // Get the platform specific texture profile.
+            var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
+
 			try {
 				if (!File.Exists(fontName)) {
 					throw new Exception(string.Format("Could not load {0}", fontName));
@@ -96,11 +100,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-                var format = GraphicsUtil.GetTextureFormatForPlatform(TextureFormat, context.TargetPlatform);
-                var requiresPOT = GraphicsUtil.RequiresPowerOfTwo(format, context.TargetPlatform, context.TargetProfile);
-                var requiresSquare = GraphicsUtil.RequiresSquare(format, context.TargetPlatform);
+                // We need to know how to pack the glyphs.
+                bool requiresPot, requiresSquare;
+                texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
 
-                var face = GlyphPacker.ArrangeGlyphs(glyphs, requiresPOT, requiresSquare);
+                var face = GlyphPacker.ArrangeGlyphs(glyphs, requiresPot, requiresSquare);
 
 				// Adjust line and character spacing.
 				lineSpacing += input.Spacing;
@@ -123,16 +127,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
 				}
 
-                output.Texture.Faces[0].Add(face);
-
-                if (GraphicsUtil.IsCompressedTextureFormat(format))
-                {
-                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, true, true);
-                }
+                output.Texture.Faces[0].Add(face);            
 			}
 			catch(Exception ex) {
 				context.Logger.LogImportantMessage("{0}", ex.ToString());
 			}
+
+            // Perform the final texture conversion.
+            texProfile.ConvertTexture(context, output.Texture, TextureFormat, false, true);    
 
             return output;
         }

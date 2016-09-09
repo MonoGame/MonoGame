@@ -3,10 +3,19 @@ using System.Diagnostics;
 
 #if OPENGL
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-#elif DESKTOPGL
-using OpenTK.Graphics;
+using GLPixelFormat = MonoMac.OpenGL.All;
+using PixelFormat = MonoMac.OpenGL.PixelFormat;
+#else
 using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
+using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+#endif
+#elif DESKTOPGL
+using OpenGL;
+using GLPixelFormat = OpenGL.PixelFormat;
+using PixelFormat = OpenGL.PixelFormat;
 #elif GLES
 #if ANGLE
 using OpenTK.Graphics;
@@ -16,6 +25,8 @@ using VertexPointerType = OpenTK.Graphics.ES20.All;
 using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #endif
 #endif
 
@@ -24,19 +35,6 @@ namespace Microsoft.Xna.Framework.Graphics
     static class GraphicsExtensions
     {
 #if OPENGL
-        public static All OpenGL11(CullMode cull)
-        {
-            switch (cull)
-            {
-                case CullMode.CullClockwiseFace:
-                    return All.Cw;
-                case CullMode.CullCounterClockwiseFace:
-                    return All.Ccw;
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
         public static int OpenGLNumberOfElements(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -63,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 2;
 
                 case VertexElementFormat.Short4:
-                    return 2;
+                    return 4;
 
                 case VertexElementFormat.NormalizedShort2:
                     return 2;
@@ -374,10 +372,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorSrc.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS || DESKTOPGL
-				return (BlendingFactorSrc)All.OneMinusSrcColor;
+#if MONOMAC
+                return (BlendingFactorSrc)All.OneMinusSrcColor;
 #else
-				return BlendingFactorSrc.OneMinusSrcColor;
+                return BlendingFactorSrc.OneMinusSrcColor;
 #endif
 			case Blend.One:
 				return BlendingFactorSrc.One;
@@ -386,11 +384,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceAlphaSaturation:
 				return BlendingFactorSrc.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS || DESKTOPGL
-				return (BlendingFactorSrc)All.SrcColor;
-#else
+        #if MONOMAC
+                return (BlendingFactorSrc)All.SrcColor;
+        #else
 				return BlendingFactorSrc.SrcColor;
-#endif
+        #endif
 			case Blend.Zero:
 				return BlendingFactorSrc.Zero;
 			default:
@@ -413,11 +411,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorDest.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS
-				return (BlendingFactorDest)All.OneMinusSrcColor;
-#else
 				return BlendingFactorDest.OneMinusSrcColor;
-#endif
 			case Blend.One:
 				return BlendingFactorDest.One;
 			case Blend.SourceAlpha:
@@ -425,11 +419,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //			case Blend.SourceAlphaSaturation:
 //				return BlendingFactorDest.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS
-				return (BlendingFactorDest)All.SrcColor;
-#else
 				return BlendingFactorDest.SrcColor;
-#endif
 			case Blend.Zero:
 				return BlendingFactorDest.Zero;
 			default:
@@ -579,37 +569,37 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !IOS && !ANDROID && !ANGLE
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
-				glFormat = (PixelFormat)All.CompressedTextureFormats;
+                glFormat = (PixelFormat)GLPixelFormat.CompressedTextureFormats;
 				break;
             case SurfaceFormat.Dxt1SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt1;
                 glInternalFormat = PixelInternalFormat.CompressedSrgbS3tcDxt1Ext;
-                glFormat = (PixelFormat) All.CompressedTextureFormats;
+                glFormat = (PixelFormat)GLPixelFormat.CompressedTextureFormats;
                 break;
             case SurfaceFormat.Dxt1a:
                 glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
-                glFormat = (PixelFormat)All.CompressedTextureFormats;
+                glFormat = (PixelFormat)GLPixelFormat.CompressedTextureFormats;
                 break;
             case SurfaceFormat.Dxt3:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
-				glFormat = (PixelFormat)All.CompressedTextureFormats;
+                glFormat = (PixelFormat)GLPixelFormat.CompressedTextureFormats;
 				break;
             case SurfaceFormat.Dxt3SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt3;
                 glInternalFormat = PixelInternalFormat.CompressedSrgbAlphaS3tcDxt3Ext;
-                glFormat = (PixelFormat) All.CompressedTextureFormats;
+                glFormat = (PixelFormat)GLPixelFormat.CompressedTextureFormats;
                 break;
 			case SurfaceFormat.Dxt5:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
-				glFormat = (PixelFormat)All.CompressedTextureFormats;
+                glFormat = (PixelFormat)GLPixelFormat.CompressedTextureFormats;
 				break;
             case SurfaceFormat.Dxt5SRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Dxt5;
                 glInternalFormat = PixelInternalFormat.CompressedSrgbAlphaS3tcDxt5Ext;
-                glFormat = (PixelFormat) All.CompressedTextureFormats;
+                glFormat = (PixelFormat)GLPixelFormat.CompressedTextureFormats;
                 break;
 			
 			case SurfaceFormat.Single:
@@ -772,6 +762,29 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public static bool IsCompressedFormat(this SurfaceFormat format)
+        {
+            switch (format)
+            {
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1a:
+                case SurfaceFormat.Dxt1SRgb:
+                case SurfaceFormat.Dxt3:
+                case SurfaceFormat.Dxt3SRgb:
+                case SurfaceFormat.Dxt5:
+                case SurfaceFormat.Dxt5SRgb:
+                case SurfaceFormat.RgbaAtcExplicitAlpha:
+                case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                case SurfaceFormat.RgbaPvrtc2Bpp:
+                case SurfaceFormat.RgbaPvrtc4Bpp:
+                case SurfaceFormat.RgbEtc1:
+                case SurfaceFormat.RgbPvrtc2Bpp:
+                case SurfaceFormat.RgbPvrtc4Bpp:
+                    return true;
+            }
+            return false;
+        }
+
         public static int GetSize(this SurfaceFormat surfaceFormat)
         {
             switch (surfaceFormat)
@@ -887,6 +900,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             var error = GL.GetError();
 #endif
+            //Console.WriteLine(error);
             if (error != ErrorCode.NoError)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
         }

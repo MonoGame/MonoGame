@@ -5,14 +5,12 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="Mono.Android" />
   </Platform>
 
   <Platform Type="iOS">
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="Xamarin.iOS" />
   </Platform>
 
   <Platform Type="Linux">
@@ -31,7 +29,6 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="Mono.Android" />
   </Platform>
 
   <Platform Type="Windows">

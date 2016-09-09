@@ -1,0 +1,34 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>MonoGame iOS Project</Name>
+    <Description>A MonoGame game project for iOS which requires Xamarin.iOS.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>43300</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>Game</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>__TemplateIcon.png</Icon>
+    <PreviewImage>__PreviewImage.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project ReplaceParameters="true" TargetFileName="$safeprojectname$.csproj" File="Game1.csproj">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Default.png">Default.png</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Entitlements.plist">Entitlements.plist</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="GameThumbnail.png">GameThumbnail.png</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Info.plist">Info.plist</ProjectItem>
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Content" TargetFolderName="Content">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
+      </Folder>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

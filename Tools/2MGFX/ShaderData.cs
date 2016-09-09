@@ -4,7 +4,14 @@ namespace TwoMGFX
 {
 	internal partial class ShaderData
 	{
-		public bool IsVertexShader;
+		public ShaderData(bool isVertexShader, int sharedIndex, byte[] bytecode)
+		{
+			IsVertexShader = isVertexShader;
+			SharedIndex = sharedIndex;
+			Bytecode = (byte[])bytecode.Clone();	    
+		}
+
+		public bool IsVertexShader { get; private set; }
 
 		public struct Sampler
 		{
@@ -19,10 +26,11 @@ namespace TwoMGFX
 
 		public struct Attribute
 		{
+            public string name;
+            public VertexElementUsage usage;
 			public int index;
-			public string name;
-			public VertexElementUsage usage;
-		}
+            public int location;
+        }
 
 		/// <summary>
 		/// The index to the constant buffers which are 
@@ -34,7 +42,7 @@ namespace TwoMGFX
 
 		public Attribute[] _attributes;
 
-		public byte[] ShaderCode { get; private set; }
+		public byte[] ShaderCode { get; set; }
 
 
 #region Non-Serialized Stuff

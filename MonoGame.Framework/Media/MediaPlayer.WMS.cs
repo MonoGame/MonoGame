@@ -15,7 +15,12 @@ namespace Microsoft.Xna.Framework.Media
         private static MediaSession _session;
         private static AudioStreamVolume _volumeController;
         private static PresentationClock _clock;
+
         private static Song _nextSong;
+        private static TimeSpan? _nextSongStartPosition;
+        private static Variant? _desiredPosition;
+
+
         private static Song _currentSong;
 
         private enum SessionState { Stopped, Stopping, Started, Paused, Ended }
@@ -41,7 +46,7 @@ namespace Microsoft.Xna.Framework.Media
 
                 switch (ev.TypeInfo)
                 {
-                    case MediaEventTypes.EndOfPresentation:
+                    case MediaEventTypes.SessionEnded:
                         _sessionState = SessionState.Ended;
                         OnSongFinishedPlaying(null, null);
                         break;
@@ -166,41 +171,43 @@ namespace Microsoft.Xna.Framework.Media
             _session.Pause();
         }
 
-        private static void PlatformPlaySong(Song song)
+        private static void PlatformPlaySong(Song song, TimeSpan? startPosition)
         {
             if (_currentSong == song)
-                ReplayCurrentSong(song);
+                ReplayCurrentSong(song, startPosition);
             else
-                PlayNewSong(song);
+                PlayNewSong(song, startPosition);
         }
 
-        private static void ReplayCurrentSong(Song song)
+        private static void ReplayCurrentSong(Song song, TimeSpan? startPosition)
         {
             if (_sessionState == SessionState.Stopping)
             {
                 // The song will be started after the SessionStopped event is received
                 _nextSong = song;
+                _nextSongStartPosition = startPosition;
                 return;
             }
 
-            StartSession(PositionBeginning);
+            StartSession(PositionVariantFor(startPosition));
         }
 
-        private static void PlayNewSong(Song song)
+        private static void PlayNewSong(Song song, TimeSpan? startPosition)
         {
             if (_sessionState != SessionState.Stopped)
             {
                 // The session needs to be stopped to reset the play position
                 // The new song will be started after the SessionStopped event is received
                 _nextSong = song;
+                _nextSongStartPosition = startPosition;
                 PlatformStop();
                 return;
             }
 
-            StartNewSong(song);
+            StartNewSong(song, startPosition);
         }
 
-        private static void StartNewSong(Song song)
+        private static void StartNewSong(Song song, TimeSpan? startPosition)
         {
             if (_volumeController != null)
             {
@@ -210,6 +217,9 @@ namespace Microsoft.Xna.Framework.Media
 
             _currentSong = song;
 
+            //We need to start playing from 0, then seek the stream when the topology is ready, otherwise the song doesn't play.
+            if (startPosition.HasValue)
+                _desiredPosition = PositionVariantFor(startPosition.Value);
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
 
             StartSession(PositionBeginning);
@@ -231,6 +241,12 @@ namespace Microsoft.Xna.Framework.Media
             _volumeController = CppObject.FromPointer<AudioStreamVolume>(volumeObjectPtr);
 
             SetChannelVolumes();
+
+            if (_desiredPosition.HasValue)
+            {
+                StartSession(_desiredPosition.Value);
+                _desiredPosition = null;
+            }
         }
 
         private static void PlatformResume()
@@ -260,11 +276,18 @@ namespace Microsoft.Xna.Framework.Media
             if (_nextSong != null)
             {
                 if (_nextSong != _currentSong)
-                    StartNewSong(_nextSong);
+                    StartNewSong(_nextSong, _nextSongStartPosition);
                 else
-                    StartSession(PositionBeginning);
+                    StartSession(PositionVariantFor(_nextSongStartPosition));
                 _nextSong = null;
             }
+        }
+
+        private static Variant PositionVariantFor(TimeSpan? position)
+        {
+            if (position.HasValue)
+                return new Variant { Value = position.Value.Ticks };
+            return PositionBeginning;
         }
     }
 }

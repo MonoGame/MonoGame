@@ -53,10 +53,13 @@ namespace MonoGame.Tools.Pipeline
         }
 
         [Browsable(false)]
-        public string Icon { get; set; }
+        public bool Exists { get; set; }
 
         [Browsable(false)]
-        public bool Exists { get; set; }
+        public bool ExpandToThis { get; set; }
+
+        [Browsable(false)]
+        public bool SelectThis { get; set; }
 
         #endregion
 

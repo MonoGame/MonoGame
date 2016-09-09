@@ -18,17 +18,23 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private void PlatformSetup()
         {
-            JSAPIAccess.Instance.GraphicsDevicePlatformSetup();
+            
         }
 
         private void PlatformInitialize()
         {
         }
 
+        internal void OnPresentationChanged()
+        {
+        }
+
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            // TODO: This is just a test at the moment.
-            JSAPIAccess.Instance.GraphicsDevicePlatformClear();
+            WebGL.gl.enable(WebGL.gl.DEPTH_TEST);
+            WebGL.gl.depthFunc(WebGL.gl.LEQUAL);
+            WebGL.gl.clearColor(color.X, color.Y, color.Z, color.W);
+            WebGL.gl.clear(WebGL.gl.COLOR_BUFFER_BIT | WebGL.gl.DEPTH_BUFFER_BIT);
         }
 
         private void PlatformDispose()
@@ -85,9 +91,18 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+        private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int instanceCount)
+        {
+        }
+
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             return GraphicsProfile.HiDef;
+        }
+
+        private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
+        {
+            return new Rectangle(x, y, width, height);
         }
     }
 }

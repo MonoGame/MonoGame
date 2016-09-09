@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
             : this(graphicsDevice, width, height, depth, mipMap, format, false)
-		{		    
+		{
 		}
 
 		protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
@@ -54,18 +54,28 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			SetData<T>(data, 0, data.Length);
 		}
-		
+
 		public void SetData<T> (T[] data, int startIndex, int elementCount) where T : struct
 		{
 			SetData<T>(0, 0, 0, Width, Height, 0, Depth, data, startIndex, elementCount);
 		}
-		
+
 		public void SetData<T> (int level,
 		                        int left, int top, int right, int bottom, int front, int back,
 		                        T[] data, int startIndex, int elementCount) where T : struct
 		{
-			if (data == null) 
+            long area = (right - left) * (bottom - top) * (back - front);
+
+            if (left < 0 || top < 0 || back < 0 || right > Width || bottom > Height || front > Depth)
+                throw new ArgumentException("area must remain inside texture bounds");
+            if (startIndex < 0)
+                throw new ArgumentException("startIndex must be non negative", "startIndex");
+			if (data == null)
 				throw new ArgumentNullException("data");
+            if (data.Length - startIndex < area)
+                throw new ArgumentException("data must be long enough to cover the area, taking into account startIndex", "data");
+            if (area > elementCount)
+                throw new ArgumentException("ElementCount must match the size of the requested area of the texture", "elementCount");
 
             int width = right - left;
             int height = bottom - top;

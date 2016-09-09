@@ -27,6 +27,7 @@
   </References>
 
   <Properties>
+    <LangVersion>Default</LangVersion>
     <WarningLevel>0</WarningLevel>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
     <CustomDefinitions>
@@ -42,6 +43,7 @@
       <Platform Name="Windows">TRACE;UNITY_4_5</Platform>
       <Platform Name="WindowsGL">TRACE;UNITY_4_5</Platform>
     </CustomDefinitions>
+
   </Properties>
 
    <Files>

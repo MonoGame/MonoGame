@@ -9,9 +9,15 @@ using System.Drawing;
 using MonoGame.Utilities.Png;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
+#else
+using AppKit;
+using CoreGraphics;
+using Foundation;
+#endif
 #endif
 
 #if IOS
@@ -22,18 +28,27 @@ using Foundation;
 
 #if OPENGL
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
+using GLPixelFormat = MonoMac.OpenGL.All;
+using PixelFormat = MonoMac.OpenGL.PixelFormat;
+#else
+using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
+using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+#endif
 #endif
 
 #if DESKTOPGL
-using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using OpenGL;
+using GLPixelFormat = OpenGL.PixelFormat;
+using PixelFormat = OpenGL.PixelFormat;
 #endif
 
 #if GLES
 using OpenTK.Graphics.ES20;
-using GLPixelFormat = OpenTK.Graphics.ES20.PixelFormat;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.PixelFormat;
 #endif
 
 #if ANDROID
@@ -62,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 format.GetGLFormat(GraphicsDevice, out glInternalFormat, out glFormat, out glType);
 
-                if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+                if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                 {
                     var imageSize = 0;
                     switch (format)
@@ -114,52 +129,52 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Threading.BlockOnUIThread(() =>
             {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            // Use try..finally to make sure dataHandle is freed in case of an error
-            try
-            {
-                var startBytes = startIndex * elementSizeInByte;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                int x, y, w, h;
-                if (rect.HasValue)
+                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                // Use try..finally to make sure dataHandle is freed in case of an error
+                try
                 {
-                    x = rect.Value.X;
-                    y = rect.Value.Y;
-                    w = rect.Value.Width;
-                    h = rect.Value.Height;
-                }
-                else
-                {
-                    x = 0;
-                    y = 0;
-                    w = Math.Max(width >> level, 1);
-                    h = Math.Max(height >> level, 1);
-
-                    // For DXT textures the width and height of each level is a multiple of 4.
-                    // OpenGL only: The last two mip levels require the width and height to be 
-                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
-                    // a 4x4 block. 
-                    // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                    if (_format == SurfaceFormat.Dxt1
-                        || _format == SurfaceFormat.Dxt1a
-                        || _format == SurfaceFormat.Dxt3
-                        || _format == SurfaceFormat.Dxt5
-                        || _format == SurfaceFormat.RgbaAtcExplicitAlpha
-                        || _format == SurfaceFormat.RgbaAtcInterpolatedAlpha
-                        || _format == SurfaceFormat.RgbPvrtc2Bpp
-                        || _format == SurfaceFormat.RgbPvrtc4Bpp
-                        || _format == SurfaceFormat.RgbaPvrtc2Bpp
-                        || _format == SurfaceFormat.RgbaPvrtc4Bpp
-                        || _format == SurfaceFormat.RgbEtc1
-                        )
+                    var startBytes = startIndex * elementSizeInByte;
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                    int x, y, w, h;
+                    if (rect.HasValue)
                     {
-                            if (w > 4)
-                                w = (w + 3) & ~3;
-                            if (h > 4)
-                                h = (h + 3) & ~3;
+                        x = rect.Value.X;
+                        y = rect.Value.Y;
+                        w = rect.Value.Width;
+                        h = rect.Value.Height;
                     }
-                }
+                    else
+                    {
+                        x = 0;
+                        y = 0;
+                        w = Math.Max(width >> level, 1);
+                        h = Math.Max(height >> level, 1);
+
+                        // For DXT textures the width and height of each level is a multiple of 4.
+                        // OpenGL only: The last two mip levels require the width and height to be 
+                        // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
+                        // a 4x4 block. 
+                        // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
+                        if (_format == SurfaceFormat.Dxt1
+                            || _format == SurfaceFormat.Dxt1a
+                            || _format == SurfaceFormat.Dxt3
+                            || _format == SurfaceFormat.Dxt5
+                            || _format == SurfaceFormat.RgbaAtcExplicitAlpha
+                            || _format == SurfaceFormat.RgbaAtcInterpolatedAlpha
+                            || _format == SurfaceFormat.RgbPvrtc2Bpp
+                            || _format == SurfaceFormat.RgbPvrtc4Bpp
+                            || _format == SurfaceFormat.RgbaPvrtc2Bpp
+                            || _format == SurfaceFormat.RgbaPvrtc4Bpp
+                            || _format == SurfaceFormat.RgbEtc1
+                            )
+                        {
+                                if (w > 4)
+                                    w = (w + 3) & ~3;
+                                if (h > 4)
+                                    h = (h + 3) & ~3;
+                        }
+                    }
 
                     // Store the current bound texture.
                     var prevTexture = GraphicsExtensions.GetBoundTexture2D();
@@ -168,16 +183,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                     GraphicsExtensions.CheckGLError();
-                    if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+                    if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                     {
                         if (rect.HasValue)
                         {
-                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glFormat, data.Length - startBytes, dataPtr);
+                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glFormat, elementCount - startBytes, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                         else
                         {
-                            GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
+                            GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, elementCount - startBytes, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                     }
@@ -210,11 +225,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Restore the bound texture.
                     GL.BindTexture(TextureTarget.Texture2D, prevTexture);
                     GraphicsExtensions.CheckGLError();
-            }
-            finally
-            {
-                dataHandle.Free();
-            }
+                }
+                finally
+                {
+                    dataHandle.Free();
+                }
 
 #if !ANDROID
                 // Required to make sure that any texture uploads on a thread are completed
@@ -258,7 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
-            if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+            if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
             {
                 throw new NotImplementedException();
             }
@@ -302,8 +317,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS
 				var cgImage = uiImage.CGImage;
 #elif MONOMAC
+#if PLATFORM_MACOS_LEGACY
 				var rectangle = RectangleF.Empty;
-				var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
+#else
+                var rectangle = CGRect.Empty;
+#endif
+                var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
 #endif
 
 			    return PlatformFromStream(graphicsDevice, cgImage);
@@ -396,7 +415,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if MONOMAC
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, NSImage nsImage)
         {
+#if PLATFORM_MACOS_LEGACY
             var rectangle = RectangleF.Empty;
+#else
+            var rectangle = CGRect.Empty;
+#endif
 		    var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
             return PlatformFromStream(graphicsDevice, cgImage);
         }
@@ -412,7 +435,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var colorSpace = CGColorSpace.CreateDeviceRGB();
             var bitmapContext = new CGBitmapContext(data, width, height, 8, width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
+#if PLATFORM_MACOS_LEGACY || IOS
             bitmapContext.DrawImage(new RectangleF(0, 0, width, height), cgImage);
+#else
+            bitmapContext.DrawImage(new CGRect(0, 0, width, height), cgImage);
+#endif
             bitmapContext.Dispose();
             colorSpace.Dispose();
 
@@ -492,7 +519,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS
+#if DESKTOPGL || MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #elif ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
@@ -503,18 +530,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS || IOS
-            var pngWriter = new PngWriter();
-            pngWriter.Write(this, stream);
-#elif ANDROID
+#if ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else
-            throw new NotImplementedException();
+            var pngWriter = new PngWriter();
+            pngWriter.Write(this, stream);
 #endif
         }
 
-#if MONOMAC || WINDOWS
-		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
+#if DESKTOPGL || MONOMAC
+        internal void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)
 			{

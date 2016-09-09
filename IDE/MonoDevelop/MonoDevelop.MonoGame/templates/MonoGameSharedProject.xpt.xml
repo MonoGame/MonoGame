@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Shared Project</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/library/crossplat</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Shared Project to shared common code. This can be used to share most of your shared code, but you can also include platform specific code using #defines.
@@ -17,6 +17,9 @@ Note this is a Shared Project only, it will need to be referenced from another M
 		<Project name = "${ProjectName}" directory = "." type = "SharedAssetsProject">
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
+				<Directory name="Content">
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference"/>
+				</Directory>
 			</Files>
 		</Project>
 	</Combine>

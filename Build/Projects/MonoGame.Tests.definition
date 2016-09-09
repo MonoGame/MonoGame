@@ -13,6 +13,7 @@
 
   <Properties>
     
+    <LangVersion>Default</LangVersion>
     <NoWarn>1591,0436</NoWarn>
     <MonoDevelopPoliciesFile>Build/MonoDevelopPolicies.xml</MonoDevelopPoliciesFile>
 
@@ -85,13 +86,17 @@
         <Platforms>iOS</Platforms>
     </Compile>
 
+    <Compile Include="Framework\ByteBufferPoolTest.cs" />
+    <Compile Include="Utilities\ActionDaemon.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\ColorTest.cs" />
 	<Compile Include="Framework\CurveKeyCollectionTest.cs" />
 	<Compile Include="Framework\CurveKeyTest.cs" />
 	<Compile Include="Framework\CurveTest.cs" />
 	<Compile Include="Framework\EnumConformingTest.cs" />
+    <Compile Include="Framework\GameComponentTest.cs" />
     <Compile Include="Framework\GamePadStateTest.cs" />
+    <Compile Include="Framework\GamePadThumbSticksTest.cs" />
     <Compile Include="Framework\GameTest.cs" />	
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
@@ -105,6 +110,7 @@
     <Compile Include="Framework\RayTest.cs" />
 	<Compile Include="Framework\RectangleTest.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Framework\TitleContainerTest.cs" />
     <Compile Include="Framework\TouchCollectionTest.cs" />
     <Compile Include="Framework\TouchLocationTest.cs" />
     <Compile Include="Framework\TouchPanelTest.cs" />
@@ -112,11 +118,17 @@
     <Compile Include="Framework\Vector2Test.cs" />
     <Compile Include="Framework\Vector3Test.cs" />
     <Compile Include="Framework\Vector4Test.cs" />
-    
+    <Compile Include="Framework\VertexTests.cs" />
+
+    <Compile Include="Framework\Audio\SoundEffectTest.cs" />
+    <Compile Include="Framework\Audio\XactTest.cs" />
+    <Compile Include="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
+	
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
+    <Compile Include="Framework\Components\InitializeOrderComponent.cs" />
     <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
     <Compile Include="Framework\Components\Simple3DCubeComponent.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
@@ -125,24 +137,36 @@
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
     <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
     <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
-    
-    <Compile Include="Framework\Visual\BlendStateTest.cs" />
-    <Compile Include="Framework\Visual\DepthStencilStateTest.cs" />
-    <Compile Include="Framework\Visual\EffectTest.cs" />
-    <Compile Include="Framework\Visual\GraphicsDeviceTest.cs" />
-    <Compile Include="Framework\Visual\RasterizerStateTest.cs" />
-    <Compile Include="Framework\Visual\SamplerStateTest.cs" />
-    <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
-    <Compile Include="Framework\Visual\Texture2DTest.cs" />
-    <Compile Include="Framework\Visual\Texture3DTest.cs" />
-    <Compile Include="Framework\Visual\TextureCubeTest.cs" />
-    <Compile Include="Framework\Visual\IndexBufferTest.cs" />
-    <Compile Include="Framework\Visual\VertexBufferTest.cs" />
+
+    <Compile Include="Framework\Graphics\BlendStateTest.cs" />
+    <Compile Include="Framework\Graphics\EffectTest.cs" />
+    <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
+    <Compile Include="Framework\Graphics\GraphicsDeviceTest.cs" />
+    <Compile Include="Framework\Graphics\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Graphics\GraphicsDeviceTestFixtureBase.cs" />
+    <Compile Include="Framework\Graphics\IndexBufferTest.cs" />
+    <Compile Include="Framework\Graphics\Texture2DNonVisualTest.cs" />
+    <Compile Include="Framework\Graphics\Texture3DNonVisualTest.cs" />
+
+    <Compile Include="Framework\Input\MouseTest.cs" />
+
+    <Compile Include="Framework\Graphics\DepthStencilStateTest.cs" />
+    <Compile Include="Framework\Graphics\GraphicsDeviceManagerTest.cs" />
+    <Compile Include="Framework\Graphics\RasterizerStateTest.cs" />
+    <Compile Include="Framework\Graphics\RenderTarget2DTest.cs" />
+    <Compile Include="Framework\Graphics\RenderTargetCubeTest.cs" />
+    <Compile Include="Framework\Graphics\SamplerStateTest.cs" />
+    <Compile Include="Framework\Graphics\ScissorRectangleTest.cs" />
+    <Compile Include="Framework\Graphics\Texture2DTest.cs" />
+    <Compile Include="Framework\Graphics\Texture3DTest.cs" />
+    <Compile Include="Framework\Graphics\TextureCubeTest.cs" />
+    <Compile Include="Framework\Graphics\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
-    <Compile Include="Framework\Visual\ShaderTest.cs" />
-    <Compile Include="Framework\Visual\SpriteBatchTest.cs" />
-    <Compile Include="Framework\Visual\SpriteFontTest.cs" />
-    <Compile Include="Framework\Visual\ViewportTest.cs" />
+    <Compile Include="Framework\Graphics\ShaderTest.cs" />
+    <Compile Include="Framework\Graphics\SpriteBatchTest.cs" />
+    <Compile Include="Framework\Graphics\SpriteFontTest.cs" />
+    <Compile Include="Framework\Graphics\ViewportTest.cs" />
+    <Compile Include="Framework\Graphics\OcclusionQueryTest.cs" />
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
 
@@ -150,6 +174,9 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\AssetTestUtility.cs" />
+    <Compile Include="ContentPipeline\AudioContentTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\BitmapContentTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -171,6 +198,12 @@
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\Mp3ImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\OggImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
@@ -189,6 +222,86 @@
     <Compile Include="ContentPipeline\TextureProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\WavImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\WmaImporterTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+
+    <Content Include="Assets\Audio\Win\Tests.xgs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xsb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\Win\Tests.xwb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	
+    <Content Include="Assets\Audio\bark_mono_11hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_22hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_44hz_32bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_44hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\bark_mono_88hz_16bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_11hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_11hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_22hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_22hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\blast_mono_44hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo.wma">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_11hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_11hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_22hz.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_22hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_44hz_8bit.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Audio\rock_loop_stereo_44hz_adpcm_ms.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -244,6 +357,9 @@
     <Content Include="Assets\Effects\DefinesTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Effects\Instancing.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Effects\ParserTest.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -275,28 +391,31 @@
     <Content Include="Assets\ReferenceImages\DepthStencilState\VisualTestStencilBuffer.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\DrawInstancedPrimitivesVisualTest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\GraphicsDevice\VertexTextureVisualTest.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-1.png">
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-2.png">
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-3.png">
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-4.png">
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-4.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-5.png">
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-5.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-6.png">
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-6.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-7.png">
+    <Content Include="Assets\ReferenceImages\GraphicsDevice\Clear-7.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\Miscellaneous\Colored3DCube.png">
@@ -378,6 +497,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestScissorTestEnable_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RenderTarget2D\GenerateMips.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SamplerState\VisualTestAddressModes.png">
@@ -519,6 +641,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	<Content Include="Assets\ReferenceImages\SpriteBatch\DrawWithLayerDepth.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_many.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
@@ -680,6 +805,9 @@
     <Content Include="Assets\Xml\26_ChildCollections.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Xml\27_Colors.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\Default.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -735,6 +863,22 @@
     <Content Include="Assets\Fonts\DataFont.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Fonts\JingJing.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\Lindsey.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\Motorwerk.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\QuartzMS.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\SegoeKeycaps.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
     <Content Include="Assets\Textures\white-1.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -754,6 +898,12 @@
     <Content Include="Assets\Textures\LogoOnly_64px.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Textures\LogoOnly_64px-monochrome.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\LogoOnly_64px-4bits.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Textures\LogoOnly_64px.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -767,6 +917,33 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\LogoOnly_64px.tif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\SampleCube64DXT1Mips.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\Sunset.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px-mipmaps.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\Logo555.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\Logo565.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Textures\rgbf.tif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\Textures\RGBA16.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 

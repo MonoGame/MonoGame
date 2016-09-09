@@ -8,15 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-#if MONOMAC
+#if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
+#endif
+#if MONOMAC && !PLATFORM_MACOS_LEGACY
+using OpenTK.Graphics.OpenGL;
 #endif
 #if GLES
 using OpenTK.Graphics.ES20;
 using BufferUsageHint = OpenTK.Graphics.ES20.BufferUsage;
 #endif
 #if DESKTOPGL
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -76,10 +79,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !GLES
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
             GraphicsExtensions.CheckGLError();
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+            IntPtr ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
 			if (typeof(T) == typeof(byte))
@@ -87,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
                 // Copy from the index buffer to the destination array
-                Marshal.Copy(ptr, buffer, 0, buffer.Length);
+                Marshal.Copy(ptr, buffer, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
             else
             {
@@ -98,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Copy from the temporary buffer to the destination array
                 Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
-            GL.UnmapBuffer(BufferTarget.ArrayBuffer);
+            GL.UnmapBuffer(BufferTarget.ElementArrayBuffer);
             GraphicsExtensions.CheckGLError();
         }
 #endif

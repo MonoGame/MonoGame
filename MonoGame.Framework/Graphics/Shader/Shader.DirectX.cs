@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.IO;
-
 using SharpDX.Direct3D11;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -14,7 +13,18 @@ namespace Microsoft.Xna.Framework.Graphics
         private PixelShader _pixelShader;
         private byte[] _shaderBytecode;
 
-        public byte[] Bytecode { get; private set; }
+        // Caches the DirectX input layouts for this vertex shader.
+        private InputLayoutCache _inputLayouts;
+
+        internal byte[] Bytecode
+        {
+            get { return _shaderBytecode; }
+        }
+
+        internal InputLayoutCache InputLayouts
+        {
+            get { return _inputLayouts; }
+        }
 
         internal VertexShader VertexShader
         {
@@ -36,13 +46,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
+        private static int PlatformProfile()
         {
-            _shaderBytecode = shaderBytecode;
+            return 1;
+        }
 
+        private void PlatformConstruct(bool isVertexShader, byte[] shaderBytecode)
+        {
             // We need the bytecode later for allocating the
             // input layout from the vertex declaration.
-            Bytecode = shaderBytecode;
+            _shaderBytecode = shaderBytecode;
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(Bytecode);
 
@@ -56,6 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             SharpDX.Utilities.Dispose(ref _vertexShader);
             SharpDX.Utilities.Dispose(ref _pixelShader);
+            SharpDX.Utilities.Dispose(ref _inputLayouts);
         }
 
         protected override void Dispose(bool disposing)
@@ -64,6 +78,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 SharpDX.Utilities.Dispose(ref _vertexShader);
                 SharpDX.Utilities.Dispose(ref _pixelShader);
+                SharpDX.Utilities.Dispose(ref _inputLayouts);
             }
 
             base.Dispose(disposing);
@@ -79,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             System.Diagnostics.Debug.Assert(Stage == ShaderStage.Vertex);
             _vertexShader = new VertexShader(GraphicsDevice._d3dDevice, _shaderBytecode, null);
+            _inputLayouts = new InputLayoutCache(GraphicsDevice, Bytecode);
         }
     }
 }
-

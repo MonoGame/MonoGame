@@ -284,6 +284,20 @@ namespace MGCB
             errorCount = 0;
             successCount = 0;
 
+            // Before building the content, register all files to be built. (Necessary to
+            // correctly resolve external references.)
+            foreach (var c in _content)
+            {
+                try
+                {
+                    _manager.RegisterContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
+                }
+                catch
+                {
+                    // Ignore exception. Exception will be handled below.
+                }
+            }
+
             foreach (var c in _content)
             {
                 try
@@ -316,14 +330,14 @@ namespace MGCB
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
                 }
             }
@@ -385,7 +399,7 @@ namespace MGCB
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
 
                     ++errorCount;
                 }

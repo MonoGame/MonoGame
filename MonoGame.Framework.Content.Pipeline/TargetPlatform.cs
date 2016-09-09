@@ -1,13 +1,17 @@
 ﻿// MonoGame - Copyright (C) The MonoGame Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
 using System;
+using System.ComponentModel;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
     /// Identifiers for the target platform.
     /// </summary>
+    [TypeConverter(typeof(TargetPlatformTypeConverter))]
     public enum TargetPlatform
     {
         /// <summary>
@@ -88,17 +92,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         PlayStation4,
 
         /// <summary>
-        /// All desktop versions of Windows using OpenGL.
-        /// (MonoGame)
+        /// PlayStation Vita
         /// </summary>
-        [Obsolete("This platform is obsolete, use DesktopGL instead")]
-        WindowsGL = DesktopGL,
-
+        PSVita,
+       
         /// <summary>
-        /// Linux-based PCs
-        /// (MonoGame)
+        /// Xbox One
         /// </summary>
-        [Obsolete("This platform is obsolete, use DesktopGL instead")]
-        Linux = DesktopGL
+        XboxOne,
+    }
+
+
+    /// <summary>
+    /// Deserialize legacy Platforms from .MGCB files.
+    /// </summary>
+    internal class TargetPlatformTypeConverter : EnumConverter
+    {
+        public TargetPlatformTypeConverter(Type type) : base(type)
+        {
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {   
+            try
+            {
+                return base.ConvertFrom(context, culture, value);
+            }
+            catch (FormatException fex)
+            { 
+                // convert legacy Platforms
+                if (value.Equals("Linux") || value.Equals("WindowsGL"))
+                    return TargetPlatform.DesktopGL;
+                else throw fex;
+            }
+        }
     }
 }

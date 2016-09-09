@@ -10,12 +10,17 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 #if MONOMAC
+#if PLATFORM_MACOS_LEGACY
 using MonoMac;
 using MonoMac.OpenGL;
+#else
+using ObjCRuntime;
+using OpenTK.Graphics.OpenGL;
+#endif
 #endif
 
 #if (WINDOWS || DESKTOPGL) && !GLES
-using OpenTK.Graphics.OpenGL;
+using OpenGL;
 
 #endif
 

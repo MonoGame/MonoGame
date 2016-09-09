@@ -111,16 +111,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 output.VerticalLineSpacing = Math.Max(output.VerticalLineSpacing, glyph.Subrect.Height);
 			}
 
-            var format = GraphicsUtil.GetTextureFormatForPlatform(TextureFormat, context.TargetPlatform);
-            var requiresPOT = GraphicsUtil.RequiresPowerOfTwo(format, context.TargetPlatform, context.TargetProfile);
-            var requiresSquare = GraphicsUtil.RequiresSquare(format, context.TargetPlatform);
-            face = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), requiresPOT, requiresSquare);
+            // Get the platform specific texture profile.
+            var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
+
+            // We need to know how to pack the glyphs.
+            bool requiresPot, requiresSquare;
+            texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
+
+            face = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), requiresPot, requiresSquare);
 			
 			foreach (var glyph in glyphs)
             {
 				output.CharacterMap.Add(glyph.Character);
 				output.Glyphs.Add(new Rectangle (glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
-                output.Cropping.Add(new Rectangle((int)glyph.XOffset, (int)glyph.YOffset, glyph.Subrect.Width, glyph.Subrect.Height));
+                output.Cropping.Add(new Rectangle((int)glyph.XOffset, (int)glyph.YOffset, glyph.Width, glyph.Height));
 				var abc = glyph.CharacterWidths;
 				output.Kerning.Add(new Vector3(abc.A, abc.B, abc.C));
 			}
@@ -151,17 +155,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 bmp.SetPixelData(data);
             }
 
-			if (GraphicsUtil.IsCompressedTextureFormat(format))
-            {
-				try
-                {
-					GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, format, context, false, PremultiplyAlpha, true);
-				}
-				catch(Exception ex)
-                {
-					context.Logger.LogImportantMessage("{0}", ex.ToString());
-				}
-			}
+            // Perform the final texture conversion.
+            texProfile.ConvertTexture(context, output.Texture, TextureFormat, false, true);
 
 			return output;
 		}
