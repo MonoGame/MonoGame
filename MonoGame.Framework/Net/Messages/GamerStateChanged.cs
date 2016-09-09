@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
-        public void Send(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(NetBuffer output, NetworkMachine currentMachine)
         {
             output.Write(localGamer.Id);
 
@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct GamerStateChangedReceiver : IInternalMessageReceiver
+    internal class GamerStateChangedReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {

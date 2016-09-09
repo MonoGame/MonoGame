@@ -578,7 +578,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             output.Write((byte)message.MessageType);
 
-            message.Send(output, localMachine);
+            message.Write(output, localMachine);
         }
 
         internal void QueueMessage(IInternalMessageContent message)
@@ -649,8 +649,7 @@ namespace Microsoft.Xna.Framework.Net
                 Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(senderMachine) + "...");
             }
 
-            Type receiverToInstantiate = InternalMessageReceivers.FromType[messageType];
-            IInternalMessageReceiver receiver = (IInternalMessageReceiver)Activator.CreateInstance(receiverToInstantiate);
+            IInternalMessageReceiver receiver = InternalMessageReceivers.FromType[messageType];
             receiver.Receive(input, localMachine, senderMachine);
         }
 

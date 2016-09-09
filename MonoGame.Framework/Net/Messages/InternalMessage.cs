@@ -21,20 +21,20 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal static class InternalMessageReceivers
     {
-        public static Type[] FromType = new Type[]
+        public static IInternalMessageReceiver[] FromType =
         {
-            typeof(ConnectionAcknowledgedReceiver),
-            typeof(ConnectToAllRequestReceiver),
-            typeof(FullyConnectedReceiver),
-            typeof(GamerIdRequestReceiver),
-            typeof(GamerIdResponseReceiver),
-            typeof(GamerJoinedReceiver),
-            typeof(GamerLeftReceiver),
-            typeof(GamerStateChangedReceiver),
-            typeof(GameStartedReceiver),
-            typeof(GameEndedReceiver),
-            typeof(UserMessageReceiver),
-            typeof(RemoveMachineReceiver)
+            new ConnectionAcknowledgedReceiver(),
+            new ConnectToAllRequestReceiver(),
+            new FullyConnectedReceiver(),
+            new GamerIdRequestReceiver(),
+            new GamerIdResponseReceiver(),
+            new GamerJoinedReceiver(),
+            new GamerLeftReceiver(),
+            new GamerStateChangedReceiver(),
+            new GameStartedReceiver(),
+            new GameEndedReceiver(),
+            new UserMessageReceiver(),
+            new RemoveMachineReceiver()
         };
     }
 
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         InternalMessageType MessageType { get; }
         int SequenceChannel { get; }
         SendDataOptions Options { get; }
-        void Send(NetBuffer output, NetworkMachine currentMachine);
+        void Write(NetBuffer output, NetworkMachine currentMachine);
     }
 
     internal interface IInternalMessageReceiver

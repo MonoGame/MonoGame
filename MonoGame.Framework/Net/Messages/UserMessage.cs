@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 0; } }
         public SendDataOptions Options { get { return options; } }
 
-        public void Send(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(NetBuffer output, NetworkMachine currentMachine)
         {
             if (!currentMachine.IsFullyConnected)
             {
@@ -41,14 +41,13 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct UserMessageReceiver : IInternalMessageReceiver
+    internal class UserMessageReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (!currentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {
-                // TODO: SuspiciousUnexpectedMessage
-                Debug.Assert(false);
+                // Will occur naturally for non fully connected machines if a machine sends to everyone
                 return;
             }
 

@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
-        public void Send(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(NetBuffer output, NetworkMachine currentMachine)
         {
             if (!currentMachine.IsHost)
             {
@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         }
     }
 
-    internal struct GameStartedReceiver : IInternalMessageReceiver
+    internal class GameStartedReceiver : IInternalMessageReceiver
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
