@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerIdRequestSender : IInternalMessageSender
+    internal struct GamerIdRequestSender : IInternalMessageContent
     {
         public InternalMessageType MessageType { get { return InternalMessageType.GamerIdRequest; } }
         public int SequenceChannel { get { return 1; } }
@@ -18,20 +18,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            if (!currentMachine.IsHost)
+            if (!currentMachine.IsHost || !senderMachine.IsFullyConnected)
             {
-                Debug.WriteLine("Warning: Received GamerIdRequest when not host!");
                 // TODO: SuspiciousUnexpectedMessage
-                return;
-            }
-            if (!senderMachine.IsFullyConnected)
-            {
-                Debug.WriteLine("Warning: Received GamerIdRequest from not fully connected peer!");
-                // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
                 return;
             }
 
-            currentMachine.Session.Send(new GamerIdResponseSender(), senderMachine);
+            currentMachine.Session.QueueMessage(new GamerIdResponseSender(), senderMachine);
         }
     }
 }

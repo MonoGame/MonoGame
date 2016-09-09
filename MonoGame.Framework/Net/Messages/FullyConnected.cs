@@ -1,9 +1,10 @@
 ﻿using System;
 using Lidgren.Network;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct FullyConnectedSender : IInternalMessageSender
+    internal struct FullyConnectedSender : IInternalMessageContent
     {
         public InternalMessageType MessageType { get { return InternalMessageType.FullyConnected; } }
         public int SequenceChannel { get { return 1; } }
@@ -20,6 +21,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (senderMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousRepeatedInfo
+                Debug.Assert(false);
                 return;
             }
 

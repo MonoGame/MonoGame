@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GameEndedSender : IInternalMessageSender
+    internal struct GameEndedSender : IInternalMessageContent
     {
         public InternalMessageType MessageType { get { return InternalMessageType.GameEnded; } }
         public int SequenceChannel { get { return 1; } }
@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!senderMachine.IsHost)
             {
                 // TODO: SuspiciousHostClaim
-                Debug.WriteLine("Warning: Received GameEnded from non-host!");
+                Debug.Assert(false);
                 return;
             }
 
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 localGamer.SetReadyState(false);
 
-                currentMachine.Session.Send(new GamerStateChangedSender(localGamer, false, true));
+                currentMachine.Session.QueueMessage(new GamerStateChangedSender(localGamer, false, true));
             }
 
             // Reset state before going into lobby

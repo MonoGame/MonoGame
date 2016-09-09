@@ -1,9 +1,10 @@
 ﻿using System;
 using Lidgren.Network;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerJoinedSender : IInternalMessageSender
+    internal struct GamerJoinedSender : IInternalMessageContent
     {
         private LocalNetworkGamer localGamer;
 
@@ -37,6 +38,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!senderMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
                 return;
             }
 
@@ -49,6 +51,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (currentMachine.Session.FindGamerById(id) != null)
             {
                 // TODO: SuspiciousGamerIdCollision
+                Debug.Assert(false);
                 return;
             }
 

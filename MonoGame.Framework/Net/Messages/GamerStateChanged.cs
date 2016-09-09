@@ -1,9 +1,10 @@
 ﻿using Lidgren.Network;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerStateChangedSender : IInternalMessageSender
+    internal struct GamerStateChangedSender : IInternalMessageContent
     {
         private LocalNetworkGamer localGamer;
         private bool sendNames;
@@ -55,6 +56,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (remoteGamer.Machine != senderMachine)
             {
                 // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
                 return;
             }
 

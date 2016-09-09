@@ -19,9 +19,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
         RemoveMachine
     }
 
-    internal static class InternalMessage
+    internal static class InternalMessageReceivers
     {
-        public static Type[] MessageToReceiverTypeMap = new Type[]
+        public static Type[] FromType = new Type[]
         {
             typeof(ConnectionAcknowledgedReceiver),
             typeof(ConnectToAllRequestReceiver),
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         };
     }
 
-    internal interface IInternalMessageSender
+    internal interface IInternalMessageContent
     {
         InternalMessageType MessageType { get; }
         int SequenceChannel { get; }
@@ -49,5 +49,17 @@ namespace Microsoft.Xna.Framework.Net.Messages
     internal interface IInternalMessageReceiver
     {
         void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine);
+    }
+
+    internal struct InternalMessage
+    {
+        public IInternalMessageContent content;
+        public NetworkMachine recipient;
+
+        public InternalMessage(IInternalMessageContent content, NetworkMachine recipient)
+        {
+            this.content = content;
+            this.recipient = recipient;
+        }
     }
 }

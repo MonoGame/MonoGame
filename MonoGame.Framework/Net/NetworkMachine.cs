@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Lidgren.Network;
 using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Net.Messages;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -11,6 +12,8 @@ namespace Microsoft.Xna.Framework.Net
         internal NetConnection connection;
         private IList<LocalNetworkGamer> localGamers;
         private IList<NetworkGamer> gamers;
+
+        private bool beingRemoved;
 
         internal NetworkMachine(NetworkSession session, NetConnection connection, bool isHost)
         {
@@ -25,6 +28,7 @@ namespace Microsoft.Xna.Framework.Net
             this.connection = connection;
             this.localGamers = this.IsLocal ? new List<LocalNetworkGamer>() : null;
             this.gamers = new List<NetworkGamer>();
+            this.beingRemoved = false;
 
             this.LocalGamers = this.IsLocal ? new GamerCollection<LocalNetworkGamer>(localGamers) : null;
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
@@ -116,9 +120,11 @@ namespace Microsoft.Xna.Framework.Net
             }
             else
             {
-                if (!Session.forceRemovedMachines.Contains(this))
+                if (!beingRemoved)
                 {
-                    Session.forceRemovedMachines.Add(this);
+                    Session.QueueMessage(new RemoveMachineSender(this));
+
+                    beingRemoved = true;
                 }
             }
         }

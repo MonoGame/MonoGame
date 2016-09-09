@@ -7,7 +7,7 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct ConnectToAllRequestSender : IInternalMessageSender
+    internal struct ConnectToAllRequestSender : IInternalMessageContent
     {
         private ICollection<NetworkMachine> requestedConnections;
 
@@ -46,13 +46,13 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!senderMachine.IsHost)
             {
                 // TODO: SuspiciousHostClaim
-                Debug.WriteLine("Warning: Received ConnectToAllRequest from non-host!");
+                Debug.Assert(false);
                 return;
             }
             if (currentMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousRepeatedInfo
-                Debug.WriteLine("Warning: Received ConnectToAllRequest when already fully connected!");
+                Debug.Assert(false);
                 return;
             }
 

@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct UserMessageSender : IInternalMessageSender
+    internal struct UserMessageSender : IInternalMessageContent
     {
         private NetworkGamer sender;
         private NetworkGamer recipient;
@@ -48,6 +48,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!currentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
                 return;
             }
 
@@ -64,7 +65,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (sender != null && sender.Machine != senderMachine)
             {
                 // TODO: SuspiciousInvalidGamerId
-                Debug.WriteLine("Warning: User message sender does not belong to the sender machine!");
+                Debug.Assert(false);
                 return;
             }
 
@@ -87,8 +88,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 }
                 if (!recipient.IsLocal)
                 {
-                    Debug.WriteLine("Warning: User message sent to the wrong peer!");
                     // TODO: SuspiciousInvalidGamerId
+                    Debug.Assert(false);
                     return;
                 }
 

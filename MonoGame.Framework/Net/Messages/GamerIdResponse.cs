@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerIdResponseSender : IInternalMessageSender
+    internal struct GamerIdResponseSender : IInternalMessageContent
     {
         public InternalMessageType MessageType { get { return InternalMessageType.GamerIdResponse; } }
         public int SequenceChannel { get { return 1; } }
@@ -33,13 +33,13 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!senderMachine.IsHost)
             {
                 // TODO: SuspiciousHostClaim
-                Debug.WriteLine("Warning: Received GamerIdResponse from non-host!");
+                Debug.Assert(false);
                 return;
             }
             if (!currentMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousUnexpectedMessage
-                Debug.WriteLine("Warning: Received GamerIdResponse when not fully connected!");
+                Debug.Assert(false);
                 return;
             }
 
@@ -49,18 +49,19 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (currentMachine.Session.FindGamerById(id) != null)
             {
                 // TODO: SuspiciousGamerIdCollision
-                Debug.WriteLine("Warning: GamerIdResponse received with colliding id!");
+                Debug.Assert(false);
                 return;
             }
-            if (currentMachine.Session.joiningSignedInGamers.Count == 0)
+
+            if (currentMachine.Session.pendingSignedInGamers.Count == 0)
             {
-                Debug.WriteLine("Warning: GamerIdResponse received but no signed in gamers waiting to join!");
+                Debug.WriteLine("Warning: GamerIdResponse received but there are no pending signed in gamers!");
                 return;
             }
 
             // Host approved request, now possible to create network gamer
-            SignedInGamer signedInGamer = currentMachine.Session.joiningSignedInGamers[0];
-            currentMachine.Session.joiningSignedInGamers.RemoveAt(0);
+            SignedInGamer signedInGamer = currentMachine.Session.pendingSignedInGamers[0];
+            currentMachine.Session.pendingSignedInGamers.RemoveAt(0);
 
             if (!wasApprovedByHost)
             {
@@ -70,7 +71,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             LocalNetworkGamer localGamer = new LocalNetworkGamer(currentMachine, signedInGamer, id, false);
             currentMachine.Session.AddGamer(localGamer);
-            currentMachine.Session.Send(new GamerJoinedSender(localGamer));
+            currentMachine.Session.QueueMessage(new GamerJoinedSender(localGamer));
         }
     }
 }

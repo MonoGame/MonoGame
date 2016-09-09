@@ -1,9 +1,10 @@
 ﻿using Lidgren.Network;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct ConnectionAcknowledgedSender : IInternalMessageSender
+    internal struct ConnectionAcknowledgedSender : IInternalMessageContent
     {
         public InternalMessageType MessageType { get { return InternalMessageType.ConnectionAcknowledged; } }
         public int SequenceChannel { get { return 1; } }
@@ -43,6 +44,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (senderMachine.HasAcknowledgedLocalMachine)
             {
                 // TODO: SuspiciousRepeatedInfo
+                Debug.Assert(false);
                 return;
             }
 
@@ -51,6 +53,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (isHost && !senderMachine.IsHost)
             {
                 // TODO: SuspiciousHostClaim
+                Debug.Assert(false);
                 return;
             }
 
@@ -65,6 +68,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (gamerCount > 0 && !senderMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
                 return;
             }
 
@@ -79,6 +83,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 if (currentMachine.Session.FindGamerById(id) != null)
                 {
                     // TODO: SuspiciousGamerIdCollision
+                    Debug.Assert(false);
                     return;
                 }
 

@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct RemoveMachineSender : IInternalMessageSender
+    internal struct RemoveMachineSender : IInternalMessageContent
     {
         private NetworkMachine machine;
 
@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!senderMachine.IsHost)
             {
                 // TODO: SuspiciousHostClaim
+                Debug.Assert(false);
                 return;
             }
 

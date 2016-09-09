@@ -1,9 +1,10 @@
 ﻿using Lidgren.Network;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerLeftSender : IInternalMessageSender
+    internal struct GamerLeftSender : IInternalMessageContent
     {
         private LocalNetworkGamer localGamer;
 
@@ -26,26 +27,30 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
-            if (senderMachine.IsLocal)
-            {
-                return;
-            }
             if (!senderMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
                 return;
             }
 
             byte id = input.ReadByte();
-            NetworkGamer remoteGamer = currentMachine.Session.FindGamerById(id);
+            NetworkGamer gamer = currentMachine.Session.FindGamerById(id);
 
-            if (remoteGamer.Machine != senderMachine)
+            if (gamer == null)
+            {
+                // TODO: SuspiciousInvalidGamerId
+                Debug.Assert(false);
+                return;
+            }
+            if (gamer.Machine != senderMachine)
             {
                 // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
                 return;
             }
 
-            currentMachine.Session.RemoveGamer(remoteGamer);
+            currentMachine.Session.RemoveGamer(gamer);
         }
     }
 }

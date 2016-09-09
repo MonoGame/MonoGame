@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GameStartedSender : IInternalMessageSender
+    internal struct GameStartedSender : IInternalMessageContent
     {
         public InternalMessageType MessageType { get { return InternalMessageType.GameStarted; } }
         public int SequenceChannel { get { return 1; } }
@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             if (!senderMachine.IsHost)
             {
                 // TODO: SuspiciousHostClaim
-                Debug.WriteLine("Warning: Received GameStarted from non-host!");
+                Debug.Assert(false);
                 return;
             }
 
