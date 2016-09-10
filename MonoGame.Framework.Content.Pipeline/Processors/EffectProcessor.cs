@@ -161,28 +161,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] {"\n", "\r", Environment.NewLine},
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
-            ContentIdentity identity = null;
+            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(error|warning)\s*([A-Z0-9]*)\s*:\s*(.*)", RegexOptions.Compiled);
             var allErrorsAndWarnings = string.Empty;
 
             // Process all the lines.
             for (var i = 0; i < errorsAndWarningArray.Length; i++)
             {
                 var match = errorOrWarning.Match(errorsAndWarningArray[i]);
-                if (!match.Success || match.Groups.Count != 4)
+                // handle messages we don't recognize 
+                if (!match.Success || match.Groups.Count != 6)
                 {
-                    // Just log anything we don't recognize as a warning.
                     if (buildFailed)
+                    {
+                        // If we got an exception then we'll be throwing an exception 
+                        // below, so just gather the lines to throw later.
                         allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
+                    }
                     else
+                    {
+                        // Just log anything we don't recognize as a warning.
                         context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
+                    }
                         
                     continue;
                 }
 
                 var fileName = match.Groups[1].Value;
                 var lineAndColumn = match.Groups[2].Value;
-                var message = match.Groups[3].Value;
+                var errorType = match.Groups[3].Value;
+                var errorCode = match.Groups[4].Value;
+                var message = match.Groups[5].Value;
 
                 // Try to ensure a good file name for the error message.
                 if (string.IsNullOrEmpty(fileName))
@@ -193,27 +201,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     fileName = Path.Combine(folder, fileName);
                 }
 
-                // If we got an exception then we'll be throwing an exception 
-                // below, so just gather the lines to throw later.
-                if (buildFailed)
+                var identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
+                var errorCodeAndMessage = string.Format("{0}:{1}", errorCode, message);
+
+                switch(errorType)
                 {
-                    if (identity == null)
-                    {
-                        identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                        allErrorsAndWarnings = errorsAndWarningArray[i] + Environment.NewLine;
-                    }
-                    else
-                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
-                }
-                else
-                {
-                    identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                    context.Logger.LogWarning(string.Empty, identity, message, string.Empty);
+                    case "warning":
+                        context.Logger.LogWarning(string.Empty, identity, errorCodeAndMessage);
+                        continue;
+
+                    case "error":
+                        throw new InvalidContentException(errorCodeAndMessage, identity);
+
+                    default:
+                        // log anything we didn't recognize as a warning.
+                        if (allErrorsAndWarnings != string.Empty) 
+                            context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
+                        break;
                 }
             }
 
+            // We failed to detect an error message. Log anything we didn't recognize as an error. 
             if (buildFailed)
-                throw new InvalidContentException(allErrorsAndWarnings, identity ?? input.Identity);
+                throw new InvalidContentException(allErrorsAndWarnings, input.Identity);
         }
     }
 }

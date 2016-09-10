@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
@@ -341,8 +342,15 @@ namespace MGCB
                     }
                     else
                         message = c.SourceFile + " ";
-                    message += ": error : ";
-                    message += ex.Message;
+                    message += ": error ";
+
+                    // extract errorCode from MGFX message
+                    var match = Regex.Match(ex.Message, @"([A-Z]*[0-9]*):(.*)");
+                    if (match.Success || match.Groups.Count == 2)
+                        message += match.Groups[1].Value + " : " + match.Groups[2].Value;
+                    else
+                        message += ": " + ex.Message;
+
                     Console.WriteLine(message);
                     ++errorCount;
                 }
