@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                     }
                 }
-                PlatformSetData<T>(face, level, dataPtr, xOffset, yOffset, width, height);
+                PlatformSetData<T>(face, level, dataPtr, xOffset, yOffset, width, height, startIndex, elementCount, Marshal.SizeOf(typeof(T)));
             }
             finally
             {
