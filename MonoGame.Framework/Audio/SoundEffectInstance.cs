@@ -140,6 +140,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>Throws an exception if more sounds are playing than the platform allows.</remarks>
         public virtual void Play()
         {
+            if (_isDisposed)
+                throw new ObjectDisposedException("SoundEffectInstance");
+
             if (State == SoundState.Playing)
                 return;
 

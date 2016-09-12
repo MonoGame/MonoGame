@@ -155,6 +155,9 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlaySong(Song song, TimeSpan? startPosition)
         {
+            if (song != null && song.IsDisposed)
+                throw new ObjectDisposedException(nameof(song));
+
             PlatformPlaySong(song, startPosition);
             State = MediaState.Playing;
         }
