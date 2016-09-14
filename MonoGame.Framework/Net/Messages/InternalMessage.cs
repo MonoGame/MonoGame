@@ -1,5 +1,4 @@
-﻿using Lidgren.Network;
-using System;
+﻿using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
@@ -43,12 +42,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
         InternalMessageType MessageType { get; }
         int SequenceChannel { get; }
         SendDataOptions Options { get; }
-        void Write(NetBuffer output, NetworkMachine currentMachine);
+        void Write(IOutgoingMessage output, NetworkMachine currentMachine);
     }
 
     internal interface IInternalMessageReceiver
     {
-        void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine);
+        void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine);
     }
 
     internal struct InternalMessage

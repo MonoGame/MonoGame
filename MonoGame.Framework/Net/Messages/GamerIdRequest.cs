@@ -1,5 +1,4 @@
-﻿using Lidgren.Network;
-using System;
+﻿using Microsoft.Xna.Framework.Net.Backend;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
@@ -10,13 +9,13 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
-        public void Write(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
         { }
     }
 
     internal class GamerIdRequestReceiver : IInternalMessageReceiver
     {
-        public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (!currentMachine.IsHost || !senderMachine.IsFullyConnected)
             {

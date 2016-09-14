@@ -64,10 +64,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public TimeSpan RoundtripTime
         {
-            get
-            {
-                return TimeSpan.FromSeconds(Machine.connection.AverageRoundtripTime);
-            }
+            get { return Machine.peer.RoundtripTime; }
         }
 
         public NetworkSession Session { get { return Machine.Session; } }

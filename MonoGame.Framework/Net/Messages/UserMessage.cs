@@ -1,5 +1,4 @@
-﻿using Lidgren.Network;
-using System;
+﻿using Microsoft.Xna.Framework.Net.Backend;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
@@ -23,7 +22,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 0; } }
         public SendDataOptions Options { get { return options; } }
 
-        public void Write(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
         {
             if (!currentMachine.IsFullyConnected)
             {
@@ -43,7 +42,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal class UserMessageReceiver : IInternalMessageReceiver
     {
-        public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (!currentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {
@@ -55,7 +54,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool sendToAll = input.ReadBoolean();
             byte recipientId = input.ReadByte();
             SendDataOptions options = (SendDataOptions)input.ReadByte();
-            int length = input.ReadInt32();
+            int length = input.ReadInt();
             Packet packet = currentMachine.Session.packetPool.GetPacket(length);
             input.ReadBytes(packet.data, 0, length);
 

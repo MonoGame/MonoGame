@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-using Lidgren.Network;
+using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
@@ -20,7 +18,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
-        public void Write(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
         {
             if (!currentMachine.IsHost)
             {
@@ -30,14 +28,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
             output.Write((int)requestedConnections.Count);
             foreach (NetworkMachine machine in requestedConnections)
             {
-                output.Write(machine.connection.RemoteEndPoint);
+                output.Write(machine.peer.EndPoint);
             }
         }
     }
 
     internal class ConnectToAllRequestReceiver : IInternalMessageReceiver
     {
-        public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -56,16 +54,16 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            int requestedConnectionCount = input.ReadInt32();
+            int requestedConnectionCount = input.ReadInt();
             currentMachine.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
             for (int i = 0; i < requestedConnectionCount; i++)
             {
                 IPEndPoint endPoint = input.ReadIPEndPoint();
                 currentMachine.Session.pendingEndPoints.Add(endPoint);
 
-                if (!currentMachine.Session.IsConnectedToEndPoint(endPoint))
+                if (!currentMachine.Session.backend.IsConnectedToEndPoint(endPoint))
                 {
-                    currentMachine.Session.peer.Connect(endPoint);
+                    currentMachine.Session.backend.Connect(endPoint);
                 }
             }
         }

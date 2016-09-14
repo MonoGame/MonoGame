@@ -1,5 +1,4 @@
-﻿using Lidgren.Network;
-using System;
+﻿using Microsoft.Xna.Framework.Net.Backend;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
@@ -17,15 +16,15 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
-        public void Write(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
         {
-            output.Write(machine.connection.RemoteUniqueIdentifier);
+            output.Write(machine.peer);
         }
     }
 
     internal class RemoveMachineReceiver : IInternalMessageReceiver
     {
-        public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -34,20 +33,17 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            long removeId = input.ReadInt64();
+            IPeer removePeer = input.ReadPeer();
 
-            if (removeId == currentMachine.Session.peer.UniqueIdentifier)
+            if (removePeer == currentMachine.Session.backend.LocalPeer)
             {
                 currentMachine.Session.End(NetworkSessionEndReason.RemovedByHost);
             }
             else
             {
-                foreach (NetConnection connection in currentMachine.Session.peer.Connections)
+                if (removePeer != null)
                 {
-                    if (removeId == connection.RemoteUniqueIdentifier)
-                    {
-                        connection.Disconnect("Removed by host");
-                    }
+                    removePeer.Disconnect("Removed by host");
                 }
             }
         }

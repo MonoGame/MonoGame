@@ -1,42 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using Lidgren.Network;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Net.Messages;
+using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkMachine
     {
-        internal NetConnection connection;
+        internal IPeer peer;
         private IList<LocalNetworkGamer> localGamers;
         private IList<NetworkGamer> gamers;
-
         private bool beingRemoved;
 
-        internal NetworkMachine(NetworkSession session, NetConnection connection, bool isHost)
+        internal NetworkMachine(NetworkSession session, IPeer peer, bool isLocal, bool isHost)
         {
             this.Session = session;
-
             this.HasLeftSession = false;
             this.IsFullyConnected = false;
             this.HasAcknowledgedLocalMachine = false;
-            this.IsLocal = connection == null;
+            this.IsLocal = isLocal;
             this.IsHost = isHost;
 
-            this.connection = connection;
+            this.peer = peer;
+            this.peer.Tag = this;
             this.localGamers = this.IsLocal ? new List<LocalNetworkGamer>() : null;
             this.gamers = new List<NetworkGamer>();
             this.beingRemoved = false;
 
             this.LocalGamers = this.IsLocal ? new GamerCollection<LocalNetworkGamer>(localGamers) : null;
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
-
-            if (this.connection != null)
-            {
-                this.connection.Tag = this;
-            }
         }
 
         internal NetworkSession Session { get; }

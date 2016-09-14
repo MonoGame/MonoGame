@@ -1,6 +1,5 @@
-﻿using Lidgren.Network;
-using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
@@ -10,7 +9,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public int SequenceChannel { get { return 1; } }
         public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
 
-        public void Write(NetBuffer output, NetworkMachine currentMachine)
+        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
         {
             bool isHost = currentMachine.IsHost;
 
@@ -35,7 +34,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal class ConnectionAcknowledgedReceiver : IInternalMessageReceiver
     {
-        public void Receive(NetBuffer input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -63,7 +62,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 currentMachine.Session.SessionState = (NetworkSessionState)input.ReadByte();
             }
 
-            int gamerCount = input.ReadInt32();
+            int gamerCount = input.ReadInt();
 
             if (gamerCount > 0 && !senderMachine.IsFullyConnected)
             {

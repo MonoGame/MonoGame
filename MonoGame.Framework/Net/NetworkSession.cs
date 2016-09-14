@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
-using System.Threading;
 using System.Diagnostics;
-
 using Microsoft.Xna.Framework.Net.Messages;
 using Microsoft.Xna.Framework.GamerServices;
-using Lidgren.Network;
+using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net
 {
-    public sealed class NetworkSession : IDisposable
+    public sealed class NetworkSession : IDisposable, IBackendListener
     {
         internal const int Port = 14242;
         internal const int DiscoveryTime = 1000;
@@ -50,10 +48,11 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         internal PacketPool packetPool;
-
-        internal NetPeer peer;
+        internal IBackend backend;
+        private IPEndPoint hostEndPoint;
         private NetworkMachine localMachine;
-        private NetConnection hostConnection;
+        private NetworkMachine hostMachine;
+        private List<InternalMessage> messageQueue;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
         internal ICollection<IPEndPoint> pendingEndPoints;
@@ -66,17 +65,15 @@ namespace Microsoft.Xna.Framework.Net
         private List<NetworkGamer> remoteGamers;
         private List<NetworkGamer> previousGamers;
 
-        private List<InternalMessage> messageQueue;
-        private NetBuffer internalBuffer;
-        private DateTime lastTime;
-        private int lastReceivedBytes;
-        private int lastSentBytes;
-
-        internal NetworkSession(NetPeer peer, NetConnection hostConnection, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(IBackend backend, IPEndPoint hostEndPoint, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
-            this.peer = peer;
-            this.localMachine = new NetworkMachine(this, null, hostConnection == null);
-            this.hostConnection = hostConnection;
+            this.packetPool = new PacketPool();
+            this.backend = backend;
+            this.backend.Listener = this;
+            this.hostEndPoint = hostEndPoint;
+            this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, hostEndPoint == null);
+            this.hostMachine = hostEndPoint == null ? this.localMachine : null;
+            this.messageQueue = new List<InternalMessage>();
 
             this.pendingSignedInGamers = new List<SignedInGamer>();
 
@@ -90,7 +87,7 @@ namespace Microsoft.Xna.Framework.Net
 
             this.pendingEndPoints = null;
 
-            if (hostConnection == null)
+            if (hostEndPoint == null)
             {
                 // Initialize empty pending end point list so that the host is approved automatically
                 this.pendingEndPoints = new List<IPEndPoint>();
@@ -118,13 +115,6 @@ namespace Microsoft.Xna.Framework.Net
             this.SimulatedLatency = TimeSpan.Zero;
             this.SimulatedPacketLoss = 0.0f;
 
-            this.packetPool = new PacketPool();
-            this.messageQueue = new List<InternalMessage>();
-            this.internalBuffer = new NetBuffer();
-            this.lastTime = DateTime.Now;
-            this.lastReceivedBytes = this.peer.Statistics.ReceivedBytes;
-            this.lastSentBytes = this.peer.Statistics.SentBytes;
-
             SignedInGamer.SignedOut += LocalGamerSignedOut;
         }
 
@@ -143,8 +133,6 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     throw new ObjectDisposedException("NetworkSession");
                 }
-
-                NetworkMachine hostMachine = IsHost ? localMachine : hostConnection.Tag as NetworkMachine;
 
                 if (hostMachine == null)
                 {
@@ -229,7 +217,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                return TimeSpan.FromSeconds(peer.Configuration.SimulatedRandomLatency);
+                return backend.SimulatedLatency;
             }
             set
             {
@@ -238,7 +226,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                peer.Configuration.SimulatedRandomLatency = (float)value.TotalSeconds;
+                backend.SimulatedLatency = value;
             }
         }
 
@@ -251,7 +239,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                return peer.Configuration.SimulatedLoss;
+                return backend.SimulatedPacketLoss;
             }
             set
             {
@@ -260,20 +248,21 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                peer.Configuration.SimulatedLoss = value;
+                backend.SimulatedPacketLoss = value;
             }
         }
 
         // For discovery response
-        internal int CurrentGamerCount { get { return allGamers.Count; } }
-        internal string HostGamertag
+        bool IBackendListener.ShouldSendDiscoveryResponse { get { return IsHost; } }
+        int IBackendListener.CurrentGamerCount { get { return allGamers.Count; } }
+        string IBackendListener.HostGamertag
         {
             get
             {
                 return Host != null || Host.Gamertag == string.Empty ? Host.Gamertag : "Game starting...";
             }
         }
-        internal int OpenPrivateGamerSlots
+        int IBackendListener.OpenPrivateGamerSlots
         {
             get
             {
@@ -290,7 +279,7 @@ namespace Microsoft.Xna.Framework.Net
                 return PrivateGamerSlots - usedSlots;
             }
         }
-        internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - CurrentGamerCount; } }
+        int IBackendListener.OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - allGamers.Count; } }
 
         // Events
         public event EventHandler<GamerJoinedEventArgs> GamerJoined;
@@ -530,11 +519,6 @@ namespace Microsoft.Xna.Framework.Net
             return false;
         }
 
-        internal bool IsConnectedToEndPoint(IPEndPoint endPoint)
-        {
-            return peer.GetConnection(endPoint) != null;
-        }
-
         private string MachineOwnerName(NetworkMachine machine)
         {
             if (machine == null)
@@ -562,26 +546,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        private NetDeliveryMethod ToDeliveryMethod(SendDataOptions options)
-        {
-            switch (options)
-            {
-                case SendDataOptions.InOrder:
-                    return NetDeliveryMethod.UnreliableSequenced;
-                case SendDataOptions.Reliable:
-                    return NetDeliveryMethod.ReliableUnordered;
-                case SendDataOptions.ReliableInOrder:
-                    return NetDeliveryMethod.ReliableOrdered;
-                case SendDataOptions.Chat:
-                    return NetDeliveryMethod.ReliableUnordered;
-                case SendDataOptions.Chat & SendDataOptions.InOrder:
-                    return NetDeliveryMethod.ReliableOrdered;
-                default:
-                    throw new InvalidOperationException("Could not convert SendDataOptions!");
-            }
-        }
-
-        private void EncodeMessage(IInternalMessageContent message, NetBuffer output)
+        private void EncodeMessage(IInternalMessageContent message, IOutgoingMessage output)
         {
             output.Write((byte)message.MessageType);
 
@@ -603,15 +568,6 @@ namespace Microsoft.Xna.Framework.Net
             messageQueue.Add(new InternalMessage(message, recipient));
         }
 
-        private void SendToSelf(ref IInternalMessageContent content)
-        {
-            internalBuffer.LengthBits = 0;
-            EncodeMessage(content, internalBuffer);
-
-            internalBuffer.Position = 0;
-            Receive(internalBuffer, localMachine);
-        }
-
         private void Send(ref InternalMessage message)
         {
             if (message.content.MessageType != InternalMessageType.UserMessage)
@@ -624,32 +580,94 @@ namespace Microsoft.Xna.Framework.Net
                 // Send to all machines
                 foreach (NetworkMachine remoteMachine in RemoteMachines)
                 {
-                    NetOutgoingMessage msg = peer.CreateMessage();
+                    IOutgoingMessage msg = backend.GetMessageBuffer(remoteMachine.peer, message.content.Options, message.content.SequenceChannel);
                     EncodeMessage(message.content, msg);
-                    peer.SendMessage(msg, remoteMachine.connection, ToDeliveryMethod(message.content.Options), message.content.SequenceChannel);
+                    backend.SendToPeer(msg);
                 }
 
-                SendToSelf(ref message.content);
+                // Send to self
+                IOutgoingMessage selfMsg = backend.GetMessageBuffer(backend.LocalPeer, message.content.Options, message.content.SequenceChannel);
+                EncodeMessage(message.content, selfMsg);
+                backend.SendToPeer(selfMsg);
             }
             else
             {
                 // Send to a single machine
-                if (message.recipient.IsLocal)
+                IOutgoingMessage msg = backend.GetMessageBuffer(message.recipient.peer, message.content.Options, message.content.SequenceChannel);
+                EncodeMessage(message.content, msg);
+                backend.SendToPeer(msg);
+            }
+        }
+        
+        void IBackendListener.PeerConnected(IPeer peer)
+        {
+            bool senderIsHost = peer.EndPoint == hostEndPoint;
+
+            // Create a pending network machine
+            NetworkMachine senderMachine = new NetworkMachine(this, peer, false, senderIsHost);
+            AddMachine(senderMachine);
+
+            if (senderIsHost)
+            {
+                hostMachine = senderMachine;
+            }
+
+            if (localMachine.IsFullyConnected)
+            {
+                QueueMessage(new FullyConnectedSender(), senderMachine);
+            }
+
+            QueueMessage(new ConnectionAcknowledgedSender(), senderMachine);
+
+            if (IsHost)
+            {
+                // Save snapshot of current connections and send them to the new peer
+                ICollection<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
+                requestedConnections.Remove(senderMachine);
+                pendingPeerConnections.Add(senderMachine, requestedConnections);
+
+                QueueMessage(new ConnectToAllRequestSender(requestedConnections), senderMachine);
+            }
+        }
+
+        void IBackendListener.PeerDisconnected(IPeer peer)
+        {
+            NetworkMachine disconnectedMachine = peer.Tag as NetworkMachine;
+
+            RemoveMachine(disconnectedMachine);
+
+            if (IsHost)
+            {
+                // Update pending peers
+                pendingPeerConnections.Remove(disconnectedMachine);
+
+                foreach (var pendingPair in pendingPeerConnections)
                 {
-                    SendToSelf(ref message.content);
+                    NetworkMachine pendingMachine = pendingPair.Key;
+
+                    if (pendingPair.Value.Contains(disconnectedMachine))
+                    {
+                        pendingPair.Value.Remove(disconnectedMachine);
+
+                        QueueMessage(new ConnectToAllRequestSender(pendingPair.Value), pendingMachine);
+                    }
                 }
-                else
+            }
+            else
+            {
+                if (disconnectedMachine == HostMachine)
                 {
-                    NetOutgoingMessage msg = peer.CreateMessage();
-                    EncodeMessage(message.content, msg);
-                    peer.SendMessage(msg, message.recipient.connection, ToDeliveryMethod(message.content.Options), message.content.SequenceChannel);
+                    // TODO: Host migration
+                    End(NetworkSessionEndReason.HostEndedSession);
                 }
             }
         }
 
-        private void Receive(NetBuffer input, NetworkMachine senderMachine)
+        void IBackendListener.Receive(IIncomingMessage data, IPeer sender)
         {
-            byte messageType = input.ReadByte();
+            NetworkMachine senderMachine = sender.Tag as NetworkMachine;
+
+            byte messageType = data.ReadByte();
 
             if ((InternalMessageType)messageType != InternalMessageType.UserMessage)
             {
@@ -657,7 +675,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             IInternalMessageReceiver receiver = InternalMessageReceivers.FromType[messageType];
-            receiver.Receive(input, localMachine, senderMachine);
+            receiver.Receive(data, localMachine, senderMachine);
         }
 
         public void Update()
@@ -680,135 +698,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Handle incoming internal messages (Might add new inbound packets)
-            NetIncomingMessage msg;
-            while ((msg = peer.ReadMessage()) != null)
-            {
-                switch (msg.MessageType)
-                {
-                    // Discovery
-                    case NetIncomingMessageType.DiscoveryRequest:
-                        if (!IsHost)
-                        {
-                            throw new NetworkException("Discovery request received when not host");
-                        }
-
-                        Debug.WriteLine("Discovery request received");
-                        NetOutgoingMessage response = peer.CreateMessage();
-                        response.Write((byte)SessionType);
-                        response.Write(MaxGamers);
-                        response.Write(PrivateGamerSlots);
-                        response.Write(CurrentGamerCount);
-                        response.Write(HostGamertag);
-                        response.Write(OpenPrivateGamerSlots);
-                        response.Write(OpenPublicGamerSlots);
-                        SessionProperties.Send(response);
-                        peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
-                        break;
-                    // Peer state changes
-                    case NetIncomingMessageType.StatusChanged:
-                        if (msg.SenderConnection == null)
-                        {
-                            throw new NetworkException("Sender connection is null");
-                        }
-
-                        NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
-                        Debug.WriteLine("Status now: " + status + "; Reason: " + msg.ReadString());
-                        
-                        if (status == NetConnectionStatus.Connected)
-                        {
-                            // Create a pending network machine
-                            NetworkMachine senderMachine = new NetworkMachine(this, msg.SenderConnection, msg.SenderConnection == hostConnection);
-                            AddMachine(senderMachine);
-
-                            if (localMachine.IsFullyConnected)
-                            {
-                                QueueMessage(new FullyConnectedSender(), senderMachine);
-                            }
-
-                            QueueMessage(new ConnectionAcknowledgedSender(), senderMachine);
-
-                            if (IsHost)
-                            {
-                                // Save snapshot of current connections and send them to the new peer
-                                ICollection<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
-                                requestedConnections.Remove(senderMachine);
-                                pendingPeerConnections.Add(senderMachine, requestedConnections);
-
-                                QueueMessage(new ConnectToAllRequestSender(requestedConnections), senderMachine);
-                            }
-                        }
-                        else if (status == NetConnectionStatus.Disconnected)
-                        {
-                            // Remove gamers
-                            NetworkMachine disconnectedMachine = msg.SenderConnection.Tag as NetworkMachine;
-
-                            if (disconnectedMachine == null)
-                            {
-                                // Host responded to connect, then peer disconnected
-                                break;
-                            }
-
-                            RemoveMachine(disconnectedMachine);
-
-                            if (IsHost)
-                            {
-                                // Update pending peers
-                                pendingPeerConnections.Remove(disconnectedMachine);
-
-                                foreach (var pendingPair in pendingPeerConnections)
-                                {
-                                    NetworkMachine pendingMachine = pendingPair.Key;
-
-                                    if (pendingPair.Value.Contains(disconnectedMachine))
-                                    {
-                                        pendingPair.Value.Remove(disconnectedMachine);
-
-                                        QueueMessage(new ConnectToAllRequestSender(pendingPair.Value), pendingMachine);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (msg.SenderConnection == hostConnection)
-                                {
-                                    // TODO: Host migration
-                                    End(NetworkSessionEndReason.HostEndedSession);
-                                }
-                            }
-                        }
-                        break;
-                    // Internal messages
-                    case NetIncomingMessageType.Data:
-                        if (msg.SenderConnection == null)
-                        {
-                            throw new NetworkException("Sender connection is null");
-                        }
-
-                        Receive(msg, msg.SenderConnection.Tag as NetworkMachine);
-                        break;
-                    // Unconnected data
-                    case NetIncomingMessageType.UnconnectedData:
-                        Debug.WriteLine("Unconnected data received!");
-                        break;
-                    // Error checking
-                    case NetIncomingMessageType.VerboseDebugMessage:
-                    case NetIncomingMessageType.DebugMessage:
-                    case NetIncomingMessageType.WarningMessage:
-                    case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine("Lidgren: " + msg.ReadString());
-                        break;
-                    default:
-                        Debug.WriteLine("Unhandled type: " + msg.MessageType);
-                        break;
-                }
-
-                peer.Recycle(msg);
-
-                if (SessionState == NetworkSessionState.Ended)
-                {
-                    return;
-                }
-            }
+            backend.Update();
 
             HandleInitialConnection();
 
@@ -830,7 +720,7 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            UpdateStatistics();
+            backend.UpdateStatistics();
         }
 
         private void HandleInitialConnection()
@@ -844,7 +734,7 @@ namespace Microsoft.Xna.Framework.Net
 
             foreach (IPEndPoint endPoint in pendingEndPoints)
             {
-                if (!(IsConnectedToEndPoint(endPoint) && (peer.GetConnection(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
+                if (!(backend.IsConnectedToEndPoint(endPoint) && (backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
                 {
                     done = false;
                 }
@@ -877,27 +767,7 @@ namespace Microsoft.Xna.Framework.Net
 
             messageQueue.Clear();
         }
-
-        private void UpdateStatistics()
-        {
-            DateTime currentTime = DateTime.Now;
-            int receivedBytes = peer.Statistics.ReceivedBytes;
-            int sentBytes = peer.Statistics.SentBytes;
-            double elapsedSeconds = (currentTime - lastTime).TotalSeconds;
-
-            if (elapsedSeconds >= 1.0)
-            {
-                BytesPerSecondReceived = (int)Math.Round((receivedBytes - lastReceivedBytes) / elapsedSeconds);
-                BytesPerSecondSent = (int)Math.Round((sentBytes - lastSentBytes) / elapsedSeconds);
-
-                //Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
-                //Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
-
-                lastTime = currentTime;
-                lastReceivedBytes = receivedBytes;
-                lastSentBytes = sentBytes;
-            }
-        }
+        
 
         internal void End(NetworkSessionEndReason reason)
         {
@@ -908,7 +778,7 @@ namespace Microsoft.Xna.Framework.Net
 
             RemoveAllMachines();
 
-            peer.Shutdown("Done");
+            backend.Shutdown("Done");
 
             SessionState = NetworkSessionState.Ended;
             Session = null;
