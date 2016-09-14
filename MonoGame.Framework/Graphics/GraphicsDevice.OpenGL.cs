@@ -414,7 +414,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL || ANGLE
                 Context.Dispose();
                 Context = null;
-
+#endif
             });
         }
 

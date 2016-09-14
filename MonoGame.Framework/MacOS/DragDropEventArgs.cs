@@ -24,15 +24,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 using System;
-using System.Drawing;
-using System.ComponentModel;
-using System.Reflection;
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.CoreVideo;
-using MonoMac.CoreGraphics;
-using MonoMac.OpenGL;
-using System.Collections.Generic;
+using AppKit;
 
 namespace Microsoft.Xna.Framework
 {

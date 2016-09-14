@@ -28,16 +28,28 @@ using System.Drawing;
 using System.ComponentModel;
 using System.Reflection;
 
-using MonoMac.Foundation;
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
-using MonoMac.CoreVideo;
-using MonoMac.CoreGraphics;
-using MonoMac.OpenGL;
+using MonoMac.Foundation;
+using RectF = System.Drawing.RectangleF;
+using _float = System.Single;
+#else
+using AppKit;
+using Foundation;
+using RectF = CoreGraphics.CGRect;
+using _float = System.nfloat;
+#endif
+
+using CoreVideo;
+using CoreGraphics;
+using OpenGL;
 using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Platform;
 
 namespace Microsoft.Xna.Framework
 {
-	public class MacGameView : MonoMac.AppKit.NSView, IGameWindow
+	public class MacGameView : AppKit.NSView, IGameWindow
 	{
 		bool disposed;
 		NSOpenGLContext openGLContext;
@@ -54,11 +66,11 @@ namespace Microsoft.Xna.Framework
 		FrameEventArgs renderEventArgs = new FrameEventArgs ();
 
 		[Export("initWithFrame:")]
-		public MacGameView (RectangleF frame) : this(frame, null)
+		public MacGameView (RectF frame) : this(frame, null)
 		{
 		}
 
-		public MacGameView (RectangleF frame, NSOpenGLContext context) : base(frame)
+		public MacGameView (RectF frame, NSOpenGLContext context) : base(frame)
 		{
 			var attribs = new object [] {
 				NSOpenGLPixelFormatAttribute.Accelerated,
@@ -92,7 +104,7 @@ namespace Microsoft.Xna.Framework
 		}
 
 		[Preserve (Conditional=true)]
-		public override void DrawRect (RectangleF dirtyRect)
+		public override void DrawRect (RectF dirtyRect)
 		{
 			if (animating) {
 				if (displayLinkSupported) {
@@ -339,11 +351,6 @@ namespace Microsoft.Xna.Framework
 		System.Drawing.Point INativeWindow.Location {
 			get { throw new NotSupportedException ();}
 			set { throw new NotSupportedException ();}
-		}
-
-		System.Drawing.Icon INativeWindow.Icon {  
-			get { throw new NotSupportedException ();}
-			set { throw new NotSupportedException ();}		
 		}
 
 		Size size;
