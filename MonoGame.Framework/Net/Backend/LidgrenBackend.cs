@@ -7,7 +7,7 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend
 {
-    internal class LidgrenInternalMessage : IOutgoingMessage
+    internal class LidgrenOutgoingMessageToSelf : IOutgoingMessage
     {
         internal NetBuffer buffer = new NetBuffer();
         internal LidgrenLocalPeer recipient;
@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         internal LidgrenIncomingMessage incomingMessage;
 
-        public LidgrenInternalMessage()
+        public LidgrenOutgoingMessageToSelf()
         {
             this.incomingMessage = new LidgrenIncomingMessage(this.buffer);
         }
@@ -228,7 +228,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         private LidgrenLocalPeer localPeer;
         private IList<LidgrenRemotePeer> remotePeers;
 
-        private LidgrenOutgoingMessagePool<LidgrenInternalMessage> internalMessagePool;
+        private LidgrenOutgoingMessagePool<LidgrenOutgoingMessageToSelf> internalMessagePool;
         private LidgrenOutgoingMessagePool<LidgrenOutgoingMessage> outgoingMessagePool;
         private LidgrenIncomingMessage remoteIncomingMessage;
 
@@ -241,7 +241,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
             this.localPeer = new LidgrenLocalPeer(peer);
             this.remotePeers = new List<LidgrenRemotePeer>();
 
-            this.internalMessagePool = new LidgrenOutgoingMessagePool<LidgrenInternalMessage>();
+            this.internalMessagePool = new LidgrenOutgoingMessagePool<LidgrenOutgoingMessageToSelf>();
             this.outgoingMessagePool = new LidgrenOutgoingMessagePool<LidgrenOutgoingMessage>();
             this.remoteIncomingMessage = new LidgrenIncomingMessage(null);
 
@@ -333,7 +333,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
             if (recipient == localPeer)
             {
-                LidgrenInternalMessage msg = internalMessagePool.Get();
+                LidgrenOutgoingMessageToSelf msg = internalMessagePool.Get();
                 msg.buffer.LengthBits = 0;
                 msg.recipient = recipient as LidgrenLocalPeer;
                 msg.options = options;
@@ -353,11 +353,12 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         public void SendToPeer(IOutgoingMessage data)
         {
-            if (data is LidgrenInternalMessage)
+            if (data is LidgrenOutgoingMessageToSelf)
             {
-                LidgrenInternalMessage msg = data as LidgrenInternalMessage;
+                LidgrenOutgoingMessageToSelf msg = data as LidgrenOutgoingMessageToSelf;
                 
                 msg.buffer.Position = 0;
+
                 InvokeReceive(msg.incomingMessage, localPeer);
 
                 // Recycle
