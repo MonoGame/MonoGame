@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Internal error", e);
+                throw new InvalidOperationException("Internal error: " + e.Message, e);
             }
 
             NetworkSession.Session = new NetworkSession(new LidgrenBackend(peer), null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);

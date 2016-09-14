@@ -14,6 +14,13 @@ namespace Microsoft.Xna.Framework.Net.Backend
         internal SendDataOptions options;
         internal int channel;
 
+        internal LidgrenIncomingMessage incomingMessage;
+
+        public LidgrenInternalMessage()
+        {
+            this.incomingMessage = new LidgrenIncomingMessage(this.buffer);
+        }
+
         public IPeer Recipient { get { return recipient; } }
         public SendDataOptions Options { get { return options; } }
         public int Channel { get { return channel; } }
@@ -101,12 +108,12 @@ namespace Microsoft.Xna.Framework.Net.Backend
     }
     internal class LidgrenIncomingMessage : IIncomingMessage
     {
-        private LidgrenBackend backend;
+        internal LidgrenBackend backend;
         internal NetBuffer buffer;
 
-        public LidgrenIncomingMessage(LidgrenBackend backend)
+        public LidgrenIncomingMessage(NetBuffer buffer)
         {
-            this.backend = backend;
+            this.buffer = buffer;
         }
 
         public bool ReadBoolean()
@@ -223,7 +230,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         private LidgrenOutgoingMessagePool<LidgrenInternalMessage> internalMessagePool;
         private LidgrenOutgoingMessagePool<LidgrenOutgoingMessage> outgoingMessagePool;
-        private LidgrenIncomingMessage incomingMessage;
+        private LidgrenIncomingMessage remoteIncomingMessage;
 
         private DateTime lastTime;
         private int lastReceivedBytes;
@@ -236,7 +243,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
             this.internalMessagePool = new LidgrenOutgoingMessagePool<LidgrenInternalMessage>();
             this.outgoingMessagePool = new LidgrenOutgoingMessagePool<LidgrenOutgoingMessage>();
-            this.incomingMessage = new LidgrenIncomingMessage(this);
+            this.remoteIncomingMessage = new LidgrenIncomingMessage(null);
 
             this.lastTime = DateTime.Now;
             this.lastReceivedBytes = 0;
@@ -293,6 +300,30 @@ namespace Microsoft.Xna.Framework.Net.Backend
             return localPeer.peer.GetConnection(endPoint).Tag as LidgrenRemotePeer;
         }
 
+        public bool IsConnectedToEndPoint(IPEndPoint endPoint)
+        {
+            return localPeer.peer.GetConnection(endPoint) != null;
+        }
+
+        private NetDeliveryMethod ToDeliveryMethod(SendDataOptions options)
+        {
+            switch (options)
+            {
+                case SendDataOptions.InOrder:
+                    return NetDeliveryMethod.UnreliableSequenced;
+                case SendDataOptions.Reliable:
+                    return NetDeliveryMethod.ReliableUnordered;
+                case SendDataOptions.ReliableInOrder:
+                    return NetDeliveryMethod.ReliableOrdered;
+                case SendDataOptions.Chat:
+                    return NetDeliveryMethod.ReliableUnordered;
+                case SendDataOptions.Chat & SendDataOptions.InOrder:
+                    return NetDeliveryMethod.ReliableOrdered;
+                default:
+                    throw new InvalidOperationException("Could not convert SendDataOptions!");
+            }
+        }
+
         public IOutgoingMessage GetMessageBuffer(IPeer recipient, SendDataOptions options, int channel)
         {
             if (recipient == null)
@@ -320,45 +351,42 @@ namespace Microsoft.Xna.Framework.Net.Backend
             }
         }
 
-        public bool IsConnectedToEndPoint(IPEndPoint endPoint)
-        {
-            return localPeer.peer.GetConnection(endPoint) != null;
-        }
-
-        private NetDeliveryMethod ToDeliveryMethod(SendDataOptions options)
-        {
-            switch (options)
-            {
-                case SendDataOptions.InOrder:
-                    return NetDeliveryMethod.UnreliableSequenced;
-                case SendDataOptions.Reliable:
-                    return NetDeliveryMethod.ReliableUnordered;
-                case SendDataOptions.ReliableInOrder:
-                    return NetDeliveryMethod.ReliableOrdered;
-                case SendDataOptions.Chat:
-                    return NetDeliveryMethod.ReliableUnordered;
-                case SendDataOptions.Chat & SendDataOptions.InOrder:
-                    return NetDeliveryMethod.ReliableOrdered;
-                default:
-                    throw new InvalidOperationException("Could not convert SendDataOptions!");
-            }
-        }
-
         public void SendToPeer(IOutgoingMessage data)
         {
             if (data is LidgrenInternalMessage)
             {
                 LidgrenInternalMessage msg = data as LidgrenInternalMessage;
+                
+                msg.buffer.Position = 0;
+                InvokeReceive(msg.incomingMessage, localPeer);
 
-                incomingMessage.buffer = msg.buffer;
-                Listener.Receive(incomingMessage, localPeer);
+                // Recycle
+                msg.buffer.LengthBits = 0;
+                msg.recipient = null;
+                msg.options = SendDataOptions.None;
+                msg.channel = 0;
+                internalMessagePool.Recycle(msg);
             }
             else if (data is LidgrenOutgoingMessage)
             {
                 LidgrenOutgoingMessage msg = data as LidgrenOutgoingMessage;
 
                 localPeer.peer.SendMessage(msg.buffer, msg.recipient.connection, ToDeliveryMethod(msg.Options), msg.Channel);
+
+                // Recycle
+                msg.buffer = null;
+                msg.recipient = null;
+                msg.options = SendDataOptions.None;
+                msg.channel = 0;
+                outgoingMessagePool.Recycle(msg);
             }
+        }
+
+        private void InvokeReceive(LidgrenIncomingMessage incomingMessage, IPeer sender)
+        {
+            incomingMessage.backend = this;
+
+            Listener.Receive(incomingMessage, sender);
         }
 
         public void Update()
@@ -429,8 +457,8 @@ namespace Microsoft.Xna.Framework.Net.Backend
                             throw new NetworkException("Sender connection is null");
                         }
 
-                        incomingMessage.buffer = msg;
-                        Listener.Receive(incomingMessage, msg.SenderConnection.Tag as LidgrenRemotePeer);
+                        remoteIncomingMessage.buffer = msg;
+                        InvokeReceive(remoteIncomingMessage, msg.SenderConnection.Tag as LidgrenRemotePeer);
                         break;
                     // Unconnected data
                     case NetIncomingMessageType.UnconnectedData:
