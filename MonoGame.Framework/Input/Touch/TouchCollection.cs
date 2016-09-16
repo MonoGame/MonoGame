@@ -14,12 +14,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
     public struct TouchCollection : IList<TouchLocation>
 	{
         private readonly int _count;
-        private readonly TouchLocation _value00, _value01, _value02, _value03;
-        private readonly TouchLocation _value04, _value05, _value06, _value07;
-        private readonly TouchLocation _value08, _value09, _value10, _value11;
-        private readonly TouchLocation _value12, _value13, _value14, _value15;
-        private readonly TouchLocation _value16, _value17, _value18, _value19;
-        
+        private readonly TouchLocation _value0, _value1, _value2, _value3;
+        private readonly TouchLocation[] _collection;
+
         #region Properties
 
         /// <summary>
@@ -42,28 +39,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (touches == null)
                 throw new ArgumentNullException("touches");
 
-            _count = Math.Min(touches.Count, 20);
+            _count = touches.Count;
 
-            _value00 = (_count >  0) ? touches[ 0] : TouchLocation.Invalid;
-            _value01 = (_count >  1) ? touches[ 1] : TouchLocation.Invalid;
-            _value02 = (_count >  2) ? touches[ 2] : TouchLocation.Invalid;
-            _value03 = (_count >  3) ? touches[ 3] : TouchLocation.Invalid;
-            _value04 = (_count >  4) ? touches[ 4] : TouchLocation.Invalid;
-            _value05 = (_count >  5) ? touches[ 5] : TouchLocation.Invalid;
-            _value06 = (_count >  6) ? touches[ 6] : TouchLocation.Invalid;
-            _value07 = (_count >  7) ? touches[ 7] : TouchLocation.Invalid;
-            _value08 = (_count >  8) ? touches[ 8] : TouchLocation.Invalid;
-            _value09 = (_count >  9) ? touches[ 9] : TouchLocation.Invalid;
-            _value10 = (_count > 10) ? touches[10] : TouchLocation.Invalid;
-            _value11 = (_count > 11) ? touches[11] : TouchLocation.Invalid;
-            _value12 = (_count > 12) ? touches[12] : TouchLocation.Invalid;
-            _value13 = (_count > 13) ? touches[13] : TouchLocation.Invalid;
-            _value14 = (_count > 14) ? touches[14] : TouchLocation.Invalid;
-            _value15 = (_count > 15) ? touches[15] : TouchLocation.Invalid;
-            _value16 = (_count > 16) ? touches[16] : TouchLocation.Invalid;
-            _value17 = (_count > 17) ? touches[17] : TouchLocation.Invalid;
-            _value18 = (_count > 18) ? touches[18] : TouchLocation.Invalid;
-            _value19 = (_count > 19) ? touches[19] : TouchLocation.Invalid;
+            _value0 = (_count > 0) ? touches[0] : TouchLocation.Invalid;
+            _value1 = (_count > 1) ? touches[1] : TouchLocation.Invalid;
+            _value2 = (_count > 2) ? touches[2] : TouchLocation.Invalid;
+            _value3 = (_count > 3) ? touches[3] : TouchLocation.Invalid;
+            _collection = null;
+
+            if (_count > 4)
+            {
+                _collection = new TouchLocation[_count];
+                touches.CopyTo(_collection, 0);
+            }
         }
         
         /// <summary>
@@ -145,28 +133,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     throw new ArgumentOutOfRangeException("index");
 
                 switch (index)
-                 { 
-                     case  0: return _value00;
-                     case  1: return _value01; 
-                     case  2: return _value02;
-                     case  3: return _value03;
-                     case  4: return _value04;
-                     case  5: return _value05;
-                     case  6: return _value06;
-                     case  7: return _value07;
-                     case  8: return _value08;
-                     case  9: return _value09;
-                     case 10: return _value10;
-                     case 11: return _value11;
-                     case 12: return _value12;
-                     case 13: return _value13;
-                     case 14: return _value14;
-                     case 15: return _value15;
-                     case 16: return _value16;
-                     case 17: return _value17;
-                     case 18: return _value18;
-                     case 19: return _value19;
-                     default: throw new Exception();
+                {
+                    case 0: return _value0;
+                    case 1: return _value1;
+                    case 2: return _value2;
+                    case 3: return _value3;
+                    default: return _collection[index];
                 } 
             }
             set { throw new NotSupportedException(); }
