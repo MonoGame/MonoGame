@@ -36,6 +36,7 @@
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="BuildContent.cs" />
     <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="ConsoleAsyncLogger.cs" />
     <Compile Include="SourceFileCollection.cs" />
     <None Include="app.config" />
 
