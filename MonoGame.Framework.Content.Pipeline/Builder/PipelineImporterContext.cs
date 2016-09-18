@@ -10,14 +10,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
     {
         private readonly PipelineManager _manager;
 
-        public PipelineImporterContext(PipelineManager manager)
+        private readonly PipelineBuildEvent _pipelineEvent;
+
+        public PipelineImporterContext(PipelineManager manager, PipelineBuildEvent pipelineEvent)
         {
             _manager = manager;
+            _pipelineEvent = pipelineEvent;
         }
 
         public override string IntermediateDirectory { get { return _manager.IntermediateDirectory; } }
         public override string OutputDirectory { get { return _manager.OutputDirectory; } }
-        public override ContentBuildLogger Logger { get { return _manager.Logger; } }
+        public override ContentBuildLogger Logger { get { return _pipelineEvent.Logger; } }
 
         public override void AddDependency(string filename)
         {            

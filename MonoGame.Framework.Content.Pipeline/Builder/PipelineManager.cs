@@ -525,7 +525,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             TrackPipelineBuildEvent(contentEvent);
         }
 
-        public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
+        public PipelineBuildEvent BuildContent(ContentBuildLogger logger, string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
         {
             sourceFilepath = PathHelper.Normalize(sourceFilepath);
             ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
@@ -540,6 +540,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 Importer = importerName,
                 Processor = processorName,
                 Parameters = ValidateProcessorParameters(processorName, processorParameters),
+                Logger = logger
             };
 
             // Load the previous content event if it exists.
@@ -559,18 +560,18 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 throw new PipelineException("The source file '{0}' does not exist!", pipelineEvent.SourceFile);
             }
 
-            Logger.PushFile(pipelineEvent.SourceFile);
+            pipelineEvent.Logger.PushFile(pipelineEvent.SourceFile);
 
             // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
             TrackPipelineBuildEvent(pipelineEvent);
 
             var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);            
             if (rebuild)
-                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
+                pipelineEvent.Logger.LogMessage("{0}", pipelineEvent.SourceFile);
             else
-                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+                pipelineEvent.Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
             
-            Logger.Indent();
+            pipelineEvent.Logger.Indent();
             try
             {
                 if (!rebuild)
@@ -596,6 +597,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             Importer = assetCachedEvent.Importer,
                             Processor = assetCachedEvent.Processor,
                             Parameters = assetCachedEvent.Parameters,
+                            Logger = pipelineEvent.Logger,
                         };
 
                         // Give the asset a chance to rebuild.                    
@@ -622,8 +624,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
             finally
             {
-                Logger.Unindent();
-                Logger.PopFile();
+                pipelineEvent.Logger.Unindent();
+                pipelineEvent.Logger.PopFile();
             }
         }
 
@@ -647,7 +649,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 try
                 {
-                    var importContext = new PipelineImporterContext(this);
+                    var importContext = new PipelineImporterContext(this, pipelineEvent);
                     importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
                 }
                 catch (PipelineException)
@@ -661,7 +663,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
             else
             {
-                var importContext = new PipelineImporterContext(this);
+                var importContext = new PipelineImporterContext(this, pipelineEvent);
                 importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
             }
 
@@ -810,7 +812,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <param name="processorName">The name of the content processor. Can be <see langword="null"/>.</param>
         /// <param name="processorParameters">The processor parameters. Can be <see langword="null"/>.</param>
         /// <returns>The asset name.</returns>
-        public string GetAssetName(string sourceFileName, string importerName, string processorName, OpaqueDataDictionary processorParameters)
+        public string GetAssetName(ContentBuildLogger logger, string sourceFileName, string importerName, string processorName, OpaqueDataDictionary processorParameters)
         {
             Debug.Assert(Path.IsPathRooted(sourceFileName), "Absolute path expected.");
 
@@ -835,7 +837,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     return existingName;
                 }
 
-                Logger.LogMessage(string.Format("Warning: Asset {0} built multiple times with different settings.", relativeSourceFileName));
+                logger.LogMessage(string.Format("Warning: Asset {0} built multiple times with different settings.", relativeSourceFileName));
             }
 
             // No pipeline build event with matching settings found.

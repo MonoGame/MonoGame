@@ -302,7 +302,8 @@ namespace MGCB
             {
                 try
                 {
-                    _manager.BuildContent(c.SourceFile,
+                    _manager.BuildContent(_manager.Logger,
+                                          c.SourceFile,
                                           null,
                                           c.Importer,
                                           c.Processor,
