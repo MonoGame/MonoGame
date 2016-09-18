@@ -767,7 +767,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Remove event file (.mgcontent file) from intermediate folder.
             FileHelper.DeleteIfExists(eventFilepath);
 
-            _pipelineBuildEvents.Remove(sourceFilepath);
+            lock (_pipelineBuildEvents)
+            {
+                _pipelineBuildEvents.Remove(sourceFilepath);
+            }
         }
 
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
@@ -796,15 +799,18 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private void TrackPipelineBuildEvent(PipelineBuildEvent pipelineEvent)
         {
             List<PipelineBuildEvent> pipelineBuildEvents;
-            bool eventsFound = _pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents);
-            if (!eventsFound)
+            lock (_pipelineBuildEvents)
             {
-                pipelineBuildEvents = new List<PipelineBuildEvent>();
-                _pipelineBuildEvents.Add(pipelineEvent.SourceFile, pipelineBuildEvents);
-            }
+                bool eventsFound = _pipelineBuildEvents.TryGetValue(pipelineEvent.SourceFile, out pipelineBuildEvents);
+                if (!eventsFound)
+                {
+                    pipelineBuildEvents = new List<PipelineBuildEvent>();
+                    _pipelineBuildEvents.Add(pipelineEvent.SourceFile, pipelineBuildEvents);
+                }
 
-            if (FindMatchingEvent(pipelineBuildEvents, pipelineEvent.DestFile, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters) == null)
-                pipelineBuildEvents.Add(pipelineEvent);
+                if (FindMatchingEvent(pipelineBuildEvents, pipelineEvent.DestFile, pipelineEvent.Importer, pipelineEvent.Processor, pipelineEvent.Parameters) == null)
+                    pipelineBuildEvents.Add(pipelineEvent);
+            }
         }
 
         /// <summary>
@@ -824,23 +830,26 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             string relativeSourceFileName = PathHelper.GetRelativePath(ProjectDirectory, sourceFileName);
 
             List<PipelineBuildEvent> pipelineBuildEvents;
-            if (_pipelineBuildEvents.TryGetValue(sourceFileName, out pipelineBuildEvents))
+            lock (_pipelineBuildEvents)
             {
-                // This source file has already been build.
-                // --> Compare pipeline build events.
-                ResolveImporterAndProcessor(sourceFileName, ref importerName, ref processorName);
-
-                var matchingEvent = FindMatchingEvent(pipelineBuildEvents, null, importerName, processorName, processorParameters);
-                if (matchingEvent != null)
+                if (_pipelineBuildEvents.TryGetValue(sourceFileName, out pipelineBuildEvents))
                 {
-                    // Matching pipeline build event found.
-                    string existingName = matchingEvent.DestFile;
-                    existingName = PathHelper.GetRelativePath(OutputDirectory, existingName);
-                    existingName = existingName.Substring(0, existingName.Length - 4);   // Remove ".xnb".
-                    return existingName;
-                }
+                    // This source file has already been build.
+                    // --> Compare pipeline build events.
+                    ResolveImporterAndProcessor(sourceFileName, ref importerName, ref processorName);
 
-                logger.LogMessage(string.Format("Warning: Asset {0} built multiple times with different settings.", relativeSourceFileName));
+                    var matchingEvent = FindMatchingEvent(pipelineBuildEvents, null, importerName, processorName, processorParameters);
+                    if (matchingEvent != null)
+                    {
+                        // Matching pipeline build event found.
+                        string existingName = matchingEvent.DestFile;
+                        existingName = PathHelper.GetRelativePath(OutputDirectory, existingName);
+                        existingName = existingName.Substring(0, existingName.Length - 4);   // Remove ".xnb".
+                        return existingName;
+                    }
+
+                    logger.LogMessage(string.Format("Warning: Asset {0} built multiple times with different settings.", relativeSourceFileName));
+                }
             }
 
             // No pipeline build event with matching settings found.
@@ -915,9 +924,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             string destFile = Path.Combine(OutputDirectory, assetName + ".xnb");
 
-            return _pipelineBuildEvents.SelectMany(pair => pair.Value)
-                                       .Select(pipelineEvent => pipelineEvent.DestFile)
-                                       .Any(existingDestFile => destFile.Equals(existingDestFile, StringComparison.OrdinalIgnoreCase));
+            lock (_pipelineBuildEvents)
+            {
+                return _pipelineBuildEvents.SelectMany(pair => pair.Value)
+                                           .Select(pipelineEvent => pipelineEvent.DestFile)
+                                           .Any(existingDestFile => destFile.Equals(existingDestFile, StringComparison.OrdinalIgnoreCase));
+            }
         }
     }
 }
