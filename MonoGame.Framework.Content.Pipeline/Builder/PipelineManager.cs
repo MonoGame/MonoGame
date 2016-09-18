@@ -398,27 +398,30 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 processorName = string.Empty;
 
             OpaqueDataDictionary defaultValues;
-            if (!_processorDefaultValues.TryGetValue(processorName, out defaultValues))
+            lock (_processorDefaultValues)
             {
-                // Create the content processor instance and read the default values.
-                defaultValues = new OpaqueDataDictionary();
-                var processorType = GetProcessorType(processorName);
-                if (processorType != null)
+                if (!_processorDefaultValues.TryGetValue(processorName, out defaultValues))
                 {
-                    try
+                    // Create the content processor instance and read the default values.
+                    defaultValues = new OpaqueDataDictionary();
+                    var processorType = GetProcessorType(processorName);
+                    if (processorType != null)
                     {
-                        var processor = (IContentProcessor)Activator.CreateInstance(processorType);
-                        var properties = processorType.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
-                        foreach (var property in properties)
-                            defaultValues.Add(property.Name, property.GetValue(processor, null));
+                        try
+                        {
+                            var processor = (IContentProcessor)Activator.CreateInstance(processorType);
+                            var properties = processorType.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
+                            foreach (var property in properties)
+                                defaultValues.Add(property.Name, property.GetValue(processor, null));
+                        }
+                        catch
+                        {
+                            // Ignore exception. Will be handled in ProcessContent.
+                        }
                     }
-                    catch
-                    {
-                        // Ignore exception. Will be handled in ProcessContent.
-                    }
-                }
 
-                _processorDefaultValues.Add(processorName, defaultValues);
+                    _processorDefaultValues.Add(processorName, defaultValues);
+                }
             }
 
             return defaultValues;
