@@ -3,24 +3,25 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GameEndedSender : IInternalMessageContent
+    internal class GameEndedSender : IInternalMessage
     {
-        public InternalMessageType MessageType { get { return InternalMessageType.GameEnded; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
+        public void Create(NetworkMachine recipient)
         {
-            if (!currentMachine.IsHost)
+            if (!CurrentMachine.IsHost)
             {
                 throw new NetworkException("Only host can send EndGame");
             }
-        }
-    }
 
-    internal class GameEndedReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.GameEnded);
+            Queue.Place(msg);
+        }
+
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -30,9 +31,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Make sure that the host can not accidentaly start the game too early
-            if (currentMachine.IsHost)
+            if (CurrentMachine.IsHost)
             {
-                foreach (NetworkGamer gamer in currentMachine.Session.AllGamers)
+                foreach (NetworkGamer gamer in CurrentMachine.Session.AllGamers)
                 {
                     // Safe because any ready state change from a remote gamer will happen after the scope of this Receive() call
                     gamer.SetReadyState(false);
@@ -40,16 +41,16 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Tell everyone that our local gamers are not yet ready
-            foreach (LocalNetworkGamer localGamer in currentMachine.LocalGamers)
+            foreach (LocalNetworkGamer localGamer in CurrentMachine.LocalGamers)
             {
                 localGamer.SetReadyState(false);
 
-                currentMachine.Session.QueueMessage(new GamerStateChangedSender(localGamer, false, true));
+                CurrentMachine.Session.internalMessages.GamerStateChanged.Create(localGamer, false, true, null);
             }
 
             // Reset state before going into lobby
-            currentMachine.Session.SessionState = NetworkSessionState.Lobby;
-            currentMachine.Session.InvokeGameEndedEvent(new GameEndedEventArgs());
+            CurrentMachine.Session.SessionState = NetworkSessionState.Lobby;
+            CurrentMachine.Session.InvokeGameEndedEvent(new GameEndedEventArgs());
         }
     }
 }

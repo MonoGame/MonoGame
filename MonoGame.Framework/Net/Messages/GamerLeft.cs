@@ -3,28 +3,23 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerLeftSender : IInternalMessageContent
+    internal class GamerLeftSender : IInternalMessage
     {
-        private LocalNetworkGamer localGamer;
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public GamerLeftSender(LocalNetworkGamer localGamer)
+        public void Create(LocalNetworkGamer localGamer, NetworkMachine recipient)
         {
-            this.localGamer = localGamer;
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.GamerLeft);
+
+            msg.Write(localGamer.Id);
+
+            Queue.Place(msg);
         }
 
-        public InternalMessageType MessageType { get { return InternalMessageType.GamerLeft; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
-
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
-        {
-            output.Write(localGamer.Id);
-        }
-    }
-
-    internal class GamerLeftReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsFullyConnected)
             {
@@ -34,7 +29,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             byte id = input.ReadByte();
-            NetworkGamer gamer = currentMachine.Session.FindGamerById(id);
+            NetworkGamer gamer = CurrentMachine.Session.FindGamerById(id);
 
             if (gamer == null)
             {
@@ -49,7 +44,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            currentMachine.Session.RemoveGamer(gamer);
+            CurrentMachine.Session.RemoveGamer(gamer);
         }
     }
 }

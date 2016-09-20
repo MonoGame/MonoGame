@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         void PeerConnected(IPeer peer);
         void PeerDisconnected(IPeer peer);
-        void Receive(IIncomingMessage data, IPeer sender);
+        void ReceiveMessage(IIncomingMessage data, IPeer sender);
     }
     internal interface IPeer
     {
@@ -63,10 +63,10 @@ namespace Microsoft.Xna.Framework.Net.Backend
         void Connect(IPEndPoint endPoint);
         bool IsConnectedToEndPoint(IPEndPoint endPoint);
         IPeer FindRemotePeerByEndPoint(IPEndPoint endPoint);
-
-        IOutgoingMessage GetMessageBuffer(IPeer recipient, SendDataOptions options, int channel);
         
-        void SendToPeer(IOutgoingMessage data);
+        IOutgoingMessage GetMessage(IPeer recipient, SendDataOptions options, int channel);
+        
+        void SendMessage(IOutgoingMessage data);
         void Update();
         void UpdateStatistics();
         void Shutdown(string byeMessage);

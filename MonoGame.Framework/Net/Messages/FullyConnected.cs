@@ -3,19 +3,20 @@ using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct FullyConnectedSender : IInternalMessageContent
+    internal class FullyConnectedSender : IInternalMessage
     {
-        public InternalMessageType MessageType { get { return InternalMessageType.FullyConnected; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
-        { }
-    }
+        public void Create(NetworkMachine recipient)
+        {
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.FullyConnected);
+            Queue.Place(msg);
+        }
 
-    internal class FullyConnectedReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsFullyConnected)
             {
@@ -27,9 +28,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // The sender machine is now considered fully connected
             senderMachine.IsFullyConnected = true;
             
-            if (currentMachine.IsHost && !senderMachine.IsLocal)
+            if (CurrentMachine.IsHost && !senderMachine.IsLocal)
             {
-                currentMachine.Session.pendingPeerConnections.Remove(senderMachine);
+                CurrentMachine.Session.pendingPeerConnections.Remove(senderMachine);
             }
         }
     }

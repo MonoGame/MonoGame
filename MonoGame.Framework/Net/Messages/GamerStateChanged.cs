@@ -3,46 +3,37 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerStateChangedSender : IInternalMessageContent
+    internal class GamerStateChangedSender : IInternalMessage
     {
-        private LocalNetworkGamer localGamer;
-        private bool sendNames;
-        private bool sendFlags;
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public GamerStateChangedSender(LocalNetworkGamer localGamer, bool sendNames, bool sendFlags)
+        public void Create(LocalNetworkGamer localGamer, bool sendNames, bool sendFlags, NetworkMachine recipient)
         {
-            this.localGamer = localGamer;
-            this.sendNames = sendNames;
-            this.sendFlags = sendFlags;
-        }
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.GamerStateChanged);
 
-        public InternalMessageType MessageType { get { return InternalMessageType.GamerStateChanged; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
+            msg.Write(localGamer.Id);
 
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
-        {
-            output.Write(localGamer.Id);
-
-            output.Write(sendNames);
+            msg.Write(sendNames);
             if (sendNames)
             {
-                output.Write(localGamer.DisplayName);
-                output.Write(localGamer.Gamertag);
+                msg.Write(localGamer.DisplayName);
+                msg.Write(localGamer.Gamertag);
             }
 
-            output.Write(sendFlags);
+            msg.Write(sendFlags);
             if (sendFlags)
             {
-                output.Write(localGamer.IsPrivateSlot);
-                output.Write(localGamer.IsReady);
+                msg.Write(localGamer.IsPrivateSlot);
+                msg.Write(localGamer.IsReady);
             }
-        }
-    }
 
-    internal class GamerStateChangedReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+            Queue.Place(msg);
+        }
+
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -50,7 +41,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             byte id = input.ReadByte();
-            NetworkGamer remoteGamer = currentMachine.Session.FindGamerById(id);
+            NetworkGamer remoteGamer = CurrentMachine.Session.FindGamerById(id);
 
             if (remoteGamer.Machine != senderMachine)
             {

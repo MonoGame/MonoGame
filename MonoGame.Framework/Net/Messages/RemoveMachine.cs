@@ -3,28 +3,23 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct RemoveMachineSender : IInternalMessageContent
+    internal class RemoveMachineSender : IInternalMessage
     {
-        private NetworkMachine machine;
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public RemoveMachineSender(NetworkMachine machine)
+        public void Create(NetworkMachine machine, NetworkMachine recipient)
         {
-            this.machine = machine;
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.RemoveMachine);
+
+            msg.Write(machine.peer);
+
+            Queue.Place(msg);
         }
 
-        public InternalMessageType MessageType { get { return InternalMessageType.RemoveMachine; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
-
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
-        {
-            output.Write(machine.peer);
-        }
-    }
-
-    internal class RemoveMachineReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -35,9 +30,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             IPeer removePeer = input.ReadPeer();
 
-            if (removePeer == currentMachine.Session.backend.LocalPeer)
+            if (removePeer == CurrentMachine.Session.backend.LocalPeer)
             {
-                currentMachine.Session.End(NetworkSessionEndReason.RemovedByHost);
+                CurrentMachine.Session.End(NetworkSessionEndReason.RemovedByHost);
             }
             else
             {

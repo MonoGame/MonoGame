@@ -3,24 +3,25 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GameStartedSender : IInternalMessageContent
+    internal class GameStartedSender : IInternalMessage
     {
-        public InternalMessageType MessageType { get { return InternalMessageType.GameStarted; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
+        public void Create(NetworkMachine recipient)
         {
-            if (!currentMachine.IsHost)
+            if (!CurrentMachine.IsHost)
             {
                 throw new NetworkException("Only host can send StartGame");
             }
-        }
-    }
 
-    internal class GameStartedReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.GameStarted);
+            Queue.Place(msg);
+        }
+
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -30,8 +31,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             // Reset state after exiting lobby
-            currentMachine.Session.SessionState = NetworkSessionState.Playing;
-            currentMachine.Session.InvokeGameStartedEvent(new GameStartedEventArgs());
+            CurrentMachine.Session.SessionState = NetworkSessionState.Playing;
+            CurrentMachine.Session.InvokeGameStartedEvent(new GameStartedEventArgs());
         }
     }
 }

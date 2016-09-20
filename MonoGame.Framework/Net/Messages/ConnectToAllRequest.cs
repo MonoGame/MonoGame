@@ -5,37 +5,32 @@ using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct ConnectToAllRequestSender : IInternalMessageContent
+    internal class ConnectToAllRequestSender : IInternalMessage
     {
-        private ICollection<NetworkMachine> requestedConnections;
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public ConnectToAllRequestSender(ICollection<NetworkMachine> requestedConnections)
+        public void Create(ICollection<NetworkMachine> requestedConnections, NetworkMachine recipient)
         {
-            this.requestedConnections = requestedConnections;
-        }
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.ConnectToAllRequest);
 
-        public InternalMessageType MessageType { get { return InternalMessageType.ConnectToAllRequest; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
-
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
-        {
-            if (!currentMachine.IsHost)
+            if (!CurrentMachine.IsHost)
             {
                 throw new NetworkException("Only host can send ConnectToAllRequest");
             }
 
-            output.Write((int)requestedConnections.Count);
+            msg.Write((int)requestedConnections.Count);
             foreach (NetworkMachine machine in requestedConnections)
             {
-                output.Write(machine.peer.EndPoint);
+                msg.Write(machine.peer.EndPoint);
             }
-        }
-    }
 
-    internal class ConnectToAllRequestReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+            Queue.Place(msg);
+        }
+
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -47,7 +42,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 Debug.Assert(false);
                 return;
             }
-            if (currentMachine.IsFullyConnected)
+            if (CurrentMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousRepeatedInfo
                 Debug.Assert(false);
@@ -55,15 +50,15 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             int requestedConnectionCount = input.ReadInt();
-            currentMachine.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
+            CurrentMachine.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
             for (int i = 0; i < requestedConnectionCount; i++)
             {
                 IPEndPoint endPoint = input.ReadIPEndPoint();
-                currentMachine.Session.pendingEndPoints.Add(endPoint);
+                CurrentMachine.Session.pendingEndPoints.Add(endPoint);
 
-                if (!currentMachine.Session.backend.IsConnectedToEndPoint(endPoint))
+                if (!CurrentMachine.Session.backend.IsConnectedToEndPoint(endPoint))
                 {
-                    currentMachine.Session.backend.Connect(endPoint);
+                    CurrentMachine.Session.backend.Connect(endPoint);
                 }
             }
         }

@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     ready = value;
 
-                    Session.QueueMessage(new GamerStateChangedSender(this, false, true));
+                    Session.internalMessages.GamerStateChanged.Create(this, false, true, null);
                 }
             }
         }
@@ -184,16 +184,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             foreach (OutboundPacket outboundPacket in outboundPackets)
             {
-                IInternalMessageContent userMessage = new UserMessageSender(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
-
-                if (outboundPacket.recipient == null)
-                {
-                    Session.QueueMessage(userMessage);
-                }
-                else
-                {
-                    Session.QueueMessage(userMessage, outboundPacket.recipient.Machine);
-                }
+                Session.internalMessages.UserMessage.Create(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
             }
         }
 

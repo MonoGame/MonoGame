@@ -3,48 +3,37 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct UserMessageSender : IInternalMessageContent
+    internal class UserMessageSender : IInternalMessage
     {
-        private NetworkGamer sender;
-        private NetworkGamer recipient;
-        private SendDataOptions options;
-        private Packet packet;
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public UserMessageSender(NetworkGamer sender, NetworkGamer recipient, SendDataOptions options, Packet packet)
+        public void Create(NetworkGamer sender, NetworkGamer recipient, SendDataOptions options, Packet packet)
         {
-            this.sender = sender;
-            this.recipient = recipient;
-            this.options = options;
-            this.packet = packet;
-        }
-
-        public InternalMessageType MessageType { get { return InternalMessageType.UserMessage; } }
-        public int SequenceChannel { get { return 0; } }
-        public SendDataOptions Options { get { return options; } }
-
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
-        {
-            if (!currentMachine.IsFullyConnected)
+            if (!CurrentMachine.IsFullyConnected)
             {
                 throw new NetworkException("UserMessage from not fully connected peer");
             }
+            
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.Machine.peer, options, 0);
+            msg.Write((byte)InternalMessageType.UserMessage);
 
             bool sendToAll = recipient == null;
 
-            output.Write(sender.Id);
-            output.Write(sendToAll);
-            output.Write((byte)(sendToAll ? 255 : recipient.Id));
-            output.Write((byte)options);
-            output.Write(packet.length);
-            output.Write(packet.data);
-        }
-    }
+            msg.Write(sender.Id);
+            msg.Write(sendToAll);
+            msg.Write((byte)(sendToAll ? 255 : recipient.Id));
+            msg.Write((byte)options);
+            msg.Write(packet.length);
+            msg.Write(packet.data);
 
-    internal class UserMessageReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+            Queue.Place(msg);
+        }
+
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
-            if (!currentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
+            if (!CurrentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {
                 // Will occur naturally for non fully connected machines if a machine sends to everyone
                 return;
@@ -55,10 +44,10 @@ namespace Microsoft.Xna.Framework.Net.Messages
             byte recipientId = input.ReadByte();
             SendDataOptions options = (SendDataOptions)input.ReadByte();
             int length = input.ReadInt();
-            Packet packet = currentMachine.Session.packetPool.GetPacket(length);
+            Packet packet = CurrentMachine.Session.packetPool.GetPacket(length);
             input.ReadBytes(packet.data, 0, length);
 
-            NetworkGamer sender = currentMachine.Session.FindGamerById(senderId);
+            NetworkGamer sender = CurrentMachine.Session.FindGamerById(senderId);
 
             if (sender != null && sender.Machine != senderMachine)
             {
@@ -69,14 +58,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             if (sendToAll)
             {
-                foreach (LocalNetworkGamer localGamer in currentMachine.Session.LocalGamers)
+                foreach (LocalNetworkGamer localGamer in CurrentMachine.Session.LocalGamers)
                 {
                     localGamer.AddInboundPacket(packet, senderId, options);
                 }
             }
             else
             {
-                NetworkGamer recipient = currentMachine.Session.FindGamerById(recipientId);
+                NetworkGamer recipient = CurrentMachine.Session.FindGamerById(recipientId);
 
                 if (recipient == null)
                 {

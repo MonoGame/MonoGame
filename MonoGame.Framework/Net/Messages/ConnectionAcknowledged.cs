@@ -3,38 +3,40 @@ using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct ConnectionAcknowledgedSender : IInternalMessageContent
+    internal class ConnectionAcknowledgedSender : IInternalMessage
     {
-        public InternalMessageType MessageType { get { return InternalMessageType.ConnectionAcknowledged; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
+        public void Create(NetworkMachine recipient)
         {
-            bool isHost = currentMachine.IsHost;
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.ConnectionAcknowledged);
+
+            bool isHost = CurrentMachine.IsHost;
 
             // Send a priori state
-            output.Write(isHost);
+            msg.Write(isHost);
             if (isHost)
             {
-                output.Write((byte)currentMachine.Session.SessionState);
+                msg.Write((byte)CurrentMachine.Session.SessionState);
             }
 
-            output.Write((int)currentMachine.LocalGamers.Count);
-            foreach (LocalNetworkGamer localGamer in currentMachine.LocalGamers)
+            msg.Write((int)CurrentMachine.LocalGamers.Count);
+            foreach (LocalNetworkGamer localGamer in CurrentMachine.LocalGamers)
             {
-                output.Write(localGamer.DisplayName);
-                output.Write(localGamer.Gamertag);
-                output.Write(localGamer.Id);
-                output.Write(localGamer.IsPrivateSlot);
-                output.Write(localGamer.IsReady);
+                msg.Write(localGamer.DisplayName);
+                msg.Write(localGamer.Gamertag);
+                msg.Write(localGamer.Id);
+                msg.Write(localGamer.IsPrivateSlot);
+                msg.Write(localGamer.IsReady);
             }
-        }
-    }
 
-    internal class ConnectionAcknowledgedReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+            Queue.Place(msg);
+        }
+
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -59,7 +61,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Receive a priori state
             if (isHost)
             {
-                currentMachine.Session.SessionState = (NetworkSessionState)input.ReadByte();
+                CurrentMachine.Session.SessionState = (NetworkSessionState)input.ReadByte();
             }
 
             int gamerCount = input.ReadInt();
@@ -79,7 +81,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 bool isPrivateSlot = input.ReadBoolean();
                 bool isReady = input.ReadBoolean();
 
-                if (currentMachine.Session.FindGamerById(id) != null)
+                if (CurrentMachine.Session.FindGamerById(id) != null)
                 {
                     // TODO: SuspiciousGamerIdCollision
                     Debug.Assert(false);
@@ -87,7 +89,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 }
 
                 NetworkGamer remoteGamer = new NetworkGamer(senderMachine, displayName, gamertag, id, isPrivateSlot, isReady);
-                currentMachine.Session.AddGamer(remoteGamer);
+                CurrentMachine.Session.AddGamer(remoteGamer);
             }
 
             // Everything went fine

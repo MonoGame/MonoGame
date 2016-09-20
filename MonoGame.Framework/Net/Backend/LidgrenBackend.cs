@@ -7,71 +7,23 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend
 {
-    internal class LidgrenOutgoingMessageToSelf : IOutgoingMessage
-    {
-        internal NetBuffer buffer = new NetBuffer();
-        internal LidgrenLocalPeer recipient;
-        internal SendDataOptions options;
-        internal int channel;
-
-        internal LidgrenIncomingMessage incomingMessage;
-
-        public LidgrenOutgoingMessageToSelf()
-        {
-            this.incomingMessage = new LidgrenIncomingMessage(this.buffer);
-        }
-
-        public IPeer Recipient { get { return recipient; } }
-        public SendDataOptions Options { get { return options; } }
-        public int Channel { get { return channel; } }
-
-        public void Write(int value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(byte[] value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(string value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(byte value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(bool value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(IPEndPoint value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(IPeer value)
-        {
-            buffer.Write((value as ILidgrenPeer).Id);
-        }
-    }
     internal class LidgrenOutgoingMessage : IOutgoingMessage
     {
-        internal NetOutgoingMessage buffer;
-        internal LidgrenRemotePeer recipient;
-        internal SendDataOptions options;
-        internal int channel;
+        internal NetBuffer buffer;
 
-        public IPeer Recipient { get { return recipient; } }
-        public SendDataOptions Options { get { return options; } }
-        public int Channel { get { return channel; } }
+        public LidgrenOutgoingMessage()
+        {
+            this.buffer = null;
+            this.Recipient = null;
+            this.Options = SendDataOptions.None;
+            this.Channel = 0;
+        }
+        
+        public IPeer Recipient { get; internal set; }
+        public SendDataOptions Options { get; internal set; }
+        public int Channel { get; internal set; }
 
-        public void Write(int value)
+        public void Write(string value)
         {
             buffer.Write(value);
         }
@@ -81,17 +33,17 @@ namespace Microsoft.Xna.Framework.Net.Backend
             buffer.Write(value);
         }
 
-        public void Write(string value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(byte value)
+        public void Write(int value)
         {
             buffer.Write(value);
         }
 
         public void Write(bool value)
+        {
+            buffer.Write(value);
+        }
+
+        public void Write(byte value)
         {
             buffer.Write(value);
         }
@@ -111,9 +63,10 @@ namespace Microsoft.Xna.Framework.Net.Backend
         internal LidgrenBackend backend;
         internal NetBuffer buffer;
 
-        public LidgrenIncomingMessage(NetBuffer buffer)
+        public LidgrenIncomingMessage()
         {
-            this.buffer = buffer;
+            this.backend = null;
+            this.buffer = null;
         }
 
         public bool ReadBoolean()
@@ -152,24 +105,26 @@ namespace Microsoft.Xna.Framework.Net.Backend
         }
     }
 
-    internal class LidgrenOutgoingMessagePool<T> where T : IOutgoingMessage, new()
+    internal class Pool<T> where T : new()
     {
         private IList<T> freeMessages = new List<T>();
 
         public T Get()
         {
-            T msg;
+            T item;
 
             if (freeMessages.Count > 0)
             {
-                msg = freeMessages[freeMessages.Count - 1];
+                int lastIndex = freeMessages.Count - 1;
+                item = freeMessages[lastIndex];
+                freeMessages.RemoveAt(lastIndex);
             }
             else
             {
-                msg = new T();
+                item = new T();
             }
 
-            return msg;
+            return item;
         }
 
         public void Recycle(T item)
@@ -227,10 +182,11 @@ namespace Microsoft.Xna.Framework.Net.Backend
     {
         private LidgrenLocalPeer localPeer;
         private IList<LidgrenRemotePeer> remotePeers;
+        private List<NetConnection> reportedConnections;
 
-        private LidgrenOutgoingMessagePool<LidgrenOutgoingMessageToSelf> internalMessagePool;
-        private LidgrenOutgoingMessagePool<LidgrenOutgoingMessage> outgoingMessagePool;
-        private LidgrenIncomingMessage remoteIncomingMessage;
+        private Pool<NetBuffer> bufferPool;
+        private Pool<LidgrenOutgoingMessage> outgoingMessagePool;
+        private Pool<LidgrenIncomingMessage> incomingMessagePool;
 
         private DateTime lastTime;
         private int lastReceivedBytes;
@@ -240,10 +196,11 @@ namespace Microsoft.Xna.Framework.Net.Backend
         {
             this.localPeer = new LidgrenLocalPeer(peer);
             this.remotePeers = new List<LidgrenRemotePeer>();
+            this.reportedConnections = new List<NetConnection>();
 
-            this.internalMessagePool = new LidgrenOutgoingMessagePool<LidgrenOutgoingMessageToSelf>();
-            this.outgoingMessagePool = new LidgrenOutgoingMessagePool<LidgrenOutgoingMessage>();
-            this.remoteIncomingMessage = new LidgrenIncomingMessage(null);
+            this.bufferPool = new Pool<NetBuffer>();
+            this.outgoingMessagePool = new Pool<LidgrenOutgoingMessage>();
+            this.incomingMessagePool = new Pool<LidgrenIncomingMessage>();
 
             this.lastTime = DateTime.Now;
             this.lastReceivedBytes = 0;
@@ -324,70 +281,89 @@ namespace Microsoft.Xna.Framework.Net.Backend
             }
         }
 
-        public IOutgoingMessage GetMessageBuffer(IPeer recipient, SendDataOptions options, int channel)
+        public IOutgoingMessage GetMessage(IPeer recipient, SendDataOptions options, int channel)
         {
-            if (recipient == null)
-            {
-                throw new ArgumentNullException("recipient");
-            }
+            NetBuffer buffer;
 
             if (recipient == localPeer)
             {
-                LidgrenOutgoingMessageToSelf msg = internalMessagePool.Get();
-                msg.buffer.LengthBits = 0;
-                msg.recipient = recipient as LidgrenLocalPeer;
-                msg.options = options;
-                msg.channel = channel;
-                return msg;
+                buffer = bufferPool.Get();
             }
             else
             {
-                LidgrenOutgoingMessage msg = outgoingMessagePool.Get();
-                msg.buffer = localPeer.peer.CreateMessage();
-                msg.recipient = recipient as LidgrenRemotePeer;
-                msg.options = options;
-                msg.channel = channel;
-                return msg;
+                buffer = localPeer.peer.CreateMessage();
             }
+
+            LidgrenOutgoingMessage msg = outgoingMessagePool.Get();
+            msg.buffer = buffer;
+            msg.Recipient = recipient;
+            msg.Options = options;
+            msg.Channel = channel;
+            return msg;
         }
 
-        public void SendToPeer(IOutgoingMessage data)
+        public void SendMessage(IOutgoingMessage data)
         {
-            if (data is LidgrenOutgoingMessageToSelf)
+            LidgrenOutgoingMessage msg = data as LidgrenOutgoingMessage;
+
+            if (msg == null)
             {
-                LidgrenOutgoingMessageToSelf msg = data as LidgrenOutgoingMessageToSelf;
-                
+                throw new NetworkException("Not possible to mix backends");
+            }
+
+            if (msg.Recipient == null)
+            {
+                // Prepare for reading
+                long prevPos = msg.buffer.Position;
                 msg.buffer.Position = 0;
 
-                InvokeReceive(msg.incomingMessage, localPeer);
+                InvokeReceive(msg.buffer, localPeer);
 
-                // Recycle
-                msg.buffer.LengthBits = 0;
-                msg.recipient = null;
-                msg.options = SendDataOptions.None;
-                msg.channel = 0;
-                internalMessagePool.Recycle(msg);
+                // Prepare for sending
+                msg.buffer.Position = prevPos;
+
+                if (reportedConnections.Count > 0)
+                {
+                    NetOutgoingMessage outgoingMsg = msg.buffer as NetOutgoingMessage;
+                    localPeer.peer.SendMessage(outgoingMsg, reportedConnections, ToDeliveryMethod(msg.Options), msg.Channel);
+                }
             }
-            else if (data is LidgrenOutgoingMessage)
+            else if (msg.Recipient == localPeer)
             {
-                LidgrenOutgoingMessage msg = data as LidgrenOutgoingMessage;
+                NetBuffer buffer = msg.buffer;
+                buffer.Position = 0;
 
-                localPeer.peer.SendMessage(msg.buffer, msg.recipient.connection, ToDeliveryMethod(msg.Options), msg.Channel);
+                InvokeReceive(buffer, localPeer);
 
-                // Recycle
-                msg.buffer = null;
-                msg.recipient = null;
-                msg.options = SendDataOptions.None;
-                msg.channel = 0;
-                outgoingMessagePool.Recycle(msg);
+                buffer.LengthBits = 0;
+                buffer.Position = 0;
+                bufferPool.Recycle(buffer);
             }
+            else
+            {
+                NetOutgoingMessage outgoingMsg = msg.buffer as NetOutgoingMessage;
+                LidgrenRemotePeer recipient = msg.Recipient as LidgrenRemotePeer;
+                localPeer.peer.SendMessage(outgoingMsg, recipient.connection, ToDeliveryMethod(msg.Options), msg.Channel);
+            }
+
+            msg.buffer = null;
+            msg.Recipient = null;
+            msg.Options = SendDataOptions.None;
+            msg.Channel = 0;
+            outgoingMessagePool.Recycle(msg);
         }
 
-        private void InvokeReceive(LidgrenIncomingMessage incomingMessage, IPeer sender)
+        private void InvokeReceive(NetBuffer buffer, IPeer sender)
         {
-            incomingMessage.backend = this;
+            LidgrenIncomingMessage incomingMsg = incomingMessagePool.Get();
+            incomingMsg.backend = this;
+            incomingMsg.buffer = buffer;
 
-            Listener.Receive(incomingMessage, sender);
+            Listener.ReceiveMessage(incomingMsg, sender);
+
+            incomingMsg.backend = null;
+            incomingMsg.buffer = null;
+            incomingMessagePool.Recycle(incomingMsg);
         }
 
         public void Update()
@@ -433,6 +409,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
                             LidgrenRemotePeer remotePeer = new LidgrenRemotePeer(msg.SenderConnection);
                             msg.SenderConnection.Tag = remotePeer;
                             remotePeers.Add(remotePeer);
+                            reportedConnections.Add(msg.SenderConnection);
 
                             Listener.PeerConnected(remotePeer);
                         }
@@ -447,6 +424,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
                             }
 
                             remotePeers.Remove(disconnectedPeer);
+                            reportedConnections.Remove(msg.SenderConnection);
 
                             Listener.PeerDisconnected(disconnectedPeer);
                         }
@@ -458,8 +436,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
                             throw new NetworkException("Sender connection is null");
                         }
 
-                        remoteIncomingMessage.buffer = msg;
-                        InvokeReceive(remoteIncomingMessage, msg.SenderConnection.Tag as LidgrenRemotePeer);
+                        InvokeReceive(msg, msg.SenderConnection.Tag as LidgrenRemotePeer);
                         break;
                     // Unconnected data
                     case NetIncomingMessageType.UnconnectedData:

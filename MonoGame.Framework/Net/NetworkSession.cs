@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net
 {
-    public sealed class NetworkSession : IDisposable, IBackendListener
+    public sealed class NetworkSession : IDisposable, IBackendListener, IMessageQueue
     {
         internal const int Port = 14242;
         internal const int DiscoveryTime = 1000;
@@ -52,7 +52,8 @@ namespace Microsoft.Xna.Framework.Net
         private IPEndPoint hostEndPoint;
         private NetworkMachine localMachine;
         private NetworkMachine hostMachine;
-        private List<InternalMessage> messageQueue;
+        internal InternalMessages internalMessages;
+        private List<IOutgoingMessage> messageQueue;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
         internal ICollection<IPEndPoint> pendingEndPoints;
@@ -73,7 +74,8 @@ namespace Microsoft.Xna.Framework.Net
             this.hostEndPoint = hostEndPoint;
             this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, hostEndPoint == null);
             this.hostMachine = hostEndPoint == null ? this.localMachine : null;
-            this.messageQueue = new List<InternalMessage>();
+            this.messageQueue = new List<IOutgoingMessage>();
+            this.internalMessages = new InternalMessages(this.backend, this, this.localMachine);
 
             this.pendingSignedInGamers = new List<SignedInGamer>();
 
@@ -334,7 +336,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 pendingSignedInGamers.Add(signedInGamer);
 
-                QueueMessage(new GamerIdRequestSender(), HostMachine);
+                internalMessages.GamerIdRequest.Create(HostMachine);
             }
         }
 
@@ -358,7 +360,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("Not all players are ready"); // TODO: See if this is the expected behavior
             }
 
-            QueueMessage(new GameStartedSender());
+            internalMessages.GameStarted.Create(null);
         }
 
         public void EndGame()
@@ -376,8 +378,8 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("The game can only end from the playing state");
             }
-
-            QueueMessage(new GameEndedSender());
+            
+            internalMessages.GameEnded.Create(null);
         }
 
         public void ResetReady() // only host
@@ -491,7 +493,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (localGamer != null)
             {
-                QueueMessage(new GamerLeftSender(localGamer));
+                internalMessages.GamerLeft.Create(localGamer, null);
             }
         }
 
@@ -546,28 +548,11 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        private void EncodeMessage(IInternalMessageContent message, IOutgoingMessage output)
+        void IMessageQueue.Place(IOutgoingMessage msg)
         {
-            output.Write((byte)message.MessageType);
-
-            message.Write(output, localMachine);
+            messageQueue.Add(msg);
         }
-
-        internal void QueueMessage(IInternalMessageContent message)
-        {
-            messageQueue.Add(new InternalMessage(message, null));
-        }
-
-        internal void QueueMessage(IInternalMessageContent message, NetworkMachine recipient)
-        {
-            if (recipient == null)
-            {
-                throw new ArgumentNullException("recipient");
-            }
-
-            messageQueue.Add(new InternalMessage(message, recipient));
-        }
-
+        /*
         private void Send(ref InternalMessage message)
         {
             if (message.content.MessageType != InternalMessageType.UserMessage)
@@ -598,7 +583,7 @@ namespace Microsoft.Xna.Framework.Net
                 backend.SendToPeer(msg);
             }
         }
-        
+        */
         void IBackendListener.PeerConnected(IPeer peer)
         {
             bool senderIsHost = peer.EndPoint == hostEndPoint;
@@ -614,10 +599,10 @@ namespace Microsoft.Xna.Framework.Net
 
             if (localMachine.IsFullyConnected)
             {
-                QueueMessage(new FullyConnectedSender(), senderMachine);
+                internalMessages.FullyConnected.Create(senderMachine);
             }
-
-            QueueMessage(new ConnectionAcknowledgedSender(), senderMachine);
+            
+            internalMessages.ConnectionAcknowledged.Create(senderMachine);
 
             if (IsHost)
             {
@@ -625,8 +610,8 @@ namespace Microsoft.Xna.Framework.Net
                 ICollection<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
                 requestedConnections.Remove(senderMachine);
                 pendingPeerConnections.Add(senderMachine, requestedConnections);
-
-                QueueMessage(new ConnectToAllRequestSender(requestedConnections), senderMachine);
+                
+                internalMessages.ConnectToAllRequest.Create(requestedConnections, senderMachine);
             }
         }
 
@@ -649,7 +634,7 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         pendingPair.Value.Remove(disconnectedMachine);
 
-                        QueueMessage(new ConnectToAllRequestSender(pendingPair.Value), pendingMachine);
+                        internalMessages.ConnectToAllRequest.Create(pendingPair.Value, pendingMachine);
                     }
                 }
             }
@@ -663,7 +648,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        void IBackendListener.Receive(IIncomingMessage data, IPeer sender)
+        void IBackendListener.ReceiveMessage(IIncomingMessage data, IPeer sender)
         {
             NetworkMachine senderMachine = sender.Tag as NetworkMachine;
 
@@ -674,8 +659,8 @@ namespace Microsoft.Xna.Framework.Net
                 Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(senderMachine) + "...");
             }
 
-            IInternalMessageReceiver receiver = InternalMessageReceivers.FromType[messageType];
-            receiver.Receive(data, localMachine, senderMachine);
+            IInternalMessage receiver = internalMessages.ByType[messageType];
+            receiver.Receive(data, senderMachine);
         }
 
         public void Update()
@@ -742,11 +727,11 @@ namespace Microsoft.Xna.Framework.Net
 
             if (done)
             {
-                QueueMessage(new FullyConnectedSender());
+                internalMessages.FullyConnected.Create(null);
 
                 foreach (SignedInGamer pendingGamer in pendingSignedInGamers)
                 {
-                    QueueMessage(new GamerIdRequestSender(), HostMachine);
+                    internalMessages.GamerIdRequest.Create(HostMachine);
                 }
             }
         }
@@ -755,9 +740,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             for (int i = 0; i < messageQueue.Count; i++)
             {
-                InternalMessage message = messageQueue[i];
-
-                Send(ref message);
+                backend.SendMessage(messageQueue[i]);
 
                 if (SessionState == NetworkSessionState.Ended)
                 {

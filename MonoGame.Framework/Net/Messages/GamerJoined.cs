@@ -3,32 +3,27 @@ using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerJoinedSender : IInternalMessageContent
+    internal class GamerJoinedSender : IInternalMessage
     {
-        private LocalNetworkGamer localGamer;
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public GamerJoinedSender(LocalNetworkGamer localGamer)
+        public void Create(LocalNetworkGamer localGamer, NetworkMachine recipient)
         {
-            this.localGamer = localGamer;
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.GamerJoined);
+
+            msg.Write(localGamer.DisplayName);
+            msg.Write(localGamer.Gamertag);
+            msg.Write(localGamer.Id);
+            msg.Write(localGamer.IsPrivateSlot);
+            msg.Write(localGamer.IsReady);
+
+            Queue.Place(msg);
         }
 
-        public InternalMessageType MessageType { get { return InternalMessageType.GamerJoined; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
-
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
-        {
-            output.Write(localGamer.DisplayName);
-            output.Write(localGamer.Gamertag);
-            output.Write(localGamer.Id);
-            output.Write(localGamer.IsPrivateSlot);
-            output.Write(localGamer.IsReady);
-        }
-    }
-
-    internal class GamerJoinedReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -47,7 +42,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool isPrivateSlot = input.ReadBoolean();
             bool isReady = input.ReadBoolean();
 
-            if (currentMachine.Session.FindGamerById(id) != null)
+            if (CurrentMachine.Session.FindGamerById(id) != null)
             {
                 // TODO: SuspiciousGamerIdCollision
                 Debug.Assert(false);
@@ -55,7 +50,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             NetworkGamer remoteGamer = new NetworkGamer(senderMachine, displayName, gamertag, id, isPrivateSlot, isReady);
-            currentMachine.Session.AddGamer(remoteGamer);
+            CurrentMachine.Session.AddGamer(remoteGamer);
         }
     }
 }

@@ -7,58 +7,72 @@ namespace Microsoft.Xna.Framework.Net.Messages
         ConnectionAcknowledged,
         ConnectToAllRequest,
         FullyConnected,
+        GameEnded,
         GamerIdRequest,
         GamerIdResponse,
         GamerJoined,
         GamerLeft,
         GamerStateChanged,
         GameStarted,
-        GameEnded,
-        UserMessage,
-        RemoveMachine
+        RemoveMachine,
+        UserMessage
     }
 
-    internal static class InternalMessageReceivers
+    internal class InternalMessages
     {
-        public static IInternalMessageReceiver[] FromType =
+        public ConnectionAcknowledgedSender ConnectionAcknowledged = new ConnectionAcknowledgedSender();
+        public ConnectToAllRequestSender ConnectToAllRequest = new ConnectToAllRequestSender();
+        public FullyConnectedSender FullyConnected = new FullyConnectedSender();
+        public GameEndedSender GameEnded = new GameEndedSender();
+        public GamerIdRequestSender GamerIdRequest = new GamerIdRequestSender();
+        public GamerIdResponseSender GamerIdResponse = new GamerIdResponseSender();
+        public GamerJoinedSender GamerJoined = new GamerJoinedSender();
+        public GamerLeftSender GamerLeft = new GamerLeftSender();
+        public GamerStateChangedSender GamerStateChanged = new GamerStateChangedSender();
+        public GameStartedSender GameStarted = new GameStartedSender();
+        public RemoveMachineSender RemoveMachine = new RemoveMachineSender();
+        public UserMessageSender UserMessage = new UserMessageSender();
+
+        public IInternalMessage[] ByType;
+
+        public InternalMessages(IBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
         {
-            new ConnectionAcknowledgedReceiver(),
-            new ConnectToAllRequestReceiver(),
-            new FullyConnectedReceiver(),
-            new GamerIdRequestReceiver(),
-            new GamerIdResponseReceiver(),
-            new GamerJoinedReceiver(),
-            new GamerLeftReceiver(),
-            new GamerStateChangedReceiver(),
-            new GameStartedReceiver(),
-            new GameEndedReceiver(),
-            new UserMessageReceiver(),
-            new RemoveMachineReceiver()
-        };
-    }
+            ByType = new IInternalMessage[]
+            {
+                ConnectionAcknowledged,
+                ConnectToAllRequest,
+                FullyConnected,
+                GameEnded,
+                GamerIdRequest,
+                GamerIdResponse,
+                GamerJoined,
+                GamerLeft,
+                GamerStateChanged,
+                GameStarted,
+                RemoveMachine,
+                UserMessage
+            };
 
-    internal interface IInternalMessageContent
-    {
-        InternalMessageType MessageType { get; }
-        int SequenceChannel { get; }
-        SendDataOptions Options { get; }
-        void Write(IOutgoingMessage output, NetworkMachine currentMachine);
-    }
-
-    internal interface IInternalMessageReceiver
-    {
-        void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine);
-    }
-
-    internal struct InternalMessage
-    {
-        public IInternalMessageContent content;
-        public NetworkMachine recipient;
-
-        public InternalMessage(IInternalMessageContent content, NetworkMachine recipient)
-        {
-            this.content = content;
-            this.recipient = recipient;
+            foreach (IInternalMessage internalMessage in ByType)
+            {
+                internalMessage.Backend = backend;
+                internalMessage.Queue = queue;
+                internalMessage.CurrentMachine = currentMachine;
+            }
         }
+    }
+
+    internal interface IMessageQueue
+    {
+        void Place(IOutgoingMessage msg);
+    }
+
+    internal interface IInternalMessage
+    {
+        IBackend Backend { get; set; }
+        IMessageQueue Queue { get; set; }
+        NetworkMachine CurrentMachine { get; set; }
+
+        void Receive(IIncomingMessage input, NetworkMachine senderMachine);
     }
 }

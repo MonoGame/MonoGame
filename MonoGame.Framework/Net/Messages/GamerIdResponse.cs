@@ -4,30 +4,32 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal struct GamerIdResponseSender : IInternalMessageContent
+    internal class GamerIdResponseSender : IInternalMessage
     {
-        public InternalMessageType MessageType { get { return InternalMessageType.GamerIdResponse; } }
-        public int SequenceChannel { get { return 1; } }
-        public SendDataOptions Options { get { return SendDataOptions.ReliableInOrder; } }
+        public IBackend Backend { get; set; }
+        public IMessageQueue Queue { get; set; }
+        public NetworkMachine CurrentMachine { get; set; }
 
-        public void Write(IOutgoingMessage output, NetworkMachine currentMachine)
+        public void Create(NetworkMachine recipient)
         {
-            if (!currentMachine.IsHost)
+            if (!CurrentMachine.IsHost)
             {
                 throw new NetworkException("Only host can send GamerIdResponse");
             }
 
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageType.GamerIdResponse);
+
             byte id;
-            bool wasApprovedByHost = currentMachine.Session.GetNewUniqueId(out id);
+            bool wasApprovedByHost = CurrentMachine.Session.GetNewUniqueId(out id);
 
-            output.Write(wasApprovedByHost);
-            output.Write(id);
+            msg.Write(wasApprovedByHost);
+            msg.Write(id);
+
+            Queue.Place(msg);
         }
-    }
 
-    internal class GamerIdResponseReceiver : IInternalMessageReceiver
-    {
-        public void Receive(IIncomingMessage input, NetworkMachine currentMachine, NetworkMachine senderMachine)
+        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -35,7 +37,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 Debug.Assert(false);
                 return;
             }
-            if (!currentMachine.IsFullyConnected)
+            if (!CurrentMachine.IsFullyConnected)
             {
                 // TODO: SuspiciousUnexpectedMessage
                 Debug.Assert(false);
@@ -45,22 +47,22 @@ namespace Microsoft.Xna.Framework.Net.Messages
             bool wasApprovedByHost = input.ReadBoolean();
             byte id = input.ReadByte();
 
-            if (currentMachine.Session.FindGamerById(id) != null)
+            if (CurrentMachine.Session.FindGamerById(id) != null)
             {
                 // TODO: SuspiciousGamerIdCollision
                 Debug.Assert(false);
                 return;
             }
 
-            if (currentMachine.Session.pendingSignedInGamers.Count == 0)
+            if (CurrentMachine.Session.pendingSignedInGamers.Count == 0)
             {
                 Debug.WriteLine("Warning: GamerIdResponse received but there are no pending signed in gamers!");
                 return;
             }
 
             // Host approved request, now possible to create network gamer
-            SignedInGamer signedInGamer = currentMachine.Session.pendingSignedInGamers[0];
-            currentMachine.Session.pendingSignedInGamers.RemoveAt(0);
+            SignedInGamer signedInGamer = CurrentMachine.Session.pendingSignedInGamers[0];
+            CurrentMachine.Session.pendingSignedInGamers.RemoveAt(0);
 
             if (!wasApprovedByHost)
             {
@@ -68,9 +70,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            LocalNetworkGamer localGamer = new LocalNetworkGamer(currentMachine, signedInGamer, id, false);
-            currentMachine.Session.AddGamer(localGamer);
-            currentMachine.Session.QueueMessage(new GamerJoinedSender(localGamer));
+            LocalNetworkGamer localGamer = new LocalNetworkGamer(CurrentMachine, signedInGamer, id, false);
+            CurrentMachine.Session.AddGamer(localGamer);
+            CurrentMachine.Session.internalMessages.GamerJoined.Create(localGamer, null);
         }
     }
 }
