@@ -7,6 +7,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using MapFlags = SharpDX.Direct3D11.MapFlags;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -14,6 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
         private bool renderTarget;
         private bool mipMap;
+	    private SampleDescription _sampleDescription;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
@@ -58,7 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
 
-        private void PlatformSetData<T>(int level,
+	    private void PlatformSetData<T>(int level,
                                      int left, int top, int right, int bottom, int front, int back,
                                      T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
