@@ -95,8 +95,6 @@
 	<Compile Include="Framework\CurveTest.cs" />
 	<Compile Include="Framework\EnumConformingTest.cs" />
     <Compile Include="Framework\GameComponentTest.cs" />
-    <Compile Include="Framework\GamePadStateTest.cs" />
-    <Compile Include="Framework\GamePadThumbSticksTest.cs" />
     <Compile Include="Framework\GameTest.cs" />	
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
@@ -148,6 +146,9 @@
     <Compile Include="Framework\Graphics\Texture2DNonVisualTest.cs" />
     <Compile Include="Framework\Graphics\Texture3DNonVisualTest.cs" />
 
+    <Compile Include="Framework\Input\GamePadTest.cs" />
+    <Compile Include="Framework\Input\JoystickTest.cs" />
+    <Compile Include="Framework\Input\KeyboardTest.cs" />
     <Compile Include="Framework\Input\MouseTest.cs" />
 
     <Compile Include="Framework\Graphics\DepthStencilStateTest.cs" />

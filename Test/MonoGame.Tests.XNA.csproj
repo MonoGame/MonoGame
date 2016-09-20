@@ -118,8 +118,6 @@
     <Compile Include="Framework\CurveTest.cs" />
     <Compile Include="Framework\EnumConformingTest.cs" />
     <Compile Include="Framework\GameComponentTest.cs" />
-    <Compile Include="Framework\GamePadStateTest.cs" />
-    <Compile Include="Framework\GamePadThumbSticksTest.cs" />
     <Compile Include="Framework\Graphics\DepthStencilStateTest.cs" />
     <Compile Include="Framework\Graphics\EffectTest.cs" />
     <Compile Include="Framework\Graphics\GraphicsAdapterTest.cs" />
@@ -143,6 +141,9 @@
     <Compile Include="Framework\Graphics\TextureCubeTest.cs" />
     <Compile Include="Framework\Graphics\VertexBufferTest.cs" />
     <Compile Include="Framework\Graphics\ViewportTest.cs" />
+    <Compile Include="Framework\Input\GamePadTest.cs" />
+    <Compile Include="Framework\Input\KeyboardTest.cs" />
+    <Compile Include="Framework\Input\MouseTest.cs" />
     <Compile Include="Framework\MatrixTest.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
