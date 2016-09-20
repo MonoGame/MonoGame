@@ -28,6 +28,7 @@
 			<Files>
 				<File name="Game1.cs" src="Common/Game1.cs" />
 				<File name="Program.cs" src="Common/Program.cs" />
+				<File name="app.manifest" src="Common/app.manifest />
 				<RawFile name="Icon.png" src="Common/Icon-md.png" />
 				<Directory name="Properties">
 					<File name="AssemblyInfo.cs" src="Common/AssemblyInfo.cs" />

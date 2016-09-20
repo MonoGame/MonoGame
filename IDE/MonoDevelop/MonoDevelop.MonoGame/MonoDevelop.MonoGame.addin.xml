@@ -24,6 +24,7 @@
     <Import file="templates/Common/OpenTK.dll.config" />
     <Import file="templates/Common/Tao.Sdl.dll.config" />
     <Import file="templates/Common/MonoGame.Framework.dll.config" />
+    <Import file="templates/Common/app.manifest" />
     <!-- Android Templates -->
     <Import file="templates/MonoGameAndroidProject.xpt.xml" />
     <Import file="templates/MonoGameOUYAProject.xpt.xml" />

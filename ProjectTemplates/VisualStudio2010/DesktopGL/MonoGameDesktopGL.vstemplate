@@ -22,6 +22,7 @@
       <ProjectItem ReplaceParameters="false" TargetFileName="Icon.ico">Icon.ico</ProjectItem>
 	  <ProjectItem ReplaceParameters="false" TargetFileName="Icon.bmp">Icon.bmp</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="app.manifest">app.manifest</ProjectItem>
       <Folder Name="Properties" TargetFolderName="Properties">
         <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
       </Folder>
