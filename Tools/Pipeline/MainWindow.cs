@@ -99,9 +99,9 @@ namespace MonoGame.Tools.Pipeline
         {
             var result = MessageBox.Show(this, "Do you want to save the project first?", "Save Project", MessageBoxButtons.YesNoCancel, MessageBoxType.Question);
 
-            if (result == Eto.Forms.DialogResult.Yes)
+            if (result == DialogResult.Yes)
                 return AskResult.Yes;
-            if (result == Eto.Forms.DialogResult.No)
+            if (result == DialogResult.No)
                 return AskResult.No;
 
             return AskResult.Cancel;
@@ -208,13 +208,13 @@ namespace MonoGame.Tools.Pipeline
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
-            return dialog.Run(this) == Eto.Forms.DialogResult.Ok;
+            return dialog.Run(this) == DialogResult.Ok;
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
-            var result = dialog.Run(this) == Eto.Forms.DialogResult.Ok;
+            var result = dialog.Run(this) == DialogResult.Ok;
 
             newname = dialog.Text;
 
@@ -384,25 +384,6 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItemWith.Enabled = info.OpenItemWith;
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
             cmdRebuildItem.Enabled = info.RebuildItem;
-
-            // ToolBar
-
-            if (info.Build && toolbar.Items.Contains(toolCancelBuild))
-            {
-                toolbar.Items.Remove(toolCancelBuild);
-
-                toolbar.Items.Insert(12, toolBuild);
-                toolbar.Items.Insert(13, toolRebuild);
-                toolbar.Items.Insert(14, toolClean);
-            }
-            else if (info.Cancel && toolbar.Items.Contains(toolBuild))
-            {
-                toolbar.Items.Remove(toolBuild);
-                toolbar.Items.Remove(toolRebuild);
-                toolbar.Items.Remove(toolClean);
-
-                toolbar.Items.Insert(12, toolCancelBuild);
-            }
 
             // Visibility of menu items can't be changed so 
             // we need to recreate the context menu each time.

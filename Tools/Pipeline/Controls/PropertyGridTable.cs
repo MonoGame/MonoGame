@@ -281,11 +281,11 @@ namespace MonoGame.Tools.Pipeline
 #if LINUX
             // force size realocation
             drawable.Width = pixel1.Width - 2;
-#endif
 
             foreach (var child in pixel1.Children)
                 if (child != drawable)
                     child.Width = drawable.Width - _separatorPos;
+#endif
 
             drawable.Invalidate();
         }
@@ -297,6 +297,10 @@ namespace MonoGame.Tools.Pipeline
             {
                 var scrollsize = (_height >= Height) ? System.Windows.SystemParameters.VerticalScrollBarWidth : 0.0;
                 drawable.Width = (int)(Width - scrollsize - System.Windows.SystemParameters.BorderWidth * 2);
+
+                foreach (var child in pixel1.Children)
+                    if (child != drawable)
+                        child.Width = drawable.Width - _separatorPos;
             });
 
             (drawable.ControlObject as System.Windows.Controls.Canvas).Dispatcher.BeginInvoke(action,
