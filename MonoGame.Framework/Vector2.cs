@@ -756,9 +756,11 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            float val = 1.0f / (float)Math.Sqrt((X * X) + (Y * Y));
-            X *= val;
-            Y *= val;
+			var magnitude = (float)Math.Sqrt((X * X) + (Y * Y));
+			if(magnitude > 1E-05f)
+				this /= magnitude;
+			else
+				X = Y = 0;
         }
 
         /// <summary>
