@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     displayModes = monitor.GetDisplayModeList(formatTranslation.Key, 0);
                 }
-                catch (SharpDX.SharpDXException ex)
+                catch (SharpDX.SharpDXException)
                 {
                     var mode = new DisplayMode(desktopWidth, desktopHeight, SurfaceFormat.Color);
                     modes.Add(mode);

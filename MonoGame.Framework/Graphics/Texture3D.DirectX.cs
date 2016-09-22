@@ -7,7 +7,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -16,7 +15,6 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
         private bool renderTarget;
         private bool mipMap;
-	    private SampleDescription _sampleDescription;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
