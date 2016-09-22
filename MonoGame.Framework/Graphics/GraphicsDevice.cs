@@ -17,6 +17,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
+        private Color _blendFactor = Color.White;
+        private bool _blendFactorDirty;
+
         private BlendState _blendState;
         private BlendState _actualBlendState;
         private bool _blendStateDirty;
@@ -338,6 +341,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public Color BlendFactor
+        {
+            get { return _blendFactor; }
+            set
+            {
+                if (_blendFactor == value)
+                    return;
+                _blendFactor = value;
+                _blendFactorDirty = true;
+            }
+        }
+
         public BlendState BlendState
         {
 			get { return _blendState; }
@@ -369,6 +384,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 newBlendState.BindToGraphicsDevice(this);
 
                 _actualBlendState = newBlendState;
+
+                BlendFactor = _actualBlendState.BlendFactor;
 
                 _blendStateDirty = true;
             }
