@@ -1182,6 +1182,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_d3dContext != null, "The d3d context is null!");
         }
 
+        private void PlatformApplyBlendFactor()
+        {
+#if WINDOWS_UAP
+			_d3dContext.OutputMerger.BlendFactor =
+				new SharpDX.Mathematics.Interop.RawColor4(
+					BlendFactor.R / 255.0f,
+					BlendFactor.G / 255.0f,
+					BlendFactor.B / 255.0f,
+					BlendFactor.A / 255.0f);
+#else
+			_d3dContext.OutputMerger.BlendFactor = BlendFactor.ToColor4();
+#endif
+        }
+
         internal void PlatformApplyState(bool applyShaders)
         {
             // NOTE: This code assumes _d3dContext has been locked by the caller.

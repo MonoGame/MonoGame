@@ -341,6 +341,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// The color used as blend factor when alpha blending.
+        /// </summary>
+        /// <remarks>
+        /// When only changing BlendFactor, use this rather than <see cref="Graphics.BlendState.BlendFactor"/> to
+        /// only update BlendFactor so the whole BlendState does not have to be updated.
+        /// </remarks>
         public Color BlendFactor
         {
             get { return _blendFactor; }
@@ -431,6 +438,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _actualBlendState.PlatformApplyState(this);
                 _blendStateDirty = false;
+            }
+
+            if (_blendFactorDirty)
+            {
+                PlatformApplyBlendFactor();
+                _blendFactorDirty = false;
             }
 
             if (_depthStencilStateDirty)
