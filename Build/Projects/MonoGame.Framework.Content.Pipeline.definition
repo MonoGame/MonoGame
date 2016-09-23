@@ -256,6 +256,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\Parser.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\Parser.Static.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\Parser.Static.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\ParseTree.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ParseTree.cs</Link>
@@ -276,6 +280,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\SamplerStateInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\SemanticVariableInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\SemanticVariableInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\Scanner.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\Scanner.cs</Link>
@@ -295,6 +303,10 @@
     <Compile Include="..\Tools\2MGFX\ShaderProfile.DirectX.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderProfile.DirectX.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderProfile.GLFX.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderProfile.GLFX.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderResult.cs">
       <Platforms>Windows</Platforms>

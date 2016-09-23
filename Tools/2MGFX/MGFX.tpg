@@ -38,6 +38,11 @@ LessThan -> @"<";
 GreaterThan -> @">";
 [IgnoreCase] Compile -> @"compile";
 ShaderModel -> @"[A-Za-z_][A-Za-z0-9_]*";
+
+// Glsl
+GlslIn -> @"in|attribute";
+Void -> @"void";
+
 Code -> @"[\S]+";
 EndOfFile -> @"^$";
 
@@ -151,7 +156,7 @@ EndOfFile -> @"^$";
 
 
 // Productions
-Start -> (Code | Technique_Declaration | Sampler_Declaration)* EndOfFile
+Start -> (Code | Technique_Declaration | Sampler_Declaration | Function_Header | Semantic_Variable)* EndOfFile
 {
    var shader = new ShaderInfo();
 
@@ -424,5 +429,30 @@ Sampler_Declaration -> Sampler Identifier Sampler_Register_Expression* Sampler_D
 	var shaderInfo = paramlist[0] as ShaderInfo;
 	shaderInfo.SamplerStates.Add(sampler.Name, sampler);
 	
+	return null;
+};
+
+// Semantics, glsl only for simplicity
+Semantic_Variable -> GlslIn Identifier Identifier Semantic Semicolon
+{
+	var variable = new SemanticVariableInfo();
+	variable.TypeName = $Identifier[0] as string;
+	variable.Name = $Identifier[1] as string;
+	variable.SemanticName = $Identifier[2] as string;
+
+	var shaderInfo = paramlist[0] as ShaderInfo;
+	shaderInfo.SemanticVariables.Add(variable.Name, variable);
+
+	return null;
+};
+
+Semantic -> Colon Identifier;
+
+// Functions (only parse parameterless void functions with this)
+Function_Header -> Void Identifier OpenParenthesis CloseParenthesis
+{
+	var shaderInfo = paramlist[0] as ShaderInfo;
+	shaderInfo.Functions.Add($Identifier as string);
+
 	return null;
 };

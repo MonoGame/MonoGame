@@ -66,15 +66,14 @@ namespace TwoMGFX
                 }
             }
 
-            // Use the D3DCompiler to pre-process the file resolving 
-            // all #includes and macros.... this even works for GLSL.
-            string newFile;
+		    // Use the Cpp.Net preprocessor to pre-process the file resolving 
+			// all #includes and macros.
             var fullPath = Path.GetFullPath(filePath);
             var dependencies = new List<string>();
-            newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
+            var newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
 
             // Parse the resulting file for techniques and passes.
-            var tree = new Parser(new Scanner()).Parse(newFile, fullPath);
+            var tree = new Parser(new Scanner(), options.Profile).Parse(newFile, fullPath);
             if (tree.Errors.Count > 0)
             {
                 var errors = String.Empty;
@@ -85,7 +84,8 @@ namespace TwoMGFX
             }
 
             // Evaluate the results of the parse tree.
-            var shaderInfo = tree.Eval() as ShaderInfo;
+            var shaderInfo = (ShaderInfo) tree.Eval();
+            shaderInfo.ParseTree = tree;
 
             // Remove the samplers and techniques so that the shader compiler
             // gets a clean file without any FX file syntax in it.

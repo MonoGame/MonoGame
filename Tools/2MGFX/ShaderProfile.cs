@@ -27,6 +27,8 @@ namespace TwoMGFX
 
         public static readonly ShaderProfile DirectX_11 = FromName("DirectX_11");
 
+        public static readonly ShaderProfile GLFX = FromName("GLFX");
+
         /// <summary>
         /// Returns all the loaded shader profiles.
         /// </summary>

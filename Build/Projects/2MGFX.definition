@@ -197,10 +197,12 @@
     <Compile Include="ShaderData.writer.cs" />
     <Compile Include="PassInfo.cs" />
     <Compile Include="SamplerStateInfo.cs" />
+    <Compile Include="SemanticVariableInfo.cs" />
     <Compile Include="ShaderInfo.cs" />
     <Compile Include="ShaderProfile.cs" />
     <Compile Include="ShaderProfile.OpenGL.cs" />
     <Compile Include="ShaderProfile.DirectX.cs" />
+    <Compile Include="ShaderProfile.GLFX.cs" />
     <Compile Include="ShaderResult.cs" />
     <Compile Include="TechniqueInfo.cs" />
     <Compile Include="TextureFilterType.cs" />
@@ -212,6 +214,7 @@
     <!-- The MGFX parser -->
     <None Include="MGFX.tpg" />
     <Compile Include="Parser.cs" />
+    <Compile Include="Parser.Static.cs" />
     <Compile Include="ParseTree.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="ParseTreeTools.cs" />
