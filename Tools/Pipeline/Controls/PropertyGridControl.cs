@@ -90,6 +90,7 @@ namespace MonoGame.Tools.Pipeline
             foreach (var p in props)
             {
                 var attrs = p.GetCustomAttributes(true);
+                var name = p.Name;
                 var browsable = true;
                 var category = "Mics";
 
@@ -99,6 +100,8 @@ namespace MonoGame.Tools.Pipeline
                         browsable = (a as BrowsableAttribute).Browsable;
                     else if (a is CategoryAttribute)
                         category = (a as CategoryAttribute).Category;
+                    else if (a is DisplayNameAttribute)
+                        name = (a as DisplayNameAttribute).DisplayName;
                 }
 
                 object value = p.GetValue(objects[0], null);
@@ -114,7 +117,7 @@ namespace MonoGame.Tools.Pipeline
                 if (!browsable)
                     continue;
 
-                propertyTable.AddEntry(category, p.Name, value, p.PropertyType, (sender, e) =>
+                propertyTable.AddEntry(category, name, value, p.PropertyType, (sender, e) =>
                 {
                     var action = new UpdatePropertyAction(MainWindow.Instance, objects, p, sender);
                     PipelineController.Instance.AddAction(action);
@@ -130,6 +133,9 @@ namespace MonoGame.Tools.Pipeline
         {
             foreach (var p in objects[0].Processor.Properties)
             {
+                if (!p.Browsable)
+                    continue;
+
                 object value = objects[0].ProcessorParams[p.Name];
                 foreach (ContentItem o in objects)
                 {
@@ -140,7 +146,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
 
-                propertyTable.AddEntry("Processor Parameters", p.Name, value, p.Type, (sender, e) =>
+                propertyTable.AddEntry("Processor Parameters", p.DisplayName, value, p.Type, (sender, e) =>
                 {
                     var action = new UpdateProcessorAction(MainWindow.Instance, objects.Cast<ContentItem>().ToList(), p.Name, sender);
                     PipelineController.Instance.AddAction(action);
