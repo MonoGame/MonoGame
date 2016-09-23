@@ -44,7 +44,7 @@ namespace MonoGame.Tools.Pipeline
 
             try
             {
-                _iconMissing = _theme.LoadIcon("dialog-error", 16, 0);
+                _iconMissing = _theme.LoadIcon("error", 16, 0);
             }
             catch
             {
@@ -143,78 +143,102 @@ namespace MonoGame.Tools.Pipeline
             return ret;
         }
 
-        private static bool PlatformSetIcon(Command cmd)
+        private static Gdk.Pixbuf PlatformGetIcon(string resource)
         {
             IconInfo iconInfo = null;
             Gdk.Pixbuf icon = null;
 
             try
             {
-                switch (cmd.MenuText)
+                switch (resource)
                 {
-                    case "New...":
-                        iconInfo = _theme.LookupIcon("document-new-symbolic", 16, 0);
+                    case "Commands.New.png":
+                        iconInfo = _theme.LookupIcon("document-new", 16, 0);
                         break;
-                    case "Open...":
-                        iconInfo = _theme.LookupIcon("document-open-symbolic", 16, 0);
+                    case "Commands.Open.png":
+                        iconInfo = _theme.LookupIcon("document-open", 16, 0);
                         break;
-                    case "Save...":
-                        iconInfo = _theme.LookupIcon("document-save-symbolic", 16, 0);
+                    case "Commands.Close.png":
+                        iconInfo = _theme.LookupIcon("window-close", 16, 0);
                         break;
-                    case "Undo":
-                        iconInfo = _theme.LookupIcon("edit-undo-symbolic", 16, 0);
+                    case "Commands.Save.png":
+                        iconInfo = _theme.LookupIcon("document-save", 16, 0);
                         break;
-                    case "Redo":
-                        iconInfo = _theme.LookupIcon("edit-redo-symbolic", 16, 0);
+                    case "Commands.SaveAs.png":
+                        iconInfo = _theme.LookupIcon("document-save-as", 16, 0);
                         break;
-                    case "New Item...":
-                        iconInfo = _theme.LookupIcon("document-new-symbolic", 16, 0);
+                    case "Commands.Undo.png":
+                        iconInfo = _theme.LookupIcon("edit-undo", 16, 0);
                         break;
-                    case "New Folder...":
-                        iconInfo = _theme.LookupIcon("folder-new-symbolic", 16, 0);
+                    case "Commands.Redo.png":
+                        iconInfo = _theme.LookupIcon("edit-redo", 16, 0);
                         break;
-                    case "Existing Item...":
-                        iconInfo = _theme.LookupIcon("folder-documents-symbolic", 16, 0);
+                    case "Commands.Delete.png":
+                        iconInfo = _theme.LookupIcon("edit-delete", 16, 0);
                         break;
-                    case "Existing Folder...":
-                        iconInfo = _theme.LookupIcon("folder-open-symbolic", 16, 0);
+                    case "Commands.NewItem.png":
+                        iconInfo = _theme.LookupIcon("document-new", 16, 0);
                         break;
-                    case "Build":
-                        iconInfo = _theme.LookupIcon("emblem-system-symbolic", 16, 0);
+                    case "Commands.NewFolder.png":
+                        iconInfo = _theme.LookupIcon("folder-new", 16, 0);
                         break;
-                    case "Rebuild":
-                        iconInfo = _theme.LookupIcon("system-run-symbolic", 16, 0);
+                    case "Commands.ExistingItem.png":
+                        iconInfo = _theme.LookupIcon("document", 16, 0);
                         break;
-                    case "Cancel Build":
-                        iconInfo = _theme.LookupIcon("media-playback-stop-symbolic", 16, 0);
+                    case "Commands.ExistingFolder.png":
+                        iconInfo = _theme.LookupIcon("folder", 16, 0);
                         break;
-                    case "Clean":
-                        iconInfo = _theme.LookupIcon("edit-clear-symbolic", 16, 0);
+                    case "Commands.Build.png":
+                        iconInfo = _theme.LookupIcon("applications-system", 16, 0);
+                        break;
+                    case "Commands.Rebuild.png":
+                        iconInfo = _theme.LookupIcon("system-run", 16, 0);
+                        break;
+                    case "Commands.Clean.png":
+                        iconInfo = _theme.LookupIcon("edit-clear-all", 16, 0);
+                        break;
+                    case "Commands.CancelBuild.png":
+                        iconInfo = _theme.LookupIcon("stop", 16, 0);
+                        break;
+                    case "Commands.Help.png":
+                        iconInfo = _theme.LookupIcon("help", 16, 0);
+                        break;
+
+                    case "Build.Information.png":
+                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        break;
+                    case "Build.Fail.png":
+                        iconInfo = _theme.LookupIcon("error", 16, 0);
+                        break;
+                    case "Build.Processing.png":
+                        iconInfo = _theme.LookupIcon("preferences-system-time", 16, 0);
+                        break;
+                    case "Build.Skip.png":
+                        iconInfo = _theme.LookupIcon("gtk-yes", 16, 0);
+                        break;
+                    case "Build.Start.png":
+                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        break;
+                    case "Build.EndSucceed.png":
+                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        break;
+                    case "Build.EndFailed.png":
+                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        break;
+                    case "Build.Succeed.png":
+                        iconInfo = _theme.LookupIcon("gtk-yes", 16, 0);
                         break;
                 }
 
                 if (iconInfo != null)
-                {
-                    var colText = SystemColors.ControlText;
-                    bool ws;
-                    var col = new Gdk.RGBA();
-                    col.Red = colText.R;
-                    col.Green = colText.G;
-                    col.Blue = colText.B;
-                    col.Alpha = colText.A;
-
-                    icon = iconInfo.LoadSymbolic(col, col, col, col, out ws);
-                }
+                    icon = iconInfo.LoadIcon();
+                
+                if (resource == "Commands.Rename.png" || resource == "Commands.OpenItem.png")
+                    icon = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 1, 1, 1);
             }
             catch { }
 
-            if (icon != null)
-            {
-                cmd.Image = new Bitmap(new BitmapHandler(icon));
-                return true;
-            }
-
-            return false;
+            return icon;
         }
     }
 }

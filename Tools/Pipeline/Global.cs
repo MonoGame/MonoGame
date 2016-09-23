@@ -108,56 +108,28 @@ namespace MonoGame.Tools.Pipeline
             return exists ? Xwt.Drawing.Image.FromResource("TreeView.File.png") : Xwt.Drawing.Image.FromResource("TreeView.FileMissing.png");
         }
 
-        public static void SetIcon(Command cmd)
+        public static Image GetEtoIcon(string resource)
         {
-            if (PlatformSetIcon(cmd))
-                return;
+#if LINUX
+            var nativeicon = PlatformGetIcon(resource);
 
-            switch (cmd.MenuText)
-            {
-                case "New...":
-                    cmd.Image = Icon.FromResource("Toolbar.New.png");
-                    break;
-                case "Open...":
-                    cmd.Image = Icon.FromResource("Toolbar.Open.png");
-                    break;
-                case "Save...":
-                    cmd.Image = Icon.FromResource("Toolbar.Save.png");
-                    break;
-                case "Undo":
-                    cmd.Image = Icon.FromResource("Toolbar.Undo.png");
-                    break;
-                case "Redo":
-                    cmd.Image = Icon.FromResource("Toolbar.Redo.png");
-                    break;
-                case "New Item...":
-                    cmd.Image = Icon.FromResource("Toolbar.NewItem.png");
-                    break;
-                case "New Folder...":
-                    cmd.Image = Icon.FromResource("Toolbar.NewFolder.png");
-                    break;
-                case "Existing Item...":
-                    cmd.Image = Icon.FromResource("Toolbar.ExistingItem.png");
-                    break;
-                case "Existing Folder...":
-                    cmd.Image = Icon.FromResource("Toolbar.ExistingFolder.png");
-                    break;
-                case "Build":
-                    cmd.Image = Icon.FromResource("Toolbar.Build.png");
-                    break;
-                case "Rebuild":
-                    cmd.Image = Icon.FromResource("Toolbar.Rebuild.png");
-                    break;
-                case "Cancel Build":
-                    cmd.Image = Icon.FromResource("Toolbar.CancelBuild.png");
-                    break;
-                case "Clean":
-                    cmd.Image = Icon.FromResource("Toolbar.Clean.png");
-                    break;
-                case "Filter Output":
-                    cmd.Image = Icon.FromResource("Toolbar.FilterOutput.png");
-                    break;
-            }
+            if (nativeicon != null)
+                return ToEtoImage(nativeicon);
+#endif
+
+            return Icon.FromResource(resource);
+        }
+
+        public static Xwt.Drawing.Image GetXwtIcon(string resource)
+        {
+#if LINUX
+            var nativeicon = PlatformGetIcon(resource);
+
+            if (nativeicon != null)
+                return ToXwtImage(nativeicon);
+#endif
+            
+            return Xwt.Drawing.Image.FromResource(resource);
         }
     }
 }
