@@ -7,11 +7,13 @@ using System;
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.All;
+using PixelFormat = MonoMac.OpenGL.All;
 using Bool = MonoMac.OpenGL.Boolean;
 #endif
 #if (MONOMAC && !PLATFORM_MACOS_LEGACY)
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.All;
+using PixelFormat = OpenTK.Graphics.OpenGL.All;
 using Bool = OpenTK.Graphics.OpenGL.Boolean;
 #endif
 #if DESKTOPGL
