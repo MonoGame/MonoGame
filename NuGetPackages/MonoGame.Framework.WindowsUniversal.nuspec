@@ -18,6 +18,12 @@
         <language>en-US</language>
         <references>
             <reference file="MonoGame.Framework.dll" />
+            <reference file="SharpDX.Direct2D1.dll" />
+            <reference file="SharpDX.Direct3D11.dll" />
+            <reference file="SharpDX.dll" />
+            <reference file="SharpDX.DXGI.dll" />
+            <reference file="SharpDX.MediaFoundation.dll" />
+            <reference file="SharpDX.XAudio2.dll" />
         </references>
 	</metadata>
     <files>
