@@ -34,7 +34,7 @@ namespace MonoGame.Tools.Pipeline
             stack.Items.Add(new StackLayoutItem(label, true));
 
             imageSettings = new ImageView();
-            imageSettings.Image = Bitmap.FromResource("Icons.Settings.png");
+            imageSettings.Image = Global.GetEtoIcon("Icons.Settings.png");
             imageSettings.Visible = false;
             stack.Items.Add(new StackLayoutItem(imageSettings, false)); 
 

@@ -29,11 +29,6 @@ namespace MonoGame.Tools.Pipeline
         {
             throw new NotImplementedException();
         }
-
-        private static bool PlatformSetIcon(Command cmd)
-        {
-            return false;
-        }
     }
 }
 

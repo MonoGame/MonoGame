@@ -107,11 +107,6 @@ namespace MonoGame.Tools.Pipeline
             var args = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "shell32.dll");
             Process.Start("rundll32.exe", args + ",OpenAs_RunDLL " + filePath);
         }
-
-        private static bool PlatformSetIcon(Command cmd)
-        {
-            return false;
-        }
     }
 }
 

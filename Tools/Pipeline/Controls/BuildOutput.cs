@@ -15,7 +15,7 @@ namespace MonoGame.Tools.Pipeline
         private readonly DataField<Image> _dataImage;
         private readonly DataField<string> _dataText;
         private TreePosition _last;
-        private Image _iconClean, _iconFail, _iconProcessing, _iconSkip, _iconStartEnd, _iconSucceed;
+        private Image _iconInformation, _iconFail, _iconProcessing, _iconSkip, _iconSucceed, _iconStart, _iconEndSucceed, _iconEndFailed;
         private Eto.Forms.CheckCommand _cmdFilterOutput, _cmdAutoScroll;
 
         public BuildOutput()
@@ -24,12 +24,14 @@ namespace MonoGame.Tools.Pipeline
 
             _output = new OutputParser();
 
-            _iconClean = Image.FromResource("Build.Clean.png");
-            _iconFail = Image.FromResource("Build.Fail.png");
-            _iconProcessing = Image.FromResource("Build.Processing.png");
-            _iconSkip = Image.FromResource("Build.Skip.png");
-            _iconStartEnd = Image.FromResource("Build.StartEnd.png");
-            _iconSucceed = Image.FromResource("Build.Succeed.png");
+            _iconInformation = Global.GetXwtIcon("Build.Information.png");
+            _iconFail = Global.GetXwtIcon("Build.Fail.png");
+            _iconProcessing = Global.GetXwtIcon("Build.Processing.png");
+            _iconSkip = Global.GetXwtIcon("Build.Skip.png");
+            _iconStart = Global.GetXwtIcon("Build.Start.png");
+            _iconEndSucceed = Global.GetXwtIcon("Build.EndSucceed.png");
+            _iconEndFailed = Global.GetXwtIcon("Build.EndFailed.png");
+            _iconSucceed = Global.GetXwtIcon("Build.Succeed.png");
 
             _dataImage = new DataField<Image>();
             _dataText = new DataField<string>();
@@ -86,10 +88,10 @@ namespace MonoGame.Tools.Pipeline
             switch (_output.State)
             {
                 case OutputState.BuildBegin:
-                    AddItem(_iconStartEnd, line);
+                    AddItem(_iconStart, line);
                     break;
                 case OutputState.Cleaning:
-                    AddItem(_iconClean, "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename));
+                    AddItem(_iconInformation, "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.Skipping:
@@ -111,11 +113,17 @@ namespace MonoGame.Tools.Pipeline
                     AddItem(_output.ErrorMessage);
                     break;
                 case OutputState.BuildEnd:
-                    AddItem(_iconStartEnd, line);
+                    if (line.Contains("0 failed"))
+                        AddItem(_iconEndSucceed, line);
+                    else
+                        AddItem(_iconEndFailed, line);
                     break;
                 case OutputState.BuildTime:
-                    var text = _treeStore.GetNavigatorAt(_last).GetValue(_dataText);
-                    _treeStore.GetNavigatorAt(_last).SetValue(_dataText, text.TrimEnd(new[] { '.', ' ' }) + ", " + line);
+                    var node = _treeStore.GetNavigatorAt(_last);
+                    var text = node.GetValue(_dataText);
+
+                    AddItem(node.GetValue(_dataImage), text.TrimEnd(new[] { '.', ' ' }) + ", " + line);
+                    node.Remove();
                     break;
             }
         }
