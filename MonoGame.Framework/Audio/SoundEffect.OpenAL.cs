@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (codec == MiniFormatTag.Adpcm)
             {
-                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, blockAlignment, loopStart, loopLength);
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, (blockAlignment + 16) * 2, loopStart, loopLength);
                 duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
                 return;
             }
