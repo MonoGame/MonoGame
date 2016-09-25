@@ -42,17 +42,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// locked the d3dContext for us to use.
 
 			// Apply the state!
-#if WINDOWS_UAP
-			device._d3dContext.OutputMerger.SetBlendState(_state,
-				new SharpDX.Mathematics.Interop.RawColor4(
-					_blendFactor.R / 255.0f,
-					_blendFactor.G / 255.0f,
-					_blendFactor.B / 255.0f,
-					_blendFactor.A / 255.0f));
-#else
-			device._d3dContext.OutputMerger.SetBlendState(_state, _blendFactor.ToColor4());
-#endif
-		}
+			device._d3dContext.OutputMerger.BlendState = _state;
+        }
 
         protected override void Dispose(bool disposing)
         {

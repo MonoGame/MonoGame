@@ -298,6 +298,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Force reseting states
             this.BlendState.PlatformApplyState(this, true);
+            this.PlatformApplyBlendFactor(true);
             this.DepthStencilState.PlatformApplyState(this, true);
             this.RasterizerState.PlatformApplyState(this, true);            
 
@@ -840,6 +841,20 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void PlatformBeginApplyState()
         {
             Threading.EnsureUIThread();
+        }
+
+        private void PlatformApplyBlendFactor(bool force = false)
+        {
+            if (force || BlendFactor != _lastBlendState.BlendFactor)
+            {
+                GL.BlendColor(
+                    this.BlendFactor.R / 255.0f,
+                    this.BlendFactor.G / 255.0f,
+                    this.BlendFactor.B / 255.0f,
+                    this.BlendFactor.A / 255.0f);
+                GraphicsExtensions.CheckGLError();
+                _lastBlendState.BlendFactor = this.BlendFactor;
+            }
         }
 
         internal void PlatformApplyState(bool applyShaders)
