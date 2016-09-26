@@ -74,6 +74,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         enum FourCC : uint
         {
+            A32B32G32R32F = 116,
             Dxt1 = 0x31545844,
             Dxt2 = 0x32545844,
             Dxt3 = 0x33545844,
@@ -113,9 +114,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             rbSwap = false;
             if (pixelFormat.dwFlags.HasFlag(Ddpf.FourCC))
             {
-                // It is a compressed format
                 switch (pixelFormat.dwFourCC)
                 {
+                    case FourCC.A32B32G32R32F:
+                        return SurfaceFormat.Vector4;
                     case FourCC.Dxt1:
                         return SurfaceFormat.Dxt1;
                     case FourCC.Dxt2:
@@ -162,6 +164,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     throw new ContentLoadException("Unsupported RGB pixel format");
                 }
             }
+            //else if (pixelFormat.dwFlags.HasFlag(Ddpf.Luminance))
+            //{
+            //    return SurfaceFormat.Alpha8;
+            //}
             throw new ContentLoadException("Unsupported pixel format");
         }
 
@@ -189,6 +195,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 case SurfaceFormat.Dxt5:
                     return new Dxt5BitmapContent(width, height);
+
+                case SurfaceFormat.Vector4:
+                    return new PixelBitmapContent<Vector4>(width, height);
             }
             throw new ContentLoadException("Unsupported SurfaceFormat " + format);
         }
@@ -199,21 +208,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // https://msdn.microsoft.com/en-us/library/bb943991.aspx
             int pitch = 0;
             int rows = 0;
-            if (format == SurfaceFormat.Dxt1)
+
+            switch (format)
             {
-                pitch = MathHelper.Max(1, ((width + 3) / 4)) * 8;
-                rows = (height + 3) / 4;
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Bgra4444:
+                case SurfaceFormat.Bgra5551:
+                case SurfaceFormat.Bgr565:
+                case SurfaceFormat.Vector4:
+                    pitch = width * format.GetSize();
+                    rows = height;
+                    break;
+
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt3:
+                case SurfaceFormat.Dxt5:
+                    pitch = ((width + 3) / 4) * format.GetSize();
+                    rows = (height + 3) / 4;
+                    break;
+
+                default:
+                    throw new ContentLoadException("Unsupported SurfaceFormat " + format);
             }
-            else if (format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
-            {
-                pitch = MathHelper.Max(1, ((width + 3) / 4)) * 16;
-                rows = (height + 3) / 4;
-            }
-            else if (format == SurfaceFormat.Color)
-            {
-                pitch = (width * 32 + 7) / 8;
-                rows = height;
-            }
+
             return pitch * rows;
         }
 
