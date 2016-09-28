@@ -196,6 +196,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ConstantBufferData.writer.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\DirectXEffectObject.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DirectXEffectObject.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\EffectObject.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\EffectObject.cs</Link>
@@ -311,6 +315,10 @@
     <Compile Include="..\Tools\2MGFX\ShaderResult.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\SourceShaderLanguage.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\SourceShaderLanguage.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\TechniqueInfo.cs">
       <Platforms>Windows</Platforms>

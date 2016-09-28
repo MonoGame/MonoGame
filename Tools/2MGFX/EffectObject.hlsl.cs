@@ -5,7 +5,7 @@ namespace TwoMGFX
 {
     partial class EffectObject
     {
-        public static byte[] CompileHLSL(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ref string errorsAndWarnings)
+        public static byte[] CompileHLSL(ShaderResult shaderResult, string shaderFunction, string shaderModel, ref string errorsAndWarnings)
         {
             SharpDX.D3DCompiler.ShaderBytecode shaderByteCode;
             try
@@ -34,7 +34,7 @@ namespace TwoMGFX
                 var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
                     shaderResult.FileContent,
                     shaderFunction,
-                    shaderProfile,
+                    shaderModel,
                     shaderFlags,
                     0,
                     null,

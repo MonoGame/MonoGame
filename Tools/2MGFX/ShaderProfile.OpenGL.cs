@@ -60,10 +60,8 @@ namespace TwoMGFX
             var shaderInfo = shaderResult.ShaderInfo;
             var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
             effect.Shaders.Add(shaderData);
-
-            return shaderData;
         }
-            
+
         internal override bool Supports(string platform)
         {
             if (platform == "iOS" ||

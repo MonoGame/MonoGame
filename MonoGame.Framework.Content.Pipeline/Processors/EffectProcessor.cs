@@ -54,9 +54,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
 
-            options.Profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
-            if (options.Profile == null)
-                throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+            var profile = ShaderProfile.ForPlatform(context.TargetPlatform.ToString());
+            if (profile == null)
+                throw new InvalidContentException($"{context.TargetPlatform} effects are not supported.", input.Identity);
+
+            options.Profile = profile;
 
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.Defines = Defines;
@@ -100,6 +102,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 // This will log any warnings and errors and throw.
                 ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
+                // let the compiler know control flow stops here
+                return null;
             }
 
             // Process any warning messages that the shader compiler might have produced.
@@ -112,7 +116,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 using (var stream = new MemoryStream())
                 {
                     using (var writer = new BinaryWriter(stream))
-                        effect.Write(writer, options);
+                        effect.Write(writer, profile);
 
                     result = new CompiledEffectContent(stream.GetBuffer());
                 }

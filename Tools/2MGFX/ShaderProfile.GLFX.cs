@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
+using System.Collections.Generic;
 
 namespace TwoMGFX
 {
@@ -22,8 +27,15 @@ namespace TwoMGFX
         internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader,
             EffectObject effect, ref string errorsAndWarnings)
         {
-            var shaderData = new GlfxShaderData();
-            ;
+            var shaderInfo = shaderResult.ShaderInfo;
+            var content = shaderResult.FileContent;
+            ParseTreeTools.WhitespaceNodes(TokenType.Semantic, shaderInfo.ParseTree.Nodes, ref content);
+
+
+            // we should have pure GLSL now so we can pass it to the optimizer
+
+            errorsAndWarnings = string.Empty;
+            return null;
         }
 
         internal override bool Supports(string platform)

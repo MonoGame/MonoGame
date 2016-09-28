@@ -24,6 +24,8 @@ namespace TwoMGFX
 
         public ShaderProfile Profile { get; private set; }
 
+        public SourceShadingLanguage Language { get; private set; }
+
         public bool Debug { get; private set; }
 
 
@@ -119,6 +121,11 @@ namespace TwoMGFX
                 throw new Exception("The effect must contain at least one technique and pass!");
 
             result.Profile = options.Profile;
+
+            result.Language = shaderInfo.Techniques[0].Passes[0].psModel.StartsWith("glsl") ? 
+                SourceShadingLanguage.Glsl : 
+                SourceShadingLanguage.Hlsl;
+
             result.Debug = options.Debug;
 
             return result;

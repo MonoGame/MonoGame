@@ -12,7 +12,7 @@ namespace TwoMGFX
 
         public List<int> ParameterOffset { get; private set; }
 
-        public List<EffectObject.d3dx_parameter> Parameters { get; private set; }
+        public List<DirectXEffectObject.d3dx_parameter> Parameters { get; private set; }
 
         public ConstantBufferData(string name)
         {
