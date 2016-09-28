@@ -21,8 +21,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private Color _blendFactor = Color.White;
         private bool _blendFactorDirty;
 
-        private SurfaceFormat _backBufferFormat;
-
         private BlendState _blendState;
         private BlendState _actualBlendState;
         private bool _blendStateDirty;
@@ -1326,7 +1324,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("The data array is too small.");
 
             var tSize = Marshal.SizeOf(typeof(T));
-            var fSize = _backBufferFormat.GetSize();
+            var fSize = PresentationParameters.BackBufferFormat.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
                 throw new ArgumentException("Type T is of an invalid size for the format of the back buffer.", "T");
 
