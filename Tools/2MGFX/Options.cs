@@ -1,22 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 namespace TwoMGFX
 {
     public class Options
     {
-        [Utilities.CommandLineParser.Required]
+        [CommandLineParser.Required]
         public string SourceFile;
 
-        [Utilities.CommandLineParser.Required]
+        [CommandLineParser.Required]
         public string OutputFile = string.Empty;
 
-        [Utilities.CommandLineParser.Name("DX11")]
-        public bool DX11Profile;
+        [CommandLineParser.ProfileName]
+        public ShaderProfile Profile = ShaderProfile.OpenGL;
 
-        [Utilities.CommandLineParser.Name("DEBUG")]
+        [CommandLineParser.Name("Debug", "\t\t - Include extra debug information in the compiled effect.")]
         public bool Debug;
+
+        [CommandLineParser.Name("Defines", "\t - Semicolon-delimited define assignments")]
+        public string Defines;
     }
 }

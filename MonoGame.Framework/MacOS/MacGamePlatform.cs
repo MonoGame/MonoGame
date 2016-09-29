@@ -70,14 +70,23 @@ using System;
 using System.Drawing;
 using System.IO;
 
+#if PLATFORM_MACOS_LEGACY
 using MonoMac.AppKit;
 using MonoMac.Foundation;
+using RectF = System.Drawing.RectangleF;
+using _float = System.Single;
+#else
+using AppKit;
+using Foundation;
+using RectF = CoreGraphics.CGRect;
+using _float = System.nfloat;
+#endif
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.GamerServices;
+//using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -94,7 +103,6 @@ namespace Microsoft.Xna.Framework
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
-        private OpenALSoundController soundControllerInstance = null;
 
         public MacGamePlatform(Game game) :
             base(game)
@@ -103,7 +111,14 @@ namespace Microsoft.Xna.Framework
             game.Services.AddService(typeof(MacGamePlatform), this);
 
             // Setup our OpenALSoundController to handle our SoundBuffer pools
-            soundControllerInstance = OpenALSoundController.GetInstance;
+            try
+            {
+                OpenALSoundController soundControllerInstance = OpenALSoundController.GetInstance;
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+            }
 
             InitializeMainWindow();
 
@@ -116,7 +131,7 @@ namespace Microsoft.Xna.Framework
 
         private void InitializeMainWindow()
         {
-            RectangleF frame = new RectangleF(
+            var frame = new RectF(
                 0, 0,
                 GraphicsDeviceManager.DefaultBackBufferWidth,
                 GraphicsDeviceManager.DefaultBackBufferHeight);
@@ -133,7 +148,10 @@ namespace Microsoft.Xna.Framework
             _mainWindow.AcceptsMouseMovedEvents = false;
             _mainWindow.Center();
 
-            _gameWindow = new GameWindow(Game, frame);
+			if (GameWindow.CreateWindowDelegate == null)
+            	_gameWindow = new GameWindow(Game, frame);
+			else
+				_gameWindow = GameWindow.CreateWindowDelegate(Game, frame);
             Window = _gameWindow;
             _mainWindow.ContentView.AddSubview(_gameWindow);
         }
@@ -253,12 +271,10 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
-            // Update our OpenAL sound buffer pools
-            soundControllerInstance.Update();
             if (_needsToResetElapsedTime)
                 _needsToResetElapsedTime = false;
 
-            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo) // || Guide.isVisible) (SJ) this seems very odd
                 return false;
 
             return true;
@@ -266,7 +282,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo) // || Guide.isVisible) (SJ) this seems very odd
                 return false;
             return true;
         }
@@ -303,10 +319,10 @@ namespace Microsoft.Xna.Framework
                 //        Hopefully this does not cause excessive havoc.
                 //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
-                _mainWindow.HidesOnDeactivate = true;   
-                Mouse.State.LeftButton = ButtonState.Released;
-                Mouse.State.RightButton = ButtonState.Released;
-                Mouse.State.MiddleButton = ButtonState.Released;
+                _mainWindow.HidesOnDeactivate = true;
+                _gameWindow.MouseState.LeftButton = ButtonState.Released;
+                _gameWindow.MouseState.RightButton = ButtonState.Released;
+                _gameWindow.MouseState.MiddleButton = ButtonState.Released;
             }
             finally { ResumeUpdatingAndDrawing(); }
         }
@@ -347,9 +363,9 @@ namespace Microsoft.Xna.Framework
                 //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
                 _mainWindow.HidesOnDeactivate = false;
-                Mouse.State.LeftButton = ButtonState.Released;
-                Mouse.State.RightButton = ButtonState.Released;
-                Mouse.State.MiddleButton = ButtonState.Released;
+                _gameWindow.MouseState.LeftButton = ButtonState.Released;
+                _gameWindow.MouseState.RightButton = ButtonState.Released;
+                _gameWindow.MouseState.MiddleButton = ButtonState.Released;
             }
             finally { ResumeUpdatingAndDrawing(); }
         }
@@ -377,6 +393,13 @@ namespace Microsoft.Xna.Framework
         {
             _gameWindow.ResetElapsedTime();
         }
+		
+		public override void Present()
+        {
+            var device = Game.GraphicsDevice;
+            if (device != null)
+                device._graphicsMetrics = new GraphicsMetrics();
+        }
 
         #endregion
 
@@ -400,8 +423,8 @@ namespace Microsoft.Xna.Framework
 
         private void ResetWindowBounds()
         {
-            RectangleF frame;
-            RectangleF content;
+            RectF frame;
+            RectF content;
 
             var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
 
@@ -413,23 +436,24 @@ namespace Microsoft.Xna.Framework
             else
             {
                 content = _gameWindow.Bounds;
-                content.Width = Math.Min(
+                content.Width = (_float)Math.Min(
                     graphicsDeviceManager.PreferredBackBufferWidth,
                     NSScreen.MainScreen.VisibleFrame.Width);
-                content.Height = Math.Min(
+                content.Height = (_float)Math.Min(
                     graphicsDeviceManager.PreferredBackBufferHeight,
                     NSScreen.MainScreen.VisibleFrame.Height - GetTitleBarHeight());
 
                 frame = _mainWindow.Frame;
-                frame.X = Math.Max(frame.X, NSScreen.MainScreen.VisibleFrame.X);
-                frame.Y = Math.Max(frame.Y, NSScreen.MainScreen.VisibleFrame.Y);
+                frame.X = (_float)Math.Max(frame.X, NSScreen.MainScreen.VisibleFrame.X);
+                frame.Y = (_float)Math.Max(frame.Y, NSScreen.MainScreen.VisibleFrame.Y);
                 frame.Width = content.Width;
                 frame.Height = content.Height + GetTitleBarHeight();
             }
             _mainWindow.SetFrame(frame, true);
 
             _gameWindow.Bounds = content;
-            _gameWindow.Size = content.Size.ToSize();
+            var nativeSize = content.Size.ToSize();
+            _gameWindow.Size = new Size((int)nativeSize.Width, (int)nativeSize.Height);
 
             // Now we set our Presentation Parameters
             var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
@@ -446,10 +470,10 @@ namespace Microsoft.Xna.Framework
 
         private float GetTitleBarHeight()
         {
-            RectangleF contentRect = NSWindow.ContentRectFor(
+            var contentRect = NSWindow.ContentRectFor(
                 _mainWindow.Frame, _mainWindow.StyleMask);
 
-            return _mainWindow.Frame.Height - contentRect.Height;
+            return (float)(_mainWindow.Frame.Height - contentRect.Height);
         }
 
 
@@ -495,7 +519,11 @@ namespace Microsoft.Xna.Framework
                     _owner.State = MacGamePlatform.RunState.Exited);
             }
 
-			public override bool ShouldZoom (NSWindow window, RectangleF newFrame)
+            #if PLATFORM_MACOS_LEGACY
+            public override bool ShouldZoom (NSWindow window, RectangleF newFrame)
+            #else
+            public override bool ShouldZoom(NSWindow window, CoreGraphics.CGRect newFrame)
+            #endif
 			{
 				return _owner.AllowUserResizing;
 			}

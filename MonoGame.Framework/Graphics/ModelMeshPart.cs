@@ -7,43 +7,71 @@ namespace Microsoft.Xna.Framework.Graphics
 		// Summary:
 		//     Gets or sets the material Effect for this mesh part. Reference page contains
 		//     code sample.
-		private Effect _effect;
-		public Effect Effect {
-			get {
-				return _effect;
-			}
-			set {
-				if (value == _effect) {
-					return;
-				}
-				_effect = value;
-				parent.Effects.Add (value);
-			}
-		}
+        private Effect _effect;
+        public Effect Effect 
+        {
+            get 
+            {
+                return _effect;
+            }
+            set 
+            {
+                if (value == _effect)
+                    return;
+
+                if (_effect != null)
+                {
+                    // First check to see any other parts are also using this effect.
+                    var removeEffect = true;
+                    foreach (var part in parent.MeshParts)
+                    {
+                        if (part != this && part._effect == _effect)
+                        {
+                            removeEffect = false;
+                            break;
+                        }
+                    }
+
+                    if (removeEffect)
+                        parent.Effects.Remove(_effect);
+                }
+
+                // Set the new effect.
+                _effect = value;
+                parent.Effects.Add(value);
+            }
+        }
+
 		//
 		// Summary:
 		//     Gets the index buffer for this mesh part.
 		public IndexBuffer IndexBuffer { get; set; }
+
 		//
 		// Summary:
 		//     Gets the number of vertices used during a draw call.
 		public int NumVertices { get; set; }
+
 		//
 		// Summary:
 		//     Gets the number of primitives to render.
 		public int PrimitiveCount { get; set; }
+
 		//
 		// Summary:
 		//     Gets the location in the index array at which to start reading vertices.
 		public int StartIndex { get; set; }
+
 		//
 		// Summary:
 		//     Gets or sets an object identifying this model mesh part.
 		public object Tag { get; set; }
+
 		//
 		// Summary:
 		//     Gets the vertex buffer for this mesh part.
 		public VertexBuffer VertexBuffer { get; set; }
+
 		//
 		// Summary:
 		//     Gets the offset (in vertices) from the top of vertex buffer.

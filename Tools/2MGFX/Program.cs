@@ -1,6 +1,9 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.IO;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -8,9 +11,15 @@ namespace TwoMGFX
     {
         public static int Main(string[] args)
         {
+            if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
+            {
+                Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
+                return -1;
+            }
+
             var options = new Options();
-            var parser = new Utilities.CommandLineParser(options);
-            parser.Title = "2MGFX - Converts Microsoft FX files to a compiled MonoGame Effect.";
+            var parser = new CommandLineParser(options);
+            parser.Title = "2MGFX - The MonoGame Effect compiler.";
 
             if (!parser.ParseCommandLine(args))
                 return 1;
@@ -31,30 +40,49 @@ namespace TwoMGFX
             ShaderInfo shaderInfo;
             try
             {
-                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+                shaderInfo = ShaderInfo.FromFile(options.SourceFile, options, new ConsoleEffectCompilerOutput());
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed to parse the input file '{0}'!", options.SourceFile);
                 Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to parse '{0}'!", options.SourceFile);
                 return 1;
             }
 
             // Create the effect object.
-            DXEffectObject effect;
+            EffectObject effect;
+            var shaderErrorsAndWarnings = string.Empty;
             try
             {
-                effect = DXEffectObject.FromShaderInfo(shaderInfo);
+                effect = EffectObject.CompileEffect(shaderInfo, out shaderErrorsAndWarnings);
+
+                if (!string.IsNullOrEmpty(shaderErrorsAndWarnings))
+                    Console.Error.WriteLine(shaderErrorsAndWarnings);
+            }
+            catch (ShaderCompilerException)
+            {
+                // Write the compiler errors and warnings and let the user know what happened.
+                Console.Error.WriteLine(shaderErrorsAndWarnings);
+                Console.Error.WriteLine("Failed to compile '{0}'!", options.SourceFile);
+                return 1;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Fatal exception when creating the effect!");
-                Console.Error.WriteLine(ex.ToString());
+                // First write all the compiler errors and warnings.
+                if (!string.IsNullOrEmpty(shaderErrorsAndWarnings))
+                    Console.Error.WriteLine(shaderErrorsAndWarnings);
+
+                // If we have an exception message then write that.
+                if (!string.IsNullOrEmpty(ex.Message))
+                    Console.Error.WriteLine(ex.Message);
+
+                // Let the user know what happened.
+                Console.Error.WriteLine("Unexpected error compiling '{0}'!", options.SourceFile);
                 return 1;
             }
             
             // Get the output file path.
-            if ( options.OutputFile == string.Empty )
+            if (options.OutputFile == string.Empty)
                 options.OutputFile = Path.GetFileNameWithoutExtension(options.SourceFile) + ".mgfxo";
 
             // Write out the effect to a runtime format.
@@ -66,14 +94,27 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed to write the output file '{0}'!", options.OutputFile);
                 Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to write '{0}'!", options.OutputFile);
                 return 1;
             }
 
             // We finished succesfully.
             Console.WriteLine("Compiled '{0}' to '{1}'.", options.SourceFile, options.OutputFile);
             return 0;
+        }
+
+        private class ConsoleEffectCompilerOutput : IEffectCompilerOutput
+        {
+            public void WriteWarning(string file, int line, int column, string message)
+            {
+                Console.WriteLine("Warning: {0}({1},{2}): {3}" , file, line, column, message);
+            }
+
+            public void WriteError(string file, int line, int column, string message)
+            {
+                throw new Exception(string.Format("Error: {0}({1},{2}): {3}", file, line, column, message));
+            }
         }
     }
 }

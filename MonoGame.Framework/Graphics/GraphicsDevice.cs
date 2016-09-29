@@ -1,277 +1,139 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
 using System.Diagnostics;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif WINRT
-using SharpDX;
-using SharpDX.DXGI;
-using SharpDX.Direct3D;
-using Windows.Graphics.Display;
-using Windows.UI.Core;
-using Windows.UI.Xaml.Controls;
-#elif PSS
-using Sce.PlayStation.Core.Graphics;
-using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using BeginMode = OpenTK.Graphics.ES20.All;
-using EnableCap = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using BufferTarget = OpenTK.Graphics.ES20.All;
-using BufferUsageHint = OpenTK.Graphics.ES20.All;
-using DrawElementsType = OpenTK.Graphics.ES20.All;
-using GetPName = OpenTK.Graphics.ES20.All;
-using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
-using FramebufferTarget = OpenTK.Graphics.ES20.All;
-using FramebufferAttachment = OpenTK.Graphics.ES20.All;
-using RenderbufferTarget = OpenTK.Graphics.ES20.All;
-using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-#endif
+using System.Globalization;
 
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class GraphicsDevice : IDisposable
+    public partial class GraphicsDevice : IDisposable
     {
         private Viewport _viewport;
+        private GraphicsProfile _graphicsProfile;
 
         private bool _isDisposed;
 
-        private BlendState _blendState = BlendState.Opaque;
-        private DepthStencilState _depthStencilState = DepthStencilState.Default;
-		private RasterizerState _rasterizerState = RasterizerState.CullCounterClockwise;
+        private Color _blendFactor = Color.White;
+        private bool _blendFactorDirty;
 
+        private BlendState _blendState;
+        private BlendState _actualBlendState;
         private bool _blendStateDirty;
+
+        private BlendState _blendStateAdditive;
+        private BlendState _blendStateAlphaBlend;
+        private BlendState _blendStateNonPremultiplied;
+        private BlendState _blendStateOpaque;
+
+        private DepthStencilState _depthStencilState;
+        private DepthStencilState _actualDepthStencilState;
         private bool _depthStencilStateDirty;
+
+        private DepthStencilState _depthStencilStateDefault;
+        private DepthStencilState _depthStencilStateDepthRead;
+        private DepthStencilState _depthStencilStateNone;
+
+        private RasterizerState _rasterizerState;
+        private RasterizerState _actualRasterizerState;
         private bool _rasterizerStateDirty;
+
+        private RasterizerState _rasterizerStateCullClockwise;
+        private RasterizerState _rasterizerStateCullCounterClockwise;
+        private RasterizerState _rasterizerStateCullNone;
 
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
-  
-        private VertexBuffer _vertexBuffer;
-        private bool _vertexBufferDirty;
+
+        private VertexBufferBindings _vertexBuffers;
+        private bool _vertexBuffersDirty;
 
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
-        private RenderTargetBinding[] _currentRenderTargetBindings;
+        private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
+        private int _currentRenderTargetCount;
+        private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
-        private static readonly RenderTargetBinding[] EmptyRenderTargetBinding = new RenderTargetBinding[0];
+        internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+
+        public TextureCollection VertexTextures { get; private set; }
+
+        public SamplerStateCollection VertexSamplerStates { get; private set; }
 
         public TextureCollection Textures { get; private set; }
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
+        // On Intel Integrated graphics, there is a fast hw unit for doing
+        // clears to colors where all components are either 0 or 255.
+        // Despite XNA4 using Purple here, we use black (in Release) to avoid
+        // performance warnings on Intel/Mesa
+#if DEBUG
         private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
+#else
+        private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
+#endif
 
         /// <summary>
         /// The active vertex shader.
         /// </summary>
         private Shader _vertexShader;
         private bool _vertexShaderDirty;
+        private bool VertexShaderDirty
+        {
+            get { return _vertexShaderDirty; }
+        }
 
         /// <summary>
         /// The active pixel shader.
         /// </summary>
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
-
-#if OPENGL
-        List<Action> disposeActions = new List<Action>();
-        object disposeActionsLock = new object();
-#endif
+        private bool PixelShaderDirty
+        {
+            get { return _pixelShaderDirty; }
+        }
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
 
-#if DIRECTX
+        /// <summary>
+        /// The cache of effects from unique byte streams.
+        /// </summary>
+        internal Dictionary<int, Effect> EffectCache;
 
-        // Declare Direct2D Objects
-        protected SharpDX.Direct2D1.Factory1 _d2dFactory;
-        protected SharpDX.Direct2D1.Device _d2dDevice;
-        protected SharpDX.Direct2D1.DeviceContext _d2dContext;
+        // Resources may be added to and removed from the list from many threads.
+        private readonly object _resourcesLock = new object();
 
-        // Declare DirectWrite & Windows Imaging Component Objects
-        protected SharpDX.DirectWrite.Factory _dwriteFactory;
-        protected SharpDX.WIC.ImagingFactory2 _wicFactory;
+        // Use WeakReference for the global resources list as we do not know when a resource
+        // may be disposed and collected. We do not want to prevent a resource from being
+        // collected by holding a strong reference to it in this list.
+        private readonly List<WeakReference> _resources = new List<WeakReference>();
 
-        // Direct3D Objects
-        internal SharpDX.Direct3D11.Device1 _d3dDevice;
-        internal SharpDX.Direct3D11.DeviceContext1 _d3dContext;
-        protected FeatureLevel _featureLevel;
-
-        // The backbuffer resources.
-        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
-        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
-        protected SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
-        protected SharpDX.DXGI.SwapChain1 _swapChain;
-        protected SwapChainBackgroundPanel _swapChainPanel;
-
-        // The active render targets.
-        protected SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
-
-        // The active depth view.
-        protected SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
-
-        protected float _dpi; 
-
-        private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
-
-        private readonly Dictionary<int, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<int, DynamicVertexBuffer>();
-
-        private readonly Dictionary<IndexElementSize, DynamicIndexBuffer> _userIndexBuffers = new Dictionary<IndexElementSize, DynamicIndexBuffer>();
-
-
-#endif // DIRECTX
-
-#if OPENGL
-
-        private readonly ShaderProgramCache _programCache = new ShaderProgramCache();
-
-        private int _shaderProgram = -1;
-
-        static readonly float[] _posFixup = new float[4];
-
-        internal static readonly List<int> _enabledVertexAttributes = new List<int>();
-
-#elif PSS
-
-        internal GraphicsContext _graphics;
-        internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
-        internal List<PssVertexBuffer> _usedVertexBuffers = new List<PssVertexBuffer>();
-#endif
-
-#if GLES
-        const FramebufferTarget GLFramebuffer = FramebufferTarget.Framebuffer;
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
-		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachment;
-		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
-		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
-		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
-		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#elif OPENGL
-		const FramebufferTarget GLFramebuffer = FramebufferTarget.FramebufferExt;
-		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
-		const FramebufferAttachment GLDepthAttachment = FramebufferAttachment.DepthAttachmentExt;
-		const FramebufferAttachment GLStencilAttachment = FramebufferAttachment.StencilAttachment;
-		const FramebufferAttachment GLColorAttachment0 = FramebufferAttachment.ColorAttachment0;
-		const GetPName GLFramebufferBinding = GetPName.FramebufferBinding;
-		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
-		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
-		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
-		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
-#endif
-		
 		// TODO Graphics Device events need implementing
 		public event EventHandler<EventArgs> DeviceLost;
 		public event EventHandler<EventArgs> DeviceReset;
 		public event EventHandler<EventArgs> DeviceResetting;
-		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
-		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
+		public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
+		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
+        public event EventHandler<EventArgs> Disposing;
 
-        readonly List<string> _extensions = new List<string>();
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return
+                DeviceLost != null &&
+                ResourceCreated != null &&
+                ResourceDestroyed != null &&
+                Disposing != null;
+        }
 
-#if OPENGL
-        internal int glFramebuffer;
-        internal int MaxVertexAttributes;        
-#endif
-        
+        private int _maxVertexBufferSlots;
         internal int MaxTextureSlots;
-
-#if DIRECTX
-
-        internal float Dpi
-        {
-            get { return _dpi; }
-            set
-            {
-                if (_dpi == value)
-                    return;
-
-                _dpi = value;
-                _d2dContext.DotsPerInch = new DrawingSizeF(_dpi, _dpi);
-
-                //if (OnDpiChanged != null)
-                    //OnDpiChanged(this);
-            }
-        }
-
-#endif // DIRECTX
-
-
-#if OPENGL
-
-        internal void SetVertexAttributeArray(bool[] attrs)
-        {
-            for(int x = 0; x < attrs.Length; x++)
-            {
-                if (attrs[x] && !_enabledVertexAttributes.Contains(x))
-                {
-                    _enabledVertexAttributes.Add(x);
-                    GL.EnableVertexAttribArray(x);
-                    GraphicsExtensions.CheckGLError();
-                }
-                else if (!attrs[x] && _enabledVertexAttributes.Contains(x))
-                {
-                    _enabledVertexAttributes.Remove(x);
-                    GL.DisableVertexAttribArray(x);
-                    GraphicsExtensions.CheckGLError();
-                }
-            }
-        }
-
-#endif
+        internal int MaxVertexTextureSlots;
 
         public bool IsDisposed
         {
@@ -280,8 +142,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _isDisposed;
             }
         }
-		
-		public bool IsContentLost { 
+
+		public bool IsContentLost {
 			get {
 				// We will just return IsDisposed for now
 				// as that is the only case I can see for now
@@ -293,36 +155,110 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return _currentRenderTargetBindings != null && _currentRenderTargetBindings.Length > 0;
+                return _currentRenderTargetCount > 0;
             }
         }
 
-        public GraphicsDevice ()
+        public GraphicsAdapter Adapter
+        {
+            get;
+            private set;
+        }
+
+        internal GraphicsMetrics _graphicsMetrics;
+
+        /// <summary>
+        /// The rendering information for debugging and profiling.
+        /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>. 
+        /// </summary>
+        public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
+
+        internal GraphicsDevice(GraphicsDeviceInformation gdi)
+        {
+            if (gdi.PresentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+            PresentationParameters = gdi.PresentationParameters;
+            Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
+            GraphicsProfile = gdi.GraphicsProfile;
+            Initialize();
+        }
+
+        internal GraphicsDevice ()
 		{
-			// Initialize the main viewport
-			_viewport = new Viewport (0, 0,
+            PresentationParameters = new PresentationParameters();
+            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
+        /// </summary>
+        /// <param name="adapter">The graphics adapter.</param>
+        /// <param name="graphicsProfile">The graphics profile.</param>
+        /// <param name="presentationParameters">The presentation options.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="presentationParameters"/> is <see langword="null"/>.
+        /// </exception>
+        public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
+        {
+            Adapter = adapter;
+            if (presentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+            PresentationParameters = presentationParameters;
+            Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
+            GraphicsProfile = graphicsProfile;
+            Initialize();
+        }
+
+        private void Setup()
+        {
+#if DEBUG
+            if (DisplayMode == null)
+            {
+                throw new Exception(
+                    "Unable to determine the current display mode.  This can indicate that the " +
+                    "game is not configured to be HiDPI aware under Windows 10 or later.  See " +
+                    "https://github.com/MonoGame/MonoGame/issues/5040 for more information.");
+            }
+#endif
+
+            // Initialize the main viewport
+            _viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
-            MaxTextureSlots = 16;
-#if GLES
-            GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
-            GraphicsExtensions.CheckGLError();
+            PlatformSetup();
 
-            GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();            
-#elif OPENGL
-            GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
-            GraphicsExtensions.CheckGLError();
+            VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, true);
+            VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);
 
-            GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();            
-#endif
-            Textures = new TextureCollection (MaxTextureSlots);
-			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
+            Textures = new TextureCollection(this, MaxTextureSlots, false);
+            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
 
-			PresentationParameters = new PresentationParameters ();
-			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            _blendStateAdditive = BlendState.Additive.Clone();
+            _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
+            _blendStateNonPremultiplied = BlendState.NonPremultiplied.Clone();
+            _blendStateOpaque = BlendState.Opaque.Clone();
+
+            BlendState = BlendState.Opaque;
+
+            _depthStencilStateDefault = DepthStencilState.Default.Clone();
+            _depthStencilStateDepthRead = DepthStencilState.DepthRead.Clone();
+            _depthStencilStateNone = DepthStencilState.None.Clone();
+
+            DepthStencilState = DepthStencilState.Default;
+
+            _rasterizerStateCullClockwise = RasterizerState.CullClockwise.Clone();
+            _rasterizerStateCullCounterClockwise = RasterizerState.CullCounterClockwise.Clone();
+            _rasterizerStateCullNone = RasterizerState.CullNone.Clone();
+
+            RasterizerState = RasterizerState.CullCounterClockwise;
+
+            EffectCache = new Dictionary<int, Effect>();
         }
 
         ~GraphicsDevice()
@@ -332,44 +268,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            // Setup extensions.
-#if OPENGL
-#if GLES
-            var extstring = GL.GetString(RenderbufferStorage.Extensions);            			
-#else
-            var extstring = GL.GetString(StringName.Extensions);	
-#endif
-            GraphicsExtensions.CheckGLError();
-            if (!string.IsNullOrEmpty(extstring))
-            {
-                _extensions.AddRange(extstring.Split(' '));
-#if ANDROID
-                Android.Util.Log.Debug("MonoGame", "Supported extensions:");
-#else
-                System.Diagnostics.Debug.WriteLine("Supported extensions:");
-#endif
-                foreach (string extension in _extensions)
-#if ANDROID
-                    Android.Util.Log.Debug("MonoGame", extension);
-#else
-                    System.Diagnostics.Debug.WriteLine(extension);
-#endif
-            }
-
-#endif // OPENGL
-
-#if DIRECTX
-
-            CreateDeviceIndependentResources();
-            CreateDeviceResources();
-            Dpi = DisplayProperties.LogicalDpi;
-            CreateSizeDependentResources();
-
-#elif PSS
-            _graphics = new GraphicsContext();
-#elif OPENGL
-            _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
-#endif
+            PlatformInitialize();
 
             // Force set the default render states.
             _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
@@ -379,6 +278,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the texture and sampler collections forcing
             // the state to be reapplied.
+            VertexTextures.Clear();
+            VertexSamplerStates.Clear();
             Textures.Clear();
             SamplerStates.Clear();
 
@@ -386,14 +287,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexConstantBuffers.Clear();
             _pixelConstantBuffers.Clear();
 
-#if OPENGL
-            // Ensure the vertex attributes are reset
-            _enabledVertexAttributes.Clear();
-#endif
-
             // Force set the buffers and shaders on next ApplyState() call
+            _vertexBuffers = new VertexBufferBindings(_maxVertexBufferSlots);
+            _vertexBuffersDirty = true;
             _indexBufferDirty = true;
-            _vertexBufferDirty = true;
             _vertexShaderDirty = true;
             _pixelShaderDirty = true;
 
@@ -403,297 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Set the default render target.
             ApplyRenderTargets(null);
-
-#if OPENGL
-            // Free all the cached shader programs. 
-            _programCache.Clear();
-            _shaderProgram = -1;
-#endif
         }
-
-#if DIRECTX
-
-        /// <summary>
-        /// Creates resources not tied the active graphics device.
-        /// </summary>
-        protected void CreateDeviceIndependentResources()
-        {
-#if DEBUG
-            var debugLevel = SharpDX.Direct2D1.DebugLevel.Information;
-#else 
-            var debugLevel = SharpDX.Direct2D1.DebugLevel.None; 
-#endif
-            // Dispose previous references.
-            if (_d2dFactory != null)
-                _d2dFactory.Dispose();
-            if (_dwriteFactory != null)
-                _dwriteFactory.Dispose();
-            if (_wicFactory != null)
-                _wicFactory.Dispose();
-
-            // Allocate new references
-            _d2dFactory = new SharpDX.Direct2D1.Factory1(SharpDX.Direct2D1.FactoryType.SingleThreaded, debugLevel);
-            _dwriteFactory = new SharpDX.DirectWrite.Factory(SharpDX.DirectWrite.FactoryType.Shared);
-            _wicFactory = new SharpDX.WIC.ImagingFactory2();
-        }
-
-        /// <summary>
-        /// Create graphics device specific resources.
-        /// </summary>
-        protected virtual void CreateDeviceResources()
-        {
-            // Dispose previous references.
-            if (_d3dDevice != null)
-                _d3dDevice.Dispose();
-            if (_d3dContext != null)
-                _d3dContext.Dispose();
-            if (_d2dDevice != null)
-                _d2dDevice.Dispose();
-            if (_d2dContext != null)
-                _d2dContext.Dispose();
-
-            // Windows requires BGRA support out of DX.
-            var creationFlags = SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport;
-#if DEBUG
-            creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
-#endif
-
-            // Pass the preferred feature levels based on the
-            // target profile that may have been set by the user.
-            var featureLevels = new List<FeatureLevel>();
-            if (GraphicsProfile == GraphicsProfile.HiDef)
-            {
-                featureLevels.Add(FeatureLevel.Level_11_1);
-                featureLevels.Add(FeatureLevel.Level_11_0);
-                featureLevels.Add(FeatureLevel.Level_10_1);
-                featureLevels.Add(FeatureLevel.Level_10_0);
-            }
-            featureLevels.Add(FeatureLevel.Level_9_3);
-            featureLevels.Add(FeatureLevel.Level_9_2);
-            featureLevels.Add(FeatureLevel.Level_9_1);
-
-            // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
-                _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
-
-            // Set the correct profile based on the feature level.
-            _featureLevel = _d3dDevice.FeatureLevel;
-            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
-
-            // Get Direct3D 11.1 context
-            _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
-
-            // Create the Direct2D device.
-            using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device>())
-                _d2dDevice = new SharpDX.Direct2D1.Device(_d2dFactory, dxgiDevice);
-
-            // Create Direct2D context
-            _d2dContext = new SharpDX.Direct2D1.DeviceContext(_d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.None);
-        }
-
-        internal void CreateSizeDependentResources()
-        {
-            _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null, 
-                                                (SharpDX.Direct3D11.RenderTargetView)null);  
-
-            _d2dContext.Target = null;
-            if (_renderTargetView != null)
-            {
-                _renderTargetView.Dispose();
-                _renderTargetView = null;
-            }
-            if (_depthStencilView != null)
-            {
-                _depthStencilView.Dispose();
-                _depthStencilView = null;
-            }
-            if (_bitmapTarget != null)
-            {
-                _bitmapTarget.Dispose();
-                _bitmapTarget = null;
-            }
-
-			// Clear the current render targets.
-            _currentDepthStencilView = null;
-            _currentRenderTargets[0] = null;
-            _currentRenderTargets[1] = null;
-            _currentRenderTargets[2] = null;
-            _currentRenderTargets[3] = null;
-            _currentDepthStencilView = null;
-            _currentRenderTargetBindings = null;
-
-			// Make sure all pending rendering commands are flushed.
-            _d3dContext.Flush();
-
-            // We need presentation parameters to continue here.
-            if (    PresentationParameters == null ||
-                    (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
-            {
-                if (_swapChain != null)
-                {
-                    _swapChain.Dispose();
-                    _swapChain = null;
-                }
-
-                return;
-            }
-
-            // Did we change swap panels?
-            if (PresentationParameters.SwapChainPanel != _swapChainPanel)
-            {
-                _swapChainPanel = null;
-                if (_swapChain != null)
-                {
-                    _swapChain.Dispose();
-                    _swapChain = null;
-                }                
-            }
-
-            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if ( PresentationParameters.MultiSampleCount > 1 )
-            {
-                multisampleDesc.Count = PresentationParameters.MultiSampleCount;
-                multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
-
-            // Use BGRA for the swap chain.
-            var format = PresentationParameters.BackBufferFormat == SurfaceFormat.Color ? 
-                            SharpDX.DXGI.Format.B8G8R8A8_UNorm : 
-                            SharpDXHelper.ToFormat(PresentationParameters.BackBufferFormat);
-
-            // If the swap chain already exists... update it.
-            if (_swapChain != null)
-            {
-                _swapChain.ResizeBuffers(   2,
-                                            PresentationParameters.BackBufferWidth,
-                                            PresentationParameters.BackBufferHeight,
-                                            format, 
-                                            SwapChainFlags.None);
-            }
-
-            // Otherwise, create a new swap chain.
-            else
-            {
-                // SwapChain description
-                var desc = new SharpDX.DXGI.SwapChainDescription1()
-                {
-                    // Automatic sizing
-                    Width = PresentationParameters.BackBufferWidth,
-                    Height = PresentationParameters.BackBufferHeight,
-                    Format = format,
-                    Stereo = false,
-                    SampleDescription = multisampleDesc,
-                    Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
-                    BufferCount = 2,
-                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
-
-                    // By default we scale the backbuffer to the window 
-                    // rectangle to function more like a WP7 game.
-                    Scaling = SharpDX.DXGI.Scaling.Stretch,
-                };
-
-                // Once the desired swap chain description is configured, it must be created on the same adapter as our D3D Device
-
-                // First, retrieve the underlying DXGI Device from the D3D Device.
-                // Creates the swap chain 
-                using (var dxgiDevice2 = _d3dDevice.QueryInterface<SharpDX.DXGI.Device2>())
-                using (var dxgiAdapter = dxgiDevice2.Adapter)
-                using (var dxgiFactory2 = dxgiAdapter.GetParent<SharpDX.DXGI.Factory2>())
-                {
-                    if (PresentationParameters.DeviceWindowHandle != IntPtr.Zero)
-                    {
-                        // Creates a SwapChain from a CoreWindow pointer.
-                        var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
-                        using (var comWindow = new ComObject(coreWindow))
-                            _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
-                    }
-                    else
-                    {
-                        _swapChainPanel = PresentationParameters.SwapChainPanel;
-
-                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
-                        {
-                            _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
-                            nativePanel.SwapChain = _swapChain;
-                        }
-                    }
-
-                    // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
-                    // latency and ensures that the application will only render after each VSync, minimizing 
-                    // power consumption.
-                    dxgiDevice2.MaximumFrameLatency = 1;
-                }
-            }
-
-            _swapChain.Rotation = SharpDX.DXGI.DisplayModeRotation.Identity;
-
-            // Obtain the backbuffer for this window which will be the final 3D rendertarget.
-            Point targetSize;
-            using (var backBuffer = SharpDX.Direct3D11.Texture2D.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
-            {
-                // Create a view interface on the rendertarget to use on bind.
-                _renderTargetView = new SharpDX.Direct3D11.RenderTargetView(_d3dDevice, backBuffer);
-
-                // Get the rendertarget dimensions for later.
-                var backBufferDesc = backBuffer.Description;
-                targetSize = new Point(backBufferDesc.Width, backBufferDesc.Height);
-            }
-
-            // Create the depth buffer if we need it.
-            if (PresentationParameters.DepthStencilFormat != DepthFormat.None)
-            {
-                var depthFormat = SharpDXHelper.ToFormat(PresentationParameters.DepthStencilFormat);
-
-                // Allocate a 2-D surface as the depth/stencil buffer.
-                using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(_d3dDevice, new SharpDX.Direct3D11.Texture2DDescription()
-                {
-                    Format = depthFormat,
-                    ArraySize = 1,
-                    MipLevels = 1,
-                    Width = targetSize.X,
-                    Height = targetSize.Y,
-                    SampleDescription = multisampleDesc,
-                    Usage = SharpDX.Direct3D11.ResourceUsage.Default,
-                    BindFlags = SharpDX.Direct3D11.BindFlags.DepthStencil,
-                }))
-
-                // Create a DepthStencil view on this surface to use on bind.
-                _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(_d3dDevice, depthBuffer);
-            }
-
-            // Set the current viewport.
-            Viewport = new Viewport
-            { 
-                X = 0, 
-                Y = 0,
-                Width = targetSize.X, 
-                Height = targetSize.Y, 
-                MinDepth = 0.0f, 
-                MaxDepth = 1.0f 
-            };
-
-            // Now we set up the Direct2D render target bitmap linked to the swapchain. 
-            // Whenever we render to this bitmap, it will be directly rendered to the 
-            // swapchain associated with the window.
-            var bitmapProperties = new SharpDX.Direct2D1.BitmapProperties1(
-                new SharpDX.Direct2D1.PixelFormat(format, SharpDX.Direct2D1.AlphaMode.Premultiplied),
-                _dpi, _dpi,
-                SharpDX.Direct2D1.BitmapOptions.Target | SharpDX.Direct2D1.BitmapOptions.CannotDraw);
-            
-            // Direct2D needs the dxgi version of the backbuffer surface pointer.
-            // Get a D2D surface from the DXGI back buffer to use as the D2D render target.
-            using (var dxgiBackBuffer = _swapChain.GetBackBuffer<SharpDX.DXGI.Surface>(0))
-                _bitmapTarget = new SharpDX.Direct2D1.Bitmap1(_d2dContext, dxgiBackBuffer, bitmapProperties);
-
-            // So now we can set the Direct2D render target.
-            _d2dContext.Target = _bitmapTarget;
-
-            // Set D2D text anti-alias mode to Grayscale to 
-            // ensure proper rendering of text on intermediate surfaces.
-            _d2dContext.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
-        }
-
-#endif // WINRT
 
         public RasterizerState RasterizerState
         {
@@ -704,25 +311,89 @@ namespace Microsoft.Xna.Framework.Graphics
 
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_rasterizerState == value)
                     return;
 
+                if (!value.DepthClipEnable && !GraphicsCapabilities.SupportsDepthClamp)
+                    throw new InvalidOperationException("Cannot set RasterizerState.DepthClipEnable to false on this graphics device");
+
                 _rasterizerState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newRasterizerState = _rasterizerState;
+                if (ReferenceEquals(_rasterizerState, RasterizerState.CullClockwise))
+                    newRasterizerState = _rasterizerStateCullClockwise;
+                else if (ReferenceEquals(_rasterizerState, RasterizerState.CullCounterClockwise))
+                    newRasterizerState = _rasterizerStateCullCounterClockwise;
+                else if (ReferenceEquals(_rasterizerState, RasterizerState.CullNone))
+                    newRasterizerState = _rasterizerStateCullNone;
+
+                newRasterizerState.BindToGraphicsDevice(this);
+
+                _actualRasterizerState = newRasterizerState;
+
                 _rasterizerStateDirty = true;
             }
         }
 
-        public BlendState BlendState 
+        /// <summary>
+        /// The color used as blend factor when alpha blending.
+        /// </summary>
+        /// <remarks>
+        /// When only changing BlendFactor, use this rather than <see cref="Graphics.BlendState.BlendFactor"/> to
+        /// only update BlendFactor so the whole BlendState does not have to be updated.
+        /// </remarks>
+        public Color BlendFactor
+        {
+            get { return _blendFactor; }
+            set
+            {
+                if (_blendFactor == value)
+                    return;
+                _blendFactor = value;
+                _blendFactorDirty = true;
+            }
+        }
+
+        public BlendState BlendState
         {
 			get { return _blendState; }
-			set 
+			set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_blendState == value)
                     return;
 
 				_blendState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newBlendState = _blendState;
+                if (ReferenceEquals(_blendState, BlendState.Additive))
+                    newBlendState = _blendStateAdditive;
+                else if (ReferenceEquals(_blendState, BlendState.AlphaBlend))
+                    newBlendState = _blendStateAlphaBlend;
+                else if (ReferenceEquals(_blendState, BlendState.NonPremultiplied))
+                    newBlendState = _blendStateNonPremultiplied;
+                else if (ReferenceEquals(_blendState, BlendState.Opaque))
+                    newBlendState = _blendStateOpaque;
+
+                // Blend state is now bound to a device... no one should
+                // be changing the state of the blend state object now!
+                newBlendState.BindToGraphicsDevice(this);
+
+                _actualBlendState = newBlendState;
+
+                BlendFactor = _actualBlendState.BlendFactor;
+
                 _blendStateDirty = true;
             }
 		}
@@ -732,145 +403,97 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _depthStencilState; }
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
                 // Don't set the same state twice!
                 if (_depthStencilState == value)
                     return;
 
                 _depthStencilState = value;
+
+                // Static state properties never actually get bound;
+                // instead we use our GraphicsDevice-specific version of them.
+                var newDepthStencilState = _depthStencilState;
+                if (ReferenceEquals(_depthStencilState, DepthStencilState.Default))
+                    newDepthStencilState = _depthStencilStateDefault;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.DepthRead))
+                    newDepthStencilState = _depthStencilStateDepthRead;
+                else if (ReferenceEquals(_depthStencilState, DepthStencilState.None))
+                    newDepthStencilState = _depthStencilStateNone;
+
+                newDepthStencilState.BindToGraphicsDevice(this);
+
+                _actualDepthStencilState = newDepthStencilState;
+
                 _depthStencilStateDirty = true;
             }
         }
 
-        public void Clear(Color color)
+        internal void ApplyState(bool applyShaders)
         {
-			var options = ClearOptions.Target;
+            PlatformBeginApplyState();
 
-#if DIRECTX
-
-            if (_currentDepthStencilView != null)
+            if (_blendStateDirty)
             {
-                options |= ClearOptions.DepthBuffer;
-
-                if (_currentDepthStencilView.Description.Format == SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
-                    options |= ClearOptions.Stencil;
+                _actualBlendState.PlatformApplyState(this);
+                _blendStateDirty = false;
             }
 
-#else
-            // TODO: We need to figure out how to detect if
-            // we have a depth stencil buffer or not!
+            if (_blendFactorDirty)
+            {
+                PlatformApplyBlendFactor();
+                _blendFactorDirty = false;
+            }
+
+            if (_depthStencilStateDirty)
+            {
+                _actualDepthStencilState.PlatformApplyState(this);
+                _depthStencilStateDirty = false;
+            }
+
+            if (_rasterizerStateDirty)
+            {
+                _actualRasterizerState.PlatformApplyState(this);
+                _rasterizerStateDirty = false;
+            }
+
+            PlatformApplyState(applyShaders);
+        }
+
+        public void Clear(Color color)
+        {
+            var options = ClearOptions.Target;
             options |= ClearOptions.DepthBuffer;
             options |= ClearOptions.Stencil;
-#endif
+            PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
 
-            Clear(options, color.ToVector4(), _viewport.MaxDepth, 0);
+            unchecked
+            {
+                _graphicsMetrics._clearCount++;
+            }
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
         {
-            Clear (options, color.ToVector4 (), depth, stencil);
+            PlatformClear(options, color.ToVector4(), depth, stencil);
+
+            unchecked
+            {
+                _graphicsMetrics._clearCount++;
+            }
         }
 
 		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
 		{
-#if DIRECTX
-            lock (_d3dContext)
+            PlatformClear(options, color, depth, stencil);
+
+            unchecked
             {
-                // Clear the diffuse render buffer.
-                if (options.HasFlag(ClearOptions.Target))
-                {
-                    foreach (var view in _currentRenderTargets)
-                    {
-                        if (view != null)
-                            _d3dContext.ClearRenderTargetView(view, new Color4(color.X, color.Y, color.Z, color.W));
-                    }
-                }
-
-                // Clear the depth/stencil render buffer.
-                SharpDX.Direct3D11.DepthStencilClearFlags flags = 0;
-                if (options.HasFlag(ClearOptions.DepthBuffer))
-                    flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Depth;
-                if (options.HasFlag(ClearOptions.Stencil))
-                    flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Stencil;
-
-                if (flags != 0 && _currentDepthStencilView != null)
-                    _d3dContext.ClearDepthStencilView(_currentDepthStencilView, flags, depth, (byte)stencil);
+                _graphicsMetrics._clearCount++;
             }
-
-#elif PSS
-
-            _graphics.SetClearColor(color.ToPssVector4());
-            _graphics.Clear();
-
-#elif OPENGL
-
-            // Unlike with XNA and DirectX...  GL.Clear() obeys several
-            // different render states:
-            //
-            //  - The color write flags.
-            //  - The scissor rectangle.
-            //  - The depth/stencil state.
-            //
-            // So overwrite these states with what is needed to perform
-            // the clear correctly and restore it afterwards.
-            //
-		    var prevScissorRect = ScissorRectangle;
-		    var prevDepthStencilState = DepthStencilState;
-            var prevBlendState = BlendState;
-            ScissorRectangle = _viewport.Bounds;
-            DepthStencilState = DepthStencilState.Default;
-		    BlendState = BlendState.Opaque;
-            ApplyState(false);
-
-            ClearBufferMask bufferMask = 0;
-            if (options.HasFlag(ClearOptions.Target))
-            {
-                GL.ClearColor(color.X, color.Y, color.Z, color.W);
-                GraphicsExtensions.CheckGLError();
-                bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
-            }
-			if (options.HasFlag(ClearOptions.Stencil))
-            {
-				GL.ClearStencil(stencil);
-                GraphicsExtensions.CheckGLError();
-                bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
-			}
-
-			if (options.HasFlag(ClearOptions.DepthBuffer)) 
-            {
-#if GLES
-                GL.ClearDepth (depth);
-                GraphicsExtensions.CheckGLError();
-#else
-                GL.ClearDepth ((double)depth);
-#endif
-				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
-			}
-
-#if GLES
-			GL.Clear((uint)bufferMask);
-            GraphicsExtensions.CheckGLError();
-#else
-			GL.Clear(bufferMask);
-#endif
-           		
-            // Restore the previous render state.
-		    ScissorRectangle = prevScissorRect;
-		    DepthStencilState = prevDepthStencilState;
-		    BlendState = prevBlendState;
-
-#endif // OPENGL
         }
 
-        public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-		
         public void Dispose()
         {
             Dispose(true);
@@ -884,162 +507,50 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (disposing)
                 {
                     // Dispose of all remaining graphics resources before disposing of the graphics device
-                    GraphicsResource.DisposeAll();
-
-#if DIRECTX
-                    if (_swapChain != null)
+                    lock (_resourcesLock)
                     {
-                        _swapChain.Dispose();
-                        _swapChain = null;
-                    }
-                    if (_renderTargetView != null)
-                    {
-                        _renderTargetView.Dispose();
-                        _renderTargetView = null;
-                    }
-                    if (_depthStencilView != null)
-                    {
-                        _depthStencilView.Dispose();
-                        _depthStencilView = null;
-                    }
-                    if (_bitmapTarget != null)
-                    {
-                        _bitmapTarget.Dispose();
-                        _depthStencilView = null;
+                        foreach (var resource in _resources.ToArray())
+                        {
+                            var target = resource.Target as IDisposable;
+                            if (target != null)
+                                target.Dispose();
+                        }
+                        _resources.Clear();
                     }
 
-                    if (_d3dDevice != null)
-                    {
-                        _d3dDevice.Dispose();
-                        _d3dDevice = null;
-                    }
-                    if (_d3dContext != null)
-                    {
-                        _d3dContext.Dispose();
-                        _d3dContext = null;
-                    }
-                    if (_d2dDevice != null)
-                    {
-                        _d2dDevice.Dispose();
-                        _d2dDevice = null;
-                    }
-                    if (_d2dContext != null)
-                    {
-                        _d2dContext.Target = null;
-                        _d2dContext.Dispose();
-                        _d2dContext = null;
-                    }
-                    if (_d2dFactory != null)
-                    {
-                        _d2dFactory.Dispose();
-                        _d2dFactory = null;
-                    }
-                    if (_dwriteFactory != null)
-                    {
-                        _dwriteFactory.Dispose();
-                        _dwriteFactory = null;
-                    }
-                    if (_wicFactory != null)
-                    {
-                        _wicFactory.Dispose();
-                        _wicFactory = null;
-                    }
+                    // Clear the effect cache.
+                    EffectCache.Clear();
 
-#endif // DIRECTX
-
-#if OPENGL
-                    // Free all the cached shader programs.
-                    _programCache.Dispose();
-#endif
-
-#if PSS
-                    if (_graphics != null)
-                    {
-                        _graphics.Dispose();
-                        _graphics = null;
-                    }
-#endif
+                    PlatformDispose();
                 }
 
                 _isDisposed = true;
             }
         }
 
-#if OPENGL
-        /// <summary>
-        /// Adds a dispose action to the list of pending dispose actions. These are executed at the end of each call to Present().
-        /// This allows GL resources to be disposed from other threads, such as the finalizer.
-        /// </summary>
-        /// <param name="disposeAction">The action to execute for the dispose.</param>
-        internal void AddDisposeAction(Action disposeAction)
+        internal void AddResourceReference(WeakReference resourceReference)
         {
-            if (disposeAction == null)
-                throw new ArgumentNullException("disposeAction");
-            if (Threading.IsOnUIThread())
+            lock (_resourcesLock)
             {
-                disposeAction();
-            }
-            else
-            {
-                lock (disposeActionsLock)
-                {
-                    disposeActions.Add(disposeAction);
-                }
+                _resources.Add(resourceReference);
             }
         }
-#endif
+
+        internal void RemoveResourceReference(WeakReference resourceReference)
+        {
+            lock (_resourcesLock)
+            {
+                _resources.Remove(resourceReference);
+            }
+        }
 
         public void Present()
         {
-#if DIRECTX
-            // The application may optionally specify "dirty" or "scroll" rects to improve efficiency
-            // in certain scenarios.  In this sample, however, we do not utilize those features.
-            var parameters = new SharpDX.DXGI.PresentParameters();
-            
-            try
-            {
-                // TODO: Hook in PresentationParameters here!
-
-                // The first argument instructs DXGI to block until VSync, putting the application
-                // to sleep until the next VSync. This ensures we don't waste any cycles rendering
-                // frames that will never be displayed to the screen.
-                _swapChain.Present(1, SharpDX.DXGI.PresentFlags.None, parameters);
-            }
-            catch (SharpDX.SharpDXException)
-            {
-                // TODO: How should we deal with a device lost case here?
-                /*               
-                // If the device was removed either by a disconnect or a driver upgrade, we 
-                // must completely reinitialize the renderer.
-                if (    ex.ResultCode == SharpDX.DXGI.DXGIError.DeviceRemoved ||
-                        ex.ResultCode == SharpDX.DXGI.DXGIError.DeviceReset)
-                    this.Initialize();
-                else
-                    throw;
-                */
-            }
-						
-#elif PSS
-            _graphics.SwapBuffers();
-            _availableVertexBuffers.AddRange(_usedVertexBuffers);
-            _usedVertexBuffers.Clear();
-#elif OPENGL
-			GL.Flush();
-            GraphicsExtensions.CheckGLError();
-
-            // Dispose of any GL resources that were disposed in another thread
-            lock (disposeActionsLock)
-            {
-                if (disposeActions.Count > 0)
-                {
-                    foreach (var action in disposeActions)
-                        action();
-                    disposeActions.Clear();
-                }
-            }
-#endif
+            _graphicsMetrics = new GraphicsMetrics();
+            PlatformPresent();
         }
 
+        /*
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
             throw new NotImplementedException();
@@ -1050,16 +561,25 @@ namespace Microsoft.Xna.Framework.Graphics
             // Manually resetting the device is not currently supported.
             throw new NotImplementedException();
         }
+        */
 
+#if WINDOWS && DIRECTX
         public void Reset(PresentationParameters presentationParameters)
         {
-            throw new NotImplementedException();
-        }
+            PresentationParameters = presentationParameters;
 
+            // Update the back buffer.
+            CreateSizeDependentResources();
+            ApplyRenderTargets(null);
+        }
+#endif
+
+        /*
         public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
         {
             throw new NotImplementedException();
         }
+        */
 
         /// <summary>
         /// Trigger the DeviceResetting event
@@ -1069,6 +589,19 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
+
+            lock (_resourcesLock)
+            {
+                foreach (var resource in _resources)
+                {
+                    var target = resource.Target as GraphicsResource;
+                    if (target != null)
+                        target.GraphicsDeviceResetting();
+                }
+
+                // Remove references to resources that have been garbage collected.
+                _resources.RemoveAll(wr => !wr.IsAlive);
+            }
         }
 
         /// <summary>
@@ -1079,14 +612,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
-            GraphicsResource.DoGraphicsDeviceResetting();
         }
 
         public DisplayMode DisplayMode
         {
             get
             {
-                return GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
+                return Adapter.CurrentDisplayMode;
             }
         }
 
@@ -1114,27 +646,27 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _viewport = value;
-#if DIRECTX
-                var viewport = new SharpDX.Direct3D11.Viewport(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
-                lock (_d3dContext) 
-                    _d3dContext.Rasterizer.SetViewports(viewport);
-#elif OPENGL
-                if (IsRenderTargetBound)
-                    GL.Viewport(value.X, value.Y, value.Width, value.Height);
-                else
-                    GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
-                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.Viewport");
-#if GLES
-                GL.DepthRange(value.MinDepth, value.MaxDepth);
-#else
-                GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
-#endif
-                GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
-#endif
+                PlatformSetViewport(ref value);
             }
         }
 
-        public GraphicsProfile GraphicsProfile { get; set; }
+        public GraphicsProfile GraphicsProfile
+        {
+            get
+            {
+                return _graphicsProfile;
+            }
+            internal set
+            {
+                //Check if Profile is supported.
+                //TODO: [DirectX] Recreate the Device using the new
+                //      feature level each time the Profile changes.
+                if(value > GetHighestSupportedGraphicsProfile(this))
+                    throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
+                _graphicsProfile = value;
+                GraphicsCapabilities.Initialize(this);
+            }
+        }
 
         public Rectangle ScissorRectangle
         {
@@ -1153,261 +685,202 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public int RenderTargetCount
+        {
+            get
+            {
+                return _currentRenderTargetCount;
+            }
+        }
+
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
+		    {
                 SetRenderTargets(null);
+		    }
 			else
-				SetRenderTargets(new RenderTargetBinding(renderTarget));
+			{
+				_tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget);
+				SetRenderTargets(_tempRenderTargetBinding);
+			}
 		}
-		
-		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
-		{
-            // If the default swap chain is already set then do nothing.
-            if (_currentRenderTargetBindings == null && renderTargets == null)
-                return;
 
-            // If the bindings are the same then early out as well.
-            if (    _currentRenderTargetBindings != null && renderTargets != null &&
-                    _currentRenderTargetBindings.Length == renderTargets.Length )
+        public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
+        {
+            if (renderTarget == null)
+            {
+                SetRenderTargets(null);
+            }
+            else
+            {
+                _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, cubeMapFace);
+                SetRenderTargets(_tempRenderTargetBinding);
+            }
+        }
+
+		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
+		{
+            // Avoid having to check for null and zero length.
+            var renderTargetCount = 0;
+            if (renderTargets != null)
+            {
+                renderTargetCount = renderTargets.Length;
+                if (renderTargetCount == 0)
+                {
+                    renderTargets = null;
+                }
+            }
+
+            // Try to early out if the current and new bindings are equal.
+            if (_currentRenderTargetCount == renderTargetCount)
             {
                 var isEqual = true;
-
-                for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
+                for (var i = 0; i < _currentRenderTargetCount; i++)
                 {
-                    if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget)
+                    if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget ||
+                        _currentRenderTargetBindings[i].ArraySlice != renderTargets[i].ArraySlice)
                     {
                         isEqual = false;
                         break;
                     }
                 }
 
-                if ( isEqual )
+                if (isEqual)
                     return;
             }
 
             ApplyRenderTargets(renderTargets);
+
+            if (renderTargetCount == 0)
+            {
+                unchecked
+                {
+                    _graphicsMetrics._targetCount++;
+                }
+            }
+            else
+            {
+                unchecked
+                {
+                    _graphicsMetrics._targetCount += (ulong)renderTargetCount;
+                }
+            }
         }
 
         internal void ApplyRenderTargets(RenderTargetBinding[] renderTargets)
         {
-            // The render target is really changing now.
-            var previousRenderTargetBindings = _currentRenderTargetBindings;
-            _currentRenderTargetBindings = renderTargets;
-		
             var clearTarget = false;
 
-#if OPENGL
-            // In OpenGL we have to re-apply the special "posFixup"
-            // vertex shader uniform if the render target changes.
-            _vertexShaderDirty = true;
-#endif
+            PlatformResolveRenderTargets();
 
-            if (_currentRenderTargetBindings == null || _currentRenderTargetBindings.Length == 0)
-			{
-#if DIRECTX
-                // Set the default swap chain.
-                _currentRenderTargets[0] = _renderTargetView;
-                _currentRenderTargets[1] = null;
-                _currentRenderTargets[2] = null;
-                _currentRenderTargets[3] = null;
-                _currentDepthStencilView = _depthStencilView;
+            // Clear the current bindings.
+            Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
 
-                lock (_d3dContext) 
-                    _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
-#elif OPENGL
-				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
-                GraphicsExtensions.CheckGLError();
-#endif
+            int renderTargetWidth;
+            int renderTargetHeight;
+            if (renderTargets == null)
+            {
+                _currentRenderTargetCount = 0;
 
-                clearTarget = true;
+                PlatformApplyDefaultRenderTarget();
+                clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
-                Viewport = new Viewport(0, 0,
-					PresentationParameters.BackBufferWidth, 
-					PresentationParameters.BackBufferHeight);
-			}
+                renderTargetWidth = PresentationParameters.BackBufferWidth;
+                renderTargetHeight = PresentationParameters.BackBufferHeight;
+            }
 			else
 			{
-                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
+                // Copy the new bindings.
+                Array.Copy(renderTargets, _currentRenderTargetBindings, renderTargets.Length);
+                _currentRenderTargetCount = renderTargets.Length;
 
-#if DIRECTX
-                // Set the new render targets.
-                _currentRenderTargets[0] = null;
-                _currentRenderTargets[1] = null;
-                _currentRenderTargets[2] = null;
-                _currentRenderTargets[3] = null;
-                _currentDepthStencilView = null;
-
-                for (var b = 0; b < _currentRenderTargetBindings.Length; b++)
-                {
-                    var target = _currentRenderTargetBindings[b]._renderTarget as RenderTarget2D;
-                    _currentRenderTargets[b] = target._renderTargetView;
-
-                    // Use the depth from the first target.
-                    if (b == 0)
-                        _currentDepthStencilView = target._depthStencilView;
-                }
-
-                // Set the targets.
-                lock (_d3dContext)
-                    _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
-
-#elif OPENGL
-				if (renderTarget.glFramebuffer == 0)
-				{
-#if GLES
-					GL.GenFramebuffers(1, ref renderTarget.glFramebuffer);
-#else
-					GL.GenFramebuffers(1, out renderTarget.glFramebuffer);
-#endif
-                    GraphicsExtensions.CheckGLError();
-                }
-
-				GL.BindFramebuffer(GLFramebuffer, renderTarget.glFramebuffer);
-                GraphicsExtensions.CheckGLError();
-                GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
-                GraphicsExtensions.CheckGLError();
-                if (renderTarget.DepthStencilFormat != DepthFormat.None)
-				{
-					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                    GraphicsExtensions.CheckGLError();
-                    if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
-					{
-						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                        GraphicsExtensions.CheckGLError();
-                    }
-				}
-
-				var status = GL.CheckFramebufferStatus(GLFramebuffer);
-				if (status != GLFramebufferComplete)
-				{
-					string message = "Framebuffer Incomplete.";
-					switch (status)
-					{
-					case FramebufferErrorCode.FramebufferIncompleteAttachment: message = "Not all framebuffer attachment points are framebuffer attachment complete."; break;
-					case FramebufferErrorCode.FramebufferIncompleteMissingAttachment : message = "No images are attached to the framebuffer."; break;
-					case FramebufferErrorCode.FramebufferUnsupported : message = "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions."; break;
-					//case FramebufferErrorCode.FramebufferIncompleteDimensions : message = "Not all attached images have the same width and height."; break;
-					}
-					throw new InvalidOperationException(message);
-				}
-                                
-#endif
-                // Set the viewport to the size of the first render target.
-                Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
+                var renderTarget = PlatformApplyRenderTargets();
 
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+
+                renderTargetWidth = renderTarget.Width;
+                renderTargetHeight = renderTarget.Height;
             }
+
+            // Set the viewport to the size of the first render target.
+            Viewport = new Viewport(0, 0, renderTargetWidth, renderTargetHeight);
+
+            // Set the scissor rectangle to the size of the first render target.
+            ScissorRectangle = new Rectangle(0, 0, renderTargetWidth, renderTargetHeight);
 
             // In XNA 4, because of hardware limitations on Xbox, when
             // a render target doesn't have PreserveContents as its usage
             // it is cleared before being rendered to.
             if (clearTarget)
                 Clear(DiscardColor);
-
-			if (previousRenderTargetBindings != null)
-			{
-				for (var i = 0; i < previousRenderTargetBindings.Length; ++i)
-				{
-					var renderTarget = previousRenderTargetBindings[i].RenderTarget;
-					if (renderTarget.LevelCount > 1)
-					{
-						throw new NotImplementedException();
-						/*
-						GL.ActiveTexture(TextureUnit.Texture0);
-						GL.BindTexture(TextureTarget.Texture2D, renderTarget.ID);
-						GL.GenerateMipmap(TextureTarget.Texture2D);
-						GL.BindTexture(TextureTarget.Texture2D, 0);
-                        */
-					}
-				}
-			}
-
-#if OPENGL
-			// Reset the raster state because we flip verticies
-            // when rendering offscreen and hence the cull direction.
-            _rasterizerStateDirty = true;
-#endif
         }
-
-#if WINRT
-        internal void ResetRenderTargets()
-        {
-            if ( _d3dContext != null )
-                lock (_d3dContext)
-                    _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
-        }
-#endif
 
 		public RenderTargetBinding[] GetRenderTargets()
 		{
-            if (!IsRenderTargetBound)
-                return EmptyRenderTargetBinding;
-
-            return _currentRenderTargetBindings;
+            // Return a correctly sized copy our internal array.
+            var bindings = new RenderTargetBinding[_currentRenderTargetCount];
+            Array.Copy(_currentRenderTargetBindings, bindings, _currentRenderTargetCount);
+            return bindings;
 		}
 
-#if OPENGL
-
-        private static BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
+        public void GetRenderTargets(RenderTargetBinding[] outTargets)
         {
-            switch (primitiveType)
-            {
-                case PrimitiveType.LineList:
-                    return BeginMode.Lines;
-                case PrimitiveType.LineStrip:
-                    return BeginMode.LineStrip;
-                case PrimitiveType.TriangleList:
-                    return BeginMode.Triangles;
-                case PrimitiveType.TriangleStrip:
-                    return BeginMode.TriangleStrip;
-            }
-
-            throw new NotImplementedException();
+            Debug.Assert(outTargets.Length == _currentRenderTargetCount, "Invalid outTargets array length!");
+            Array.Copy(_currentRenderTargetBindings, outTargets, _currentRenderTargetCount);
         }
-		
-#elif DIRECTX
-
-        private static PrimitiveTopology ToPrimitiveTopology(PrimitiveType primitiveType)
-        {
-            switch (primitiveType)
-            {
-                case PrimitiveType.LineList:
-                    return PrimitiveTopology.LineList;
-                case PrimitiveType.LineStrip:
-                    return PrimitiveTopology.LineStrip;
-                case PrimitiveType.TriangleList:
-                    return PrimitiveTopology.TriangleList;
-                case PrimitiveType.TriangleStrip:
-                    return PrimitiveTopology.TriangleStrip;
-            }
-
-            throw new NotImplementedException();
-        }
-		
-#endif
-
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
-            if (_vertexBuffer == vertexBuffer)
-                return;
+            _vertexBuffersDirty |= (vertexBuffer == null)
+                                   ? _vertexBuffers.Clear()
+                                   : _vertexBuffers.Set(vertexBuffer, 0);
+        }
 
-            _vertexBuffer = vertexBuffer;
-            _vertexBufferDirty = true;
+        public void SetVertexBuffer(VertexBuffer vertexBuffer, int vertexOffset)
+        {
+            // Validate vertexOffset.
+            if (vertexOffset < 0
+                || vertexBuffer == null && vertexOffset != 0
+                || vertexBuffer != null && vertexOffset >= vertexBuffer.VertexCount)
+            {
+                throw new ArgumentOutOfRangeException("vertexOffset");
+            }
+
+            _vertexBuffersDirty |= (vertexBuffer == null)
+                                   ? _vertexBuffers.Clear()
+                                   : _vertexBuffers.Set(vertexBuffer, vertexOffset);
+        }
+
+        public void SetVertexBuffers(params VertexBufferBinding[] vertexBuffers)
+        {
+            if (vertexBuffers == null || vertexBuffers.Length == 0)
+            {
+                _vertexBuffersDirty |= _vertexBuffers.Clear();
+            }
+            else
+            {
+                if (vertexBuffers.Length > _maxVertexBufferSlots)
+                {
+                    var message = string.Format(CultureInfo.InvariantCulture, "Max number of vertex buffers is {0}.", _maxVertexBufferSlots);
+                    throw new ArgumentOutOfRangeException("vertexBuffers", message);
+                }
+
+                _vertexBuffersDirty |= _vertexBuffers.Set(vertexBuffers);
+            }
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
         {
             if (_indexBuffer == indexBuffer)
                 return;
-            
+
             _indexBuffer = indexBuffer;
             _indexBufferDirty = true;
         }
 
-        public IndexBuffer Indices { set { SetIndexBuffer(value); } }
+        public IndexBuffer Indices { set { SetIndexBuffer(value); } get { return _indexBuffer; } }
 
         internal Shader VertexShader
         {
@@ -1419,6 +892,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _vertexShader = value;
+                _vertexConstantBuffers.Clear();
                 _vertexShaderDirty = true;
             }
         }
@@ -1433,6 +907,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _pixelShader = value;
+                _pixelConstantBuffers.Clear();
                 _pixelShaderDirty = true;
             }
         }
@@ -1445,329 +920,45 @@ namespace Microsoft.Xna.Framework.Graphics
                 _pixelConstantBuffers[slot] = buffer;
         }
 
-#if OPENGL
-
-        /// <summary>
-        /// Activates the Current Vertex/Pixel shader pair into a program.         
-        /// </summary>
-        private void ActivateShaderProgram()
-        {
-            // Lookup the shader program.
-            var info = _programCache.GetProgramInfo(VertexShader, PixelShader);
-            if (info.program == -1)
-                return;
-            // Set the new program if it has changed.
-            if (_shaderProgram != info.program)
-            {
-                GL.UseProgram(info.program);
-                GraphicsExtensions.CheckGLError();
-                _shaderProgram = info.program;
-            }
-
-            if (info.posFixupLoc == -1)
-                return;
-
-            // Apply vertex shader fix:
-            // The following two lines are appended to the end of vertex shaders
-            // to account for rendering differences between OpenGL and DirectX:
-            //
-            // gl_Position.y = gl_Position.y * posFixup.y;
-            // gl_Position.xy += posFixup.zw * gl_Position.ww;
-            //
-            // (the following paraphrased from wine, wined3d/state.c and wined3d/glsl_shader.c)
-            //
-            // - We need to flip along the y-axis in case of offscreen rendering.
-            // - D3D coordinates refer to pixel centers while GL coordinates refer
-            //   to pixel corners.
-            // - D3D has a top-left filling convention. We need to maintain this
-            //   even after the y-flip mentioned above.
-            // In order to handle the last two points, we translate by
-            // (63.0 / 128.0) / VPw and (63.0 / 128.0) / VPh. This is equivalent to
-            // translating slightly less than half a pixel. We want the difference to
-            // be large enough that it doesn't get lost due to rounding inside the
-            // driver, but small enough to prevent it from interfering with any
-            // anti-aliasing.
-            //
-            // OpenGL coordinates specify the center of the pixel while d3d coords specify
-            // the corner. The offsets are stored in z and w in posFixup. posFixup.y contains
-            // 1.0 or -1.0 to turn the rendering upside down for offscreen rendering. PosFixup.x
-            // contains 1.0 to allow a mad.
-
-            _posFixup[0] = 1.0f;
-            _posFixup[1] = 1.0f;
-            _posFixup[2] = (63.0f/64.0f)/Viewport.Width;
-            _posFixup[3] = -(63.0f/64.0f)/Viewport.Height;
-
-            //If we have a render target bound (rendering offscreen)
-            if (IsRenderTargetBound)
-            {
-                //flip vertically
-                _posFixup[1] *= -1.0f;
-                _posFixup[3] *= -1.0f;
-            }
-
-            GL.Uniform4(info.posFixupLoc, 1, _posFixup);
-            GraphicsExtensions.CheckGLError();
-        }
-#endif
-
         public bool ResourcesLost { get; set; }
 
-        internal void ApplyState(bool applyShaders)
+        /// <summary>
+        /// Draw geometry by indexing into the vertex buffer.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
+        /// <param name="minVertexIndex">This is unused and remains here only for XNA API compatibility.</param>
+        /// <param name="numVertices">This is unused and remains here only for XNA API compatibility.</param>
+        /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
+        /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
+        /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
+        [Obsolete("Use DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount) instead. In future versions this method can be removed.")]
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
         {
-#if DIRECTX
-            // NOTE: This code assumes _d3dContext has been locked by the caller.
-            Debug.Assert(_d3dContext != null, "The d3d context is null!");
-#endif
-            if ( _scissorRectangleDirty )
-	        {
-#if DIRECTX
-	            _d3dContext.Rasterizer.SetScissorRectangle(
-                    _scissorRectangle.X, 
-                    _scissorRectangle.Y, 
-                    _scissorRectangle.Right, 
-                    _scissorRectangle.Bottom);
-#elif OPENGL
-                var scissorRect = _scissorRectangle;
-                if (!IsRenderTargetBound)
-                    scissorRect.Y = _viewport.Height - scissorRect.Y - scissorRect.Height;
-                GL.Scissor(scissorRect.X, scissorRect.Y, scissorRect.Width, scissorRect.Height);
-                GraphicsExtensions.CheckGLError();
-#endif
-	            _scissorRectangleDirty = false;
-	        }
+            DrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
+        }
 
-            if (_blendStateDirty)
-            {
-                _blendState.ApplyState(this);
-                _blendStateDirty = false;
-            }
-	        if ( _depthStencilStateDirty )
-            {
-	            _depthStencilState.ApplyState(this);
-                _depthStencilStateDirty = false;
-            }
-	        if ( _rasterizerStateDirty )
-            {
-	            _rasterizerState.ApplyState(this);
-	            _rasterizerStateDirty = false;
-            }
-
-            // If we're not applying shaders then early out now.
-            if (!applyShaders)
-                return;
-
-            if (_indexBufferDirty)
-            {
-                if (_indexBuffer != null)
-                {
-#if DIRECTX
-                    _d3dContext.InputAssembler.SetIndexBuffer(
-                        _indexBuffer._buffer,
-                        _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
-                            SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
-                        0);
-#elif OPENGL
-
-                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
-                    GraphicsExtensions.CheckGLError();
-#endif
-                }
-                _indexBufferDirty = false;
-            }
-
-            if (_vertexBufferDirty)
-            {
-#if DIRECTX
-                if (_vertexBuffer != null)
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
-                else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0);
-#elif OPENGL
-                if (_vertexBuffer != null)
-                {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
-                    GraphicsExtensions.CheckGLError();
-                }
-#endif
-            }
-
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
+        {
             if (_vertexShader == null)
-                throw new InvalidOperationException("A vertex shader must be set!");
-            if (_pixelShader == null)
-                throw new InvalidOperationException("A pixel shader must not set!");
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawIndexedPrimitives.");
 
-#if DIRECTX 
+            if (_vertexBuffers.Count == 0)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawIndexedPrimitives.");
 
-            if (_vertexShaderDirty)
-                _d3dContext.VertexShader.Set(_vertexShader._vertexShader);                
+            if (_indexBuffer == null)
+                throw new InvalidOperationException("Index buffer must be set before calling DrawIndexedPrimitives.");
 
-            if (_vertexShaderDirty || _vertexBufferDirty)
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
+
+            unchecked
             {
-                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
-                _vertexShaderDirty = _vertexBufferDirty = false;
+                _graphicsMetrics._drawCount++;
+                _graphicsMetrics._primitiveCount += (ulong)primitiveCount;
             }
-
-            if (_pixelShaderDirty)
-            {
-                _d3dContext.PixelShader.Set(_pixelShader._pixelShader);
-                _pixelShaderDirty = false;
-            }
-
-#elif OPENGL
-
-            if (_vertexShaderDirty || _pixelShaderDirty)
-            {
-                ActivateShaderProgram();
-                _vertexShaderDirty = _pixelShaderDirty = false;
-            }
-
-#endif
-
-#if DIRECTX
-            _vertexConstantBuffers.SetConstantBuffers(this);
-            _pixelConstantBuffers.SetConstantBuffers(this);
-#elif OPENGL
-            _vertexConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-            _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
-#endif
-
-            Textures.SetTextures(this);
-            SamplerStates.SetSamplers(this);
-        }
-
-#if DIRECTX
-
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
-        {
-            SharpDX.Direct3D11.InputLayout layout;
-
-            // Lookup the layout using the shader and declaration as the key.
-            var key = (ulong)decl.HashKey << 32 | (uint)shader.HashKey;           
-            if (!_inputLayouts.TryGetValue(key, out layout))
-            {
-                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, decl.GetInputLayout());
-                _inputLayouts.Add(key, layout);
-            }
-
-            return layout;
-        }
-
-        private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl) 
-            where T : struct, IVertexType
-        {
-            DynamicVertexBuffer buffer;
-
-            if (!_userVertexBuffers.TryGetValue(vertexDecl.HashKey, out buffer) || buffer.VertexCount < vertexCount)
-            {
-                // Dispose the previous buffer if we have one.
-                if (buffer != null)
-                    buffer.Dispose();
-
-                buffer = new DynamicVertexBuffer(this, vertexDecl, Math.Max(vertexCount, 2000), BufferUsage.WriteOnly);
-                _userVertexBuffers[vertexDecl.HashKey] = buffer;
-            }
-
-            var startVertex = buffer.UserOffset;
-
-
-            if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
-            {
-                buffer.UserOffset += vertexCount;
-                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, SetDataOptions.NoOverwrite);
-            }
-            else
-            {
-                buffer.UserOffset = vertexCount;
-                buffer.SetData(vertexData, vertexOffset, vertexCount, SetDataOptions.Discard);
-                startVertex = 0;
-            }
-
-            SetVertexBuffer(buffer);
-
-            return startVertex;
-        }
-
-        private int SetUserIndexBuffer<T>(T[] indexData, int indexOffset, int indexCount)
-            where T : struct
-        {
-            DynamicIndexBuffer buffer;
-
-            var indexSize = typeof(T) == typeof(short) ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
-
-            if (!_userIndexBuffers.TryGetValue(indexSize, out buffer) || buffer.IndexCount < indexCount)
-            {
-                if (buffer != null)
-                    buffer.Dispose();
-
-                buffer = new DynamicIndexBuffer(this, indexSize, Math.Max(indexCount, 6000), BufferUsage.WriteOnly);
-                _userIndexBuffers[indexSize] = buffer;
-            }
-
-            var startIndex = buffer.UserOffset;
-
-            if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
-            {
-                buffer.UserOffset += indexCount;
-                buffer.SetData(startIndex * 2, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
-            }
-            else
-            {
-                startIndex = 0;
-                buffer.UserOffset = indexCount;
-                buffer.SetData(indexData, indexOffset, indexCount, SetDataOptions.Discard);
-            }
-
-            Indices = buffer;
-
-            return startIndex;
-        }
-#endif
-
-        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
-        {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
-            Debug.Assert(_indexBuffer != null, "The index buffer is null!");
-
-			if (minVertexIndex > 0)
-				throw new NotImplementedException ("minVertexIndex > 0 is supported");
-
-#if DIRECTX
-
-            lock (_d3dContext)
-            {
-                ApplyState(true);
-
-                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
-
-                var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
-                _d3dContext.DrawIndexed(vertexCount, startIndex, baseVertex);
-            }
-			
-#elif OPENGL
-
-            ApplyState(true);
-
-            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
-
-			var indexElementType = shortIndices ? DrawElementsType.UnsignedShort : DrawElementsType.UnsignedInt;
-            var indexElementSize = shortIndices ? 2 : 4;
-			var indexOffsetInBytes = (IntPtr)(startIndex * indexElementSize);
-			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
-			var target = PrimitiveTypeGL(primitiveType);
-			var vertexOffset = (IntPtr)(_vertexBuffer.VertexDeclaration.VertexStride * baseVertex);
-
-			_vertexBuffer.VertexDeclaration.Apply(_vertexShader, vertexOffset);
-
-            GL.DrawElements(target,
-                                     indexElementCount,
-                                     indexElementType,
-                                     indexOffsetInBytes);
-            GraphicsExtensions.CheckGLError();
-#elif PSS
-            BindVertexBuffer(true);
-            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
-#endif
         }
 
         public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount) where T : struct, IVertexType
@@ -1775,83 +966,57 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserPrimitives(primitiveType, vertexData, vertexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
-        {            
-            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
+        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        {
+            if (vertexData == null)
+                throw new ArgumentNullException("vertexData");
+
+            if (vertexData.Length == 0)
+                throw new ArgumentOutOfRangeException("vertexData");
+
+            if (vertexOffset < 0 || vertexOffset >= vertexData.Length)
+                throw new ArgumentOutOfRangeException("vertexOffset");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
-#if DIRECTX
+            if (vertexOffset + vertexCount > vertexData.Length)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
-            var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, vertexCount, vertexDeclaration);
+            if (vertexDeclaration == null)
+                throw new ArgumentNullException("vertexDeclaration");
 
-            lock (_d3dContext)
+            PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
+
+            unchecked
             {
-                ApplyState(true);
-
-                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
-                _d3dContext.Draw(vertexCount, startVertex);
+                _graphicsMetrics._drawCount++;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-#elif OPENGL
-
-            ApplyState(true);
-
-            // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
-
-            // Pin the buffers.
-            var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-
-            // Setup the vertex declaration to point at the VB data.
-            vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
-
-            //Draw
-            GL.DrawArrays(PrimitiveTypeGL(primitiveType),
-                          vertexOffset,
-                          vertexCount);
-            GraphicsExtensions.CheckGLError();
-
-            // Release the handles.
-            vbHandle.Free();
-#endif
         }
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawPrimitives.");
+
+            if (_vertexBuffers.Count == 0)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawPrimitives.");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
-#if DIRECTX
+            PlatformDrawPrimitives(primitiveType, vertexStart, vertexCount);
 
-            lock (_d3dContext)
+            unchecked
             {
-                ApplyState(true);
-
-                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
-                _d3dContext.Draw(vertexCount, vertexStart);
+                _graphicsMetrics._drawCount++;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-#elif OPENGL
-
-            ApplyState(true);
-
-            _vertexBuffer.VertexDeclaration.Apply(_vertexShader, IntPtr.Zero);
-
-			GL.DrawArrays(PrimitiveTypeGL(primitiveType),
-			              vertexStart,
-			              vertexCount);
-            GraphicsExtensions.CheckGLError();
-#elif PSS
-            BindVertexBuffer(false);
-            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
-#endif
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -1859,55 +1024,45 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
-            Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
+            // These parameter checks are a duplicate of the checks in the int[] overload of DrawUserIndexedPrimitives.
+            // Inlined here for efficiency.
 
-#if DIRECTX
+            if (vertexData == null || vertexData.Length == 0)
+                throw new ArgumentNullException("vertexData");
 
-            var indexCount = GetElementCountArray(primitiveType, primitiveCount);
-            var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
-            var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
+            if (vertexOffset < 0 || vertexOffset >= vertexData.Length)
+                throw new ArgumentOutOfRangeException("vertexOffset");
 
-            lock (_d3dContext)
+            if (numVertices <= 0 || numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (vertexOffset + numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (indexData == null || indexData.Length == 0)
+                throw new ArgumentNullException("indexData");
+
+            if (indexOffset < 0 || indexOffset >= indexData.Length)
+                throw new ArgumentOutOfRangeException("indexOffset");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (vertexDeclaration == null)
+                throw new ArgumentNullException("vertexDeclaration");
+
+            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
+
+            unchecked
             {
-                ApplyState(true);
-
-                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
-                _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);
+                _graphicsMetrics._drawCount++;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-#elif OPENGL
-
-            ApplyState(true);
-
-            // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
-
-            // Pin the buffers.
-            var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-            var ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
-
-            // Setup the vertex declaration to point at the VB data.
-            vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
-
-            //Draw
-            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
-                                GetElementCountArray(primitiveType, primitiveCount),
-                                DrawElementsType.UnsignedShort,
-                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
-            GraphicsExtensions.CheckGLError();
-
-            // Release the handles.
-            ibHandle.Free();
-            vbHandle.Free();
-#endif
         }
 
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount) where T : struct, IVertexType
@@ -1915,141 +1070,73 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
-            Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
+            // These parameter checks are a duplicate of the checks in the short[] overload of DrawUserIndexedPrimitives.
+            // Inlined here for efficiency.
 
-#if DIRECTX
+            if (vertexData == null || vertexData.Length == 0)
+                throw new ArgumentNullException("vertexData");
 
-            var indexCount = GetElementCountArray(primitiveType, primitiveCount);
-            var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
-            var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
+            if (vertexOffset < 0 || vertexOffset >= vertexData.Length)
+                throw new ArgumentOutOfRangeException("vertexOffset");
 
-            lock (_d3dContext)
+            if (numVertices <= 0 || numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (vertexOffset + numVertices > vertexData.Length)
+                throw new ArgumentOutOfRangeException("numVertices");
+
+            if (indexData == null || indexData.Length == 0)
+                throw new ArgumentNullException("indexData");
+
+            if (indexOffset < 0 || indexOffset >= indexData.Length)
+                throw new ArgumentOutOfRangeException("indexOffset");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            if (vertexDeclaration == null)
+                throw new ArgumentNullException("vertexDeclaration");
+
+            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
+            
+            unchecked
             {
-                ApplyState(true);
-
-                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
-                _d3dContext.DrawIndexed(indexCount, startIndex, startVertex);
+                _graphicsMetrics._drawCount++;
+                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
             }
-
-#elif OPENGL
-
-            ApplyState(true);
-
-            // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
-
-            // Pin the buffers.
-            var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
-            var ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
-
-            // Setup the vertex declaration to point at the VB data.
-            vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
-
-            //Draw
-            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
-                                GetElementCountArray(primitiveType, primitiveCount),
-                                DrawElementsType.UnsignedInt,
-                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
-            GraphicsExtensions.CheckGLError();
-
-            // Release the handles.
-            ibHandle.Free();
-            vbHandle.Free();
-
-#endif
         }
 
-#if PSS
-        internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
+        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex,
+                                            int numVertices, int startIndex, int primitiveCount, int instanceCount)
         {
-            int bestMatchIndex = -1;
-            PssVertexBuffer bestMatch = null;
-            
-            //Search for a good one
-            for (int i = _availableVertexBuffers.Count - 1; i >= 0; i--)
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
+
+            if (_vertexBuffers.Count == 0)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawInstancedPrimitives.");
+
+            if (_indexBuffer == null)
+                throw new InvalidOperationException("Index buffer must be set before calling DrawInstancedPrimitives.");
+
+            if (primitiveCount <= 0)
+                throw new ArgumentOutOfRangeException("primitiveCount");
+
+            PlatformDrawInstancedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount, instanceCount);
+
+            unchecked
             {
-                var buf = _availableVertexBuffers[i];
-                
-#region Check there is enough space
-                if (buf.VertexCount < requiredVertexLength)
-                    continue;
-                if (requiredIndexLength == 0 && buf.IndexCount != 0)
-                    continue;
-                if (requiredIndexLength > 0 && buf.IndexCount < requiredIndexLength)
-                    continue;
-#endregion
-                
-#region Check VertexFormat is the same
-                var bufFormats = buf.Formats;
-                if (vertexFormat.Length != bufFormats.Length)
-                    continue;
-                bool allEqual = true;
-                for (int j = 0; j < bufFormats.Length; j++)
-                {
-                    if (vertexFormat[j] != bufFormats[j])
-                    {
-                        allEqual = false;
-                        break;
-                    }
-                }
-                if (!allEqual)
-                    continue;
-#endregion
-                
-                //this one is acceptable
-                
-                //No current best or this one is smaller than the current best
-                if (bestMatch == null || (buf.IndexCount + buf.VertexCount) < (bestMatch.IndexCount + bestMatch.VertexCount))
-                {
-                    bestMatch = buf;
-                    bestMatchIndex = i;
-                }
+                _graphicsMetrics._drawCount++;
+                _graphicsMetrics._primitiveCount += (ulong)(primitiveCount * instanceCount);
             }
-            
-            if (bestMatch != null)
-            {
-                _availableVertexBuffers.RemoveAt(bestMatchIndex);
-            }
-            else
-            {
-                //Create one
-                bestMatch = new PssVertexBuffer(requiredVertexLength, requiredIndexLength, vertexFormat);
-            }
-            _usedVertexBuffers.Add(bestMatch);
-            
-            return bestMatch;
         }
-        
-        /// <summary>
-        /// Set the current _graphics VertexBuffer based on _vertexBuffer and _indexBuffer, reusing an existing VertexBuffer if possible
-        /// </summary>
-        private void BindVertexBuffer(bool bindIndexBuffer)
-        {
-            int requiredVertexLength = _vertexBuffer.VertexCount;
-            int requiredIndexLength = (!bindIndexBuffer || _indexBuffer == null) ? 0 : _indexBuffer.IndexCount;
-            
-            var vertexFormat = _vertexBuffer.VertexDeclaration.GetVertexFormat();
-            
-            var vertexBuffer = GetVertexBuffer(vertexFormat, requiredVertexLength, requiredIndexLength);
-            
-            vertexBuffer.SetVertices(_vertexBuffer._vertexArray);
-            if (requiredIndexLength > 0)
-                vertexBuffer.SetIndices(_indexBuffer._buffer);
-            _graphics.SetVertexBuffer(0, vertexBuffer);
-        }
-#endif
 
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
-            //TODO: Overview the calculation
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
@@ -2059,11 +1146,33 @@ namespace Microsoft.Xna.Framework.Graphics
                 case PrimitiveType.TriangleList:
                     return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
-                    return 3 + (primitiveCount - 1); // ???
+                    return primitiveCount + 2;
             }
 
             throw new NotSupportedException();
         }
-		
+
+        internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+            return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
+        }
+
+        // uniformly scales down the given rectangle by 10%
+        internal static Rectangle GetDefaultTitleSafeArea(int x, int y, int width, int height)
+        {
+            var marginX = (width + 19) / 20;
+            var marginY = (height + 19) / 20;
+            x += marginX;
+            y += marginY;
+
+            width -= marginX * 2;
+            height -= marginY * 2;
+            return new Rectangle(x, y, width, height);
+        }
+
+        internal static Rectangle GetTitleSafeArea(int x, int y, int width, int height)
+        {
+            return PlatformGetTitleSafeArea(x, y, width, height);
+        }
     }
 }

@@ -1,17 +1,33 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class SpriteFontContent
+	public class SpriteFontContent
     {
+        public SpriteFontContent() { }
+
+        public SpriteFontContent(FontDescription desc)
+        {
+            FontName = desc.FontName;
+            Style = desc.Style;
+            FontSize = desc.Size;
+            CharacterMap = new List<char>(desc.Characters.Count);
+            VerticalLineSpacing = (int)desc.Spacing; // Will be replaced in the pipeline.
+            HorizontalSpacing = desc.Spacing;
+
+            DefaultCharacter = desc.DefaultCharacter;
+        }
+
         public string FontName = string.Empty;
 
-        public string Style = string.Empty;
+        FontDescriptionStyle Style = FontDescriptionStyle.Regular;
 
         public float FontSize;
 

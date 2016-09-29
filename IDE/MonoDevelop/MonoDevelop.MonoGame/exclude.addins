@@ -1,0 +1,23 @@
+﻿<Addins>
+	<Exclude>Assimp64.dll</Exclude>
+    <Exclude>nvtt.dll</Exclude>
+	<Exclude>freetype6.dll</Exclude>
+	<Exlcude>pvrtc.dll</Exlcude>
+	<Exlcude>templates/libs/x86/SDL2.dll</Exlcude>
+	<Exlcude>templates/libs/x64/SDL2.dll</Exlcude>
+	<Exclude>templates/libs/x86/soft_oal.dll</Exclude>
+	<Exclude>templates/libs/x64/soft_oal.dll</Exclude>
+	<!--
+	<Exclude>libnvtt.dylib</Exlcude>
+	<Exclude>libnvimage.dylib</Exlcude>
+	<Exclude>libnvmath.dylib</Exlcude>
+	<Exclude>libnvcore.dylib</Exlcude>
+	<Exclude>libpvrtc.dylib</Exlcude>
+	<Exclude>libfreetype.6.dylib</Exlcude>
+	<Exclude>libpng15.15.dylib</Exlcude>
+	<Exclude>libassimp.dylib</Exlcude>
+	<Exclude>libfreeimage.dylib</Exlcude>
+	<Exclude>libfreeimageplus.dylib</Exlcude>
+	-->
+</Addins>
+

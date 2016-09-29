@@ -1,42 +1,6 @@
-﻿#region License
-/*
- Microsoft Public License (Ms-PL)
- MonoGame - Copyright © 2012 The MonoGame Team
- 
- All rights reserved.
- 
- This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
- accept the license, do not use the software.
- 
- 1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
- U.S. copyright law.
- 
- A "contribution" is the original software, or any additions or changes to the software.
- A "contributor" is any person that distributes its contribution under this license.
- "Licensed patents" are a contributor's patent claims that read directly on its contribution.
- 
- 2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
- 
- 3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
- your patent license from such contributor to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
- notices that are present in the software.
- (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
- a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
- code form, you may only do so under a license that complies with this license.
- (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
- or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
- permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
- purpose and non-infringement.
- */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Graphics;
 
@@ -114,6 +78,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="sourceAsset">Reference to the source asset.</param>
         /// <param name="processorName">Optional processor for this content.</param>
         /// <returns>Copy of the final converted content.</returns>
+        /// <remarks>An example of usage would be a mesh processor calling BuildAndLoadAsset to build any associated textures and replace the original .tga file references with an embedded copy of the converted texture.</remarks>
         public TOutput BuildAndLoadAsset<TInput,TOutput>(
             ExternalReference<TInput> sourceAsset,
             string processorName
@@ -123,15 +88,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
-        /// 
+        /// Initiates a nested build of the specified asset and then loads the result into memory.
         /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="sourceAsset"></param>
-        /// <param name="processorName"></param>
-        /// <param name="processorParameters"></param>
-        /// <param name="importerName"></param>
-        /// <returns></returns>
+        /// <typeparam name="TInput">Type of the input.</typeparam>
+        /// <typeparam name="TOutput">Type of the converted output.</typeparam>
+        /// <param name="sourceAsset">Reference to the source asset.</param>
+        /// <param name="processorName">Optional processor for this content.</param>
+        /// <param name="processorParameters">Optional collection of named values available as input to the content processor.</param>
+        /// <param name="importerName">Optional importer for this content.</param>
+        /// <returns>Copy of the final converted content.</returns>
+        /// <remarks>An example of usage would be a mesh processor calling BuildAndLoadAsset to build any associated textures and replace the original .tga file references with an embedded copy of the converted texture.</remarks>
         public abstract TOutput BuildAndLoadAsset<TInput,TOutput>(
             ExternalReference<TInput> sourceAsset,
             string processorName,
@@ -140,13 +106,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             );
 
         /// <summary>
-        /// 
+        /// Initiates a nested build of an additional asset.
         /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="sourceAsset"></param>
-        /// <param name="processorName"></param>
-        /// <returns></returns>
+        /// <typeparam name="TInput">Type of the input.</typeparam>
+        /// <typeparam name="TOutput">Type of the output.</typeparam>
+        /// <param name="sourceAsset">Reference to the source asset.</param>
+        /// <param name="processorName">Optional processor for this content.</param>
+        /// <returns>Reference to the final compiled content. The build work is not required to complete before returning. Therefore, this file may not be up to date when BuildAsset returns but it will be available for loading by the game at runtime.</returns>
+        /// <remarks>An example of usage for BuildAsset is being called by a mesh processor to request that any related textures used are also built, replacing the original TGA file references with new references to the converted texture files.</remarks>
         public ExternalReference<TOutput> BuildAsset<TInput,TOutput>(
             ExternalReference<TInput> sourceAsset,
             string processorName
@@ -156,16 +123,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
-        /// 
+        /// Initiates a nested build of an additional asset.
         /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="sourceAsset"></param>
-        /// <param name="processorName"></param>
-        /// <param name="processorParameters"></param>
-        /// <param name="importerName"></param>
-        /// <param name="assetName"></param>
-        /// <returns></returns>
+        /// <typeparam name="TInput">Type of the input.</typeparam>
+        /// <typeparam name="TOutput">Type of the output.</typeparam>
+        /// <param name="sourceAsset">Reference to the source asset.</param>
+        /// <param name="processorName">Optional processor for this content.</param>
+        /// <param name="processorParameters">Optional collection of named values available as input to the content processor.</param>
+        /// <param name="importerName">Optional importer for this content.</param>
+        /// <param name="assetName">Optional name of the final compiled content.</param>
+        /// <returns>Reference to the final compiled content. The build work is not required to complete before returning. Therefore, this file may not be up to date when BuildAsset returns but it will be available for loading by the game at runtime.</returns>
+        /// <remarks>An example of usage for BuildAsset is being called by a mesh processor to request that any related textures used are also built, replacing the original TGA file references with new references to the converted texture files.</remarks>
         public abstract ExternalReference<TOutput> BuildAsset<TInput,TOutput>(
             ExternalReference<TInput> sourceAsset,
             string processorName,
@@ -175,13 +143,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             );
 
         /// <summary>
-        /// 
+        /// Converts a content item object using the specified content processor.
         /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="input"></param>
-        /// <param name="processorName"></param>
-        /// <returns></returns>
+        /// <typeparam name="TInput">Type of the input content.</typeparam>
+        /// <typeparam name="TOutput">Type of the converted output.</typeparam>
+        /// <param name="input">Source content to be converted.</param>
+        /// <param name="processorName">Optional processor for this content.</param>
+        /// <returns>Reference of the final converted content.</returns>
         public TOutput Convert<TInput,TOutput>(
             TInput input,
             string processorName
@@ -191,14 +159,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
-        /// 
+        /// Converts a content item object using the specified content processor.
         /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="input"></param>
-        /// <param name="processorName"></param>
-        /// <param name="processorParameters"></param>
-        /// <returns></returns>
+        /// <typeparam name="TInput">Type of the input content.</typeparam>
+        /// <typeparam name="TOutput">Type of the converted output.</typeparam>
+        /// <param name="input">Source content to be converted.</param>
+        /// <param name="processorName">Optional processor for this content.</param>
+        /// <param name="processorParameters">Optional parameters for the processor.</param>
+        /// <returns>Reference of the final converted content.</returns>
         public abstract TOutput Convert<TInput,TOutput>(
             TInput input,
             string processorName,

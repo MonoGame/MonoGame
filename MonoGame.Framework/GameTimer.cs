@@ -6,8 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+
+#if WINDOWS_PHONE
+
+#elif WINRT
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -139,7 +144,7 @@ namespace Microsoft.Xna.Framework
 
             // Do we need to initialize the window event handlers?
             if (_windowEvents == null && Window.Current != null)
-                _windowEvents = new InputEvents(Window.Current.CoreWindow, SharedGraphicsDeviceManager.Current.SwapChainPanel);
+                _windowEvents = new InputEvents(Window.Current.CoreWindow, SharedGraphicsDeviceManager.Current.SwapChainBackgroundPanel, MetroGamePlatform.TouchQueue);
             if (_windowEvents != null)
                 _windowEvents.UpdateState();
 

@@ -47,7 +47,6 @@ using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
 using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 
 #endregion Using clause
 
@@ -61,7 +60,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool simulateTrialMode;
 		
 		internal static void Initialise(Game game) {
-			
+			Guide.Window = game.Window;
 		}
 		delegate string ShowKeyboardInputDelegate (
 			PlayerIndex player, 
@@ -200,7 +199,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 //			}
 			if (isVisible)
 				return;
-			
+			isVisible = true;
 			// We clear the key cache state here to prevent any extraneous keys from
 			// corrupting the key states from the time we call the method
 			// to the time it is actually shown.  This seems to be caused because
@@ -229,16 +228,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			if ((Gamer.SignedInGamers.Count > 0) && (Gamer.SignedInGamers [0].IsSignedInToLive)) {
 
 			}
-		}
-
-		public static IAsyncResult BeginShowStorageDeviceSelector (AsyncCallback callback, object state)
-		{
-			return null;
-		}
-
-		public static StorageDevice EndShowStorageDeviceSelector (IAsyncResult result)
-		{
-			return null;
 		}
 
 		#region Properties
@@ -278,6 +267,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 
+		[CLSCompliant(false)]
 		public static GameWindow Window { 
 			get;
 			set;

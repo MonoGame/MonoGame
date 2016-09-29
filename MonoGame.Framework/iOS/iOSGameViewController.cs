@@ -1,174 +1,201 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2012 The MonoGame Team
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion
 using System;
 using System.Drawing;
 
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
+using UIKit;
+using Foundation;
+using CoreGraphics;
 
-namespace Microsoft.Xna.Framework {
-	class iOSGameViewController : UIViewController {
-		iOSGamePlatform _platform;
+namespace Microsoft.Xna.Framework
+{
+    class iOSGameViewController : 
+    #if TVOS
+        GameController.GCEventViewController
+    #else
+        UIViewController
+    #endif
+    {
+        iOSGamePlatform _platform;
+        #if TVOS
+        IPlatformBackButton platformBackButton;
+        #endif
 
-		public iOSGameViewController (iOSGamePlatform platform)
-		{
-			if (platform == null)
-				throw new ArgumentNullException ("platform");
-			_platform = platform;
-			SupportedOrientations = DisplayOrientation.Default;
-		}
+        public iOSGameViewController(iOSGamePlatform platform)
+        {
+            if (platform == null)
+                throw new ArgumentNullException("platform");
+            _platform = platform;
+            SupportedOrientations = 
+                DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight 
+                | DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
+        }
 
-		public event EventHandler<EventArgs> InterfaceOrientationChanged;
+        public event EventHandler<EventArgs> InterfaceOrientationChanged;
 
-		public DisplayOrientation SupportedOrientations { get; set; }
+        public DisplayOrientation SupportedOrientations { get; set; }
 
-		public override void LoadView ()
-		{
-			RectangleF frame;
-			if (ParentViewController != null && ParentViewController.View != null) {
-				frame = new RectangleF(PointF.Empty, ParentViewController.View.Frame.Size);
-			} else {
-				UIScreen screen = UIScreen.MainScreen;
-				if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft ||
-				    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight) {
-					frame = new RectangleF(0, 0, screen.Bounds.Height, screen.Bounds.Width);
-				} else {
-					frame = new RectangleF(0, 0, screen.Bounds.Width, screen.Bounds.Height);
-				}
-			}
+        public override void LoadView()
+        {
+			CGRect frame;
+            if (ParentViewController != null && ParentViewController.View != null)
+            {
+				frame = new CGRect(CGPoint.Empty, ParentViewController.View.Frame.Size);
+            }
+            else
+            {
+                UIScreen screen = UIScreen.MainScreen;
 
-			base.View = new iOSGameView (_platform, frame);
-		}
+                #if !TVOS
+                // iOS 7 and older reverses width/height in landscape mode when reporting resolution,
+                // iOS 8+ reports resolution correctly in all cases
+                if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft || InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
+                {
+					frame = new CGRect(0, 0, (nfloat)Math.Max(screen.Bounds.Width, screen.Bounds.Height), (nfloat)Math.Min(screen.Bounds.Width, screen.Bounds.Height));
+                }
+                else
+                {
+					frame = new CGRect(0, 0, screen.Bounds.Width, screen.Bounds.Height);
+                }
+                #else
+                frame = new CGRect(0, 0, screen.Bounds.Width, screen.Bounds.Height);
+                #endif
+            }
 
-		public new iOSGameView View {
-			get { return (iOSGameView) base.View; }
-		}
+            base.View = new iOSGameView(_platform, frame);
+
+            // Need to set resize mask to ensure a view resize (which in iOS 8+ corresponds with a rotation) adjusts
+            // the view and underlying CALayer correctly
+            View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+            #if TVOS
+            ControllerUserInteractionEnabled = false;
+            #endif
+        }
+
+        public new iOSGameView View
+        {
+            get { return (iOSGameView)base.View; }
+        }
+        #if !TVOS
 
         #region Autorotation for iOS 5 or older
-		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
-		{
-            DisplayOrientation supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);
-			var toOrientation = OrientationConverter.ToDisplayOrientation (toInterfaceOrientation);
-			return (toOrientation & supportedOrientations) == toOrientation;
-		}
+        public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
+        {
+            DisplayOrientation supportedOrientations = OrientationConverter.Normalize(SupportedOrientations);
+            var toOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);
+            return (toOrientation & supportedOrientations) == toOrientation;
+        }
         #endregion
 
         #region Autorotation for iOS 6 or newer
-        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations()
         {
             return OrientationConverter.ToUIInterfaceOrientationMask(this.SupportedOrientations);
         }
-        
-        public override bool ShouldAutorotate ()
+
+        public override bool ShouldAutorotate()
         {
-            return _platform.Game.Initialized;
-        }
-        
-        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
-        {
-            DisplayOrientation supportedOrientations = OrientationConverter.Normalize(SupportedOrientations);
-            if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
-                return UIInterfaceOrientation.LandscapeRight;
-            else if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
-                return UIInterfaceOrientation.LandscapeLeft;
-            else
-                return UIInterfaceOrientation.Portrait;
+            return true;
         }
         #endregion
 
-		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
-		{
-			base.DidRotate (fromInterfaceOrientation);
+        public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
+        {
+            base.DidRotate(fromInterfaceOrientation);
 
-			var handler = InterfaceOrientationChanged;
-			if (handler != null)
-				handler (this, EventArgs.Empty);
-        }       
-		
-		public override void TouchesBegan (NSSet touches, UIEvent evt)
-		{
-			base.TouchesBegan (touches, evt);
-		}
+            var handler = InterfaceOrientationChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+        #region Hide statusbar for iOS 7 or newer
+        public override bool PrefersStatusBarHidden()
+        {
+            return _platform.Game.graphicsDeviceManager.IsFullScreen;
+        }
+        #endregion
 
-		public override void TouchesEnded (NSSet touches, UIEvent evt)
-		{
-			base.TouchesEnded (touches, evt);
-			
-		}
 
-		public override void TouchesMoved (NSSet touches, UIEvent evt)
-		{
-			base.TouchesMoved (touches, evt);
-		}
 
-		public override void TouchesCancelled (NSSet touches, UIEvent evt)
-		{
-			base.TouchesCancelled (touches, evt);
-		}
-	}
+
+        #region iOS 8 or newer
+
+		public override void ViewWillTransitionToSize(CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
+        {
+			CGSize oldSize = View.Bounds.Size;
+
+            if (oldSize != toSize)
+            {
+                UIInterfaceOrientation prevOrientation = InterfaceOrientation;
+
+                // In iOS 8+ DidRotate is no longer called after a rotation
+                // But we need to notify iOSGamePlatform to update back buffer so we explicitly call it 
+
+                // We do this within the animateAlongside action, which at the point of calling
+                // will have the new InterfaceOrientation set
+                coordinator.AnimateAlongsideTransition((context) =>
+                    {
+                        DidRotate(prevOrientation);
+                    }, (context) => 
+                    {
+                    });
+
+            }
+
+            base.ViewWillTransitionToSize(toSize, coordinator);
+        }
+
+        #endregion
+
+        #endif
+
+        #if TVOS
+
+        public override UIView PreferredFocusedView
+        {
+            get
+            {
+                return this.View;
+            }
+        }
+
+        public override void PressesBegan(NSSet<UIPress> presses, UIPressesEvent evt)
+        {
+            if (presses.Count == 0)
+                return;
+            foreach (UIPress press in presses)
+            {
+                if (press.Type == UIPressType.Menu)
+                {
+                    if (platformBackButton == null)
+                        platformBackButton = _platform.Game.Services.GetService<IPlatformBackButton>();
+                    if (platformBackButton != null)
+                    {
+                        if (!platformBackButton.Handled())
+                        {
+                            ControllerUserInteractionEnabled = true;
+                        }
+                        else
+                        {
+                            Microsoft.Xna.Framework.Input.GamePad.MenuPressed = true;
+                        }
+                    }
+                    else
+                    {
+                        ControllerUserInteractionEnabled = true;
+                    }
+                }
+            }
+            if (ControllerUserInteractionEnabled)
+                base.PressesBegan(presses, evt);
+        }
+
+        public override void PressesEnded(NSSet<UIPress> presses, UIPressesEvent evt)
+        {
+            if (ControllerUserInteractionEnabled)
+                base.PressesEnded(presses, evt);
+        }
+        #endif
+    }
 }

@@ -1,72 +1,76 @@
-// #region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-// #endregion License
-// 
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.IO;
-
-#if IPHONE
-using MonoTouch.Foundation;
-#endif
+using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
-	public static class TitleContainer
-	{
-		public static Stream OpenStream (string name)
-		{
-#if IPHONE
-			return File.OpenRead (GetFilename (name));
-#elif ANDROID
-            return Game.Activity.Assets.Open(GetFilename(name));
-#endif
-		}
-		
-		internal static string GetFilename(string name)
-		{
-			// Replace Windows path separators with local path separators
-			name = name.Replace('\\', Path.DirectorySeparatorChar);
-#if IPHONE
-			name = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
-#endif
-			return name;
-		}
-	}
+    public static partial class TitleContainer
+    {
+        static partial void PlatformInit();
+
+        static TitleContainer() 
+        {
+            Location = string.Empty;
+            PlatformInit();
+        }
+
+        static internal string Location { get; private set; }
+
+        /// <summary>
+        /// Returns an open stream to an exsiting file in the title storage area.
+        /// </summary>
+        /// <param name="name">The filepath relative to the title storage area.</param>
+        /// <returns>A open stream or null if the file is not found.</returns>
+        public static Stream OpenStream(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            // We do not accept absolute paths here.
+            if (Path.IsPathRooted(name))
+                throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.", name);
+
+            // Normalize the file path.
+            var safeName = NormalizeRelativePath(name);
+
+            // Call the platform code to open the stream.  Any errors
+            // at this point should result in a file not found.
+            Stream stream;
+            try
+            {
+                stream = PlatformOpenStream(safeName);
+                if (stream == null)
+                    throw FileNotFoundException(name, null);
+            }
+            catch (FileNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new FileNotFoundException(name, ex);
+            }
+
+            return stream;
+        }
+
+        private static Exception FileNotFoundException(string name, Exception inner)
+        {
+            return new FileNotFoundException("Error loading \"" + name + "\". File not found.", inner);
+        }
+
+        internal static string NormalizeRelativePath(string name)
+        {
+            var uri = new Uri("file:///" + name);
+            var path = uri.LocalPath;
+            path = path.Substring(1);
+            return path.Replace(FileHelpers.NotSeparator, FileHelpers.Separator);
+        }
+    }
 }
 

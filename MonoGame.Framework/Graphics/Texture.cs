@@ -1,88 +1,55 @@
-// #region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-// #endregion License
-// 
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Diagnostics;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif WINRT
-// TODO
-#elif GLES
-using OpenTK.Graphics.ES20;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-#endif
-
+using System.Threading;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public abstract class Texture : GraphicsResource
+	public abstract partial class Texture : GraphicsResource
 	{
-		protected SurfaceFormat format;
-		protected int levelCount;
+		internal SurfaceFormat _format;
+		internal int _levelCount;
 
-#if DIRECTX
+        private readonly int _sortingKey = Interlocked.Increment(ref _lastSortingKey);
+        private static int _lastSortingKey;
 
-        protected SharpDX.Direct3D11.Resource _texture;
+        /// <summary>
+        /// Gets a unique identifier of this texture for sorting purposes.
+        /// </summary>
+        /// <remarks>
+        /// <para>For example, this value is used by <see cref="SpriteBatch"/> when drawing with <see cref="SpriteSortMode.Texture"/>.</para>
+        /// <para>The value is an implementation detail and may change between application launches or MonoGame versions.
+        /// It is only guaranteed to stay consistent during application lifetime.</para>
+        /// </remarks>
+        internal int SortingKey
+        {
+            get { return _sortingKey; }
+        }
 
-        private SharpDX.Direct3D11.ShaderResourceView _resourceView;
-
-#elif OPENGL
-		internal int glTexture = -1;
-		internal TextureTarget glTarget;
-        internal TextureUnit glTextureUnit = TextureUnit.Texture0;
-        internal SamplerState glLastSamplerState = null;
-#endif
-		
 		public SurfaceFormat Format
 		{
-			get { return format; }
+			get { return _format; }
 		}
 		
 		public int LevelCount
 		{
-			get { return levelCount; }
+			get { return _levelCount; }
 		}
+
+        internal static int CalculateMipLevels(int width, int height = 0, int depth = 0)
+        {
+            int levels = 1;
+            int size = Math.Max(Math.Max(width, height), depth);
+            while (size > 1)
+            {
+                size = size / 2;
+                levels++;
+            }
+            return levels;
+        }
 
         internal int GetPitch(int width)
         {
@@ -90,116 +57,35 @@ namespace Microsoft.Xna.Framework.Graphics
 
             int pitch;
 
-            switch (format)
+            switch (_format)
             {
                 case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1SRgb:
+                case SurfaceFormat.Dxt1a:
                 case SurfaceFormat.RgbPvrtc2Bpp:
                 case SurfaceFormat.RgbaPvrtc2Bpp:
                 case SurfaceFormat.RgbEtc1:
-                    Debug.Assert(MathHelper.IsPowerOfTwo(width), "This format must be power of two!");
-                    pitch = ((width + 3) / 4) * 8;
-                    break;
-
                 case SurfaceFormat.Dxt3:
+                case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt5:
+                case SurfaceFormat.Dxt5SRgb:
                 case SurfaceFormat.RgbPvrtc4Bpp:
-                case SurfaceFormat.RgbaPvrtc4Bpp:
-                    Debug.Assert(MathHelper.IsPowerOfTwo(width), "This format must be power of two!");
-                    pitch = ((width + 3) / 4) * 16;
-                    break;
-
-                case SurfaceFormat.Alpha8:
-                    pitch = width;
-                    break;
-
-                case SurfaceFormat.Bgr565:
-                case SurfaceFormat.Bgra4444:
-                case SurfaceFormat.Bgra5551:
-                case SurfaceFormat.NormalizedByte2:
-                case SurfaceFormat.HalfSingle:
-                    pitch = width * 2;
-                    break;
-
-                case SurfaceFormat.Color:
-                case SurfaceFormat.Single:
-                case SurfaceFormat.Rg32:
-                case SurfaceFormat.HalfVector2:
-                case SurfaceFormat.NormalizedByte4:
-                case SurfaceFormat.Rgba1010102:
-                    pitch = width * 4;
-                    break;
-
-                case SurfaceFormat.HalfVector4:
-                case SurfaceFormat.Rgba64:
-                case SurfaceFormat.Vector2:
-                    pitch = width * 8;
-                    break;
-
-                case SurfaceFormat.Vector4:
-                    pitch = width * 16;
+                case SurfaceFormat.RgbaPvrtc4Bpp:                    
+                    pitch = ((width + 3) / 4) * _format.GetSize();
                     break;
 
                 default:
-                    throw new NotImplementedException( "Unexpected format!" );
+                    pitch = width * _format.GetSize();
+                    break;
             };
 
             return pitch;
         }
 
-#if DIRECTX
-
-        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        internal protected override void GraphicsDeviceResetting()
         {
-            if (_resourceView == null)
-                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, _texture);
-
-            return _resourceView;
+            PlatformGraphicsDeviceResetting();
         }
-
-#endif
-
-        internal protected virtual void GraphicsDeviceResetting()
-        {
-#if OPENGL
-            this.glTexture = -1;
-#endif
-        }
-
-        protected override void Dispose(bool disposing)
-		{
-            if (!IsDisposed)
-            {
-#if DIRECTX
-                if (disposing)
-                {
-                    if (_resourceView != null)
-                    {
-                        _resourceView.Dispose();
-                        _resourceView = null;
-                    }
-
-                    if (_texture != null)
-                    {
-                        _texture.Dispose();
-                        _texture = null;
-                    }
-                }
-#elif OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteTextures(1, ref glTexture);
-                            GraphicsExtensions.CheckGLError();
-                        });
-                }
-
-                glLastSamplerState = null;
-#endif
-            }
-            base.Dispose(disposing);
-		}
-		
-	}
+    }
 }
 

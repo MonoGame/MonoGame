@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6BC96721-9A69-4698-BF22-7BDB319FF381}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MouseGetStateAndIsMouseVisibleTester</RootNamespace>
+    <AssemblyName>MouseGetStateAndIsMouseVisibleTester</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG; LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\MonoGame\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
+      <Project>{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}</Project>
+      <Name>Lidgren.Network.Linux</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
+      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
+      <Name>MonoGame.Framework.Linux</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\Enums.cs">
+      <Link>Enums.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\Game1.cs">
+      <Link>Game1.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\InputManager.cs">
+      <Link>InputManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\Object.cs">
+      <Link>Object.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\TextManager.cs">
+      <Link>TextManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\MainMenu.xib">
+      <Link>MainMenu.xib</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\Content\UiCursor.xnb">
+      <Link>Content\UiCursor.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MacOS\MouseGetStateAndIsMouseVisibleTester\MouseGetStateAndIsMouseVisibleTester\Content\fntStandard.xnb">
+      <Link>Content\fntStandard.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

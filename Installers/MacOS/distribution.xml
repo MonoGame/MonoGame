@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <title>MonoGame 0.0.0.0</title>
+    <background file="background.png" mime-type="image/png" />
+    <license file="LICENSE.html" mime-type="text/html"/>
+    <pkg-ref id="com.monogame.pipeline"/>
+    <pkg-ref id="com.monogame.xsaddin"/>
+    <pkg-ref id="com.monogame.framework"/>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.monogame.pipeline"/>
+            <line choice="com.monogame.xsaddin"/>
+            <line choice="com.monogame.framework"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.monogame.pipeline" visible="false">
+        <pkg-ref id="com.monogame.pipeline"/>
+    </choice>
+    <pkg-ref id="com.monogame.pipeline" version="1" onConclusion="none">Pipeline.MacOS.pkg</pkg-ref>
+    <choice id="com.monogame.xsaddin" visible="false">
+        <pkg-ref id="com.monogame.xsaddin"/>
+    </choice>
+    <pkg-ref id="com.monogame.xsaddin" version="1" onConclusion="none">MonoGame.XamarinStudio.Addin.pkg</pkg-ref>
+    <choice id="com.monogame.framework" visible="false">
+        <pkg-ref id="com.monogame.framework"/>
+    </choice>
+    <pkg-ref id="com.monogame.framework" version="1" onConclusion="none">MonoGame.framework.pkg</pkg-ref>
+</installer-gui-script>

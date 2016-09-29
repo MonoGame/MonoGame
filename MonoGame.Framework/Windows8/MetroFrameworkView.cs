@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +16,12 @@ namespace Microsoft.Xna.Framework
     class MetroFrameworkView<T> : IFrameworkView
         where T : Game, new()
     {
+        public MetroFrameworkView(Action<T, IActivatedEventArgs> gameConstructorCustomizationDelegate)
+        {
+            this._gameConstructorCustomizationDelegate = gameConstructorCustomizationDelegate;
+        }
+
+        private Action<T, IActivatedEventArgs> _gameConstructorCustomizationDelegate = null;
         private CoreApplicationView _applicationView;
         private T _game;
 
@@ -30,8 +40,13 @@ namespace Microsoft.Xna.Framework
                 MetroGamePlatform.LaunchParameters = ((LaunchActivatedEventArgs)args).Arguments;
                 MetroGamePlatform.PreviousExecutionState = ((LaunchActivatedEventArgs)args).PreviousExecutionState;
 
-                // Construct the game.
+                // Construct the game.                
                 _game = new T();
+
+                //Initializes it, if delegate was provided
+                if (_gameConstructorCustomizationDelegate != null)
+                    _gameConstructorCustomizationDelegate(_game, args);
+
             }
             else if (args.Kind == ActivationKind.Protocol)
             {
@@ -40,8 +55,16 @@ namespace Microsoft.Xna.Framework
                 MetroGamePlatform.LaunchParameters = protocolArgs.Uri.AbsoluteUri;
                 MetroGamePlatform.PreviousExecutionState = protocolArgs.PreviousExecutionState;
 
-                // Construct the game.
-                _game = new T();
+                // Construct the game if it does not exist
+                // Protocol can be used to reactivate a suspended game
+                if (_game == null)
+                {
+                    _game = new T();
+
+                    //Initializes it, if delegate was provided
+                    if (_gameConstructorCustomizationDelegate != null)
+                        _gameConstructorCustomizationDelegate(_game, args);
+                }
             }
         }
 
@@ -58,7 +81,7 @@ namespace Microsoft.Xna.Framework
         public void SetWindow(CoreWindow window)
         {
             // Initialize the singleton window.
-            MetroGameWindow.Instance.Initialize(window, null);
+            MetroGameWindow.Instance.Initialize(window, null, MetroGamePlatform.TouchQueue);
         }
 
         public void Uninitialize()

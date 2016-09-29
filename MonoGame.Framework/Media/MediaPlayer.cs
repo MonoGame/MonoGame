@@ -1,252 +1,145 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 
-#if IPHONE
-using MonoTouch.AudioToolbox;
-#endif
-
-using Microsoft.Xna.Framework.Audio;
-
-#if IPHONE
-using MonoTouch.AudioToolbox;
-using MonoTouch.AVFoundation;
-using MonoTouch.Foundation;
-using MonoTouch.MediaPlayer;
-#endif
-
-#if WINRT
-using SharpDX.MediaFoundation;
-using SharpDX;
-using Windows.Storage;
-#endif
-
-using System.Linq;
-
 namespace Microsoft.Xna.Framework.Media
 {
-    public static class MediaPlayer
+    public static partial class MediaPlayer
     {
 		// Need to hold onto this to keep track of how many songs
 		// have played when in shuffle mode
 		private static int _numSongsInQueuePlayed = 0;
 		private static MediaState _state = MediaState.Stopped;
 		private static float _volume = 1.0f;
-		private static bool _isMuted = false;
-		private static MediaQueue _queue = new MediaQueue();
+		private static bool _isMuted;
+        private static bool _isRepeating;
+        private static bool _isShuffled;
+		private static readonly MediaQueue _queue = new MediaQueue();
 
-#if WINRT
-        private static MediaEngine _mediaEngineEx;
-
-        static MediaPlayer()
-        {            
-            MediaManager.Startup(true);
-
-            using (var factory = new MediaEngineClassFactory())
-            {
-                var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
-                _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
-            }
-        }
-
-        private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
-        {
-            if (mediaEvent == MediaEngineEvent.Ended)
-            {
-                OnSongFinishedPlaying(null, null);
-            }
-        }
+#if WINDOWS_PHONE
+        // PlayingInternal should default to true to be to work with the user's default playing music
+        private static bool playingInternal = true;
 #endif
 
-		#region Properties
-		
-		public static MediaQueue Queue { get { return _queue; } }
+		public static event EventHandler<EventArgs> ActiveSongChanged;
+        public static event EventHandler<EventArgs> MediaStateChanged;
+
+        static MediaPlayer()
+        {
+            PlatformInitialize();
+        }
+
+        #region Properties
+
+        public static MediaQueue Queue { get { return _queue; } }
 		
 		public static bool IsMuted
         {
-            get { return _isMuted; }
-            set
-            {
-				_isMuted = value;
-
-#if WINRT
-                _mediaEngineEx.Muted = value;
-#else
-				if (_queue.Count == 0)
-					return;
-				
-				var newVolume = value ? 0.0f : _volume;
-                _queue.SetVolume(newVolume);
-#endif
-            }
+            get { return PlatformGetIsMuted(); }
+            set { PlatformSetIsMuted(value); }
         }
-
-        private static bool _isRepeating;
 
         public static bool IsRepeating 
         {
-            get
-            {
-                return _isRepeating;
-            }
-
-            set
-            {
-                _isRepeating = value;
-
-#if WINRT
-                _mediaEngineEx.Loop = value;
-#endif
-            }
+            get { return PlatformGetIsRepeating(); }
+            set { PlatformSetIsRepeating(value); }
         }
 
-        public static bool IsShuffled { get; set; }
+        public static bool IsShuffled
+        {
+            get { return PlatformGetIsShuffled(); }
+            set { PlatformSetIsShuffled(value); }
+        }
 
         public static bool IsVisualizationEnabled { get { return false; } }
-#if !WINRT
+
         public static TimeSpan PlayPosition
         {
-            get
-            {
-				if (_queue.ActiveSong == null)
-					return TimeSpan.Zero;
-				
-				return _queue.ActiveSong.Position;
-            }
-        }
+            get { return PlatformGetPlayPosition(); }
+#if (IOS && !TVOS) || ANDROID
+            set { PlatformSetPlayPosition(value); }
 #endif
-		
+        }
+
         public static MediaState State
         {
-            get { return _state; }
+            get { return PlatformGetState(); }
             private set
             {
                 if (_state != value)
                 {
                     _state = value;
                     if (MediaStateChanged != null)
-                        MediaStateChanged (null, EventArgs.Empty);
+#if WINDOWS_PHONE
+                        // Playing music using XNA, we shouldn't fire extra state changed events
+                        if (!playingInternal)
+#endif
+                            MediaStateChanged(null, EventArgs.Empty);
                 }
             }
         }
-        public static event EventHandler<EventArgs> MediaStateChanged;
-        
-		
-#if IPHONE
-		public static bool GameHasControl 
-		{ 
-			get 
-			{ 
-				var musicPlayer = MPMusicPlayerController.iPodMusicPlayer;
-				
-				if (musicPlayer == null)
-					return true;
-				
-				// TODO: Research the Interrupted state and see if it's valid to
-				// have control at that time.
-				
-				// Note: This will throw a bunch of warnings/output to the console
-				// if running in the simulator. This is a known issue:
-				// http://forums.macrumors.com/showthread.php?t=689102
-				if (musicPlayer.PlaybackState == MPMusicPlaybackState.Playing || 
-				 	musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingForward ||
-				    musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingBackward)
-				return false;
-				
-				return true;
-			} 
-		}
-#else
-		public static bool GameHasControl { get { return true; } }
-#endif
+
+        public static bool GameHasControl
+        {
+            get
+            {
+                return PlatformGetGameHasControl();
+            }
+        }
 		
 
         public static float Volume
         {
-            get { return _volume; }
-			set 
-			{       
-				_volume = value;
-				
-#if WINRT
-                _mediaEngineEx.Volume = value;       
-#else
-				if (_queue.ActiveSong == null)
-					return;
+            get { return PlatformGetVolume(); }
+            set
+            {
+                var volume = MathHelper.Clamp(value, 0, 1);
 
-                _queue.SetVolume(_isMuted ? 0.0f : value);
-#endif
+                PlatformSetVolume(volume);
             }
         }
-		
+
 		#endregion
 		
         public static void Pause()
         {
-#if WINRT
-            _mediaEngineEx.Pause();
-#else
-            if (_queue.ActiveSong == null)
+            if (State != MediaState.Playing || _queue.ActiveSong == null)
                 return;
-		
-            _queue.ActiveSong.Pause ();
-#endif
+
+            PlatformPause();
 
             State = MediaState.Paused;
-
         }
-		
-		/// <summary>
-		/// Play clears the current playback queue, and then queues up the specified song for playback. 
-		/// Playback starts immediately at the beginning of the song.
-		/// </summary>
+
+        /// <summary>
+        /// Play clears the current playback queue, and then queues up the specified song for playback. 
+        /// Playback starts immediately at the beginning of the song.
+        /// </summary>
         public static void Play(Song song)
-        {                        
+        {
+            Play(song, null);
+        }
+
+        /// <summary>
+        /// Play clears the current playback queue, and then queues up the specified song for playback. 
+        /// Playback starts immediately at the given position of the song.
+        /// </summary>
+        public static void Play(Song song, TimeSpan? startPosition)
+        {
+            var previousSong = _queue.Count > 0 ? _queue[0] : null;
             _queue.Clear();
             _numSongsInQueuePlayed = 0;
             _queue.Add(song);
+            _queue.ActiveSongIndex = 0;
             
-            PlaySong(song);
+            PlaySong(song, startPosition);
+
+            if (previousSong != song && ActiveSongChanged != null)
+                ActiveSongChanged.Invoke(null, EventArgs.Empty);
         }
-		
+
 		public static void Play(SongCollection collection, int index = 0)
 		{
             _queue.Clear();
@@ -257,30 +150,19 @@ namespace Microsoft.Xna.Framework.Media
 			
 			_queue.ActiveSongIndex = index;
 			
-			PlaySong(_queue.ActiveSong);
+			PlaySong(_queue.ActiveSong, null);
 		}
-		
-		private static void PlaySong(Song song)
-		{
-#if WINRT
-            var folder = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-            var path = folder + "\\" + song.FilePath;
-            var uri = new Uri(path);
-            var converted = uri.AbsoluteUri;
 
-            _mediaEngineEx.Source = converted;            
-            _mediaEngineEx.Load();
-            _mediaEngineEx.Play();
+        private static void PlaySong(Song song, TimeSpan? startPosition)
+        {
+            if (song != null && song.IsDisposed)
+                throw new ObjectDisposedException("song");
 
-#else
-			song.SetEventHandler(OnSongFinishedPlaying);			
-			song.Volume = _isMuted ? 0.0f : _volume;
-			song.Play();
-#endif
-			State = MediaState.Playing;
-		}
-		
-		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
+            PlatformPlaySong(song, startPosition);
+            State = MediaState.Playing;
+        }
+
+        internal static void OnSongFinishedPlaying(object sender, EventArgs args)
 		{
 			// TODO: Check args to see if song sucessfully played
 			_numSongsInQueuePlayed++;
@@ -290,39 +172,46 @@ namespace Microsoft.Xna.Framework.Media
 				_numSongsInQueuePlayed = 0;
 				if (!IsRepeating)
 				{
-					State = MediaState.Stopped;
+					Stop();
+
+					if (ActiveSongChanged != null)
+					{
+						ActiveSongChanged.Invoke(null, null);
+					}
+
 					return;
 				}
 			}
+
+#if WINDOWS_PHONE
+            if (IsRepeating)
+            {
+                System.Windows.Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Position = TimeSpan.Zero;
+                    _mediaElement.Play();
+                });
+            }
+#endif
 			
 			MoveNext();
 		}
 
         public static void Resume()
         {
-#if WINRT
-            _mediaEngineEx.Play();            
-#else
-			if (_queue.ActiveSong == null)
-				return;
-			
-			_queue.ActiveSong.Resume();
-#endif
+            if (State != MediaState.Paused)
+                return;
+
+            PlatformResume();
 			State = MediaState.Playing;
         }
 
         public static void Stop()
         {
-#if WINRT
-            _mediaEngineEx.Source = null;
-#else
-			if (_queue.ActiveSong == null)
-				return;
-			
-			// Loop through so that we reset the PlayCount as well
-			foreach(var song in Queue.Songs)
-				_queue.ActiveSong.Stop();
-#endif
+            if (State == MediaState.Stopped)
+                return;
+
+            PlatformStop();
 			State = MediaState.Stopped;
 		}
 		
@@ -338,12 +227,28 @@ namespace Microsoft.Xna.Framework.Media
 		
 		private static void NextSong(int direction)
 		{
+            Stop();
+
+            if (IsRepeating && _queue.ActiveSongIndex >= _queue.Count - 1)
+            {
+                _queue.ActiveSongIndex = 0;
+                
+                // Setting direction to 0 will force the first song
+                // in the queue to be played.
+                // if we're on "shuffle", then it'll pick a random one
+                // anyway, regardless of the "direction".
+                direction = 0;
+            }
+
 			var nextSong = _queue.GetNextSong(direction, IsShuffled);
 
-            if (nextSong == null)
-                Stop();
-            else            
-                Play(nextSong);                            
+            if (nextSong != null)
+                PlaySong(nextSong, null);
+
+            if (ActiveSongChanged != null)
+            {
+                ActiveSongChanged.Invoke(null, null);
+            }
 		}
     }
 }

@@ -34,8 +34,6 @@ namespace Microsoft.Xna.Framework.Graphics
         EffectParameter worldInverseTransposeParam;
         EffectParameter worldViewProjParam;
 
-        int _shaderIndex = -1;
-
         #endregion
 
         #region Fields
@@ -67,16 +65,6 @@ namespace Microsoft.Xna.Framework.Graphics
         float fogEnd = 1;
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
-
-        static readonly byte[] Bytecode = LoadEffectResource(
-#if DIRECTX
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.dx11.mgfxo"
-#elif PSS 
-            "MonoGame.Framework.PSMobile.PSSuite.Graphics.Resources.BasicEffect.cgx" //FIXME: This shader is totally incomplete
-#else
-            "Microsoft.Xna.Framework.Graphics.Effect.Resources.BasicEffect.ogl.mgfxo"
-#endif
-        );
 
         #endregion
         
@@ -192,10 +180,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-
-        /// <summary>
-        /// Gets or sets the lighting enable flag.
-        /// </summary>
+        /// <inheritdoc/>
         public bool LightingEnabled
         {
             get { return lightingEnabled; }
@@ -229,9 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the ambient light color (range 0 to 1).
-        /// </summary>
+        /// <inheritdoc/>
         public Vector3 AmbientLightColor
         {
             get { return ambientLightColor; }
@@ -244,27 +227,19 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets the first directional light.
-        /// </summary>
+        /// <inheritdoc/>
         public DirectionalLight DirectionalLight0 { get { return light0; } }
 
 
-        /// <summary>
-        /// Gets the second directional light.
-        /// </summary>
+        /// <inheritdoc/>
         public DirectionalLight DirectionalLight1 { get { return light1; } }
 
 
-        /// <summary>
-        /// Gets the third directional light.
-        /// </summary>
+        /// <inheritdoc/>
         public DirectionalLight DirectionalLight2 { get { return light2; } }
 
 
-        /// <summary>
-        /// Gets or sets the fog enable flag.
-        /// </summary>
+        /// <inheritdoc/>
         public bool FogEnabled
         {
             get { return fogEnabled; }
@@ -280,9 +255,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the fog start distance.
-        /// </summary>
+        /// <inheritdoc/>
         public float FogStart
         {
             get { return fogStart; }
@@ -295,9 +268,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the fog end distance.
-        /// </summary>
+        /// <inheritdoc/>
         public float FogEnd
         {
             get { return fogEnd; }
@@ -310,9 +281,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the fog color.
-        /// </summary>
+        /// <inheritdoc/>
         public Vector3 FogColor
         {
             get { return fogColorParam.GetValueVector3(); }
@@ -374,7 +343,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new BasicEffect with default parameter settings.
         /// </summary>
         public BasicEffect(GraphicsDevice device)
-            : base(device, Bytecode)
+            : base(device, EffectResource.BasicEffect.Bytecode)
         {
             CacheEffectParameters(null);
 
@@ -421,9 +390,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Sets up the standard key/fill/back lighting rig.
-        /// </summary>
+        /// <inheritdoc/>
         public void EnableDefaultLighting()
         {
             LightingEnabled = true;
@@ -469,7 +436,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Lazily computes derived parameter values immediately before applying the effect.
         /// </summary>
-        protected internal override bool OnApply()
+        protected internal override void OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
@@ -523,20 +490,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 dirtyFlags &= ~EffectDirtyFlags.ShaderIndex;
-#if PSS
-#warning Major hack as PSS Shaders don't support multiple Techinques (yet)
-                shaderIndex = 0;
-#endif
 
-                if (_shaderIndex != shaderIndex)
-                {
-                    _shaderIndex = shaderIndex;
-                    CurrentTechnique = Techniques[_shaderIndex];
-                    return true;
-                }
+                CurrentTechnique = Techniques[shaderIndex];
             }
-
-            return false;
         }
 
 

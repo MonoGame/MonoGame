@@ -1,15 +1,21 @@
-using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectAnnotationCollection : IEnumerable<EffectAnnotation>
 	{
-        List<EffectAnnotation> _annotations = new List<EffectAnnotation>();
-		
+        internal static readonly EffectAnnotationCollection Empty = new EffectAnnotationCollection(new EffectAnnotation[0]);
+
+	    private readonly EffectAnnotation[] _annotations;
+
+        internal EffectAnnotationCollection(EffectAnnotation[] annotations)
+        {
+            _annotations = annotations;
+        }
+
 		public int Count 
         {
-			get { return _annotations.Count; }
+			get { return _annotations.Length; }
 		}
 		
 		public EffectAnnotation this[int index]
@@ -32,17 +38,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public IEnumerator<EffectAnnotation> GetEnumerator()
         {
-            return _annotations.GetEnumerator();
+            return ((IEnumerable<EffectAnnotation>)_annotations).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _annotations.GetEnumerator();
-        }
-
-        internal void Add(EffectAnnotation annotation)
-        {
-            _annotations.Add(annotation);
         }
 	}
 }

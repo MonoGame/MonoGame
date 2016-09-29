@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.Framework.Portable</id>
+        <version>0.0.0.0</version>
+        <title>MonoGame.Framework.Portable</title>
+        <authors>MonoGameTeam</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>https://github.com/mono/MonoGame/blob/develop/LICENSE.txt#L2</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>https://pbs.twimg.com/profile_images/487954549441691649/O3KsHAsb_400x400.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>This is the bait-and-switch PCL build of MonoGame.Framework.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes></releaseNotes>
+        <copyright>Copyright 2016</copyright>
+        <language>en-US</language>
+        <references>
+            <reference file="MonoGame.Framework.dll" />
+        </references>	
+	</metadata>
+    <files>
+        <file src="Portable\AnyCPU\MonoGame.Framework.dll" target="lib\net40\MonoGame.Framework.dll" />
+        <file src="Windows\AnyCPU\Release\MonoGame.Framework.xml" target="lib\net40\MonoGame.Framework.xml" />
+        <file src="..\..\NuGetPackages\readme\MonoGame.Framework\readme.txt" target="readme.txt" />
+    </files>
+</package>

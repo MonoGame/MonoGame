@@ -1,133 +1,112 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 
 namespace TwoMGFX
 {
-    public class PassInfo
-    {
-        public string name;
-
-        public string vsModel;
-        public string vsFunction;
-
-        public string psModel;
-        public string psFunction;
-    }
-
-    public class TechniqueInfo
-    {
-        public int startPos;
-        public int length;
-
-        public string name;
-        public List<PassInfo> Passes = new List<PassInfo>();
-    }
-
     public class ShaderInfo
-    {
-        public string fileName { get; private set; }
-        public string fileContent { get; private set; }
+	{
+		public string FilePath { get; private set; }
 
-        public bool DX11Profile { get; private set; }
+		public string FileContent { get; private set; }
 
-        public bool Debug { get; private set; }
+		public ShaderProfile Profile { get; private set; }
 
-        public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
+		public string OutputFilePath { get; private set; }
 
+		public bool Debug { get; private set; }
 
-        static public ShaderInfo FromFile(string path, Options options)
-        {
-            var effectSource = File.ReadAllText(path);
-            return FromString(effectSource, path, options);
-        }
+		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
 
-        static public ShaderInfo FromString(string effectSource, string filePath, Options options)
-        {
-            var macros = new List<SharpDX.Direct3D.ShaderMacro>();
-            macros.Add(new SharpDX.Direct3D.ShaderMacro("MGFX", 1));
+        public Dictionary<string, SamplerStateInfo> SamplerStates = new Dictionary<string, SamplerStateInfo>();
 
-            // Under the DX11 profile we pass a few more macros.
-            if (options.DX11Profile)
-            {
-                macros.Add(new SharpDX.Direct3D.ShaderMacro("HLSL", 1));
-                macros.Add(new SharpDX.Direct3D.ShaderMacro("SM4", 1));
-            }
+        public List<string> Dependencies { get; private set; }
 
-            // If we're building shaders for debug set that flag too.
-            if (options.Debug)
-                macros.Add(new SharpDX.Direct3D.ShaderMacro("DEBUG", 1));
+        public List<string> AdditionalOutputFiles { get; private set; }
 
-            // Use the D3DCompiler to pre-process the file resolving 
-            // all #includes and macros.... this even works for GLSL.
-            string newFile;
-            using (var includer = new CompilerInclude(Path.GetDirectoryName(Path.GetFullPath(filePath))))
-                newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer);
+        static public ShaderInfo FromFile(string path, Options options, IEffectCompilerOutput output)
+		{
+			var effectSource = File.ReadAllText(path);
+			return FromString(effectSource, path, options, output);
+		}
 
-            // Parse the resulting file for techniques and passes.
-            var tree = new Parser(new Scanner()).Parse(newFile);
-            if (tree.Errors.Count > 0)
-            {
-                // TODO: Make the error info pretty!
+		static public ShaderInfo FromString(string effectSource, string filePath, Options options, IEffectCompilerOutput output)
+		{
+			var macros = new Dictionary<string, string>();
+			macros.Add("MGFX", "1");
+
+			options.Profile.AddMacros(macros);
+
+			// If we're building shaders for debug set that flag too.
+			if (options.Debug)
+				macros.Add("DEBUG", "1");
+
+		    if (!string.IsNullOrEmpty(options.Defines))
+		    {
+		        var defines = options.Defines.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var define in defines)
+                    macros.Add(define, "1");
+		    }
+
+		    // Use the D3DCompiler to pre-process the file resolving 
+			// all #includes and macros.... this even works for GLSL.
+			string newFile;
+		    var fullPath = Path.GetFullPath(filePath);
+		    var dependencies = new List<string>();
+		    newFile = Preprocessor.Preprocess(effectSource, fullPath, macros, dependencies, output);
+
+			// Parse the resulting file for techniques and passes.
+            var tree = new Parser(new Scanner()).Parse(newFile, fullPath);
+			if (tree.Errors.Count > 0)
+			{
                 var errors = String.Empty;
                 foreach (var error in tree.Errors)
-                {
-                    int line, col;
-                    FindLineAndCol(newFile, error.Position, out line, out col);
-                    errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, line, col, error.Message);
-                }
+                    errors += string.Format("{0}({1},{2}) : {3}\r\n", error.File, error.Line, error.Column, error.Message);
 
-                throw new Exception(errors);
-            }
+				throw new Exception(errors);
+			}
 
             // Evaluate the results of the parse tree.
             var result = tree.Eval() as ShaderInfo;
-            result.fileName = filePath;
-            result.fileContent = newFile;
 
-            // Finally remove the techniques from the file.
-            //
-            // TODO: Do we really need to do this, or will the HLSL 
-            // compiler just ignore it as we compile shaders?
-            //
-            /*
-            var extra = 2;
-            var offset = 0;
-            foreach (var tech in result.Techniques)
+            // Remove the samplers and techniques so that the shader compiler
+            // gets a clean file without any FX file syntax in it.
+            var cleanFile = newFile;
+            ParseTreeTools.WhitespaceNodes(TokenType.Technique_Declaration, tree.Nodes, ref cleanFile);
+            ParseTreeTools.WhitespaceNodes(TokenType.Sampler_Declaration_States, tree.Nodes, ref cleanFile);
+
+            // Setup the rest of the shader info.
+            result.Dependencies = dependencies;
+            result.FilePath = fullPath;
+            result.FileContent = cleanFile;
+            if (!string.IsNullOrEmpty(options.OutputFile))
+                result.OutputFilePath = Path.GetFullPath(options.OutputFile);
+            result.AdditionalOutputFiles = new List<string>();
+
+            // Remove empty techniques.
+            for (var i=0; i < result.Techniques.Count; i++)
             {
-                // Remove the technique from the file.
-                newFile = newFile.Remove(tech.startPos + offset, tech.length + extra);
-                offset -= tech.length + extra;
-
-                techniques.Add(tech);
-            }
-            */
-
-            result.DX11Profile = options.DX11Profile;
-            result.Debug = options.Debug;
-
-            return result;
-        }
-
-        public static void FindLineAndCol(string src, int pos, out int line, out int col)
-        {
-            line = 1;
-            col = 1;
-
-            for (var i = 0; i < pos; i++)
-            {
-                if (src[i] == '\n')
+                var tech = result.Techniques[i];
+                if (tech.Passes.Count <= 0)
                 {
-                    line++;
-                    col = 1;
-                }
-                else
-                {
-                    col++;
+                    result.Techniques.RemoveAt(i);
+                    i--;
                 }
             }
-        }
-    }
+
+            // We must have at least one technique.
+            if (result.Techniques.Count <= 0)
+                throw new Exception("The effect must contain at least one technique and pass!");
+
+			result.Profile = options.Profile;
+			result.Debug = options.Debug;
+
+			return result;
+		}
+
+	}
 }

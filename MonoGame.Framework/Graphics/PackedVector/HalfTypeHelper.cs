@@ -1,6 +1,9 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
@@ -13,16 +16,18 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             public float f;
             [FieldOffset(0)]
             public int i;
+            [FieldOffset(0)]
+            public uint u;
         }
 
-        internal static UInt16 convert(float f)
+        internal static UInt16 Convert(float f)
         {
             uif uif = new uif();
             uif.f = f;
-            return convert(uif.i);
+            return Convert(uif.i);
         }
 
-        internal static UInt16 convert(int i)
+        internal static UInt16 Convert(int i)
         {
             int s = (i >> 16) & 0x00008000;
             int e = ((i >> 23) & 0x000000ff) - (127 - 15);
@@ -76,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
         }
 
-        internal static unsafe float convert(ushort value)
+        internal static float Convert(ushort value)
         {
             uint rst;
             uint mantissa = (uint)(value & 1023);
@@ -92,7 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
                         mantissa = mantissa << 1;
                     }
                     mantissa &= 0xfffffbff;
-                    rst = ((uint)(((value & 0x8000) << 16) | ((exp + 127) << 23))) | (mantissa << 13);
+                    rst = ((uint)((((uint)value & 0x8000) << 16) | ((exp + 127) << 23))) | (mantissa << 13);
                 }
                 else
                 {
@@ -101,10 +106,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
             else
             {
-                rst = (uint)((((value & 0x8000) << 16) | (((((value >> 10) & 0x1f) - 15) + 127) << 23)) | (mantissa << 13));
+                rst = (uint)(((((uint)value & 0x8000) << 16) | ((((((uint)value >> 10) & 0x1f) - 15) + 127) << 23)) | (mantissa << 13));
             }
 
-            return *(((float*)&rst));
+            var uif = new uif();
+            uif.u = rst;
+            return uif.f;
         }
     }
 }

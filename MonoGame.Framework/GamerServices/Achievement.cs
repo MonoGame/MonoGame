@@ -40,41 +40,50 @@
 // 
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-	public class Achievement
+    [DataContract]
+    public class Achievement
 	{
 		public Achievement ()
 		{
 		}
-		
-		public string Description { get; internal set; }
-		
-		public bool DisplayBeforeEarned { get; internal set;}
-		
-		public DateTime EarnedDateTime { get; internal set;}
 
-		public bool EarnedOnline { get; internal set;}
-		
-		public int GamerScore { get; internal set;}
-		
-		public string HowToEarn { get; internal set;}
-		
-		public bool IsEarned { get; internal set;}
-		
-		public string Key { get; internal set;}
-		
-		public string Name { get; internal set;}
+        [DataMember]
+        public string Description { get; internal set; }
 
+        [DataMember]
+        public bool DisplayBeforeEarned { get; internal set; }
+
+        [DataMember]
+        public DateTime EarnedDateTime { get; internal set; }
+
+        [DataMember]
+        public bool EarnedOnline { get; internal set; }
+
+        [DataMember]
+        public int GamerScore { get; internal set; }
+
+        [DataMember]
+        public string HowToEarn { get; internal set; }
+
+        [DataMember]
+        public bool IsEarned { get; internal set; }
+
+        [DataMember]
+        public string Key { get; internal set; }
+
+        [DataMember]
+        public string Name { get; internal set; }
+
+        /*
 		public Stream GetPicture ()
 		{
 			throw new NotImplementedException();
 		}
-
-
-
-
+        */
 	}
 }
 

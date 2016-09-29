@@ -45,7 +45,10 @@ namespace Microsoft.Devices.Sensors
                 if (IsDisposed)
                     throw new ObjectDisposedException(GetType().Name);
                 if (sensorManager == null)
+                {
                     Initialize();
+                    state = sensor != null ? SensorState.Initializing : SensorState.NotSupported;
+                }
                 return state;
             }
         }
@@ -177,10 +180,11 @@ namespace Microsoft.Devices.Sensors
                             accelerometer.IsDataValid = (values != null && values.Count == 3);
                             if (accelerometer.IsDataValid)
                             {
-                                reading.Acceleration = new Vector3(values[0], values[1], values[2]);
-                                reading.Timestamp = DateTime.Now;
+                                const float gravity = Android.Hardware.SensorManager.GravityEarth;
+                                reading.Acceleration = new Vector3(values[0], values[1], values[2]) / gravity;
+                                reading.Timestamp = DateTime.UtcNow;
                             }
-                            accelerometer.FireOnCurrentValueChanged(this, new SensorReadingEventArgs<AccelerometerReading>(reading));
+                            accelerometer.CurrentValue = reading;
                         }
                         finally
                         {

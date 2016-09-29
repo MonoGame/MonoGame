@@ -1,532 +1,213 @@
-﻿#region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-#region Using Statements
 using System;
-#if WINRT
-using SharpDX.XAudio2;
-using SharpDX.X3DAudio;
-using SharpDX.Multimedia;
-#endif
-#endregion Statements
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public sealed class SoundEffectInstance : IDisposable
-	{
-		private bool isDisposed = false;
-#if !WINRT
-		private SoundState soundState = SoundState.Stopped;
-#endif
-#if ANDROID
-        private int _streamId = -1;
-#endif
+    /// <summary>Represents a single instance of a playing, paused, or stopped sound.</summary>
+    /// <remarks>
+    /// <para>SoundEffectInstances are created through SoundEffect.CreateInstance() and used internally by SoundEffect.Play()</para>
+    /// </remarks>
+    public partial class SoundEffectInstance : IDisposable
+    {
+        private bool _isDisposed = false;
+        internal bool _isPooled = true;
+        internal bool _isXAct;
+        internal bool _isDynamic;
+        internal SoundEffect _effect;
+        private float _pan;
+        private float _volume;
+        private float _pitch;
 
-#if WINRT        
-        internal SourceVoice _voice { get; set; }
-        internal SoundEffect _effect { get; set; }
-
-        private bool _paused;
-        private bool _loop;
-#else
-        private Sound _sound;
-		internal Sound Sound 
-		{ 
-			get
-			{
-				return _sound;
-			} 
-			
-			set
-			{
-				_sound = value;
-			} 
-		}
-#endif
-
-        internal SoundEffectInstance()
-		{			
-		}
-		
-		public void Dispose()
-		{
-#if WINRT
-            _voice.DestroyVoice();
-            _voice.Dispose();
-            _voice = null;
-            _effect = null;
-#elif ANDROID
-            if (_streamId >= 0)
-                _sound.Stop(_streamId);
-#else
-            // When disposing a SoundEffectInstance, the Sound should
-            // just be stopped as it will likely be reused later
-            _sound.Stop();
-#endif
-			isDisposed = true;
-		}
-		
-		public void Apply3D (AudioListener listener, AudioEmitter emitter)
-		{
-#if WINRT		
-            // Convert from XNA Emitter to a SharpDX Emitter
-            var e = emitter.ToEmitter();
-            e.CurveDistanceScaler = SoundEffect.DistanceScale;
-            e.DopplerScaler = SoundEffect.DopplerScale;
-            e.ChannelCount = _effect._format.Channels;
-
-            // Convert from XNA Listener to a SharpDX Listener
-            var l = listener.ToListener();                        
-            
-            // Number of channels in the sound being played.
-            // Not actually sure if XNA supported 3D attenuation of sterio sounds, but X3DAudio does.
-            var srcChannelCount = _effect._format.Channels;            
-
-            // Number of output channels.
-            var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
-
-            // XNA supports distance attenuation and doppler.            
-            var dpsSettings = SoundEffect.Device3D.Calculate(l, e, CalculateFlags.Matrix | CalculateFlags.Doppler, srcChannelCount, dstChannelCount);
-
-            // Apply Volume settings (from distance attenuation) ...
-            _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, dpsSettings.MatrixCoefficients, 0);
-
-            // Apply Pitch settings (from doppler) ...
-            _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
-#endif
-		}
-		
-		public void Apply3D (AudioListener[] listeners,AudioEmitter emitter)
-		{
-            foreach ( var l in listeners )
-                Apply3D(l, emitter);            
-		}		
-		
-		public void Pause ()
-		{
-#if WINRT            
-            _voice.Stop();
-            _paused = true;
-#else
-            if ( _sound != null )
-			{
-#if ANDROID
-				_sound.Pause(_streamId);
-#else
-				_sound.Pause();
-#endif
-                soundState = SoundState.Paused;
-			}
-#endif
-		}
-		
-		public void Play ()
-		{
-#if WINRT              
-            // Choose the correct buffer depending on if we are looped.            
-            var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
-
-            if (_voice.State.BuffersQueued > 0)
-            {
-                _voice.Stop();
-                _voice.FlushSourceBuffers();
-            }
-
-            _voice.SubmitSourceBuffer(buffer, null);
-            _voice.Start();
-
-            _paused = false;
-#else
-			if ( _sound != null )
-			{
-#if ANDROID
-				if (soundState == SoundState.Paused)
-					_sound.Resume(_streamId);
-				else
-					_streamId = _sound.Play();
-#else
-				if (soundState == SoundState.Paused)
-					_sound.Resume();
-				else
-					_sound.Play();
-#endif
-				soundState = SoundState.Playing;
-			}
-#endif
-		}
-		
-		public void Resume()
-		{
-#if WINRT
-            _voice.Start();
-            _paused = false;
-#else
-			if ( _sound != null )
-			{
-				if (soundState == SoundState.Paused)
-				{
-#if ANDROID
-					_sound.Resume(_streamId);
-#else
-                    _sound.Resume();
-#endif
-                }
-				soundState = SoundState.Playing;
- 			}
-#endif
-		}
-		
-		public void Stop()
-		{
-#if WINRT
-            _voice.Stop(0);
-            _voice.FlushSourceBuffers();
-            _paused = false;
-#else
-			if ( _sound != null )
-			{
-#if ANDROID
-				_sound.Stop(_streamId);
-				_streamId = -1;
-#else
-                _sound.Stop();
-#endif
-                soundState = SoundState.Stopped;
-			}
-#endif
+        /// <summary>Enables or Disables whether the SoundEffectInstance should repeat after playback.</summary>
+        /// <remarks>This value has no effect on an already playing sound.</remarks>
+        public virtual bool IsLooped
+        { 
+            get { return PlatformGetIsLooped(); }
+            set { PlatformSetIsLooped(value); }
         }
 
-        public void Stop(bool immediate)
+        /// <summary>Gets or sets the pan, or speaker balance..</summary>
+        /// <value>Pan value ranging from -1.0 (left speaker) to 0.0 (centered), 1.0 (right speaker). Values outside of this range will throw an exception.</value>
+        public float Pan
         {
-#if WINRT            
-            _voice.Stop( immediate ? 0 : (int)PlayFlags.Tails );
-            _paused = false;
-#else
-			if ( _sound != null )
-			{
-#if ANDROID
-                _sound.Stop(_streamId);
-                _streamId = -1;
-#else
-                _sound.Stop();
-#endif
-				soundState = SoundState.Stopped;
-			}
-#endif
-        }		
-		
-		public bool IsDisposed 
-		{ 
-			get
-			{
-				return isDisposed;
-			}
-		}
-		
-		public bool IsLooped 
-		{ 
-			get
-			{
-#if WINRT
-                return _loop;
-#else
-				if ( _sound != null )
-				{
-					return _sound.Looping;
-				}
-				else
-				{
-					return false;
-				}
-#endif
-			}
-			
-			set
-			{
-#if WINRT
-                _loop = value;
-#else
-				if ( _sound != null )
-				{
-					if ( _sound.Looping != value )
-					{
-						_sound.Looping = value;
-					}
-				}
-#endif
-			}
-		}
-		        
-#if WINRT
-        private float _pan;
-        private static float[] _panMatrix;
-#endif
+            get { return _pan; } 
+            set
+            {
+                if (value < -1.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
 
-		public float Pan 
-		{ 
-			get
-			{
-#if WINRT                
-                return _pan;
-#else
-                if ( _sound != null )
-				{
-					return _sound.Pan;
-				}
-				else
-				{
-					return 0.0f;
-				}
-#endif
-			}
-			
-			set
-			{
-#if WINRT                
-                // According to XNA documentation:
-                // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
-                _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
-                
-                var srcChannelCount = _effect._format.Channels;
-                var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
-                
-                if ( _panMatrix == null || _panMatrix.Length < dstChannelCount )
-                    _panMatrix = new float[Math.Max(dstChannelCount,8)];                
-
-                // Default to full volume for all channels/destinations   
-                for (var i = 0; i < _panMatrix.Length; i++)
-                    _panMatrix[i] = 1.0f;
-
-                // From X3DAudio documentation:
-                /*
-                    For submix and mastering voices, and for source voices without a channel mask or a channel mask of 0, 
-                       XAudio2 assumes default speaker positions according to the following table. 
-
-                    Channels
-
-                    Implicit Channel Positions
-
-                    1 Always maps to FrontLeft and FrontRight at full scale in both speakers (special case for mono sounds) 
-                    2 FrontLeft, FrontRight (basic stereo configuration) 
-                    3 FrontLeft, FrontRight, LowFrequency (2.1 configuration) 
-                    4 FrontLeft, FrontRight, BackLeft, BackRight (quadraphonic) 
-                    5 FrontLeft, FrontRight, FrontCenter, SideLeft, SideRight (5.0 configuration) 
-                    6 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight (5.1 configuration) (see the following remarks) 
-                    7 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight, BackCenter (6.1 configuration) 
-                    8 FrontLeft, FrontRight, FrontCenter, LowFrequency, BackLeft, BackRight, SideLeft, SideRight (7.1 configuration) 
-                    9 or more No implicit positions (one-to-one mapping)                      
-                 */
-
-                // Notes:
-                //
-                // Since XNA does not appear to expose any 'master' voice channel mask / speaker configuration,
-                // I assume the mappings listed above should be used.
-                //
-                // Assuming it is correct to pan all channels which have a left/right component.
-
-                var lVal = 1.0f - _pan;
-                var rVal = 1.0f + _pan;
-                                
-                switch (SoundEffect.MasterVoice.ChannelMask)
-                {
-                    case ((int)Speakers.Stereo):
-                    case ((int)Speakers.TwoPointOne):
-                    case ((int)Speakers.Surround):
-                        _panMatrix[0] = lVal;
-                        _panMatrix[1] = rVal;
-                        break;
-
-                    case ((int)Speakers.Quad):
-                        _panMatrix[0] = _panMatrix[2] = lVal;
-                        _panMatrix[1] = _panMatrix[3] = rVal;
-                        break;
-
-                    case ((int)Speakers.FourPointOne):
-                        _panMatrix[0] = _panMatrix[3] = lVal;
-                        _panMatrix[1] = _panMatrix[4] = rVal;
-                        break;
-
-                    case ((int)Speakers.FivePointOne):
-                    case ((int)Speakers.SevenPointOne):
-                    case ((int)Speakers.FivePointOneSurround):
-                        _panMatrix[0] = _panMatrix[4] = lVal;
-                        _panMatrix[1] = _panMatrix[5] = rVal;
-                        break;
-
-                    case ((int)Speakers.SevenPointOneSurround):
-                        _panMatrix[0] = _panMatrix[4] = _panMatrix[6] = lVal;
-                        _panMatrix[1] = _panMatrix[5] = _panMatrix[7] = rVal;
-                        break;
-
-                    case ((int)Speakers.Mono):
-                    default:
-                        // don't do any panning here   
-                        break;
-                }
-
-                _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
-
-#else
-                if ( _sound != null )
-				{
-					if ( _sound.Pan != value )
-					{
-						_sound.Pan = value;
-					}
-				}
-#endif
+                _pan = value;
+                PlatformSetPan(value);
             }
-		}
-		
-		public float Pitch         
-		{             
-	            get
-	            {                    
-#if WINRT
-                    // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
-                    // which avoids the native call and is actually more accurate.
-                    var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
+        }
 
-                    // Convert from semitones to octaves.
-                    pitch /= 12.0;
+        /// <summary>Gets or sets the pitch adjustment.</summary>
+        /// <value>Pitch adjustment, ranging from -1.0 (down an octave) to 0.0 (no change) to 1.0 (up an octave). Values outside of this range will throw an Exception.</value>
+        public float Pitch
+        {
+            get { return _pitch; }
+            set
+            {
+                // XAct sounds effects don't have pitch limits
+                if (!_isXAct && (value < -1.0f || value > 1.0f))
+                    throw new ArgumentOutOfRangeException();
 
-                    return (float)pitch;
-#else
-					if ( _sound != null)
-				    {
-	                   return _sound.Rate;
-				    }
-				    return 0.0f;
-#endif
-	            }
-	            set
-	            {
-#if WINRT
-                    // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
-                    // which avoids the native call and is actually more accurate.
-                    var ratio = Math.Pow(2.0, value);
-                    _voice.SetFrequencyRatio((float)ratio);                  
-#else
-				    if ( _sound != null && _sound.Rate != value)
-				    {
-	                   _sound.Rate = value;
-				    } 
-#endif
-	            }        
-		 }				
-		
-		public SoundState State 
-		{ 
-			get
-			{
-#if WINRT           
-                // If no buffers queued the sound is stopped.
-                if (_voice.State.BuffersQueued == 0)
-                {
-                    return SoundState.Stopped;
-                }
-                
-                // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
-                // we have to save the "paused" state ourself.
-                if (_paused)
-                    return SoundState.Paused;
+                _pitch = value;
+                PlatformSetPitch(value);
+            }
+        }
 
-                return SoundState.Playing;                                
-#elif ANDROID
-                // Android SoundPool can't tell us when a sound is finished playing.
-                // TODO: Remove this code when OpenAL for Android is implemented
-                if (_sound != null && IsLooped)
-                {
-                    // Looping sounds use our stored state
-                    return soundState;
-                }
+        /// <summary>Gets or sets the volume of the SoundEffectInstance.</summary>
+        /// <value>Volume, ranging from 0.0 (silence) to 1.0 (full volume). Volume during playback is scaled by SoundEffect.MasterVolume.</value>
+        /// <remarks>
+        /// This is the volume relative to SoundEffect.MasterVolume. Before playback, this Volume property is multiplied by SoundEffect.MasterVolume when determining the final mix volume.
+        /// </remarks>
+        public float Volume
+        {
+            get { return _volume; }
+            set
+            {
+                // XAct sound effects don't have volume limits.
+                if (!_isXAct && (value < 0.0f || value > 1.0f))
+                    throw new ArgumentOutOfRangeException();
+
+                _volume = value;
+
+                // XAct sound effects are not tied to the SoundEffect master volume.
+                if (_isXAct)
+                    PlatformSetVolume(value);
                 else
-                {
-                    // Non looping sounds always return Stopped
-                    return SoundState.Stopped;
-                }
-#else
-                if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) 
-                {
-                    soundState = SoundState.Stopped;
-                }
+                    PlatformSetVolume(value * SoundEffect.MasterVolume);
+            }
+        }
 
-                return soundState;
-#endif
-			} 
-		}
-		
-		public float Volume
-		{ 
-			get
-			{
-#if WINRT
-                return _voice.Volume;
-#else
-				if (_sound != null)
-				{
-					return _sound.Volume;
-				}
-				else
-				{
-					return 0.0f;
-				}
-#endif
-			}
-			
-			set
-			{
-#if WINRT
-                _voice.SetVolume(value, XAudio2.CommitNow);
-#else
-				if ( _sound != null )
-				{
-					if ( _sound.Volume != value )
-					{
-						_sound.Volume = value;
-					}
-				}
-#endif
-			}
-		}	
-		
-		
-	}
+        /// <summary>Gets the SoundEffectInstance's current playback state.</summary>
+        public virtual SoundState State { get { return PlatformGetState(); } }
+
+        /// <summary>Indicates whether the object is disposed.</summary>
+        public bool IsDisposed { get { return _isDisposed; } }
+
+        internal SoundEffectInstance()
+        {
+            _pan = 0.0f;
+            _volume = 1.0f;
+            _pitch = 0.0f;            
+        }
+
+        internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
+            : this()
+        {
+            PlatformInitialize(buffer, sampleRate, channels);
+        }
+
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// <see cref="Microsoft.Xna.Framework.Audio.SoundEffectInstance"/> is reclaimed by garbage collection.
+        /// </summary>
+        ~SoundEffectInstance()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>Applies 3D positioning to the SoundEffectInstance using a single listener.</summary>
+        /// <param name="listener">Data about the listener.</param>
+        /// <param name="emitter">Data about the source of emission.</param>
+        public void Apply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            PlatformApply3D(listener, emitter);
+        }
+
+        /// <summary>Applies 3D positioning to the SoundEffectInstance using multiple listeners.</summary>
+        /// <param name="listeners">Data about each listener.</param>
+        /// <param name="emitter">Data about the source of emission.</param>
+        public void Apply3D(AudioListener[] listeners, AudioEmitter emitter)
+        {
+            foreach (var l in listeners)
+				PlatformApply3D(l, emitter);
+        }
+
+        /// <summary>Pauses playback of a SoundEffectInstance.</summary>
+        /// <remarks>Paused instances can be resumed with SoundEffectInstance.Play() or SoundEffectInstance.Resume().</remarks>
+        public virtual void Pause()
+        {
+            PlatformPause();
+        }
+
+        /// <summary>Plays or resumes a SoundEffectInstance.</summary>
+        /// <remarks>Throws an exception if more sounds are playing than the platform allows.</remarks>
+        public virtual void Play()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException("SoundEffectInstance");
+
+            if (State == SoundState.Playing)
+                return;
+
+            // We don't need to check if we're at the instance play limit
+            // if we're resuming from a paused state.
+            if (State != SoundState.Paused)
+            {
+                if (!SoundEffectInstancePool.SoundsAvailable)
+                    throw new InstancePlayLimitException();
+
+                SoundEffectInstancePool.Remove(this);
+            }
+            
+            // For non-XAct sounds we need to be sure the latest
+            // master volume level is applied before playback.
+            if (!_isXAct)
+                PlatformSetVolume(_volume * SoundEffect.MasterVolume);
+
+            PlatformPlay();
+        }
+
+        /// <summary>Resumes playback for a SoundEffectInstance.</summary>
+        /// <remarks>Only has effect on a SoundEffectInstance in a paused state.</remarks>
+        public virtual void Resume()
+        {
+            PlatformResume();
+        }
+
+        /// <summary>Immediately stops playing a SoundEffectInstance.</summary>
+        public virtual void Stop()
+        {
+            PlatformStop(true);
+        }
+
+        /// <summary>Stops playing a SoundEffectInstance, either immediately or as authored.</summary>
+        /// <param name="immediate">Determined whether the sound stops immediately, or after playing its release phase and/or transitions.</param>
+        /// <remarks>Stopping a sound with the immediate argument set to false will allow it to play any release phases, such as fade, before coming to a stop.</remarks>
+        public virtual void Stop(bool immediate)
+        {
+            PlatformStop(immediate);
+        }
+
+        /// <summary>Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffectInstance"/>.</summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffectInstance"/>.
+        /// </summary>
+        /// <param name="disposing">If set to <c>true</c>, Dispose was called explicitly.</param>
+        /// <remarks>If the disposing parameter is true, the Dispose method was called explicitly. This
+        /// means that managed objects referenced by this instance should be disposed or released as
+        /// required.  If the disposing parameter is false, Dispose was called by the finalizer and
+        /// no managed objects should be touched because we do not know if they are still valid or
+        /// not at that time.  Unmanaged resources should always be released.</remarks>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                PlatformDispose(disposing);
+                _isDisposed = true;
+            }
+        }
+    }
 }

@@ -1,51 +1,44 @@
 using System;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    #if WINRT
     [DataContract]
-    #else
-    [Serializable]
-    #endif
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct VertexPositionColor : IVertexType
 	{
-#if WINRT
         [DataMember]
-#endif
 		public Vector3 Position;
-#if WINRT
+        
         [DataMember]
-#endif
-		public VertexElementColor Color;
+		public Color Color;
 
 		public static readonly VertexDeclaration VertexDeclaration;
 
-		public VertexPositionColor (Vector3 position, Color color)
+		public VertexPositionColor(Vector3 position, Color color)
 		{
 			this.Position = position;
 			Color = color;
 		}
 
-		VertexDeclaration IVertexType.VertexDeclaration {
-			get {
+		VertexDeclaration IVertexType.VertexDeclaration
+        {
+			get
+            {
 				return VertexDeclaration;
 			}
 		}
 
-		public override int GetHashCode ()
+		public override int GetHashCode()
 		{
 			// TODO: Fix gethashcode
 			return 0;
 		}
 
-		public override string ToString ()
+		public override string ToString()
 		{
-			return string.Format ("{{Position:{0} Color:{1}}}", new object[] { this.Position, this.Color });
+            return "{{Position:" + this.Position + " Color:" + this.Color + "}}";
 		}
 
 		public static bool operator == (VertexPositionColor left, VertexPositionColor right)
@@ -58,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return !(left == right);
 		}
 
-		public override bool Equals (object obj)
+		public override bool Equals(object obj)
 		{
 			if (obj == null) {
 				return false;
@@ -69,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return (this == ((VertexPositionColor)obj));
 		}
 
-		static VertexPositionColor ()
+		static VertexPositionColor()
 		{
 			VertexElement[] elements = new VertexElement[] { new VertexElement (0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement (12, VertexElementFormat.Color, VertexElementUsage.Color, 0) };
 			VertexDeclaration declaration = new VertexDeclaration (elements);

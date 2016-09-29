@@ -42,8 +42,8 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
-	public struct GamePadDPad
-	{
+    public struct GamePadDPad
+    {
         public ButtonState Down
         {
             get;
@@ -73,17 +73,62 @@ namespace Microsoft.Xna.Framework.Input
             Left = leftValue;
             Right = rightValue;
         }
-        internal GamePadDPad(Buttons b)
+
+        internal GamePadDPad(Buttons buttons)
             : this()
         {
-            if ((b & Buttons.DPadDown) == Buttons.DPadDown)
+            if ((buttons & Buttons.DPadDown) == Buttons.DPadDown)
                 Down = ButtonState.Pressed;
-            if ((b & Buttons.DPadLeft) == Buttons.DPadLeft)
+            if ((buttons & Buttons.DPadLeft) == Buttons.DPadLeft)
                 Left = ButtonState.Pressed;
-            if ((b & Buttons.DPadRight) == Buttons.DPadRight)
+            if ((buttons & Buttons.DPadRight) == Buttons.DPadRight)
                 Right = ButtonState.Pressed;
-            if ((b & Buttons.DPadUp) == Buttons.DPadUp)
+            if ((buttons & Buttons.DPadUp) == Buttons.DPadUp)
                 Up = ButtonState.Pressed;
         }
-	}
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadDPad"/> are equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
+        public static bool operator ==(GamePadDPad left, GamePadDPad right)
+        {
+            return (left.Down == right.Down)
+                && (left.Left == right.Left)
+                && (left.Right == right.Right)
+                && (left.Up == right.Up);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadDPad"/> are not equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.</returns>
+        public static bool operator !=(GamePadDPad left, GamePadDPad right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare to this instance.</param>
+        /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadDPad"/> and has the same value as this instance; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is GamePadDPad) && (this == (GamePadDPad)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return
+                (this.Down == ButtonState.Pressed ? 1 : 0) +
+                (this.Left == ButtonState.Pressed ? 2 : 0) +
+                (this.Right == ButtonState.Pressed ? 4 : 0) +
+                (this.Up == ButtonState.Pressed ? 8 : 0);
+        }
+    }
 }

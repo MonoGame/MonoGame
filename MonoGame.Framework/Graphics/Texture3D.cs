@@ -1,75 +1,140 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
-
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Texture3D : Texture
+	public partial class Texture3D : Texture
 	{
-		public int Width { get; private set; }
-		public int Height { get; private set; }
-		public int Depth { get; private set; }
-		
-		PixelInternalFormat glInternalFormat;
-		PixelFormat glFormat;
-		PixelType glType;
-		
-		public Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+        private int _width;
+        private int _height;
+        private int _depth;
+
+        public int Width
+        {
+            get { return _width; }
+        }
+
+        public int Height
+        {
+            get { return _height; }
+        }
+
+        public int Depth
+        {
+            get { return _depth; }
+        }
+
+		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, depth, mipMap, format, false)
 		{
-			this.GraphicsDevice = graphicsDevice;
-			Width = width;
-			Height = height;
-			Depth = depth;
-
-			this.glTarget = TextureTarget.Texture3D;
-
-			GL.GenTextures (1, out this.glTexture);
-			GL.BindTexture (glTarget, glTexture);
-
-			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
-
-			GL.TexImage3D (glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
-
-			if (mipMap) {
-					throw new NotImplementedException ();
-			}
 		}
-		
-		public void SetData<T> (T[] data) where T : struct
+
+		protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
+		{
+		    if (graphicsDevice == null)
+		    {
+		        throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+		    }
+		    this.GraphicsDevice = graphicsDevice;
+            this._width = width;
+            this._height = height;
+            this._depth = depth;
+            this._levelCount = 1;
+		    this._format = format;
+
+            PlatformConstruct(graphicsDevice, width, height, depth, mipMap, format, renderTarget);
+        }
+
+        public void SetData<T>(T[] data) where T : struct
 		{
 			SetData<T>(data, 0, data.Length);
 		}
-		
+
 		public void SetData<T> (T[] data, int startIndex, int elementCount) where T : struct
 		{
 			SetData<T>(0, 0, 0, Width, Height, 0, Depth, data, startIndex, elementCount);
 		}
-		
+
 		public void SetData<T> (int level,
 		                        int left, int top, int right, int bottom, int front, int back,
 		                        T[] data, int startIndex, int elementCount) where T : struct
 		{
-			if (data == null) 
+            long area = (right - left) * (bottom - top) * (back - front);
+
+            if (left < 0 || top < 0 || back < 0 || right > Width || bottom > Height || front > Depth)
+                throw new ArgumentException("area must remain inside texture bounds");
+            if (startIndex < 0)
+                throw new ArgumentException("startIndex must be non negative", "startIndex");
+			if (data == null)
 				throw new ArgumentNullException("data");
+            if (data.Length - startIndex < area)
+                throw new ArgumentException("data must be long enough to cover the area, taking into account startIndex", "data");
+            if (area > elementCount)
+                throw new ArgumentException("ElementCount must match the size of the requested area of the texture", "elementCount");
 
-			var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+            int width = right - left;
+            int height = bottom - top;
+            int depth = back - front;
 
-            GL.BindTexture(glTarget, glTexture);
-			GL.TexSubImage3D(glTarget, level, left, top, front, right-left, bottom-top, back-front, glFormat, glType, dataPtr);
-			
-			dataHandle.Free ();
+            PlatformSetData<T>(level, left, top, right, bottom, front, back, data, startIndex, elementCount, width, height, depth);
 		}
-		
 
+        /// <summary>
+        /// Gets a copy of 3D texture data, specifying a mipmap level, source box, start index, and number of elements.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="level">Mipmap level.</param>
+        /// <param name="left">Position of the left side of the box on the x-axis.</param>
+        /// <param name="top">Position of the top of the box on the y-axis.</param>
+        /// <param name="right">Position of the right side of the box on the x-axis.</param>
+        /// <param name="bottom">Position of the bottom of the box on the y-axis.</param>
+        /// <param name="front">Position of the front of the box on the z-axis.</param>
+        /// <param name="back">Position of the back of the box on the z-axis.</param>
+        /// <param name="data">Array of data.</param>
+        /// <param name="startIndex">Index of the first element to get.</param>
+        /// <param name="elementCount">Number of elements to get.</param>
+        public void GetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            if (data == null || data.Length == 0)
+                throw new ArgumentException("data cannot be null");
+            if (data.Length < startIndex + elementCount)
+                throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+
+            // Disallow negative box size
+            if ((left < 0 || left >= right)
+                || (top < 0 || top >= bottom)
+                || (front < 0 || front >= back))
+                throw new ArgumentException("Neither box size nor box position can be negative");
+
+            PlatformGetData(level, left, top, right, bottom, front, back, data, startIndex, elementCount);
+        }
+
+        /// <summary>
+        /// Gets a copy of 3D texture data, specifying a start index and number of elements.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="data">Array of data.</param>
+        /// <param name="startIndex">Index of the first element to get.</param>
+        /// <param name="elementCount">Number of elements to get.</param>
+        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            GetData(0, 0, 0, _width, _height, 0, _depth, data, startIndex, elementCount);
+        }
+
+        /// <summary>
+        /// Gets a copy of 3D texture data.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="data">Array of data.</param>
+        public void GetData<T>(T[] data) where T : struct
+        {
+            GetData(data, 0, data.Length);
+        }
 	}
 }
 

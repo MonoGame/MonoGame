@@ -92,6 +92,10 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				return isReadOnly;
 			}
+            private set 
+            {
+                isReadOnly = value;
+            }
         }
 		
         #endregion Properties

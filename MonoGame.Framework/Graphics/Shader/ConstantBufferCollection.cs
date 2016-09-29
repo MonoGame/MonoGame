@@ -1,14 +1,6 @@
-﻿using System;
-
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif PSS
-using Sce.PlayStation.Core.Graphics;
-#elif GLES
-using OpenTK.Graphics.ES20;
-#endif
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -17,6 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly ConstantBuffer[] _buffers;
 
         private ShaderStage _stage;
+        private ShaderStage Stage { get { return this._stage; } }
 
         private int _valid;
 
@@ -56,10 +49,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _valid = 0;
         }
 
-#if DIRECTX
-        internal void SetConstantBuffers(GraphicsDevice device)
-#elif OPENGL || PSS
+#if WEB
         internal void SetConstantBuffers(GraphicsDevice device, int shaderProgram)
+#elif OPENGL
+        internal void SetConstantBuffers(GraphicsDevice device, ShaderProgram shaderProgram)
+#else
+        internal void SetConstantBuffers(GraphicsDevice device)
 #endif
         {
             // If there are no constant buffers then skip it.
@@ -71,12 +66,12 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _buffers.Length; i++)
             {
                 var buffer = _buffers[i];
-                if (buffer != null)
+                if (buffer != null && !buffer.IsDisposed)
                 {
-#if DIRECTX
-                    buffer.Apply(device, _stage, i);
-#elif OPENGL || PSS
-                    buffer.Apply(device, shaderProgram);
+#if OPENGL || WEB
+                    buffer.PlatformApply(device, shaderProgram);
+#else
+                    buffer.PlatformApply(device, _stage, i);
 #endif
                 }
 

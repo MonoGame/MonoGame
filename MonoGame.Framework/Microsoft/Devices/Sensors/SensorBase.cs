@@ -9,12 +9,28 @@ namespace Microsoft.Devices.Sensors
 	public abstract class SensorBase<TSensorReading> : IDisposable
 		where TSensorReading : ISensorReading
 	{
-#if IPHONE
-        protected static readonly MonoTouch.CoreMotion.CMMotionManager motionManager = new MonoTouch.CoreMotion.CMMotionManager();
+#if IOS
+        [CLSCompliant(false)]
+        protected static readonly CoreMotion.CMMotionManager motionManager = new CoreMotion.CMMotionManager();
 #endif
         bool disposed;
 		private TimeSpan timeBetweenUpdates;
-		public TSensorReading CurrentValue { get; protected set; }
+	    private TSensorReading currentValue;
+        private SensorReadingEventArgs<TSensorReading> eventArgs = new SensorReadingEventArgs<TSensorReading>(default(TSensorReading));
+
+		public TSensorReading CurrentValue 
+        {
+            get { return currentValue; }
+		    protected set
+		    {
+		        currentValue = value;
+                if (this.CurrentValueChanged != null)
+                {
+                    eventArgs.SensorReading = value;
+                    this.CurrentValueChanged(this, eventArgs);
+                }
+		    }
+		}
 		public bool IsDataValid { get; protected set; }
 		public TimeSpan TimeBetweenUpdates
 		{
@@ -64,12 +80,6 @@ namespace Microsoft.Devices.Sensors
 		public abstract void Start();
 
 		public abstract void Stop();
-
-		protected void FireOnCurrentValueChanged(object sender, SensorReadingEventArgs<TSensorReading> sample)
-		{
-			if (this.CurrentValueChanged != null)
-				this.CurrentValueChanged(this, sample);
-		}
 	}
 }
 

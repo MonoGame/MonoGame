@@ -1,46 +1,14 @@
-﻿#region License
-/*
- Microsoft Public License (Ms-PL)
- MonoGame - Copyright © 2012 The MonoGame Team
- 
- All rights reserved.
- 
- This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
- accept the license, do not use the software.
- 
- 1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
- U.S. copyright law.
- 
- A "contribution" is the original software, or any additions or changes to the software.
- A "contributor" is any person that distributes its contribution under this license.
- "Licensed patents" are a contributor's patent claims that read directly on its contribution.
- 
- 2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
- 
- 3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
- your patent license from such contributor to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
- notices that are present in the software.
- (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
- a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
- code form, you may only do so under a license that complies with this license.
- (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
- or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
- permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
- purpose and non-infringement.
- */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Design;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -77,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Gets or sets the element at the specified index.
         /// </summary>
-        public T this[int index]
+        public new T this[int index]
         {
             get
             {
@@ -110,6 +78,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             items = new List<T>();
         }
 
+        static VertexChannel()
+        {
+            // Some platforms (such as Windows Store) don't support TypeConverter, which
+            // is normally referenced with an attribute on the target type. To keep them
+            // out of the main assembly, they are registered here before their use.
+
+            //TypeDescriptor.AddAttributes(typeof(Single), new TypeConverterAttribute(typeof(SingleTypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Vector2), new TypeConverterAttribute(typeof(Vector2TypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Vector3), new TypeConverterAttribute(typeof(Vector3TypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Vector4), new TypeConverterAttribute(typeof(Vector4TypeConverter)));
+            //TypeDescriptor.AddAttributes(typeof(IPackedVector), new TypeConverterAttribute(typeof(PackedVectorTypeConverter)));
+        }
+
         /// <summary>
         /// Determines whether the specified element is in the channel.
         /// </summary>
@@ -134,7 +115,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Gets an enumerator interface for reading channel content.
         /// </summary>
         /// <returns>Enumeration of the channel content.</returns>
-        public IEnumerator<T> GetEnumerator()
+        public new IEnumerator<T> GetEnumerator()
         {
             return items.GetEnumerator();
         }
@@ -152,7 +133,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Inserts the range of values from the enumerable into the channel.
         /// </summary>
-        /// <typeparam name="T">The type of the channel.</typeparam>
         /// <param name="index">The zero-based index at which the new elements should be inserted.</param>
         /// <param name="data">The data to insert into the channel.</param>
         internal override void InsertRange(int index, IEnumerable data)
@@ -173,6 +153,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The converted channel data.</returns>
         public override IEnumerable<TargetType> ReadConvertedContent<TargetType>()
         {
+            if (typeof(TargetType).IsAssignableFrom(typeof(T)))
+                return items.Cast<TargetType>();
+
+            return Convert<TargetType>(items);
+        }
+
+        private static IEnumerable<TargetType> Convert<TargetType>(IEnumerable<T> items)
+        {
             // The following formats are supported:
             // - Single
             // - Vector2 Structure
@@ -180,7 +168,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // - Vector4 Structure
             // - Any implementation of IPackedVector Interface.
 
-            throw new NotImplementedException();
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            if (!converter.CanConvertTo(typeof(TargetType)))
+            {
+                // If you got this exception, check out the static constructor above
+                // to make sure your type is registered.
+                throw new NotImplementedException(
+                    string.Format("TypeConverter for {0} -> {1} is not implemented.",
+                    typeof(T).Name, typeof(TargetType).Name));
+            }
+
+            foreach (var item in items)
+                yield return (TargetType)converter.ConvertTo(item, typeof(TargetType));
         }
 
         /// <summary>

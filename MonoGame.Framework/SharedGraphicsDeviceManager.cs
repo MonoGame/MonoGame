@@ -1,10 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-
-#if WINRT
 using Windows.UI.Xaml.Controls;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -15,10 +12,8 @@ namespace Microsoft.Xna.Framework
 
         static SharedGraphicsDeviceManager()
         {
-#if WINRT
             DefaultBackBufferWidth = 1024;
             DefaultBackBufferHeight = 768;
-#endif
         }
 
         private GameTimer _timer;
@@ -28,7 +23,6 @@ namespace Microsoft.Xna.Framework
             if (Current != null)
                 throw new InvalidOperationException("Only one device manager can be created per process!");
             
-#if WINRT
             GraphicsProfile = GraphicsProfile.HiDef;
 
             PreferredBackBufferFormat = SurfaceFormat.Color;
@@ -39,7 +33,7 @@ namespace Microsoft.Xna.Framework
             PresentationInterval = PresentInterval.One;
 
             SynchronizeWithVerticalRetrace = true;
-#endif
+
             Current = this;
         }
 
@@ -63,9 +57,13 @@ namespace Microsoft.Xna.Framework
 
         public bool SynchronizeWithVerticalRetrace { get; set; }
 
-#if WINRT
-        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
-#endif 
+#if WINDOWS_UAP
+		[CLSCompliant(false)]
+		public SwapChainPanel SwapChainPanel { get; set; }
+#else
+		[CLSCompliant(false)]
+        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
+#endif
 
         public event EventHandler<EventArgs> DeviceCreated;
 
@@ -80,22 +78,24 @@ namespace Microsoft.Xna.Framework
         public void ApplyChanges()
         {
             var createDevice = GraphicsDevice == null;
-            if (createDevice)
-                GraphicsDevice = new GraphicsDevice();
 
-            GraphicsDevice.PresentationParameters.BackBufferWidth = PreferredBackBufferWidth;
-            GraphicsDevice.PresentationParameters.BackBufferHeight = PreferredBackBufferHeight;
-            GraphicsDevice.PresentationParameters.BackBufferFormat = PreferredBackBufferFormat;
-            GraphicsDevice.PresentationParameters.DepthStencilFormat = PreferredDepthStencilFormat;
-            GraphicsDevice.PresentationParameters.MultiSampleCount = MultiSampleCount;
-            GraphicsDevice.PresentationParameters.PresentationInterval = PresentationInterval;
-            GraphicsDevice.PresentationParameters.IsFullScreen = false;
-            GraphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
+            var presentationParameters = createDevice ? new PresentationParameters() : GraphicsDevice.PresentationParameters;
+            presentationParameters.BackBufferWidth = PreferredBackBufferWidth;
+            presentationParameters.BackBufferHeight = PreferredBackBufferHeight;
+            presentationParameters.BackBufferFormat = PreferredBackBufferFormat;
+            presentationParameters.DepthStencilFormat = PreferredDepthStencilFormat;
+            presentationParameters.MultiSampleCount = MultiSampleCount;
+            presentationParameters.PresentationInterval = PresentationInterval;
+            presentationParameters.IsFullScreen = false;
+#if WINDOWS_UAP
+			presentationParameters.SwapChainPanel = this.SwapChainPanel;
+#else
+			presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
+#endif
 
             if (createDevice)
             {
-                GraphicsDevice.GraphicsProfile = GraphicsProfile;
-                GraphicsDevice.Initialize();
+                GraphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, presentationParameters);
             }
             else
             {

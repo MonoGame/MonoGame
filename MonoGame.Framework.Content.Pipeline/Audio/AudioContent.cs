@@ -1,105 +1,104 @@
-﻿#region License
-/*
- Microsoft Public License (Ms-PL)
- MonoGame - Copyright © 2012 The MonoGame Team
- 
- All rights reserved.
- 
- This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
- accept the license, do not use the software.
- 
- 1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
- U.S. copyright law.
- 
- A "contribution" is the original software, or any additions or changes to the software.
- A "contributor" is any person that distributes its contribution under this license.
- "Licensed patents" are a contributor's patent claims that read directly on its contribution.
- 
- 2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
- 
- 3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
- your patent license from such contributor to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
- notices that are present in the software.
- (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
- a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
- code form, you may only do so under a license that complies with this license.
- (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
- or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
- permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
- purpose and non-infringement.
- */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
     /// <summary>
-    /// Encapsulates and provides operations, such as format conversions, on the source audio. This type is produced by the audio importers and used by audio processors to produce compiled audio assets.
+    /// Encapsulates and provides operations, such as format conversions, on the 
+    /// source audio. This type is produced by the audio importers and used by audio
+    /// processors to produce compiled audio assets.
     /// </summary>
+    /// <remarks>Note that AudioContent can load and process audio files that are not supported by the importers.</remarks>
     public class AudioContent : ContentItem, IDisposable
     {
-        List<byte> data;
-        TimeSpan duration;
-        string fileName;
-        AudioFileType fileType;
-        AudioFormat format;
-        int loopLength;
-        int loopStart;
-        bool disposed;
+        private bool _disposed;
+        private readonly string _fileName;
+        private readonly AudioFileType _fileType;
+        private ReadOnlyCollection<byte> _data;
+        private TimeSpan _duration;
+        private AudioFormat _format;
+        private int _loopStart;
+        private int _loopLength;
 
         /// <summary>
-        /// Gets the raw audio data.
+        /// The name of the original source audio file.
         /// </summary>
-        /// <value>If unprocessed, the source data; otherwise, the processed data.</value>
-        public ReadOnlyCollection<byte> Data { get { return data.AsReadOnly(); } }
+        [ContentSerializer(AllowNull = false)]
+        public string FileName { get { return _fileName; } }
 
         /// <summary>
-        /// Gets the duration (in milliseconds) of the audio data.
+        /// The type of the original source audio file.
         /// </summary>
-        /// <value>Duration of the audio data.</value>
-        public TimeSpan Duration { get { return duration; } }
+        public AudioFileType FileType { get { return _fileType; } }
 
         /// <summary>
-        /// Gets the file name containing the audio data.
+        /// The current raw audio data without header information.
         /// </summary>
-        /// <value>The name of the file containing this data.</value>
-        [ContentSerializerAttribute]
-        public string FileName { get { return fileName; } }
+        /// <remarks>
+        /// This changes from the source data to the output data after conversion.
+        /// For MP3 and WMA files this throws an exception to match XNA behavior.
+        /// </remarks>
+        public ReadOnlyCollection<byte> Data 
+        {
+            get
+            {
+                if (_disposed || _data == null)                
+                    throw new InvalidContentException("Could not read the audio data from file \"" + Path.GetFileName(_fileName) + "\".");
+                return _data;
+            }
+        }
 
         /// <summary>
-        /// Gets the AudioFileType of this audio source.
+        /// The duration of the audio data.
         /// </summary>
-        /// <value>The AudioFileType of this audio source.</value>
-        public AudioFileType FileType { get { return fileType; } }
+        public TimeSpan Duration
+        {
+            get
+            {
+                return _duration;
+            }
+        }
 
         /// <summary>
-        /// Gets the AudioFormat of this audio source.
+        /// The current format of the audio data.
         /// </summary>
-        /// <value>The AudioFormat of this audio source.</value>
-        public AudioFormat Format { get { return format; } }
+        /// <remarks>This changes from the source format to the output format after conversion.</remarks>
+        public AudioFormat Format
+        {
+            get
+            {
+                return _format;
+            }
+        }
 
         /// <summary>
-        /// Gets the loop length, in samples.
+        /// The current loop length in samples.
         /// </summary>
-        /// <value>The number of samples in the loop.</value>
-        public int LoopLength { get { return loopLength; } }
+        /// <remarks>This changes from the source loop length to the output loop length after conversion.</remarks>
+        public int LoopLength
+        {
+            get
+            {
+                return _loopLength;
+            } 
+        }
 
         /// <summary>
-        /// Gets the loop start, in samples.
+        /// The current loop start location in samples.
         /// </summary>
-        /// <value>The number of samples to the start of the loop.</value>
-        public int LoopStart { get { return loopStart; } }
+        /// <remarks>This changes from the source loop start to the output loop start after conversion.</remarks>
+        public int LoopStart
+        {
+            get
+            {
+                return _loopStart;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of AudioContent.
@@ -109,55 +108,81 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <remarks>Constructs the object from the specified source file, in the format specified.</remarks>
         public AudioContent(string audioFileName, AudioFileType audioFileType)
         {
-            throw new NotImplementedException();
-        }
+            _fileName = audioFileName;
 
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before garbage collection reclaims the object.
-        /// </summary>
-        ~AudioContent()
-        {
-            Dispose(false);
+            try
+            {
+                // Get the full path to the file.
+                audioFileName = Path.GetFullPath(audioFileName);
+
+                // Use probe to get the details of the file.
+                DefaultAudioProfile.ProbeFormat(audioFileName, out _fileType, out _format, out _duration, out _loopStart, out _loopLength);
+
+                // Looks like XNA only cares about type mismatch when
+                // the type is WAV... else it is ok.
+                if (    (audioFileType == AudioFileType.Wav || _fileType == AudioFileType.Wav) &&
+                        audioFileType != _fileType)
+                    throw new ArgumentException("Incorrect file type!", "audioFileType");
+
+                // Only provide the data for WAV files.
+                if (audioFileType == AudioFileType.Wav)
+                {
+                    byte[] rawData;
+
+                    // Must be opened in read mode otherwise it fails to open
+                    // read-only files (found in some source control systems)
+                    using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
+                    {
+                        rawData = new byte[fs.Length];
+                        fs.Read(rawData, 0, rawData.Length);
+                    }
+
+                    var stripped = DefaultAudioProfile.StripRiffWaveHeader(rawData);
+                    _data = Array.AsReadOnly(stripped);
+                }
+            }
+            catch (Exception ex)
+            {
+                var message = string.Format("Failed to open file {0}. Ensure the file is a valid audio file and is not DRM protected.", Path.GetFileNameWithoutExtension(audioFileName));
+                throw new InvalidContentException(message, ex);
+            }
         }
 
         /// <summary>
         /// Transcodes the source audio to the target format and quality.
         /// </summary>
-        /// <param name="formatType">Format of the processed source audio: WAV, MP3 or WMA.</param>
-        /// <param name="quality">Quality of the processed source audio. It can be one of the following: Low (96 kbps), Medium (128 kbps), Best (192 kbps)</param>
-        /// <param name="targetFileName">Name of the file containing the processed source audio.</param>
-        public void ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string targetFileName)
+        /// <param name="formatType">Format to convert this audio to.</param>
+        /// <param name="quality">Quality of the processed output audio. For streaming formats, it can be one of the following: Low (96 kbps), Medium (128 kbps), Best (192 kbps).  For WAV formats, it can be one of the following: Low (11kHz ADPCM), Medium (22kHz ADPCM), Best (44kHz PCM)</param>
+        /// <param name="saveToFile">
+        /// The name of the file that the converted audio should be saved into.  This is used for SongContent, where
+        /// the audio is stored external to the XNB file.  If this is null, then the converted audio is stored in
+        /// the Data property.
+        /// </param>
+        [Obsolete("You should prefer to use AudioProfile.")]
+        public void ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string saveToFile)
         {
-            if (disposed)
-                throw new ObjectDisposedException("AudioContent");
-
-            throw new NotImplementedException();
+            // Call the legacy conversion code.
+            DefaultAudioProfile.ConvertToFormat(this, formatType, quality, saveToFile);
         }
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        public void SetData(byte[] data, AudioFormat format, TimeSpan duration, int loopStart, int loopLength)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (format == null)
+                throw new ArgumentNullException("format");
+
+            _data = Array.AsReadOnly(data);
+            _format = format;
+            _duration = duration;
+            _loopStart = loopStart;
+            _loopLength = loopLength;
+        }
+
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
-        /// <param name="disposing">True if disposing of the unmanaged resources</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    // Release unmanaged resources
-                    // ...
-                }
-                disposed = true;
-            }
+            _disposed = true;
+            _data = null;
         }
     }
 }

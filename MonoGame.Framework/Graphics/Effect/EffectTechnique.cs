@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
 
             // Clone the mutable types.
-            Passes = new EffectPassCollection(effect, cloneSource.Passes);
+            Passes = cloneSource.Passes.Clone(effect);
         }
 
         internal EffectTechnique(Effect effect, string name, EffectPassCollection passes, EffectAnnotationCollection annotations)

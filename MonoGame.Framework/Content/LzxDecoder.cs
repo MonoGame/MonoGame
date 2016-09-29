@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	using System.IO;
 	
-	public class LzxDecoder
+	class LzxDecoder
 	{
 		public static uint[] position_base = null;
 		public static byte[] extra_bits = null;
@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Content
 				     * remaining - in this boundary case they aren't really part of
 				     * the compressed data)
 					 */
-					Debug.WriteLine("WTF");
+					//Debug.WriteLine("WTF");
 
 					if(inData.Position > (startpos+inLen+2) || bitbuf.GetBitsLeft() < 16) return -1; //TODO throw proper exception
 				}
@@ -481,15 +481,12 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					int dataend = outLen - 10;
 					uint curpos = (uint)m_state.intel_curpos;
-					uint filesize = (uint)m_state.intel_filesize;
-					//uint abs_off, rel_off;
 					
 					m_state.intel_curpos = (int)curpos + outLen;
 					
 					while(outData.Position < dataend)
 					{
 						if(outData.ReadByte() != 0xE8) { curpos++; continue; }
-						//abs_off = 
 					}
 				}
 				return -1;
@@ -672,7 +669,7 @@ namespace Microsoft.Xna.Framework.Content
 				while(bitsleft < bits) {
 					int lo = (byte)byteStream.ReadByte();
 					int hi = (byte)byteStream.ReadByte();
-					int amount2shift = sizeof(uint)*8 - 16 - bitsleft;
+                    //int amount2shift = sizeof(uint)*8 - 16 - bitsleft;
 					buffer |= (uint)(((hi << 8) | lo) << (sizeof(uint)*8 - 16 - bitsleft));
 					bitsleft += 16;
 				}
@@ -749,7 +746,7 @@ namespace Microsoft.Xna.Framework.Content
 	}
 	
 	/* CONSTANTS */
-	public struct LzxConstants {
+	struct LzxConstants {
 		public const ushort MIN_MATCH =				2;
 		public const ushort MAX_MATCH =				257;
 		public const ushort NUM_CHARS =				256;
@@ -777,7 +774,7 @@ namespace Microsoft.Xna.Framework.Content
 	}
 	
 	/* EXCEPTIONS */
-	public class UnsupportedWindowSizeRange : Exception
+	class UnsupportedWindowSizeRange : Exception
 	{
 	}
 }

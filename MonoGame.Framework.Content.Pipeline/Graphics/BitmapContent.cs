@@ -1,42 +1,6 @@
-﻿#region License
-/*
- Microsoft Public License (Ms-PL)
- MonoGame - Copyright © 2012 The MonoGame Team
- 
- All rights reserved.
- 
- This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
- accept the license, do not use the software.
- 
- 1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
- U.S. copyright law.
- 
- A "contribution" is the original software, or any additions or changes to the software.
- A "contributor" is any person that distributes its contribution under this license.
- "Licensed patents" are a contributor's patent claims that read directly on its contribution.
- 
- 2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
- 
- 3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
- your patent license from such contributor to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
- notices that are present in the software.
- (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
- a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
- code form, you may only do so under a license that complies with this license.
- (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
- or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
- permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
- purpose and non-infringement.
- */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
@@ -60,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 return height;
             }
-            set
+            protected set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException("height");
@@ -77,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 return width;
             }
-            set
+            protected set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException("width");
@@ -116,7 +80,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 throw new ArgumentNullException("sourceBitmap");
             if (destinationBitmap == null)
                 throw new ArgumentNullException("destinationBitmap");
-            Copy(sourceBitmap, new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), destinationBitmap, new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height));
+
+            var sourceRegion = new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height);
+            var destinationRegion = new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height);
+
+            Copy(sourceBitmap, sourceRegion, destinationBitmap, destinationRegion);
         }
 
         /// <summary>
@@ -130,7 +98,43 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void Copy(BitmapContent sourceBitmap, Rectangle sourceRegion, BitmapContent destinationBitmap, Rectangle destinationRegion)
         {
             ValidateCopyArguments(sourceBitmap, sourceRegion, destinationBitmap, destinationRegion);
-            throw new NotImplementedException();
+
+            SurfaceFormat sourceFormat;
+            if (!sourceBitmap.TryGetFormat(out sourceFormat))
+                throw new InvalidOperationException("Could not retrieve surface format of source bitmap");
+            SurfaceFormat destinationFormat;
+            if (!destinationBitmap.TryGetFormat(out destinationFormat))
+                throw new InvalidOperationException("Could not retrieve surface format of destination bitmap");
+
+            // If the formats are the same and the regions are the full bounds of the bitmaps and they are the same size, do a simpler copy
+            if (sourceFormat == destinationFormat && sourceRegion == destinationRegion
+                && sourceRegion == new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height)
+                && destinationRegion == new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height))
+            {
+                destinationBitmap.SetPixelData(sourceBitmap.GetPixelData());
+                return;
+            }
+
+            // The basic process is
+            // 1. Copy from source bitmap region to a new PixelBitmapContent<Vector4> using sourceBitmap.TryCopyTo()
+            // 2. If source and destination regions are a different size, resize Vector4 version
+            // 3. Copy from Vector4 to destination region using destinationBitmap.TryCopyFrom()
+
+            // Copy from the source to the intermediate Vector4 format
+            var intermediate = new PixelBitmapContent<Vector4>(sourceRegion.Width, sourceRegion.Height);
+            var intermediateRegion = new Rectangle(0, 0, intermediate.Width, intermediate.Height);
+            if (sourceBitmap.TryCopyTo(intermediate, sourceRegion, intermediateRegion))
+            {
+                // Resize the intermediate if required
+                if (intermediate.Width != destinationRegion.Width || intermediate.Height != destinationRegion.Height)
+                    intermediate = intermediate.Resize(destinationRegion.Width, destinationRegion.Height) as PixelBitmapContent<Vector4>;
+                // Copy from the intermediate to the destination
+                if (destinationBitmap.TryCopyFrom(intermediate, new Rectangle(0, 0, intermediate.Width, intermediate.Height), destinationRegion))
+                    return;
+            }
+
+            // If we got here, one of the above steps didn't work
+            throw new InvalidOperationException("Could not copy between " + sourceFormat + " and " + destinationFormat);
         }
 
         /// <summary>
@@ -151,8 +155,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Description of the bitmap.</returns>
         public override string ToString()
         {
-            // See what Microsoft's implementation returns
-            throw new NotImplementedException();
+            return string.Format("{0}, {1}x{2}", GetType().Name, Width, Height);
         }
 
         /// <summary>

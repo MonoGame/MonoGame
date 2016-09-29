@@ -64,14 +64,15 @@ namespace Microsoft.Xna.Framework.GamerServices
             GC.SuppressFinalize(this);
 		}
 
-        protected void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
-
         }
 
 	    #endregion
 
 	#region Properties
+
+        /*
 		public Texture2D GamerPicture {
 			get {
 				throw new NotImplementedException ();
@@ -125,6 +126,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 				throw new NotImplementedException ();
 			}
 		}
+        */
+
 	#endregion
 	}
 }

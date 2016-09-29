@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections;
@@ -8,7 +12,7 @@ using System.Reflection;
 using System.ComponentModel;
 
 
-namespace Utilities
+namespace TwoMGFX
 {
     // Reusable, reflection based helper for parsing commandline options.
     //
@@ -34,14 +38,15 @@ namespace Utilities
             // Reflect to find what commandline options are available.
             foreach (var field in optionsObject.GetType().GetFields())
             {
-                var fieldName = GetOptionName(field);
+                String description;
+                var fieldName = GetOptionNameAndDescription(field, out description);
 
                 if (GetAttribute<RequiredAttribute>(field) != null)
                 {
                     // Record a required option.
                     _requiredOptions.Enqueue(field);
 
-                    _requiredUsageHelp.Add(string.Format("<{0}>", fieldName));
+                    _requiredUsageHelp.Add(string.Format("<{0}> {1}", fieldName, description));
                 }
                 else
                 {
@@ -49,9 +54,9 @@ namespace Utilities
                     _optionalOptions.Add(fieldName.ToLowerInvariant(), field);
 
                     if (field.FieldType == typeof(bool))
-                        _optionalUsageHelp.Add(string.Format("/{0}", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0} {1}", fieldName, description));
                     else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0}:value {1}", fieldName, description));
                 }
             }
         }
@@ -181,11 +186,26 @@ namespace Utilities
         static string GetOptionName(FieldInfo field)
         {
             var nameAttribute = GetAttribute<NameAttribute>(field);
-
             if (nameAttribute != null)
                 return nameAttribute.Name;
             else
                 return field.Name;
+        }
+
+        static string GetOptionNameAndDescription(FieldInfo field, out String description)
+        {
+            var nameAttribute = GetAttribute<NameAttribute>(field);
+
+            if (nameAttribute != null)
+            {
+                description = nameAttribute.Description;
+                return nameAttribute.Name;
+            }
+            else
+            {
+                description = null;
+                return field.Name;
+            }
         }
 
         public string Title { get; set; }
@@ -228,14 +248,33 @@ namespace Utilities
 
         // Used on an optionsObject field to rename the corresponding commandline option.
         [AttributeUsage(AttributeTargets.Field)]
-        public sealed class NameAttribute : Attribute
+        public class NameAttribute : Attribute
         {
             public NameAttribute(string name)
             {
                 Name = name;
+                Description = null;
+            }
+
+            public NameAttribute(string name, string description)
+            {
+                Name = name;
+                Description = description;
             }
 
             public string Name { get; private set; }
+            public string Description { get; protected set; }
+        }
+
+        [AttributeUsage(AttributeTargets.Field)]
+        public sealed class ProfileNameAttribute : NameAttribute
+        {
+            public ProfileNameAttribute()
+                : base("Profile")
+            {
+                var names = ShaderProfile.All.Select(p => p.Name);
+                Description = "\t - Must be one of the following: " + string.Join(", ", names);                               
+            }
         }
     }
 }

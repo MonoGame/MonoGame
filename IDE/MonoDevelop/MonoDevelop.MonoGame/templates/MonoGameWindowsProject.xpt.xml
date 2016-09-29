@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Application (DirectX)</_Name>
+		<Category>monogame/app/games</Category>
+		<Icon>monogame-project</Icon>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a new C# MonoGame Windows Application. This application will use the DirectX backend.</_Description>	   
+	</TemplateConfiguration>
+	
+	<Actions>
+		<Open filename = "Game1.cs"/>
+	</Actions>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = ".">
+			<Options />
+			<References>
+				<Reference type="Gac" refto="System" />
+				<Reference type="Gac" refto="System.Xml" />
+				<Reference type="Gac" refto="System.Core" />
+				<Reference type="Package" refto="MonoGame.Framework" />
+			</References>
+			<Files>
+				<File name="Game1.cs" src="Common/Game1.cs" />
+				<File name="Program.cs" src="Common/Program.cs" />
+				<File name="app.manifest" src="Common/app.manifest />
+				<RawFile name="Icon.png" src="Common/Icon-md.png" />
+				<Directory name="Properties">
+					<File name="AssemblyInfo.cs" src="Common/AssemblyInfo.cs" />
+				</Directory>
+				<Directory name="Content">
+					<File name="Content.mgcb" src="Common/Content.mgcb" BuildAction="MonoGameContentReference" />
+				</Directory>
+			</Files>
+		</Project>
+	</Combine>
+</Template>

@@ -2,8 +2,8 @@ using System;
 
 using Microsoft.Xna.Framework;
 
-using MonoTouch.CoreMotion;
-using MonoTouch.Foundation;
+using CoreMotion;
+using Foundation;
 
 namespace Microsoft.Devices.Sensors
 {
@@ -84,12 +84,11 @@ namespace Microsoft.Devices.Sensors
             if (this.IsDataValid)
             {
                 this.IsDataValid = true;
-                reading.Acceleration = new Vector3((float)motionManager.AccelerometerData.Acceleration.X, (float)motionManager.AccelerometerData.Acceleration.Y, (float)motionManager.AccelerometerData.Acceleration.Z);
-                reading.Timestamp = DateTime.Now;
+                reading.Acceleration = new Vector3((float)data.Acceleration.X, (float)data.Acceleration.Y, (float)data.Acceleration.Z);
+                reading.Timestamp = DateTime.UtcNow;
                 this.CurrentValue = reading;
                 this.IsDataValid = error == null;
             }
-            FireOnCurrentValueChanged(this, new SensorReadingEventArgs<AccelerometerReading>(reading));
 		}
 
 		private void UpdateInterval(object sender, EventArgs args)

@@ -1,46 +1,12 @@
-﻿#region License
-/*
- Microsoft Public License (Ms-PL)
- MonoGame - Copyright © 2012 The MonoGame Team
- 
- All rights reserved.
- 
- This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
- accept the license, do not use the software.
- 
- 1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
- U.S. copyright law.
- 
- A "contribution" is the original software, or any additions or changes to the software.
- A "contributor" is any person that distributes its contribution under this license.
- "Licensed patents" are a contributor's patent claims that read directly on its contribution.
- 
- 2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
- 
- 3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
- your patent license from such contributor to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
- notices that are present in the software.
- (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
- a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
- code form, you may only do so under a license that complies with this license.
- (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
- or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
- permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
- purpose and non-infringement.
- */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -80,14 +46,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Number of vertices for the content.
         /// </summary>
         /// <value>Number of vertices.</value>
-        public int VertexCount { get { return positions.Count; } }
+        public int VertexCount { get { return positionIndices.Count; } }
 
         /// <summary>
         /// Constructs a VertexContent instance.
         /// </summary>
-        internal VertexContent()
+        internal VertexContent(GeometryContent geom)
         {
-
+            positionIndices = new VertexChannel<int>("PositionIndices");
+            positions = new IndirectPositionCollection(geom, positionIndices);
+            channels = new VertexChannelCollection(this);
         }
 
         /// <summary>
@@ -98,7 +66,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Index of the new entry. This can be added to the Indices member of the parent.</returns>
         public int Add(int positionIndex)
         {
-            throw new NotImplementedException();
+            return positionIndices.Items.Add(positionIndex);
         }
 
         /// <summary>
@@ -108,7 +76,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="positionIndexCollection">Index into the Positions member of the parent.</param>
         public void AddRange(IEnumerable<int> positionIndexCollection)
         {
-            throw new NotImplementedException();
+            positionIndices.InsertRange(positionIndices.Items.Count, positionIndexCollection);
         }
 
         /// <summary>
@@ -118,7 +86,90 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <exception cref="InvalidContentException">One or more of the vertex channel types are invalid or an unrecognized name was passed to VertexElementUsage.</exception>
         public VertexBufferContent CreateVertexBuffer()
         {
-            throw new NotImplementedException();
+            var vertexBuffer = new VertexBufferContent(positions.Count);
+            var stride = SetupVertexDeclaration(vertexBuffer);
+
+            // TODO: Verify enough elements in channels to match positions?
+
+            // Write out data in an interleaved fashion each channel at a time, for example:
+            //    |------------------------------------------------------------|
+            //    |POSITION[0] | NORMAL[0]  |TEX0[0] | POSITION[1]| NORMAL[1]  |
+            //    |-----------------------------------------------|------------|
+            // #0 |111111111111|____________|________|111111111111|____________|
+            // #1 |111111111111|111111111111|________|111111111111|111111111111|
+            // #2 |111111111111|111111111111|11111111|111111111111|111111111111|
+
+            // #0: Write position vertices using stride to skip over the other channels:
+            vertexBuffer.Write(0, stride, positions);
+
+            var channelOffset = VertexBufferContent.SizeOf(typeof(Vector3));
+            foreach (var channel in Channels)
+            {
+                // #N: Fill in the channel within each vertex
+                var channelType = channel.ElementType;
+                vertexBuffer.Write(channelOffset, stride, channelType, channel);
+                channelOffset += VertexBufferContent.SizeOf(channelType);
+            }
+
+            return vertexBuffer;
+        }
+
+        private int SetupVertexDeclaration(VertexBufferContent result)
+        {
+            var offset = 0;
+
+            // We always have a position channel
+            result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, VertexElementFormat.Vector3,
+                                                                           VertexElementUsage.Position, 0));
+            offset += VertexElementFormat.Vector3.GetSize();
+
+            // Optional channels
+            foreach (var channel in Channels)
+            {
+                VertexElementFormat format;
+                VertexElementUsage usage;
+
+                // Try to determine the vertex format
+                if (channel.ElementType == typeof(Single))
+                    format = VertexElementFormat.Single;
+                else if (channel.ElementType == typeof(Vector2))
+                    format = VertexElementFormat.Vector2;
+                else if (channel.ElementType == typeof(Vector3))
+                    format = VertexElementFormat.Vector3;
+                else if (channel.ElementType == typeof(Vector4))
+                    format = VertexElementFormat.Vector4;
+                else if (channel.ElementType == typeof(Color))
+                    format = VertexElementFormat.Color;
+                else if (channel.ElementType == typeof(Byte4))
+                    format = VertexElementFormat.Byte4;
+                else if (channel.ElementType == typeof(Short2))
+                    format = VertexElementFormat.Short2;
+                else if (channel.ElementType == typeof(Short4))
+                    format = VertexElementFormat.Short4;
+                else if (channel.ElementType == typeof(NormalizedShort2))
+                    format = VertexElementFormat.NormalizedShort2;
+                else if (channel.ElementType == typeof(NormalizedShort4))
+                    format = VertexElementFormat.NormalizedShort4;
+                else if (channel.ElementType == typeof(HalfVector2))
+                    format = VertexElementFormat.HalfVector2;
+                else if (channel.ElementType == typeof(HalfVector4))
+                    format = VertexElementFormat.HalfVector4;
+                else
+                    throw new InvalidContentException(string.Format("Unrecognized vertex content type: '{0}'", channel.ElementType));
+
+                // Try to determine the vertex usage
+                if (!VertexChannelNames.TryDecodeUsage(channel.Name, out usage))
+                    throw new InvalidContentException(string.Format("Unknown vertex element usage for channel '{0}'", channel.Name));
+
+                // Try getting the usage index
+                var usageIndex = VertexChannelNames.DecodeUsageIndex(channel.Name);
+
+                result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, format, usage, usageIndex));
+                offset += format.GetSize();
+            }
+
+            result.VertexDeclaration.VertexStride = offset;
+            return offset;
         }
 
         /// <summary>
@@ -129,7 +180,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="positionIndex">Position of new vertex index in the collection.</param>
         public void Insert(int index, int positionIndex)
         {
-            throw new NotImplementedException();
+            positionIndices.Items.Insert(index, positionIndex);
         }
 
         /// <summary>
@@ -140,26 +191,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="positionIndexCollection">Position of the first element of the inserted range in the collection.</param>
         public void InsertRange(int index, IEnumerable<int> positionIndexCollection)
         {
-            throw new NotImplementedException();
+            positionIndices.InsertRange(index, positionIndexCollection);
         }
 
         /// <summary>
-        /// Removes a vertex index from the specified location in both PositionIndices and VertexChannel<T>.
+        /// Removes a vertex index from the specified location in both PositionIndices and VertexChannel&lt;T&gt;.
         /// </summary>
         /// <param name="index">Index of the vertex to be removed.</param>
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            positionIndices.Items.RemoveAt(index);
+
+            foreach (var channel in channels)
+                channel.Items.RemoveAt(index);
         }
 
         /// <summary>
-        /// Removes a range of vertex indices from the specified location in both PositionIndices and VertexChannel<T>.
+        /// Removes a range of vertex indices from the specified location in both PositionIndices and VertexChannel&lt;T&gt;.
         /// </summary>
         /// <param name="index">Index of the first vertex index to be removed.</param>
         /// <param name="count">Number of indices to remove.</param>
         public void RemoveRange(int index, int count)
         {
-            throw new NotImplementedException();
+            for (var i = index; i < index + count; i++)
+                RemoveAt(i);
         }
     }
 }

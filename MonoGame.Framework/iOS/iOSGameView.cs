@@ -64,16 +64,19 @@ change. To the extent permitted under your local laws, the contributors exclude
 the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
+
+
 #endregion License
 
 using System;
 using System.Drawing;
 
-using MonoTouch.CoreAnimation;
-using MonoTouch.Foundation;
-using MonoTouch.ObjCRuntime;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
+using CoreAnimation;
+using Foundation;
+using ObjCRuntime;
+using OpenGLES;
+using UIKit;
+using CoreGraphics;
 
 using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
@@ -82,19 +85,17 @@ using OpenTK.Platform.iPhoneOS;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-using All = OpenTK.Graphics.ES20.All;
-
 namespace Microsoft.Xna.Framework {
+
+    [Register("iOSGameView")]
 	partial class iOSGameView : UIView {
 		private readonly iOSGamePlatform _platform;
 		private int _colorbuffer;
 		private int _depthbuffer;
 		private int _framebuffer;
 
-        public bool PreserveFrameBuffer = false;
-
 		#region Construction/Destruction
-		public iOSGameView (iOSGamePlatform platform, RectangleF frame)
+		public iOSGameView (iOSGamePlatform platform, CGRect frame)
 			: base(frame)
 		{
 			if (platform == null)
@@ -105,7 +106,9 @@ namespace Microsoft.Xna.Framework {
 
 		private void Initialize ()
 		{
+            #if !TVOS
 			MultipleTouchEnabled = true;
+            #endif
 			Opaque = true;
 		}
 
@@ -156,9 +159,12 @@ namespace Microsoft.Xna.Framework {
 		{
 			AssertNotDisposed ();
 
+            // RetainedBacking controls if the content of the colorbuffer should be preserved after being displayed
+            // This is the XNA equivalent to set PreserveContent when initializing the GraphicsDevice
+            // (should be false by default for better performance)
 			Layer.DrawableProperties = NSDictionary.FromObjectsAndKeys (
 				new NSObject [] {
-					NSNumber.FromBoolean (true),
+					NSNumber.FromBoolean (false), 
 					EAGLColorFormat.RGBA8
 				},
 				new NSObject [] {
@@ -180,7 +186,7 @@ namespace Microsoft.Xna.Framework {
 				_glapi = new Gles11Api ();
 			}
 
-			__renderbuffergraphicsContext.MakeCurrent (null);
+			this.MakeCurrent();
 		}
 
 		private void DestroyContext ()
@@ -193,39 +199,51 @@ namespace Microsoft.Xna.Framework {
 			_glapi = null;
 		}
 
+        [Export("doTick")]
+        void DoTick()
+        {
+            _platform.Tick();
+        }
+
 		private void CreateFramebuffer ()
 		{
-			AssertNotDisposed ();
-			AssertValidContext ();
-
-            if (PreserveFrameBuffer)
-                return;
-
-			__renderbuffergraphicsContext.MakeCurrent (null);
+			this.MakeCurrent();
 			
 			// HACK:  GraphicsDevice itself should be calling
 			//        glViewport, so we shouldn't need to do it
 			//        here and then force the state into
 			//        GraphicsDevice.  However, that change is a
 			//        ways off, yet.
-			int unscaledViewportHeight = (int) Math.Round (Layer.Bounds.Size.Height);
-			int unscaledViewportWidth = (int) Math.Round (Layer.Bounds.Size.Width);
+            int viewportHeight = (int)Math.Round(Layer.Bounds.Size.Height * Layer.ContentsScale);
+            int viewportWidth = (int)Math.Round(Layer.Bounds.Size.Width * Layer.ContentsScale);
 
-			int previousRenderbuffer = 0;
-			_glapi.GetInteger (All.RenderbufferBinding, ref previousRenderbuffer);
-			
 			_glapi.GenFramebuffers (1, ref _framebuffer);
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
-			
-			// Create our Depth buffer. Color buffer must be the last one bound
-			GL.GenRenderbuffers(1, ref _depthbuffer);
-			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
-			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, unscaledViewportWidth * (int)Layer.ContentsScale, unscaledViewportHeight * (int)Layer.ContentsScale );
-			
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
 
-			_glapi.GenRenderbuffers (2, ref _colorbuffer);
-			_glapi.BindRenderbuffer (All.Renderbuffer, _colorbuffer);
+			// Create our Depth buffer. Color buffer must be the last one bound
+            var gdm = _platform.Game.Services.GetService(
+                typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
+            if (gdm != null)
+            {
+                var preferredDepthFormat = gdm.PreferredDepthStencilFormat;
+                if (preferredDepthFormat != DepthFormat.None)
+                {
+                    GL.GenRenderbuffers(1, out _depthbuffer);
+                    GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthbuffer);
+                    var internalFormat = All.DepthComponent16;
+                    if (preferredDepthFormat == DepthFormat.Depth24)
+                        internalFormat = All.DepthComponent24Oes;
+                    else if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
+                        internalFormat = All.Depth24Stencil8Oes;
+                    GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (RenderbufferInternalFormat)internalFormat, viewportWidth, viewportHeight);
+                    GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
+                    if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
+                        GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.StencilAttachment, RenderbufferTarget.Renderbuffer, _depthbuffer);
+                }
+            }
+
+			_glapi.GenRenderbuffers(1, ref _colorbuffer);
+			_glapi.BindRenderbuffer(All.Renderbuffer, _colorbuffer);
 
 			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
 
@@ -235,44 +253,44 @@ namespace Microsoft.Xna.Framework {
 			//       claims to have failed.
 			ctx.EAGLContext.RenderBufferStorage ((uint) All.Renderbuffer, Layer);
 			
-			_glapi.FramebufferRenderbuffer ( All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
+			_glapi.FramebufferRenderbuffer (All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
 			
-			var status = GL.CheckFramebufferStatus (All.Framebuffer);
-			if (status != All.FramebufferComplete)
+			var status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+			if (status != FramebufferErrorCode.FramebufferComplete)
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
 
-			_glapi.Viewport (0, 0, unscaledViewportWidth, unscaledViewportHeight);
-			_glapi.Scissor (0, 0, unscaledViewportWidth, unscaledViewportHeight);
+			_glapi.Viewport(0, 0, viewportWidth, viewportHeight);
+            _glapi.Scissor(0, 0, viewportWidth, viewportHeight);
 
-			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
-				typeof (IGraphicsDeviceService));
+			var gds = _platform.Game.Services.GetService(
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
 			if (gds != null && gds.GraphicsDevice != null)
 			{
                 var pp = gds.GraphicsDevice.PresentationParameters;
-                int height = (int)(unscaledViewportHeight * Layer.ContentsScale);
-                int width = (int)(unscaledViewportWidth * Layer.ContentsScale);
+                int height = viewportHeight;
+                int width = viewportWidth;
 
                 if (this.NextResponder is iOSGameViewController)
                 {
-                    DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
-                    if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+                    var displayOrientation = _platform.Game.Window.CurrentOrientation;
+                    if (displayOrientation == DisplayOrientation.LandscapeLeft || displayOrientation == DisplayOrientation.LandscapeRight)
                     {
-                        height = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
-                        width = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                        height = Math.Min(viewportHeight, viewportWidth);
+                        width = Math.Max(viewportHeight, viewportWidth);
                     }
                     else
                     {
-                        height = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
-                        width = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                        height = Math.Max(viewportHeight, viewportWidth);
+                        width = Math.Min(viewportHeight, viewportWidth);
                     }
                 }
 
                 pp.BackBufferHeight = height;
                 pp.BackBufferWidth = width;
 
-				gds.GraphicsDevice.Viewport = new Viewport (
+				gds.GraphicsDevice.Viewport = new Viewport(
 					0, 0,
 					pp.BackBufferWidth,
 					pp.BackBufferHeight);
@@ -283,27 +301,15 @@ namespace Microsoft.Xna.Framework {
 			}
 
             if (Threading.BackgroundContext == null)
-                Threading.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(ctx.EAGLContext.API, ctx.EAGLContext.ShareGroup);
+                Threading.BackgroundContext = new OpenGLES.EAGLContext(ctx.EAGLContext.API, ctx.EAGLContext.ShareGroup);
 		}
 
 		private void DestroyFramebuffer ()
 		{
-            if (PreserveFrameBuffer)
-                return;
-
 			AssertNotDisposed ();
 			AssertValidContext ();
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
-
-			var ctx = ((IGraphicsContextInternal)__renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
-			// FIXME: MonoTouch needs to allow null arguments to
-			//        RenderBufferStorage, but it doesn't right now.
-			//        So we call it manually.
-			//ctx.EAGLContext.RenderBufferStorage((uint)All.Renderbuffer, null);
-			var selector = new Selector("renderbufferStorage:fromDrawable:");
-			Messaging.bool_objc_msgSend_UInt32_IntPtr(
-				ctx.EAGLContext.Handle, selector.Handle, (uint)All.Renderbuffer, IntPtr.Zero);
 
 			_glapi.DeleteFramebuffers (1, ref _framebuffer);
 			_framebuffer = 0;
@@ -311,48 +317,54 @@ namespace Microsoft.Xna.Framework {
 			_glapi.DeleteRenderbuffers (1, ref _colorbuffer);
 			_colorbuffer = 0;
 			
-			_glapi.DeleteRenderbuffers (1, ref _depthbuffer);
-			_depthbuffer = 0;
+            if (_depthbuffer != 0)
+            {
+			    _glapi.DeleteRenderbuffers (1, ref _depthbuffer);
+			    _depthbuffer = 0;
+            }
 		}
+
+        private static readonly All[] attachements = new All[] { All.DepthAttachment, All.StencilAttachment };
 
 		// FIXME: This logic belongs in GraphicsDevice.Present, not
 		//        here.  If it can someday be moved there, then the
 		//        normal call to Present in Game.Tick should cover
 		//        this.  For now, iOSGamePlatform will call Present
 		//        in the Draw/Update loop handler.
-		[Obsolete("Remove iOSGameView.Present once GraphicsDevice.Present fully expresses this")]
 		public void Present ()
 		{
-			AssertNotDisposed ();
-			AssertValidContext ();
+            AssertNotDisposed ();
+            AssertValidContext ();
 
-			__renderbuffergraphicsContext.MakeCurrent (null);
-
-			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
-			ctx.EAGLContext.PresentRenderBuffer ((uint) All.Renderbuffer);
+            this.MakeCurrent();
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this._colorbuffer);
+            GraphicsDevice.FramebufferHelper.GLDiscardFramebufferExt(All.Framebuffer, 2, attachements);
+            __renderbuffergraphicsContext.SwapBuffers();
 		}
 
-		// FIXME: This functionality belongs iMakeCurrentn GraphicsDevice.
-		[Obsolete("Move the functionality of iOSGameView.MakeCurrent into GraphicsDevice")]
+		// FIXME: This functionality belongs in GraphicsDevice.
 		public void MakeCurrent ()
 		{
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			__renderbuffergraphicsContext.MakeCurrent (null);
+            if (!__renderbuffergraphicsContext.IsCurrent)
+            {
+			    __renderbuffergraphicsContext.MakeCurrent (null);
+            }
 		}
 
 		public override void LayoutSubviews ()
 		{
 			base.LayoutSubviews ();
 
-            var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
-                typeof (IGraphicsDeviceService));
+            var gds = _platform.Game.Services.GetService (
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
             if (gds == null || gds.GraphicsDevice == null)
                 return;
 
-			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
+			if (_framebuffer != 0)
 				DestroyFramebuffer ();
 			if (__renderbuffergraphicsContext == null)
 				CreateContext();
@@ -361,25 +373,17 @@ namespace Microsoft.Xna.Framework {
 
 		#region UIWindow Notifications
 
-		public override void WillMoveToWindow (UIWindow window)
-		{
-			base.WillMoveToWindow (window);
-
-			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
-				DestroyFramebuffer();
-		}
-
 		[Export ("didMoveToWindow")]
 		public virtual void DidMoveToWindow ()
 		{
 
-			if (Window != null) {
-				
-				if (__renderbuffergraphicsContext == null)
-					CreateContext ();
-				if (_framebuffer * _colorbuffer * _depthbuffer == 0)
-					CreateFramebuffer ();
-			}
+            if (Window != null) {
+                
+                if (__renderbuffergraphicsContext == null)
+                    CreateContext ();
+                if (_framebuffer == 0)
+                    CreateFramebuffer ();
+            }
 		}
 
 		#endregion UIWindow Notifications

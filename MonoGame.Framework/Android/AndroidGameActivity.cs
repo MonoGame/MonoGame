@@ -1,26 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Android.App;
 using Android.Content;
-using Android.Hardware;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
-using Android.Widget;
-
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
+	[CLSCompliant(false)]
+#if OUYA
+    public class AndroidGameActivity : Ouya.Console.Api.OuyaActivity
+#else
     public class AndroidGameActivity : Activity
+#endif
     {
-        public static Game Game { get; set; }
-		
-		private OrientationListener o;		
-		private ScreenReceiver screenReceiver;
+        internal Game Game { private get; set; }
+
+        private ScreenReceiver screenReceiver;
+        private OrientationListener _orientationListener;
+
+        public bool AutoPauseAndResumeMediaPlayer = true;
+        public bool RenderOnUIThread = true; 
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
@@ -31,12 +34,8 @@ namespace Microsoft.Xna.Framework
 		/// </param>
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
-			base.OnCreate (savedInstanceState);
-			o = new OrientationListener(this);	
-			if (o.CanDetectOrientation())
-			{
-				o.Enable();				
-			}					
+            RequestWindowFeature(WindowFeatures.NoTitle);
+            base.OnCreate(savedInstanceState);
 
 			IntentFilter filter = new IntentFilter();
 		    filter.AddAction(Intent.ActionScreenOff);
@@ -46,14 +45,16 @@ namespace Microsoft.Xna.Framework
 		    screenReceiver = new ScreenReceiver();
 		    RegisterReceiver(screenReceiver, filter);
 
-            RequestWindowFeature(WindowFeatures.NoTitle);
+            _orientationListener = new OrientationListener(this);
+
+			Game.Activity = this;
 		}
 
         public static event EventHandler Paused;
 
 		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
 		{
-			// we need to refresh the viewport here.			
+			// we need to refresh the viewport here.
 			base.OnConfigurationChanged (newConfig);
 		}
 
@@ -63,6 +64,8 @@ namespace Microsoft.Xna.Framework
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
 
+            if (_orientationListener.CanDetectOrientation())
+                _orientationListener.Disable();
         }
 
         public static event EventHandler Resumed;
@@ -72,20 +75,31 @@ namespace Microsoft.Xna.Framework
             if (Resumed != null)
                 Resumed(this, EventArgs.Empty);
 
-            var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
-            if (deviceManager == null)
-                return;
-            (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
-            Game.Window.RequestFocus();
+            if (Game != null)
+            {
+                var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+                if (deviceManager == null)
+                    return;
+                ((GraphicsDeviceManager)deviceManager).ForceSetFullScreen();
+                ((AndroidGameWindow)Game.Window).GameView.RequestFocus();
+                if (_orientationListener.CanDetectOrientation())
+                    _orientationListener.Enable();
+            }
         }
 
 		protected override void OnDestroy ()
 		{
             UnregisterReceiver(screenReceiver);
+            ScreenReceiver.ScreenLocked = false;
+            _orientationListener = null;
+            if (Game != null)
+                Game.Dispose();
+            Game = null;
 			base.OnDestroy ();
 		}
     }
-	
+
+	[CLSCompliant(false)]
 	public static class ActivityExtensions
     {
         public static ActivityAttribute GetActivityAttribute(this AndroidGameActivity obj)

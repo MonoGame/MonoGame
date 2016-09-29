@@ -1,41 +1,35 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 namespace Microsoft.Xna.Framework
 {
-    using System;
-
+    /// <summary>
+    /// Defines how the <see cref="Curve"/> value is determined for position before first point or after the end point on the <see cref="Curve"/>.
+    /// </summary>
     public enum CurveLoopType
     {
+        /// <summary>
+        /// The value of <see cref="Curve"/> will be evaluated as first point for positions before the beginning and end point for positions after the end.
+        /// </summary>
         Constant,
+        /// <summary>
+        /// The positions will wrap around from the end to beginning of the <see cref="Curve"/> for determined the value.
+        /// </summary>
         Cycle,
+        /// <summary>
+        /// The positions will wrap around from the end to beginning of the <see cref="Curve"/>.
+        /// The value will be offset by the difference between the values of first and end <see cref="CurveKey"/> multiplied by the wrap amount.
+        /// If the position is before the beginning of the <see cref="Curve"/> the difference will be subtracted from its value; otherwise the difference will be added.
+        /// </summary>
         CycleOffset,
+        /// <summary>
+        /// The value at the end of the <see cref="Curve"/> act as an offset from the same side of the <see cref="Curve"/> toward the opposite side.
+        /// </summary>
         Oscillate,
+        /// <summary>
+        /// The linear interpolation will be performed for determined the value. 
+        /// </summary>
         Linear
     }
 }
-

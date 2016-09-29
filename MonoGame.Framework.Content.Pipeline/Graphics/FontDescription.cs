@@ -1,159 +1,156 @@
-﻿#region License
-/*
- Microsoft Public License (Ms-PL)
- MonoGame - Copyright © 2012 The MonoGame Team
- 
- All rights reserved.
- 
- This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
- accept the license, do not use the software.
- 
- 1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
- U.S. copyright law.
- 
- A "contribution" is the original software, or any additions or changes to the software.
- A "contributor" is any person that distributes its contribution under this license.
- "Licensed patents" are a contributor's patent claims that read directly on its contribution.
- 
- 2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
- 
- 3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
- your patent license from such contributor to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
- notices that are present in the software.
- (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
- a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
- code form, you may only do so under a license that complies with this license.
- (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
- or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
- permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
- purpose and non-infringement.
- */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    /// <summary>
-    /// Provides information to the FontDescriptionProcessor describing which font to rasterize, which font size to utilize, and which Unicode characters to include in the processor output.
-    /// </summary>
-    public class FontDescription : ContentItem
+    internal class CharacterCollection : ICollection<char>
     {
-        List<char> characters;
-        char? defaultCharacter;
-        string fontName;
-        float size;
-        float spacing;
-        FontDescriptionStyle style;
-        bool useKerning;
+        private List<char> _items;
 
-        /// <summary>
-        /// Gets the collection of characters provided by this FontDescription.
-        /// </summary>
-        [ContentSerializerIgnoreAttribute]
-        public ICollection<char> Characters
+        public CharacterCollection()
         {
-            get
-            {
-                return characters;
-            }
+            _items = new List<char>();
         }
 
-        /// <summary>
-        /// Gets or sets the default character for the font.
-        /// </summary>
-        [ContentSerializerAttribute]
-        public Nullable<char> DefaultCharacter
+        public CharacterCollection(IEnumerable<char> characters)
         {
-            get
-            {
-                return defaultCharacter;
-            }
-            set
-            {
-                defaultCharacter = value;
-            }
+            _items = new List<char>();
+            foreach (var c in characters)
+                Add(c);
         }
 
-        /// <summary>
-        /// Gets or sets the name of the font, such as "Times New Roman" or "Arial". This value cannot be null or empty.
-        /// </summary>
-        public string FontName
+        #region ICollection<char> Members
+
+        public void Add(char item)
         {
-            get
-            {
-                return fontName;
-            }
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                    throw new ArgumentNullException("FontName is null or an empty string.");
-                fontName = value;
-            }
+            if (!_items.Contains(item))
+                _items.Add(item);
         }
 
-        /// <summary>
-        /// Gets or sets the size, in points, of the font.
-        /// </summary>
-        public float Size
+        public void Clear()
         {
-            get
-            {
-                return size;
-            }
-            set
-            {
-                if (value <= 0.0f)
-                    throw new ArgumentOutOfRangeException("Size is less than or equal to zero. Specify a value for this property that is greater than zero.");
-                size = value;
-            }
+            _items.Clear();
         }
 
-        /// <summary>
-        /// Gets or sets the amount of space, in pixels, to insert between letters in a string.
-        /// </summary>
-        public float Spacing
+        public bool Contains(char item)
         {
-            get
-            {
-                return spacing;
-            }
-            set
-            {
-                if (value <= 0.0f)
-                    throw new ArgumentOutOfRangeException("Spacing is less than or equal to zero. Specify a value for this property that is greater than zero.");
-                spacing = value;
-            }
+            return _items.Contains(item);
         }
 
-        /// <summary>
-        /// Gets or sets the style of the font, expressed as a combination of one or more FontDescriptionStyle flags.
-        /// </summary>
-        public FontDescriptionStyle Style
+        public void CopyTo(char[] array, int arrayIndex)
         {
-            get
-            {
-                return style;
-            }
-            set
-            {
-                style = value;
-            }
+            _items.CopyTo(array, arrayIndex);
         }
+
+        public int Count
+        {
+            get { return _items.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public bool Remove(char item)
+        {
+            return _items.Remove(item);
+        }
+
+        #endregion
+
+        #region IEnumerable<char> Members
+
+        public IEnumerator<char> GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        #endregion
+    }
+
+	/// <summary>
+	/// Provides information to the FontDescriptionProcessor describing which font to rasterize, which font size to utilize, and which Unicode characters to include in the processor output.
+	/// </summary>
+	public class FontDescription : ContentItem
+	{
+        private char? defaultCharacter;
+        private string fontName;
+        private float size;
+        private float spacing;
+        private FontDescriptionStyle style;
+        private bool useKerning;
+	    private CharacterCollection characters = new CharacterCollection();
+
+		/// <summary>
+		/// Gets or sets the name of the font, such as "Times New Roman" or "Arial". This value cannot be null or empty.
+		/// </summary>
+        [ContentSerializer(AllowNull = false)]
+		public string FontName
+		{
+			get
+			{
+				return fontName;
+			}
+			set
+			{
+				if (string.IsNullOrEmpty(value))
+					throw new ArgumentNullException("FontName is null or an empty string.");
+				fontName = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the size, in points, of the font.
+		/// </summary>
+		public float Size
+		{
+			get
+			{
+				return size;
+			}
+			set
+			{
+				if (value <= 0.0f)
+					throw new ArgumentOutOfRangeException("Size must be greater than zero.");
+				size = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the amount of space, in pixels, to insert between letters in a string.
+		/// </summary>
+        [ContentSerializer(Optional = true)]
+		public float Spacing
+		{
+			get
+			{
+				return spacing;
+			}
+			set
+			{
+				spacing = value;
+			}
+		}
 
         /// <summary>
         /// Indicates if kerning information is used when drawing characters.
         /// </summary>
-        [ContentSerializerAttribute]
+        [ContentSerializer(Optional = true)]
         public bool UseKerning
         {
             get
@@ -166,45 +163,128 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+		/// <summary>
+		/// Gets or sets the style of the font, expressed as a combination of one or more FontDescriptionStyle flags.
+		/// </summary>
+		public FontDescriptionStyle Style
+		{
+			get
+			{
+				return style;
+			}
+			set
+			{
+				style = value;
+			}
+		}
+
         /// <summary>
-        /// Initializes a new instance of FontDescription and initializes its members to the specified font, size, and spacing, using FontDescriptionStyle.Regular as the default value for Style.
+        /// Gets or sets the default character for the font.
         /// </summary>
-        /// <param name="fontName">The name of the font, such as Times New Roman.</param>
-        /// <param name="size">The size, in points, of the font.</param>
-        /// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
-        public FontDescription(string fontName, float size, float spacing)
-            : this(fontName, size, spacing, FontDescriptionStyle.Regular, true)
+        [ContentSerializer(Optional = true)]
+        public Nullable<char> DefaultCharacter
+        {
+            get
+            {
+                return defaultCharacter;
+            }
+            set
+            {
+                defaultCharacter = value;
+            }
+        }
+
+        [ContentSerializer(CollectionItemName = "CharacterRegion")]
+        internal CharacterRegion[] CharacterRegions
+        {
+            get
+            {
+                var regions = new List<CharacterRegion>();
+                var chars = Characters.ToList();
+                chars.Sort();
+
+                var start = chars[0];
+                var end = chars[0];
+
+                for (var i=1; i < chars.Count; i++)
+                {
+                    if (chars[i] != (end+1))
+                    {
+                        regions.Add(new CharacterRegion(start, end));
+                        start = chars[i];
+                    }
+                    end = chars[i];
+                }
+
+                regions.Add(new CharacterRegion(start, end));
+
+                return regions.ToArray();
+            }
+
+            set
+            {
+                for (int index = 0; index < value.Length; ++index)
+                {
+                    CharacterRegion characterRegion = value[index];
+                    if (characterRegion.End < characterRegion.Start)
+                        throw new ArgumentException("CharacterRegion.End must be greater than CharacterRegion.Start");
+
+                    for (var start = characterRegion.Start; start <= characterRegion.End; start++)
+                        Characters.Add(start);
+                }
+            }
+        }
+		
+	    [ContentSerializerIgnore]
+	    public ICollection<char> Characters
+	    {
+	        get { return characters; } 
+            internal set { characters = new CharacterCollection(value); }
+	    }
+
+        internal FontDescription()
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of FontDescription and initializes its members to the specified font, size, spacing, and style.
-        /// </summary>
-        /// <param name="fontName">The name of the font, such as Times New Roman.</param>
-        /// <param name="size">The size, in points, of the font.</param>
-        /// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
-        /// <param name="fontStyle">The font style for the font.</param>
-        public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle)
-            : this(fontName, size, spacing, fontStyle, true)
-        {
-        }
+		/// <summary>
+		/// Initializes a new instance of FontDescription and initializes its members to the specified font, size, and spacing, using FontDescriptionStyle.Regular as the default value for Style.
+		/// </summary>
+		/// <param name="fontName">The name of the font, such as Times New Roman.</param>
+		/// <param name="size">The size, in points, of the font.</param>
+		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
+		public FontDescription(string fontName, float size, float spacing)
+			: this(fontName, size, spacing, FontDescriptionStyle.Regular, false)
+		{
+		}
 
-        /// <summary>
-        /// Initializes a new instance of FontDescription using the specified values.
-        /// </summary>
-        /// <param name="fontName">The name of the font, such as Times New Roman.</param>
-        /// <param name="size">The size, in points, of the font.</param>
-        /// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
-        /// <param name="fontStyle">The font style for the font.</param>
-        /// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
-        public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning)
-        {
-            // Write to the properties so the validation is run
-            FontName = fontName;
-            Size = size;
-            Spacing = spacing;
-            Style = fontStyle;
-            UseKerning = useKerning;
-        }
-    }
+		/// <summary>
+		/// Initializes a new instance of FontDescription and initializes its members to the specified font, size, spacing, and style.
+		/// </summary>
+		/// <param name="fontName">The name of the font, such as Times New Roman.</param>
+		/// <param name="size">The size, in points, of the font.</param>
+		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
+		/// <param name="fontStyle">The font style for the font.</param>
+		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle)
+            : this(fontName, size, spacing, fontStyle, false)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of FontDescription using the specified values.
+		/// </summary>
+		/// <param name="fontName">The name of the font, such as Times New Roman.</param>
+		/// <param name="size">The size, in points, of the font.</param>
+		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
+		/// <param name="fontStyle">The font style for the font.</param>
+		/// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
+		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning)            
+		{
+			// Write to the properties so the validation is run
+			FontName = fontName;
+			Size = size;
+			Spacing = spacing;
+			Style = fontStyle;
+			UseKerning = useKerning;			
+		}
+	}
 }

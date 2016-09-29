@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="OptionalElements">
+    <b Null="true" />
+    <c></c>
+    <e>CullClockwiseFace</e>
+    <f>CullCounterClockwiseFace</f>
+    <g>CullClockwiseFace</g>
+  </Asset>
+</XnaContent>

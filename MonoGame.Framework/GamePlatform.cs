@@ -1,109 +1,30 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2011 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
-#if WINRT
-using Windows.UI.ViewManagement;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    abstract class GamePlatform : IDisposable
+    abstract partial class GamePlatform : IDisposable
     {
         #region Fields
 
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
         bool disposed;
+        protected bool _alreadyInFullScreenMode = false;
+        protected bool _alreadyInWindowedMode = false;
         protected bool IsDisposed { get { return disposed; } }
 
         #endregion
 
         #region Construction/Destruction
-        public static GamePlatform Create(Game game)
-        {
-#if IPHONE
-            return new iOSGamePlatform(game);
-#elif MONOMAC
-            return new MacGamePlatform(game);
-#elif WINDOWS || LINUX
-            return new OpenTKGamePlatform(game);
-#elif ANDROID
-            return new AndroidGamePlatform(game);
-#elif PSS
-			return new PSSGamePlatform(game);
-#elif WINRT
-            return new MetroGamePlatform(game);
-#endif
-        }
 
-        protected GamePlatform(Game game)
+		protected GamePlatform(Game game)
         {
             if (game == null)
                 throw new ArgumentNullException("game");
@@ -161,50 +82,24 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if WINRT
-        private ApplicationViewState _viewState;
-        public ApplicationViewState ViewState
-        {
-            get { return _viewState; }
-            set
-            {
-                if (_viewState == value)
-                    return;
-
-                Raise(ViewStateChanged, new ViewStateChangedEventArgs(value));
-
-                _viewState = value;
-            }
-        }
-#endif
-
-#if ANDROID
-        public AndroidGameWindow Window
-        {
-            get; protected set;
-        }
-#elif PSS
-		public PSSGameWindow Window
-		{
-			get; protected set;
-		}
-#else
+        private GameWindow _window;
         public GameWindow Window
         {
-            get; protected set;
-        }
-#endif
-  
-        public virtual bool VSyncEnabled
-        {
-            get
+            get { return _window; }
+
+
+            protected set
             {
-                throw new NotImplementedException();
-            }
-            set {
+                if (_window == null)
+                {
+                    Mouse.PrimaryWindow = value;
+                    TouchPanel.PrimaryWindow = value;
+                }
+
+                _window = value;
             }
         }
-        
+
         #endregion
 
         #region Events
@@ -212,10 +107,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> AsyncRunLoopEnded;
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
-
-#if WINRT
-        public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
-#endif
 
         private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
             where TEventArgs : EventArgs
@@ -251,9 +142,6 @@ namespace Microsoft.Xna.Framework
             {
                 var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
                 graphicsDeviceManager.CreateDevice();
-#if ANDROID
-                Window.TouchEnabled = true;
-#endif
             }
         }
 
@@ -366,7 +254,17 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public virtual void ResetElapsedTime() {}
 
+        public virtual void Present() { }
+
         protected virtual void OnIsMouseVisibleChanged() {}
+
+        /// <summary>
+        /// Used by the GraphicsDeviceManager to update the platform window
+        /// after the graphics device has changed the presentation.
+        /// </summary>
+        internal virtual void OnPresentationChanged()
+        {            
+        }
 
         #endregion Methods
 
@@ -386,6 +284,9 @@ namespace Microsoft.Xna.Framework
         {
             if (!disposed)
             {
+                Mouse.PrimaryWindow = null;
+                TouchPanel.PrimaryWindow = null;
+
                 disposed = true;
             }
         }
@@ -401,8 +302,6 @@ namespace Microsoft.Xna.Framework
 			
 
         #endregion
-
-        public virtual void Present() {}
     }
 }
 
