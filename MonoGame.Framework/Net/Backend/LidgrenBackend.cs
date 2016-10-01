@@ -7,104 +7,6 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend
 {
-    internal class LidgrenOutgoingMessage : IOutgoingMessage
-    {
-        internal NetBuffer buffer;
-
-        public LidgrenOutgoingMessage()
-        {
-            this.buffer = null;
-            this.Recipient = null;
-            this.Options = SendDataOptions.None;
-            this.Channel = 0;
-        }
-        
-        public IPeer Recipient { get; internal set; }
-        public SendDataOptions Options { get; internal set; }
-        public int Channel { get; internal set; }
-
-        public void Write(string value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(byte[] value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(int value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(bool value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(byte value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(IPEndPoint value)
-        {
-            buffer.Write(value);
-        }
-
-        public void Write(IPeer value)
-        {
-            buffer.Write((value as ILidgrenPeer).Id);
-        }
-    }
-    internal class LidgrenIncomingMessage : IIncomingMessage
-    {
-        internal LidgrenBackend backend;
-        internal NetBuffer buffer;
-
-        public LidgrenIncomingMessage()
-        {
-            this.backend = null;
-            this.buffer = null;
-        }
-
-        public bool ReadBoolean()
-        {
-            return buffer.ReadBoolean();
-        }
-
-        public byte ReadByte()
-        {
-            return buffer.ReadByte();
-        }
-
-        public void ReadBytes(byte[] into, int offset, int length)
-        {
-            buffer.ReadBytes(into, offset, length);
-        }
-
-        public int ReadInt()
-        {
-            return buffer.ReadInt32();
-        }
-
-        public IPEndPoint ReadIPEndPoint()
-        {
-            return buffer.ReadIPEndPoint();
-        }
-
-        public IPeer ReadPeer()
-        {
-            return backend.FindPeerById(buffer.ReadInt64());
-        }
-
-        public string ReadString()
-        {
-            return buffer.ReadString();
-        }
-    }
-
     internal class Pool<T> where T : new()
     {
         private IList<T> freeMessages = new List<T>();
@@ -130,6 +32,109 @@ namespace Microsoft.Xna.Framework.Net.Backend
         public void Recycle(T item)
         {
             freeMessages.Add(item);
+        }
+    }
+
+    internal class LidgrenOutgoingMessage : IOutgoingMessage
+    {
+        public LidgrenOutgoingMessage()
+        {
+            this.Buffer = new NetBuffer();
+        }
+
+        internal NetBuffer Buffer { get; private set; }
+        public IPeer Recipient { get; internal set; }
+        public SendDataOptions Options { get; internal set; }
+        public int Channel { get; internal set; }
+
+        public void Reset()
+        {
+            Buffer.LengthBits = 0;
+            Buffer.Position = 0;
+            Recipient = null;
+            Options = SendDataOptions.None;
+            Channel = 0;
+        }
+
+        public void Write(string value)
+        {
+            Buffer.Write(value);
+        }
+
+        public void Write(byte[] value)
+        {
+            Buffer.Write(value);
+        }
+
+        public void Write(int value)
+        {
+            Buffer.Write(value);
+        }
+
+        public void Write(bool value)
+        {
+            Buffer.Write(value);
+        }
+
+        public void Write(byte value)
+        {
+            Buffer.Write(value);
+        }
+
+        public void Write(IPEndPoint value)
+        {
+            Buffer.Write(value);
+        }
+
+        public void Write(IPeer value)
+        {
+            Buffer.Write((value as ILidgrenPeer).Id);
+        }
+    }
+    internal class LidgrenIncomingMessage : IIncomingMessage
+    {
+        internal LidgrenBackend Backend { get; set; }
+        internal NetBuffer Buffer { get; set; }
+
+        public void Reset()
+        {
+            Backend = null;
+            Buffer = null;
+        }
+
+        public bool ReadBoolean()
+        {
+            return Buffer.ReadBoolean();
+        }
+
+        public byte ReadByte()
+        {
+            return Buffer.ReadByte();
+        }
+
+        public void ReadBytes(byte[] into, int offset, int length)
+        {
+            Buffer.ReadBytes(into, offset, length);
+        }
+
+        public int ReadInt()
+        {
+            return Buffer.ReadInt32();
+        }
+
+        public IPEndPoint ReadIPEndPoint()
+        {
+            return Buffer.ReadIPEndPoint();
+        }
+
+        public IPeer ReadPeer()
+        {
+            return Backend.FindPeerById(Buffer.ReadInt64());
+        }
+
+        public string ReadString()
+        {
+            return Buffer.ReadString();
         }
     }
     
@@ -183,8 +188,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         private LidgrenLocalPeer localPeer;
         private IList<LidgrenRemotePeer> remotePeers;
         private List<NetConnection> reportedConnections;
-
-        private Pool<NetBuffer> bufferPool;
+        
         private Pool<LidgrenOutgoingMessage> outgoingMessagePool;
         private Pool<LidgrenIncomingMessage> incomingMessagePool;
 
@@ -197,8 +201,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
             this.localPeer = new LidgrenLocalPeer(peer);
             this.remotePeers = new List<LidgrenRemotePeer>();
             this.reportedConnections = new List<NetConnection>();
-
-            this.bufferPool = new Pool<NetBuffer>();
+            
             this.outgoingMessagePool = new Pool<LidgrenOutgoingMessage>();
             this.incomingMessagePool = new Pool<LidgrenIncomingMessage>();
 
@@ -283,86 +286,66 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         public IOutgoingMessage GetMessage(IPeer recipient, SendDataOptions options, int channel)
         {
-            NetBuffer buffer;
-
-            if (recipient == localPeer)
-            {
-                buffer = bufferPool.Get();
-            }
-            else
-            {
-                buffer = localPeer.peer.CreateMessage();
-            }
-
             LidgrenOutgoingMessage msg = outgoingMessagePool.Get();
-            msg.buffer = buffer;
             msg.Recipient = recipient;
             msg.Options = options;
             msg.Channel = channel;
             return msg;
         }
 
-        public void SendMessage(IOutgoingMessage data)
+        public void SendMessage(IOutgoingMessage message)
         {
-            LidgrenOutgoingMessage msg = data as LidgrenOutgoingMessage;
+            LidgrenOutgoingMessage msg = message as LidgrenOutgoingMessage;
 
             if (msg == null)
             {
                 throw new NetworkException("Not possible to mix backends");
             }
 
-            if (msg.Recipient == null)
+            // Handle remote peers
+            if (msg.Recipient != localPeer)
             {
-                // Prepare for reading
-                long prevPos = msg.buffer.Position;
-                msg.buffer.Position = 0;
+                msg.Buffer.Position = 0;
 
-                InvokeReceive(msg.buffer, localPeer);
+                NetOutgoingMessage outgoingMsg = localPeer.peer.CreateMessage(msg.Buffer.LengthBytes);
+                outgoingMsg.Write(msg.Buffer);
 
-                // Prepare for sending
-                msg.buffer.Position = prevPos;
-
-                if (reportedConnections.Count > 0)
+                if (msg.Recipient == null)
                 {
-                    NetOutgoingMessage outgoingMsg = msg.buffer as NetOutgoingMessage;
-                    localPeer.peer.SendMessage(outgoingMsg, reportedConnections, ToDeliveryMethod(msg.Options), msg.Channel);
+                    // Send to all remote peers
+                    if (reportedConnections.Count > 0)
+                    {
+                        localPeer.peer.SendMessage(outgoingMsg, reportedConnections, ToDeliveryMethod(msg.Options), msg.Channel);
+                    }
+                }
+                else
+                {
+                    // Send to specific remote peer
+                    localPeer.peer.SendMessage(outgoingMsg, (msg.Recipient as LidgrenRemotePeer).connection, ToDeliveryMethod(msg.Options), msg.Channel);
                 }
             }
-            else if (msg.Recipient == localPeer)
-            {
-                NetBuffer buffer = msg.buffer;
-                buffer.Position = 0;
 
-                InvokeReceive(buffer, localPeer);
-
-                buffer.LengthBits = 0;
-                buffer.Position = 0;
-                bufferPool.Recycle(buffer);
-            }
-            else
+            // Handle self
+            if (msg.Recipient == null || msg.Recipient == localPeer)
             {
-                NetOutgoingMessage outgoingMsg = msg.buffer as NetOutgoingMessage;
-                LidgrenRemotePeer recipient = msg.Recipient as LidgrenRemotePeer;
-                localPeer.peer.SendMessage(outgoingMsg, recipient.connection, ToDeliveryMethod(msg.Options), msg.Channel);
+                msg.Buffer.Position = 0;
+
+                InvokeReceive(msg.Buffer, localPeer);
             }
 
-            msg.buffer = null;
-            msg.Recipient = null;
-            msg.Options = SendDataOptions.None;
-            msg.Channel = 0;
+            msg.Reset();
             outgoingMessagePool.Recycle(msg);
         }
 
         private void InvokeReceive(NetBuffer buffer, IPeer sender)
         {
             LidgrenIncomingMessage incomingMsg = incomingMessagePool.Get();
-            incomingMsg.backend = this;
-            incomingMsg.buffer = buffer;
+            incomingMsg.Backend = this;
+            incomingMsg.Buffer = buffer;
 
             Listener.ReceiveMessage(incomingMsg, sender);
 
-            incomingMsg.backend = null;
-            incomingMsg.buffer = null;
+            incomingMsg.Reset();
             incomingMessagePool.Recycle(incomingMsg);
         }
 

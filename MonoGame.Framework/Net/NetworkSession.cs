@@ -676,14 +676,14 @@ namespace Microsoft.Xna.Framework.Net
                 localGamer.RecycleInboundPackets();
             }
 
+            // Handle incoming internal messages (Might add new inbound packets)
+            backend.Update();
+
             // Add delayed inbound packets if sender has joined (Might add new inbound packets)
             foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
             {
                 localGamer.TryAddDelayedInboundPackets();
             }
-
-            // Handle incoming internal messages (Might add new inbound packets)
-            backend.Update();
 
             HandleInitialConnection();
 

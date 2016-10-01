@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             for (int i = 0; i < inboundPacketIndex; i++)
             {
-                Session.packetPool.RecyclePacket(inboundPackets[i].packet);
+                Session.packetPool.Recycle(inboundPackets[i].packet);
             }
 
             if (inboundPacketIndex > 0)
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             foreach (OutboundPacket outboundPacket in outboundPackets)
             {
-                Session.packetPool.RecyclePacket(outboundPacket.packet);
+                Session.packetPool.Recycle(outboundPacket.packet);
             }
 
             outboundPackets.Clear();
@@ -260,7 +260,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Write stream contents to an outbound packet
-            Packet packet = Session.packetPool.GetPacket(data.Length);
+            Packet packet = Session.packetPool.Get(data.Length);
             data.BaseStream.Position = 0;
             data.BaseStream.Read(packet.data, 0, packet.length);
 

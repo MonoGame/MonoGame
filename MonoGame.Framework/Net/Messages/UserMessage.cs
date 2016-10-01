@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             byte recipientId = input.ReadByte();
             SendDataOptions options = (SendDataOptions)input.ReadByte();
             int length = input.ReadInt();
-            Packet packet = CurrentMachine.Session.packetPool.GetPacket(length);
+            Packet packet = CurrentMachine.Session.packetPool.Get(length);
             input.ReadBytes(packet.data, 0, length);
 
             NetworkGamer sender = CurrentMachine.Session.FindGamerById(senderId);

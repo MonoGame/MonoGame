@@ -11,6 +11,16 @@ namespace Microsoft.Xna.Framework.Net
         {
             this.length = length;
             this.data = new byte[length];
+
+            this.Reset();
+        }
+
+        public void Reset()
+        {
+            for (int i = 0; i < length; i++)
+            {
+                data[i] = 255;
+            }
         }
     }
 
@@ -18,34 +28,24 @@ namespace Microsoft.Xna.Framework.Net
     {
         protected IList<Packet> freePackets = new List<Packet>();
 
-        public Packet GetPacket(int length)
+        public Packet Get(int requestedLength)
         {
-            Packet packet = null;
-
-            foreach (Packet freePacket in freePackets)
+            for (int i = freePackets.Count - 1; i >= 0; i--)
             {
-                if (freePacket.length == length)
+                if (freePackets[i].length == requestedLength)
                 {
-                    packet = freePacket;
-                    break;
+                    Packet packet = freePackets[i];
+                    freePackets.RemoveAt(i);
+                    return packet;
                 }
             }
 
-            if (packet != null)
-            {
-                freePackets.Remove(packet);
-                return packet;
-            }
-            
-            return new Packet(length);
+            return new Packet(requestedLength);
         }
 
-        public void RecyclePacket(Packet packet)
+        public void Recycle(Packet packet)
         {
-            for (int i = 0; i < packet.length; i++)
-            {
-                packet.data[i] = 255;
-            }
+            packet.Reset();
 
             freePackets.Add(packet);
         }

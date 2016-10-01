@@ -65,8 +65,8 @@ namespace Microsoft.Xna.Framework.Net.Backend
         IPeer FindRemotePeerByEndPoint(IPEndPoint endPoint);
         
         IOutgoingMessage GetMessage(IPeer recipient, SendDataOptions options, int channel);
-        
-        void SendMessage(IOutgoingMessage data);
+        void SendMessage(IOutgoingMessage message);
+
         void Update();
         void UpdateStatistics();
         void Shutdown(string byeMessage);
