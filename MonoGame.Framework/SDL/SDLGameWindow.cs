@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework
             get { return _borderless; }
             set
             {
-                Sdl.Window.SetBordered(_handle, value ? 1 : 0);
+                Sdl.Window.SetBordered(_handle, value ? 0 : 1);
                 _borderless = value;
             }
         }
