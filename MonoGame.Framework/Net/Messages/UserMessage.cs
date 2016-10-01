@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 throw new NetworkException("UserMessage from not fully connected peer");
             }
-            
+
             IOutgoingMessage msg = Backend.GetMessage(recipient?.Machine.peer, options, 0);
             msg.Write((byte)InternalMessageType.UserMessage);
 
@@ -58,9 +58,20 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             if (sendToAll)
             {
+                bool firstGamer = true;
+
                 foreach (LocalNetworkGamer localGamer in CurrentMachine.Session.LocalGamers)
                 {
-                    localGamer.AddInboundPacket(packet, senderId, options);
+                    if (firstGamer)
+                    {
+                        localGamer.AddInboundPacket(packet, senderId, options);
+                    }
+                    else
+                    {
+                        localGamer.AddInboundPacket(CurrentMachine.Session.packetPool.GetAndCopyFrom(packet.data), senderId, options);
+                    }
+
+                    firstGamer = false;
                 }
             }
             else

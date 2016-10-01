@@ -43,6 +43,15 @@ namespace Microsoft.Xna.Framework.Net
             return new Packet(requestedLength);
         }
 
+        public Packet GetAndCopyFrom(byte[] source)
+        {
+            Packet packet = Get(source.Length);
+
+            source.CopyTo(packet.data, 0);
+
+            return packet;
+        }
+
         public void Recycle(Packet packet)
         {
             packet.Reset();
