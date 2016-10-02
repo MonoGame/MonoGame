@@ -3,12 +3,8 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal class GameEndedSender : IInternalMessage
+    internal class GameEnded : InternalMessage
     {
-        public IBackend Backend { get; set; }
-        public IMessageQueue Queue { get; set; }
-        public NetworkMachine CurrentMachine { get; set; }
-
         public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -17,11 +13,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageType.GameEnded);
+            msg.Write((byte)InternalMessageIndex.GameEnded);
             Queue.Place(msg);
         }
 
-        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -45,7 +41,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             {
                 localGamer.SetReadyState(false);
 
-                CurrentMachine.Session.internalMessages.GamerStateChanged.Create(localGamer, false, true, null);
+                CurrentMachine.Session.InternalMessages.GamerStateChanged.Create(localGamer, false, true, null);
             }
 
             // Reset state before going into lobby

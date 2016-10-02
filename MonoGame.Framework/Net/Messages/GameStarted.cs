@@ -3,12 +3,8 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal class GameStartedSender : IInternalMessage
+    internal class GameStarted : InternalMessage
     {
-        public IBackend Backend { get; set; }
-        public IMessageQueue Queue { get; set; }
-        public NetworkMachine CurrentMachine { get; set; }
-
         public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -17,11 +13,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageType.GameStarted);
+            msg.Write((byte)InternalMessageIndex.GameStarted);
             Queue.Place(msg);
         }
 
-        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {

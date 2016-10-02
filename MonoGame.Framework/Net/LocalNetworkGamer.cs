@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Net
                 {
                     ready = value;
 
-                    Session.internalMessages.GamerStateChanged.Create(this, false, true, null);
+                    Session.InternalMessages.GamerStateChanged.Create(this, false, true, null);
                 }
             }
         }
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             for (int i = 0; i < inboundPacketIndex; i++)
             {
-                Session.packetPool.Recycle(inboundPackets[i].packet);
+                Session.PacketPool.Recycle(inboundPackets[i].packet);
             }
 
             if (inboundPacketIndex > 0)
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             foreach (OutboundPacket outboundPacket in outboundPackets)
             {
-                Session.packetPool.Recycle(outboundPacket.packet);
+                Session.PacketPool.Recycle(outboundPacket.packet);
             }
 
             outboundPackets.Clear();
@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             foreach (OutboundPacket outboundPacket in outboundPackets)
             {
-                Session.internalMessages.UserMessage.Create(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
+                Session.InternalMessages.UserMessage.Create(outboundPacket.sender, outboundPacket.recipient, outboundPacket.options, outboundPacket.packet);
             }
         }
 
@@ -260,7 +260,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Write stream contents to an outbound packet
-            Packet packet = Session.packetPool.Get(data.Length);
+            Packet packet = Session.PacketPool.Get(data.Length);
             data.BaseStream.Position = 0;
             data.BaseStream.Read(packet.data, 0, packet.length);
 

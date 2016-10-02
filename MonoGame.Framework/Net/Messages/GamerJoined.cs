@@ -3,16 +3,12 @@ using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal class GamerJoinedSender : IInternalMessage
+    internal class GamerJoined : InternalMessage
     {
-        public IBackend Backend { get; set; }
-        public IMessageQueue Queue { get; set; }
-        public NetworkMachine CurrentMachine { get; set; }
-
         public void Create(LocalNetworkGamer localGamer, NetworkMachine recipient)
         {
             IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageType.GamerJoined);
+            msg.Write((byte)InternalMessageIndex.GamerJoined);
 
             msg.Write(localGamer.DisplayName);
             msg.Write(localGamer.Gamertag);
@@ -23,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {

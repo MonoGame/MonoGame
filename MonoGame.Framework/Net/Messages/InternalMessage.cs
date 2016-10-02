@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal enum InternalMessageType
+    internal enum InternalMessageIndex
     {
         ConnectionAcknowledged,
         ConnectToAllRequest,
@@ -20,24 +20,24 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal class InternalMessages
     {
-        public ConnectionAcknowledgedSender ConnectionAcknowledged = new ConnectionAcknowledgedSender();
-        public ConnectToAllRequestSender ConnectToAllRequest = new ConnectToAllRequestSender();
-        public FullyConnectedSender FullyConnected = new FullyConnectedSender();
-        public GameEndedSender GameEnded = new GameEndedSender();
-        public GamerIdRequestSender GamerIdRequest = new GamerIdRequestSender();
-        public GamerIdResponseSender GamerIdResponse = new GamerIdResponseSender();
-        public GamerJoinedSender GamerJoined = new GamerJoinedSender();
-        public GamerLeftSender GamerLeft = new GamerLeftSender();
-        public GamerStateChangedSender GamerStateChanged = new GamerStateChangedSender();
-        public GameStartedSender GameStarted = new GameStartedSender();
-        public RemoveMachineSender RemoveMachine = new RemoveMachineSender();
-        public UserMessageSender UserMessage = new UserMessageSender();
+        public ConnectionAcknowledged ConnectionAcknowledged = new ConnectionAcknowledged();
+        public ConnectToAllRequest ConnectToAllRequest = new ConnectToAllRequest();
+        public FullyConnected FullyConnected = new FullyConnected();
+        public GameEnded GameEnded = new GameEnded();
+        public GamerIdRequest GamerIdRequest = new GamerIdRequest();
+        public GamerIdResponse GamerIdResponse = new GamerIdResponse();
+        public GamerJoined GamerJoined = new GamerJoined();
+        public GamerLeft GamerLeft = new GamerLeft();
+        public GamerStateChanged GamerStateChanged = new GamerStateChanged();
+        public GameStarted GameStarted = new GameStarted();
+        public RemoveMachine RemoveMachine = new RemoveMachine();
+        public UserMessage UserMessage = new UserMessage();
 
-        public IInternalMessage[] ByType;
+        public InternalMessage[] FromIndex;
 
         public InternalMessages(IBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
         {
-            ByType = new IInternalMessage[]
+            FromIndex = new InternalMessage[]
             {
                 ConnectionAcknowledged,
                 ConnectToAllRequest,
@@ -53,11 +53,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 UserMessage
             };
 
-            foreach (IInternalMessage internalMessage in ByType)
+            foreach (InternalMessage internalMessage in FromIndex)
             {
-                internalMessage.Backend = backend;
-                internalMessage.Queue = queue;
-                internalMessage.CurrentMachine = currentMachine;
+                internalMessage.Initialize(backend, queue, currentMachine);
             }
         }
     }
@@ -67,12 +65,19 @@ namespace Microsoft.Xna.Framework.Net.Messages
         void Place(IOutgoingMessage msg);
     }
 
-    internal interface IInternalMessage
+    internal abstract class InternalMessage
     {
-        IBackend Backend { get; set; }
-        IMessageQueue Queue { get; set; }
-        NetworkMachine CurrentMachine { get; set; }
+        public IBackend Backend { get; private set; }
+        public IMessageQueue Queue { get; private set; }
+        public NetworkMachine CurrentMachine { get; private set; }
 
-        void Receive(IIncomingMessage input, NetworkMachine senderMachine);
+        public void Initialize(IBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
+        {
+            this.Backend = backend;
+            this.Queue = queue;
+            this.CurrentMachine = currentMachine;
+        }
+
+        public abstract void Receive(IIncomingMessage input, NetworkMachine senderMachine);
     }
 }

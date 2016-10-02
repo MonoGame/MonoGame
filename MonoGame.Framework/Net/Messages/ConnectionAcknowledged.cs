@@ -1,18 +1,15 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal class ConnectionAcknowledgedSender : IInternalMessage
+    internal class ConnectionAcknowledged : InternalMessage
     {
-        public IBackend Backend { get; set; }
-        public IMessageQueue Queue { get; set; }
-        public NetworkMachine CurrentMachine { get; set; }
-
         public void Create(NetworkMachine recipient)
         {
             IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageType.ConnectionAcknowledged);
+            msg.Write((byte)InternalMessageIndex.ConnectionAcknowledged);
 
             bool isHost = CurrentMachine.IsHost;
 
@@ -36,7 +33,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {

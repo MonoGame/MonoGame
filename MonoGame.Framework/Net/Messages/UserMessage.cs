@@ -3,12 +3,8 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal class UserMessageSender : IInternalMessage
+    internal class UserMessage : InternalMessage
     {
-        public IBackend Backend { get; set; }
-        public IMessageQueue Queue { get; set; }
-        public NetworkMachine CurrentMachine { get; set; }
-
         public void Create(NetworkGamer sender, NetworkGamer recipient, SendDataOptions options, Packet packet)
         {
             if (!CurrentMachine.IsFullyConnected)
@@ -17,7 +13,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             IOutgoingMessage msg = Backend.GetMessage(recipient?.Machine.peer, options, 0);
-            msg.Write((byte)InternalMessageType.UserMessage);
+            msg.Write((byte)InternalMessageIndex.UserMessage);
 
             bool sendToAll = recipient == null;
 
@@ -31,7 +27,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!CurrentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {
@@ -44,7 +40,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             byte recipientId = input.ReadByte();
             SendDataOptions options = (SendDataOptions)input.ReadByte();
             int length = input.ReadInt();
-            Packet packet = CurrentMachine.Session.packetPool.Get(length);
+            Packet packet = CurrentMachine.Session.PacketPool.Get(length);
             input.ReadBytes(packet.data, 0, length);
 
             NetworkGamer sender = CurrentMachine.Session.FindGamerById(senderId);
@@ -68,7 +64,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                     }
                     else
                     {
-                        localGamer.AddInboundPacket(CurrentMachine.Session.packetPool.GetAndCopyFrom(packet.data), senderId, options);
+                        localGamer.AddInboundPacket(CurrentMachine.Session.PacketPool.GetAndFillWith(packet.data), senderId, options);
                     }
 
                     firstGamer = false;

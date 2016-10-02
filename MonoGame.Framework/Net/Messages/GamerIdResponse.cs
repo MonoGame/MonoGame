@@ -4,12 +4,8 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal class GamerIdResponseSender : IInternalMessage
+    internal class GamerIdResponse : InternalMessage
     {
-        public IBackend Backend { get; set; }
-        public IMessageQueue Queue { get; set; }
-        public NetworkMachine CurrentMachine { get; set; }
-
         public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
@@ -18,7 +14,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageType.GamerIdResponse);
+            msg.Write((byte)InternalMessageIndex.GamerIdResponse);
 
             byte id;
             bool wasApprovedByHost = CurrentMachine.Session.GetNewUniqueId(out id);
@@ -29,7 +25,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -72,7 +68,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             LocalNetworkGamer localGamer = new LocalNetworkGamer(CurrentMachine, signedInGamer, id, false);
             CurrentMachine.Session.AddGamer(localGamer);
-            CurrentMachine.Session.internalMessages.GamerJoined.Create(localGamer, null);
+            CurrentMachine.Session.InternalMessages.GamerJoined.Create(localGamer, null);
         }
     }
 }

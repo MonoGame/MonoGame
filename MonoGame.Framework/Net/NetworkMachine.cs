@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 if (!beingRemoved)
                 {
-                    Session.internalMessages.RemoveMachine.Create(this, null);
+                    Session.InternalMessages.RemoveMachine.Create(this, null);
 
                     beingRemoved = true;
                 }

@@ -47,12 +47,9 @@ namespace Microsoft.Xna.Framework.Net
             return NetworkSessionCreation.Join(availableSession);
         }
 
-        internal PacketPool packetPool;
-        internal IBackend backend;
         private IPEndPoint hostEndPoint;
         private NetworkMachine localMachine;
         private NetworkMachine hostMachine;
-        internal InternalMessages internalMessages;
         private List<IOutgoingMessage> messageQueue;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
@@ -68,14 +65,10 @@ namespace Microsoft.Xna.Framework.Net
 
         internal NetworkSession(IBackend backend, IPEndPoint hostEndPoint, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
-            this.packetPool = new PacketPool();
-            this.backend = backend;
-            this.backend.Listener = this;
             this.hostEndPoint = hostEndPoint;
             this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, hostEndPoint == null);
             this.hostMachine = hostEndPoint == null ? this.localMachine : null;
             this.messageQueue = new List<IOutgoingMessage>();
-            this.internalMessages = new InternalMessages(this.backend, this, this.localMachine);
 
             this.pendingSignedInGamers = new List<SignedInGamer>();
 
@@ -99,7 +92,12 @@ namespace Microsoft.Xna.Framework.Net
             this.remoteGamers = new List<NetworkGamer>();
             this.previousGamers = new List<NetworkGamer>();
 
+            this.Backend = backend;
+            this.Backend.Listener = this;
+            this.PacketPool = new PacketPool();
+            this.InternalMessages = new InternalMessages(this.Backend, this, this.localMachine);
             this.RemoteMachines = new List<NetworkMachine>();
+
             this.AllGamers = new GamerCollection<NetworkGamer>(this.allGamers);
             this.AllowHostMigration = false;
             this.AllowJoinInProgress = false;
@@ -119,8 +117,12 @@ namespace Microsoft.Xna.Framework.Net
 
             SignedInGamer.SignedOut += LocalGamerSignedOut;
         }
-
+        
+        internal IBackend Backend { get; }
+        internal PacketPool PacketPool { get; }
+        internal InternalMessages InternalMessages { get; }
         internal IList<NetworkMachine> RemoteMachines { get; }
+
         public GamerCollection<NetworkGamer> AllGamers { get; }
         public bool AllowHostMigration { get; set; } // any peer can get, only host can set
         public bool AllowJoinInProgress { get; set; } // any peer can get, only host can set
@@ -219,7 +221,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                return backend.SimulatedLatency;
+                return Backend.SimulatedLatency;
             }
             set
             {
@@ -228,7 +230,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                backend.SimulatedLatency = value;
+                Backend.SimulatedLatency = value;
             }
         }
 
@@ -241,7 +243,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                return backend.SimulatedPacketLoss;
+                return Backend.SimulatedPacketLoss;
             }
             set
             {
@@ -250,7 +252,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new ObjectDisposedException("NetworkSession");
                 }
 
-                backend.SimulatedPacketLoss = value;
+                Backend.SimulatedPacketLoss = value;
             }
         }
 
@@ -336,7 +338,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 pendingSignedInGamers.Add(signedInGamer);
 
-                internalMessages.GamerIdRequest.Create(HostMachine);
+                InternalMessages.GamerIdRequest.Create(HostMachine);
             }
         }
 
@@ -360,7 +362,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("Not all players are ready"); // TODO: See if this is the expected behavior
             }
 
-            internalMessages.GameStarted.Create(null);
+            InternalMessages.GameStarted.Create(null);
         }
 
         public void EndGame()
@@ -378,8 +380,8 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("The game can only end from the playing state");
             }
-            
-            internalMessages.GameEnded.Create(null);
+
+            InternalMessages.GameEnded.Create(null);
         }
 
         public void ResetReady() // only host
@@ -493,7 +495,7 @@ namespace Microsoft.Xna.Framework.Net
 
             if (localGamer != null)
             {
-                internalMessages.GamerLeft.Create(localGamer, null);
+                InternalMessages.GamerLeft.Create(localGamer, null);
             }
         }
 
@@ -599,10 +601,10 @@ namespace Microsoft.Xna.Framework.Net
 
             if (localMachine.IsFullyConnected)
             {
-                internalMessages.FullyConnected.Create(senderMachine);
+                InternalMessages.FullyConnected.Create(senderMachine);
             }
-            
-            internalMessages.ConnectionAcknowledged.Create(senderMachine);
+
+            InternalMessages.ConnectionAcknowledged.Create(senderMachine);
 
             if (IsHost)
             {
@@ -610,8 +612,8 @@ namespace Microsoft.Xna.Framework.Net
                 ICollection<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
                 requestedConnections.Remove(senderMachine);
                 pendingPeerConnections.Add(senderMachine, requestedConnections);
-                
-                internalMessages.ConnectToAllRequest.Create(requestedConnections, senderMachine);
+
+                InternalMessages.ConnectToAllRequest.Create(requestedConnections, senderMachine);
             }
         }
 
@@ -634,7 +636,7 @@ namespace Microsoft.Xna.Framework.Net
                     {
                         pendingPair.Value.Remove(disconnectedMachine);
 
-                        internalMessages.ConnectToAllRequest.Create(pendingPair.Value, pendingMachine);
+                        InternalMessages.ConnectToAllRequest.Create(pendingPair.Value, pendingMachine);
                     }
                 }
             }
@@ -654,12 +656,12 @@ namespace Microsoft.Xna.Framework.Net
 
             byte messageType = data.ReadByte();
 
-            if ((InternalMessageType)messageType != InternalMessageType.UserMessage)
+            if ((InternalMessageIndex)messageType != InternalMessageIndex.UserMessage)
             {
-                Debug.WriteLine("Receiving " + (InternalMessageType)messageType + " from " + MachineOwnerName(senderMachine) + "...");
+                Debug.WriteLine("Receiving " + (InternalMessageIndex)messageType + " from " + MachineOwnerName(senderMachine) + "...");
             }
 
-            IInternalMessage receiver = internalMessages.ByType[messageType];
+            InternalMessage receiver = InternalMessages.FromIndex[messageType];
             receiver.Receive(data, senderMachine);
         }
 
@@ -677,7 +679,7 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             // Handle incoming internal messages (Might add new inbound packets)
-            backend.Update();
+            Backend.Update();
 
             // Add delayed inbound packets if sender has joined (Might add new inbound packets)
             foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
@@ -705,7 +707,7 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            backend.UpdateStatistics();
+            Backend.UpdateStatistics();
         }
 
         private void HandleInitialConnection()
@@ -719,7 +721,7 @@ namespace Microsoft.Xna.Framework.Net
 
             foreach (IPEndPoint endPoint in pendingEndPoints)
             {
-                if (!(backend.IsConnectedToEndPoint(endPoint) && (backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
+                if (!(Backend.IsConnectedToEndPoint(endPoint) && (Backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
                 {
                     done = false;
                 }
@@ -727,11 +729,11 @@ namespace Microsoft.Xna.Framework.Net
 
             if (done)
             {
-                internalMessages.FullyConnected.Create(null);
+                InternalMessages.FullyConnected.Create(null);
 
                 foreach (SignedInGamer pendingGamer in pendingSignedInGamers)
                 {
-                    internalMessages.GamerIdRequest.Create(HostMachine);
+                    InternalMessages.GamerIdRequest.Create(HostMachine);
                 }
             }
         }
@@ -740,7 +742,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             for (int i = 0; i < messageQueue.Count; i++)
             {
-                backend.SendMessage(messageQueue[i]);
+                Backend.SendMessage(messageQueue[i]);
 
                 if (SessionState == NetworkSessionState.Ended)
                 {
@@ -761,7 +763,7 @@ namespace Microsoft.Xna.Framework.Net
 
             RemoveAllMachines();
 
-            backend.Shutdown("Done");
+            Backend.Shutdown("Done");
 
             SessionState = NetworkSessionState.Ended;
             Session = null;

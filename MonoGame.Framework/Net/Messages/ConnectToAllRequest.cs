@@ -5,16 +5,12 @@ using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net.Messages
 {
-    internal class ConnectToAllRequestSender : IInternalMessage
+    internal class ConnectToAllRequest : InternalMessage
     {
-        public IBackend Backend { get; set; }
-        public IMessageQueue Queue { get; set; }
-        public NetworkMachine CurrentMachine { get; set; }
-
         public void Create(ICollection<NetworkMachine> requestedConnections, NetworkMachine recipient)
         {
             IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageType.ConnectToAllRequest);
+            msg.Write((byte)InternalMessageIndex.ConnectToAllRequest);
 
             if (!CurrentMachine.IsHost)
             {
@@ -30,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -56,9 +52,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 IPEndPoint endPoint = input.ReadIPEndPoint();
                 CurrentMachine.Session.pendingEndPoints.Add(endPoint);
 
-                if (!CurrentMachine.Session.backend.IsConnectedToEndPoint(endPoint))
+                if (!CurrentMachine.Session.Backend.IsConnectedToEndPoint(endPoint))
                 {
-                    CurrentMachine.Session.backend.Connect(endPoint);
+                    CurrentMachine.Session.Backend.Connect(endPoint);
                 }
             }
         }
