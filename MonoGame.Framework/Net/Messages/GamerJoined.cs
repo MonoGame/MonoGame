@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -32,11 +32,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            string displayName = input.ReadString();
-            string gamertag = input.ReadString();
-            byte id = input.ReadByte();
-            bool isPrivateSlot = input.ReadBoolean();
-            bool isReady = input.ReadBoolean();
+            string displayName = msg.ReadString();
+            string gamertag = msg.ReadString();
+            byte id = msg.ReadByte();
+            bool isPrivateSlot = msg.ReadBoolean();
+            bool isReady = msg.ReadBoolean();
 
             if (CurrentMachine.Session.FindGamerById(id) != null)
             {

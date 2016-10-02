@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -45,11 +45,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            int requestedConnectionCount = input.ReadInt();
+            int requestedConnectionCount = msg.ReadInt();
             CurrentMachine.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
             for (int i = 0; i < requestedConnectionCount; i++)
             {
-                IPEndPoint endPoint = input.ReadIPEndPoint();
+                IPEndPoint endPoint = msg.ReadIPEndPoint();
                 CurrentMachine.Session.pendingEndPoints.Add(endPoint);
 
                 if (!CurrentMachine.Session.Backend.IsConnectedToEndPoint(endPoint))

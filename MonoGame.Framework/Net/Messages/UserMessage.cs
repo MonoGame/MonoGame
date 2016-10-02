@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!CurrentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {
@@ -35,13 +35,13 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            byte senderId = input.ReadByte();
-            bool sendToAll = input.ReadBoolean();
-            byte recipientId = input.ReadByte();
-            SendDataOptions options = (SendDataOptions)input.ReadByte();
-            int length = input.ReadInt();
+            byte senderId = msg.ReadByte();
+            bool sendToAll = msg.ReadBoolean();
+            byte recipientId = msg.ReadByte();
+            SendDataOptions options = (SendDataOptions)msg.ReadByte();
+            int length = msg.ReadInt();
             Packet packet = CurrentMachine.Session.PacketPool.Get(length);
-            input.ReadBytes(packet.data, 0, length);
+            msg.ReadBytes(packet.data, 0, length);
 
             NetworkGamer sender = CurrentMachine.Session.FindGamerById(senderId);
 

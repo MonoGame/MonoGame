@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {
@@ -40,8 +40,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            bool wasApprovedByHost = input.ReadBoolean();
-            byte id = input.ReadByte();
+            bool wasApprovedByHost = msg.ReadBoolean();
+            byte id = msg.ReadByte();
 
             if (CurrentMachine.Session.FindGamerById(id) != null)
             {

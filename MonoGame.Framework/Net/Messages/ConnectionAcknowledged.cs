@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage input, NetworkMachine senderMachine)
+        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {
@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            bool isHost = input.ReadBoolean();
+            bool isHost = msg.ReadBoolean();
 
             if (isHost && !senderMachine.IsHost)
             {
@@ -58,10 +58,10 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Receive a priori state
             if (isHost)
             {
-                CurrentMachine.Session.SessionState = (NetworkSessionState)input.ReadByte();
+                CurrentMachine.Session.SessionState = (NetworkSessionState)msg.ReadByte();
             }
 
-            int gamerCount = input.ReadInt();
+            int gamerCount = msg.ReadInt();
 
             if (gamerCount > 0 && !senderMachine.IsFullyConnected)
             {
@@ -72,11 +72,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             for (int i = 0; i < gamerCount; i++)
             {
-                string displayName = input.ReadString();
-                string gamertag = input.ReadString();
-                byte id = input.ReadByte();
-                bool isPrivateSlot = input.ReadBoolean();
-                bool isReady = input.ReadBoolean();
+                string displayName = msg.ReadString();
+                string gamertag = msg.ReadString();
+                byte id = msg.ReadByte();
+                bool isPrivateSlot = msg.ReadBoolean();
+                bool isReady = msg.ReadBoolean();
 
                 if (CurrentMachine.Session.FindGamerById(id) != null)
                 {

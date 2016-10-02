@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Lidgren.Network;
+using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -18,6 +19,8 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
+        internal NetworkSession Session { get; set; }
+
         internal void Send(NetBuffer buffer)
         {
             buffer.Write(list.Count);
@@ -29,6 +32,20 @@ namespace Microsoft.Xna.Framework.Net
 
                 buffer.Write(isSet);
                 buffer.Write(value);
+            }
+        }
+
+        internal void Send(IOutgoingMessage msg)
+        {
+            msg.Write(list.Count);
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                bool isSet = list[i] != null;
+                int value = isSet ? (int)list[i] : -1;
+
+                msg.Write(isSet);
+                msg.Write(value);
             }
         }
 
@@ -44,6 +61,22 @@ namespace Microsoft.Xna.Framework.Net
             {
                 bool isSet = buffer.ReadBoolean();
                 int value = buffer.ReadInt32();
+                this[i] = isSet ? value : (Nullable<int>)null;
+            }
+        }
+
+        internal void Receive(IIncomingMessage msg)
+        {
+            int remoteCount = msg.ReadInt();
+            if (remoteCount != list.Count)
+            {
+                throw new NetworkException("NetworkSessionProperties size mismatch, different builds?");
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                bool isSet = msg.ReadBoolean();
+                int value = msg.ReadInt();
                 this[i] = isSet ? value : (Nullable<int>)null;
             }
         }

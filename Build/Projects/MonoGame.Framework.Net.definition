@@ -249,10 +249,13 @@
     <Compile Include="Net\Messages\InternalMessage.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
+    <Compile Include="Net\Messages\RemoveMachine.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
     <Compile Include="Net\Messages\UserMessage.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Messages\RemoveMachine.cs">
+    <Compile Include="Net\Messages\SessionStateChanged.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
 

@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("Only one NetworkSession allowed");
             }
-            if (maxGamers < 2 || maxGamers > NetworkSession.MaxSupportedGamers)
+            if (maxGamers < NetworkSession.MinSupportedGamers || maxGamers > NetworkSession.MaxSupportedGamers)
             {
                 throw new ArgumentOutOfRangeException("maxGamers must be in the range [2, " + NetworkSession.MaxSupportedGamers + "]");
             }

@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         GamerStateChanged,
         GameStarted,
         RemoveMachine,
+        SessionStateChanged,
         UserMessage
     }
 
@@ -31,6 +32,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public GamerStateChanged GamerStateChanged = new GamerStateChanged();
         public GameStarted GameStarted = new GameStarted();
         public RemoveMachine RemoveMachine = new RemoveMachine();
+        public SessionStateChanged SessionStateChanged = new SessionStateChanged();
         public UserMessage UserMessage = new UserMessage();
 
         public InternalMessage[] FromIndex;
@@ -50,6 +52,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 GamerStateChanged,
                 GameStarted,
                 RemoveMachine,
+                SessionStateChanged,
                 UserMessage
             };
 
@@ -78,6 +81,6 @@ namespace Microsoft.Xna.Framework.Net.Messages
             this.CurrentMachine = currentMachine;
         }
 
-        public abstract void Receive(IIncomingMessage input, NetworkMachine senderMachine);
+        public abstract void Receive(IIncomingMessage msg, NetworkMachine senderMachine);
     }
 }

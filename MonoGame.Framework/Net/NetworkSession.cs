@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Net
         internal const int JoinTime = 1000;
 
         public const int MaxPreviousGamers = 10;
+        public const int MinSupportedGamers = 2;
         public const int MaxSupportedGamers = 64;
 
         internal static NetworkSession Session = null;
@@ -63,6 +64,11 @@ namespace Microsoft.Xna.Framework.Net
         private List<NetworkGamer> remoteGamers;
         private List<NetworkGamer> previousGamers;
 
+        internal bool allowHostMigration;
+        internal bool allowJoinInProgress;
+        internal int maxGamers;
+        internal int privateGamerSlots;
+
         internal NetworkSession(IBackend backend, IPEndPoint hostEndPoint, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
             this.hostEndPoint = hostEndPoint;
@@ -92,6 +98,11 @@ namespace Microsoft.Xna.Framework.Net
             this.remoteGamers = new List<NetworkGamer>();
             this.previousGamers = new List<NetworkGamer>();
 
+            this.allowHostMigration = false;
+            this.allowJoinInProgress = false;
+            this.maxGamers = maxGamers;
+            this.privateGamerSlots = privateGamerSlots;
+
             this.Backend = backend;
             this.Backend.Listener = this;
             this.PacketPool = new PacketPool();
@@ -99,17 +110,14 @@ namespace Microsoft.Xna.Framework.Net
             this.RemoteMachines = new List<NetworkMachine>();
 
             this.AllGamers = new GamerCollection<NetworkGamer>(this.allGamers);
-            this.AllowHostMigration = false;
-            this.AllowJoinInProgress = false;
             this.BytesPerSecondReceived = 0;
             this.BytesPerSecondSent = 0;
             this.IsDisposed = false;
             this.LocalGamers = this.localMachine.LocalGamers;
-            this.MaxGamers = maxGamers;
             this.PreviousGamers = new GamerCollection<NetworkGamer>(this.previousGamers);
-            this.PrivateGamerSlots = privateGamerSlots;
             this.RemoteGamers = new GamerCollection<NetworkGamer>(this.remoteGamers);
             this.SessionProperties = properties != null ? properties : new NetworkSessionProperties();
+            this.SessionProperties.Session = this;
             this.SessionState = NetworkSessionState.Lobby;
             this.SessionType = type;
             this.SimulatedLatency = TimeSpan.Zero;
@@ -124,8 +132,71 @@ namespace Microsoft.Xna.Framework.Net
         internal IList<NetworkMachine> RemoteMachines { get; }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
-        public bool AllowHostMigration { get; set; } // any peer can get, only host can set
-        public bool AllowJoinInProgress { get; set; } // any peer can get, only host can set
+
+        public bool AllowHostMigration
+        {
+            get
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+
+                return allowHostMigration;
+            }
+
+            set
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+                if (!IsHost)
+                {
+                    throw new InvalidOperationException("Only the host can perform this action");
+                }
+
+                if (allowHostMigration != value)
+                {
+                    allowHostMigration = value;
+
+                    InternalMessages.SessionStateChanged.Create();
+                }
+            }
+        }
+
+        public bool AllowJoinInProgress
+        {
+            get
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+
+                return allowJoinInProgress;
+            }
+
+            set
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+                if (!IsHost)
+                {
+                    throw new InvalidOperationException("Only the host can perform this action");
+                }
+
+                if (allowJoinInProgress != value)
+                {
+                    allowJoinInProgress = value;
+
+                    InternalMessages.SessionStateChanged.Create();
+                }
+            }
+        }
+
         public int BytesPerSecondReceived { get; private set; }
         public int BytesPerSecondSent { get; private set; }
 
@@ -204,11 +275,101 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         public GamerCollection<LocalNetworkGamer> LocalGamers { get; }
-        public int MaxGamers { get; set; } // TODO: Only host can set
+
+        public int MaxGamers
+        {
+            get
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+
+                return maxGamers;
+            }
+
+            set
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+                if (!IsHost)
+                {
+                    throw new InvalidOperationException("Only the host can perform this action");
+                }
+                if (value < MinSupportedGamers || value > MaxSupportedGamers)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+
+                if (maxGamers != value)
+                {
+                    maxGamers = value;
+
+                    InternalMessages.SessionStateChanged.Create();
+                }
+            }
+        }
+        
         public GamerCollection<NetworkGamer> PreviousGamers { get; }
-        public int PrivateGamerSlots { get; set; } // TODO: Only host can set
+
+        internal int MaxPossiblePrivateGamerSlots
+        {
+            get
+            {
+                int usedPublicSlots = 0;
+
+                foreach (NetworkGamer gamer in AllGamers)
+                {
+                    if (!gamer.IsPrivateSlot)
+                    {
+                        usedPublicSlots++;
+                    }
+                }
+
+                return maxGamers - usedPublicSlots;
+            }
+        }
+
+        public int PrivateGamerSlots
+        {
+            get
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+
+                return privateGamerSlots;
+            }
+
+            set
+            {
+                if (IsDisposed || SessionState == NetworkSessionState.Ended)
+                {
+                    throw new ObjectDisposedException("NetworkSession");
+                }
+                if (!IsHost)
+                {
+                    throw new InvalidOperationException("Only the host can perform this action");
+                }
+                if (value < 0 || value > MaxPossiblePrivateGamerSlots)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+
+                if (privateGamerSlots != value)
+                {
+                    privateGamerSlots = value;
+
+                    InternalMessages.SessionStateChanged.Create();
+                }
+            }
+        }
+
         public GamerCollection<NetworkGamer> RemoteGamers { get; }
-        public NetworkSessionProperties SessionProperties { get; } // TODO: Should be synchronized
+        public NetworkSessionProperties SessionProperties { get; }
         public NetworkSessionState SessionState { get; internal set; }
         public NetworkSessionType SessionType { get; }
 
@@ -362,6 +523,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("Not all players are ready"); // TODO: See if this is the expected behavior
             }
 
+            SessionState = NetworkSessionState.Playing;
             InternalMessages.GameStarted.Create(null);
         }
 
@@ -381,6 +543,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("The game can only end from the playing state");
             }
 
+            SessionState = NetworkSessionState.Lobby;
             InternalMessages.GameEnded.Create(null);
         }
 
@@ -554,38 +717,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             messageQueue.Add(msg);
         }
-        /*
-        private void Send(ref InternalMessage message)
-        {
-            if (message.content.MessageType != InternalMessageType.UserMessage)
-            {
-                Debug.WriteLine("Sending " + message.content.MessageType + " to " + MachineOwnerName(message.recipient) + "...");
-            }
 
-            if (message.recipient == null)
-            {
-                // Send to all machines
-                foreach (NetworkMachine remoteMachine in RemoteMachines)
-                {
-                    IOutgoingMessage msg = backend.GetMessageBuffer(remoteMachine.peer, message.content.Options, message.content.SequenceChannel);
-                    EncodeMessage(message.content, msg);
-                    backend.SendToPeer(msg);
-                }
-
-                // Send to self
-                IOutgoingMessage selfMsg = backend.GetMessageBuffer(backend.LocalPeer, message.content.Options, message.content.SequenceChannel);
-                EncodeMessage(message.content, selfMsg);
-                backend.SendToPeer(selfMsg);
-            }
-            else
-            {
-                // Send to a single machine
-                IOutgoingMessage msg = backend.GetMessageBuffer(message.recipient.peer, message.content.Options, message.content.SequenceChannel);
-                EncodeMessage(message.content, msg);
-                backend.SendToPeer(msg);
-            }
-        }
-        */
         void IBackendListener.PeerConnected(IPeer peer)
         {
             bool senderIsHost = peer.EndPoint == hostEndPoint;
