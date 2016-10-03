@@ -90,8 +90,8 @@
     <Import file="exclude.addins" />
   </Runtime>
   <Dependencies>
-    <Addin id="Core" version="5.0" />
-    <Addin id="Ide" version="5.0" />
+    <Addin id="Core" version="6.0" />
+    <Addin id="Ide" version="6.0" />
     <Addin id="DesignerSupport" version="4.0" />
   </Dependencies>
   <ConditionType id="IsWindows" type="MonoDevelop.MonoGame.MonoGameIsWindowsCondition" />
@@ -100,14 +100,15 @@
   <Extension path="/MonoDevelop/Core/StockIcons">
     <StockIcon stockid="monogame-project" file="icons/monogame-project-32.png" />
   </Extension>
-  <Extension path="/MonoDevelop/ProjectModel/MSBuildExtensions">
+  <Extension path="/MonoDevelop/ProjectModel/ProjectModelExtensions">
     <Class class="MonoDevelop.MonoGame.MonoGameMSBuildImports" />
   </Extension>
+  <!--
   <Extension path="/MonoDevelop/ProjectModel/MSBuildItemTypes">
     <DotNetProjectSubtype id="MonoGame" guid="{9b831fef-f496-498f-9fe8-180da5cb4258}" type="MonoDevelop.MonoGame.MonoGameProject">
-      <!-- Add MonoGame Specific Imports  -->
     </DotNetProjectSubtype>
   </Extension>
+	-->
   <Extension path="/MonoDevelop/Ide/ProjectTemplateCategories">
     <Category id="monogame" name="MonoGame" icon="monogame-project" insertbefore="other">
       <Category id="app" name="App">
@@ -122,9 +123,11 @@
   <Extension path="/MonoDevelop/Ide/FileTemplateTypes">
     <FileTemplateType name="ContentFile" class="MonoDevelop.MonoGame.ContentItemTemplate" />
   </Extension>
+  <!--
   <Extension path="/MonoDevelop/ProjectModel/ProjectBindings">
     <ProjectBinding id="MonoGame" class="MonoDevelop.MonoGame.MonoGameProjectBinding" />
   </Extension>
+	-->
   <Extension path="/MonoDevelop/Ide/ProjectTemplates">
     <ProjectTemplate id="MonoGameSharedProject" file="templates/MonoGameSharedProject.xpt.xml" />
     <ProjectTemplate id="MonoGamePCLProject" file="templates/MonoGamePCLProject.xpt.xml" />
@@ -164,9 +167,11 @@
     <DisplayBinding id="MonoGamePipeline" insertbefore="DefaultDisplayBinding" class="MonoDevelop.MonoGame.PipelineDisplayBinding" />
   </Extension>
   <!-- We still need this for MonoMac and Xamarin Mac Classic support -->
+  <!--
   <Extension path="/MonoDevelop/ProjectModel/ProjectServiceExtensions">
     <Class class="MonoDevelop.MonoGame.MonoGameBuildExtension" />
   </Extension>
+  -->
   <Module>
     <Runtime>
       <Import assembly="MonoDevelop.MonoGame.Android.dll" />
