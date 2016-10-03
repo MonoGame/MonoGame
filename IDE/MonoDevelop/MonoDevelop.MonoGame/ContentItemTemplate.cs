@@ -31,10 +31,11 @@ namespace MonoDevelop.MonoGame
 			}
 		}
 
-		public override bool AddToProject (SolutionItem policyParent, Project project, string language, string directory, string name)
+		public override bool AddToProject(SolutionFolderItem policyParent, Project project, string language, string directory, string name)
 		{
-			ProjectFile file = template.AddFileToProject (policyParent, project, language, directory, name);
-			if (file != null) {
+			ProjectFile file = template.AddFileToProject(policyParent, project, language, directory, name);
+			if (file != null)
+			{
 				file.BuildAction = BuildAction.Content;
 				file.CopyToOutputDirectory = mode;
 				return true;
