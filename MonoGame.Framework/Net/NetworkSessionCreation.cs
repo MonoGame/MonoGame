@@ -28,23 +28,6 @@ namespace Microsoft.Xna.Framework.Net
 
         public static NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
-            {
-                throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
-            }
-            if (NetworkSession.Session != null)
-            {
-                throw new InvalidOperationException("Only one NetworkSession allowed");
-            }
-            if (maxGamers < NetworkSession.MinSupportedGamers || maxGamers > NetworkSession.MaxSupportedGamers)
-            {
-                throw new ArgumentOutOfRangeException("maxGamers must be in the range [2, " + NetworkSession.MaxSupportedGamers + "]");
-            }
-            if (privateGamerSlots < 0 || privateGamerSlots > maxGamers)
-            {
-                throw new ArgumentOutOfRangeException("privateGamerSlots must be in the range [0, maxGamers]");
-            }
-
             NetPeer peer = new NetPeer(CreateNetPeerConfig(true));
 
             try
@@ -58,16 +41,6 @@ namespace Microsoft.Xna.Framework.Net
 
             NetworkSession.Session = new NetworkSession(new LidgrenBackend(peer), null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
             return NetworkSession.Session;
-        }
-
-        internal static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
-        {
-            throw new NotImplementedException();
         }
 
         // ArgumentOutOfRangeException if maxLocalGamers is < 1 or > 4
@@ -139,11 +112,6 @@ namespace Microsoft.Xna.Framework.Net
             discoverPeer.Shutdown("Discovery complete");
 
             return new AvailableNetworkSessionCollection(availableSessions);
-        }
-
-        public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties)
-        {
-            throw new NotImplementedException();
         }
 
         public static NetworkSession Join(AvailableNetworkSession availableSession)
