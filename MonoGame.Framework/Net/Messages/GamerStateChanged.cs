@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             byte id = msg.ReadByte();
             NetworkGamer remoteGamer = CurrentMachine.Session.FindGamerById(id);
 
-            if (remoteGamer.Machine != senderMachine)
+            if (remoteGamer == null || remoteGamer.Machine != senderMachine)
             {
                 // TODO: SuspiciousUnexpectedMessage
                 Debug.Assert(false);

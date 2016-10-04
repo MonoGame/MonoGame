@@ -8,28 +8,29 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Create(NetworkMachine recipient)
         {
-            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            if (recipient == null)
+            {
+                throw new ArgumentNullException("recipient");
+            }
+
+            IOutgoingMessage msg = Backend.GetMessage(recipient.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.ConnectionAcknowledged);
 
-            bool isHost = CurrentMachine.IsHost;
+            // Encode validation info
+            msg.Write((int)CurrentMachine.LocalGamers.Count);
 
             // Send a priori state
-            msg.Write(isHost);
-            if (isHost)
+            if (CurrentMachine.IsHost)
             {
-                msg.Write((byte)CurrentMachine.Session.SessionState);
+                CurrentMachine.Session.InternalMessages.SessionStateChanged.Create(recipient);
             }
 
-            msg.Write((int)CurrentMachine.LocalGamers.Count);
             foreach (LocalNetworkGamer localGamer in CurrentMachine.LocalGamers)
             {
-                msg.Write(localGamer.DisplayName);
-                msg.Write(localGamer.Gamertag);
-                msg.Write(localGamer.Id);
-                msg.Write(localGamer.IsPrivateSlot);
-                msg.Write(localGamer.IsReady);
+                CurrentMachine.Session.InternalMessages.GamerJoined.Create(localGamer, recipient);
             }
 
+            // Make sure to send acknowledged message after a priori messages (above)
             Queue.Place(msg);
         }
 
@@ -46,21 +47,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            bool isHost = msg.ReadBoolean();
-
-            if (isHost && !senderMachine.IsHost)
-            {
-                // TODO: SuspiciousHostClaim
-                Debug.Assert(false);
-                return;
-            }
-
-            // Receive a priori state
-            if (isHost)
-            {
-                CurrentMachine.Session.SessionState = (NetworkSessionState)msg.ReadByte();
-            }
-
+            // Decode validation info
             int gamerCount = msg.ReadInt();
 
             if (gamerCount > 0 && !senderMachine.IsFullyConnected)
@@ -70,23 +57,19 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            for (int i = 0; i < gamerCount; i++)
+            // Make sure we have received all a priori state
+            if (senderMachine.IsHost && !senderMachine.HasSentSessionStateToLocalMachine)
             {
-                string displayName = msg.ReadString();
-                string gamertag = msg.ReadString();
-                byte id = msg.ReadByte();
-                bool isPrivateSlot = msg.ReadBoolean();
-                bool isReady = msg.ReadBoolean();
+                // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
+                return;
+            }
 
-                if (CurrentMachine.Session.FindGamerById(id) != null)
-                {
-                    // TODO: SuspiciousGamerIdCollision
-                    Debug.Assert(false);
-                    return;
-                }
-
-                NetworkGamer remoteGamer = new NetworkGamer(senderMachine, displayName, gamertag, id, isPrivateSlot, isReady);
-                CurrentMachine.Session.AddGamer(remoteGamer);
+            if (senderMachine.Gamers.Count != gamerCount)
+            {
+                // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
+                return;
             }
 
             // Everything went fine

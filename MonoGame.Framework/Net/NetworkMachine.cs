@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Net
             this.Session = session;
             this.HasLeftSession = false;
             this.IsFullyConnected = false;
+            this.HasSentSessionStateToLocalMachine = false;
             this.HasAcknowledgedLocalMachine = false;
             this.IsLocal = isLocal;
             this.IsHost = isHost;
@@ -35,6 +36,7 @@ namespace Microsoft.Xna.Framework.Net
         internal NetworkSession Session { get; }
         internal bool HasLeftSession { get; set; }
         internal bool IsFullyConnected { get; set; }
+        internal bool HasSentSessionStateToLocalMachine { get; set; }
         internal bool HasAcknowledgedLocalMachine { get; set; }
         internal bool IsLocal { get; }
         internal bool IsHost { get; }

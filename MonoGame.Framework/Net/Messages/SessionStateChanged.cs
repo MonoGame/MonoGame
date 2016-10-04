@@ -5,14 +5,14 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class SessionStateChanged : InternalMessage
     {
-        public void Create()
+        public void Create(NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
             {
                 throw new NetworkException("Only host can send SessionStateChanged");
             }
 
-            IOutgoingMessage msg = Backend.GetMessage(null, SendDataOptions.ReliableInOrder, 1);
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.SessionStateChanged);
 
             msg.Write(CurrentMachine.Session.allowHostMigration);
@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             msg.Write(CurrentMachine.Session.maxGamers);
             msg.Write(CurrentMachine.Session.privateGamerSlots);
             CurrentMachine.Session.SessionProperties.Send(msg);
+            msg.Write((byte)CurrentMachine.Session.SessionState);
 
             Queue.Place(msg);
         }
@@ -42,6 +43,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
             CurrentMachine.Session.maxGamers = msg.ReadInt();
             CurrentMachine.Session.privateGamerSlots = msg.ReadInt();
             CurrentMachine.Session.SessionProperties.Receive(msg);
+            CurrentMachine.Session.SessionState = (NetworkSessionState)msg.ReadByte();
+
+            senderMachine.HasSentSessionStateToLocalMachine = true;
         }
     }
 }
