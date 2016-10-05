@@ -56,10 +56,6 @@ using Android.Graphics;
 #endif
 #endif // OPENGL
 
-#if DESKTOPGL || MONOMAC || ANGLE
-using System.Drawing.Imaging;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
@@ -519,9 +515,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if DESKTOPGL || MONOMAC
-			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
-#elif ANDROID
+#if ANDROID
             SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
 #else
             throw new NotImplementedException();
@@ -538,64 +532,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if DESKTOPGL || MONOMAC
-        internal void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
-		{
-			if (stream == null)
-			{
-				throw new ArgumentNullException("stream", "'stream' cannot be null (Nothing in Visual Basic)");
-			}
-			if (width <= 0)
-			{
-				throw new ArgumentOutOfRangeException("width", width, "'width' cannot be less than or equal to zero");
-			}
-			if (height <= 0)
-			{
-				throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
-			}
-			if (format == null)
-			{
-				throw new ArgumentNullException("format", "'format' cannot be null (Nothing in Visual Basic)");
-			}
-			
-			byte[] data = null;
-			GCHandle? handle = null;
-			Bitmap bitmap = null;
-			try 
-			{
-				data = new byte[width * height * 4];
-				handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-				GetData(data);
-				
-				// internal structure is BGR while bitmap expects RGB
-				for(int i = 0; i < data.Length; i += 4)
-				{
-					byte temp = data[i + 0];
-					data[i + 0] = data[i + 2];
-					data[i + 2] = temp;
-				}
-				
-				bitmap = new Bitmap(width, height, width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.Value.AddrOfPinnedObject());
-				
-				bitmap.Save(stream, format);
-			} 
-			finally 
-			{
-				if (bitmap != null)
-				{
-					bitmap.Dispose();
-				}
-				if (handle.HasValue)
-				{
-					handle.Value.Free();
-				}
-				if (data != null)
-				{
-					data = null;
-				}
-			}
-		}
-#elif ANDROID
+#if ANDROID
         private void SaveAsImage(Stream stream, int width, int height, Bitmap.CompressFormat format)
         {
             int[] data = new int[width * height];
