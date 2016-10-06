@@ -5,7 +5,7 @@ using System.Net;
 
 using Lidgren.Network;
 
-namespace Microsoft.Xna.Framework.Net.Backend
+namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
     internal interface IResetable
     {
@@ -42,9 +42,9 @@ namespace Microsoft.Xna.Framework.Net.Backend
         }
     }
 
-    internal class LidgrenOutgoingMessage : IOutgoingMessage, IResetable
+    internal class OutgoingMessage : IOutgoingMessage, IResetable
     {
-        public LidgrenOutgoingMessage()
+        public OutgoingMessage()
         {
             this.Buffer = new NetBuffer();
         }
@@ -98,7 +98,8 @@ namespace Microsoft.Xna.Framework.Net.Backend
             Buffer.Write((value as ILidgrenPeer).Id);
         }
     }
-    internal class LidgrenIncomingMessage : IIncomingMessage, IResetable
+
+    internal class IncomingMessage : IIncomingMessage, IResetable
     {
         internal LidgrenBackend Backend { get; set; }
         internal NetBuffer Buffer { get; set; }
@@ -150,11 +151,11 @@ namespace Microsoft.Xna.Framework.Net.Backend
         long Id { get; }
     }
 
-    internal class LidgrenRemotePeer : ILidgrenPeer
+    internal class RemotePeer : ILidgrenPeer
     {
         internal NetConnection connection;
 
-        public LidgrenRemotePeer(NetConnection connection)
+        public RemotePeer(NetConnection connection)
         {
             this.connection = connection;
         }
@@ -170,11 +171,11 @@ namespace Microsoft.Xna.Framework.Net.Backend
         }
     }
 
-    internal class LidgrenLocalPeer : ILidgrenPeer
+    internal class LocalPeer : ILidgrenPeer
     {
         internal NetPeer peer;
 
-        public LidgrenLocalPeer(NetPeer peer)
+        public LocalPeer(NetPeer peer)
         {
             this.peer = peer;
         }
@@ -190,18 +191,14 @@ namespace Microsoft.Xna.Framework.Net.Backend
         }
     }
 
-    internal class LidgrenBackend : IBackend
+    internal class LidgrenBackend : ISessionBackend
     {
-        internal const int Port = 14242;
-        internal const int DiscoveryTime = 1000;
-        internal const int JoinTime = 1000;
-
-        private LidgrenLocalPeer localPeer;
-        private IList<LidgrenRemotePeer> remotePeers;
+        private LocalPeer localPeer;
+        private IList<RemotePeer> remotePeers;
         private List<NetConnection> reportedConnections;
         
-        private Pool<LidgrenOutgoingMessage> outgoingMessagePool;
-        private Pool<LidgrenIncomingMessage> incomingMessagePool;
+        private Pool<OutgoingMessage> outgoingMessagePool;
+        private Pool<IncomingMessage> incomingMessagePool;
 
         private DateTime lastTime;
         private int lastReceivedBytes;
@@ -209,12 +206,12 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         public LidgrenBackend(NetPeer peer)
         {
-            this.localPeer = new LidgrenLocalPeer(peer);
-            this.remotePeers = new List<LidgrenRemotePeer>();
+            this.localPeer = new LocalPeer(peer);
+            this.remotePeers = new List<RemotePeer>();
             this.reportedConnections = new List<NetConnection>();
             
-            this.outgoingMessagePool = new Pool<LidgrenOutgoingMessage>();
-            this.incomingMessagePool = new Pool<LidgrenIncomingMessage>();
+            this.outgoingMessagePool = new Pool<OutgoingMessage>();
+            this.incomingMessagePool = new Pool<IncomingMessage>();
 
             this.lastTime = DateTime.Now;
             this.lastReceivedBytes = 0;
@@ -250,7 +247,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
                 return localPeer;
             }
 
-            foreach (LidgrenRemotePeer remotePeer in remotePeers)
+            foreach (RemotePeer remotePeer in remotePeers)
             {
                 if (remotePeer.Id == id)
                 {
@@ -268,7 +265,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         public IPeer FindRemotePeerByEndPoint(IPEndPoint endPoint)
         {
-            return localPeer.peer.GetConnection(endPoint).Tag as LidgrenRemotePeer;
+            return localPeer.peer.GetConnection(endPoint).Tag as RemotePeer;
         }
 
         public bool IsConnectedToEndPoint(IPEndPoint endPoint)
@@ -297,7 +294,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         public IOutgoingMessage GetMessage(IPeer recipient, SendDataOptions options, int channel)
         {
-            LidgrenOutgoingMessage msg = outgoingMessagePool.Get();
+            OutgoingMessage msg = outgoingMessagePool.Get();
             msg.Recipient = recipient;
             msg.Options = options;
             msg.Channel = channel;
@@ -306,7 +303,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         public void SendMessage(IOutgoingMessage message)
         {
-            LidgrenOutgoingMessage msg = message as LidgrenOutgoingMessage;
+            OutgoingMessage msg = message as OutgoingMessage;
 
             if (msg == null)
             {
@@ -332,7 +329,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
                 else
                 {
                     // Send to specific remote peer
-                    localPeer.peer.SendMessage(outgoingMsg, (msg.Recipient as LidgrenRemotePeer).connection, ToDeliveryMethod(msg.Options), msg.Channel);
+                    localPeer.peer.SendMessage(outgoingMsg, (msg.Recipient as RemotePeer).connection, ToDeliveryMethod(msg.Options), msg.Channel);
                 }
             }
 
@@ -349,7 +346,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         private void InvokeReceive(NetBuffer buffer, IPeer sender)
         {
-            LidgrenIncomingMessage incomingMsg = incomingMessagePool.Get();
+            IncomingMessage incomingMsg = incomingMessagePool.Get();
             incomingMsg.Backend = this;
             incomingMsg.Buffer = buffer;
 
@@ -373,18 +370,24 @@ namespace Microsoft.Xna.Framework.Net.Backend
                         }
 
                         Debug.WriteLine("Discovery request received");
-                        NetOutgoingMessage response = localPeer.peer.CreateMessage();
-                        response.Write((byte)Listener.SessionType);
-                        Listener.SessionProperties.Send(response);
 
-                        response.Write(Listener.MaxGamers);
-                        response.Write(Listener.PrivateGamerSlots);
-                        response.Write(Listener.CurrentGamerCount);
-                        response.Write(Listener.HostGamertag);
-                        response.Write(Listener.OpenPrivateGamerSlots);
-                        response.Write(Listener.OpenPublicGamerSlots);
-                        
+                        OutgoingMessage outgoingMsg = outgoingMessagePool.Get();
+                        outgoingMsg.Write((byte)Listener.SessionType);
+                        Listener.SessionProperties.Pack(outgoingMsg);
+                        outgoingMsg.Write(Listener.MaxGamers);
+                        outgoingMsg.Write(Listener.PrivateGamerSlots);
+                        outgoingMsg.Write(Listener.CurrentGamerCount);
+                        outgoingMsg.Write(Listener.HostGamertag);
+                        outgoingMsg.Write(Listener.OpenPrivateGamerSlots);
+                        outgoingMsg.Write(Listener.OpenPublicGamerSlots);
+
+                        outgoingMsg.Buffer.Position = 0;
+
+                        NetOutgoingMessage response = localPeer.peer.CreateMessage();
+                        response.Write(outgoingMsg.Buffer);
                         localPeer.peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
+
+                        outgoingMessagePool.Recycle(outgoingMsg);
                         break;
                     // Peer state changes
                     case NetIncomingMessageType.StatusChanged:
@@ -398,7 +401,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
                         if (status == NetConnectionStatus.Connected)
                         {
-                            LidgrenRemotePeer remotePeer = new LidgrenRemotePeer(msg.SenderConnection);
+                            RemotePeer remotePeer = new RemotePeer(msg.SenderConnection);
                             msg.SenderConnection.Tag = remotePeer;
                             remotePeers.Add(remotePeer);
                             reportedConnections.Add(msg.SenderConnection);
@@ -407,7 +410,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
                         }
                         else if (status == NetConnectionStatus.Disconnected)
                         {
-                            LidgrenRemotePeer disconnectedPeer = msg.SenderConnection.Tag as LidgrenRemotePeer;
+                            RemotePeer disconnectedPeer = msg.SenderConnection.Tag as RemotePeer;
 
                             if (disconnectedPeer == null)
                             {
@@ -428,7 +431,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
                             throw new NetworkException("Sender connection is null");
                         }
 
-                        InvokeReceive(msg, msg.SenderConnection.Tag as LidgrenRemotePeer);
+                        InvokeReceive(msg, msg.SenderConnection.Tag as RemotePeer);
                         break;
                     // Unconnected data
                     case NetIncomingMessageType.UnconnectedData:

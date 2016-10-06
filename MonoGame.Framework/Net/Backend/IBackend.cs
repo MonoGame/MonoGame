@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.GamerServices;
+using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Microsoft.Xna.Framework.Net.Backend
@@ -16,6 +18,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         void Write(string value);
         void Write(byte[] value);
     }
+
     internal interface IIncomingMessage
     {
         IPeer ReadPeer();
@@ -26,6 +29,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         string ReadString();
         void ReadBytes(byte[] into, int offset, int length);
     }
+
     internal interface IBackendListener
     {
         NetworkSessionType SessionType { get; }
@@ -43,6 +47,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         void PeerDisconnected(IPeer peer);
         void ReceiveMessage(IIncomingMessage data, IPeer sender);
     }
+
     internal interface IPeer
     {
         IPEndPoint EndPoint { get; }
@@ -50,7 +55,8 @@ namespace Microsoft.Xna.Framework.Net.Backend
         object Tag { get; set; }
         void Disconnect(string byeMessage);
     }
-    internal interface IBackend
+
+    internal interface ISessionBackend
     {
         bool HasShutdown { get; }
         IBackendListener Listener { get; set; }
@@ -70,5 +76,12 @@ namespace Microsoft.Xna.Framework.Net.Backend
         void Update();
         void UpdateStatistics();
         void Shutdown(string byeMessage);
+    }
+
+    internal interface ISessionCreator
+    {
+        NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties);
+        AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
+        NetworkSession Join(AvailableNetworkSession availableSession);
     }
 }

@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
         public InternalMessage[] FromIndex;
 
-        public InternalMessages(IBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
+        public InternalMessages(ISessionBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
         {
             FromIndex = new InternalMessage[]
             {
@@ -70,11 +70,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal abstract class InternalMessage
     {
-        public IBackend Backend { get; private set; }
+        public ISessionBackend Backend { get; private set; }
         public IMessageQueue Queue { get; private set; }
         public NetworkMachine CurrentMachine { get; private set; }
 
-        public void Initialize(IBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
+        public void Initialize(ISessionBackend backend, IMessageQueue queue, NetworkMachine currentMachine)
         {
             this.Backend = backend;
             this.Queue = queue;

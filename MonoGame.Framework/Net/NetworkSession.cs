@@ -20,20 +20,15 @@ namespace Microsoft.Xna.Framework.Net
         public const int MaxSupportedGamers = 64; // Should be public according to docs
         public const int MaxPreviousGamers = 10; // Should be public according to docs
 
-        internal static NetworkSession Session = null;
+        private static NetworkSession Session;
+        private static AsyncCreate AsyncCreateCaller;
+        private static AsyncFind AsyncFindCaller;
+        private static AsyncJoin AsyncJoinCaller;
 
-        private static AsyncCreate asyncCreateCaller;
-        private static AsyncFind asyncFindCaller;
-        private static AsyncJoin asyncJoinCaller;
-
-        // Asynchronous
+        // Asynchronous session creation
         public static IAsyncResult BeginCreate(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, AsyncCallback callback, Object asyncState)
         {
-            if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
-            {
-                throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
-            }
-            if (Session != null || asyncCreateCaller != null || asyncFindCaller != null || asyncJoinCaller != null)
+            if (Session != null || AsyncCreateCaller != null || AsyncFindCaller != null || AsyncJoinCaller != null)
             {
                 throw new InvalidOperationException("Only one NetworkSession allowed");
             }
@@ -45,12 +40,16 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new ArgumentOutOfRangeException("privateGamerSlots must be in the range [0, maxGamers]");
             }
+            if (sessionProperties == null)
+            {
+                sessionProperties = new NetworkSessionProperties();
+            }
 
-            asyncCreateCaller = new AsyncCreate(NetworkSessionCreation.Create);
+            AsyncCreateCaller = new AsyncCreate(NetworkSessionCreator.Instance.Create);
 
             try
             {
-                return asyncCreateCaller.BeginInvoke(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties, callback, asyncState);
+                return AsyncCreateCaller.BeginInvoke(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties, callback, asyncState);
             }
             catch { throw; }
         }
@@ -82,20 +81,16 @@ namespace Microsoft.Xna.Framework.Net
         {
             try
             {
-                NetworkSession session = asyncCreateCaller.EndInvoke(result);
-                asyncCreateCaller = null;
-                return session;
+                Session = AsyncCreateCaller.EndInvoke(result);
+                AsyncCreateCaller = null;
+                return Session;
             }
             catch { throw; }
         }
 
         public static IAsyncResult BeginFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties, AsyncCallback callback, Object asyncState)
         {
-            if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
-            {
-                throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
-            }
-            if (Session != null || asyncCreateCaller != null || asyncFindCaller != null || asyncJoinCaller != null)
+            if (Session != null || AsyncCreateCaller != null || AsyncFindCaller != null || AsyncJoinCaller != null)
             {
                 throw new InvalidOperationException("Only one NetworkSession allowed");
             }
@@ -108,11 +103,11 @@ namespace Microsoft.Xna.Framework.Net
                 searchProperties = new NetworkSessionProperties();
             }
 
-            asyncFindCaller = new AsyncFind(NetworkSessionCreation.Find);
+            AsyncFindCaller = new AsyncFind(NetworkSessionCreator.Instance.Find);
 
             try
             {
-                return asyncFindCaller.BeginInvoke(sessionType, localGamers, searchProperties, callback, asyncState);
+                return AsyncFindCaller.BeginInvoke(sessionType, localGamers, searchProperties, callback, asyncState);
             }
             catch { throw; }
         }
@@ -138,8 +133,8 @@ namespace Microsoft.Xna.Framework.Net
         {
             try
             {
-                AvailableNetworkSessionCollection availableSessions = asyncFindCaller.EndInvoke(result);
-                asyncFindCaller = null;
+                AvailableNetworkSessionCollection availableSessions = AsyncFindCaller.EndInvoke(result);
+                AsyncFindCaller = null;
                 return availableSessions;
             }
             catch { throw; }
@@ -147,7 +142,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public static IAsyncResult BeginJoin(AvailableNetworkSession availableSession, AsyncCallback callback, Object asyncState)
         {
-            if (Session != null || asyncCreateCaller != null || asyncFindCaller != null || asyncJoinCaller != null)
+            if (Session != null || AsyncCreateCaller != null || AsyncFindCaller != null || AsyncJoinCaller != null)
             {
                 throw new InvalidOperationException("Only one NetworkSession allowed");
             }
@@ -156,11 +151,11 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ArgumentNullException("availableSession");
             }
 
-            asyncJoinCaller = new AsyncJoin(NetworkSessionCreation.Join);
+            AsyncJoinCaller = new AsyncJoin(NetworkSessionCreator.Instance.Join);
 
             try
             {
-                return asyncJoinCaller.BeginInvoke(availableSession, callback, asyncState);
+                return AsyncJoinCaller.BeginInvoke(availableSession, callback, asyncState);
             }
             catch { throw; }
         }
@@ -169,14 +164,14 @@ namespace Microsoft.Xna.Framework.Net
         {
             try
             {
-                NetworkSession session = asyncJoinCaller.EndInvoke(result);
-                asyncJoinCaller = null;
-                return session;
+                Session = AsyncJoinCaller.EndInvoke(result);
+                AsyncJoinCaller = null;
+                return Session;
             }
             catch { throw; }
         }
 
-        // Synchronous
+        // Synchronous session creation
         public static NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
             try { return EndCreate(BeginCreate(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties, null, null)); }
@@ -234,7 +229,7 @@ namespace Microsoft.Xna.Framework.Net
         internal int maxGamers;
         internal int privateGamerSlots;
 
-        internal NetworkSession(IBackend backend, IPEndPoint hostEndPoint, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(ISessionBackend backend, IPEndPoint hostEndPoint, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
             this.hostEndPoint = hostEndPoint;
             this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, hostEndPoint == null);
@@ -281,7 +276,7 @@ namespace Microsoft.Xna.Framework.Net
             this.LocalGamers = this.localMachine.LocalGamers;
             this.PreviousGamers = new GamerCollection<NetworkGamer>(this.previousGamers);
             this.RemoteGamers = new GamerCollection<NetworkGamer>(this.remoteGamers);
-            this.SessionProperties = properties != null ? properties : new NetworkSessionProperties();
+            this.SessionProperties = properties;
             this.SessionProperties.Session = this;
             this.SessionState = NetworkSessionState.Lobby;
             this.SessionType = type;
@@ -291,7 +286,7 @@ namespace Microsoft.Xna.Framework.Net
             SignedInGamer.SignedOut += LocalGamerSignedOut;
         }
         
-        internal IBackend Backend { get; }
+        internal ISessionBackend Backend { get; }
         internal PacketPool PacketPool { get; }
         internal InternalMessages InternalMessages { get; }
         internal IList<NetworkMachine> RemoteMachines { get; }

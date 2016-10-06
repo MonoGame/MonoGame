@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Lidgren.Network;
 using Microsoft.Xna.Framework.Net.Backend;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -20,22 +21,38 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         internal NetworkSession Session { get; set; }
+        public bool IsReadOnly { get { return Session == null || !Session.IsHost; } }
+        public int Count { get { return list.Count; } }
 
-        internal void Send(NetBuffer buffer)
+        public Nullable<int> this[int index]
         {
-            buffer.Write(list.Count);
-
-            for (int i = 0; i < list.Count; i++)
+            get
             {
-                bool isSet = list[i] != null;
-                int value = isSet ? (int)list[i] : -1;
+                if (index < 0 || index >= list.Count)
+                {
+                    throw new ArgumentOutOfRangeException("index");
+                }
 
-                buffer.Write(isSet);
-                buffer.Write(value);
+                return list[index];
+            }
+
+            set
+            {
+                if (IsReadOnly)
+                {
+                    throw new InvalidOperationException("Properties are read-only when not host");
+                }
+
+                if (index < 0 || index >= list.Count)
+                {
+                    throw new ArgumentOutOfRangeException("index");
+                }
+
+                list[index] = value;
             }
         }
 
-        internal void Send(IOutgoingMessage msg)
+        internal void Pack(IOutgoingMessage msg)
         {
             msg.Write(list.Count);
 
@@ -49,23 +66,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void Receive(NetBuffer buffer)
-        {
-            int remoteCount = buffer.ReadInt32();
-            if (remoteCount != list.Count)
-            {
-                throw new NetworkException("NetworkSessionProperties size mismatch, different builds?");
-            }
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                bool isSet = buffer.ReadBoolean();
-                int value = buffer.ReadInt32();
-                this[i] = isSet ? value : (Nullable<int>)null;
-            }
-        }
-
-        internal void Receive(IIncomingMessage msg)
+        internal void Unpack(IIncomingMessage msg)
         {
             int remoteCount = msg.ReadInt();
             if (remoteCount != list.Count)
@@ -77,7 +78,7 @@ namespace Microsoft.Xna.Framework.Net
             {
                 bool isSet = msg.ReadBoolean();
                 int value = msg.ReadInt();
-                this[i] = isSet ? value : (Nullable<int>)null;
+                list[i] = isSet ? value : (Nullable<int>)null;
             }
         }
 
@@ -99,60 +100,39 @@ namespace Microsoft.Xna.Framework.Net
             return true;
         }
 
-        public Nullable<int> this[int index]
+        public void Clear()
         {
-            get
+            if (IsReadOnly)
             {
-                if (index < 0 || index >= list.Count)
-                {
-                    throw new ArgumentOutOfRangeException("index");
-                }
-
-                return list[index];
+                throw new InvalidOperationException("Properties are read-only when not host");
             }
 
-            set
+            for (int i = 0; i < list.Count; i++)
             {
-                if (index < 0 || index >= list.Count)
-                {
-                    throw new ArgumentOutOfRangeException("index");
-                }
-
-                list[index] = value;
+                list[i] = null;
             }
         }
 
-        public int Count
+        public void Insert(int index, int? item)
         {
-            get
-            {
-                int count = 0;
-
-                for (int i = 0; i < list.Count; i++)
-                {
-                    if (list[i] != null)
-                    {
-                        count++;
-                    }
-                }
-
-                return count;
-            }
+            try { this[index] = item; }
+            catch { throw; }
         }
 
-        public bool IsReadOnly { get { return false; } }
+        public void RemoveAt(int index)
+        {
+            try { this[index] = null; }
+            catch { throw; }
+        }
 
         public void Add(Nullable<int> item)
         {
             throw new InvalidOperationException("Use []-operator instead");
         }
 
-        public void Clear()
+        public bool Remove(int? item)
         {
-            for (int i = 0; i < list.Count; i++)
-            {
-                list[i] = null;
-            }
+            throw new InvalidOperationException("Use []-operator instead");
         }
 
         public bool Contains(int? item)
@@ -165,34 +145,19 @@ namespace Microsoft.Xna.Framework.Net
             list.CopyTo(array, arrayIndex);
         }
 
-        public IEnumerator<int?> GetEnumerator()
-        {
-            return list.GetEnumerator();
-        }
-
         public int IndexOf(int? item)
         {
             return -1;
         }
 
-        public void Insert(int index, int? item)
-        {
-            this[index] = item;
-        }
-
-        public bool Remove(int? item)
-        {
-            throw new InvalidOperationException("Use []-operator instead");
-        }
-
-        public void RemoveAt(int index)
-        {
-            this[index] = null;
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public IEnumerator<int?> GetEnumerator()
+        {
+            return list.GetEnumerator();
         }
     }
 }

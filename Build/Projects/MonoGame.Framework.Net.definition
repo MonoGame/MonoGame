@@ -140,7 +140,7 @@
     <Compile Include="Net\NetworkSession.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\NetworkSessionCreation.cs">
+    <Compile Include="Net\NetworkSessionCreator.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\NetworkSessionProperties.cs">
@@ -263,6 +263,9 @@
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Backend\LidgrenBackend.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Backend\LidgrenSessionCreator.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
 

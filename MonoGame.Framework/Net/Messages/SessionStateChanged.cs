@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             msg.Write(CurrentMachine.Session.allowJoinInProgress);
             msg.Write(CurrentMachine.Session.maxGamers);
             msg.Write(CurrentMachine.Session.privateGamerSlots);
-            CurrentMachine.Session.SessionProperties.Send(msg);
+            CurrentMachine.Session.SessionProperties.Pack(msg);
             msg.Write((byte)CurrentMachine.Session.SessionState);
 
             Queue.Place(msg);
@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             CurrentMachine.Session.allowJoinInProgress = msg.ReadBoolean();
             CurrentMachine.Session.maxGamers = msg.ReadInt();
             CurrentMachine.Session.privateGamerSlots = msg.ReadInt();
-            CurrentMachine.Session.SessionProperties.Receive(msg);
+            CurrentMachine.Session.SessionProperties.Unpack(msg);
             CurrentMachine.Session.SessionState = (NetworkSessionState)msg.ReadByte();
 
             senderMachine.HasSentSessionStateToLocalMachine = true;
