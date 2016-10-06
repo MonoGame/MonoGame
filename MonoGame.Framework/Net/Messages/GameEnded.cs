@@ -12,6 +12,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send EndGame");
             }
 
+            // Queue reset ready first
+            CurrentMachine.Session.InternalMessages.ResetReady.Create();
+
             IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GameEnded);
             Queue.Place(msg);
@@ -25,23 +28,17 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 Debug.Assert(false);
                 return;
             }
-
-            // Make sure that the host can not accidentaly start the game too early
+            
+            // Assert: Reset ready message must have happened before this call as it was sent just before
             if (CurrentMachine.IsHost)
             {
                 foreach (NetworkGamer gamer in CurrentMachine.Session.AllGamers)
                 {
-                    // Safe because any ready state change from a remote gamer will happen after the scope of this Receive() call
-                    gamer.SetReadyState(false);
+                    if (gamer.IsReady)
+                    {
+                        throw new NetworkException("A gamer is ready even though we are about to end game and go into the lobby state");
+                    }
                 }
-            }
-
-            // Tell everyone that our local gamers are not yet ready
-            foreach (LocalNetworkGamer localGamer in CurrentMachine.LocalGamers)
-            {
-                localGamer.SetReadyState(false);
-
-                CurrentMachine.Session.InternalMessages.GamerStateChanged.Create(localGamer, false, true, null);
             }
 
             // Reset state before going into lobby

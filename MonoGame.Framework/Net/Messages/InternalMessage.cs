@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         GamerStateChanged,
         GameStarted,
         RemoveMachine,
+        ResetReady,
         SessionStateChanged,
         UserMessage
     }
@@ -32,6 +33,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
         public GamerStateChanged GamerStateChanged = new GamerStateChanged();
         public GameStarted GameStarted = new GameStarted();
         public RemoveMachine RemoveMachine = new RemoveMachine();
+        public ResetReady ResetReady = new ResetReady();
         public SessionStateChanged SessionStateChanged = new SessionStateChanged();
         public UserMessage UserMessage = new UserMessage();
 
@@ -52,6 +54,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 GamerStateChanged,
                 GameStarted,
                 RemoveMachine,
+                ResetReady,
                 SessionStateChanged,
                 UserMessage
             };

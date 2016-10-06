@@ -673,7 +673,6 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new ObjectDisposedException("NetworkSession");
             }
-
             if (!IsHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
@@ -697,7 +696,6 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new ObjectDisposedException("NetworkSession");
             }
-
             if (!IsHost)
             {
                 throw new InvalidOperationException("Only the host can perform this action");
@@ -711,14 +709,18 @@ namespace Microsoft.Xna.Framework.Net
             InternalMessages.GameEnded.Create(null);
         }
 
-        public void ResetReady() // only host
+        public void ResetReady()
         {
             if (IsDisposed || SessionState == NetworkSessionState.Ended)
             {
                 throw new ObjectDisposedException("NetworkSession");
             }
+            if (!IsHost)
+            {
+                throw new InvalidOperationException("Only the host can perform this action");
+            }
 
-            throw new NotImplementedException();
+            InternalMessages.ResetReady.Create();
         }
 
         public NetworkGamer FindGamerById(byte gamerId)
