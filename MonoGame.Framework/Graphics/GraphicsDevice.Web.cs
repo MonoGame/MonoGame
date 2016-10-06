@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void PlatformApplyBlendFactor()
+        private void PlatformApplyBlend()
         {
         }
 

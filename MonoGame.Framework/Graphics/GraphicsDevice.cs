@@ -434,17 +434,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformBeginApplyState();
 
-            if (_blendStateDirty)
-            {
-                _actualBlendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
-
-            if (_blendFactorDirty)
-            {
-                PlatformApplyBlendFactor();
-                _blendFactorDirty = false;
-            }
+            PlatformApplyBlend();
 
             if (_depthStencilStateDirty)
             {
