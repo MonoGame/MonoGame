@@ -43,22 +43,8 @@ namespace Microsoft.Xna.Framework.Net
             return NetworkSession.Session;
         }
 
-        // ArgumentOutOfRangeException if maxLocalGamers is < 1 or > 4
         public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
-            if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
-            {
-                throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
-            }
-            if (sessionType == NetworkSessionType.Local)
-            {
-                throw new ArgumentException("Find cannot be used with NetworkSessionType.Local");
-            }
-            if (searchProperties == null)
-            {
-                searchProperties = new NetworkSessionProperties();
-            }
-
             // Send discover requests on subnet
             NetPeer discoverPeer = new NetPeer(CreateNetPeerConfig(false));
             discoverPeer.Start();
@@ -116,16 +102,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public static NetworkSession Join(AvailableNetworkSession availableSession)
         {
-            if (NetworkSession.Session != null)
-            {
-                throw new InvalidOperationException("Only one NetworkSession allowed");
-            }
-            if (availableSession == null)
-            {
-                throw new ArgumentNullException("availableSession");
-            }
             // TODO: NetworkSessionJoinException if availableSession full/not joinable/cannot be found
-
             NetPeer peer = new NetPeer(CreateNetPeerConfig(false));
             peer.Start();
             peer.Connect(availableSession.remoteEndPoint);

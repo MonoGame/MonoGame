@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework.Net.Backend;
 namespace Microsoft.Xna.Framework.Net
 {
     internal delegate NetworkSession AsyncCreate(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties);
+    internal delegate AvailableNetworkSessionCollection AsyncFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
+    internal delegate NetworkSession AsyncJoin(AvailableNetworkSession availableSession);
 
     public sealed class NetworkSession : IDisposable, IBackendListener, IMessageQueue
     {
@@ -23,15 +25,17 @@ namespace Microsoft.Xna.Framework.Net
         internal static NetworkSession Session = null;
 
         private static AsyncCreate asyncCreateCaller;
+        private static AsyncFind asyncFindCaller;
+        private static AsyncJoin asyncJoinCaller;
 
-        // Create (async)
+        // Asynchronous
         public static IAsyncResult BeginCreate(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, AsyncCallback callback, Object asyncState)
         {
             if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
             {
                 throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
             }
-            if (Session != null || asyncCreateCaller != null)
+            if (Session != null || asyncCreateCaller != null || asyncFindCaller != null || asyncJoinCaller != null)
             {
                 throw new InvalidOperationException("Only one NetworkSession allowed");
             }
@@ -53,6 +57,16 @@ namespace Microsoft.Xna.Framework.Net
             catch { throw; }
         }
 
+        public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, AsyncCallback callback, Object asyncState)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, AsyncCallback callback, Object asyncState)
+        {
+            throw new NotImplementedException();
+        }
+
         public static NetworkSession EndCreate(IAsyncResult result)
         {
             try
@@ -64,55 +78,121 @@ namespace Microsoft.Xna.Framework.Net
             catch { throw; }
         }
 
-        public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, AsyncCallback callback, Object asyncState)
+        public static IAsyncResult BeginFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties, AsyncCallback callback, Object asyncState)
         {
-            throw new NotImplementedException();
+            if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
+            {
+                throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
+            }
+            if (Session != null || asyncCreateCaller != null || asyncFindCaller != null || asyncJoinCaller != null)
+            {
+                throw new InvalidOperationException("Only one NetworkSession allowed");
+            }
+            if (sessionType == NetworkSessionType.Local)
+            {
+                throw new ArgumentException("Find cannot be used with NetworkSessionType.Local");
+            }
+            if (searchProperties == null)
+            {
+                searchProperties = new NetworkSessionProperties();
+            }
+
+            asyncFindCaller = new AsyncFind(NetworkSessionCreation.Find);
+
+            try
+            {
+                return asyncFindCaller.BeginInvoke(sessionType, localGamers, searchProperties, callback, asyncState);
+            }
+            catch { throw; }
         }
-        public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, AsyncCallback callback, Object asyncState)
+
+        public static IAsyncResult BeginFind(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties, AsyncCallback callback, Object asyncState)
         {
+            if (maxLocalGamers < 1 || maxLocalGamers > 4)
+            {
+                throw new ArgumentOutOfRangeException("maxLocalGamers must be in the range [1, 4]");
+            }
+
             throw new NotImplementedException();
         }
 
-        // Create (sync)
+        public static AvailableNetworkSessionCollection EndFind(IAsyncResult result)
+        {
+            try
+            {
+                AvailableNetworkSessionCollection availableSessions = asyncFindCaller.EndInvoke(result);
+                asyncFindCaller = null;
+                return availableSessions;
+            }
+            catch { throw; }
+        }
+
+        public static IAsyncResult BeginJoin(AvailableNetworkSession availableSession, AsyncCallback callback, Object asyncState)
+        {
+            if (Session != null || asyncCreateCaller != null || asyncFindCaller != null || asyncJoinCaller != null)
+            {
+                throw new InvalidOperationException("Only one NetworkSession allowed");
+            }
+            if (availableSession == null)
+            {
+                throw new ArgumentNullException("availableSession");
+            }
+
+            asyncJoinCaller = new AsyncJoin(NetworkSessionCreation.Join);
+
+            try
+            {
+                return asyncJoinCaller.BeginInvoke(availableSession, callback, asyncState);
+            }
+            catch { throw; }
+        }
+
+        public static NetworkSession EndJoin(IAsyncResult result)
+        {
+            try
+            {
+                NetworkSession session = asyncJoinCaller.EndInvoke(result);
+                asyncJoinCaller = null;
+                return session;
+            }
+            catch { throw; }
+        }
+
+        // Synchronous
         public static NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            try
-            {
-                return EndCreate(BeginCreate(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties, null, null));
-            }
+            try { return EndCreate(BeginCreate(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties, null, null)); }
             catch { throw; }
         }
+
         public static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers)
         {
-            try
-            {
-                return EndCreate(BeginCreate(sessionType, maxLocalGamers, maxGamers, null, null));
-            }
+            try { return EndCreate(BeginCreate(sessionType, maxLocalGamers, maxGamers, null, null)); }
             catch { throw; }
         }
+
         public static NetworkSession Create(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            try
-            {
-                return EndCreate(BeginCreate(sessionType, maxLocalGamers, maxGamers, privateGamerSlots, sessionProperties, null, null));
-            }
+            try { return EndCreate(BeginCreate(sessionType, maxLocalGamers, maxGamers, privateGamerSlots, sessionProperties, null, null)); }
             catch { throw; }
         }
 
-        // Find (sync)
         public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
-            return NetworkSessionCreation.Find(sessionType, localGamers, searchProperties);
-        }
-        public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties)
-        {
-            throw new NotImplementedException();
+            try { return EndFind(BeginFind(sessionType, localGamers, searchProperties, null, null)); }
+            catch { throw; }
         }
 
-        // Join (sync)
+        public static AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties)
+        {
+            try { return EndFind(BeginFind(sessionType, maxLocalGamers, searchProperties, null, null)); }
+            catch { throw; }
+        }
+
         public static NetworkSession Join(AvailableNetworkSession availableSession)
         {
-            return NetworkSessionCreation.Join(availableSession);
+            try { return EndJoin(BeginJoin(availableSession, null, null)); }
+            catch { throw; }
         }
 
         private IPEndPoint hostEndPoint;
