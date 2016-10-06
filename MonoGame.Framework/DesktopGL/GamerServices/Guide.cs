@@ -40,20 +40,14 @@ purpose and non-infringement.
 
 #region Using clause
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Runtime.Remoting.Messaging;
-
-using Microsoft.Xna.Framework.OldNet;
 
 
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-	public static class Guide
+    public static class Guide
 	{
 		private static bool isScreenSaverEnabled;
 		private static bool isTrialMode;

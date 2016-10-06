@@ -68,19 +68,17 @@ non-infringement.
 
 
 #region Using Statements
-using System;
 
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.OldNet;
 #endregion Statements
 
 #if !WINDOWS_PHONE
-namespace Microsoft.Xna.Framework.GamerServices {
+namespace Microsoft.Xna.Framework.GamerServices
+{
 #else
 namespace MonoGame.Xna.Framework.GamerServices {
 #endif
 
-	public class GamerServicesComponent : GameComponent {
+    public class GamerServicesComponent : GameComponent {
 
 		public GamerServicesComponent(Game game)
 			: base(game)
