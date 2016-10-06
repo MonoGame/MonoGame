@@ -1195,18 +1195,21 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private Color4 GetBlendFactor()
-        {
 #if WINDOWS_UAP
+        private SharpDX.Mathematics.Interop.RawColor4 GetBlendFactor()
+        {
 			return new SharpDX.Mathematics.Interop.RawColor4(
 					BlendFactor.R / 255.0f,
 					BlendFactor.G / 255.0f,
 					BlendFactor.B / 255.0f,
 					BlendFactor.A / 255.0f);
-#else
-			return BlendFactor.ToColor4();
-#endif
         }
+#else
+        private Color4 GetBlendFactor()
+        {
+			return BlendFactor.ToColor4();
+        }
+#endif
 
         internal void PlatformApplyState(bool applyShaders)
         {
