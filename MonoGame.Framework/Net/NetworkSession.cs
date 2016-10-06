@@ -18,9 +18,11 @@ namespace Microsoft.Xna.Framework.Net
         internal const int DiscoveryTime = 1000;
         internal const int JoinTime = 1000;
 
-        public const int MaxPreviousGamers = 10;
-        public const int MaxSupportedGamers = 64;
+        private const int MinSupportedLocalGamers = 1;
+        private const int MaxSupportedLocalGamers = 4;
         private const int MinSupportedGamers = 2;
+        public const int MaxSupportedGamers = 64; // Should be public according to docs
+        public const int MaxPreviousGamers = 10; // Should be public according to docs
 
         internal static NetworkSession Session = null;
 
@@ -57,14 +59,27 @@ namespace Microsoft.Xna.Framework.Net
             catch { throw; }
         }
 
-        public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, AsyncCallback callback, Object asyncState)
-        {
-            throw new NotImplementedException();
-        }
-
         public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, AsyncCallback callback, Object asyncState)
         {
-            throw new NotImplementedException();
+            if (maxLocalGamers < MinSupportedLocalGamers || maxLocalGamers > MaxSupportedLocalGamers)
+            {
+                throw new ArgumentOutOfRangeException("maxLocalGamers must be in the range [" + MinSupportedLocalGamers + ", " + MaxSupportedLocalGamers + "]");
+            }
+
+            List<SignedInGamer> localGamers = new List<SignedInGamer>(SignedInGamer.SignedInGamers);
+            if (localGamers.Count > maxLocalGamers)
+            {
+                localGamers.RemoveRange(maxLocalGamers, localGamers.Count - maxLocalGamers);
+            }
+
+            try { return BeginCreate(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties, callback, asyncState); }
+            catch { throw; }
+        }
+
+        public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, AsyncCallback callback, Object asyncState)
+        {
+            try { return BeginCreate(sessionType, maxLocalGamers, maxGamers, 0, null, callback, asyncState); }
+            catch { throw; }
         }
 
         public static NetworkSession EndCreate(IAsyncResult result)
@@ -108,12 +123,19 @@ namespace Microsoft.Xna.Framework.Net
 
         public static IAsyncResult BeginFind(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties, AsyncCallback callback, Object asyncState)
         {
-            if (maxLocalGamers < 1 || maxLocalGamers > 4)
+            if (maxLocalGamers < MinSupportedLocalGamers || maxLocalGamers > MaxSupportedLocalGamers)
             {
-                throw new ArgumentOutOfRangeException("maxLocalGamers must be in the range [1, 4]");
+                throw new ArgumentOutOfRangeException("maxLocalGamers must be in the range [" + MinSupportedLocalGamers + ", " + MaxSupportedLocalGamers + "]");
             }
 
-            throw new NotImplementedException();
+            List<SignedInGamer> localGamers = new List<SignedInGamer>(SignedInGamer.SignedInGamers);
+            if (localGamers.Count > maxLocalGamers)
+            {
+                localGamers.RemoveRange(maxLocalGamers, localGamers.Count - maxLocalGamers);
+            }
+
+            try { return BeginFind(sessionType, localGamers, searchProperties, callback, asyncState); }
+            catch { throw; }
         }
 
         public static AvailableNetworkSessionCollection EndFind(IAsyncResult result)
