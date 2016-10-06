@@ -12,7 +12,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     {
         private const int Port = 14242;
         private const int DiscoveryTime = 1000;
-        private const int JoinTime = 1000;
+        private const int FullyConnectedPollingTime = 50;
+        private const int FullyConnectedTimeOut = 500;
 
         private static NetPeerConfiguration CreateNetPeerConfig(bool specifyPort)
         {
@@ -27,6 +28,26 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
             return config;
+        }
+
+        private static bool WaitUntilFullyConnected(NetworkSession session)
+        {
+            int totalTime = 0;
+
+            while (!session.IsFullyConnected)
+            {
+                if (totalTime > FullyConnectedTimeOut)
+                {
+                    return false;
+                }
+
+                session.SilentUpdate();
+
+                Thread.Sleep(FullyConnectedPollingTime);
+                totalTime += FullyConnectedPollingTime;
+            }
+
+            return true;
         }
 
         public NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
@@ -47,7 +68,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 throw new InvalidOperationException("Lidgren error: " + e.Message, e);
             }
 
-            return new NetworkSession(new LidgrenBackend(peer), null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+            NetworkSession session = new NetworkSession(new LidgrenBackend(peer), null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+
+            if (!WaitUntilFullyConnected(session))
+            {
+                throw new NetworkException("Could not initialize session");
+            }
+
+            return session;
         }
 
         public AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
@@ -122,21 +150,20 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             peer.Start();
             peer.Connect(availableSession.remoteEndPoint);
 
-            Thread.Sleep(JoinTime);
-
-            if (peer.ConnectionsCount != 1)
-            {
-                peer.Shutdown("Connection failed");
-                throw new NetworkSessionJoinException("Connection failed", NetworkSessionJoinError.SessionNotFound);
-            }
-
             int maxGamers = availableSession.maxGamers;
             int privateGamerSlots = availableSession.privateGamerSlots;
             NetworkSessionType sessionType = availableSession.sessionType;
             NetworkSessionProperties sessionProperties = availableSession.SessionProperties;
             IEnumerable<SignedInGamer> localGamers = availableSession.localGamers;
 
-            return new NetworkSession(new LidgrenBackend(peer), availableSession.remoteEndPoint, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+            NetworkSession session = new NetworkSession(new LidgrenBackend(peer), availableSession.remoteEndPoint, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+
+            if (!WaitUntilFullyConnected(session))
+            {
+                throw new NetworkException("Could not fully connect to session");
+            }
+
+            return session;
         }
     }
 }

@@ -212,6 +212,7 @@ namespace Microsoft.Xna.Framework.Net
         private NetworkMachine localMachine;
         private NetworkMachine hostMachine;
         private List<IOutgoingMessage> messageQueue;
+        private List<EventArgs> eventQueue;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
         internal ICollection<IPEndPoint> pendingEndPoints;
@@ -235,6 +236,7 @@ namespace Microsoft.Xna.Framework.Net
             this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, hostEndPoint == null);
             this.hostMachine = hostEndPoint == null ? this.localMachine : null;
             this.messageQueue = new List<IOutgoingMessage>();
+            this.eventQueue = new List<EventArgs>();
 
             this.pendingSignedInGamers = new List<SignedInGamer>();
 
@@ -290,6 +292,8 @@ namespace Microsoft.Xna.Framework.Net
         internal PacketPool PacketPool { get; }
         internal InternalMessages InternalMessages { get; }
         internal IList<NetworkMachine> RemoteMachines { get; }
+
+        internal bool IsFullyConnected { get { return localMachine.IsFullyConnected; } }
 
         public GamerCollection<NetworkGamer> AllGamers { get; }
 
@@ -620,27 +624,27 @@ namespace Microsoft.Xna.Framework.Net
 
         internal void InvokeGamerJoinedEvent(GamerJoinedEventArgs args)
         {
-            GamerJoined?.Invoke(this, args);
+            eventQueue.Add(args);
         }
 
         internal void InvokeGamerLeftEvent(GamerLeftEventArgs args)
         {
-            GamerLeft?.Invoke(this, args);
+            eventQueue.Add(args);
         }
 
         internal void InvokeGameStartedEvent(GameStartedEventArgs args)
         {
-            GameStarted?.Invoke(this, args);
+            eventQueue.Add(args);
         }
 
         internal void InvokeGameEndedEvent(GameEndedEventArgs args)
         {
-            GameEnded?.Invoke(this, args);
+            eventQueue.Add(args);
         }
 
         internal void InvokeSessionEnded(NetworkSessionEndedEventArgs args)
         {
-            SessionEnded?.Invoke(this, args);
+            eventQueue.Add(args);
         }
 
         public void AddLocalGamer(SignedInGamer signedInGamer)
@@ -957,51 +961,6 @@ namespace Microsoft.Xna.Framework.Net
             receiver.Receive(data, senderMachine);
         }
 
-        public void Update()
-        {
-            if (IsDisposed || SessionState == NetworkSessionState.Ended)
-            {
-                throw new ObjectDisposedException("NetworkSession");
-            }
-
-            // Recycle inbound packets that the user has read from the last frame
-            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
-            {
-                localGamer.RecycleInboundPackets();
-            }
-
-            // Handle incoming internal messages (Might add new inbound packets)
-            Backend.Update();
-
-            // Add delayed inbound packets if sender has joined (Might add new inbound packets)
-            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
-            {
-                localGamer.TryAddDelayedInboundPackets();
-            }
-
-            HandleInitialConnection();
-
-            // Queue outbound packets as internal messages
-            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
-            {
-                localGamer.QueueOutboundPackets();
-            }
-
-            SendInternalMessages();
-
-            foreach (LocalNetworkGamer localGamer in LocalGamers)
-            {
-                localGamer.RecycleOutboundPackets();
-            }
-
-            if (SessionState == NetworkSessionState.Ended)
-            {
-                return;
-            }
-
-            Backend.UpdateStatistics();
-        }
-
         private void HandleInitialConnection()
         {
             if (localMachine.IsFullyConnected || pendingEndPoints == null)
@@ -1044,7 +1003,97 @@ namespace Microsoft.Xna.Framework.Net
 
             messageQueue.Clear();
         }
-        
+
+        internal void SilentUpdate()
+        {
+            if (IsDisposed || SessionState == NetworkSessionState.Ended)
+            {
+                return;
+            }
+
+            // Recycle inbound packets that the user has read from the last frame
+            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
+            {
+                localGamer.RecycleInboundPackets();
+            }
+
+            // Handle incoming internal messages (Might add new inbound packets)
+            Backend.Update();
+
+            // Add delayed inbound packets if sender has joined (Might add new inbound packets)
+            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
+            {
+                localGamer.TryAddDelayedInboundPackets();
+            }
+
+            HandleInitialConnection();
+
+            // Queue outbound packets as internal messages
+            foreach (LocalNetworkGamer localGamer in localMachine.LocalGamers)
+            {
+                localGamer.QueueOutboundPackets();
+            }
+
+            SendInternalMessages();
+
+            foreach (LocalNetworkGamer localGamer in LocalGamers)
+            {
+                localGamer.RecycleOutboundPackets();
+            }
+
+            if (SessionState == NetworkSessionState.Ended)
+            {
+                return;
+            }
+
+            Backend.UpdateStatistics();
+        }
+
+        private void TriggerEvents()
+        {
+            // This is not an elegant solution but it is convenient. Performance is not a problem since events are rare!
+            foreach (EventArgs arg in eventQueue)
+            {
+                if (arg is GamerJoinedEventArgs)
+                {
+                    GamerJoined?.Invoke(this, arg as GamerJoinedEventArgs);
+                }
+                else if (arg is GamerLeftEventArgs)
+                {
+                    GamerLeft?.Invoke(this, arg as GamerLeftEventArgs);
+                }
+                else if (arg is GameStartedEventArgs)
+                {
+                    GameStarted?.Invoke(this, arg as GameStartedEventArgs);
+                }
+                else if (arg is GameEndedEventArgs)
+                {
+                    GameEnded?.Invoke(this, arg as GameEndedEventArgs);
+                }
+                else if (arg is NetworkSessionEndedEventArgs)
+                {
+                    SessionEnded?.Invoke(this, arg as NetworkSessionEndedEventArgs);
+                }
+            }
+
+            eventQueue.Clear();
+        }
+
+        public void Update()
+        {
+            if (IsDisposed || SessionState == NetworkSessionState.Ended)
+            {
+                throw new ObjectDisposedException("NetworkSession");
+            }
+            if (!localMachine.IsFullyConnected)
+            {
+                throw new NetworkException("NetworkSession not initialized properly. The ISessionCreator must call NetworkSession.SilentUpdate() until NetworkSession.IsFullyConnected is true before returning the NetworkSession.");
+            }
+
+            SilentUpdate();
+
+            TriggerEvents();
+        }
 
         internal void End(NetworkSessionEndReason reason)
         {
