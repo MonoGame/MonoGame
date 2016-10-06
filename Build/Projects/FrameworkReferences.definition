@@ -31,9 +31,6 @@
       <Binary
         Name="Tao.Sdl"
         Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-      <Binary
-        Name="OpenTK"
-        Path="ThirdParty/Dependencies/OpenTK.dll" />
     </Service>
   </Platform>
 
