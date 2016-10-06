@@ -2,7 +2,7 @@
 
 ## This Fork
 
-My fork of MonoGame implements the Net namespace in order to compile networked games/apps that were built for XNA on any platform. I wanted to port my kart-racing game "Seaside Racing" to MonoGame and I decided to reimplement the Net namespace instead of rewriting the networking code in the game. The main reason to use the Net namespace for a new project is that the original API is very elegant, does player management and handles lobby-to-game transitions. The implementation supports multiple backends and it should be straightforward to add support for new platforms. At the moment, the default backend uses the [Lidgren](https://github.com/lidgren/lidgren-network-gen3) library for low level networking tasks.
+My fork of MonoGame implements the Net namespace in order to compile networked games/apps that were built for XNA on any platform. I wanted to port my kart-racing game "Seaside Racing" to MonoGame and I decided to reimplement the Net namespace instead of rewriting the networking code in the game. The main reason to use the Net namespace for a new project is that the original API is very elegant, does player management and handles lobby-to-game transitions. The implementation supports multiple backends and it should be straightforward to add support for new platforms. At the moment, the default backend uses the [Lidgren](https://github.com/lidgren/lidgren-network-gen3) library for low level networking tasks and it will work on any platform that supports standard .NET sockets.
 
 ### TODO
 * Master server and NAT introduction for PlayerMatch/Ranked support (can only handle Local and SystemLink/LAN atm)
