@@ -7,7 +7,12 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend
 {
-    internal class Pool<T> where T : new()
+    internal interface IResetable
+    {
+        void Reset();
+    }
+
+    internal class Pool<T> where T : IResetable, new()
     {
         private IList<T> freeMessages = new List<T>();
 
@@ -24,6 +29,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
             else
             {
                 item = new T();
+                item.Reset();
             }
 
             return item;
@@ -31,11 +37,12 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
         public void Recycle(T item)
         {
+            item.Reset();
             freeMessages.Add(item);
         }
     }
 
-    internal class LidgrenOutgoingMessage : IOutgoingMessage
+    internal class LidgrenOutgoingMessage : IOutgoingMessage, IResetable
     {
         public LidgrenOutgoingMessage()
         {
@@ -91,7 +98,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
             Buffer.Write((value as ILidgrenPeer).Id);
         }
     }
-    internal class LidgrenIncomingMessage : IIncomingMessage
+    internal class LidgrenIncomingMessage : IIncomingMessage, IResetable
     {
         internal LidgrenBackend Backend { get; set; }
         internal NetBuffer Buffer { get; set; }
@@ -185,6 +192,10 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
     internal class LidgrenBackend : IBackend
     {
+        internal const int Port = 14242;
+        internal const int DiscoveryTime = 1000;
+        internal const int JoinTime = 1000;
+
         private LidgrenLocalPeer localPeer;
         private IList<LidgrenRemotePeer> remotePeers;
         private List<NetConnection> reportedConnections;
@@ -333,7 +344,6 @@ namespace Microsoft.Xna.Framework.Net.Backend
                 InvokeReceive(msg.Buffer, localPeer);
             }
 
-            msg.Reset();
             outgoingMessagePool.Recycle(msg);
         }
 
@@ -344,8 +354,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
             incomingMsg.Buffer = buffer;
 
             Listener.ReceiveMessage(incomingMsg, sender);
-
-            incomingMsg.Reset();
+            
             incomingMessagePool.Recycle(incomingMsg);
         }
 

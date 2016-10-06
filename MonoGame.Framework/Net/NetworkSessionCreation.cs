@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             NetPeerConfiguration config = new NetPeerConfiguration("MonoGameApp");
 
-            config.Port = specifyPort ? NetworkSession.Port : 0;
+            config.Port = specifyPort ? LidgrenBackend.Port : 0;
             config.AcceptIncomingConnections = true;
 
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
@@ -48,9 +48,9 @@ namespace Microsoft.Xna.Framework.Net
             // Send discover requests on subnet
             NetPeer discoverPeer = new NetPeer(CreateNetPeerConfig(false));
             discoverPeer.Start();
-            discoverPeer.DiscoverLocalPeers(NetworkSession.Port);
+            discoverPeer.DiscoverLocalPeers(LidgrenBackend.Port);
 
-            Thread.Sleep(NetworkSession.DiscoveryTime);
+            Thread.Sleep(LidgrenBackend.DiscoveryTime);
 
             // Get list of answers
             List<AvailableNetworkSession> availableSessions = new List<AvailableNetworkSession>();
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Net
             peer.Start();
             peer.Connect(availableSession.remoteEndPoint);
 
-            Thread.Sleep(NetworkSession.JoinTime);
+            Thread.Sleep(LidgrenBackend.JoinTime);
 
             if (peer.ConnectionsCount != 1)
             {

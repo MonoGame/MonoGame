@@ -12,12 +12,8 @@ namespace Microsoft.Xna.Framework.Net
     internal delegate AvailableNetworkSessionCollection AsyncFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
     internal delegate NetworkSession AsyncJoin(AvailableNetworkSession availableSession);
 
-    public sealed class NetworkSession : IDisposable, IBackendListener, IMessageQueue
+    public sealed class NetworkSession : IBackendListener, IDisposable, IMessageQueue
     {
-        internal const int Port = 14242;
-        internal const int DiscoveryTime = 1000;
-        internal const int JoinTime = 1000;
-
         private const int MinSupportedLocalGamers = 1;
         private const int MaxSupportedLocalGamers = 4;
         private const int MinSupportedGamers = 2;
