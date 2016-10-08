@@ -145,6 +145,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Matrix.Multiply(ref _matrix, ref projection, out projection);
 
+            if (_effect != null)
+            {
+                EffectParameter matrixTransform = _effect.Parameters["MatrixTransform"];
+                if (matrixTransform != null)
+                    matrixTransform.SetValue(projection);
+            }
+
             _matrixTransform.SetValue(projection);
             _spritePass.Apply();
 		}
