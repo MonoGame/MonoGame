@@ -21,7 +21,7 @@ namespace MonoGame.Tools.Pipeline
 
         MenuBar menubar;
         ToolBar toolbar;
-        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuPads, menuBuild, menuHelp;
+        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
         MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmRebuildItem, cmExclude, cmRename, cmDelete;
         ButtonMenuItem cmAdd;
@@ -289,11 +289,11 @@ namespace MonoGame.Tools.Pipeline
             menuEdit.Items.Add(cmdDelete);
             Menu.Items.Add(menuEdit);
 
-            //Pads Commands
+            // View Commands
 
-            menuPads = new ButtonMenuItem();
-            menuPads.Text = "Pads";
-            Menu.Items.Add(menuPads);
+            menuView = new ButtonMenuItem();
+            menuView.Text = "View";
+            Menu.Items.Add(menuView);
 
             menuBuild = new ButtonMenuItem();
             menuBuild.Text = "Build";

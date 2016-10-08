@@ -45,7 +45,7 @@ namespace MonoGame.Tools.Pipeline
                     foreach (var com in pad.Commands)
                         menu.Items.Add(com.CreateMenuItem());
 
-                    menuPads.Items.Add(menu);
+                    menuView.Items.Add(menu);
                 }
             }
 
