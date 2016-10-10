@@ -376,6 +376,11 @@ namespace Microsoft.Xna.Framework
 
 #endif // WINDOWS || WINRT
 
+
+#if MONOMAC
+            presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+#endif
+
             // TODO: Implement multisampling (aka anti-alising) for all platforms!
             if (PreparingDeviceSettings != null)
             {
