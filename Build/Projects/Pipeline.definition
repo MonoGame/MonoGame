@@ -231,6 +231,9 @@
     <EmbeddedResource Include="Icons\Build\Succeed.png">
       <LogicalName>Build.Succeed.png</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Icons\Build\SucceedWithWarnings.png">
+      <LogicalName>Build.SucceedWithWarnings.png</LogicalName>
+    </EmbeddedResource>
     
     <!-- The resources for menubar and toolbar -->
     <EmbeddedResource Include="Icons\Commands\Build.png">

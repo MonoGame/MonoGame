@@ -15,7 +15,7 @@ namespace MonoGame.Tools.Pipeline
         private readonly DataField<Image> _dataImage;
         private readonly DataField<string> _dataText;
         private TreePosition _last;
-        private Image _iconInformation, _iconFail, _iconProcessing, _iconSkip, _iconSucceed, _iconStart, _iconEndSucceed, _iconEndFailed;
+        private Image _iconInformation, _iconFail, _iconProcessing, _iconSkip, _iconSucceed, _iconSucceedWithWarnings, _iconStart, _iconEndSucceed, _iconEndFailed;
         private Eto.Forms.CheckCommand _cmdFilterOutput, _cmdAutoScroll;
 
         public BuildOutput()
@@ -32,6 +32,7 @@ namespace MonoGame.Tools.Pipeline
             _iconEndSucceed = Global.GetXwtIcon("Build.EndSucceed.png");
             _iconEndFailed = Global.GetXwtIcon("Build.EndFailed.png");
             _iconSucceed = Global.GetXwtIcon("Build.Succeed.png");
+            _iconSucceedWithWarnings = Global.GetXwtIcon("Build.SucceedWithWarnings.png");
 
             _dataImage = new DataField<Image>();
             _dataText = new DataField<string>();
@@ -110,6 +111,8 @@ namespace MonoGame.Tools.Pipeline
                     AddItem(_output.ErrorMessage);
                     break;
                 case OutputState.BuildWarning:
+                    if (_treeStore.GetNavigatorAt(_last).GetValue(_dataImage) == _iconProcessing)
+                        _treeStore.GetNavigatorAt(_last).SetValue(_dataImage, _iconSucceedWithWarnings);
                     AddItem(_output.ErrorMessage);
                     break;
                 case OutputState.BuildEnd:
