@@ -28,6 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
         readonly EffectPass _spritePass;
 
 		Matrix _matrix;
+        EffectParameter _matrixParam;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
@@ -69,6 +70,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="rasterizerState">State of the rasterization. Uses <see cref="RasterizerState.CullCounterClockwise"/> if null.</param>
         /// <param name="effect">A custom <see cref="Effect"/> to override the default sprite effect. Uses default sprite effect if null.</param>
         /// <param name="transformMatrix">An optional matrix used to transform the sprite geometry. Uses <see cref="Matrix.Identity"/> if null.</param>
+        /// <param name="effectMatrixParam">The parameter in <paramref name="effect"/> which receives the transformation originating in
+        /// <paramref name="transformMatrix"/>.</param>
         /// <exception cref="InvalidOperationException">Thrown if <see cref="Begin"/> is called next time without previous <see cref="End"/>.</exception>
         /// <remarks>This method uses optional parameters.</remarks>
         /// <remarks>The <see cref="Begin"/> Begin should be called before drawing commands, and you cannot call it again before subsequent <see cref="End"/>.</remarks>
@@ -80,11 +83,18 @@ namespace Microsoft.Xna.Framework.Graphics
              DepthStencilState depthStencilState = null,
              RasterizerState rasterizerState = null,
              Effect effect = null,
-             Matrix? transformMatrix = null
+             Matrix? transformMatrix = null,
+             EffectParameter effectMatrixParam = null
         )
         {
             if (_beginCalled)
                 throw new InvalidOperationException("Begin cannot be called again until End has been successfully called.");
+
+            if (effectMatrixParam != null)
+            {
+                if (effectMatrixParam.ParameterClass != EffectParameterClass.Matrix)
+                    effectMatrixParam = null;
+            }
 
             // defaults
             _sortMode = sortMode;
@@ -94,6 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
             _effect = effect;
             _matrix = transformMatrix ?? Matrix.Identity;
+            _matrixParam = effectMatrixParam;
 
             // Setup things now so a user can change them.
             if (sortMode == SpriteSortMode.Immediate)
@@ -145,12 +156,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Matrix.Multiply(ref _matrix, ref projection, out projection);
 
-            if (_effect != null)
-            {
-                EffectParameter matrixTransform = _effect.Parameters["MatrixTransform"];
-                if (matrixTransform != null)
-                    matrixTransform.SetValue(projection);
-            }
+            if (_matrixParam != null)
+                _matrixParam.SetValue(projection);
 
             _matrixTransform.SetValue(projection);
             _spritePass.Apply();
