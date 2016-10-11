@@ -297,9 +297,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            // TODO: This looks excessive... i suspect we could do most
-            // of this with simple vector math and avoid this much matrix work.
-
+            // OPTIMIZED
+            //Matrix transformation, temp;
+            //Matrix.CreateTranslation(-origin.X, -origin.Y, 0f, out transformation);
+            //Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f, out temp);
+            //Matrix.Multiply(ref transformation, ref temp, out transformation);
+            //Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0, out temp);
+            //Matrix.Multiply(ref temp, ref transformation, out transformation);
+            //Matrix.CreateRotationZ(rotation, out temp);
+            //Matrix.Multiply(ref transformation, ref temp, out transformation);
+            //Matrix.CreateTranslation(position.X, position.Y, 0f, out temp);
+            //Matrix.Multiply(ref transformation, ref temp, out transformation);
+            
             Matrix transformation = Matrix.Identity;
             if (rotation == 0)
             {
