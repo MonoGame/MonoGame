@@ -302,25 +302,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var cos = (float)Math.Cos(rotation);
             var sin = (float)Math.Sin(rotation);
-            Matrix mFlipOriginScaleRotation;
-            mFlipOriginScaleRotation.M11 = ((flippedHorz ? -scale.X : scale.X) * cos);
-            mFlipOriginScaleRotation.M12 = ((flippedHorz ? -scale.X : scale.X) * sin);
-            mFlipOriginScaleRotation.M13 = 0;
-            mFlipOriginScaleRotation.M14 = 0;
-            mFlipOriginScaleRotation.M21 = ((flippedVert ? -scale.Y : scale.Y) * (-sin));
-            mFlipOriginScaleRotation.M22 = ((flippedVert ? -scale.Y : scale.Y) * cos);
-            mFlipOriginScaleRotation.M23 = 0;
-            mFlipOriginScaleRotation.M24 = 0;
-            mFlipOriginScaleRotation.M31 = 0;
-            mFlipOriginScaleRotation.M32 = 0;
-            mFlipOriginScaleRotation.M33 = 1;
-            mFlipOriginScaleRotation.M34 = 0;
-            mFlipOriginScaleRotation.M41 = (((((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X)) * cos) + ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y)) * (-sin)));
-            mFlipOriginScaleRotation.M42 = (((((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X)) * sin) + ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y)) * cos));
-            mFlipOriginScaleRotation.M43 = 0;
-            mFlipOriginScaleRotation.M44 = 1;
-            var mPosition = Matrix.CreateTranslation(position.X, position.Y, 0f);
-            var transformation = mFlipOriginScaleRotation * mPosition;
+            Matrix transformation;
+            transformation.M11 = ((flippedHorz ? -scale.X : scale.X) * cos);
+            transformation.M12 = ((flippedHorz ? -scale.X : scale.X) * sin);
+            transformation.M13 = 0;
+            transformation.M14 = 0;
+            transformation.M21 = ((flippedVert ? -scale.Y : scale.Y) * (-sin));
+            transformation.M22 = ((flippedVert ? -scale.Y : scale.Y) * cos);
+            transformation.M23 = 0;
+            transformation.M24 = 0;
+            transformation.M31 = 0;
+            transformation.M32 = 0;
+            transformation.M33 = 1;
+            transformation.M34 = 0;
+            transformation.M41 = (((((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X)) * cos) + ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y)) * (-sin))) + position.X;
+            transformation.M42 = (((((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X)) * sin) + ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y)) * cos)) + position.Y;
+            transformation.M43 = 0;
+            transformation.M44 = 1;
 
             // Get the default glyph here once.
             Glyph? defaultGlyph = null;
