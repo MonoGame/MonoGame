@@ -298,7 +298,8 @@ namespace MonoGame.Framework
 
         private void OnClientSizeChanged(object sender, EventArgs eventArgs)
         {
-            if (Game.Window == this)
+            // Only resize the backbuffer in windowed mode. In fullscreen mode, it gets stretched to fit the window.
+            if (Game.Window == this && !Game.graphicsDeviceManager.IsFullScreen)
             {
                 var manager = Game.graphicsDeviceManager;
 
