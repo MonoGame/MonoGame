@@ -303,13 +303,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Matrix transformation, temp;
             transformation = Matrix.CreateTranslation(-origin.X, -origin.Y, 0f);
             temp = Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f);
-            transformation = Matrix.Multiply(transformation, temp);
+            transformation = transformation * temp;
             temp = Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0);
-            transformation = Matrix.Multiply(temp, transformation);
+            transformation = temp * transformation;
             temp = Matrix.CreateRotationZ(rotation);
-            transformation = Matrix.Multiply(transformation, temp);
+            transformation = transformation * temp;
             temp = Matrix.CreateTranslation(position.X, position.Y, 0f);
-            transformation = Matrix.Multiply(transformation, temp);
+            transformation = transformation * temp;
 
             // Get the default glyph here once.
             Glyph? defaultGlyph = null;
