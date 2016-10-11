@@ -300,16 +300,16 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: This looks excessive... i suspect we could do most
             // of this with simple vector math and avoid this much matrix work.
 
-            Matrix transformation, temp;
+            Matrix transformation;
             transformation = Matrix.CreateTranslation(-origin.X, -origin.Y, 0f);
-            temp = Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f);
-            transformation = transformation * temp;
-            temp = Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0);
-            transformation = temp * transformation;
-            temp = Matrix.CreateRotationZ(rotation);
-            transformation = transformation * temp;
-            temp = Matrix.CreateTranslation(position.X, position.Y, 0f);
-            transformation = transformation * temp;
+            var mScale = Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f);
+            transformation = transformation * mScale;
+            var mFlip = Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0);
+            transformation = mFlip * transformation;
+            var mRotation = Matrix.CreateRotationZ(rotation);
+            transformation = transformation * mRotation;
+            var mPosition = Matrix.CreateTranslation(position.X, position.Y, 0f);
+            transformation = transformation * mPosition;
 
             // Get the default glyph here once.
             Glyph? defaultGlyph = null;
