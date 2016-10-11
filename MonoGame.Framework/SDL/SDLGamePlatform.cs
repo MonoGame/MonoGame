@@ -135,11 +135,15 @@ namespace Microsoft.Xna.Framework
                     char character = (char)ev.Key.Keysym.Sym;
                     if (char.IsControl (character))
                         _view.CallTextInput (character, key);
+
+                    _view.OnKeyDown(this, key);
                 }
                 else if (ev.Type == Sdl.EventType.KeyUp)
                 {
                     var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
                     _keys.Remove(key);
+
+                    _view.OnKeyUp(this, key);
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {

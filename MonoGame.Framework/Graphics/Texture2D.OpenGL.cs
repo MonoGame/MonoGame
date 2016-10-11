@@ -44,6 +44,9 @@ using OpenGL;
 using GLPixelFormat = OpenGL.PixelFormat;
 using PixelFormat = OpenGL.PixelFormat;
 #endif
+#if DESKTOPGL && WINDOWS
+using System.Drawing.Imaging;
+#endif
 
 #if GLES
 using OpenTK.Graphics.ES20;

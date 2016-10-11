@@ -34,22 +34,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private static MouseCursor PlatformFromTexture2D(Texture2D texture, int originx, int originy)
         {
-            IntPtr handle;
-
-            var stream = new MemoryStream();
-            texture.SaveAsImage(stream, texture.Width, texture.Height, ImageFormat.Bmp);
-            stream.Position = 0;
-
-            using (var br = new BinaryReader(stream))
-            {
-                var src = Sdl.RwFromMem(br.ReadBytes((int) stream.Length), (int) stream.Length);
-                var surface = Sdl.LoadBMP_RW(src, 1);
-                handle = Sdl.Mouse.CreateColorCursor(surface, originx, originy);
-                Sdl.FreeSurface(surface);
-            }
-
-            stream.Dispose();
-            return new MouseCursor(handle);
+            return null;
         }
 
         private void PlatformDispose()

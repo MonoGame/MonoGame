@@ -10,8 +10,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
-    internal class SdlGameWindow : GameWindow, IDisposable
+    public class SdlGameWindow : GameWindow, IDisposable
     {
+        // Amendment: Added events for integrating our key processing logic with monogame.
+        public event EventHandler<KeysEventArgs> TSKeyUp;
+        public event EventHandler<KeysEventArgs> TSKeyDown;
+
         public override bool AllowUserResizing
         {
             get { return !IsBorderless && _resizable; }
@@ -124,7 +128,10 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.State.MouseFocus;
 
             if (_resizable)
+            {
                 initflags |= Sdl.Window.State.Resizable;
+                initflags |= Sdl.Window.State.Maximized;
+            }
 
             if (_borderless)
                 initflags |= Sdl.Window.State.Borderless;
@@ -160,7 +167,11 @@ namespace Microsoft.Xna.Framework
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleBuffer, 1);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMajorVersion, 2);
             Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMinorVersion, 1);
-            
+
+            // Enable AA.
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, 4);
+
             _handle = Sdl.Window.Create (title,
                 _winx - _width / 2, _winy - _height / 2,
                 _width, _height, initflags);
@@ -290,6 +301,17 @@ namespace Microsoft.Xna.Framework
 
         public void ClientResize(int width, int height)
         {
+            // If we resize immediately, due to maximising, we can receive this before we're setup.
+            // Update our intended backbuffer width and height and recorded size, and return.
+            if (_game.GraphicsDevice == null || _game.GraphicsDevice.PresentationParameters == null)
+            {
+                _game.graphicsDeviceManager.PreferredBackBufferWidth = width;
+                _game.graphicsDeviceManager.PreferredBackBufferHeight = height;
+
+                Sdl.Window.GetSize(Handle, out _width, out _height);
+                return;
+            }
+
             // SDL reports many resize events even if the Size didn't change.
             // Only call the code below if it actually changed.
             if (_game.GraphicsDevice.PresentationParameters.BackBufferWidth == width &&
@@ -335,6 +357,26 @@ namespace Microsoft.Xna.Framework
             _handle = IntPtr.Zero;
 
             _disposed = true;
+        }
+
+        internal void OnKeyDown(object sender, Keys key)
+        {
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyDown;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
+        }
+
+        internal void OnKeyUp(object sender, Keys key)
+        {
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyUp;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
         }
     }
 }
