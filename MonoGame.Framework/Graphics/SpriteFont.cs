@@ -302,23 +302,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var cos = (float)Math.Cos(rotation);
             var sin = (float)Math.Sin(rotation);
-            Matrix transformation;
-            transformation.M11 = ((flippedHorz ? -scale.X : scale.X) * cos);
-            transformation.M12 = ((flippedHorz ? -scale.X : scale.X) * sin);
-            transformation.M13 = 0;
-            transformation.M14 = 0;
-            transformation.M21 = ((flippedVert ? -scale.Y : scale.Y) * (-sin));
-            transformation.M22 = ((flippedVert ? -scale.Y : scale.Y) * cos);
-            transformation.M23 = 0;
-            transformation.M24 = 0;
-            transformation.M31 = 0;
-            transformation.M32 = 0;
-            transformation.M33 = 1;
-            transformation.M34 = 0;
-            transformation.M41 = (((((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X)) * cos) + ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y)) * (-sin))) + position.X;
-            transformation.M42 = (((((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X)) * sin) + ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y)) * cos)) + position.Y;
-            transformation.M43 = 0;
-            transformation.M44 = 1;
+            Matrix transformation = Matrix.Identity;
+            transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
+            transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
+            transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
+            transformation.M22 = (flippedVert ? -scale.Y : scale.Y) * cos;
+            transformation.M41 = (((flipAdjustment.X - origin.X) * transformation.M11) + (flipAdjustment.Y - origin.Y) * transformation.M21) + position.X;
+            transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y;            
 
             // Get the default glyph here once.
             Glyph? defaultGlyph = null;
