@@ -301,22 +301,22 @@ namespace Microsoft.Xna.Framework.Graphics
             // of this with simple vector math and avoid this much matrix work.
 
             Matrix mFlipOriginScale;
-            mFlipOriginScale.M11 = (((1 * (flippedHorz ? -scale.X : scale.X)) + (0 * 0)) + (0 * 0)) + (0 * 0);
-            mFlipOriginScale.M12 = (((1 * 0) + (0 * (flippedVert ? -scale.Y : scale.Y))) + (0 * 0)) + (0 * 0);
-            mFlipOriginScale.M13 = (((1 * 0) + (0 * 0)) + (0 * 1)) + (0 * 0);
-            mFlipOriginScale.M14 = (((1 * 0) + (0 * 0)) + (0 * 0)) + (0 * 1);
-            mFlipOriginScale.M21 = (((0 * (flippedHorz ? -scale.X : scale.X)) + (1 * 0)) + (0 * 0)) + (0 * 0);
-            mFlipOriginScale.M22 = (((0 * 0) + (1 * (flippedVert ? -scale.Y : scale.Y))) + (0 * 0)) + (0 * 0);
-            mFlipOriginScale.M23 = (((0 * 0) + (1 * 0)) + (0 * 1)) + (0 * 0);
-            mFlipOriginScale.M24 = (((0 * 0) + (1 * 0)) + (0 * 0)) + (0 * 1);
-            mFlipOriginScale.M31 = (((0 * (flippedHorz ? -scale.X : scale.X)) + (0 * 0)) + (1 * 0)) + (0 * 0);
-            mFlipOriginScale.M32 = (((0 * 0) + (0 * (flippedVert ? -scale.Y : scale.Y))) + (1 * 0)) + (0 * 0);
-            mFlipOriginScale.M33 = (((0 * 0) + (0 * 0)) + (1 * 1)) + (0 * 0);
-            mFlipOriginScale.M34 = (((0 * 0) + (0 * 0)) + (1 * 0)) + (0 * 1);
-            mFlipOriginScale.M41 = ((((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X)) + ((flipAdjustment.Y - origin.Y) * 0)) + (0 * 0)) + (1 * 0);
-            mFlipOriginScale.M42 = ((((flipAdjustment.X - origin.X) * 0) + ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y))) + (0 * 0)) + (1 * 0);
-            mFlipOriginScale.M43 = ((((flipAdjustment.X - origin.X) * 0) + ((flipAdjustment.Y - origin.Y) * 0)) + (0 * 1)) + (1 * 0);
-            mFlipOriginScale.M44 = ((((flipAdjustment.X - origin.X) * 0) + ((flipAdjustment.Y - origin.Y) * 0)) + (0 * 0)) + (1 * 1);
+            mFlipOriginScale.M11 = (flippedHorz ? -scale.X : scale.X);
+            mFlipOriginScale.M12 = 0;
+            mFlipOriginScale.M13 = 0;
+            mFlipOriginScale.M14 = 0;
+            mFlipOriginScale.M21 = 0;
+            mFlipOriginScale.M22 = (flippedVert ? -scale.Y : scale.Y);
+            mFlipOriginScale.M23 = 0;
+            mFlipOriginScale.M24 = 0;
+            mFlipOriginScale.M31 = 0;
+            mFlipOriginScale.M32 = 0;
+            mFlipOriginScale.M33 = 1;
+            mFlipOriginScale.M34 = 0;
+            mFlipOriginScale.M41 = ((flipAdjustment.X - origin.X) * (flippedHorz ? -scale.X : scale.X));
+            mFlipOriginScale.M42 = ((flipAdjustment.Y - origin.Y) * (flippedVert ? -scale.Y : scale.Y));
+            mFlipOriginScale.M43 = 0;
+            mFlipOriginScale.M44 = 1;
             var mRotation = Matrix.CreateRotationZ(rotation);
             var mFlipOriginScaleRotation = mFlipOriginScale * mRotation;
             var mPosition = Matrix.CreateTranslation(position.X, position.Y, 0f);
