@@ -300,15 +300,25 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: This looks excessive... i suspect we could do most
             // of this with simple vector math and avoid this much matrix work.
 
-            var cos = (float)Math.Cos(rotation);
-            var sin = (float)Math.Sin(rotation);
             Matrix transformation = Matrix.Identity;
-            transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
-            transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
-            transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
-            transformation.M22 = (flippedVert ? -scale.Y : scale.Y) * cos;
-            transformation.M41 = (((flipAdjustment.X - origin.X) * transformation.M11) + (flipAdjustment.Y - origin.Y) * transformation.M21) + position.X;
-            transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y;            
+            if (rotation == 0)
+            {
+                transformation.M11 = (flippedHorz ? -scale.X : scale.X);
+                transformation.M22 = (flippedVert ? -scale.Y : scale.Y);
+                transformation.M41 = ((flipAdjustment.X - origin.X) * transformation.M11) + position.X;
+                transformation.M42 = ((flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y;
+            }
+            else
+            {
+                var cos = (float)Math.Cos(rotation);
+                var sin = (float)Math.Sin(rotation);
+                transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
+                transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
+                transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
+                transformation.M22 = (flippedVert ? -scale.Y : scale.Y) * cos;
+                transformation.M41 = (((flipAdjustment.X - origin.X) * transformation.M11) + (flipAdjustment.Y - origin.Y) * transformation.M21) + position.X;
+                transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y; 
+            }
 
             // Get the default glyph here once.
             Glyph? defaultGlyph = null;
