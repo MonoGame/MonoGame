@@ -300,9 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: This looks excessive... i suspect we could do most
             // of this with simple vector math and avoid this much matrix work.
 
-            var mFlip = Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0);
-            var mOrigin = Matrix.CreateTranslation(-origin.X, -origin.Y, 0f);
-            var mFlipOrigin = mFlip * mOrigin;
+            var mFlipOrigin = Matrix.CreateTranslation(flipAdjustment.X - origin.X, flipAdjustment.Y - origin.Y, 0);
             var mScale = Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f);            
             var mFlipOriginScale = mFlipOrigin * mScale;
             var mRotation = Matrix.CreateRotationZ(rotation);
