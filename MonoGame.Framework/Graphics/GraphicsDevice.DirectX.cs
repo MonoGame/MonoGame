@@ -589,9 +589,10 @@ namespace Microsoft.Xna.Framework.Graphics
             var featureLevels = new List<FeatureLevel>();
             if (GraphicsProfile == GraphicsProfile.HiDef)
             {
-                featureLevels.Add(FeatureLevel.Level_11_0);
-                featureLevels.Add(FeatureLevel.Level_10_1);
-                featureLevels.Add(FeatureLevel.Level_10_0);
+                // Cut it down to just asking for level 9_3; this is all we need.
+                // The high feature level requests otherwise cause us problems,
+                // as even some cards which ought to detect as supporting them don't.
+                featureLevels.Add(FeatureLevel.Level_9_3);
             }
 
             // We can not give featureLevels for granted in GraphicsProfile.Reach
@@ -605,7 +606,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // if GetSupportedFeatureLevel() fails, do not crash the initialization. Program can run without this.
             }
 
-            if (supportedFeatureLevel >= FeatureLevel.Level_9_3)
+            if (GraphicsProfile != GraphicsProfile.HiDef && supportedFeatureLevel >= FeatureLevel.Level_9_3)
                 featureLevels.Add(FeatureLevel.Level_9_3);
             if (supportedFeatureLevel >= FeatureLevel.Level_9_2)
                 featureLevels.Add(FeatureLevel.Level_9_2);
