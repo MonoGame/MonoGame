@@ -213,7 +213,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void Setup()
         {
-#if DEBUG
             if (DisplayMode == null)
             {
                 throw new ApplicationException(
@@ -221,7 +220,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     "game is not configured to be HiDPI aware under Windows 10 or later.  See " +
                     "https://github.com/MonoGame/MonoGame/issues/5040 for more information.");
             }
-#endif
 
             // Initialize the main viewport
             _viewport = new Viewport (0, 0,
