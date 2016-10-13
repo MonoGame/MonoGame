@@ -37,6 +37,8 @@ namespace MonoGame.Framework
 
         private bool _isMouseInBounds;
 
+        private bool _areClientSizeChangedEventsIgnored;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -296,8 +298,18 @@ namespace MonoGame.Framework
             _form.Show();
         }
 
+        internal void EnableClientSizeChangedEvent(bool isEnabled)
+        {
+            _areClientSizeChangedEventsIgnored = !isEnabled;
+            if (isEnabled)
+                OnClientSizeChanged(this, EventArgs.Empty);
+        }
+
         private void OnClientSizeChanged(object sender, EventArgs eventArgs)
         {
+            if (_areClientSizeChangedEventsIgnored)
+                return;
+
             // Only resize the backbuffer in windowed mode. In fullscreen mode, it gets stretched to fit the window.
             if (Game.Window == this && !Game.graphicsDeviceManager.IsFullScreen)
             {
