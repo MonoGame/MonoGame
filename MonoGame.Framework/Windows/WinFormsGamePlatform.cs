@@ -126,7 +126,6 @@ namespace MonoGame.Framework
             }
 
             _window._form.WindowState = FormWindowState.Normal;
-            _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
 
             _alreadyInWindowedMode = true;
             _alreadyInFullScreenMode = false;
@@ -137,9 +136,14 @@ namespace MonoGame.Framework
             _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is resized
 
             if (Game.GraphicsDevice.PresentationParameters.IsFullScreen)
+            {
                 EnterFullScreen();
+            }
             else
+            {
                 ExitFullScreen();
+                _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
+            }
 
             _window.EnableClientSizeChangedEvent(true); // Re-enable (and trigger) ClientSizeChanged event
         }
