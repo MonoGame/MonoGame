@@ -310,23 +310,23 @@ namespace MonoGame.Framework
             if (_areClientSizeChangedEventsIgnored)
                 return;
 
-            // Only resize the backbuffer in windowed mode. In fullscreen mode, it gets stretched to fit the window.
-            if (Game.Window == this && !Game.graphicsDeviceManager.IsFullScreen)
+            if (Game.Window == this)
             {
                 var manager = Game.graphicsDeviceManager;
-
-                // Set the default new back buffer size and viewport, but this
-                // can be overloaded by the two events below.
-
-                var newWidth = _form.ClientRectangle.Width;
-                var newHeight = _form.ClientRectangle.Height;
-
                 if (manager.GraphicsDevice == null)
                     return;
 
-                manager.GraphicsDevice.PresentationParameters.BackBufferWidth = newWidth;
-                manager.GraphicsDevice.PresentationParameters.BackBufferHeight = newHeight;
-                manager.GraphicsDevice.OnPresentationChanged();
+                // Only resize the backbuffer in windowed mode. In fullscreen mode, it gets stretched to fit the window.
+                // Also skip resizing the backbuffer when the window is minimized.
+                if (!manager.IsFullScreen && (_form.WindowState != FormWindowState.Minimized))
+                {
+                    // Set the default new back buffer size and viewport, but this
+                    // can be overloaded by the two events below.
+                    var newSize = _form.ClientSize;
+                    manager.GraphicsDevice.PresentationParameters.BackBufferWidth = newSize.Width;
+                    manager.GraphicsDevice.PresentationParameters.BackBufferHeight = newSize.Height;
+                    manager.GraphicsDevice.OnPresentationChanged();
+                }
             }
 
             // Set the new view state which will trigger the 
