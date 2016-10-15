@@ -1145,7 +1145,7 @@ namespace TwoMGFX
         protected virtual object EvalFunction_Header(ParseTree tree, params object[] paramlist)
         {
             var shaderInfo = paramlist[0] as ShaderInfo;
-        	shaderInfo.Functions.Add(this.GetValue(tree, TokenType.Identifier, 0) as string);
+        	shaderInfo.Functions.Add(this.GetValue(tree, TokenType.Identifier, 0) as string, this);
         
         	return null;
         }

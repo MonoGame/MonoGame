@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace TwoMGFX
 {
@@ -14,6 +13,6 @@ namespace TwoMGFX
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
         public Dictionary<string, SamplerStateInfo> SamplerStates = new Dictionary<string, SamplerStateInfo>();
 	    public Dictionary<string, SemanticVariableInfo> SemanticVariables = new Dictionary<string, SemanticVariableInfo>();
-	    public List<string> Functions = new List<string>();
+	    public Dictionary<string, ParseNode> Functions = new Dictionary<string, ParseNode>();
 	}
 }

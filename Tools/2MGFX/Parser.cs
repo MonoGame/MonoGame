@@ -49,20 +49,20 @@ namespace TwoMGFX
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Start), "Start");
             parent.Nodes.Add(node);
 
-            TokenType[] expectedTokens;
-            if (this.shaderProfile == ShaderProfile.GLFX)
-                expectedTokens = new[] {TokenType.Code, TokenType.Technique, TokenType.Sampler, TokenType.Void, TokenType.GlslIn};
+            TokenType[] expected;
+            if (shaderProfile == ShaderProfile.DirectX_11)
+                expected = new[] {TokenType.Code, TokenType.Technique, TokenType.Sampler};
             else
-                expectedTokens = new[] {TokenType.Code, TokenType.Technique, TokenType.Sampler};
-            
-            tok = scanner.LookAhead(expectedTokens);
+                expected = new[] {TokenType.Code, TokenType.Technique, TokenType.Sampler, TokenType.Void, TokenType.GlslIn};
+
+            tok = scanner.LookAhead(expected);
             while (tok.Type == TokenType.Code
                 || tok.Type == TokenType.Technique
                 || tok.Type == TokenType.Sampler
                 || tok.Type == TokenType.Void
                 || tok.Type == TokenType.GlslIn)
             {
-                tok = scanner.LookAhead(expectedTokens);
+                tok = scanner.LookAhead(expected);
                 switch (tok.Type)
                 {
                     case TokenType.Code:
@@ -91,7 +91,7 @@ namespace TwoMGFX
                         tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Code, Technique, Sampler, Void, or GlslIn.", 0x0002, tok));
                         break;
                 }
-                tok = scanner.LookAhead(expectedTokens);
+                tok = scanner.LookAhead(expected);
             }
 
             
@@ -162,6 +162,16 @@ namespace TwoMGFX
             node.Nodes.Add(n);
             if (tok.Type != TokenType.CloseBracket) {
                 tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.CloseBracket.ToString(), 0x1001, tok));
+                return;
+            }
+
+            
+            tok = scanner.Scan(TokenType.Semicolon);
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Semicolon) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Semicolon.ToString(), 0x1001, tok));
                 return;
             }
 

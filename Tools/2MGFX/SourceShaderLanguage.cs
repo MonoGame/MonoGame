@@ -9,6 +9,7 @@ namespace TwoMGFX
     /// </summary>
     public enum SourceShadingLanguage
     {
+        Unknown,
         Hlsl,
         Glsl
     }
