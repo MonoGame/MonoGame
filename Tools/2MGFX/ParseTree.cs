@@ -509,6 +509,9 @@ namespace TwoMGFX
                 case TokenType.Semantic:
                     Value = EvalSemantic(tree, paramlist);
                     break;
+                case TokenType.GlslParam:
+                    Value = EvalGlslParam(tree, paramlist);
+                    break;
                 case TokenType.Function_Header:
                     Value = EvalFunction_Header(tree, paramlist);
                     break;
@@ -1124,27 +1127,37 @@ namespace TwoMGFX
 
         protected virtual object EvalSemantic_Variable(ParseTree tree, params object[] paramlist)
         {
-            var variable = new SemanticVariableInfo();
+            if (this.GetValue(tree, TokenType.Semantic, 0) == null) return null;
+        
+        	var variable = new VsInputVariableInfo();
         	variable.TypeName = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	variable.Name = this.GetValue(tree, TokenType.Identifier, 1) as string;
         	variable.SemanticName = this.GetValue(tree, TokenType.Identifier, 2) as string;
+        	variable.AttributeSyntax = (this.GetValue(tree, TokenType.GlslIn, 0) as string) == "attribute";
+        	variable.Node = this;
         
         	var shaderInfo = paramlist[0] as ShaderInfo;
-        	shaderInfo.SemanticVariables.Add(variable.Name, variable);
+        	shaderInfo.VsInputVariables.Add(variable.Name, variable);
         
         	return null;
         }
 
         protected virtual object EvalSemantic(ParseTree tree, params object[] paramlist)
         {
-            foreach (var node in Nodes)
-                node.Eval(tree, paramlist);
-            return null;
+            return this.GetValue(tree, TokenType.Identifier, 0);
+        }
+
+        protected virtual object EvalGlslParam(ParseTree tree, params object[] paramlist)
+        {
+            // just return something so we can detect that this is available in parents
+        	return true;
         }
 
         protected virtual object EvalFunction_Header(ParseTree tree, params object[] paramlist)
         {
-            var shaderInfo = paramlist[0] as ShaderInfo;
+            // only add parameterless functions since we want this to match with shader stage entry points
+        	if (this.GetValue(tree, TokenType.GlslParam, 0) != null) return null;
+        	var shaderInfo = paramlist[0] as ShaderInfo;
         	shaderInfo.Functions.Add(this.GetValue(tree, TokenType.Identifier, 0) as string, this);
         
         	return null;

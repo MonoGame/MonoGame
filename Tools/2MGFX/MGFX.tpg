@@ -433,24 +433,41 @@ Sampler_Declaration -> Sampler Identifier Sampler_Register_Expression* Sampler_D
 };
 
 // Semantics, glsl only for simplicity
-Semantic_Variable -> GlslIn Identifier Identifier Semantic Semicolon
+Semantic_Variable -> GlslIn Identifier Identifier Semantic? Semicolon
 {
-	var variable = new SemanticVariableInfo();
+	if ($Semantic == null) return null;
+
+	var variable = new VsInputVariableInfo();
 	variable.TypeName = $Identifier[0] as string;
 	variable.Name = $Identifier[1] as string;
 	variable.SemanticName = $Identifier[2] as string;
+	variable.AttributeSyntax = ($GlslIn[0] as string) == "attribute";
+	variable.Node = this;
 
 	var shaderInfo = paramlist[0] as ShaderInfo;
-	shaderInfo.SemanticVariables.Add(variable.Name, variable);
+	shaderInfo.VsInputVariables.Add(variable.Name, variable);
 
 	return null;
 };
 
-Semantic -> Colon Identifier;
-
-// Functions (only parse parameterless void functions with this)
-Function_Header -> Void Identifier OpenParenthesis CloseParenthesis
+Semantic -> Colon Identifier
 {
+	return $Identifier;
+};
+
+// Functions
+
+// param syntax: (in|out|inout)?(TYPE)(NAME)
+GlslParam -> Identifier Identifier Identifier?
+{
+	// just return something so we can detect that this is available in parents
+	return true;
+};
+
+Function_Header -> Void Identifier OpenParenthesis GlslParam? (Comma GlslParam)* CloseParenthesis
+{
+	// only add parameterless functions since we want this to match with shader stage entry points
+	if ($GlslParam != null) return null;
 	var shaderInfo = paramlist[0] as ShaderInfo;
 	shaderInfo.Functions.Add($Identifier as string, this);
 

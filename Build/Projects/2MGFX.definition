@@ -198,7 +198,7 @@
     <Compile Include="ShaderData.writer.cs" />
     <Compile Include="PassInfo.cs" />
     <Compile Include="SamplerStateInfo.cs" />
-    <Compile Include="SemanticVariableInfo.cs" />
+    <Compile Include="VsInputVariableInfo.cs" />
     <Compile Include="ShaderInfo.cs" />
     <Compile Include="ShaderProfile.cs" />
     <Compile Include="ShaderProfile.OpenGL.cs" />

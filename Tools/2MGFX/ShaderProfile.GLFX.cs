@@ -90,6 +90,9 @@ namespace TwoMGFX
             // TODO this is really, really inefficient...
             WhitespaceFunctions(ref text,
                 shaderInfo.Functions.Where(kvp => kvp.Key != functionName).Select(kvp => kvp.Value));
+            // non vertex shaders can't have any "attribute" input variables
+            if (type != ShaderType.Vertex)
+                WhitespaceNodes(ref text, shaderInfo.VsInputVariables.Where(v => v.Value.AttributeSyntax).Select(v => v.Value.Node));
 
             // note that this modifies the position of characters so any modification based
             // on the parsenodes after this will be incorrect
@@ -139,6 +142,12 @@ namespace TwoMGFX
                 var funcEnd = node.Token.EndPos + length;
                 ParseTreeTools.WhitespaceRange(ref text, funcHeaderStart, funcEnd - funcHeaderStart + 1);
             }
+        }
+
+        private static void WhitespaceNodes(ref string text, IEnumerable<ParseNode> nodes)
+        {
+            foreach (var node in nodes)
+                ParseTreeTools.WhitespaceRange(ref text, node.Token.StartPos, node.Token.Length);
         }
 
         internal override bool Supports(string platform)

@@ -9,14 +9,16 @@ namespace TwoMGFX
     {
         public static string Preprocess(
             string effectCode, string filePath, IDictionary<string, string> defines, List<string> dependencies,
-            IEffectCompilerOutput output)
+            IEffectCompilerOutput output, ShaderProfile profile)
         {
             var fullPath = Path.GetFullPath(filePath);
 
             var pp = new CppNet.Preprocessor();
 
             pp.EmitExtraLineInfo = false;
-            pp.addFeature(Feature.LINEMARKERS);
+            // the glsl-optimizer crashes from #line directives, and line numbers are off anyway after optimization so don't bother
+            if (profile != ShaderProfile.GLFX)
+                pp.addFeature(Feature.LINEMARKERS);
             pp.setListener(new MGErrorListener(output));
             pp.setFileSystem(new MGFileSystem(dependencies));
             pp.setQuoteIncludePath(new List<string> { Path.GetDirectoryName(fullPath) });
