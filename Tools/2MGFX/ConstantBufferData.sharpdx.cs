@@ -14,7 +14,7 @@ namespace TwoMGFX
 
             ParameterIndex = new List<int>();
 
-            var parameters = new List<DirectXEffectObject.d3dx_parameter>();
+            var parameters = new List<EffectObject.d3dx_parameter>();
 
             // Gather all the parameters.
             for (var i = 0; i < cb.Description.VariableCount; i++)
@@ -47,9 +47,9 @@ namespace TwoMGFX
                 ParameterOffset.Add(param.bufferOffset);
         }
 
-        private static DirectXEffectObject.d3dx_parameter GetParameterFromType(SharpDX.D3DCompiler.ShaderReflectionType type)
+        private static EffectObject.d3dx_parameter GetParameterFromType(SharpDX.D3DCompiler.ShaderReflectionType type)
         {
-            var param = new DirectXEffectObject.d3dx_parameter();
+            var param = new EffectObject.d3dx_parameter();
             param.rows = (uint)type.Description.RowCount;
             param.columns = (uint)type.Description.ColumnCount;
             param.name = type.Description.Name ?? string.Empty;
@@ -59,15 +59,15 @@ namespace TwoMGFX
             switch (type.Description.Class)
             {
                 case SharpDX.D3DCompiler.ShaderVariableClass.Scalar:
-                    param.class_ = DirectXEffectObject.D3DXPARAMETER_CLASS.SCALAR;
+                    param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
                     break;
 
                 case SharpDX.D3DCompiler.ShaderVariableClass.Vector:
-                    param.class_ = DirectXEffectObject.D3DXPARAMETER_CLASS.VECTOR;
+                    param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
                     break;
 
                 case SharpDX.D3DCompiler.ShaderVariableClass.MatrixColumns:
-                    param.class_ = DirectXEffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
+                    param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     break;
 
                 default:
@@ -77,15 +77,15 @@ namespace TwoMGFX
             switch (type.Description.Type)
             {
                 case SharpDX.D3DCompiler.ShaderVariableType.Bool:
-                    param.type = DirectXEffectObject.D3DXPARAMETER_TYPE.BOOL;
+                    param.type = EffectObject.D3DXPARAMETER_TYPE.BOOL;
                     break;
 
                 case SharpDX.D3DCompiler.ShaderVariableType.Float:
-                    param.type = DirectXEffectObject.D3DXPARAMETER_TYPE.FLOAT;
+                    param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     break;
 
                 case SharpDX.D3DCompiler.ShaderVariableType.Int:
-                    param.type = DirectXEffectObject.D3DXPARAMETER_TYPE.INT;
+                    param.type = EffectObject.D3DXPARAMETER_TYPE.INT;
                     break;
 
                 default:
@@ -97,7 +97,7 @@ namespace TwoMGFX
 
             if (param.member_count > 0)
             {
-                param.member_handles = new DirectXEffectObject.d3dx_parameter[param.member_count];
+                param.member_handles = new EffectObject.d3dx_parameter[param.member_count];
                 for (var i = 0; i < param.member_count; i++)
                 {
                     var mparam = GetParameterFromType(type.GetMemberType(i));
@@ -107,10 +107,10 @@ namespace TwoMGFX
             }
             else
             {
-                param.member_handles = new DirectXEffectObject.d3dx_parameter[param.element_count];
+                param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
                 for (var i = 0; i < param.element_count; i++)
                 {
-                    var mparam = new DirectXEffectObject.d3dx_parameter();
+                    var mparam = new EffectObject.d3dx_parameter();
 
                     mparam.name = string.Empty;
                     mparam.semantic = string.Empty;

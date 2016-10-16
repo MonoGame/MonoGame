@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace TwoMGFX
 {
-    class OpenGLShaderProfile : ShaderProfile
+    internal class OpenGLShaderProfile : ShaderProfile
     {
         private static readonly Regex GlslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
         private static readonly Regex GlslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
@@ -60,6 +60,8 @@ namespace TwoMGFX
             var shaderInfo = shaderResult.ShaderInfo;
             var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);
             effect.Shaders.Add(shaderData);
+
+            return shaderData;
         }
 
         internal override bool Supports(string platform)

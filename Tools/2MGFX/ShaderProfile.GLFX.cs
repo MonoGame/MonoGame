@@ -28,58 +28,27 @@ namespace TwoMGFX
             // TODO: implement
         }
 
-        internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader,
-            EffectObject effect, ref string errorsAndWarnings)
+        internal override void BeforeCreation(ShaderResult shaderResult)
         {
             var shaderInfo = shaderResult.ShaderInfo;
             var content = shaderResult.FileContent;
             ParseTreeTools.WhitespaceNodes(TokenType.Semantic, shaderInfo.ParseTree.Nodes, ref content);
-
             // we should have pure GLSL now so we can pass it to the optimizer
+        }
+
+        internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader,
+            EffectObject effect, ref string errorsAndWarnings)
+        {
+            var shaderInfo = shaderResult.ShaderInfo;
+            var shaderType = isVertexShader ? ShaderType.Vertex : ShaderType.Pixel;
             // TODO: depending on platform and version this can be GLES 2.0 or 3.0
             var optimizer = new GLSLOptimizer(Target.OpenGL);
 
-            var vsFuncs = new Dictionary<string, OptimizationResult>();
-            var psFuncs = new Dictionary<string, OptimizationResult>();
-
-            // we need to pass all functions used in techniques to the optimizer seperately
-            foreach (var technique in shaderInfo.Techniques)
-            {
-                foreach (var pass in technique.Passes)
-                {
-                    ValidateShaderModels(pass);
-
-                    var vsName = pass.vsFunction;
-                    var vsModel = pass.vsModel;
-                    if (!string.IsNullOrEmpty(vsName) && !vsFuncs.ContainsKey(vsName))
-                    {
-                        var result = OptimizeFunction(optimizer, ShaderType.Vertex, vsName, vsModel, shaderInfo);
-                        vsFuncs.Add(vsName, result);
-                    }
-
-                    var psName = pass.psFunction;
-                    var psModel = pass.psModel;
-                    if (psFuncs.ContainsKey(psName)) continue;
-                    {
-                        var result = OptimizeFunction(optimizer, ShaderType.Fragment, psName, psModel, shaderInfo);
-                        psFuncs.Add(psName, result);
-                    }
-                }
-            }
-
-            optimizer.Dispose();
-
             errorsAndWarnings = string.Empty;
-            return null;
-        }
-
-        private static OptimizationResult OptimizeFunction(GLSLOptimizer optimizer, ShaderType type, 
-            string functionName, string version, ShaderInfo shaderInfo)
-        {
             // first replace the function to optimize with 'main'
             ParseNode funcNode;
-            if (!shaderInfo.Functions.TryGetValue(functionName, out funcNode))
-                throw new Exception(string.Format("Function specified in technique not defined: {0}", functionName));
+            if (!shaderInfo.Functions.TryGetValue(shaderFunction, out funcNode))
+                throw new Exception(string.Format("Function specified in technique not defined: {0}", shaderFunction));
 
             // the first node is 'void', the second is the function  name
             var nameNode = funcNode.Nodes[1];
@@ -89,9 +58,9 @@ namespace TwoMGFX
             var text = string.Copy(shaderInfo.FileContent);
             // TODO this is really, really inefficient...
             WhitespaceFunctions(ref text,
-                shaderInfo.Functions.Where(kvp => kvp.Key != functionName).Select(kvp => kvp.Value));
+                shaderInfo.Functions.Where(kvp => kvp.Key != shaderFunction).Select(kvp => kvp.Value));
             // non vertex shaders can't have any "attribute" input variables
-            if (type != ShaderType.Vertex)
+            if (shaderType != ShaderType.Vertex)
                 WhitespaceNodes(ref text, shaderInfo.VsInputVariables.Where(v => v.Value.AttributeSyntax).Select(v => v.Value.Node));
 
             // note that this modifies the position of characters so any modification based
@@ -105,7 +74,11 @@ namespace TwoMGFX
             // then optimize it
             var input = builder.ToString();
             const OptimizationOptions options = OptimizationOptions.SkipPreprocessor;
-            return optimizer.Optimize(type, input, options);
+            var result = optimizer.Optimize(shaderType, input, options);
+
+            optimizer.Dispose();
+
+            return null;
         }
 
         private static void WhitespaceFunctions(ref string text, IEnumerable<ParseNode> nodes)

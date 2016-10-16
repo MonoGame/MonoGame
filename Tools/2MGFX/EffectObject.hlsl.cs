@@ -17,6 +17,7 @@ namespace TwoMGFX
                 // in the first place.
                 //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.NoPreshader;
 
+                // TODO: we don't need the profile here once we drop MojoShader
                 if (shaderResult.Profile == ShaderProfile.DirectX_11)
                     shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
 

@@ -2,7 +2,7 @@
 
 namespace TwoMGFX
 {
-    partial class DirectXEffectObject
+    partial class EffectObject
     {
         private static byte[] CompilePSSL(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, ref string errorsAndWarnings)
         {

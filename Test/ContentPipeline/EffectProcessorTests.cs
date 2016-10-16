@@ -48,7 +48,7 @@ namespace MonoGame.Tests.ContentPipeline
             var mgPreprocessed = Preprocessor.Preprocess(effectCode, fullPath, new Dictionary<string, string>
             {
                 { "TEST2", "1" }
-            }, mgDependencies, new TestEffectCompilerOutput());
+            }, mgDependencies, new TestEffectCompilerOutput(), ShaderProfile.DirectX_11);
 
             Assert.That(mgDependencies, Has.Count.EqualTo(1));
             Assert.That(Path.GetFileName(mgDependencies[0]), Is.EqualTo("PreprocessorInclude.fxh"));

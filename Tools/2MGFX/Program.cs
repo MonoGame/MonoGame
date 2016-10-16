@@ -51,6 +51,7 @@ namespace TwoMGFX
 
             try
             {
+                options.Profile.BeforeCreation(shaderResult);
                 effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
 
                 if (!string.IsNullOrEmpty(shaderErrorsAndWarnings))

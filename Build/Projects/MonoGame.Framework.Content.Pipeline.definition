@@ -196,10 +196,6 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ConstantBufferData.writer.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\DirectXEffectObject.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\DirectXEffectObject.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\EffectObject.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\EffectObject.cs</Link>

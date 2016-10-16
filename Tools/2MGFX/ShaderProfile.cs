@@ -66,6 +66,10 @@ namespace TwoMGFX
 
         internal abstract void ValidateShaderModels(PassInfo pass);
 
+        internal virtual void BeforeCreation(ShaderResult shaderResult)
+        {
+        }
+
         internal abstract ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings);
 
         internal abstract bool Supports(string platform);
