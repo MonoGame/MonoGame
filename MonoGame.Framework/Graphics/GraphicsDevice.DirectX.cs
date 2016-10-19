@@ -1461,7 +1461,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsProfile graphicsProfile;
 
-            if (featureLevel >= FeatureLevel.Level_10_0 || GraphicsAdapter.UseReferenceDevice)
+            if (featureLevel >= FeatureLevel.Level_9_3 || GraphicsAdapter.UseReferenceDevice)
                 graphicsProfile = GraphicsProfile.HiDef;
             else
                 graphicsProfile = GraphicsProfile.Reach;
