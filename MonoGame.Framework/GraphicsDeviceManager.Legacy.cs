@@ -377,7 +377,7 @@ namespace Microsoft.Xna.Framework
 #endif // WINDOWS || WINRT
 
 
-#if MONOMAC
+#if MONOMAC || DESKTOPGL
             presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
 #endif
 

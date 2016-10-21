@@ -44,7 +44,7 @@ using OpenGL;
 using GLPixelFormat = OpenGL.PixelFormat;
 using PixelFormat = OpenGL.PixelFormat;
 #endif
-#if DESKTOPGL && WINDOWS
+#if DESKTOPGL && (WINDOWS || LINUX)
 using System.Drawing.Imaging;
 #endif
 
