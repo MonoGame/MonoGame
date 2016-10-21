@@ -7,6 +7,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Eto.Forms;
+using System.Windows.Threading;
+using System.Threading;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -197,7 +199,10 @@ namespace MonoGame.Tools.Pipeline
 
         public void OutputAppend(string text)
         {
-            Application.Instance.Invoke(() => buildOutput.WriteLine(text));
+            if(Dispatcher.FromThread(Thread.CurrentThread)==null)
+                Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
+            else 
+                buildOutput.WriteLine(text);
         }
 
         public void OutputClear()
