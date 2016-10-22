@@ -197,7 +197,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OutputAppend(string text)
         {
-            Application.Instance.Invoke(() => buildOutput.WriteLine(text));
+            Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
         }
 
         public void OutputClear()
