@@ -194,6 +194,8 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var c in _cells)
             {
+                rec.Height = c.Height + _spacing;
+
                 // Draw group
                 if (prevCategory != c.Category)
                 {
@@ -215,7 +217,7 @@ namespace MonoGame.Tools.Pipeline
                 // Draw separator for the current row
                 g.FillRectangle(PropInfo.BorderColor, _separatorPos - 1, rec.Y, 1, rec.Height);
 
-                rec.Y += PropInfo.TextHeight + _spacing;
+                rec.Y += c.Height + _spacing;
             }
 
             if (_height != rec.Y + 1)

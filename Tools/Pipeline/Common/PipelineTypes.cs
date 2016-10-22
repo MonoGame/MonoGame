@@ -300,8 +300,6 @@ namespace MonoGame.Tools.Pipeline
                             browsable = (a as BrowsableAttribute).Browsable;
                         else if (a is DisplayNameAttribute)
                             name = (a as DisplayNameAttribute).DisplayName;
-                        else if (a is DefaultValueAttribute)
-                            defvalue = (a as DefaultValueAttribute).Value;
                     }
 
                     var p = new ProcessorTypeDescription.Property()
