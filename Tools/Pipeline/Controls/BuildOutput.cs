@@ -97,15 +97,15 @@ namespace MonoGame.Tools.Pipeline
                     PopulateAssets();
                     break;
                 case OutputState.Cleaning:                    
-                    AddItem(_output, _iconInformation, "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename));
+                    AddItem(_output, _iconInformation, "Cleaned " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.Skipping:
-                    AddItem(_output, _iconSkip, "Skipping " + PipelineController.Instance.GetRelativePath(_output.Filename));
+                    AddItem(_output, _iconSkip, "Skipped " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.BuildAsset:
-                    AddItem(_output, _iconProcessing, "Building " + PipelineController.Instance.GetRelativePath(_output.Filename));
+                    AddItem(_output, _iconStart, "Building " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.BuildError:
@@ -168,8 +168,16 @@ namespace MonoGame.Tools.Pipeline
                 item.SetValue(_dataText, text);
             }
 
-            if (_last != null && _treeStore.GetNavigatorAt(_last).GetValue(_dataImage) == _iconProcessing)
-                _treeStore.GetNavigatorAt(_last).SetValue(_dataImage, _iconSucceed);
+            if (_last != null && _treeStore.GetNavigatorAt(_last).GetValue(_dataImage) == _iconStart)
+            {
+                var lastNode = _treeStore.GetNavigatorAt(_last);
+                lastNode.SetValue(_dataImage, _iconSucceed);
+                var tx = lastNode.GetValue(_dataText);
+                if(tx.StartsWith("Building"))
+                {
+                    lastNode.SetValue(_dataText, tx.Substring(9));
+                }
+            }
 
             if (_cmdAutoScroll.Checked)
                 treeView.ScrollToRow(item.CurrentPosition);
@@ -194,7 +202,7 @@ namespace MonoGame.Tools.Pipeline
             foreach(var ContentItem in  project.ContentItems)
             {
                 var node = _treeStore.AddNode();
-                node.SetValue(_dataImage, _iconStart);
+                node.SetValue(_dataImage, _iconProcessing);
                 node.SetValue(_dataText, ContentItem.OriginalPath);
 
                 string key = Path.Combine(project.Location, ContentItem.OriginalPath);
