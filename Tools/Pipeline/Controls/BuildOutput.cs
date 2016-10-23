@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Xwt;
 using Xwt.Drawing;
 
@@ -14,7 +16,9 @@ namespace MonoGame.Tools.Pipeline
         private TreeStore _treeStore;
         private readonly DataField<Image> _dataImage;
         private readonly DataField<string> _dataText;
-        private TreePosition _last;
+        private TreePosition _last;        
+        Dictionary<string, TreeNavigator> assetMap = new Dictionary<string, TreeNavigator>();
+        Dictionary<string, TreeNavigator> xnbMap = new Dictionary<string, TreeNavigator>();
         private Image _iconInformation, _iconFail, _iconProcessing, _iconSkip, _iconSucceed, _iconSucceedWithWarnings, _iconStart, _iconEndSucceed, _iconEndFailed;
         private Eto.Forms.CheckCommand _cmdFilterOutput, _cmdAutoScroll;
 
@@ -89,18 +93,19 @@ namespace MonoGame.Tools.Pipeline
             switch (_output.State)
             {
                 case OutputState.BuildBegin:
-                    AddItem(_iconStart, line);
+                    AddItem(_iconStart, line);                    
+                    PopulateAssets();
                     break;
-                case OutputState.Cleaning:
-                    AddItem(_iconInformation, "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename));
+                case OutputState.Cleaning:                    
+                    AddItem(_output, _iconInformation, "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.Skipping:
-                    AddItem(_iconSkip, "Skipping " + PipelineController.Instance.GetRelativePath(_output.Filename));
+                    AddItem(_output, _iconSkip, "Skipping " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.BuildAsset:
-                    AddItem(_iconProcessing, "Building " + PipelineController.Instance.GetRelativePath(_output.Filename));
+                    AddItem(_output, _iconProcessing, "Building " + PipelineController.Instance.GetRelativePath(_output.Filename));
                     AddItem(line);
                     break;
                 case OutputState.BuildError:
@@ -115,7 +120,8 @@ namespace MonoGame.Tools.Pipeline
                         _treeStore.GetNavigatorAt(_last).SetValue(_dataImage, _iconSucceedWithWarnings);
                     AddItem(_output.ErrorMessage);
                     break;
-                case OutputState.BuildEnd:
+                case OutputState.BuildEnd:                                       
+                    PostBuildAssets();
                     if (line.Contains("0 failed"))
                         AddItem(_iconEndSucceed, line);
                     else
@@ -131,11 +137,36 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        private void AddItem(Image image, string text)
-        {
-            var item = _treeStore.AddNode();
-            item.SetValue(_dataImage, image);
-            item.SetValue(_dataText, text);
+        private void AddItem(OutputParser output, Image image, string text)
+        {   
+            TreeNavigator item=null;
+            var key = _output.Filename;
+            //normalize key
+            key = Path.ChangeExtension(key, null);
+            key = key.Replace('\\','/');
+            key = new Uri(key).AbsolutePath;
+            
+            //get node
+            assetMap.TryGetValue(key, out item);
+            if(item==null)
+                xnbMap.TryGetValue(key, out item);
+
+            AddItem( image, text, item);
+        }
+
+        private void AddItem(Image image, string text, TreeNavigator item = null)
+        {   
+            if(item == null)
+            {
+                item = _treeStore.AddNode();
+                item.SetValue(_dataImage, image);
+                item.SetValue(_dataText, text);
+            }
+            else
+            {
+                item.SetValue(_dataImage, image);
+                item.SetValue(_dataText, text);
+            }
 
             if (_last != null && _treeStore.GetNavigatorAt(_last).GetValue(_dataImage) == _iconProcessing)
                 _treeStore.GetNavigatorAt(_last).SetValue(_dataImage, _iconSucceed);
@@ -150,6 +181,48 @@ namespace MonoGame.Tools.Pipeline
         {
             _treeStore.GetNavigatorAt(_last).AddChild().SetValue(_dataText, text);
         }
+                
+        internal void PopulateAssets()
+        {
+            // Suspend FilterOutput            
+            panel.Content = textArea;
+            
+            assetMap.Clear();
+            xnbMap.Clear();
+
+            var project = PipelineController.Instance.ProjectItem;
+            foreach(var ContentItem in  project.ContentItems)
+            {
+                var node = _treeStore.AddNode();
+                node.SetValue(_dataImage, _iconStart);
+                node.SetValue(_dataText, ContentItem.OriginalPath);
+
+                string key = Path.Combine(project.Location, ContentItem.OriginalPath);
+                //normalize key
+                key = Path.ChangeExtension(key, null);
+                key = key.Replace('\\','/');
+                key = new Uri(key).AbsolutePath;
+                assetMap.Add(key, node); //map key to node
+                
+                key = Path.Combine(project.Location, project.OutputDir, ContentItem.OriginalPath);
+                //normalize key
+                key = Path.ChangeExtension(key, null);
+                key = key.Replace('\\','/');
+                key = new Uri(key).AbsolutePath;
+                xnbMap.Add(key, node); //map key to node
+            }
+
+            // Resume FilterOutput Layout
+            panel.Content = _cmdFilterOutput.Checked ? treeView.ToEto() : textArea;
+        }
+        
+        private void PostBuildAssets()
+        {
+            // TODO: do something about unchanged assets here.
+            // ex. if you clean an allready cleaned project 
+            //     all assets will remain with the original icon.
+        }
+
     }
 }
 
