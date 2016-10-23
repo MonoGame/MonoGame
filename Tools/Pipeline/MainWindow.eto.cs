@@ -248,8 +248,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitalizeMenu()
         {
-            Menu = menubar = new MenuBar();
-            Menu.Style = "MenuBar";
+            menubar = new MenuBar();
 
             menuFile = new ButtonMenuItem();
             menuFile.Text = "File";
@@ -266,7 +265,7 @@ namespace MonoGame.Tools.Pipeline
             menuFile.Items.Add(new SeparatorMenuItem());
             menuFile.Items.Add(cmdSave);
             menuFile.Items.Add(cmdSaveAs);
-            Menu.Items.Add(menuFile);
+            menubar.Items.Add(menuFile);
 
             menuEdit = new ButtonMenuItem();
             menuEdit.Text = "Edit";
@@ -287,13 +286,13 @@ namespace MonoGame.Tools.Pipeline
             menuEdit.Items.Add(new SeparatorMenuItem());
             menuEdit.Items.Add(cmdRename);
             menuEdit.Items.Add(cmdDelete);
-            Menu.Items.Add(menuEdit);
+            menubar.Items.Add(menuEdit);
 
             // View Commands
 
             menuView = new ButtonMenuItem();
             menuView.Text = "View";
-            Menu.Items.Add(menuView);
+            menubar.Items.Add(menuView);
 
             menuBuild = new ButtonMenuItem();
             menuBuild.Text = "Build";
@@ -303,15 +302,18 @@ namespace MonoGame.Tools.Pipeline
             menuBuild.Items.Add(cmdCancelBuild);
             menuBuild.Items.Add(new SeparatorMenuItem());
             menuBuild.Items.Add(cmdDebugMode);
-            Menu.Items.Add(menuBuild);
+            menubar.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
             menuHelp.Text = "Help";
             menuHelp.Items.Add(cmdHelp);
-            Menu.Items.Add(menuHelp);
+            menubar.Items.Add(menuHelp);
 
-            Menu.QuitItem = cmdExit;
-            Menu.AboutItem = cmdAbout;
+            menubar.QuitItem = cmdExit;
+            menubar.AboutItem = cmdAbout;
+
+            Menu = menubar;
+            Menu.Style = "MenuBar";
         }
 
         private void InitalizeContextMenu()
