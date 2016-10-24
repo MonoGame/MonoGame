@@ -2,25 +2,19 @@
 using System.Net;
 
 using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Net.Backend;
 
 namespace Microsoft.Xna.Framework.Net
 {
     public sealed class AvailableNetworkSession
     {
-        internal IPEndPoint remoteEndPoint;
-        internal IEnumerable<SignedInGamer> localGamers;
-        internal int maxGamers;
-        internal int privateGamerSlots;
-        internal NetworkSessionType sessionType;
-
         internal AvailableNetworkSession(IPEndPoint remoteEndPoint, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionType sessionType, int currentGamerCount, string hostGamertag, int openPrivateGamerSlots, int openPublicGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            this.remoteEndPoint = remoteEndPoint;
-            this.localGamers = localGamers;
-            this.maxGamers = maxGamers;
-            this.privateGamerSlots = privateGamerSlots;
-            this.sessionType = sessionType;
-
+            this.RemoteEndPoint = remoteEndPoint;
+            this.LocalGamers = localGamers;
+            this.MaxGamers = maxGamers;
+            this.PrivateGamerSlots = privateGamerSlots;
+            this.SessionType = sessionType;
             this.CurrentGamerCount = currentGamerCount;
             this.HostGamertag = hostGamertag;
             this.OpenPrivateGamerSlots = openPrivateGamerSlots;
@@ -29,6 +23,12 @@ namespace Microsoft.Xna.Framework.Net
             this.SessionProperties = sessionProperties;
         }
 
+        internal IPEndPoint RemoteEndPoint { get; }
+        internal IEnumerable<SignedInGamer> LocalGamers { get; }
+        internal int MaxGamers { get; }
+        internal int PrivateGamerSlots { get; }
+        internal NetworkSessionType SessionType { get; }
+        internal object Tag { get; set; }
         public int CurrentGamerCount { get; }
         public string HostGamertag { get; }
         public int OpenPrivateGamerSlots { get; }

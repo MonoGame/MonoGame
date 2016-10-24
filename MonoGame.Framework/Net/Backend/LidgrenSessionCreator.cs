@@ -5,30 +5,15 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.GamerServices;
 
 using Lidgren.Network;
+using System.Net;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
     internal class LidgrenSessionCreator : ISessionCreator
     {
-        private const int Port = 14242;
         private const int DiscoveryTime = 1000;
         private const int FullyConnectedPollingTime = 50;
         private const int FullyConnectedTimeOut = 500;
-
-        private static NetPeerConfiguration CreateNetPeerConfig(bool specifyPort)
-        {
-            NetPeerConfiguration config = new NetPeerConfiguration("MonoGameApp");
-
-            config.Port = specifyPort ? Port : 0;
-            config.AcceptIncomingConnections = true;
-
-            config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
-            config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
-            config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
-            config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
-
-            return config;
-        }
 
         private static bool WaitUntilFullyConnected(NetworkSession session)
         {
@@ -57,7 +42,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
             }
 
-            NetPeer peer = new NetPeer(CreateNetPeerConfig(true));
+            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.AppId);
+            config.Port = NetworkSessionSettings.Port;
+            config.AcceptIncomingConnections = true;
+            config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
+            config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
+            config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            NetPeer peer = new NetPeer(config);
 
             try
             {
@@ -68,7 +59,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 throw new InvalidOperationException("Lidgren error: " + e.Message, e);
             }
 
-            NetworkSession session = new NetworkSession(new LidgrenBackend(peer), null, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+            NetworkSession session = new NetworkSession(new LidgrenBackend(peer, null), maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
 
             if (!WaitUntilFullyConnected(session))
             {
@@ -78,18 +69,63 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return session;
         }
 
+        private static void AddAvailableNetworkSession(NetIncomingMessage msg, long id, IPEndPoint endPoint, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
+        {
+            // Use backend message type in order to unpack session properties properly
+            IncomingMessage incomingMsg = new IncomingMessage();
+            incomingMsg.Buffer = msg;
+
+            DiscoveryContents contents = new DiscoveryContents();
+            contents.Unpack(incomingMsg);
+
+            if (searchType == contents.sessionType && searchProperties.SearchMatch(contents.sessionProperties))
+            {
+                AvailableNetworkSession availableSession = new AvailableNetworkSession(endPoint, localGamers, contents.maxGamers, contents.privateGamerSlots, contents.sessionType, contents.currentGamerCount, contents.hostGamertag, contents.openPrivateGamerSlots, contents.openPublicGamerSlots, contents.sessionProperties);
+
+                availableSession.Tag = id;
+
+                availableSessions.Add(availableSession);
+            }
+        }
+
         public AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
-            if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+
+            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.AppId);
+            config.Port = 0;
+            config.AcceptIncomingConnections = false;
+            config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
+            config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
+            config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
+            NetPeer discoverPeer = new NetPeer(config);
+
+            try
             {
-                throw new NotImplementedException("PlayerMatch and Ranked are not implemented yet");
+                discoverPeer.Start();
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Lidgren error: " + e.Message, e);
             }
 
-            // Send discover requests on subnet
-            NetPeer discoverPeer = new NetPeer(CreateNetPeerConfig(false));
-            discoverPeer.Start();
-            discoverPeer.DiscoverLocalPeers(Port);
+            // Send discovery request
+            if (sessionType == NetworkSessionType.SystemLink)
+            {
+                discoverPeer.DiscoverLocalPeers(NetworkSessionSettings.Port);
+            }
+            else if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
+            {
+                NetOutgoingMessage request = discoverPeer.CreateMessage();
+                request.Write((byte)MasterServerMessageType.RequestHosts);
+                discoverPeer.SendUnconnectedMessage(request, masterServerEndPoint);
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
 
+            // Wait for answers
             Thread.Sleep(DiscoveryTime);
 
             // Get list of answers
@@ -100,28 +136,17 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 switch (msg.MessageType)
                 {
-                    case NetIncomingMessageType.DiscoveryRequest:
-                        // Ignore own message
+                    case NetIncomingMessageType.UnconnectedData:
+                        if (!msg.SenderEndPoint.Equals(masterServerEndPoint))
+                        {
+                            long hostId = msg.ReadInt64();
+                            IPEndPoint hostEndPoint = msg.ReadIPEndPoint();
+
+                            AddAvailableNetworkSession(msg, hostId, hostEndPoint, localGamers, sessionType, searchProperties, availableSessions);
+                        }
                         break;
                     case NetIncomingMessageType.DiscoveryResponse:
-                        // Use backend message type in order to unpack session properties properly
-                        IncomingMessage incomingMsg = new IncomingMessage();
-                        incomingMsg.Buffer = msg;
-
-                        NetworkSessionType remoteSessionType = (NetworkSessionType)incomingMsg.ReadByte();
-                        NetworkSessionProperties properties = new NetworkSessionProperties();
-                        properties.Unpack(incomingMsg);
-                        int maxGamers = incomingMsg.ReadInt();
-                        int privateGamerSlots = incomingMsg.ReadInt();
-                        int currentGamerCount = incomingMsg.ReadInt();
-                        string hostGamertag = incomingMsg.ReadString();
-                        int openPrivateGamerSlots = incomingMsg.ReadInt();
-                        int openPublicGamerSlots = incomingMsg.ReadInt();
-
-                        if (sessionType == remoteSessionType && searchProperties.SearchMatch(properties))
-                        {
-                            availableSessions.Add(new AvailableNetworkSession(msg.SenderEndPoint, localGamers, maxGamers, privateGamerSlots, sessionType, currentGamerCount, hostGamertag, openPrivateGamerSlots, openPublicGamerSlots, properties));
-                        }
+                        AddAvailableNetworkSession(msg, -1, msg.SenderEndPoint, localGamers, sessionType, searchProperties, availableSessions);
                         break;
                     // Error checking
                     case NetIncomingMessageType.VerboseDebugMessage:
@@ -145,22 +170,50 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public NetworkSession Join(AvailableNetworkSession availableSession)
         {
-            // TODO: NetworkSessionJoinException if availableSession full/not joinable/cannot be found
-            NetPeer peer = new NetPeer(CreateNetPeerConfig(false));
-            peer.Start();
-            peer.Connect(availableSession.remoteEndPoint);
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
-            int maxGamers = availableSession.maxGamers;
-            int privateGamerSlots = availableSession.privateGamerSlots;
-            NetworkSessionType sessionType = availableSession.sessionType;
-            NetworkSessionProperties sessionProperties = availableSession.SessionProperties;
-            IEnumerable<SignedInGamer> localGamers = availableSession.localGamers;
+            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.AppId);
+            config.Port = 0;
+            config.AcceptIncomingConnections = true;
+            config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
+            config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
+            config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest); // if peer becomes host in the future
+            config.EnableMessageType(NetIncomingMessageType.ConnectionApproval); // if peer becomes host in the future
+            NetPeer peer = new NetPeer(config);
 
-            NetworkSession session = new NetworkSession(new LidgrenBackend(peer), availableSession.remoteEndPoint, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+            try
+            {
+                peer.Start();
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Lidgren error: " + e.Message, e);
+            }
+
+            AvailableNetworkSession aS = availableSession;
+
+            if (aS.SessionType == NetworkSessionType.SystemLink)
+            {
+                peer.Connect(aS.RemoteEndPoint);
+            }
+            else if (aS.SessionType == NetworkSessionType.PlayerMatch || aS.SessionType == NetworkSessionType.Ranked)
+            {
+                // Note: Actual connect call is handled by backend once nat introduction is successful
+                NetOutgoingMessage msg = peer.CreateMessage();
+                msg.Write((byte)MasterServerMessageType.RequestIntroduction);
+                msg.Write((long)availableSession.Tag);
+                peer.SendUnconnectedMessage(msg, masterServerEndPoint);
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+
+            NetworkSession session = new NetworkSession(new LidgrenBackend(peer, aS.RemoteEndPoint), aS.MaxGamers, aS.PrivateGamerSlots, aS.SessionType, aS.SessionProperties, aS.LocalGamers);
 
             if (!WaitUntilFullyConnected(session))
             {
-                throw new NetworkException("Could not fully connect to session");
+                throw new NetworkSessionJoinException("Could not fully connect to session");
             }
 
             return session;

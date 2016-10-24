@@ -78,6 +78,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             Buffer.Write(value);
         }
 
+        public void Write(long value)
+        {
+            Buffer.Write(value);
+        }
+
         public void Write(bool value)
         {
             Buffer.Write(value);
@@ -128,6 +133,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         public int ReadInt()
         {
             return Buffer.ReadInt32();
+        }
+
+        public long ReadLong()
+        {
+            return Buffer.ReadInt64();
         }
 
         public IPEndPoint ReadIPEndPoint()
@@ -204,7 +214,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private int lastReceivedBytes;
         private int lastSentBytes;
 
-        public LidgrenBackend(NetPeer peer)
+        public LidgrenBackend(NetPeer peer, IPEndPoint hostEndPoint)
         {
             this.localPeer = new LocalPeer(peer);
             this.remotePeers = new List<RemotePeer>();
@@ -217,10 +227,12 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             this.lastReceivedBytes = 0;
             this.lastSentBytes = 0;
 
+            this.HostEndPoint = hostEndPoint;
             this.HasShutdown = false;
             this.LocalPeer = localPeer;
         }
 
+        public IPEndPoint HostEndPoint { get; }
         public bool HasShutdown { get; private set; }
         public IBackendListener Listener { get; set; }
         public IPeer LocalPeer { get; }
@@ -260,7 +272,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public void Connect(IPEndPoint endPoint)
         {
-            localPeer.peer.Connect(endPoint);
+            if (localPeer.peer.GetConnection(endPoint) == null)
+            {
+                localPeer.peer.Connect(endPoint);
+            }
         }
 
         public IPeer FindRemotePeerByEndPoint(IPEndPoint endPoint)
@@ -364,22 +379,16 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     // Discovery
                     case NetIncomingMessageType.DiscoveryRequest:
-                        if (!Listener.ShouldSendDiscoveryResponse)
+                        if (HostEndPoint != null)
                         {
-                            throw new NetworkException("Discovery request received when not host");
+                            break;
                         }
 
                         Debug.WriteLine("Discovery request received");
 
                         OutgoingMessage outgoingMsg = outgoingMessagePool.Get();
-                        outgoingMsg.Write((byte)Listener.SessionType);
-                        Listener.SessionProperties.Pack(outgoingMsg);
-                        outgoingMsg.Write(Listener.MaxGamers);
-                        outgoingMsg.Write(Listener.PrivateGamerSlots);
-                        outgoingMsg.Write(Listener.CurrentGamerCount);
-                        outgoingMsg.Write(Listener.HostGamertag);
-                        outgoingMsg.Write(Listener.OpenPrivateGamerSlots);
-                        outgoingMsg.Write(Listener.OpenPublicGamerSlots);
+                        DiscoveryContents contents = new DiscoveryContents(Listener);
+                        contents.Pack(outgoingMsg);
 
                         outgoingMsg.Buffer.Position = 0;
 
@@ -389,6 +398,28 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                         outgoingMessagePool.Recycle(outgoingMsg);
                         break;
+                    // Connection approval
+                    case NetIncomingMessageType.ConnectionApproval:
+                        if (HostEndPoint != null || Listener.OpenPublicGamerSlots > 0)
+                        {
+                            msg.SenderConnection.Approve();
+
+                            Debug.WriteLine("Connection approved");
+                        }
+                        else
+                        {
+                            msg.SenderConnection.Deny("No free slots");
+
+                            Debug.WriteLine("Connection denied, no free slots");
+                        }
+                        break;
+                    // Nat introduction
+                    case NetIncomingMessageType.NatIntroductionSuccess:
+                        if (HostEndPoint != null && msg.SenderEndPoint == HostEndPoint)
+                        {
+                            Connect(HostEndPoint);
+                        }
+                        break;
                     // Peer state changes
                     case NetIncomingMessageType.StatusChanged:
                         if (msg.SenderConnection == null)
@@ -397,7 +428,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         }
 
                         NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
-                        Debug.WriteLine("Status now: " + status + "; Reason: " + msg.ReadString());
+                        Debug.WriteLine("Status now: " + status + " - Reason: " + msg.ReadString());
 
                         if (status == NetConnectionStatus.Connected)
                         {
@@ -432,10 +463,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         }
 
                         InvokeReceive(msg, msg.SenderConnection.Tag as RemotePeer);
-                        break;
-                    // Unconnected data
-                    case NetIncomingMessageType.UnconnectedData:
-                        Debug.WriteLine("Unconnected data received!");
                         break;
                     // Error checking
                     case NetIncomingMessageType.VerboseDebugMessage:
@@ -484,6 +511,59 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             HasShutdown = true;
 
             localPeer.Disconnect(byeMessage);
+        }
+    }
+
+    internal struct DiscoveryContents
+    {
+        internal NetworkSessionType sessionType;
+        internal NetworkSessionProperties sessionProperties;
+        internal string hostGamertag;
+        internal int maxGamers;
+        internal int privateGamerSlots;
+        internal int currentGamerCount;
+        internal int openPrivateGamerSlots;
+        internal int openPublicGamerSlots;
+
+        internal DiscoveryContents(IBackendListener backendListener)
+        {
+            this.sessionType = backendListener.SessionType;
+            this.sessionProperties = backendListener.SessionProperties;
+            this.hostGamertag = backendListener.HostGamertag;
+            this.maxGamers = backendListener.MaxGamers;
+            this.privateGamerSlots = backendListener.PrivateGamerSlots;
+            this.currentGamerCount = backendListener.CurrentGamerCount;
+            this.openPrivateGamerSlots = backendListener.OpenPrivateGamerSlots;
+            this.openPublicGamerSlots = backendListener.OpenPublicGamerSlots;
+        }
+
+        internal void Pack(IOutgoingMessage msg)
+        {
+            msg.Write((byte)sessionType);
+            sessionProperties.Pack(msg);
+            msg.Write(hostGamertag);
+            msg.Write(maxGamers);
+            msg.Write(privateGamerSlots);
+            msg.Write(currentGamerCount);
+            msg.Write(openPrivateGamerSlots);
+            msg.Write(openPublicGamerSlots);
+        }
+
+        internal void Unpack(IIncomingMessage msg)
+        {
+            if (sessionProperties == null)
+            {
+                sessionProperties = new NetworkSessionProperties();
+            }
+
+            sessionType = (NetworkSessionType)msg.ReadByte();
+            sessionProperties.Unpack(msg);
+            hostGamertag = msg.ReadString();
+            maxGamers = msg.ReadInt();
+            privateGamerSlots = msg.ReadInt();
+            currentGamerCount = msg.ReadInt();
+            openPrivateGamerSlots = msg.ReadInt();
+            openPublicGamerSlots = msg.ReadInt();
         }
     }
 }

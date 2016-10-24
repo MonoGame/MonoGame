@@ -207,8 +207,7 @@ namespace Microsoft.Xna.Framework.Net
             try { return EndJoin(BeginJoin(availableSession, null, null)); }
             catch { throw; }
         }
-
-        private IPEndPoint hostEndPoint;
+        
         private NetworkMachine localMachine;
         private NetworkMachine hostMachine;
         private List<IOutgoingMessage> messageQueue;
@@ -230,11 +229,10 @@ namespace Microsoft.Xna.Framework.Net
         internal int maxGamers;
         internal int privateGamerSlots;
 
-        internal NetworkSession(ISessionBackend backend, IPEndPoint hostEndPoint, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(ISessionBackend backend, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
-            this.hostEndPoint = hostEndPoint;
-            this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, hostEndPoint == null);
-            this.hostMachine = hostEndPoint == null ? this.localMachine : null;
+            this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, backend.HostEndPoint == null);
+            this.hostMachine = this.localMachine.IsHost ? this.localMachine : null;
             this.messageQueue = new List<IOutgoingMessage>();
             this.eventQueue = new List<EventArgs>();
 
@@ -250,7 +248,7 @@ namespace Microsoft.Xna.Framework.Net
 
             this.pendingEndPoints = null;
 
-            if (hostEndPoint == null)
+            if (this.localMachine.IsHost)
             {
                 // Initialize empty pending end point list so that the host is approved automatically
                 this.pendingEndPoints = new List<IPEndPoint>();
@@ -582,7 +580,6 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         // For discovery response
-        bool IBackendListener.ShouldSendDiscoveryResponse { get { return IsHost; } }
         int IBackendListener.CurrentGamerCount { get { return allGamers.Count; } }
         string IBackendListener.HostGamertag
         {
@@ -886,7 +883,7 @@ namespace Microsoft.Xna.Framework.Net
 
         void IBackendListener.PeerConnected(IPeer peer)
         {
-            bool senderIsHost = peer.EndPoint == hostEndPoint;
+            bool senderIsHost = !IsHost && peer.EndPoint == Backend.HostEndPoint;
 
             // Create a pending network machine
             NetworkMachine senderMachine = new NetworkMachine(this, peer, false, senderIsHost);

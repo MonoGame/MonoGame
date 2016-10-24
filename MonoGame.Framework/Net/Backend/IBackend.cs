@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         void Write(bool value);
         void Write(byte value);
         void Write(int value);
+        void Write(long value);
         void Write(string value);
         void Write(byte[] value);
     }
@@ -26,6 +27,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         bool ReadBoolean();
         byte ReadByte();
         int ReadInt();
+        long ReadLong();
         string ReadString();
         void ReadBytes(byte[] into, int offset, int length);
     }
@@ -35,7 +37,6 @@ namespace Microsoft.Xna.Framework.Net.Backend
         NetworkSessionType SessionType { get; }
         NetworkSessionProperties SessionProperties { get; }
 
-        bool ShouldSendDiscoveryResponse { get; }
         int MaxGamers { get; }
         int PrivateGamerSlots { get; }
         int CurrentGamerCount { get; }
@@ -58,6 +59,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
     internal interface ISessionBackend
     {
+        IPEndPoint HostEndPoint { get; }
         bool HasShutdown { get; }
         IBackendListener Listener { get; set; }
         IPeer LocalPeer { get; }
@@ -83,5 +85,12 @@ namespace Microsoft.Xna.Framework.Net.Backend
         NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties);
         AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
         NetworkSession Join(AvailableNetworkSession availableSession);
+    }
+
+    internal interface IMasterServer
+    {
+        void Start(string appId);
+        void Update();
+        void Shutdown();
     }
 }
