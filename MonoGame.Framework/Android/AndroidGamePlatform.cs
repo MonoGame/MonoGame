@@ -6,6 +6,7 @@ using System;
 using Android.Views;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -92,7 +93,17 @@ namespace Microsoft.Xna.Framework
                     this._gameWindow.SetOrientation(currentOrientation == DisplayOrientation.LandscapeRight ? DisplayOrientation.LandscapeRight : DisplayOrientation.LandscapeLeft, false);
                     break;
             }
+
             base.BeforeInitialize();
+
+            Game.GraphicsDevice.PresentationParameters.DepthStencilFormat = _gameWindow.GameView.GraphicsMode.Stencil == 8
+                ? DepthFormat.Depth24Stencil8
+                : _gameWindow.GameView.GraphicsMode.Depth == 24
+                ? DepthFormat.Depth24
+                : _gameWindow.GameView.GraphicsMode.Depth == 16
+                ? DepthFormat.Depth16
+                : DepthFormat.None;
+
             _gameWindow.GameView.TouchEnabled = true;
         }
 

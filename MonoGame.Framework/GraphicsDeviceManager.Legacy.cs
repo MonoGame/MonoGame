@@ -65,6 +65,10 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
+#if ANDROID
+            _preferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+#endif
+
             GraphicsProfile = GraphicsDevice.GetHighestSupportedGraphicsProfile(null);
 
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
