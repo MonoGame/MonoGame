@@ -241,8 +241,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = end - start;
 
-            // If the effect is not null, then apply each pass and render the geometry
-            if (effect != null)
+            // If the effect is not null and have multiple passes, then apply each pass and render the geometry
+            if (effect != null && effect.CurrentTechnique.Passes.Count > 1)
             {
                 var passes = effect.CurrentTechnique.Passes;
                 foreach (var pass in passes)
