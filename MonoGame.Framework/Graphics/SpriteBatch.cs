@@ -147,6 +147,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _matrixTransform.SetValue(projection);
             _spritePass.Apply();
+
+            // Apply the custom sprite effect.
+            if(_effect != null)
+            {                
+                // Effects with multiple passes are applied
+                // by SpriteBatcher.FlushVertexArray()
+                var passes = _effect.CurrentTechnique.Passes;
+                if(passes.Count == 1)
+                    passes[0].Apply();
+            }
 		}
 		
         void CheckValid(Texture2D texture)

@@ -241,17 +241,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = end - start;
 
-            // If the effect is not null, then apply each pass and render the geometry
+            // If the effect is not null and have multiple passes, then apply each pass and render the geometry
             if (effect != null)
             {
                 var passes = effect.CurrentTechnique.Passes;
                 foreach (var pass in passes)
                 {
-                    pass.Apply();
+                    if (passes.Count > 1)
+                    {
+                        pass.Apply();
 
-                    // Whatever happens in pass.Apply, make sure the texture being drawn
-                    // ends up in Textures[0].
-                    _device.Textures[0] = texture;
+                        // Whatever happens in pass.Apply, make sure the texture being drawn
+                        // ends up in Textures[0].
+                        _device.Textures[0] = texture;
+                    }
 
                     _device.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,
