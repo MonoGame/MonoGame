@@ -118,6 +118,8 @@ namespace MonoGame.Tools.Pipeline
 
         IProjectItem GetItem(string originalPath);
 
+        void CopyAssetPath();
+
         #endregion
 
         #region Undo, Redo
