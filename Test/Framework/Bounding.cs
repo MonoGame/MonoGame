@@ -21,6 +21,9 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(ContainmentType.Contains, box.Contains(Vector3.Zero));
             Assert.AreEqual(ContainmentType.Contains, box.Contains(new Vector3(0f, 0, 0.5f)));
             Assert.AreEqual(ContainmentType.Contains, box.Contains(new Vector3(0f, 0.5f, 0.5f)));
+            Assert.AreEqual(ContainmentType.Contains, box.Contains(Vector3.One));
+            Assert.AreEqual(ContainmentType.Contains, box.Contains(new Vector3(1f, 1, 0.5f)));
+            Assert.AreEqual(ContainmentType.Contains, box.Contains(new Vector3(1f, 0.5f, 0.5f)));
             Assert.AreEqual(ContainmentType.Contains, box.Contains(new Vector3(0.5f, 0.5f, 0.5f)));
         }
 
