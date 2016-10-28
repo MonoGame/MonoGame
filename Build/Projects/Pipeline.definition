@@ -122,6 +122,8 @@
 	<Compile Include="Controls\PropertyCells\CellPath.cs" />
 	<Compile Include="Controls\PropertyCells\CellRefs.cs" />
 	<Compile Include="Controls\PropertyCells\CellText.cs" />
+	<Compile Include="Controls\BuildItem.cs" />
+	<Compile Include="Controls\DrawInfo.cs" />
 	<Compile Include="Controls\Pad.cs" />
 	<Compile Include="Controls\Pad.eto.cs">
       <DependentUpon>Pad.cs</DependentUpon>

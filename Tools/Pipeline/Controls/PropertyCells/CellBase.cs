@@ -41,7 +41,7 @@ namespace MonoGame.Tools.Pipeline
             DisplayValue = (value == null) ? "" : value.ToString();
             Text = name;
             Editable = true;
-            Height = PropInfo.TextHeight;
+            Height = DrawInfo.TextHeight;
 
             _eventHandler = eventHandler;
             _type = type;
@@ -64,8 +64,8 @@ namespace MonoGame.Tools.Pipeline
             if (selected)
                 g.FillRectangle(SystemColors.Highlight, rec);
 
-            g.DrawText(SystemFonts.Default(), PropInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + (rec.Height - Height) / 2, Text);
-            g.FillRectangle(PropInfo.GetBackgroundColor(selected), separatorPos - 6, rec.Y, rec.Width, rec.Height);
+            g.DrawText(SystemFonts.Default(), DrawInfo.GetTextColor(selected, false), rec.X + 5, rec.Y + (rec.Height - Height) / 2, Text);
+            g.FillRectangle(DrawInfo.GetBackgroundColor(selected), separatorPos - 6, rec.Y, rec.Width, rec.Height);
             DrawCell(g, rec, separatorPos, selected);
         }
 
@@ -75,7 +75,7 @@ namespace MonoGame.Tools.Pipeline
             _lastRec.X += separatorPos;
             _lastRec.Width -= separatorPos - 1;
 
-            g.DrawText(SystemFonts.Default(), PropInfo.GetTextColor(selected, !Editable), separatorPos + 5, rec.Y + (rec.Height - Height) / 2, DisplayValue);
+            g.DrawText(SystemFonts.Default(), DrawInfo.GetTextColor(selected, !Editable), separatorPos + 5, rec.Y + (rec.Height - Height) / 2, DisplayValue);
         }
     }
 }
