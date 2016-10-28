@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-#if ANDROID
+#if ANDROID || IOS
             _preferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
 #endif
 
@@ -381,7 +381,7 @@ namespace Microsoft.Xna.Framework
 #endif // WINDOWS || WINRT
 
 
-#if MONOMAC || DESKTOPGL
+#if MONOMAC || DESKTOPGL || IOS
             presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
 #endif
 
