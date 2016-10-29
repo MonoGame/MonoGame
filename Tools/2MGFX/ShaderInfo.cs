@@ -12,7 +12,9 @@ namespace TwoMGFX
 	    public ParseTree ParseTree { get; set; }
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
         public Dictionary<string, SamplerStateInfo> SamplerStates = new Dictionary<string, SamplerStateInfo>();
+	    // Contains GLSL vertex shader inputs. Not used for HLSL shaders
 	    public Dictionary<string, VsInputVariableInfo> VsInputVariables = new Dictionary<string, VsInputVariableInfo>();
+	    // Contains GLSL entry point fuctions. Not used for HLSL shaders
 	    public Dictionary<string, ParseNode> Functions = new Dictionary<string, ParseNode>();
 	}
 }

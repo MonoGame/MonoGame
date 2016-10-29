@@ -19,8 +19,9 @@ namespace TwoMGFX
         internal override void AddMacros(Dictionary<string, string> macros)
         {
             macros.Add("GLSL", "1");
-            macros.Add("OPENGL", "1");                
-            macros.Add("GLFX", "1");                
+            macros.Add("OPENGL", "1");
+            macros.Add("GLFX", "1");
+            // TODO GLES?
         }
 
         internal override void ValidateShaderModels(PassInfo pass)
@@ -34,17 +35,19 @@ namespace TwoMGFX
             var content = shaderResult.FileContent;
             ParseTreeTools.WhitespaceNodes(TokenType.Semantic, shaderInfo.ParseTree.Nodes, ref content);
             // we should have pure GLSL now so we can pass it to the optimizer
+            // TODO we should also clear the dict with cached shaders here
         }
 
         internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader,
             EffectObject effect, ref string errorsAndWarnings)
         {
+            // TODO check if we already created this shader in the dict
             var shaderInfo = shaderResult.ShaderInfo;
-            var shaderType = isVertexShader ? ShaderType.Vertex : ShaderType.Pixel;
+            var shaderType = isVertexShader ? ShaderType.Vertex : ShaderType.Fragment;
+
             // TODO: depending on platform and version this can be GLES 2.0 or 3.0
             var optimizer = new GLSLOptimizer(Target.OpenGL);
 
-            errorsAndWarnings = string.Empty;
             // first replace the function to optimize with 'main'
             ParseNode funcNode;
             if (!shaderInfo.Functions.TryGetValue(shaderFunction, out funcNode))
@@ -57,8 +60,15 @@ namespace TwoMGFX
             // make sure we don't have any illegal syntax
             var text = string.Copy(shaderInfo.FileContent);
             // TODO this is really, really inefficient...
-            WhitespaceFunctions(ref text,
-                shaderInfo.Functions.Where(kvp => kvp.Key != shaderFunction).Select(kvp => kvp.Value));
+            try
+            {
+                WhitespaceFunctions(ref text,
+                    shaderInfo.Functions.Where(kvp => kvp.Key != shaderFunction).Select(kvp => kvp.Value));
+            }
+            catch (ShaderCompilerException e)
+            {
+                errorsAndWarnings += e.Message + '\n';
+            }
             // non vertex shaders can't have any "attribute" input variables
             if (shaderType != ShaderType.Vertex)
                 WhitespaceNodes(ref text, shaderInfo.VsInputVariables.Where(v => v.Value.AttributeSyntax).Select(v => v.Value.Node));
@@ -68,8 +78,10 @@ namespace TwoMGFX
             var builder = new StringBuilder(text);
             builder.Remove(token.StartPos, token.Length);
             builder.Insert(token.StartPos, "main");
+
             
-            // TODO prepend the version to the content and add precision qualifiers
+            // TODO prepend the version to the content
+            //builder.Insert(0, shaderProfile);
 
             // then optimize it
             var input = builder.ToString();
@@ -78,9 +90,42 @@ namespace TwoMGFX
 
             optimizer.Dispose();
 
-            return null;
+            // Add the required precision specifiers for GLES after the optimization
+            var floatPrecision = isVertexShader ? "precision highp float;\r\n" : "precision mediump float;\r\n";
+			var shaderByteCode = "#ifdef GL_ES\r\n" +
+                 floatPrecision +
+				"precision mediump int;\r\n" +
+				"#endif\r\n" +
+				result.OutputCode;
+
+            // TODO add result to dictionary hashed on shader name and version
+            var bytes = Encoding.ASCII.GetBytes(shaderByteCode);
+            var data = new ShaderData(isVertexShader, effect.Shaders.Count, bytes);
+
+            data._attributes = new ShaderData.Attribute[result.Inputs.Count];
+
+            for(var i = 0; i < result.Inputs.Count; i++)
+            {
+                // var usage = shaderInfo.VsInputVariables[result.Inputs[i].Name].SemanticName;
+                data._attributes[i] = new ShaderData.Attribute
+                {
+                    index = i,
+                    location = -1,
+                    name = result.Inputs[i].Name,
+                    //usage =
+                };
+            }
+
+            data._samplers = new ShaderData.Sampler[0];
+
+            data._cbuffers = new int[1];
+
+            effect.Shaders.Add(data);
+
+            return data;
         }
 
+        // replace functions corresponding to the given nodes with whitespace
         private static void WhitespaceFunctions(ref string text, IEnumerable<ParseNode> nodes)
         {
             foreach (var node in nodes)
@@ -94,6 +139,8 @@ namespace TwoMGFX
                     funcHeaderEnd++;
                 } 
 
+                // only the header is parsed and put inside the nodes, so we need
+                // to find the end of the function by matching brackets
                 var length = 0;
                 var openedBrackets = 1;
 
@@ -102,7 +149,7 @@ namespace TwoMGFX
                     length++;
                     var pos = funcHeaderEnd + length;
                     if (pos >= text.Length)
-                        throw new Exception("Unmatched bracket!");
+                        throw new ShaderCompilerException("Unmatched bracket!");
 
                     var c = text[pos];
                     if (c == '{')

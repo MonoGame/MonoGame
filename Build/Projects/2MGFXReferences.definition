@@ -13,5 +13,10 @@
       Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" />
   </Platform>
+  <Platform Type="Linux">
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
+  </Platform>
 
 </ExternalProject>
