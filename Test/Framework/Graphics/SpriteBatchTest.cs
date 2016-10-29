@@ -295,6 +295,24 @@ namespace MonoGame.Tests.Graphics {
             texture2.Dispose();
         }
 
+#if !XNA
+        [Test]
+        public void DrawWithCustomVertexShader()
+        {
+            PrepareFrameCapture();
+            var customSpriteEffect = AssetTestUtility.CompileEffect(gd, "CustomSpriteBatchEffectWithVertexShader.fx");
+
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, effect: customSpriteEffect, effectMatrixParam: customSpriteEffect.Parameters["TransformationMatrix"]);
+            _spriteBatch.Draw(_texture, new Vector2(20, 20), Color.White);
+            _spriteBatch.Draw(_texture, new Vector2(20, 120),scale:new Vector2(1.5f, 1.5f), color: Color.White);
+            _spriteBatch.Draw(_texture, new Vector2(20, 220),scale:new Vector2(.5f, .5f), color: Color.White);
+            _spriteBatch.End();
+
+            customSpriteEffect.Dispose();
+            CheckFrames();
+        }
+#endif
+
         [Test]
         public void DrawWithLayerDepth()
         {
