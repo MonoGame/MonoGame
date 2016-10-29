@@ -198,7 +198,7 @@ namespace MonoGame.Tools.Pipeline
                         iconInfo = _theme.LookupIcon("edit-clear-all", 16, 0);
                         break;
                     case "Commands.CancelBuild.png":
-                        iconInfo = _theme.LookupIcon("stop", 16, 0);
+                        iconInfo = _theme.LookupIcon("process-stop", 16, 0);
                         break;
                     case "Commands.Help.png":
                         iconInfo = _theme.LookupIcon("help", 16, 0);
