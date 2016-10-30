@@ -199,13 +199,13 @@ namespace MonoGame.Tools.Pipeline
                         iconInfo = _theme.LookupIcon("gtk-yes", 16, 0);
                         break;
                     case "Build.Start.png":
-                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        iconInfo = _theme.LookupIcon("system-run", 16, 0);
                         break;
                     case "Build.EndSucceed.png":
-                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        iconInfo = _theme.LookupIcon("system-run", 16, 0);
                         break;
                     case "Build.EndFailed.png":
-                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        iconInfo = _theme.LookupIcon("system-run", 16, 0);
                         break;
                     case "Build.Succeed.png":
                         iconInfo = _theme.LookupIcon("gtk-yes", 16, 0);
