@@ -6,20 +6,25 @@ using System;
 using System.Collections.Generic;
 using Eto.Drawing;
 using Eto.Forms;
+using System.Threading;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class BuildOutput
+    public partial class BuildOutput : Pad, IDisposable
     {
         public static Point MouseLocation;
         public static int Count;
         public static int ReqWidth;
+
+        public bool Write = false;
 
         private OutputParser _output;
         private List<BuildItem> _items;
         private CheckCommand _cmdFilterOutput, _cmdAutoScroll, _cmdShowSkipped, _cmdShowSuccessful, _cmdShowCleaned;
         private Image _iconInformation, _iconFail, _iconProcessing, _iconSkip, _iconSucceed, _iconSucceedWithWarnings, _iconStart, _iconEndSucceed, _iconEndFailed;
         private BuildItem _selectedItem;
+        private int linePosition = 0;
+        private Thread buildThread;
 
         public BuildOutput()
         {
@@ -128,83 +133,131 @@ namespace MonoGame.Tools.Pipeline
             drawable.Invalidate();
         }
 
-        public void WriteLine(string line)
+        public void Start()
         {
-            textArea.Append(line + Environment.NewLine, _cmdAutoScroll.Checked);
+            Write = true;
+            linePosition = 0;
 
-            if (string.IsNullOrEmpty(line))
-                return;
+            if (buildThread != null && buildThread.IsAlive)
+                buildThread.Abort();
 
-            _output.Parse(line);
-            line = line.Trim(new[] { ' ', '\n', '\r', '\t' });
+            buildThread = new Thread(new ThreadStart(WriteLines));
+            buildThread.Start();
+        }
 
-            switch (_output.State)
+        public void WriteLines()
+        {
+            while (Write)
             {
-                case OutputState.BuildBegin:
-                    _items.Add(new BuildItem { Text = line, Icon = _iconStart });
-                    Count = -1;
-                    ReqWidth = 0;
-                    break;
-                case OutputState.Cleaning:
-                    _items.Add(new BuildItem
-                    {
-                        Text = "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename),
-                        Icon = _iconInformation,
-                        Description = line
-                    });
-                    break;
-                case OutputState.Skipping:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceed;
+                var count = PipelineController.Instance.BuildOutput.Count;
 
-                    _items.Add(new BuildItem
-                    {
-                        Text = "Skipping " + PipelineController.Instance.GetRelativePath(_output.Filename),
-                        Icon = _iconSkip,
-                        Description = _output.Filename
-                    });
-                    break;
-                case OutputState.BuildAsset:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceed;
+                if (linePosition == count)
+                    continue;
 
-                    _items.Add(new BuildItem
-                    {
-                        Text = "Building " + PipelineController.Instance.GetRelativePath(_output.Filename),
-                        Icon = _iconProcessing,
-                        Description = _output.Filename
-                    });
-                    break;
-                case OutputState.BuildError:
-                    _items[_items.Count - 1].Icon = _iconFail;
-                    _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
-                    break;
-                case OutputState.BuildErrorContinue:
-                    _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
-                    break;
-                case OutputState.BuildWarning:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceedWithWarnings;
-                    _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
-                    break;
-                case OutputState.BuildEnd:
-                    if (_items[_items.Count - 1].Icon == _iconProcessing)
-                        _items[_items.Count - 1].Icon = _iconSucceed;
+                var newlines = "";
 
-                    _items.Add(new BuildItem
+                while (linePosition != count)
+                {
+                    var line = PipelineController.Instance.BuildOutput[linePosition];
+                    newlines += line + Environment.NewLine;
+
+                    if (string.IsNullOrEmpty(line))
                     {
-                        Text = line,
-                        Icon = line.Contains("0 failed") ? _iconEndSucceed : _iconEndFailed
-                    });
-                    break;
-                case OutputState.BuildTime:
-                    var text = _items[_items.Count - 1].Text.TrimEnd(new[] { '.', ' ' }) + ", " + line;
-                    _items[_items.Count - 1].Text = text;
+                        linePosition++;
+                        continue;
+                    }
+
+                    _output.Parse(line);
+                    line = line.Trim(new[] { ' ', '\n', '\r', '\t' });
+
+                    switch (_output.State)
+                    {
+                        case OutputState.BuildBegin:
+                            _items.Add(new BuildItem { Text = line, Icon = _iconStart });
+                            Count = -1;
+                            ReqWidth = 0;
+                            break;
+                        case OutputState.Cleaning:
+                            _items.Add(new BuildItem
+                            {
+                                Text = "Cleaning " + PipelineController.Instance.GetRelativePath(_output.Filename),
+                                Icon = _iconInformation,
+                                Description = line
+                            });
+                            break;
+                        case OutputState.Skipping:
+                            if (_items[_items.Count - 1].Icon == _iconProcessing)
+                                _items[_items.Count - 1].Icon = _iconSucceed;
+
+                            _items.Add(new BuildItem
+                            {
+                                Text = "Skipping " + PipelineController.Instance.GetRelativePath(_output.Filename),
+                                Icon = _iconSkip,
+                                Description = _output.Filename
+                            });
+                            break;
+                        case OutputState.BuildAsset:
+                            if (_items[_items.Count - 1].Icon == _iconProcessing)
+                                _items[_items.Count - 1].Icon = _iconSucceed;
+
+                            _items.Add(new BuildItem
+                            {
+                                Text = "Building " + PipelineController.Instance.GetRelativePath(_output.Filename),
+                                Icon = _iconProcessing,
+                                Description = _output.Filename
+                            });
+                            break;
+                        case OutputState.BuildError:
+                            _items[_items.Count - 1].Icon = _iconFail;
+                            _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                            break;
+                        case OutputState.BuildErrorContinue:
+                            _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                            break;
+                        case OutputState.BuildWarning:
+                            if (_items[_items.Count - 1].Icon == _iconProcessing)
+                                _items[_items.Count - 1].Icon = _iconSucceedWithWarnings;
+                            _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
+                            break;
+                        case OutputState.BuildEnd:
+                            if (_items[_items.Count - 1].Icon == _iconProcessing)
+                                _items[_items.Count - 1].Icon = _iconSucceed;
+
+                            _items.Add(new BuildItem
+                            {
+                                Text = line,
+                                Icon = line.Contains("0 failed") ? _iconEndSucceed : _iconEndFailed
+                            });
+                            break;
+                        case OutputState.BuildTime:
+                            var text = _items[_items.Count - 1].Text.TrimEnd(new[] { '.', ' ' }) + ", " + line;
+                            _items[_items.Count - 1].Text = text;
+                            Write = false;
+                            break;
+                    }
+
+                    linePosition++;
+                }
+
+                Application.Instance.Invoke(delegate
+                {
+                    textArea.Append(newlines, _cmdAutoScroll.Checked);
+                    drawable.Invalidate();
+                });
+
+                Thread.Sleep(10);
+
+                if (!Write)
                     Count = _items.Count * 35 - 3;
-                    break;
             }
+        }
 
-            drawable.Invalidate();
+        protected override void Dispose(bool disposing)
+        {
+            if (buildThread != null && buildThread.IsAlive)
+                buildThread.Abort();
+
+            base.Dispose(disposing);
         }
 
         private void Drawable_MouseMove(object sender, MouseEventArgs e)

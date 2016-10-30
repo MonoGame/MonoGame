@@ -197,14 +197,14 @@ namespace MonoGame.Tools.Pipeline
             propertyGridControl.SetObjects(PipelineController.Instance.SelectedItems);
         }
 
-        public void OutputAppend(string text)
-        {
-            Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
-        }
-
         public void OutputClear()
         {
             Application.Instance.Invoke(() => buildOutput.ClearOutput());
+        }
+
+        public void OutputThreadStart()
+        {
+            buildOutput.Start();
         }
 
         public bool ShowDeleteDialog(List<IProjectItem> items)
@@ -309,7 +309,7 @@ namespace MonoGame.Tools.Pipeline
                 if (string.IsNullOrEmpty(monoLoc))
                 {
                     monoLoc = "mono";
-                    OutputAppend("Cound not find mono. Please install the latest version from http://www.mono-project.com");
+                    ShowError("Unable to detect mono", "Cound not find mono. Please install the latest version from http://www.mono-project.com");
                 }
 
                 proc.StartInfo.FileName = monoLoc;
@@ -321,10 +321,7 @@ namespace MonoGame.Tools.Pipeline
                     var monodebugger = string.Format("--debug --debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:{0}",
                         port);
                     proc.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monodebugger, exe, commands);
-                    OutputAppend("************************************************");
-                    OutputAppend("RUNNING MGCB IN DEBUG MODE!!!");
-                    OutputAppend(string.Format("Attach your Debugger to localhost:{0}", port));
-                    OutputAppend("************************************************");
+                    ShowMessage(string.Format("Attach your Debugger to localhost:{0}", port));
                 }
                 else
                 {

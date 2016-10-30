@@ -58,9 +58,9 @@ namespace MonoGame.Tools.Pipeline
 
         void UpdateProperties();
 
-        void OutputAppend(string text);
-
         void OutputClear();
+
+        void OutputThreadStart();
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);  
 

@@ -7,7 +7,7 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class BuildOutput : Pad
+    public partial class BuildOutput : Pad, IDisposable
     {
         Panel panel;
         TextArea textArea;
