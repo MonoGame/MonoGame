@@ -39,7 +39,7 @@ namespace MonoGame.Tools.Pipeline
 
             _xwtFiles["."] = ToXwtImage(file);
             _xwtFileMissing = ToXwtImage(fileMissing);
-            _xwtFolder = ToXwtImage(folderMissing);
+            _xwtFolder = ToXwtImage(folder);
             _xwtFolderMissing = ToXwtImage(folderMissing);
         }
 
