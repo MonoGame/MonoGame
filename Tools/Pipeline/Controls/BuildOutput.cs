@@ -122,6 +122,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ClearOutput()
         {
+            scrollable1.ScrollPosition = new Point(0, 0);
             textArea.Text = "";
             _items.Clear();
             drawable.Invalidate();
@@ -153,6 +154,9 @@ namespace MonoGame.Tools.Pipeline
                     });
                     break;
                 case OutputState.Skipping:
+                    if (_items[_items.Count - 1].Icon == _iconProcessing)
+                        _items[_items.Count - 1].Icon = _iconSucceed;
+
                     _items.Add(new BuildItem
                     {
                         Text = "Skipping " + PipelineController.Instance.GetRelativePath(_output.Filename),
