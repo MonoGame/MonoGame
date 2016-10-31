@@ -337,6 +337,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
+            if(origin != Vector2.Zero)
+            {
+                origin.X = origin.X * ((float)destinationRectangle.Width ) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width  != 0) ? sourceRectangle.Value.Width  : texture.Width );
+                origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height);
+            }
+
             DrawInternal(texture,
 			      new Vector4(destinationRectangle.X,
 			                  destinationRectangle.Y,
@@ -345,8 +351,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			      sourceRectangle,
 			      color,
 			      rotation,
-			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width != 0) ? sourceRectangle.Value.Width : texture.Width)),
-                        			origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height)),
+			      origin,
 			      effects,
                   layerDepth,
 			      true);
