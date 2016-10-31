@@ -339,8 +339,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if(origin != Vector2.Zero)
             {
-                origin.X = origin.X * ((float)destinationRectangle.Width ) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width  != 0) ? sourceRectangle.Value.Width  : texture.Width );
-                origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height);
+                if(sourceRectangle.HasValue && sourceRectangle.Value.Width  != 0)
+                    origin.X = origin.X * ((float)destinationRectangle.Width ) / (float)sourceRectangle.Value.Width;
+                else
+                    origin.X = origin.X * ((float)destinationRectangle.Width ) * (float)texture._texelSize.X;
+
+                if(sourceRectangle.HasValue && sourceRectangle.Value.Height != 0)
+                    origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)sourceRectangle.Value.Height;
+                else
+                    origin.Y = origin.Y * ((float)destinationRectangle.Height) * (float)texture._texelSize.Y;
             }
 
             DrawInternal(texture,
@@ -390,11 +397,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (sourceRectangle.HasValue)
             {
-				_tempRect = sourceRectangle.Value;
-                _texCoordTL.X = _tempRect.X / (float)texture.Width;
-                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+                _texCoordTL.X = sourceRectangle.Value.X * texture._texelSize.X;
+                _texCoordTL.Y = sourceRectangle.Value.Y * texture._texelSize.Y;
+                _texCoordBR.X = _texCoordTL.X + sourceRectangle.Value.Width * texture._texelSize.X;
+                _texCoordBR.Y = _texCoordTL.Y + sourceRectangle.Value.Height * texture._texelSize.Y;
             }
             else
             {

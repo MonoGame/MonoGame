@@ -19,6 +19,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal int width;
 		internal int height;
         internal int ArraySize;
+
+        // Used by SpriteBatch 
+        internal Vector2 _texelSize;
+        
         /// <summary>
         /// Gets the dimensions of the texture
         /// </summary>
@@ -95,6 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
+            this._texelSize = new Vector2(1f / (float)width, 1f / (float)height);
             this._format = format;
             this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
             this.ArraySize = arraySize;
