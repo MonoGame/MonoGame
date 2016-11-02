@@ -105,10 +105,14 @@ namespace Microsoft.Xna.Framework
                 _winy = display.Y + display.Height / 2;
             }
 
+            var initflags =
+                Sdl.Window.State.OpenGL |
+                Sdl.Window.State.Hidden;
+
             // We need a dummy handle for GraphicDevice until our window gets created
             _handle = Sdl.Window.Create("", _winx, _winy,
                 GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight,
-                Sdl.Window.State.Hidden);
+                initflags);
         }
 
         internal void CreateWindow()
