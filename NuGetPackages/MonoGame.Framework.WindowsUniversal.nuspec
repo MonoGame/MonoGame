@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>MonoGame.Framework.WindowsUniversal</id>
         <version>0.0.0.0</version>
@@ -16,9 +16,6 @@
         <releaseNotes></releaseNotes>
         <copyright>Copyright  2016</copyright>
         <language>en-US</language>
-        <references>
-            <reference file="MonoGame.Framework.dll" />
-        </references>
 	</metadata>
     <files>
         <file src="WindowsUniversal\AnyCPU\Release\Themes\generic.xbf" target="lib\netcore\MonoGame.Framework\Themes\generic.xbf" />
