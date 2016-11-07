@@ -406,12 +406,11 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>
-        /// Reserves the given sound buffer. If there are no available sources then false is
-        /// returned, otherwise true will be returned and the sound buffer can be played. If
-        /// the controller was not able to setup the hardware, then false will be returned.
+        /// Reserves a sound buffer and return its identifier. If there are no available sources
+        /// or the controller was not able to setup the hardware then an
+        /// <see cref="InstancePlayLimitException"/> is thrown.
         /// </summary>
-        /// <param name="soundBuffer">The sound buffer you want to play</param>
-        /// <returns>True if the buffer can be played, and false if not.</returns>
+        /// <returns>The source number of the reserved sound buffer.</returns>
 		public int ReserveSource()
 		{
             if (!CheckInitState())

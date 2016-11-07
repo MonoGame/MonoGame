@@ -753,7 +753,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 unchecked
                 {
-                    _graphicsMetrics._targetCount += (ulong)renderTargetCount;
+                    _graphicsMetrics._targetCount += renderTargetCount;
                 }
             }
         }
@@ -947,7 +947,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
@@ -983,7 +983,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
@@ -1005,7 +1005,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
@@ -1051,7 +1051,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
@@ -1097,7 +1097,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
@@ -1121,7 +1121,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)(primitiveCount * instanceCount);
+                _graphicsMetrics._primitiveCount += (primitiveCount * instanceCount);
             }
         }
 

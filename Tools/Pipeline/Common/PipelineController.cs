@@ -271,7 +271,7 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.Save();
                 View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 View.ShowError("Open Project", "Failed to open project!");
                 return;
