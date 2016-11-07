@@ -117,25 +117,27 @@ namespace Microsoft.Xna.Framework
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
-            using (
-                var stream =
-                    Assembly.GetEntryAssembly().GetManifestResourceStream(Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace + ".Icon.bmp") ??
-                    Assembly.GetEntryAssembly().GetManifestResourceStream("Icon.bmp") ??
-                    Assembly.GetExecutingAssembly().GetManifestResourceStream("MonoGame.bmp"))
+            try
             {
-                if (stream != null)
-                    using (var br = new BinaryReader(stream))
+                using (
+                    var stream =
+                        Assembly.GetEntryAssembly().GetManifestResourceStream(Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace + ".Icon.bmp") ??
+                        Assembly.GetEntryAssembly().GetManifestResourceStream("Icon.bmp") ??
+                        Assembly.GetExecutingAssembly().GetManifestResourceStream("MonoGame.bmp"))
+                {
+                    if (stream != null)
                     {
-                        try
+                        using (var br = new BinaryReader(stream))
                         {
                             var src = Sdl.RwFromMem(br.ReadBytes((int)stream.Length), (int)stream.Length);
                             var icon = Sdl.LoadBMP_RW(src, 1);
                             Sdl.Window.SetIcon(_handle, icon);
                             Sdl.FreeSurface(icon);
                         }
-                        catch { }
                     }
+                }
             }
+            catch { }
 
             SetCursorVisible(_mouseVisible);
         }
