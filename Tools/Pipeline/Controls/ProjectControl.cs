@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,6 +46,60 @@ namespace MonoGame.Tools.Pipeline
 
             TreeView.ButtonReleased += Handle_ButtonReleased;
             TreeView.SelectionChanged += ProjectControl_SelectionChanged;
+
+            TreeView.SetDragDropTarget(TransferDataType.Text, TransferDataType.Uri);
+            TreeView.DragOver += TreeView_DragOver;
+            TreeView.DragDrop += TreeView_DragDrop;
+        }
+
+        private void TreeView_DragOver(object sender, DragOverEventArgs e)
+        {
+            if (!PipelineController.Instance.ProjectOpen)
+                return;
+            
+            e.AllowedAction = DragDropAction.Copy;
+
+            RowDropPosition rowpos;
+            TreePosition pos;
+
+            if (TreeView.GetDropTargetRow(e.Position.X, e.Position.Y, out rowpos, out pos))
+                if (rowpos == RowDropPosition.Into && _treeStore.GetNavigatorAt(pos).GetValue(_dataTag) is ContentItem)
+                    e.AllowedAction = DragDropAction.None;
+        }
+
+        private void TreeView_DragDrop(object sender, DragEventArgs e)
+        {
+            var initialDirectory = PipelineController.Instance.ProjectLocation;
+            var folders = new List<string>();
+            var files = new List<string>();
+            RowDropPosition rowpos;
+            TreePosition pos;
+
+            foreach (var u in e.Data.Uris)
+            {
+                if (Directory.Exists(u.LocalPath))
+                    folders.Add(u.LocalPath);
+                else
+                    files.Add(u.LocalPath);
+            }
+
+            if (TreeView.GetDropTargetRow(e.Position.X, e.Position.Y, out rowpos, out pos))
+            {
+                var item = _treeStore.GetNavigatorAt(pos).GetValue(_dataTag);
+
+                if (!(item is DirectoryItem && rowpos == RowDropPosition.Into))
+                {
+                    var nav = _treeStore.GetNavigatorAt(pos);
+                    if (nav.MoveToParent())
+                        item = nav.GetValue(_dataTag);
+                }
+
+                if (!(item is PipelineProject))
+                    initialDirectory = Path.Combine(initialDirectory, item.OriginalPath);
+            }
+
+            PipelineController.Instance.DragDrop(initialDirectory, folders.ToArray(), files.ToArray());
+            e.Success = true;
         }
 
         private void Handle_ButtonReleased(object sender, ButtonEventArgs e)
