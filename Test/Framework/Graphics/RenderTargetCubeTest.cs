@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -11,6 +12,13 @@ namespace MonoGame.Tests.Graphics
     [TestFixture]
     class RenderTargetCubeTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
+        public void ZeroSizeShouldFailTest()
+        {
+            RenderTargetCube renderTarget;
+            Assert.Throws<ArgumentOutOfRangeException>(() => renderTarget = new RenderTargetCube(gd, 0, false, SurfaceFormat.Color, DepthFormat.None));
+        }
+
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]
