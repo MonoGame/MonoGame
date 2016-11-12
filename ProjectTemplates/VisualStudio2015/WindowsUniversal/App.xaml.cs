@@ -35,12 +35,17 @@ namespace $safeprojectname$
     {
         this.InitializeComponent();
         this.Suspending += OnSuspending;
-        if (IsXbox())
-        {
-            Application.Current.RequiresPointerMode = ApplicationRequiresPointerMode.WhenRequested;
-        }
+        //If Deploying to Xbox, target the project at the "Windows 10 Anniversary Edition (14393) and uncomment the below code
+        //if (IsXbox())
+        //{
+        //    Application.Current.RequiresPointerMode = ApplicationRequiresPointerMode.WhenRequested;
+        //}
     }
 
+    /// <summary>
+    /// Detection code in Windows 10 to identify the platform it is being run on
+    /// This function returns true if the project is running on an XboxOne
+    /// </summary>
     public static bool IsXbox()
     {
         if (deviceFamily == null)
