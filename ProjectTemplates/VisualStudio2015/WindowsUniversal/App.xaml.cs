@@ -35,11 +35,16 @@ namespace $safeprojectname$
     {
         this.InitializeComponent();
         this.Suspending += OnSuspending;
-        //If Deploying to Xbox, target the project at the "Windows 10 Anniversary Edition (14393) and uncomment the below code
-        //if (IsXbox())
-        //{
-        //    Application.Current.RequiresPointerMode = ApplicationRequiresPointerMode.WhenRequested;
-        //}
+
+        //API check to ensure the "RequiresPointerMode" property exists, ensuring project is running on build 14393 or later
+        if (Windows.Foundation.Metadata.ApiInformation.IsPropertyPresent("Windows.UI.Xaml.Application", "RequiresPointerMode"))
+        {
+            //If running on the Xbox, disable the default on screen pointer
+            if (IsXbox())
+            {
+                Application.Current.RequiresPointerMode = ApplicationRequiresPointerMode.WhenRequested;
+            }
+        }
     }
 
     /// <summary>
