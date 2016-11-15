@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    GraphicsUtil.CompressPvrtc(content, generateMipmaps);
+                    GraphicsUtil.CompressPvrtc(content, generateMipmaps, sharpAlpha);
                     break;
             }
         }

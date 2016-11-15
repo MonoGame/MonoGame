@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             try
             {
                 // All other formats require platform specific choices.
-                PlatformCompressTexture(context, content, format, generateMipmaps, false);
+                PlatformCompressTexture(context, content, format, generateMipmaps, sharpAlpha);
             }
             catch (EntryPointNotFoundException ex)
             {

@@ -21,12 +21,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
     public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
+        [DefaultValue(true)]
+        public virtual bool PremultiplyAlpha { get; set; }
+
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
         public FontDescriptionProcessor()
         {
-            this.TextureFormat = TextureProcessorOutputFormat.Compressed;
+            PremultiplyAlpha = true;
+            TextureFormat = TextureProcessorOutputFormat.Compressed;
         }
 
         public override SpriteFontContent Process(FontDescription input,
@@ -132,6 +136,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			catch(Exception ex) {
 				context.Logger.LogImportantMessage("{0}", ex.ToString());
 			}
+
+            if (PremultiplyAlpha)
+            {
+                var bmp = output.Texture.Faces[0][0];
+                var data = bmp.GetPixelData();
+                var idx = 0;
+                for (; idx < data.Length; )
+                {
+                    var r = data[idx + 0];
+                    var g = data[idx + 1];
+                    var b = data[idx + 2];
+                    var a = data[idx + 3];
+                    var col = Color.FromNonPremultiplied(r, g, b, a);
+
+                    data[idx + 0] = col.R;
+                    data[idx + 1] = col.G;
+                    data[idx + 2] = col.B;
+                    data[idx + 3] = col.A;
+
+                    idx += 4;
+                }
+
+                bmp.SetPixelData(data);
+            }
 
             // Perform the final texture conversion.
             texProfile.ConvertTexture(context, output.Texture, TextureFormat, false, true);    
