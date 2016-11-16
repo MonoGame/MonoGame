@@ -57,6 +57,9 @@ namespace Microsoft.Xna.Framework.Audio
 	internal sealed class OpenALSoundController : IDisposable
     {
         private static OpenALSoundController _instance = null;
+#if SUPPORTS_EFX
+        private static EffectsExtension _efx = null;
+#endif
         private IntPtr _device;
 #if !DESKTOPGL
         ContextHandle _context;
@@ -121,7 +124,12 @@ namespace Microsoft.Xna.Framework.Audio
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
-
+            Filter = 0;
+#if SUPPORTS_EFX
+            if (Efx.IsInitialized) {
+                Filter = Efx.GenFilter ();
+            }
+#endif
             availableSourcesCollection = new List<int>(allSourcesArray);
 			inUseSourcesCollection = new List<int>();
 		}
@@ -147,6 +155,9 @@ namespace Microsoft.Xna.Framework.Audio
             try
             {
                 _device = Alc.OpenDevice(string.Empty);
+#if DESKTOPGL
+                EffectsExtension.device = _device;
+#endif
             }
             catch (Exception ex)
             {
@@ -287,6 +298,18 @@ namespace Microsoft.Xna.Framework.Audio
 				return _instance;
 			}
 		}
+#if SUPPORTS_EFX
+        public static EffectsExtension Efx {
+            get {
+                if (_efx == null)
+                    _efx = new EffectsExtension ();
+                return _efx;
+            }
+        }
+#endif
+        public int Filter {
+            get; private set;
+        }
 
         public static void DestroyInstance()
         {
@@ -371,7 +394,10 @@ namespace Microsoft.Xna.Framework.Audio
                             AL.DeleteSource(allSourcesArray[i]);
                             ALHelper.CheckError("Failed to delete source.");
                         }
-                        
+#if SUPPORTS_EFX
+                        if (Filter != 0 && Efx.IsInitialized)
+                            Efx.DeleteFilter (Filter);
+#endif
                         CleanUpOpenAL();
                     }
                 }
@@ -380,12 +406,11 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>
-        /// Reserves the given sound buffer. If there are no available sources then false is
-        /// returned, otherwise true will be returned and the sound buffer can be played. If
-        /// the controller was not able to setup the hardware, then false will be returned.
+        /// Reserves a sound buffer and return its identifier. If there are no available sources
+        /// or the controller was not able to setup the hardware then an
+        /// <see cref="InstancePlayLimitException"/> is thrown.
         /// </summary>
-        /// <param name="soundBuffer">The sound buffer you want to play</param>
-        /// <returns>True if the buffer can be played, and false if not.</returns>
+        /// <returns>The source number of the reserved sound buffer.</returns>
 		public int ReserveSource()
 		{
             if (!CheckInitState())

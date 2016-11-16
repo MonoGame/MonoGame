@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Eto;
 using Eto.Forms;
@@ -86,6 +87,26 @@ namespace MonoGame.Tools.Pipeline
             };
         }
 
+        [GLib.ConnectBefore]
+        public static void TreeView_ButtonPressEvent(object o, Gtk.ButtonPressEventArgs args)
+        {
+            var treeview = o as Gtk.TreeView;
+
+            if (args.Event.Button == 3)
+            {
+                Gtk.TreeViewDropPosition pos;
+                Gtk.TreePath path;
+                Gtk.TreeIter iter;
+
+                if (treeview.GetDestRowAtPos((int)args.Event.X, (int)args.Event.Y, out path, out pos) && treeview.Model.GetIter(out iter, path))
+                {
+                    var paths = treeview.Selection.GetSelectedRows().ToList();
+                    if (paths.Contains(path))
+                        args.RetVal = true;
+                }
+            }
+        }
+
         public static void Load()
         {
             Style.Add<FormHandler>("MainWindow", h =>
@@ -118,7 +139,7 @@ namespace MonoGame.Tools.Pipeline
                 Connect(builder.GetObject("redo_button").Handle, MainWindow.Instance.cmdRedo);
                 Connect(builder.GetObject("close_button").Handle, MainWindow.Instance.cmdClose);
                 Connect(builder.GetObject("clean_button").Handle, MainWindow.Instance.cmdClean);
-                Connect(builder.GetObject("filteroutput_button").Handle, MainWindow.Instance.cmdFilterOutput);
+                //Connect(builder.GetObject("filteroutput_button").Handle, MainWindow.Instance.cmdFilterOutput);
                 Connect(builder.GetObject("debugmode_button").Handle, MainWindow.Instance.cmdDebugMode);
 
                 MainWindow.Instance.cmdBuild.EnabledChanged += (sender, e) =>
@@ -253,13 +274,45 @@ namespace MonoGame.Tools.Pipeline
 
             Style.Add<DropDownHandler>("OverrideSize", h =>
             {
-                var cell = (h.Control.Child as Gtk.ComboBox).Cells[0] as Gtk.CellRendererText;
+                var cell = (h.Control.Child as Gtk.CellView).Cells[0] as Gtk.CellRendererText;
                 cell.Ellipsize = Pango.EllipsizeMode.End;
             });
 
             Style.Add<TextBoxHandler>("OverrideSize", h =>
             {
                 h.Control.WidthChars = 0;
+            });
+
+            Style.Add<ScrollableHandler>("BuildOutput", h =>
+            {
+                var child = ((((h.Control.Child as Gtk.Viewport).Child as Gtk.VBox).Children[0] as Gtk.HBox).Children[0] as Gtk.Alignment).Child;
+                var ok = false;
+
+                h.Control.SizeAllocated += delegate
+                {
+                    // Set Width of the Drawable
+                    var al = child.Allocation;
+                    al.Width = h.Control.AllocatedWidth - 2;
+                    if (BuildOutput.ReqWidth > al.Width)
+                        al.Width = BuildOutput.ReqWidth;
+                    child.SetAllocation(al);
+
+                    if (PipelineSettings.Default.AutoScrollBuildOutput)
+                    {
+                        // Scroll to bottom
+                        if (BuildOutput.Count == -1)
+                            ok = false;
+
+                        if (!ok)
+                        {
+                            var adj = h.Control.Vadjustment;
+                            adj.Value = adj.Upper - adj.PageSize;
+
+                            if (adj.Upper >= BuildOutput.Count && BuildOutput.Count != -1)
+                                ok = true;
+                        }
+                    }
+                };
             });
         }
     }

@@ -24,6 +24,8 @@ namespace TwoMGFX
             foreach (var define in defines)
                 pp.addMacro(define.Key, define.Value);
 
+            effectCode = effectCode.Replace("#line", "//--WORKAROUND#line");
+
             pp.addInput(new MGStringLexerSource(effectCode, true, fullPath));
 
             var result = new StringBuilder();
@@ -38,6 +40,10 @@ namespace TwoMGFX
                         endOfStream = true;
                         break;
                     case CppNet.Token.CPPCOMMENT:
+                        if (token.getText().StartsWith("//--WORKAROUND#line"))
+                        {
+                            result.Append(token.getText().Replace("//--WORKAROUND#line", "#line"));
+                        }
                         break;
                     case CppNet.Token.CCOMMENT:
                     {

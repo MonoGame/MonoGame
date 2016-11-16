@@ -17,7 +17,7 @@ namespace MonoGame.Tools.Pipeline
             editText.Style = "OverrideSize";
             editText.Width = _lastRec.Width;
             editText.Height = _lastRec.Height;
-            editText.Text = Value.ToString();
+            editText.Text = (Value == null) ? "" : Value.ToString();
 
             control.Add(editText, _lastRec.X, _lastRec.Y);
 

@@ -46,6 +46,7 @@ namespace MonoGame.Tools.Pipeline
             CreateContent(layout1);
 
             grid1.SelectionChanged += Grid1_SelectionChanged;
+            grid1.KeyDown += Grid1_KeyDown;
             buttonAdd.Click += ButtonAdd_Click;
             buttonRemove.Click += ButtonRemove_Click;
         }

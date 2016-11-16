@@ -11,7 +11,7 @@ namespace MonoGame.Tools.Pipeline
     {
         DynamicLayout layout1;
         StackLayout stack1, stack2;
-        Label label1;
+        Label label1, label2;
         TextBox textBox1;
         Button buttonBrowse;
 
@@ -35,14 +35,18 @@ namespace MonoGame.Tools.Pipeline
             stack1.Orientation = Orientation.Horizontal;
 
             textBox1 = new TextBox();
-            stack1.Items.Add(new StackLayoutItem(textBox1, true));
+            stack1.Items.Add(new StackLayoutItem(textBox1, VerticalAlignment.Center, true));
 
             buttonBrowse = new Button();
             buttonBrowse.Text = "...";
             buttonBrowse.MinimumSize = new Size(1, 1);
-            stack1.Items.Add(new StackLayoutItem(buttonBrowse, false));
+            stack1.Items.Add(new StackLayoutItem(buttonBrowse, VerticalAlignment.Center, false));
 
             layout1.Add(stack1);
+
+            label2 = new Label();
+            label2.Text = "Macros:";
+            layout1.Add(label2);
 
             stack2 = new StackLayout();
             stack2.Spacing = 4;

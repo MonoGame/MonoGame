@@ -71,10 +71,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MonoGameProject.cs" />
     <Compile Include="PipelineDisplayBinding.cs" />
     <Compile Include="MonoGameContentEditorViewContent.cs" />
-    <Compile Include="MonoGameBuildExtension.cs" />
     <Compile Include="MonoGameConditions.cs" />
     <Compile Include="ContentItemTemplate.cs" />
     <Compile Include="MonoGameMSBuildImports.cs" />
@@ -133,6 +131,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\Common\Content.mgcb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="templates\Common\app.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <!---
@@ -240,5 +241,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MonoDevelop.MonoGame.addin.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MonoGameProject.cs" />
+    <None Include="MonoGameBuildExtension.cs" />
   </ItemGroup>
 </Project>

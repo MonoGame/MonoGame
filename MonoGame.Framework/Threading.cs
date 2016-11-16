@@ -68,11 +68,9 @@ namespace Microsoft.Xna.Framework
         static int mainThreadId;
 #endif
 
-#if ANDROID || (WINDOWS && !DESKTOPGL) || ANGLE
+#if ANDROID || WINDOWS || DESKTOPGL || ANGLE
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
-#elif DESKTOPGL
-        public static IntPtr BackgroundContext;
 #elif IOS
         public static EAGLContext BackgroundContext;
 #endif
@@ -187,11 +185,6 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif DESKTOPGL
-            Sdl.GL.MakeCurrent (SdlGameWindow.Instance.Handle, BackgroundContext);
-            action ();
-            GL.Finish ();
-            GraphicsExtensions.CheckGLError ();
 #elif WINDOWS_PHONE
             BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
@@ -218,7 +211,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID || (WINDOWS && !DESKTOPGL) || ANGLE
+#if ANDROID || WINDOWS || DESKTOPGL || ANGLE
         static void Add(Action action)
         {
             lock (actions)

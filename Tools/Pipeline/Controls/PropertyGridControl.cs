@@ -7,23 +7,45 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.ComponentModel;
+using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
     public partial class PropertyGridControl
     {
-        List<object> _objects;
+        private RadioCommand _cmdSortAbc, _cmdSortGroup;
+        private List<object> _objects;
 
         public PropertyGridControl()
         {
             InitializeComponent();
 
+            _cmdSortAbc = new RadioCommand();
+            _cmdSortAbc.MenuText = "Sort Alphabetically";
+            _cmdSortAbc.CheckedChanged += CmdSort_CheckedChanged;
+            AddCommand(_cmdSortAbc);
+
+            _cmdSortGroup = new RadioCommand();
+            _cmdSortGroup.Controller = _cmdSortAbc;
+            _cmdSortGroup.MenuText = "Sort by Category";
+            _cmdSortGroup.CheckedChanged += CmdSort_CheckedChanged;
+            AddCommand(_cmdSortGroup);
+
             _objects = new List<object>();
         }
 
-        private void BtnAbc_Click(object sender, EventArgs e)
+        public override void LoadSettings()
         {
-            propertyTable.Group = false;
+            if (PipelineSettings.Default.PropertyGroupSort)
+                _cmdSortGroup.Checked = true;
+            else
+                _cmdSortAbc.Checked = true;
+        }
+
+        private void CmdSort_CheckedChanged(object sender, EventArgs e)
+        {
+            PipelineSettings.Default.PropertyGroupSort = _cmdSortGroup.Checked;
+            propertyTable.Group = _cmdSortGroup.Checked;
             propertyTable.Update();
         }
 
@@ -68,6 +90,7 @@ namespace MonoGame.Tools.Pipeline
             foreach (var p in props)
             {
                 var attrs = p.GetCustomAttributes(true);
+                var name = p.Name;
                 var browsable = true;
                 var category = "Mics";
 
@@ -77,6 +100,8 @@ namespace MonoGame.Tools.Pipeline
                         browsable = (a as BrowsableAttribute).Browsable;
                     else if (a is CategoryAttribute)
                         category = (a as CategoryAttribute).Category;
+                    else if (a is DisplayNameAttribute)
+                        name = (a as DisplayNameAttribute).DisplayName;
                 }
 
                 object value = p.GetValue(objects[0], null);
@@ -92,7 +117,7 @@ namespace MonoGame.Tools.Pipeline
                 if (!browsable)
                     continue;
 
-                propertyTable.AddEntry(category, p.Name, value, p.GetValue(objects[0], null), (sender, e) =>
+                propertyTable.AddEntry(category, name, value, p.PropertyType, (sender, e) =>
                 {
                     var action = new UpdatePropertyAction(MainWindow.Instance, objects, p, sender);
                     PipelineController.Instance.AddAction(action);
@@ -108,6 +133,9 @@ namespace MonoGame.Tools.Pipeline
         {
             foreach (var p in objects[0].Processor.Properties)
             {
+                if (!p.Browsable)
+                    continue;
+
                 object value = objects[0].ProcessorParams[p.Name];
                 foreach (ContentItem o in objects)
                 {
@@ -118,7 +146,7 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
 
-                propertyTable.AddEntry("Processor Parameters", p.Name, value, objects[0].ProcessorParams[p.Name], (sender, e) =>
+                propertyTable.AddEntry("Processor Parameters", p.DisplayName, value, p.Type, (sender, e) =>
                 {
                     var action = new UpdateProcessorAction(MainWindow.Instance, objects.Cast<ContentItem>().ToList(), p.Name, sender);
                     PipelineController.Instance.AddAction(action);

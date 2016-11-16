@@ -271,7 +271,7 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.Save();
                 View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 View.ShowError("Open Project", "Failed to open project!");
                 return;
@@ -387,11 +387,40 @@ namespace MonoGame.Tools.Pipeline
             BuildCommand(commands);
         }
 
-        public void RebuildItems(IProjectItem[] items)
+        private IEnumerable<IProjectItem> GetItems(IProjectItem dir)
         {
-            // Make sure we save first!
-            if (!AskSaveProject())
+            foreach (var item in _project.ContentItems)
+                if (item.OriginalPath.StartsWith(dir.OriginalPath + "/"))
+                    yield return item;
+        }
+
+        public void RebuildItems()
+        {
+            var items = new List<IProjectItem>();
+
+            // If the project itself was selected, just
+            // rebuild the entire project
+            if (items.Contains(_project))
+            {
+                Build(true);
                 return;
+            }
+
+            // Convert selected DirectoryItems into ContentItems
+            foreach (var item in SelectedItems)
+            {
+                if (item is ContentItem)
+                {
+                    if (!items.Contains(item))
+                        items.Add(item);
+                    
+                    continue;
+                }
+
+                foreach (var subitem in GetItems(item))
+                    if (!items.Contains(subitem))
+                        items.Add(subitem);
+            }
 
             // Create a unique file within the same folder as
             // the normal project to store this incremental build.
@@ -421,9 +450,8 @@ namespace MonoGame.Tools.Pipeline
         {
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
-            // Make sure we save first!
-            if (!AskSaveProject())
-                return;
+            if (ProjectDirty)
+                SaveProject(false);
 
             View.OutputClear();
 
@@ -512,8 +540,9 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (_buildProcess == null)
                     return;
-
+                
                 _buildProcess.Kill();
+                _buildProcess = null;
                 View.OutputAppend("Build terminated!" + Environment.NewLine);
             }
         }
@@ -714,7 +743,7 @@ namespace MonoGame.Tools.Pipeline
 
                 if (!folder.StartsWith(initialDirectory))
                 {
-                    string nd = folder.Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar);
+                    string nd = folder.Replace(folder, Path.Combine(initialDirectory, (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
 
                     if (!applyforall)
                     if (!View.CopyOrLinkFolder(folder, Directory.Exists(nd), out caction, out applyforall))
@@ -723,10 +752,10 @@ namespace MonoGame.Tools.Pipeline
                     if (caction == CopyAction.Copy)
                     {
                         for (int i = 0; i < directories.Count; i++)
-                            ddirectories.Add(directories[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
+                            ddirectories.Add(directories[i].Replace(folder, Path.Combine(initialDirectory, (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar)));
 
                         for (int i = 0; i < files.Count; i++)
-                            ffiles.Add(files[i].Replace(folder, initialDirectory + (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar));
+                            ffiles.Add(files[i].Replace(folder, Path.Combine(initialDirectory, (new DirectoryInfo(folder)).Name + Path.DirectorySeparatorChar)));
 
                         sc.Add(folder);
                         dc.Add(nd);
@@ -889,7 +918,7 @@ namespace MonoGame.Tools.Pipeline
 
             FileType type = FileType.Base;
             var path = SelectedItem.OriginalPath;
-            var newpath = Path.Combine(Path.GetDirectoryName(SelectedItem.OriginalPath), name);
+            var newpath = Path.Combine(Path.GetDirectoryName(SelectedItem.OriginalPath), name).Replace("\\", "/");
 
             if (SelectedItem is ContentItem)
                 type = FileType.File;
@@ -928,6 +957,19 @@ namespace MonoGame.Tools.Pipeline
             }
 
             return null;
+        }
+
+        public void CopyAssetPath()
+        {
+            var item = SelectedItem as ContentItem;
+            if (item != null)
+            {
+                var path = item.OriginalPath;
+                path = path.Remove(path.Length - Path.GetExtension(path).Length);
+                path = path.Replace('\\', '/');
+
+                View.SetClipboard(path);
+            }
         }
 
         #region Undo, Redo
@@ -999,11 +1041,9 @@ namespace MonoGame.Tools.Pipeline
             if (_project == null)
                 return filePath;
 
-            #if WINDOWS
-            filePath = filePath.Replace("/", "\\");
+            filePath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
             if (filePath.StartsWith("\\"))
-                filePath = filePath.Substring(2);
-            #endif
+                filePath = filePath.Substring(1);
 
             if (Path.IsPathRooted(filePath))
                 return filePath;
@@ -1087,11 +1127,12 @@ namespace MonoGame.Tools.Pipeline
             info.OpenItem = exists && oneselected && SelectedItem is ContentItem;
             info.OpenItemWith = exists && oneselected && !(SelectedItem is DirectoryItem);
             info.OpenItemLocation = exists && oneselected;
+            info.CopyAssetPath = exists && oneselected && SelectedItem is ContentItem;
             info.Add = (exists && oneselected && !(SelectedItem is ContentItem)) || !somethingselected && ProjectOpen;
             info.Exclude = somethingselected && !SelectedItems.Contains(_project);
             info.Rename = exists && oneselected;
             info.Delete = exists && info.Exclude;
-            info.RebuildItem = exists && somethingselected;
+            info.RebuildItem = exists && somethingselected && !ProjectBuilding;
         }
     }
 }

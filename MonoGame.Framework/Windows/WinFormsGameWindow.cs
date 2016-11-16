@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -14,12 +13,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
-using SharpDX.Multimedia;
-using SharpDX.RawInput;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using XnaKey = Microsoft.Xna.Framework.Input.Keys;
 using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
@@ -40,6 +36,8 @@ namespace MonoGame.Framework
         private bool _isMouseHidden;
 
         private bool _isMouseInBounds;
+
+        private bool _areClientSizeChangedEventsIgnored;
 
         #region Internal Properties
 
@@ -124,12 +122,6 @@ namespace MonoGame.Framework
 
         #endregion
 
-        #region Non-Public Properties
-
-        internal List<XnaKey> KeyState { get; set; }
-
-        #endregion
-
         internal WinFormsGameWindow(WinFormsGamePlatform platform)
         {
             _platform = platform;
@@ -149,10 +141,6 @@ namespace MonoGame.Framework
             _form.MouseWheel += OnMouseScroll;
             _form.MouseEnter += OnMouseEnter;
             _form.MouseLeave += OnMouseLeave;            
-
-            // Use RawInput to capture key events.
-            Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.None);
-            Device.KeyboardInput += OnRawKeyEvent;
 
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
@@ -227,14 +215,13 @@ namespace MonoGame.Framework
           }
 #endif
             _platform.IsActive = true;
+            Keyboard.SetActive(true);
         }
 
         private void OnDeactivate(object sender, EventArgs eventArgs)
         {
             _platform.IsActive = false;
-
-            if (KeyState != null)
-                KeyState.Clear();
+            Keyboard.SetActive(false);
         }
 
         private void OnMouseScroll(object sender, MouseEventArgs mouseEventArgs)
@@ -300,48 +287,6 @@ namespace MonoGame.Framework
             }
         }
 
-        private void OnRawKeyEvent(object sender, KeyboardInputEventArgs args)
-        {
-            if (KeyState == null)
-                return;
-
-            if ((int)args.Key == 0xff)
-            {
-                // dead key, e.g. a "shift" automatically happens when using Up/Down/Left/Right
-                return;
-            }
-
-            XnaKey xnaKey;
-
-            switch (args.MakeCode)
-            {
-                case 0x2a: // LShift
-                    xnaKey = XnaKey.LeftShift;
-                    break;
-
-                case 0x36: // RShift
-                    xnaKey = XnaKey.RightShift;
-                    break;
-
-                case 0x1d: // Ctrl
-                    xnaKey = (args.ScanCodeFlags & ScanCodeFlags.E0) != 0 ? XnaKey.RightControl : XnaKey.LeftControl;
-                    break;
-
-                case 0x38: // Alt
-                    xnaKey = (args.ScanCodeFlags & ScanCodeFlags.E0) != 0 ? XnaKey.RightAlt : XnaKey.LeftAlt;
-                    break;
-
-                default:
-                    xnaKey = (XnaKey)args.Key;
-                    break;
-            }
-
-            if ((args.State == SharpDX.RawInput.KeyState.KeyDown || args.State == SharpDX.RawInput.KeyState.SystemKeyDown) && !KeyState.Contains(xnaKey))
-                KeyState.Add(xnaKey);
-            else if (args.State == SharpDX.RawInput.KeyState.KeyUp || args.State == SharpDX.RawInput.KeyState.SystemKeyUp)
-                KeyState.Remove(xnaKey);
-        }
-
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
@@ -353,24 +298,35 @@ namespace MonoGame.Framework
             _form.Show();
         }
 
+        internal void EnableClientSizeChangedEvent(bool isEnabled)
+        {
+            _areClientSizeChangedEventsIgnored = !isEnabled;
+            if (isEnabled)
+                OnClientSizeChanged(this, EventArgs.Empty);
+        }
+
         private void OnClientSizeChanged(object sender, EventArgs eventArgs)
         {
+            if (_areClientSizeChangedEventsIgnored)
+                return;
+
             if (Game.Window == this)
             {
                 var manager = Game.graphicsDeviceManager;
-
-                // Set the default new back buffer size and viewport, but this
-                // can be overloaded by the two events below.
-
-                var newWidth = _form.ClientRectangle.Width;
-                var newHeight = _form.ClientRectangle.Height;
-
                 if (manager.GraphicsDevice == null)
                     return;
 
-                manager.GraphicsDevice.PresentationParameters.BackBufferWidth = newWidth;
-                manager.GraphicsDevice.PresentationParameters.BackBufferHeight = newHeight;
-                manager.GraphicsDevice.OnPresentationChanged();
+                // Only resize the backbuffer in windowed mode. In fullscreen mode, it gets stretched to fit the window.
+                // Also skip resizing the backbuffer when the window is minimized.
+                if (!manager.IsFullScreen && (_form.WindowState != FormWindowState.Minimized))
+                {
+                    // Set the default new back buffer size and viewport, but this
+                    // can be overloaded by the two events below.
+                    var newSize = _form.ClientSize;
+                    manager.GraphicsDevice.PresentationParameters.BackBufferWidth = newSize.Width;
+                    manager.GraphicsDevice.PresentationParameters.BackBufferHeight = newSize.Height;
+                    manager.GraphicsDevice.OnPresentationChanged();
+                }
             }
 
             // Set the new view state which will trigger the 
@@ -490,8 +446,6 @@ namespace MonoGame.Framework
             _platform = null;
             Game = null;
             Mouse.Window = null;
-            Device.KeyboardInput -= OnRawKeyEvent;
-            Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.Remove);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

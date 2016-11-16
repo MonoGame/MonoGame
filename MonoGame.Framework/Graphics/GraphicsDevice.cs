@@ -17,6 +17,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _isDisposed;
 
+        private Color _blendFactor = Color.White;
+        private bool _blendFactorDirty;
+
         private BlendState _blendState;
         private BlendState _actualBlendState;
         private bool _blendStateDirty;
@@ -213,8 +216,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void Setup()
         {
-			// Initialize the main viewport
-			_viewport = new Viewport (0, 0,
+#if DEBUG
+            if (DisplayMode == null)
+            {
+                throw new Exception(
+                    "Unable to determine the current display mode.  This can indicate that the " +
+                    "game is not configured to be HiDPI aware under Windows 10 or later.  See " +
+                    "https://github.com/MonoGame/MonoGame/issues/5040 for more information.");
+            }
+#endif
+
+            // Initialize the main viewport
+            _viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
@@ -328,6 +341,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// The color used as blend factor when alpha blending.
+        /// </summary>
+        /// <remarks>
+        /// When only changing BlendFactor, use this rather than <see cref="Graphics.BlendState.BlendFactor"/> to
+        /// only update BlendFactor so the whole BlendState does not have to be updated.
+        /// </remarks>
+        public Color BlendFactor
+        {
+            get { return _blendFactor; }
+            set
+            {
+                if (_blendFactor == value)
+                    return;
+                _blendFactor = value;
+                _blendFactorDirty = true;
+            }
+        }
+
         public BlendState BlendState
         {
 			get { return _blendState; }
@@ -359,6 +391,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 newBlendState.BindToGraphicsDevice(this);
 
                 _actualBlendState = newBlendState;
+
+                BlendFactor = _actualBlendState.BlendFactor;
 
                 _blendStateDirty = true;
             }
@@ -400,11 +434,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformBeginApplyState();
 
-            if (_blendStateDirty)
-            {
-                _actualBlendState.PlatformApplyState(this);
-                _blendStateDirty = false;
-            }
+            PlatformApplyBlend();
 
             if (_depthStencilStateDirty)
             {
@@ -723,7 +753,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 unchecked
                 {
-                    _graphicsMetrics._targetCount += (ulong)renderTargetCount;
+                    _graphicsMetrics._targetCount += renderTargetCount;
                 }
             }
         }
@@ -917,7 +947,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
@@ -953,7 +983,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount += primitiveCount;
             }
         }
 
@@ -975,7 +1005,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
@@ -1021,7 +1051,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
@@ -1067,7 +1097,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong) primitiveCount;
+                _graphicsMetrics._primitiveCount +=  primitiveCount;
             }
         }
 
@@ -1091,7 +1121,7 @@ namespace Microsoft.Xna.Framework.Graphics
             unchecked
             {
                 _graphicsMetrics._drawCount++;
-                _graphicsMetrics._primitiveCount += (ulong)(primitiveCount * instanceCount);
+                _graphicsMetrics._primitiveCount += (primitiveCount * instanceCount);
             }
         }
 
@@ -1115,6 +1145,24 @@ namespace Microsoft.Xna.Framework.Graphics
         internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
+        }
+
+        // uniformly scales down the given rectangle by 10%
+        internal static Rectangle GetDefaultTitleSafeArea(int x, int y, int width, int height)
+        {
+            var marginX = (width + 19) / 20;
+            var marginY = (height + 19) / 20;
+            x += marginX;
+            y += marginY;
+
+            width -= marginX * 2;
+            height -= marginY * 2;
+            return new Rectangle(x, y, width, height);
+        }
+
+        internal static Rectangle GetTitleSafeArea(int x, int y, int width, int height)
+        {
+            return PlatformGetTitleSafeArea(x, y, width, height);
         }
     }
 }

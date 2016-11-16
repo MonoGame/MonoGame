@@ -51,6 +51,9 @@ namespace MonoGame.Tools.Pipeline
                     item.ResolveTypes();
 
                     _con.View.AddTreeItem(item);
+
+                    item.ExpandToThis = true;
+                    _con.View.UpdateTreeItem(item);
                 }
 
                 _con.View.EndTreeUpdate();

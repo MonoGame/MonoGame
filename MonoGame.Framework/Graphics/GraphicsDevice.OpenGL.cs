@@ -204,8 +204,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // try getting the context version
             // GL_MAJOR_VERSION and GL_MINOR_VERSION are GL 3.0+ only, so we need to rely on the GL_VERSION string
-            // this string always starts with the version number in the "major.minor" format, but can be followed by
+            // for non GLES this string always starts with the version number in the "major.minor" format, but can be followed by
             // multiple vendor specific characters
+            // For GLES this string is formatted as: OpenGL<space>ES<space><version number><space><vendor-specific information>
+#if GLES
+            try
+            {
+                string version = GL.GetString(StringName.Version);
+                string[] versionSplit = version.Split(' ');
+                if(versionSplit.Length > 2 && versionSplit[0].Equals("OpenGL") && versionSplit[1].Equals("ES"))
+                {
+                    glMajorVersion = Convert.ToInt32(versionSplit[2].Substring(0, 1));
+                    glMinorVersion = Convert.ToInt32(versionSplit[2].Substring(2, 1));
+                }
+                else
+                {
+                    glMajorVersion = 1;
+                    glMinorVersion = 1;
+                }
+            }
+            catch (FormatException)
+            {
+                //if it fails we default to 1.1 context
+                glMajorVersion = 1;
+                glMinorVersion = 1;
+            }
+#else
             try
             {
                 string version = GL.GetString(StringName.Version);
@@ -218,6 +242,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 glMajorVersion = 1;
                 glMinorVersion = 1;
             }
+#endif
+
 #if !GLES
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;
@@ -270,8 +296,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     "Try updating your graphics drivers.");
             }
 
-            // Force reseting states
-            this.BlendState.PlatformApplyState(this, true);
+            // Force resetting states
+            this.PlatformApplyBlend(true);
             this.DepthStencilState.PlatformApplyState(this, true);
             this.RasterizerState.PlatformApplyState(this, true);            
 
@@ -816,6 +842,26 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.EnsureUIThread();
         }
 
+        private void PlatformApplyBlend(bool force = false)
+        {
+            _actualBlendState.PlatformApplyState(this, force);
+            ApplyBlendFactor(force);
+        }
+
+        private void ApplyBlendFactor(bool force)
+        {
+            if (force || BlendFactor != _lastBlendState.BlendFactor)
+            {
+                GL.BlendColor(
+                    this.BlendFactor.R/255.0f,
+                    this.BlendFactor.G/255.0f,
+                    this.BlendFactor.B/255.0f,
+                    this.BlendFactor.A/255.0f);
+                GraphicsExtensions.CheckGLError();
+                _lastBlendState.BlendFactor = this.BlendFactor;
+            }
+        }
+
         internal void PlatformApplyState(bool applyShaders)
         {
             if ( _scissorRectangleDirty )
@@ -1024,6 +1070,17 @@ namespace Microsoft.Xna.Framework.Graphics
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
            return GraphicsProfile.HiDef;
+        }
+        
+        private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
+        {
+            return new Rectangle(x, y, width, height);
+        }
+        
+        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+        {
+            presentationParameters.MultiSampleCount = 4;
+            quality = 0;
         }
     }
 }

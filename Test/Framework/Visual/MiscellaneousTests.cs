@@ -79,27 +79,8 @@ using MonoGame.Tests.Components;
 
 namespace MonoGame.Tests.Visual {
 	[TestFixture]
-	class MiscellaneousTests : VisualTestFixtureBase {
-		[Test]
-		public void Clear ()
-		{
-			var colors = new Color [] {
-				Color.Red,
-				Color.Orange,
-				Color.Yellow,
-				Color.Green,
-				Color.Blue,
-				Color.Indigo,
-				Color.Violet
-			};
-
-			Game.PreDrawWith += (sender, e) => {
-				Game.GraphicsDevice.Clear (colors [e.FrameInfo.DrawNumber - 1]);
-			};
-
-			RunMultiFrameTest (captureCount: colors.Length);
-		}
-
+	class MiscellaneousTests : VisualTestFixtureBase
+    {
 		[Test]
 		public void DrawOrder_falls_back_to_order_of_addition_to_Game ()
 		{
@@ -109,13 +90,6 @@ namespace MonoGame.Tests.Visual {
 
 			Game.Components.Add (new ImplicitDrawOrderComponent (Game));
 			RunMultiFrameTest (captureCount: 5);
-		}
-
-		[Test]
-		public void Colored3DCube ()
-		{
-			Game.Components.Add(new Colored3DCubeComponent(Game));
-			RunSingleFrameTest ();
 		}
 		
 		[TestCase(true)]

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Utilities;
@@ -45,17 +46,6 @@ namespace Microsoft.Xna.Framework
             Sdl.Minor = sversion.Minor;
             Sdl.Patch = sversion.Patch;
 
-            try
-            {
-                // HACK: The current development version of SDL
-                // returns 2.0.4, to check SDL version we simply
-                // need to try and execute a function that's only
-                // available in the newer version of it.
-                Sdl.Window.SetResizable(IntPtr.Zero, false);
-                Sdl.Patch = 5;
-            }
-            catch { }
-
             var version = 100 * Sdl.Major + 10 * Sdl.Minor + Sdl.Patch;
 
             if (version <= 204)
@@ -70,6 +60,7 @@ namespace Microsoft.Xna.Framework
 
             Sdl.DisableScreenSaver();
 
+            GamePad.InitDatabase();
             Window = _view = new SdlGameWindow(_game);
 
             try
@@ -84,8 +75,7 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            GamePad.InitDatabase();
-            _view.CreateWindow();
+            _view.InitGraphics();
             SdlRunLoop();
 
             base.BeforeInitialize ();
@@ -102,6 +92,7 @@ namespace Microsoft.Xna.Framework
 
             while (true)
             {
+                Threading.Run();
                 SdlRunLoop();
                 Game.Tick();
 
@@ -141,17 +132,23 @@ namespace Microsoft.Xna.Framework
                 }
                 else if (ev.Type == Sdl.EventType.TextInput)
                 {
-                    string text;
+                    int len = 0;
+                    string text = String.Empty;
                     unsafe
                     {
-                        text = new string((char*)ev.Text.Text);
+                        while (Marshal.ReadByte ((IntPtr)ev.Text.Text, len) != 0) {
+                            len++;
+                        }
+                        var buffer = new byte [len];
+                        Marshal.Copy ((IntPtr)ev.Text.Text, buffer, 0, len);
+                        text = System.Text.Encoding.UTF8.GetString (buffer);
                     }
                     if (text.Length == 0)
                         continue;
                     foreach (var c in text)
                     {
-                        var key = KeyboardUtil.ToXna ((int)c);
-                        _view.CallTextInput (c, key);
+                        var key = KeyboardUtil.ToXna((int)c);
+                        _view.CallTextInput(c, key);
                     }
                 }
                 else if (ev.Type == Sdl.EventType.WindowEvent)

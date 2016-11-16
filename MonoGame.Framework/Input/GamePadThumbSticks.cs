@@ -126,6 +126,8 @@ namespace Microsoft.Xna.Framework.Input
         {
             VirtualButtons = 0;
 
+            // VirtualButtons should always behave like deadzone is IndependentAxes. 
+            // This is consistent with XNA behaviour and generally most convenient (e.g. for menu navigation)
             if (leftPosition.X < -leftThumbDeadZone)
                 VirtualButtons |= Buttons.LeftThumbstickLeft;
             else if (leftPosition.X > leftThumbDeadZone)

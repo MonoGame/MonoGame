@@ -652,6 +652,8 @@ namespace Microsoft.Xna.Framework
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
 
+                DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
+
                 Update(gameTime);
 
                 //The TouchPanel needs to know the time for when touches arrive
@@ -719,12 +721,8 @@ namespace Microsoft.Xna.Framework
         //       Components.ComponentAdded.
         private void InitializeExistingComponents()
         {
-            // TODO: Would be nice to get rid of this copy, but since it only
-            //       happens once per game, it's fairly low priority.
-            var copy = new IGameComponent[Components.Count];
-            Components.CopyTo(copy, 0);
-            foreach (var component in copy)
-                component.Initialize();
+            for(int i = 0; i < Components.Count; ++i)
+                Components[i].Initialize();
         }
 
         private void CategorizeComponents()

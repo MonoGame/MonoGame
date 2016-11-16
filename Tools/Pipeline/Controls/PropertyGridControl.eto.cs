@@ -6,31 +6,28 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class PropertyGridControl : DynamicLayout
+    partial class PropertyGridControl : Pad
     {
-        Button btnGroup, btnAbc;
+        DynamicLayout layout;
+        StackLayout subLayout;
         PropertyGridTable propertyTable;
 
         private void InitializeComponent()
         {
-            BeginVertical();
+            Title = "Properties";
 
-            var subLayout = new StackLayout();
+            layout = new DynamicLayout();
+            layout.BeginVertical();
+
+            subLayout = new StackLayout();
             subLayout.Orientation = Orientation.Horizontal;
 
-            btnGroup = new Button { Text = "Group" };
-            subLayout.Items.Add(new StackLayoutItem(btnGroup, true));
-
-            btnAbc = new Button { Text = "Abc" };
-            subLayout.Items.Add(new StackLayoutItem(btnAbc, true));
-
-            Add(subLayout);
+            layout.Add(subLayout);
 
             propertyTable = new PropertyGridTable();
-            Add(propertyTable);
+            layout.Add(propertyTable);
 
-            btnAbc.Click += BtnAbc_Click;
-            btnGroup.Click += BtnGroup_Click;
+            CreateContent(layout);
         }
    }
 }

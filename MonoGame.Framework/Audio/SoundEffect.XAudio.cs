@@ -158,10 +158,20 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        private static DataStream ToDataStream(int offset, byte[] buffer, int length)
+        {
+            // NOTE: We make a copy here because old versions of 
+            // DataStream.Create didn't work correctly for offsets.
+            var data = new byte[length - offset];
+            Buffer.BlockCopy(buffer, offset, data, 0, length - offset);
+
+            return DataStream.Create(data, true, false);
+        }
+
         private void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             CreateBuffers(  new WaveFormat(sampleRate, (int)channels),
-                            DataStream.Create(buffer, true, false, offset),
+                            ToDataStream(offset, buffer, count),
                             loopStart, 
                             loopLength);
         }
@@ -171,7 +181,7 @@ namespace Microsoft.Xna.Framework.Audio
             var format = BitConverter.ToInt16(header, 0);
             var channels = BitConverter.ToInt16(header, 2);
             var sampleRate = BitConverter.ToInt32(header, 4);
-            var blockAlignment = BitConverter.ToInt32(header, 12);
+            var blockAlignment = BitConverter.ToInt16(header, 12);
 
             WaveFormat waveFormat;
             if (format == 1)
@@ -182,7 +192,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new NotSupportedException("Unsupported wave format!");
 
             CreateBuffers(  waveFormat,
-                            DataStream.Create(buffer, true, false),
+                            ToDataStream(0, buffer, bufferSize),
                             loopStart,
                             loopLength);
         }
@@ -194,7 +204,7 @@ namespace Microsoft.Xna.Framework.Audio
                 duration = TimeSpan.FromSeconds((float)loopLength / sampleRate);
 
                 CreateBuffers(  new WaveFormatAdpcm(sampleRate, channels, blockAlignment),
-                                DataStream.Create(buffer, true, false),
+                                ToDataStream(0, buffer, buffer.Length),
                                 loopStart,
                                 loopLength);
 
@@ -329,8 +339,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void PlatformShutdown()
         {
-            SoundEffectInstancePool.Shutdown();
-
             if (_reverbVoice != null)
             {
                 _reverbVoice.DestroyVoice();
@@ -340,7 +348,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (MasterVoice != null)
             {
-                MasterVoice.DestroyVoice();
                 MasterVoice.Dispose();
                 MasterVoice = null;
             }
