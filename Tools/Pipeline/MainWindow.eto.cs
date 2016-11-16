@@ -17,13 +17,13 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
         public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
-        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdRebuildItem;
+        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdCopyAssetPath, cmdRebuildItem;
 
         MenuBar menubar;
         ToolBar toolbar;
-        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuPads, menuBuild, menuHelp;
+        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
-        MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmRebuildItem, cmExclude, cmRename, cmDelete;
+        MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmCopyAssetPath, cmRebuildItem, cmExclude, cmRename, cmDelete;
         ButtonMenuItem cmAdd;
 
         ProjectControl projectControl;
@@ -102,6 +102,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItem.Executed += CmdOpenItem_Executed;
             cmdOpenItemWith.Executed += CmdOpenItemWith_Executed;
             cmdOpenItemLocation.Executed += CmdOpenItemLocation_Executed;
+            cmdCopyAssetPath.Executed += CmdCopyAssetPath_Executed;
             cmdRebuildItem.Executed += CmdRebuildItem_Executed;
         }
 
@@ -241,6 +242,9 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItemLocation = new Command();
             cmdOpenItemLocation.MenuText = "Open Containing Directory";
 
+            cmdCopyAssetPath = new Command();
+            cmdCopyAssetPath.MenuText = "Copy Asset Path";
+
             cmdRebuildItem = new Command();
             cmdRebuildItem.Image = Global.GetEtoIcon("Commands.Rebuild.png");
             cmdRebuildItem.MenuText = "Rebuild";
@@ -248,8 +252,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitalizeMenu()
         {
-            Menu = menubar = new MenuBar();
-            Menu.Style = "MenuBar";
+            menubar = new MenuBar();
 
             menuFile = new ButtonMenuItem();
             menuFile.Text = "File";
@@ -266,7 +269,7 @@ namespace MonoGame.Tools.Pipeline
             menuFile.Items.Add(new SeparatorMenuItem());
             menuFile.Items.Add(cmdSave);
             menuFile.Items.Add(cmdSaveAs);
-            Menu.Items.Add(menuFile);
+            menubar.Items.Add(menuFile);
 
             menuEdit = new ButtonMenuItem();
             menuEdit.Text = "Edit";
@@ -287,13 +290,13 @@ namespace MonoGame.Tools.Pipeline
             menuEdit.Items.Add(new SeparatorMenuItem());
             menuEdit.Items.Add(cmdRename);
             menuEdit.Items.Add(cmdDelete);
-            Menu.Items.Add(menuEdit);
+            menubar.Items.Add(menuEdit);
 
-            //Pads Commands
+            // View Commands
 
-            menuPads = new ButtonMenuItem();
-            menuPads.Text = "Pads";
-            Menu.Items.Add(menuPads);
+            menuView = new ButtonMenuItem();
+            menuView.Text = "View";
+            menubar.Items.Add(menuView);
 
             menuBuild = new ButtonMenuItem();
             menuBuild.Text = "Build";
@@ -303,15 +306,18 @@ namespace MonoGame.Tools.Pipeline
             menuBuild.Items.Add(cmdCancelBuild);
             menuBuild.Items.Add(new SeparatorMenuItem());
             menuBuild.Items.Add(cmdDebugMode);
-            Menu.Items.Add(menuBuild);
+            menubar.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
             menuHelp.Text = "Help";
             menuHelp.Items.Add(cmdHelp);
-            Menu.Items.Add(menuHelp);
+            menubar.Items.Add(menuHelp);
 
-            Menu.QuitItem = cmdExit;
-            Menu.AboutItem = cmdAbout;
+            menubar.QuitItem = cmdExit;
+            menubar.AboutItem = cmdAbout;
+
+            Menu = menubar;
+            Menu.Style = "MenuBar";
         }
 
         private void InitalizeContextMenu()
@@ -327,6 +333,7 @@ namespace MonoGame.Tools.Pipeline
             cmAdd.Items.Add(cmdExistingFolder.CreateMenuItem());
 
             cmOpenItemLocation = cmdOpenItemLocation.CreateMenuItem();
+            cmCopyAssetPath = cmdCopyAssetPath.CreateMenuItem();
             cmRebuildItem = cmdRebuildItem.CreateMenuItem();
             cmExclude = cmdExclude.CreateMenuItem();
             cmRename = cmdRename.CreateMenuItem();

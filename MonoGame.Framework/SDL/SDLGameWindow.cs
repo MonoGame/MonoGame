@@ -17,13 +17,10 @@ namespace Microsoft.Xna.Framework
             get { return !IsBorderless && _resizable; }
             set
             {
-                if (_init)
-                {
-                    if (Sdl.Patch > 4)
-                        Sdl.Window.SetResizable(_handle, value);
-                    else
-                        throw new Exception("SDL does not support changing resizable parameter of the window after it's already been created.");
-                }
+                if (Sdl.Patch > 4)
+                    Sdl.Window.SetResizable(_handle, value);
+                else
+                    throw new Exception("SDL 2.0.4 does not support changing resizable parameter of the window after it's already been created, please use a newer version of it.");
 
                 _resizable = value;
             }
@@ -73,7 +70,7 @@ namespace Microsoft.Xna.Framework
             get { return _borderless; }
             set
             {
-                Sdl.Window.SetBordered(_handle, value ? 1 : 0);
+                Sdl.Window.SetBordered(_handle, value ? 0 : 1);
                 _borderless = value;
             }
         }
@@ -83,7 +80,7 @@ namespace Microsoft.Xna.Framework
 
         internal readonly Game _game;
         private IntPtr _handle;
-        private bool _init, _disposed;
+        private bool _disposed;
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible, _hardwareSwitch;
         private string _screenDeviceName;
         private int _winx, _winy, _width, _height;
@@ -97,6 +94,8 @@ namespace Microsoft.Xna.Framework
 
             _winx = Sdl.Window.PosUndefined;
             _winy = Sdl.Window.PosUndefined;
+            _width = GraphicsDeviceManager.DefaultBackBufferWidth;
+            _height = GraphicsDeviceManager.DefaultBackBufferHeight;
 
             if (Sdl.Patch >= 4)
             {
@@ -105,70 +104,18 @@ namespace Microsoft.Xna.Framework
                 _winy = display.Y + display.Height / 2;
             }
 
-            // We need a dummy handle for GraphicDevice until our window gets created
-            _handle = Sdl.Window.Create("", _winx, _winy,
-                GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight,
-                Sdl.Window.State.Hidden);
-        }
-
-        internal void CreateWindow()
-        {
-            _width = GraphicsDeviceManager.DefaultBackBufferWidth;
-            _height = GraphicsDeviceManager.DefaultBackBufferHeight;
-            var title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
-
             var initflags =
                 Sdl.Window.State.OpenGL |
                 Sdl.Window.State.Hidden |
                 Sdl.Window.State.InputFocus |
                 Sdl.Window.State.MouseFocus;
 
-            if (_resizable)
-                initflags |= Sdl.Window.State.Resizable;
-
-            if (_borderless)
-                initflags |= Sdl.Window.State.Borderless;
-
-            Sdl.Window.Destroy(_handle);
-
-            var surfaceFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat.GetColorFormat ();
-            var depthStencilFormat = _game.graphicsDeviceManager.PreferredDepthStencilFormat;
-            // TODO Need to get this data from the Presentation Parameters
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.RedSize, surfaceFormat.R);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
-            switch (depthStencilFormat)
-            {
-                case DepthFormat.None:
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 0);
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
-                    break;
-                case DepthFormat.Depth16:
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 16);
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
-                    break;
-                case DepthFormat.Depth24:
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 24);
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 0);
-                    break;
-                case DepthFormat.Depth24Stencil8:
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.DepthSize, 24);
-                    Sdl.GL.SetAttribute (Sdl.GL.Attribute.StencilSize, 8);
-                    break;
-            }
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.DoubleBuffer, 1);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMajorVersion, 2);
-            Sdl.GL.SetAttribute (Sdl.GL.Attribute.ContextMinorVersion, 1);
-            
-            _handle = Sdl.Window.Create (title,
+            _handle = Sdl.Window.Create(MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle(),
                 _winx - _width / 2, _winy - _height / 2,
                 _width, _height, initflags);
 
             Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
-
-            Sdl.Window.SetTitle(Handle, title);
 
             using (
                 var stream =
@@ -191,8 +138,43 @@ namespace Microsoft.Xna.Framework
             }
 
             SetCursorVisible(_mouseVisible);
+        }
 
-            _init = true;
+        // TODO Move this to GraphicsDeviceManager
+        internal void InitGraphics()
+        {
+            var surfaceFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat.GetColorFormat();
+            var depthStencilFormat = _game.graphicsDeviceManager.PreferredDepthStencilFormat;
+
+            // TODO Need to get this data from the Presentation Parameters
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.RedSize, surfaceFormat.R);
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
+
+            switch (depthStencilFormat)
+            {
+                case DepthFormat.None:
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 0);
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth16:
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 16);
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth24:
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 24);
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 0);
+                    break;
+                case DepthFormat.Depth24Stencil8:
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.DepthSize, 24);
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.StencilSize, 8);
+                    break;
+            }
+
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.DoubleBuffer, 1);
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMajorVersion, 2);
+            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextMinorVersion, 1);
         }
 
         ~SdlGameWindow()

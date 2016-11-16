@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,42 +11,6 @@ using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    static class PropInfo
-    {
-        public static int TextHeight;
-        public static Color TextColor;
-        public static Color BackColor;
-        public static Color HoverTextColor;
-        public static Color HoverBackColor;
-        public static Color DisabledTextColor;
-        public static Color BorderColor;
-
-        static PropInfo()
-        {
-            TextHeight = (int)SystemFonts.Default().LineHeight;
-            TextColor = SystemColors.ControlText;
-            BackColor = SystemColors.ControlBackground;
-            HoverTextColor = SystemColors.HighlightText;
-            HoverBackColor = SystemColors.Highlight;
-            DisabledTextColor = SystemColors.ControlText;
-            DisabledTextColor.A = 0.4f;
-            BorderColor = Global.Unix ? SystemColors.WindowBackground : SystemColors.Control;
-        }
-
-        public static Color GetTextColor(bool selected, bool disabled)
-        {
-            if (disabled)
-                return DisabledTextColor;
-
-            return selected ? HoverTextColor : TextColor;
-        }
-
-        public static Color GetBackgroundColor(bool selected)
-        {
-            return selected ? HoverBackColor : BackColor;
-        }
-    }
-
     public partial class PropertyGridTable
     {
         private const int _spacing = 12;
@@ -167,21 +130,21 @@ namespace MonoGame.Tools.Pipeline
             var font = SystemFonts.Default();
             font = new Font(font.Family, font.Size, FontStyle.Bold);
 
-            g.FillRectangle(PropInfo.BorderColor, rec);
-            g.DrawText(SystemFonts.Default(), PropInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - font.LineHeight) / 2, text);
+            g.FillRectangle(DrawInfo.BorderColor, rec);
+            g.DrawText(SystemFonts.Default(), DrawInfo.TextColor, rec.X + 1, rec.Y + (rec.Height - font.LineHeight) / 2, text);
         }
 
         private void Drawable_Paint(object sender, PaintEventArgs e)
         {
             var g = e.Graphics;
-            var rec = new Rectangle(0, 0, drawable.Width - 1, PropInfo.TextHeight + _spacing);
+            var rec = new Rectangle(0, 0, drawable.Width - 1, DrawInfo.TextHeight + _spacing);
             var overGroup = false;
             string prevCategory = null;
 
             _separatorPos = Math.Min(Width - _separatorSafeDistance, Math.Max(_separatorSafeDistance, _separatorPos));
             _selectedCell = null;
 
-            g.Clear(PropInfo.BackColor);
+            g.Clear(DrawInfo.BackColor);
 
             if (_cells.Count == 0)
             {
@@ -190,10 +153,12 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Draw separator for not filled rows
-            g.FillRectangle(PropInfo.BorderColor, _separatorPos - 1, 0, 1, Height);
+            g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, 0, 1, Height);
 
             foreach (var c in _cells)
             {
+                rec.Height = c.Height + _spacing;
+
                 // Draw group
                 if (prevCategory != c.Category)
                 {
@@ -202,7 +167,7 @@ namespace MonoGame.Tools.Pipeline
                         DrawGroup(g, rec, c.Category);
                         prevCategory = c.Category;
                         overGroup |= rec.Contains(_mouseLocation);
-                        rec.Y += PropInfo.TextHeight + _spacing;
+                        rec.Y += DrawInfo.TextHeight + _spacing;
                     }
                 }
 
@@ -213,9 +178,9 @@ namespace MonoGame.Tools.Pipeline
                 c.Draw(g, rec, _separatorPos, selected);
 
                 // Draw separator for the current row
-                g.FillRectangle(PropInfo.BorderColor, _separatorPos - 1, rec.Y, 1, rec.Height);
+                g.FillRectangle(DrawInfo.BorderColor, _separatorPos - 1, rec.Y, 1, rec.Height);
 
-                rec.Y += PropInfo.TextHeight + _spacing;
+                rec.Y += c.Height + _spacing;
             }
 
             if (_height != rec.Y + 1)

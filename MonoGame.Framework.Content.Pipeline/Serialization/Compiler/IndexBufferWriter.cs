@@ -11,7 +11,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         protected internal override void Write(ContentWriter output, IndexCollection value)
         {
-            var shortIndices = value.Count < ushort.MaxValue;
+            // Check if the buffer and can be saved as Int16.
+            var shortIndices = true;
+            foreach(var index in value)
+            {
+                if(index > ushort.MaxValue)
+                {
+                    shortIndices = false;
+                    break;
+                }
+            }
+
             output.Write(shortIndices);
 
             var byteCount = shortIndices

@@ -1182,19 +1182,34 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_d3dContext != null, "The d3d context is null!");
         }
 
-        private void PlatformApplyBlendFactor()
+        private void PlatformApplyBlend()
         {
+            if (_blendFactorDirty || _blendStateDirty)
+            {
+                var state = _actualBlendState.GetDxState(this);
+                var factor = GetBlendFactor();
+                _d3dContext.OutputMerger.SetBlendState(state, factor);
+
+                _blendFactorDirty = false;
+                _blendStateDirty = false;
+            }
+        }
+
 #if WINDOWS_UAP
-			_d3dContext.OutputMerger.BlendFactor =
-				new SharpDX.Mathematics.Interop.RawColor4(
+        private SharpDX.Mathematics.Interop.RawColor4 GetBlendFactor()
+        {
+			return new SharpDX.Mathematics.Interop.RawColor4(
 					BlendFactor.R / 255.0f,
 					BlendFactor.G / 255.0f,
 					BlendFactor.B / 255.0f,
 					BlendFactor.A / 255.0f);
-#else
-			_d3dContext.OutputMerger.BlendFactor = BlendFactor.ToColor4();
-#endif
         }
+#else
+        private Color4 GetBlendFactor()
+        {
+			return BlendFactor.ToColor4();
+        }
+#endif
 
         internal void PlatformApplyState(bool applyShaders)
         {

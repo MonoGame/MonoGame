@@ -3,8 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Eto.Forms;
+using Eto.Drawing;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -16,7 +18,14 @@ namespace MonoGame.Tools.Pipeline
             if (Value == null)
                 Value = new List<string>();
 
-            DisplayValue = (Value as List<string>).Count > 0 ? "Collection" : "None";
+            var list = Value as List<string>;
+            var displayValue = "";
+
+            foreach (var value in list)
+                displayValue += Environment.NewLine + Path.GetFileNameWithoutExtension (value);
+
+            DisplayValue = (Value as List<string>).Count > 0 ? displayValue.Trim(Environment.NewLine.ToCharArray()) : "None";
+            Height = Height * Math.Max(list.Count, 1);
         }
 
         public override void Edit(PixelLayout control)

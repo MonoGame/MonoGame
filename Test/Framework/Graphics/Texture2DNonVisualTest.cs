@@ -73,6 +73,15 @@ namespace MonoGame.Tests.Graphics
 #endif
         }
 
+        [Test]
+        public void ZeroSizeShouldFailTest()
+        {
+            Texture2D texture;
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture2D(gd, 0, 1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture2D(gd, 1, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture2D(gd, 0, 0));
+        }
+
         [TestCase(25, 23, 1, 1, 0, 1)]
         [TestCase(25, 23, 1, 1, 1, 1)]
         [TestCase(25, 23, 2, 1, 0, 2)]

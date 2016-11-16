@@ -31,9 +31,10 @@ namespace Microsoft.Xna.Framework.Graphics
         internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
             if (graphicsDevice == null)
-            {
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
-            }
+            if (size <= 0)
+                throw new ArgumentOutOfRangeException("size","Cube size must be greater than zero");
+
             this.GraphicsDevice = graphicsDevice;
 			this.size = size;
             this._format = format;

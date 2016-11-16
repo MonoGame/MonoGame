@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
@@ -10,8 +11,8 @@ namespace MonoGame.Tools.Pipeline
     {
         Panel panel;
         TextArea textArea;
-
-        Xwt.TreeView treeView;
+        Scrollable scrollable1;
+        Drawable drawable;
 
         private void InitializeComponent()
         {
@@ -23,11 +24,20 @@ namespace MonoGame.Tools.Pipeline
             textArea.Wrap = false;
             textArea.ReadOnly = true;
 
-            treeView = new Xwt.TreeView();
-            treeView.HeadersVisible = false;
+            scrollable1 = new Scrollable();
+            scrollable1.BackgroundColor = DrawInfo.BackColor;
+            drawable = new Drawable();
+            scrollable1.Content = drawable;
 
             panel.Content = textArea;
             CreateContent(panel);
+
+            drawable.MouseDown += Drawable_MouseDown;
+            drawable.MouseMove += Drawable_MouseMove;
+            drawable.MouseLeave += Drawable_MouseLeave;
+            drawable.Paint += Drawable_Paint;
+            scrollable1.SizeChanged += Scrollable1_SizeChanged;
+            scrollable1.Scroll += Scrollable1_Scroll;
         }
     }
 }

@@ -325,7 +325,6 @@ namespace OpenAL
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourceStop")]
         public static extern void SourceStop (int sourceId);
 
-        [CLSCompliant (false)]
         [DllImport (NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "alSourcei")]
         internal static extern void Source (int sourceId, int i, int a);
 

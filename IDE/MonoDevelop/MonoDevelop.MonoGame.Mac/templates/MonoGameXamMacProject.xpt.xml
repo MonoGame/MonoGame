@@ -27,8 +27,6 @@
 				<Reference type="Gac" refto="System.Drawing" />
 				<Reference type="Gac" refto="XamMac" SpecificVersion="false"/>
 				<Reference type="Package" refto="MonoGame.Framework" />
-				<Reference type="Package" refto="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4" SpecificVersion="true" />
-				<Reference type="Package" refto="NVorbis" />
 			</References>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="Common/Game1.cs" />
@@ -42,6 +40,15 @@
 				<Directory name="Properties">
 					<File name="AssemblyInfo.cs" AddStandardHeader="True" src="Common/AssemblyInfo.cs" />
 				</Directory>
+				<ContentFile>
+					<File name="MonoGame.Framework.dll.config" src="Common/MonoGame.Framework.dll.config" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
+				<ContentFile>
+					<RawFile name="libopenal.1.dylib" src="libs/libopenal.1.dylib" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
+				<ContentFile>
+					<RawFile name="libSDL2-2.0.0.dylib" src="libs/libSDL2-2.0.0.dylib" CopyToOutputDirectory="PreserveNewest" />
+				</ContentFile>
 			</Files>
 		</Project>
 	</Combine>

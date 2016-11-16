@@ -52,6 +52,21 @@ namespace MonoGame.Tests.Graphics
         {
             t.SetData(reference);
         }
+
+        [Test]
+        public void ZeroSizeShouldFailTest()
+        {
+            Texture3D texture;
+            var gd = _game.GraphicsDevice;
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 0, 1, 1, false, SurfaceFormat.Color));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 0, 1, false, SurfaceFormat.Color));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 1, 0, false, SurfaceFormat.Color));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 0, 0, 1, false, SurfaceFormat.Color));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 0, 0, false, SurfaceFormat.Color));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 0, 1, 0, false, SurfaceFormat.Color));
+            Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 0, 0, 0, false, SurfaceFormat.Color));
+        }
+
         [Test]
         public void SetData1ParameterTest()
         {
