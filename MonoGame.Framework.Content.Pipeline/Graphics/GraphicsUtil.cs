@@ -123,10 +123,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return result;
         }
 
-        public static void CompressPvrtc(TextureContent content, bool generateMipMaps, bool sharpAlpha)
+        public static void CompressPvrtc(TextureContent content, bool generateMipMaps, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
-            if (sharpAlpha)
+            if (isSpriteFont)
             {
                 CompressColor16Bit(content, generateMipMaps);
                 return;
@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 Compress(typeof(PvrtcRgba4BitmapContent), content, generateMipMaps);
         }
 
-        public static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool sharpAlpha)
+        public static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipMaps, bool isSpriteFont)
         {
             var face = content.Faces[0][0];
 
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             if (alphaRange == AlphaRange.Opaque)
                 Compress(typeof(Dxt1BitmapContent), content, generateMipMaps);
-            else if (sharpAlpha)
+            else if (isSpriteFont)
                 CompressFontDXT3(content, generateMipMaps);
             else if (alphaRange == AlphaRange.Cutout)
                 Compress(typeof(Dxt3BitmapContent), content, generateMipMaps);
@@ -275,7 +275,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         // Compress the greyscale font texture page using a specially-formulated DXT3 mode
-        static unsafe void CompressFontDXT3(TextureContent content, bool generateMipmaps)
+        static public unsafe void CompressFontDXT3(TextureContent content, bool generateMipmaps)
         {
             if (content.Faces.Count > 1)
                 throw new PipelineException("Font textures should only have one face");
