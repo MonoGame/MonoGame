@@ -1133,12 +1133,14 @@ namespace Microsoft.Xna.Framework
             for (var i = 0; i < sourceArray.Length; i++)
             {
                 var position = sourceArray[i];
+                var w = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
+                var invW = 1f / w;
 
                 destinationArray[i] =
                     new Vector3(
-                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + 1f,
-                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + 1f,
-                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + 1f);
+                        MathHelper.PerspectiveDivision(((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41), w),
+                        MathHelper.PerspectiveDivision(((position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42), w),
+                        MathHelper.PerspectiveDivision(((position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43), w));
             }
         }
 
