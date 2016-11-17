@@ -480,52 +480,89 @@ namespace MonoGame.Tests.Graphics
 
             Assert.AreEqual(b, b2);
 
+            // MonoGame allows any kind of type that is not larger than one element while XNA only allows byte
+#if !XNA
+            var b3 = new short[t.Width*t.Height/4];
+            t.GetData(b3);
+            t.SetData(b3);
+
+            t.GetData(b2);
+            Assert.AreEqual(b, b2);
+
+            var b4 = new int[t.Width*t.Height/8];
+            t.GetData(b4);
+            t.SetData(b4);
+
+            t.GetData(b2);
+            Assert.AreEqual(b, b2);
+
+            var b5 = new long[t.Width*t.Height/16];
+            t.GetData(b5);
+            t.SetData(b5);
+
+            t.GetData(b2);
+            Assert.AreEqual(b, b2);
+
+            // this is too large, DXT1 blocks are 64 bits while Vector4 is 128 bits
+            var b6 = new Vector4[t.Width*t.Height/32];
+            Assert.Throws<ArgumentException>(() => t.GetData(b6));
+            Assert.Throws<ArgumentException>(() => t.SetData(b6));
+
+            var b7 = new Vector3[t.Width*t.Height/24];
+            Assert.Throws<ArgumentException>(() => t.GetData(b7));
+            Assert.Throws<ArgumentException>(() => t.SetData(b7));
+#endif
+
             t.Dispose();
         }
 
-        [TestCase(0)]
-        [TestCase(1)]
-        public void GetAndSetDataDxtNotMultipleOf4Rounding(int mip)
+        // DXT1
+        [TestCase(8, "random_16px_dxt", 0)]
+        [TestCase(8, "random_16px_dxt", 1)]
+        // DXT5
+        [TestCase(16, "random_16px_dxt_alpha", 0)]
+        [TestCase(16, "random_16px_dxt_alpha", 1)]
+        public void GetAndSetDataDxtNotMultipleOf4Rounding(int bs, string texName, int mip)
         {
-            var t = content.Load<Texture2D>(Paths.Texture ("random_16px_dxt"));
+            var t = content.Load<Texture2D>(Paths.Texture (texName));
 
-            var before = new byte[t.Width*t.Height/2];
+            var before = new byte[t.Width*t.Height*bs/16];
             t.GetData(before);
 
-            var b1 = new byte[8];
-            var b2 = new byte[8];
+            var b1 = new byte[bs];
+            var b2 = new byte[bs];
 
-            t.GetData(mip, new Rectangle(0,0,4,4), b1, 0, 8);
+            t.GetData(mip, new Rectangle(0, 0, 4, 4), b1, 0, bs);
 
-            t.GetData(mip, new Rectangle(0,0,1,1), b2, 0, 8);
-            t.SetData(mip, new Rectangle(0,0,1,1), b2, 0, 8);
+            t.GetData(mip, new Rectangle(0,0,1,1), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0,0,1,1), b2, 0, bs);
             Assert.AreEqual(b1, b2);
 
-            t.GetData(mip, new Rectangle(0,0,1,3), b2, 0, 8);
-            t.SetData(mip, new Rectangle(0,0,1,3), b2, 0, 8);
+            t.GetData(mip, new Rectangle(0,0,1,3), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0,0,1,3), b2, 0, bs);
             Assert.AreEqual(b1, b2);
 
-            t.GetData(mip, new Rectangle(0,0,4,3), b2, 0, 8);
-            t.SetData(mip, new Rectangle(0,0,4,3), b2, 0, 8);
+            t.GetData(mip, new Rectangle(0,0,4,3), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0,0,4,3), b2, 0, bs);
             Assert.AreEqual(b1, b2);
 
-            t.GetData(mip, new Rectangle(0, 2, 4, 4), b2, 0, 8);
-            t.SetData(mip, new Rectangle(0, 2, 4, 4), b2, 0, 8);
+            t.GetData(mip, new Rectangle(0, 2, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(0, 2, 4, 4), b2, 0, bs);
             Assert.AreEqual(b1, b2);
 
-            t.GetData(mip, new Rectangle(2, 2, 4, 4), b2, 0, 8);
-            t.SetData(mip, new Rectangle(2, 2, 4, 4), b2, 0, 8);
+            t.GetData(mip, new Rectangle(2, 2, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(2, 2, 4, 4), b2, 0, bs);
             Assert.AreEqual(b1, b2);
 
-            t.GetData(mip, new Rectangle(3, 3, 4, 4), b2, 0, 8);
-            t.SetData(mip, new Rectangle(3, 3, 4, 4), b2, 0, 8);
+            t.GetData(mip, new Rectangle(3, 3, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(3, 3, 4, 4), b2, 0, bs);
             Assert.AreEqual(b1, b2);
 
-            t.GetData(mip, new Rectangle(4, 4, 4, 4), b2, 0, 8);
-            t.SetData(mip, new Rectangle(4, 4, 4, 4), b2, 0, 8);
+            t.GetData(mip, new Rectangle(4, 4, 4, 4), b2, 0, bs);
+            t.SetData(mip, new Rectangle(4, 4, 4, 4), b2, 0, bs);
             Assert.AreNotEqual(b1, b2);
 
-            var after = new byte[t.Width*t.Height/2];
+            var after = new byte[t.Width*t.Height*bs/16];
             t.GetData(after);
 
             Assert.AreEqual(before, after);
@@ -533,38 +570,41 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
-        [Test]
-        public void GetAndSetDataDxtDontRoundWhenOutsideBounds()
+        [TestCase("random_16px_dxt", 8)]
+        [TestCase("random_16px_dxt_alpha", 16)]
+        public void GetAndSetDataDxtDontRoundWhenOutsideBounds(string texName, int bs)
         {
-            var t = content.Load<Texture2D>(Paths.Texture("random_16px_dxt"));
+            var t = content.Load<Texture2D>(Paths.Texture(texName));
 
-            var b = new byte[8];
+            var b = new byte[bs];
 
             // don't round if the unrounded rectangle would be outside the texture area
-            Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(15, 15, 3, 3), b, 0, 8));
+            Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(15, 15, 3, 3), b, 0, bs));
             // this does work
-            t.GetData(0, new Rectangle(15, 15, 1, 1), b, 0, 8);
+            t.GetData(0, new Rectangle(15, 15, 1, 1), b, 0, bs);
 
             t.Dispose();
         }
 
-        [Test]
-        public void GetAndSetDataDxtLowerMips()
+        [TestCase("random_16px_dxt", 8)]
+        [TestCase("random_16px_dxt_alpha", 16)]
+        public void GetAndSetDataDxtLowerMips(string texName, int bs)
         {
-            var t = content.Load<Texture2D>(Paths.Texture("random_16px_dxt"));
+            var t = content.Load<Texture2D>(Paths.Texture(texName));
 
-            var b = new byte[8];
-            var b2 = new byte[8];
+            var b = new byte[bs];
+            var b2 = new byte[bs];
 
-            t.GetData(0, new Rectangle(0,0,4,4), b, 0, 8);
-            t.GetData(1, new Rectangle(0,0,4,4), b2, 0, 8);
-            t.GetData(2, new Rectangle(0,0,4,4), b2, 0, 8);
-            t.GetData(3, new Rectangle(0,0,2,2), b2, 0, 8);
-            t.GetData(4, new Rectangle(0,0,1,1), b2, 0, 8);
+            t.GetData(0, new Rectangle(0,0,4,4), b, 0, bs);
+            t.GetData(1, new Rectangle(0,0,4,4), b2, 0, bs);
+            t.GetData(2, new Rectangle(0,0,4,4), b2, 0, bs);
+            t.GetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
+            t.GetData(4, new Rectangle(0,0,1,1), b2, 0, bs);
+            t.SetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
             
             // would be rounded, but the rectangle is outside the texture area so it wil throw before rounding
-            Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(1, 1, 2, 2), b, 0, 8));
-            Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(0, 0, 3, 3), b, 0, 8));
+            Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(1, 1, 2, 2), b, 0, bs));
+            Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(0, 0, 3, 3), b, 0, bs));
 
             t.Dispose();
         }

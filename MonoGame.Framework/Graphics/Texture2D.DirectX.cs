@@ -109,8 +109,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: We should probably be pooling these staging resources
             // and not creating a new one each time.
             //
-            var levelWidth = Math.Max(width >> level, 1);
-            var levelHeight = Math.Max(height >> level, 1);
+            var min = _format.IsCompressedFormat() ? 4 : 1;
+            var levelWidth = Math.Max(width >> level, min);
+            var levelHeight = Math.Max(height >> level, min);
 
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = levelWidth;
@@ -158,6 +159,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
 
                         var elementSize = _format.GetSize();
+                        if (_format.IsCompressedFormat())
+                        {
+                            // for 4x4 block compression formats an element is one block, so elementsInRow
+                            // and number of rows are 1/4 of number of pixels in width and height of the rectangle
+                            elementsInRow /= 4;
+                            rows /= 4;
+                        }
                         var rowSize = elementSize * elementsInRow;
                         if (rowSize == databox.RowPitch)
                             stream.ReadRange(data, startIndex, elementCount);
