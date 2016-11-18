@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
 #if OPENGL && (MONOMAC || DESKTOPGL)
-            if (glFormat == GLPixelFormat.CompressedTextureFormats)
+            if (glFormat == (PixelFormat) GLPixelFormat.CompressedTextureFormats)
                 throw new NotImplementedException();
 
             var target = GetGLCubeFace(cubeMapFace);
