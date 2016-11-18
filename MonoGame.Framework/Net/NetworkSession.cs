@@ -210,16 +210,11 @@ namespace Microsoft.Xna.Framework.Net
         
         private NetworkMachine localMachine;
         private NetworkMachine hostMachine;
+        private NetworkSessionPublicInfo publicInfo;
+        private int uniqueIdCount;
+
         private List<IOutgoingMessage> messageQueue;
         private List<EventArgs> eventQueue;
-
-        internal IList<SignedInGamer> pendingSignedInGamers;
-        internal ICollection<IPEndPoint> pendingEndPoints;
-
-        // Host stores which remote machines existed before a particular machine connected
-        internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
-
-        private int uniqueIdCount;
         private List<NetworkGamer> allGamers;
         private List<NetworkGamer> remoteGamers;
         private List<NetworkGamer> previousGamers;
@@ -229,15 +224,31 @@ namespace Microsoft.Xna.Framework.Net
         internal int maxGamers;
         internal int privateGamerSlots;
 
+        internal IList<SignedInGamer> pendingSignedInGamers;
+        internal ICollection<IPEndPoint> pendingEndPoints;
+
+        // Host stores which remote machines existed before a particular machine connected
+        internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
+
         internal NetworkSession(ISessionBackend backend, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
             this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, backend.HostEndPoint == null);
             this.hostMachine = this.localMachine.IsHost ? this.localMachine : null;
+            this.publicInfo = new NetworkSessionPublicInfo();
+            this.uniqueIdCount = 0;
+
             this.messageQueue = new List<IOutgoingMessage>();
             this.eventQueue = new List<EventArgs>();
+            this.allGamers = new List<NetworkGamer>();
+            this.remoteGamers = new List<NetworkGamer>();
+            this.previousGamers = new List<NetworkGamer>();
+
+            this.allowHostMigration = false;
+            this.allowJoinInProgress = false;
+            this.maxGamers = maxGamers;
+            this.privateGamerSlots = privateGamerSlots;
 
             this.pendingSignedInGamers = new List<SignedInGamer>();
-
             foreach (SignedInGamer gamer in signedInGamers)
             {
                 if (!this.pendingSignedInGamers.Contains(gamer))
@@ -247,21 +258,11 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             this.pendingEndPoints = null;
-
             if (this.localMachine.IsHost)
             {
                 // Initialize empty pending end point list so that the host is approved automatically
                 this.pendingEndPoints = new List<IPEndPoint>();
             }
-
-            this.allGamers = new List<NetworkGamer>();
-            this.remoteGamers = new List<NetworkGamer>();
-            this.previousGamers = new List<NetworkGamer>();
-
-            this.allowHostMigration = false;
-            this.allowJoinInProgress = false;
-            this.maxGamers = maxGamers;
-            this.privateGamerSlots = privateGamerSlots;
 
             this.Backend = backend;
             this.Backend.Listener = this;
@@ -579,16 +580,18 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        // For discovery response
-        int IBackendListener.CurrentGamerCount { get { return allGamers.Count; } }
-        string IBackendListener.HostGamertag
+        // BackendListener
+        internal string HostGamertag
         {
             get
             {
                 return Host != null || Host.Gamertag == string.Empty ? Host.Gamertag : "Game starting...";
             }
         }
-        int IBackendListener.OpenPrivateGamerSlots
+
+        internal int CurrentGamerCount { get { return allGamers.Count; } }
+
+        internal int OpenPrivateGamerSlots
         {
             get
             {
@@ -605,7 +608,26 @@ namespace Microsoft.Xna.Framework.Net
                 return PrivateGamerSlots - usedSlots;
             }
         }
-        int IBackendListener.OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - allGamers.Count; } }
+
+        internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - allGamers.Count; } }
+
+        bool IBackendListener.AllowConnect
+        {
+            get
+            {
+                return IsHost && OpenPublicGamerSlots > 0;
+            }
+        }
+
+        NetworkSessionPublicInfo IBackendListener.SessionPublicInfo
+        {
+            get
+            {
+                publicInfo.Set(SessionType, SessionProperties, HostGamertag, MaxGamers, PrivateGamerSlots, CurrentGamerCount, OpenPrivateGamerSlots, OpenPublicGamerSlots);
+
+                return publicInfo;
+            }
+        }
 
         // Events
         public event EventHandler<GamerJoinedEventArgs> GamerJoined;

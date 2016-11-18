@@ -395,8 +395,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         Debug.WriteLine("Discovery request received");
 
                         OutgoingMessage outgoingMsg = outgoingMessagePool.Get();
-                        DiscoveryContents contents = new DiscoveryContents(Listener);
-                        contents.Pack(outgoingMsg);
+                        Listener.SessionPublicInfo.Pack(outgoingMsg);
 
                         outgoingMsg.Buffer.Position = 0;
 
@@ -408,7 +407,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         break;
                     // Connection approval
                     case NetIncomingMessageType.ConnectionApproval:
-                        if (HostEndPoint != null || Listener.OpenPublicGamerSlots > 0)
+                        if (Listener.AllowConnect)
                         {
                             msg.SenderConnection.Approve();
 
@@ -416,9 +415,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         }
                         else
                         {
-                            msg.SenderConnection.Deny("No free slots");
+                            msg.SenderConnection.Deny("Connection denied");
 
-                            Debug.WriteLine("Connection denied, no free slots");
+                            Debug.WriteLine("Connection denied");
                         }
                         break;
                     // Nat introduction

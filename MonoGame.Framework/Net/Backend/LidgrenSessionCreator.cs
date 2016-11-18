@@ -75,8 +75,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 msg.Write((byte)MasterServerMessageType.RegisterHost);
                 msg.Write(peer.UniqueIdentifier);
                 msg.Write(new IPEndPoint(address, peer.Port));
-                DiscoveryContents contents = new DiscoveryContents(session);
-                contents.Pack(msg);
+                (session as IBackendListener).SessionPublicInfo.Pack(msg);
 
                 NetOutgoingMessage request = peer.CreateMessage();
                 request.Write(msg.Buffer);
@@ -88,11 +87,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return session;
         }
 
-        private static void AddAvailableNetworkSession(long id, IPEndPoint endPoint, DiscoveryContents contents, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
+        private static void AddAvailableNetworkSession(long id, IPEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
         {
-            if (searchType == contents.sessionType && searchProperties.SearchMatch(contents.sessionProperties))
+            if (searchType == publicInfo.sessionType && searchProperties.SearchMatch(publicInfo.sessionProperties))
             {
-                AvailableNetworkSession availableSession = new AvailableNetworkSession(endPoint, localGamers, contents.maxGamers, contents.privateGamerSlots, contents.sessionType, contents.currentGamerCount, contents.hostGamertag, contents.openPrivateGamerSlots, contents.openPublicGamerSlots, contents.sessionProperties);
+                AvailableNetworkSession availableSession = new AvailableNetworkSession(endPoint, localGamers, publicInfo.maxGamers, publicInfo.privateGamerSlots, publicInfo.sessionType, publicInfo.currentGamerCount, publicInfo.hostGamertag, publicInfo.openPrivateGamerSlots, publicInfo.openPublicGamerSlots, publicInfo.sessionProperties);
 
                 availableSession.Tag = id;
 
@@ -159,17 +158,15 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         IIncomingMessage msg = new IncomingMessage(rawMsg);
                         long hostId = msg.ReadLong();
                         IPEndPoint hostEndPoint = msg.ReadIPEndPoint();
-                        DiscoveryContents hostContents = new DiscoveryContents();
-                        hostContents.Unpack(msg);
+                        NetworkSessionPublicInfo hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
-                        AddAvailableNetworkSession(hostId, hostEndPoint, hostContents, localGamers, sessionType, searchProperties, availableSessions);
+                        AddAvailableNetworkSession(hostId, hostEndPoint, hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
                     }
                 }
                 else if (rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse)
                 {
                     IIncomingMessage msg = new IncomingMessage(rawMsg);
-                    DiscoveryContents hostContents = new DiscoveryContents();
-                    hostContents.Unpack(msg);
+                    NetworkSessionPublicInfo hostContents = NetworkSessionPublicInfo.FromMessage(msg);
 
                     AddAvailableNetworkSession(-1, rawMsg.SenderEndPoint, hostContents, localGamers, sessionType, searchProperties, availableSessions);
                 }

@@ -18,13 +18,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     {
         internal IPEndPoint internalEndPoint;
         internal IPEndPoint externalEndPoint;
-        internal DiscoveryContents contents;
+        internal NetworkSessionPublicInfo publicInfo;
 
-        public HostData(IPEndPoint internalEndPoint, IPEndPoint externalEndPoint, DiscoveryContents contents)
+        public HostData(IPEndPoint internalEndPoint, IPEndPoint externalEndPoint, NetworkSessionPublicInfo publicInfo)
         {
             this.internalEndPoint = internalEndPoint;
             this.externalEndPoint = externalEndPoint;
-            this.contents = contents;
+            this.publicInfo = publicInfo;
         }
     }
 
@@ -73,10 +73,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         long hostId = msg.ReadLong();
                         IPEndPoint internalEndPoint = msg.ReadIPEndPoint();
                         IPEndPoint externalEndPoint = rawMsg.SenderEndPoint;
-                        DiscoveryContents contents = new DiscoveryContents();
-                        contents.Unpack(msg);
+                        NetworkSessionPublicInfo publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
-                        hosts[hostId] = new HostData(internalEndPoint, externalEndPoint, contents);
+                        hosts[hostId] = new HostData(internalEndPoint, externalEndPoint, publicInfo);
 
                         Console.WriteLine("Host " + hostId + " added. (Internal endpoint: " + internalEndPoint + ", External endpoint: " + externalEndPoint + ")");
                     }
@@ -87,7 +86,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                             OutgoingMessage response = new OutgoingMessage();
                             response.Write(elem.Key);
                             response.Write(elem.Value.externalEndPoint);
-                            elem.Value.contents.Pack(response);
+                            elem.Value.publicInfo.Pack(response);
 
                             response.Buffer.Position = 0;
 
