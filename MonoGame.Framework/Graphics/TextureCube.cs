@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public void GetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
 	    {
-            ValidateParams(level, rect, data, startIndex, elementCount);
+            ValidateParams(level, ref rect, data, startIndex, elementCount);
 	        PlatformGetData(cubeMapFace, level, rect, data, startIndex, elementCount);
 	    }
 
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         public void SetData<T>(CubeMapFace face, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
 		{
-            ValidateParams(level, rect, data, startIndex, elementCount);
+            ValidateParams(level, ref rect, data, startIndex, elementCount);
 
             var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 		}
 
-        private void ValidateParams<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void ValidateParams<T>(int level, ref Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             var textureBounds = new Rectangle(0, 0, Math.Max(Size >> level, 1), Math.Max(Size >> level, 1));
             var checkedRect = rect.HasValue ? rect.Value : textureBounds;
@@ -155,7 +155,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
             if (data.Length < startIndex + elementCount)
                 throw new ArgumentException("The data array is too small.");
-            if (elementCount * tSize != checkedRect.Width * checkedRect.Height * fSize)
+
+            int dataByteSize;
+            if (Format.IsCompressedFormat())
+            {
+                // round x and y down to next multiple of four; width and height up to next multiple of four
+                if (rect.HasValue)
+                {
+                    rect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3, 
+                        (checkedRect.Width + 3) & ~0x3, (checkedRect.Height + 3) & ~0x3);
+                }
+                dataByteSize = Math.Max(checkedRect.Width, 4) * Math.Max(checkedRect.Height, 4) * fSize / 16;
+            }
+            else
+            {
+                dataByteSize = checkedRect.Width * checkedRect.Height * fSize;
+            }
+            if (elementCount * tSize != dataByteSize)
                 throw new ArgumentException("elementCount is too large or too small.", "elementCount");
         }
 	}
