@@ -268,16 +268,22 @@
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
 
+    <Compile Include="Net\Backend\GenericPool.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
     <Compile Include="Net\Backend\IBackend.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Backend\LidgrenBackend.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\LidgrenSessionCreator.cs">
+    <Compile Include="Net\Backend\LidgrenMasterServer.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\LidgrenMasterServer.cs">
+    <Compile Include="Net\Backend\LidgrenMessage.cs">
+      <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Net\Backend\LidgrenSessionCreator.cs">
       <ExcludePlatforms>WindowsPhone,WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
 

@@ -7,163 +7,6 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
-    internal interface IResetable
-    {
-        void Reset();
-    }
-
-    internal class Pool<T> where T : IResetable, new()
-    {
-        private IList<T> freeMessages = new List<T>();
-
-        public T Get()
-        {
-            T item;
-
-            if (freeMessages.Count > 0)
-            {
-                int lastIndex = freeMessages.Count - 1;
-                item = freeMessages[lastIndex];
-                freeMessages.RemoveAt(lastIndex);
-            }
-            else
-            {
-                item = new T();
-                item.Reset();
-            }
-
-            return item;
-        }
-
-        public void Recycle(T item)
-        {
-            item.Reset();
-            freeMessages.Add(item);
-        }
-    }
-
-    internal class OutgoingMessage : IOutgoingMessage, IResetable
-    {
-        public OutgoingMessage()
-        {
-            this.Buffer = new NetBuffer();
-        }
-
-        internal NetBuffer Buffer { get; private set; }
-        public IPeer Recipient { get; internal set; }
-        public SendDataOptions Options { get; internal set; }
-        public int Channel { get; internal set; }
-
-        public void Reset()
-        {
-            Buffer.LengthBits = 0;
-            Buffer.Position = 0;
-            Recipient = null;
-            Options = SendDataOptions.None;
-            Channel = 0;
-        }
-
-        public void Write(string value)
-        {
-            Buffer.Write(value);
-        }
-
-        public void Write(byte[] value)
-        {
-            Buffer.Write(value);
-        }
-
-        public void Write(int value)
-        {
-            Buffer.Write(value);
-        }
-
-        public void Write(long value)
-        {
-            Buffer.Write(value);
-        }
-
-        public void Write(bool value)
-        {
-            Buffer.Write(value);
-        }
-
-        public void Write(byte value)
-        {
-            Buffer.Write(value);
-        }
-
-        public void Write(IPEndPoint value)
-        {
-            Buffer.Write(value);
-        }
-
-        public void Write(IPeer value)
-        {
-            Buffer.Write((value as ILidgrenPeer).Id);
-        }
-    }
-
-    internal class IncomingMessage : IIncomingMessage, IResetable
-    {
-        internal LidgrenBackend Backend { get; set; }
-        internal NetBuffer Buffer { get; set; }
-
-        public IncomingMessage()
-        { }
-
-        public IncomingMessage(NetBuffer buffer)
-        {
-            this.Buffer = buffer;
-        }
-
-        public void Reset()
-        {
-            Backend = null;
-            Buffer = null;
-        }
-
-        public bool ReadBoolean()
-        {
-            return Buffer.ReadBoolean();
-        }
-
-        public byte ReadByte()
-        {
-            return Buffer.ReadByte();
-        }
-
-        public void ReadBytes(byte[] into, int offset, int length)
-        {
-            Buffer.ReadBytes(into, offset, length);
-        }
-
-        public int ReadInt()
-        {
-            return Buffer.ReadInt32();
-        }
-
-        public long ReadLong()
-        {
-            return Buffer.ReadInt64();
-        }
-
-        public IPEndPoint ReadIPEndPoint()
-        {
-            return Buffer.ReadIPEndPoint();
-        }
-
-        public IPeer ReadPeer()
-        {
-            return Backend.FindPeerById(Buffer.ReadInt64());
-        }
-
-        public string ReadString()
-        {
-            return Buffer.ReadString();
-        }
-    }
-    
     internal interface ILidgrenPeer : IPeer
     {
         long Id { get; }
@@ -219,8 +62,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private IList<RemotePeer> remotePeers;
         private List<NetConnection> reportedConnections;
         
-        private Pool<OutgoingMessage> outgoingMessagePool;
-        private Pool<IncomingMessage> incomingMessagePool;
+        private GenericPool<OutgoingMessage> outgoingMessagePool;
+        private GenericPool<IncomingMessage> incomingMessagePool;
 
         private DateTime lastMasterServerRegistration;
         private DateTime lastStatisticsUpdate;
@@ -233,8 +76,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             this.remotePeers = new List<RemotePeer>();
             this.reportedConnections = new List<NetConnection>();
             
-            this.outgoingMessagePool = new Pool<OutgoingMessage>();
-            this.incomingMessagePool = new Pool<IncomingMessage>();
+            this.outgoingMessagePool = new GenericPool<OutgoingMessage>();
+            this.incomingMessagePool = new GenericPool<IncomingMessage>();
 
             this.lastMasterServerRegistration = DateTime.MinValue;
             this.lastStatisticsUpdate = DateTime.Now;
