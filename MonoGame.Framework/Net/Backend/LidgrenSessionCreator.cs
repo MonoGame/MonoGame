@@ -64,26 +64,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 throw new NetworkException("Could not initialize session");
             }
 
-            // Hack! TODO: Move into network session and perform regularly
-            if (sessionType == NetworkSessionType.PlayerMatch || sessionType == NetworkSessionType.Ranked)
-            {
-                IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-                IPAddress address;
-                NetUtility.GetMyAddress(out address);
-
-                OutgoingMessage msg = new OutgoingMessage();
-                msg.Write((byte)MasterServerMessageType.RegisterHost);
-                msg.Write(peer.UniqueIdentifier);
-                msg.Write(new IPEndPoint(address, peer.Port));
-                (session as IBackendListener).SessionPublicInfo.Pack(msg);
-
-                NetOutgoingMessage request = peer.CreateMessage();
-                request.Write(msg.Buffer);
-                peer.SendUnconnectedMessage(request, masterServerEndPoint);
-
-                Debug.WriteLine("Registering with master server (UID: " + peer.UniqueIdentifier + ", Address: " + address + ")");
-            }
-
             return session;
         }
 

@@ -35,6 +35,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
     internal interface IBackendListener
     {
         bool AllowConnect { get; }
+        bool RegisterWithMasterServer { get; }
         NetworkSessionPublicInfo SessionPublicInfo { get; }
 
         void PeerConnected(IPeer peer);
@@ -69,7 +70,6 @@ namespace Microsoft.Xna.Framework.Net.Backend
         void SendMessage(IOutgoingMessage message);
 
         void Update();
-        void UpdateStatistics();
         void Shutdown(string byeMessage);
     }
 

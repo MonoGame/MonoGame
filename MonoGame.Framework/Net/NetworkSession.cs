@@ -619,6 +619,11 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
+        bool IBackendListener.RegisterWithMasterServer
+        {
+            get { return IsHost && (SessionType == NetworkSessionType.PlayerMatch || SessionType == NetworkSessionType.Ranked); }
+        }
+
         NetworkSessionPublicInfo IBackendListener.SessionPublicInfo
         {
             get
@@ -1066,8 +1071,6 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return;
             }
-
-            Backend.UpdateStatistics();
         }
 
         private void TriggerEvents()

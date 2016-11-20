@@ -196,10 +196,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         public LocalPeer(NetPeer peer)
         {
             this.peer = peer;
+
+            IPAddress address;
+            NetUtility.GetMyAddress(out address);
+            this.EndPoint = new IPEndPoint(address, peer.Port);
         }
 
         public long Id { get { return peer.UniqueIdentifier; } }
-        public IPEndPoint EndPoint { get { throw new InvalidOperationException(); } }
+        public IPEndPoint EndPoint { get; }
         public TimeSpan RoundtripTime { get { return TimeSpan.Zero; } }
         public object Tag { get; set; }
 
@@ -218,7 +222,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private Pool<OutgoingMessage> outgoingMessagePool;
         private Pool<IncomingMessage> incomingMessagePool;
 
-        private DateTime lastTime;
+        private DateTime lastMasterServerRegistration;
+        private DateTime lastStatisticsUpdate;
         private int lastReceivedBytes;
         private int lastSentBytes;
 
@@ -231,7 +236,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             this.outgoingMessagePool = new Pool<OutgoingMessage>();
             this.incomingMessagePool = new Pool<IncomingMessage>();
 
-            this.lastTime = DateTime.Now;
+            this.lastMasterServerRegistration = DateTime.MinValue;
+            this.lastStatisticsUpdate = DateTime.Now;
             this.lastReceivedBytes = 0;
             this.lastSentBytes = 0;
 
@@ -336,14 +342,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             // Handle remote peers
             if (msg.Recipient != localPeer)
             {
-                msg.Buffer.Position = 0;
-
                 NetOutgoingMessage outgoingMsg = localPeer.peer.CreateMessage(msg.Buffer.LengthBytes);
                 outgoingMsg.Write(msg.Buffer);
 
                 if (msg.Recipient == null)
                 {
-                    // Send to all remote peers
                     if (reportedConnections.Count > 0)
                     {
                         localPeer.peer.SendMessage(outgoingMsg, reportedConnections, ToDeliveryMethod(msg.Options), msg.Channel);
@@ -351,7 +354,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 }
                 else
                 {
-                    // Send to specific remote peer
                     localPeer.peer.SendMessage(outgoingMsg, (msg.Recipient as RemotePeer).connection, ToDeliveryMethod(msg.Options), msg.Channel);
                 }
             }
@@ -380,6 +382,20 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public void Update()
         {
+            ReceiveMessages();
+
+            if (HasShutdown)
+            {
+                return;
+            }
+
+            UpdateMasterServerRegistration();
+
+            UpdateStatistics();
+        }
+
+        protected void ReceiveMessages()
+        {
             NetIncomingMessage msg;
             while ((msg = localPeer.peer.ReadMessage()) != null)
             {
@@ -394,16 +410,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                         Debug.WriteLine("Discovery request received");
 
-                        OutgoingMessage outgoingMsg = outgoingMessagePool.Get();
-                        Listener.SessionPublicInfo.Pack(outgoingMsg);
-
-                        outgoingMsg.Buffer.Position = 0;
-
+                        OutgoingMessage responseMsg = outgoingMessagePool.Get();
+                        Listener.SessionPublicInfo.Pack(responseMsg);
+                        
                         NetOutgoingMessage response = localPeer.peer.CreateMessage();
-                        response.Write(outgoingMsg.Buffer);
+                        response.Write(responseMsg.Buffer);
                         localPeer.peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
 
-                        outgoingMessagePool.Recycle(outgoingMsg);
+                        outgoingMessagePool.Recycle(responseMsg);
                         break;
                     // Connection approval
                     case NetIncomingMessageType.ConnectionApproval:
@@ -498,22 +512,50 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
-        public void UpdateStatistics()
+        protected void UpdateMasterServerRegistration()
+        {
+            if (!Listener.RegisterWithMasterServer)
+            {
+                return;
+            }
+
+            DateTime currentTime = DateTime.Now;
+            TimeSpan elapsedTime = currentTime - lastMasterServerRegistration;
+
+            if (elapsedTime >= NetworkSessionSettings.MasterServerRegistrationInterval)
+            {
+                IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+
+                OutgoingMessage msg = outgoingMessagePool.Get();
+                msg.Write((byte)MasterServerMessageType.RegisterHost);
+                msg.Write(localPeer.Id);
+                msg.Write(localPeer.EndPoint);
+                Listener.SessionPublicInfo.Pack(msg);
+
+                NetOutgoingMessage request = localPeer.peer.CreateMessage();
+                request.Write(msg.Buffer);
+                localPeer.peer.SendUnconnectedMessage(request, masterServerEndPoint);
+
+                outgoingMessagePool.Recycle(msg);
+                lastMasterServerRegistration = currentTime;
+
+                Debug.WriteLine("Registering with master server (Id: " + localPeer.Id + ", IPEndPoint: " + localPeer.EndPoint + ")");
+            }
+        }
+
+        protected void UpdateStatistics()
         {
             DateTime currentTime = DateTime.Now;
             int receivedBytes = localPeer.peer.Statistics.ReceivedBytes;
             int sentBytes = localPeer.peer.Statistics.SentBytes;
-            double elapsedSeconds = (currentTime - lastTime).TotalSeconds;
+            double elapsedSeconds = (currentTime - lastStatisticsUpdate).TotalSeconds;
 
             if (elapsedSeconds >= 1.0)
             {
                 BytesPerSecondReceived = (int)Math.Round((receivedBytes - lastReceivedBytes) / elapsedSeconds);
                 BytesPerSecondSent = (int)Math.Round((sentBytes - lastSentBytes) / elapsedSeconds);
 
-                //Debug.WriteLine("Statistics: BytesPerSecondReceived = " + BytesPerSecondReceived);
-                //Debug.WriteLine("Statistics: BytesPerSecondSent     = " + BytesPerSecondSent);
-
-                lastTime = currentTime;
+                lastStatisticsUpdate = currentTime;
                 lastReceivedBytes = receivedBytes;
                 lastSentBytes = sentBytes;
             }
