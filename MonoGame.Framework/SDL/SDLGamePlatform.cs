@@ -51,6 +51,10 @@ namespace Microsoft.Xna.Framework
             if (version <= 204)
                 Debug.WriteLine ("Please use SDL 2.0.5 or higher.");
 
+            // Needed so VS can debug the project on Windows
+            if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
+                Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
+
             Sdl.Init((int)(
                 Sdl.InitFlags.Video |
                 Sdl.InitFlags.Joystick |
