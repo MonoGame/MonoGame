@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework.Net" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
