@@ -133,8 +133,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 output.Texture.Faces[0].Add(face);            
 			}
-			catch(Exception ex) {
-				context.Logger.LogImportantMessage("{0}", ex.ToString());
+			catch(Exception ex)
+			{
+			    throw;
 			}
 
             if (PremultiplyAlpha)
