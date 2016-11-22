@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -17,7 +16,7 @@ namespace Microsoft.Xna.Framework.Utilities
 #if WINRT
             return targetType.GetTypeInfo().IsValueType;
 #else
-			return targetType.IsValueType;
+            return targetType.IsValueType;
 #endif
         }
 
@@ -30,7 +29,7 @@ namespace Microsoft.Xna.Framework.Utilities
 #if WINRT
             var type = targetType.GetTypeInfo().BaseType;
 #else
-			var type = targetType.BaseType;
+            var type = targetType.BaseType;
 #endif
             return type;
         }
@@ -52,8 +51,8 @@ namespace Microsoft.Xna.Framework.Utilities
             if (ti.IsClass && !ti.IsAbstract)
                 return true;
 #else
-			if (t.IsClass && !t.IsAbstract)
-				return true;
+            if (t.IsClass && !t.IsAbstract)
+                return true;
 #endif
             return false;
         }
@@ -68,7 +67,7 @@ namespace Microsoft.Xna.Framework.Utilities
 #if WINRT
             return property.GetMethod;
 #else
-			return property.GetGetMethod();
+            return property.GetGetMethod();
 #endif
         }
 
@@ -82,7 +81,7 @@ namespace Microsoft.Xna.Framework.Utilities
 #if WINRT
             return property.SetMethod;
 #else
-			return property.GetSetMethod();
+            return property.GetSetMethod();
 #endif
         }
 
@@ -94,7 +93,7 @@ namespace Microsoft.Xna.Framework.Utilities
 #if WINRT
             return member.GetCustomAttribute(typeof(T)) as T;
 #else
-			return Attribute.GetCustomAttribute(member, typeof(T)) as T;
+            return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
         }
 
@@ -111,6 +110,7 @@ namespace Microsoft.Xna.Framework.Utilities
             }
 
             var getMethod = GetPropertyGetMethod(property);
+
             if (getMethod == null || !getMethod.IsPublic)
                 return false;
 
@@ -143,12 +143,15 @@ namespace Microsoft.Xna.Framework.Utilities
             if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
                 return true;
 #else
-			if (type.IsAssignableFrom(objectType))
-				return true;
+            if (type.IsAssignableFrom(objectType))
+                return true;
 #endif
             return false;
         }
 
+        /// <summary>
+        /// Generics handler for Marshal.SizeOf
+        /// </summary>
         internal static class SizeOf<T>
         {
             static int _sizeOf;
@@ -169,20 +172,12 @@ namespace Microsoft.Xna.Framework.Utilities
             }
         }
 
-        static System.Collections.Generic.Dictionary<Type, int> _sizeOfCollection;
+        /// <summary>
+        /// Fallback handler for Marshal.SizeOf(type)
+        /// </summary>
         internal static int ManagedSizeOf(Type type)
         {
-            int _sizeOf = 0;
-            _sizeOf = _sizeOfCollection[type];
-            if (_sizeOf < 1)
-            {
-                _sizeOf = Marshal.SizeOf(type);
-                _sizeOfCollection.Add(type, _sizeOf);
-            }
-            return _sizeOf;
-
+            return Marshal.SizeOf(type);
         }
-
     }
-
 }
