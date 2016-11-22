@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             // We need to copy each row separatly and skip trailing zeros.
                             stream.Seek(0, SeekOrigin.Begin);
 
-                            int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                            int elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;

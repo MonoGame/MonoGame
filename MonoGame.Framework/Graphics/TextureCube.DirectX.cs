@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             // We need to copy each row separatly and skip trailing zeros.
                             stream.Seek(startIndex, SeekOrigin.Begin);
 
-                            int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                            int elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;
