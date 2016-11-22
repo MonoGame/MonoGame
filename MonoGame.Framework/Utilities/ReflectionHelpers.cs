@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
@@ -34,9 +35,9 @@ namespace Microsoft.Xna.Framework.Utilities
 			return type;
 		}
 
-        /// <summary>
-        /// Returns true if the given type represents a non-object type that is not abstract.
-        /// </summary>
+		/// <summary>
+		/// Returns true if the given type represents a non-object type that is not abstract.
+		/// </summary>
 		public static bool IsConcreteClass(Type t)
 		{
 			if (t == null)
@@ -44,8 +45,8 @@ namespace Microsoft.Xna.Framework.Utilities
 				throw new NullReferenceException("Must supply the t (type) parameter");
 			}
 
-            if (t == typeof(object))
-                return false;
+			if (t == typeof(object))
+				return false;
 #if WINRT
 			var ti = t.GetTypeInfo();
 			if (ti.IsClass && !ti.IsAbstract)
@@ -57,33 +58,33 @@ namespace Microsoft.Xna.Framework.Utilities
 			return false;
 		}
 
-        public static MethodInfo GetPropertyGetMethod(PropertyInfo property)
-        {
-            if (property == null)
-            {
-                throw new NullReferenceException("Must supply the property parameter");
-            }
+		public static MethodInfo GetPropertyGetMethod(PropertyInfo property)
+		{
+			if (property == null)
+			{
+				throw new NullReferenceException("Must supply the property parameter");
+			}
 
 #if WINRT
-            return property.GetMethod;
+			return property.GetMethod;
 #else
-            return property.GetGetMethod();
+			return property.GetGetMethod();
 #endif
-        }
+		}
 
-        public static MethodInfo GetPropertySetMethod(PropertyInfo property)
-        {
-            if (property == null)
-            {
-                throw new NullReferenceException("Must supply the property parameter");
-            }
+		public static MethodInfo GetPropertySetMethod(PropertyInfo property)
+		{
+			if (property == null)
+			{
+				throw new NullReferenceException("Must supply the property parameter");
+			}
 
 #if WINRT
-            return property.SetMethod;
+			return property.SetMethod;
 #else
-            return property.GetSetMethod();
+			return property.GetSetMethod();
 #endif
-        }
+		}
 
 		public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
 		{
@@ -93,32 +94,32 @@ namespace Microsoft.Xna.Framework.Utilities
 #if WINRT
 			return member.GetCustomAttribute(typeof(T)) as T;
 #else
-            return Attribute.GetCustomAttribute(member, typeof(T)) as T;
+			return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
 		}
 
-        /// <summary>
-        /// Returns true if the get method of the given property exist and are public.
-        /// Note that we allow a getter-only property to be serialized (and deserialized),
-        /// *if* CanDeserializeIntoExistingObject is true for the property type.
-        /// </summary>
-        public static bool PropertyIsPublic(PropertyInfo property)
-        {
-            if (property == null)
-            {
-                throw new NullReferenceException("Must supply the property parameter");
-            }
+		/// <summary>
+		/// Returns true if the get method of the given property exist and are public.
+		/// Note that we allow a getter-only property to be serialized (and deserialized),
+		/// *if* CanDeserializeIntoExistingObject is true for the property type.
+		/// </summary>
+		public static bool PropertyIsPublic(PropertyInfo property)
+		{
+			if (property == null)
+			{
+				throw new NullReferenceException("Must supply the property parameter");
+			}
 
-            var getMethod = GetPropertyGetMethod(property);
-            if (getMethod == null || !getMethod.IsPublic)
-                return false;
+			var getMethod = GetPropertyGetMethod(property);
+			if (getMethod == null || !getMethod.IsPublic)
+				return false;
 
-            return true;
-        }
+			return true;
+		}
 
-        /// <summary>
-        /// Returns true if the given type can be assigned the given value
-        /// </summary>
+		/// <summary>
+		/// Returns true if the given type can be assigned the given value
+		/// </summary>
 		public static bool IsAssignableFrom(Type type, object value)
 		{
 			if (type == null)
@@ -126,27 +127,42 @@ namespace Microsoft.Xna.Framework.Utilities
 			if (value == null)
 				throw new ArgumentNullException("value");
 
-            return IsAssignableFromType(type, value.GetType());
+			return IsAssignableFromType(type, value.GetType());
 		}
 
-        /// <summary>
-        /// Returns true if the given type can be assigned a value with the given object type
-        /// </summary>
-        public static bool IsAssignableFromType(Type type, Type objectType)
-        {
-            if (type == null)
-                throw new ArgumentNullException("type");
-            if (objectType == null)
-                throw new ArgumentNullException("objectType");
+		/// <summary>
+		/// Returns true if the given type can be assigned a value with the given object type
+		/// </summary>
+		public static bool IsAssignableFromType(Type type, Type objectType)
+		{
+			if (type == null)
+				throw new ArgumentNullException("type");
+			if (objectType == null)
+				throw new ArgumentNullException("objectType");
 #if WINRT
-            if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
-                return true;
+			if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
+				return true;
 #else
-            if (type.IsAssignableFrom(objectType))
-                return true;
+			if (type.IsAssignableFrom(objectType))
+				return true;
 #endif
-            return false;
-        }
+			return false;
+		}
 
+		internal static class SizeOf<T>
+		{
+			static int _sizeOf;
+
+			static SizeOf()
+			{
+				var type = typeof(T);
+				_sizeOf = Marshal.SizeOf(type);
+			}
+
+			static public int Get()
+			{
+				return _sizeOf;
+			}
+		}
 	}
 }
