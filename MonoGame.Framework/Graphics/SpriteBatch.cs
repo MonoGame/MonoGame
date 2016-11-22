@@ -428,14 +428,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
 		    {
-                item.Set(destinationRectangle.X,
-                        destinationRectangle.Y,
-                        -origin.X,
-                        -origin.Y,
+                var sin = (float)Math.Sin(rotation);
+                var cos = (float)Math.Cos(rotation);
+                item.Set(destinationRectangle.X - (origin.X*cos-origin.Y*sin),
+                        destinationRectangle.Y - (origin.X*sin+origin.Y*cos),
                         destinationRectangle.Z,
                         destinationRectangle.W,
-                        (float)Math.Sin(rotation),
-                        (float)Math.Cos(rotation),
+                        sin,
+                        cos,
                         color,
                         _texCoordTL,
                         _texCoordBR,
