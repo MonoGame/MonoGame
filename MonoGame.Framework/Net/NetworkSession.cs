@@ -621,7 +621,7 @@ namespace Microsoft.Xna.Framework.Net
 
         bool IBackendListener.RegisterWithMasterServer
         {
-            get { return IsHost && (SessionType == NetworkSessionType.PlayerMatch || SessionType == NetworkSessionType.Ranked); }
+            get { return IsHost && localMachine.IsFullyConnected && (SessionType == NetworkSessionType.PlayerMatch || SessionType == NetworkSessionType.Ranked); }
         }
 
         NetworkSessionPublicInfo IBackendListener.SessionPublicInfo
