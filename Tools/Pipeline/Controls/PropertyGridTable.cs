@@ -148,7 +148,7 @@ namespace MonoGame.Tools.Pipeline
 
             if (_cells.Count == 0)
             {
-                drawable.Height = _height = 1;
+                drawable.Height = _height = 10;
                 return;
             }
 
