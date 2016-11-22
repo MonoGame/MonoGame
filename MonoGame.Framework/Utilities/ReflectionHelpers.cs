@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Utilities
 
             static SizeOf()
             {
-#if LINUX || WINDOWS || WEB
+#if LINUX || WINDOWS || WEB || SILVERLIGHT
                 var type = typeof(T);
                 _sizeOf = Marshal.SizeOf(type);
 #else
