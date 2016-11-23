@@ -31,11 +31,6 @@ namespace Microsoft.Xna.Framework.Input
         // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
         private const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
         private const float rightThumbDeadZone = SharpDX.XInput.Gamepad.RightThumbDeadZone / (float)short.MaxValue;
-#elif OUYA
-        // OUYA dead zones should
-        // They are a bit larger to accomodate OUYA Gamepad (but will also affect Xbox 360 controllers plugged to an OUYA)
-        private const float leftThumbDeadZone = 0.3f;
-        private const float rightThumbDeadZone = 0.3f;
 #else
         // Default & SDL Xbox 360 Controller dead zones
         // Based on the XInput constants

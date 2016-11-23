@@ -27,7 +27,6 @@
     <Import file="templates/Common/app.manifest" />
     <!-- Android Templates -->
     <Import file="templates/MonoGameAndroidProject.xpt.xml" />
-    <Import file="templates/MonoGameOUYAProject.xpt.xml" />
     <Import file="templates/Android/Activity1.cs" />
     <Import file="templates/Android/Resource.cs" />
     <Import file="templates/Android/AndroidManifest.xml" />
@@ -78,10 +77,8 @@
     <Import file="packages/MonoGame.Framework.iOS.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.Linux.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.MacOS.3.4.0.459.nupkg" />
-    <Import file="packages/MonoGame.Framework.Ouya.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.WindowsDX.3.4.0.459.nupkg" />
     <Import file="packages/MonoGame.Framework.WindowsGL.3.4.0.459.nupkg" />
-    <Import file="packages/Ouya.Console.Api.1.0.13.1.nupkg" />
     <Import file="packages/MonoGame.Framework.Content.Pipeline.Portable.3.2.99.1-Beta.nupkg" />
     <Import file="packages/MonoGame.Framework.Portable.3.2.99.1-Beta.nupkg" />
     <!-- Exclude non .net files from a scan -->
@@ -181,7 +178,6 @@
     </Dependencies>
     <Extension path="/MonoDevelop/Ide/ProjectTemplates">
       <ProjectTemplate id="MonoGameForAndroidProject" file="templates/MonoGameAndroidProject.xpt.xml" />
-      <ProjectTemplate id="MonoGameForOUYAProject" file="templates/MonoGameOUYAProject.xpt.xml" />
     </Extension>
   </Module>
   <Module>

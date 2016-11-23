@@ -36,17 +36,6 @@
     <Reference Include="Lidgren.Network" />
   </Platform>
 
-  <Platform Type="Ouya">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Core" />
-    <Reference Include="mscorlib" />
-    <Reference Include="Lidgren.Network" />
-    <Binary
-      Name="Ouya.Console.Api"
-      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
-  </Platform>
-
   <Platform Type="Windows">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />

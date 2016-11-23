@@ -27,9 +27,7 @@ namespace Microsoft.Xna.Framework
 
         public bool IsResuming { get; private set; }
         private bool _lostContext;
-#if !OUYA
         private bool backPressed;
-#endif
 
         public MonoGameAndroidGameView(Context context, AndroidGameWindow androidGameWindow, Game game)
             : base(context)
@@ -294,12 +292,11 @@ namespace Microsoft.Xna.Framework
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
-            // Handle gamepad inputs in Android/OUYA
+            // Handle gamepad inputs in Android
             if ((e.Source & InputSourceType.Gamepad) == InputSourceType.Gamepad)
                 return GamePad.OnKeyDown(keyCode, e);
 
             Keyboard.KeyDown(keyCode);
-#if !OUYA
             // we need to handle the Back key here because it doesnt work any other way
             if (keyCode == Keycode.Back && !this.backPressed)
             {
@@ -307,7 +304,6 @@ namespace Microsoft.Xna.Framework
                 GamePad.Back = true;
                 return true;
             }
-#endif
 
             if (keyCode == Keycode.VolumeUp)
             {
@@ -333,11 +329,9 @@ namespace Microsoft.Xna.Framework
 
             Keyboard.KeyUp(keyCode);
 
-#if !OUYA
             // we need to handle the Back key here because it doesnt work any other way
             if (keyCode == Keycode.Back)
                 this.backPressed = false;
-#endif
 
             return true;
         }

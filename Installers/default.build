@@ -63,7 +63,6 @@
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Tools" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/iOS" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android" />
-      <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/MacOSX" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Linux" />
       <mkdir dir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/DesktopGL" />
@@ -86,11 +85,6 @@
       </copy>
       <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/Android">
          <fileset basedir="../MonoGame.Framework/bin/Android/AnyCPU/Release">
-                <include name="*.*"/>
-         </fileset>
-      </copy>
-      <copy todir="root/Library/Frameworks/MonoGame.framework/v${buildNumber}/Assemblies/OUYA">
-         <fileset basedir="../MonoGame.Framework/bin/Ouya/AnyCPU/Release">
                 <include name="*.*"/>
          </fileset>
       </copy>

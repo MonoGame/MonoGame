@@ -11,6 +11,8 @@ namespace MonoGame.Tests.Graphics {
 		private Texture2D _texture;
         private Texture2D _texture2;
         private Texture2D _texture3;
+        private BasicEffect _effect;
+        private Effect _effect2;
 
 		[SetUp]
 		public override void SetUp ()
@@ -21,6 +23,20 @@ namespace MonoGame.Tests.Graphics {
             _texture = content.Load<Texture2D> (Paths.Texture ("MonoGameIcon"));
             _texture2 = content.Load<Texture2D>(Paths.Texture("Surge"));
             _texture3 = content.Load<Texture2D> (Paths.Texture ("Lines-64"));
+            _effect = new BasicEffect(gd)
+            {
+                VertexColorEnabled = true,
+                TextureEnabled = true,
+                View = Matrix.Identity,
+                World = Matrix.Identity
+            };
+            var effect2Name = "Grayscale";
+#if XNA
+            effect2Name = System.IO.Path.Combine("XNA", effect2Name);
+#elif WINDOWS
+            effect2Name = System.IO.Path.Combine("DirectX", effect2Name);
+#endif
+            _effect2 = content.Load<Effect>(Paths.Effect(effect2Name));            
 		}
 
 	    [TearDown]
@@ -30,6 +46,8 @@ namespace MonoGame.Tests.Graphics {
             _texture.Dispose();
             _texture2.Dispose();
             _texture3.Dispose();
+            _effect.Dispose();
+            _effect2.Dispose();
 	    }
 
 		[Test]
@@ -376,6 +394,81 @@ namespace MonoGame.Tests.Graphics {
             for (int x = 0; x < 99; x++)
                 for (int y = 0; y < 59; y++)
                     _spriteBatch.Draw(_texture, new Rectangle(4+x*8, 4+y*8, 4, 4), Color.White);
+            _spriteBatch.End();
+
+            CheckFrames();
+        }
+        
+        [TestCase(SpriteSortMode.Deferred)]
+        [TestCase(SpriteSortMode.Immediate)]
+        public void Draw_with_viewport_changing(SpriteSortMode sortMode)
+        {
+            Similarity = 0.975f;
+            PrepareFrameCapture();
+
+            // Test SpriteEffect
+            var vp = gd.Viewport; 
+            var lvp = new Viewport (vp.X, vp.Y, vp.Width/3, vp.Height); //Left
+            var mvp = new Viewport(vp.X + vp.Width / 3, vp.Y, vp.Width / 3, vp.Height); //middle
+            var rvp = new Viewport(vp.X+(vp.Width /3)*2, vp.Y, vp.Width / 3, vp.Height); //Right
+
+            // Test viewport change
+            gd.Viewport = rvp;
+            _spriteBatch.Begin(sortMode, BlendState.AlphaBlend);
+            _spriteBatch.Draw(_texture, new Vector2(10, 10), null, Color.White);
+            gd.Viewport = mvp;
+            _spriteBatch.Draw(_texture2, new Vector2(70, 10), null, Color.White);
+            gd.Viewport = lvp;
+            _spriteBatch.Draw(_texture3, new Vector2(130, 10), null, Color.White);
+            gd.Viewport = vp;
+            _spriteBatch.Draw(_texture2, new Vector2(190, 10), null, Color.White);
+            _spriteBatch.End();
+
+            // Test viewport/effect BasicEffect (Vertex & Pixel shader)
+#if DIRECTX
+            Matrix halfPixelOffset = Matrix.Identity;
+#else            
+            Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+#endif
+
+            _effect.Projection = halfPixelOffset * Matrix.CreateOrthographicOffCenter(0, gd.Viewport.Width, gd.Viewport.Height, 0, 0, 1);
+            
+            gd.Viewport = rvp;
+            _spriteBatch.Begin(sortMode, BlendState.AlphaBlend, null, null, null, _effect);
+            _spriteBatch.Draw(_texture, new Vector2(10, 110), null, Color.White);
+            gd.Viewport = mvp;
+            _spriteBatch.Draw(_texture2, new Vector2(70, 110), null, Color.White);
+            gd.Viewport = lvp;
+            _spriteBatch.Draw(_texture3, new Vector2(130, 110), null, Color.White);
+            gd.Viewport = vp;
+            _spriteBatch.Draw(_texture2, new Vector2(190, 110), null, Color.White);
+            _spriteBatch.End();
+
+            // Test BasicEffect (Vertex & Pixel shader)
+            // re-apply projection when viewport dimensions change
+            gd.Viewport = rvp;
+            _effect.Projection = halfPixelOffset * Matrix.CreateOrthographicOffCenter(0, gd.Viewport.Width, gd.Viewport.Height, 0, 0, 1);
+            _spriteBatch.Begin(sortMode, BlendState.AlphaBlend, null, null, null, _effect);
+            _spriteBatch.Draw(_texture, new Vector2(10, 210), null, Color.White);
+            gd.Viewport = mvp;
+            _spriteBatch.Draw(_texture2, new Vector2(70, 210), null, Color.White);
+            gd.Viewport = lvp;
+            _spriteBatch.Draw(_texture3, new Vector2(130, 210), null, Color.White);
+            gd.Viewport = vp;
+            _effect.Projection = halfPixelOffset * Matrix.CreateOrthographicOffCenter(0, gd.Viewport.Width, gd.Viewport.Height, 0, 0, 1);
+            _spriteBatch.Draw(_texture2, new Vector2(190, 210), null, Color.White);
+            _spriteBatch.End();
+            
+            // TODO: test custom Effect with no Vertex shader
+            gd.Viewport = rvp;
+            _spriteBatch.Begin(sortMode, BlendState.AlphaBlend, null, null, null, _effect2);
+            _spriteBatch.Draw(_texture, new Vector2(10, 310), null, Color.White);
+            gd.Viewport = mvp;
+            _spriteBatch.Draw(_texture2, new Vector2(70, 310), null, Color.White);
+            gd.Viewport = lvp;
+            _spriteBatch.Draw(_texture3, new Vector2(130, 310), null, Color.White);
+            gd.Viewport = vp;
+            _spriteBatch.Draw(_texture2, new Vector2(190, 310), null, Color.White);
             _spriteBatch.End();
 
             CheckFrames();
