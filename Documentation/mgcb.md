@@ -48,7 +48,6 @@ An optional parameter which adds an assembly reference which contains importers,
 Set the target platform for this build. It must be a member of the TargetPlatform enum:
 * Windows
 * Xbox360
-* WindowsPhone
 * iOS
 * Android
 * Linux
@@ -56,7 +55,6 @@ Set the target platform for this build. It must be a member of the TargetPlatfor
 * WindowsStoreApp
 * NativeClient
 * PlayStation4
-* WindowsPhone8
 * RaspberryPi
 
 If not set it will default to Windows.

@@ -63,7 +63,6 @@ namespace TwoMGFX
         internal override bool Supports(string platform)
         {
             if (platform == "Windows" ||
-                platform == "WindowsPhone8" ||
                 platform == "WindowsStoreApp")
                 return true;
 
