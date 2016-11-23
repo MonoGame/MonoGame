@@ -16,23 +16,34 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
     internal class HostData
     {
+        internal long id;
         internal IPEndPoint internalEndPoint;
         internal IPEndPoint externalEndPoint;
         internal NetworkSessionPublicInfo publicInfo;
+        internal DateTime lastUpdated;
 
-        public HostData(IPEndPoint internalEndPoint, IPEndPoint externalEndPoint, NetworkSessionPublicInfo publicInfo)
+        public HostData(long id, IPEndPoint internalEndPoint, IPEndPoint externalEndPoint, NetworkSessionPublicInfo publicInfo)
         {
+            this.id = id;
             this.internalEndPoint = internalEndPoint;
             this.externalEndPoint = externalEndPoint;
             this.publicInfo = publicInfo;
+            this.lastUpdated = DateTime.Now;
+        }
+
+        public override string ToString()
+        {
+            return "[Id: " + id + ", InternalEP: " + internalEndPoint + ", ExternalEP: " + externalEndPoint + "]";
         }
     }
 
     public class LidgrenMasterServer : IMasterServer
     {
-        private NetPeer server;
+        private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
+        private NetPeer server;
         private IDictionary<long, HostData> hosts = new Dictionary<long, HostData>();
+        private DateTime lastReportedStatus = DateTime.MinValue;
 
         public void Start(string appId)
         {
@@ -45,7 +56,46 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             server = new NetPeer(config);
             server.Start();
 
-            Console.WriteLine("Master server started. (AppId: " + appId + ", Port: " + config.Port + ")");
+            Console.WriteLine("Master server with app id " + appId + " started on port " + config.Port + ".");
+        }
+
+        protected IList<long> hostsToRemove = new List<long>();
+
+        protected void TrimHosts()
+        {
+            DateTime currentTime = DateTime.Now;
+            TimeSpan threshold = NetworkSessionSettings.MasterServerRegistrationInterval + TimeSpan.FromSeconds(5.0);
+
+            hostsToRemove.Clear();
+
+            foreach (var host in hosts)
+            {
+                if ((currentTime - host.Value.lastUpdated) > threshold)
+                {
+                    hostsToRemove.Add(host.Key);
+                }
+            }
+
+            foreach (long key in hostsToRemove)
+            {
+                HostData host = hosts[key];
+
+                hosts.Remove(key);
+
+                Console.WriteLine("Host removed due to timeout. " + host);
+            }
+        }
+
+        protected void ReportStatus()
+        {
+            DateTime currentTime = DateTime.Now;
+
+            if (currentTime - lastReportedStatus > ReportStatusInterval)
+            {
+                Console.WriteLine("Status: " + hosts.Count + " registered hosts");
+
+                lastReportedStatus = currentTime;
+            }
         }
 
         public void Update()
@@ -66,8 +116,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                     MasterServerMessageType messageType = (MasterServerMessageType)msg.ReadByte();
 
-                    Console.WriteLine("Message of type " + messageType + " received...");
-
                     if (messageType == MasterServerMessageType.RegisterHost)
                     {
                         long hostId = msg.ReadLong();
@@ -75,9 +123,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         IPEndPoint externalEndPoint = rawMsg.SenderEndPoint;
                         NetworkSessionPublicInfo publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
-                        hosts[hostId] = new HostData(internalEndPoint, externalEndPoint, publicInfo);
+                        hosts[hostId] = new HostData(hostId, internalEndPoint, externalEndPoint, publicInfo);
 
-                        Console.WriteLine("Host " + hostId + " added. (Internal endpoint: " + internalEndPoint + ", External endpoint: " + externalEndPoint + ")");
+                        Console.WriteLine("Host updated. " + hosts[hostId]);
                     }
                     else if (messageType == MasterServerMessageType.RequestHosts)
                     {
@@ -108,7 +156,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                             server.Introduce(hostData.internalEndPoint, hostData.externalEndPoint, senderInternalEndPoint, rawMsg.SenderEndPoint, string.Empty);
 
-                            Console.WriteLine("Introduced host (" + hostData.internalEndPoint + ", " + hostData.externalEndPoint + ") with client (" + senderInternalEndPoint + ", " + rawMsg.SenderEndPoint + ").");
+                            Console.WriteLine("Introduced host " + hostData + " and client [InternalEP: " + senderInternalEndPoint + ", ExternalEP: " + rawMsg.SenderEndPoint + "].");
                         }
                         else
                         {
@@ -133,6 +181,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                 server.Recycle(rawMsg);
             }
+
+            TrimHosts();
+
+            ReportStatus();
         }
 
         public void Shutdown()
