@@ -156,9 +156,6 @@
         <exec program="Protobuild" commandline="-generate Android" />
         <exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
         <exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
-        <exec program="Protobuild" commandline="-generate Ouya" />
-        <exec program="msbuild " commandline="MonoGame.Framework.Ouya.sln /t:Clean /p:Configuration=Release" />
-        <exec program="msbuild " commandline="MonoGame.Framework.Ouya.sln /t:Build /p:Configuration=Release" />
       </if>
     </if>
     <if test="${os == 'MacOS'}">
@@ -166,9 +163,6 @@
         <exec program="mono" commandline="Protobuild.exe -generate Android" />
 	<exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />
 	<exec program="xbuild" commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />
-        <exec program="mono" commandline="Protobuild.exe -generate Ouya" />
-	<exec program="xbuild" commandline="MonoGame.Framework.Ouya.sln /t:Clean /p:Configuration=Release" />
-	<exec program="xbuild" commandline="MonoGame.Framework.Ouya.sln /t:Build /p:Configuration=Release" />        
       </if>
     </if>
   </target>

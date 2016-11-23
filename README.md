@@ -18,7 +18,7 @@ Our [build server](http://teamcity.monogame.net/?guest=1) builds, tests, and pac
 
 | Name  | Status |
 |:---|--------|
-| Build Windows, Web, Android, and OUYA | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_DevelopWin&guest=1) |
+| Build Windows, Web, and Android | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_DevelopWin&guest=1) |
 | Build Mac, iOS, and Linux | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopMac/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_DevelopMac&guest=1) |
 | Generate Documentation | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_GenerateDocumentation/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_GenerateDocumentation&guest=1) |
 | Windows Tests | [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_TestWindows/statusIcon)](http://teamcity.monogame.net/viewType.html?buildTypeId=MonoGame_TestWindows&guest=1) |
@@ -44,7 +44,6 @@ We support a growing list of platforms across the desktop, mobile, and console s
  * PlayStation 4
  * PlayStation Vita
  * Xbox One (both UWP and XDK)
- * OUYA
 
 
 ## Support and Contributions

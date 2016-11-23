@@ -45,17 +45,6 @@
     <Reference Include="System.Core" />
   </Platform>
 
-  <Platform Type="Ouya">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="mscorlib" />
-    <Reference Include="OpenTK-1.0" />
-    <Reference Include="System.Core" />
-    <Binary
-      Name="Ouya.Console.Api"
-      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
-  </Platform>
-
   <Platform Type="Windows">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />

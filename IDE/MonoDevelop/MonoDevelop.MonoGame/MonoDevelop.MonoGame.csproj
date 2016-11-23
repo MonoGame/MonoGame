@@ -152,9 +152,6 @@
     <Content Include="packages\MonoGame.Framework.MonoMac.3.3.0.nupkg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="packages\MonoGame.Framework.Ouya.3.3.0.nupkg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="packages\MonoGame.Framework.WindowsDX.3.3.0.nupkg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
