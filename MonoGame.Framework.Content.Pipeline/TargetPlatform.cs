@@ -100,6 +100,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Xbox One
         /// </summary>
         XboxOne,
+
+        /// <summary>
+        /// Wii U
+        /// </summary>
+        WiiU,
     }
 
 
