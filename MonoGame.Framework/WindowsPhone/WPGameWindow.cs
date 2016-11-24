@@ -60,6 +60,7 @@ namespace MonoGame.Framework.WindowsPhone
 
         #region Internal Properties
 
+        static internal bool IsUsingDrawingSurfaceBackgroundGrid;
         static internal double Width;
         static internal double Height;
         static internal PhoneApplicationPage Page;

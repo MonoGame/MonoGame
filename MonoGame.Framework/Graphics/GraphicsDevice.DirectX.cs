@@ -156,10 +156,17 @@ namespace Microsoft.Xna.Framework.Graphics
         private void UpdateDevice(Device device, DeviceContext context)
         {
             // TODO: Lost device logic!
-            SharpDX.Utilities.Dispose(ref _d3dDevice);
-            _d3dDevice = device;
+            if (WindowsPhoneGameWindow.IsUsingDrawingSurfaceBackgroundGrid)
+            {
+			    context.ClearState();
+            }
+            else
+            {
+                SharpDX.Utilities.Dispose(ref _d3dDevice);
+                SharpDX.Utilities.Dispose(ref _d3dContext);
+            }
 
-            SharpDX.Utilities.Dispose(ref _d3dContext);
+            _d3dDevice = device;
             _d3dContext = context;
 
             SharpDX.Utilities.Dispose(ref _depthStencilView);
