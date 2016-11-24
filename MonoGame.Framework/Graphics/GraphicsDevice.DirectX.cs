@@ -229,9 +229,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 PresentationParameters.BackBufferWidth = (int)WindowsPhoneGameWindow.Width;
                 PresentationParameters.BackBufferHeight = (int)WindowsPhoneGameWindow.Height;
             }
-
-            // Display orientation is always portrait on WP8
-            PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
         }
 
 #endif
