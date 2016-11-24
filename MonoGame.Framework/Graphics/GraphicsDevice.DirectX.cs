@@ -224,6 +224,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void OnPresentationChanged()
         {
+            if (WindowsPhoneGameWindow.IsUsingDrawingSurfaceBackgroundGrid)
+            {                
+                PresentationParameters.BackBufferWidth = (int)WindowsPhoneGameWindow.Width;
+                PresentationParameters.BackBufferHeight = (int)WindowsPhoneGameWindow.Height;
+            }
+
             // Display orientation is always portrait on WP8
             PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
         }
