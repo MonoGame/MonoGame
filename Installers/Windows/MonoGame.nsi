@@ -266,6 +266,11 @@ Section "Visual Studio 2015 Templates" VS2015
   InstallTemplates:
     SetOutPath "$1\Visual C#\MonoGame"
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\MonoGameShared.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\WindowsPhone8.1.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\WindowsStore.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\WindowsStoreXaml.zip'
+    File /r '..\..\ProjectTemplates\VisualStudio2013\WindowsUniversal.zip'
     File /r '..\..\ProjectTemplates\VisualStudio2015\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:

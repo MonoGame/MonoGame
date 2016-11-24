@@ -6,7 +6,7 @@
     <Icon>__TemplateIcon.png</Icon>
     <PreviewImage>__PreviewImage.png</PreviewImage>
     <TemplateID>MonoGame.CS.WinRT.UAPGame</TemplateID>
-    <TemplateGroupID>WinRT-Managed</TemplateGroupID>
+    <TemplateGroupID>WinRT-Native-UAP</TemplateGroupID>
     <ProjectType>CSharp</ProjectType>
     <SortOrder>43160</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
