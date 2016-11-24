@@ -17,7 +17,7 @@
     <OSMinVersion>6.3.1</OSMinVersion>
     <OSMaxVersionTested>6.3.1</OSMaxVersionTested>
   </Prerequisites>
-
+  
   <Resources>
     <Resource Language="x-generate"/>
   </Resources>
