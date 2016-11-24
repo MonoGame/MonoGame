@@ -6,14 +6,14 @@
             Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>$projectname$</DisplayName>
+    <DisplayName>$ext_safeprojectname$</DisplayName>
     <PublisherDisplayName>$XmlEscapedPublisher$</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
   <Prerequisites>
-    <OSMinVersion>6.2.1</OSMinVersion>
-    <OSMaxVersionTested>6.2.1</OSMaxVersionTested>
+    <OSMinVersion>6.3.0</OSMinVersion>
+    <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
   </Prerequisites>
 
   <Resources>
