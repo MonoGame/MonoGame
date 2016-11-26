@@ -377,6 +377,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool IsProfileSupported(GraphicsProfile graphicsProfile)
         {
+            if(UseReferenceDevice)
+                return true;
+
             switch(graphicsProfile)
             {
                 case GraphicsProfile.Reach:
