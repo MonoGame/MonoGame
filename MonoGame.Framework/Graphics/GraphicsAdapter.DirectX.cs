@@ -51,8 +51,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {            
             var adapter = new GraphicsAdapter();
 
-            adapter.DeviceName = monitor.Description.DeviceName;
-            adapter.Description = device.Description1.Description;
+            adapter.DeviceName = monitor.Description.DeviceName.TrimEnd(new char[] {'\0'});
+            adapter.Description = device.Description1.Description.TrimEnd(new char[] {'\0'});
             adapter.DeviceId = device.Description1.DeviceId;
             adapter.Revision = device.Description1.Revision;
             adapter.VendorId = device.Description1.VendorId;
