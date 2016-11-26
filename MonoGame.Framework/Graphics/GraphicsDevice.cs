@@ -205,6 +205,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
         {
             Adapter = adapter;
+            if (!adapter.IsProfileSupported(graphicsProfile))
+                throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = presentationParameters;
