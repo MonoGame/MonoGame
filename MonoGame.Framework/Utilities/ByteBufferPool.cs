@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Utilities
                 if (index == -1)
                     _freeBuffers.Add(buffer);
                 else
-                    _freeBuffers.Insert(index + 1, buffer);
+                    _freeBuffers.Insert(index, buffer);
             }
         }
 
