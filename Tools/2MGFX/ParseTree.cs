@@ -1098,7 +1098,10 @@ namespace TwoMGFX
 
         protected virtual object EvalSampler_Declaration(ParseTree tree, params object[] paramlist)
         {
-            var sampler = new SamplerStateInfo();
+            // if there is a comma or closing paren at the end this is a sampler as a parameter of a function
+        	if (this.GetValue(tree, TokenType.Semicolon, 0) == null) return null;
+        
+        	var sampler = new SamplerStateInfo();
         	sampler.Name = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	
         	foreach (ParseNode node in Nodes)

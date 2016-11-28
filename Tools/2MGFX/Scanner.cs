@@ -19,22 +19,21 @@ namespace TwoMGFX
         public int CurrentLine;
         public int CurrentColumn;
         public int CurrentPosition;
-        public List<Token> Skipped; // tokens that were skipped
-        public Dictionary<TokenType, Regex> Patterns;
+        public List<Token> Skipped = new List<Token>(); // tokens that were skipped
+        
+        private Token LookAheadToken = null;
+        private static readonly TokenType FileAndLine = default(TokenType);
 
-        private Token LookAheadToken;
-        private List<TokenType> Tokens;
-        private List<TokenType> SkipList; // tokens to be skipped
-        private readonly TokenType FileAndLine;
+        public static Dictionary<TokenType, Regex> Patterns;
+        private static List<TokenType> Tokens;
+        private static List<TokenType> SkipList; // tokens to be skipped
 
-        public Scanner()
+        static Scanner()
         {
             Regex regex;
             Patterns = new Dictionary<TokenType, Regex>();
             Tokens = new List<TokenType>();
-            LookAheadToken = null;
-            Skipped = new List<Token>();
-
+            
             SkipList = new List<TokenType>();
             SkipList.Add(TokenType.BlockComment);
             SkipList.Add(TokenType.Comment);
