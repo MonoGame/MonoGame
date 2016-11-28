@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Get the platform specific texture profile.
             var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
 
-			try {
+            {
 				if (!File.Exists(fontName)) {
 					throw new Exception(string.Format("Could not load {0}", fontName));
 				}
@@ -132,9 +132,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				}
 
                 output.Texture.Faces[0].Add(face);            
-			}
-			catch(Exception ex) {
-				context.Logger.LogImportantMessage("{0}", ex.ToString());
 			}
 
             if (PremultiplyAlpha)
