@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
-    internal static class ReflectionHelpers
+    internal static partial class ReflectionHelpers
     {
         public static bool IsValueType(Type targetType)
         {
@@ -147,37 +147,6 @@ namespace Microsoft.Xna.Framework.Utilities
                 return true;
 #endif
             return false;
-        }
-
-        /// <summary>
-        /// Generics handler for Marshal.SizeOf
-        /// </summary>
-        internal static class SizeOf<T>
-        {
-            static int _sizeOf;
-
-            static SizeOf()
-            {
-#if LINUX || WINDOWS || WEB || SILVERLIGHT
-                var type = typeof(T);
-                _sizeOf = Marshal.SizeOf(type);
-#else
-                _sizeOf = Marshal.SizeOf<T>();
-#endif
-            }
-
-            static public int Get()
-            {
-                return _sizeOf;
-            }
-        }
-
-        /// <summary>
-        /// Fallback handler for Marshal.SizeOf(type)
-        /// </summary>
-        internal static int ManagedSizeOf(Type type)
-        {
-            return Marshal.SizeOf(type);
         }
     }
 }
