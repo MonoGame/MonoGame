@@ -380,7 +380,13 @@ namespace MonoGame.Framework
                 }
 
                 UpdateWindows();
-                Game.Tick();
+
+                // We might have been made to exit by the message handling above.
+                // This would make Game null.
+                if (Game != null)
+                {
+                    Game.Tick();
+                }
             }
 
             // We need to remove the WM_QUIT message in the message 
@@ -392,14 +398,12 @@ namespace MonoGame.Framework
             // process/thread.
 
             var msg = new NativeMessage();
-            do
-            {
+            do {
                 if (msg.msg == WM_QUIT)
                     break;
 
                 Thread.Sleep(100);
-            } 
-            while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
+            } while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
         }
 
         internal void UpdateWindows()
