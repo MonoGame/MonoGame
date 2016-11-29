@@ -100,6 +100,7 @@ namespace Microsoft.Xna.Framework
             Exited
         }
 
+        private NSWindowController _windowController;
         private MacGameNSWindow _mainWindow;
         private GameWindow _gameWindow;
         private bool _wasResizeable;
@@ -140,7 +141,7 @@ namespace Microsoft.Xna.Framework
 				frame, NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable,
                 NSBackingStore.Buffered, true);
 
-            _mainWindow.WindowController = new NSWindowController(_mainWindow);
+            _windowController = new NSWindowController(_mainWindow);
             _mainWindow.Delegate = new MainWindowDelegate(this);
 
             _mainWindow.IsOpaque = true;
@@ -169,6 +170,9 @@ namespace Microsoft.Xna.Framework
                 // nearest NSAutoreleasePool.
                 if (_mainWindow != null)
                     _mainWindow = null;
+
+                if (_windowController != null)
+                    _windowController = null;
             }
 
             base.Dispose(disposing);
@@ -248,10 +252,9 @@ namespace Microsoft.Xna.Framework
 
             State = RunState.Exiting;
 
-            if (_mainWindow != null)
+            if (_windowController != null)
             {
-                var windowController = (NSWindowController)_mainWindow.WindowController;
-                windowController.Close();
+                _windowController.Close();
             }
         }
 
