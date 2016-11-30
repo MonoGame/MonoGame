@@ -213,6 +213,8 @@ namespace Microsoft.Xna.Framework.Net
         private NetworkSessionPublicInfo publicInfo;
         private int uniqueIdCount;
 
+        private bool gameStartRequestThisFrame;
+        private bool gameEndRequestThisFrame;
         private List<IOutgoingMessage> messageQueue;
         private List<EventArgs> eventQueue;
         private List<NetworkGamer> allGamers;
@@ -705,13 +707,14 @@ namespace Microsoft.Xna.Framework.Net
             {
                 throw new InvalidOperationException("The game can only be started from the lobby state");
             }
-            if (!IsEveryoneReady)
+            
+            if (gameStartRequestThisFrame)
             {
-                throw new InvalidOperationException("Not all players are ready"); // TODO: See if this is the expected behavior
+                return;
             }
 
-            SessionState = NetworkSessionState.Playing;
             InternalMessages.GameStarted.Create(null);
+            gameStartRequestThisFrame = true;
         }
 
         public void EndGame()
@@ -729,8 +732,13 @@ namespace Microsoft.Xna.Framework.Net
                 throw new InvalidOperationException("The game can only end from the playing state");
             }
 
-            SessionState = NetworkSessionState.Lobby;
+            if (gameEndRequestThisFrame)
+            {
+                return;
+            }
+
             InternalMessages.GameEnded.Create(null);
+            gameEndRequestThisFrame = true;
         }
 
         public void ResetReady()
@@ -1028,6 +1036,9 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             messageQueue.Clear();
+
+            gameStartRequestThisFrame = false;
+            gameEndRequestThisFrame = false;
         }
 
         internal void SilentUpdate()
