@@ -117,6 +117,8 @@ internal static class Sdl
         [FieldOffset(0)]
         public Keyboard.TextInputEvent Text;
         [FieldOffset(0)]
+        public Mouse.MotionEvent Motion;
+        [FieldOffset(0)]
         public Mouse.WheelEvent Wheel;
         [FieldOffset(0)]
         public Joystick.DeviceEvent JoystickDevice;
@@ -489,7 +491,7 @@ internal static class Sdl
     public static class Mouse
     {
         [Flags]
-        public enum Button
+        public enum Button : uint
         {
             Left = 1 << 0,
             Middle = 1 << 1,
@@ -514,6 +516,19 @@ internal static class Sdl
             Hand
         }
 
+        public struct MotionEvent
+        {
+            public EventType Type;
+            public uint TimeStamp;
+            public uint WindowId;
+            public uint Which;
+            public Button State;
+            public int X;
+            public int Y;
+            public int RelativeX;
+            public int RelativeY;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public struct WheelEvent
         {
@@ -524,6 +539,14 @@ internal static class Sdl
             public int X;
             public int Y;
             public uint Direction;
+        }
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CaptureMouse")]
+        private static extern int SDL_CaptureMouse(bool enabled);
+
+        public static int CaptureMouse(bool enabled)
+        {
+            return GetError(SDL_CaptureMouse(enabled));
         }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateColorCursor")]
@@ -547,6 +570,9 @@ internal static class Sdl
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetGlobalMouseState")]
         public static extern Button GetGlobalState(out int x, out int y);
+
+        [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetRelativeMouseState")]
+        public static extern Button GetRelativeState(out int x, out int y);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetMouseState")]
         public static extern Button GetState(out int x, out int y);

@@ -21,6 +21,16 @@ namespace Microsoft.Xna.Framework.Input
             return PrimaryWindow.Handle;
         }
 
+        private static bool PlatformCaptureMouse()
+        {
+            return false;
+        }
+
+        private static void PlatformFreeMouse()
+        {
+            
+        }
+
         private static MouseState PlatformGetState(GameWindow window)
         {
             return window.MouseState;

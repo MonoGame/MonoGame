@@ -15,6 +15,30 @@ namespace Microsoft.Xna.Framework.Input
             return PrimaryWindow.Handle;
         }
 
+        private static bool PlatformCaptureMouse()
+        {
+            if (_isMouseCaptured)
+                return true;
+
+            int x, y;
+            var state = Sdl.Mouse.GetState(out x, out y);
+
+            if ((state & Sdl.Mouse.Button.Left) == 0)
+                return false;
+
+            _isMouseCaptured = (Sdl.Mouse.CaptureMouse(true) == 0);
+            return _isMouseCaptured;
+        }
+
+        private static void PlatformFreeMouse()
+        {
+            if (!_isMouseCaptured)
+                return;
+            
+            Sdl.Mouse.CaptureMouse(false);
+            _isMouseCaptured = false;
+        }
+
         private static MouseState PlatformGetState(GameWindow window)
         {
             int x, y;
@@ -26,17 +50,26 @@ namespace Microsoft.Xna.Framework.Input
             
             if (winFlags.HasFlag(Sdl.Window.State.MouseFocus))
             {
-                window.MouseState.LeftButton = (state.HasFlag(Sdl.Mouse.Button.Left)) ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.MiddleButton = (state.HasFlag(Sdl.Mouse.Button.Middle)) ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.RightButton = (state.HasFlag(Sdl.Mouse.Button.Right)) ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.XButton1 = (state.HasFlag(Sdl.Mouse.Button.X1Mask)) ? ButtonState.Pressed : ButtonState.Released;
-                window.MouseState.XButton2 = (state.HasFlag(Sdl.Mouse.Button.X2Mask)) ? ButtonState.Pressed : ButtonState.Released;
-
                 window.MouseState.ScrollWheelValue = ScrollY;
 
-                var clientBounds = window.ClientBounds;
-                window.MouseState.X = x - ((Sdl.Patch > 4) ? clientBounds.X : 0);
-                window.MouseState.Y = y - ((Sdl.Patch > 4) ? clientBounds.Y : 0);
+                window.MouseState.LeftButton = ((state & Sdl.Mouse.Button.Left) != 0) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.MiddleButton = ((state & Sdl.Mouse.Button.Middle) != 0) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.RightButton = ((state & Sdl.Mouse.Button.Right) != 0) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.XButton1 = ((state & Sdl.Mouse.Button.X1Mask) != 0) ? ButtonState.Pressed : ButtonState.Released;
+                window.MouseState.XButton2 = ((state & Sdl.Mouse.Button.X2Mask) != 0) ? ButtonState.Pressed : ButtonState.Released;
+
+                if (!_isMouseCaptured)
+                {
+                    window.MouseState.X = x;
+                    window.MouseState.Y = y;
+
+                    if (Sdl.Patch > 4)
+                    {
+                        var clientBounds = window.ClientBounds;
+                        window.MouseState.X -= clientBounds.X;
+                        window.MouseState.Y -= clientBounds.Y;
+                    }
+                }
             }
 
             return window.MouseState;

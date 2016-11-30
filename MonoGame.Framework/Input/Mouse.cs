@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework.Input
         internal static GameWindow PrimaryWindow;
 
         private static readonly MouseState _defaultState = new MouseState();
+        private static bool _isMouseCaptured;
 
         /// <summary>
         /// Gets or sets the window handle for current mouse processing.
@@ -30,6 +31,35 @@ namespace Microsoft.Xna.Framework.Input
             {
                 // only for XNA compatibility, yet
             }
+        }
+
+        /// <summary>
+        /// Gets a value indicating if mouse is captured.
+        /// </summary>
+        /// <value><c>true</c> if is mouse captured; otherwise, <c>false</c>.</value>
+        public static bool IsMouseCaptured
+        {
+            get
+            {
+                return _isMouseCaptured;
+            }
+        }
+
+        /// <summary>
+        /// While mouse is captured it will be invisible, won't be able to escape the window and will report relative movement.
+        /// </summary>
+        /// <returns><c>true</c>, if mouse was captured, <c>false</c> otherwise.</returns>
+        public static bool CaptureMouse()
+        {
+            return PlatformCaptureMouse();
+        }
+
+        /// <summary>
+        /// Allows mouse to move freely.
+        /// </summary>
+        public static void FreeMouse()
+        {
+            PlatformFreeMouse();
         }
 
         /// <summary>
@@ -61,6 +91,7 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <param name="x">Relative horizontal position of the cursor.</param>
         /// <param name="y">Relative vertical position of the cursor.</param>
+        [Obsolete("This method is obsolete, please consider using CaptureMouse instead.")]
         public static void SetPosition(int x, int y)
         {
             PlatformSetPosition(x, y);
