@@ -11,9 +11,6 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-#if WINDOWS_PHONE
-using MonoGame.Framework.WindowsPhone;
-#endif
 
 #if WINDOWS_STOREAPP || WINDOWS_UAP
 using Windows.UI.Xaml.Controls;
