@@ -1,5 +1,4 @@
 ﻿using Lidgren.Network;
-using System.Net;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
@@ -54,9 +53,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             Buffer.Write(value);
         }
 
-        public void Write(IPEndPoint value)
+        public void Write(IPeerEndPoint value)
         {
-            Buffer.Write(value);
+            LidgrenEndPoint ep = value as LidgrenEndPoint;
+
+            Buffer.Write(ep.endPoint);
         }
 
         public void Write(IPeer value)
@@ -109,9 +110,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return Buffer.ReadInt64();
         }
 
-        public IPEndPoint ReadIPEndPoint()
+        public IPeerEndPoint ReadPeerEndPoint()
         {
-            return Buffer.ReadIPEndPoint();
+            return new LidgrenEndPoint(Buffer.ReadIPEndPoint());
         }
 
         public IPeer ReadPeer()

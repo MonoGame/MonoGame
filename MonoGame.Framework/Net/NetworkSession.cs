@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Net.Messages;
@@ -227,14 +226,14 @@ namespace Microsoft.Xna.Framework.Net
         internal int privateGamerSlots;
 
         internal IList<SignedInGamer> pendingSignedInGamers;
-        internal ICollection<IPEndPoint> pendingEndPoints;
+        internal ICollection<IPeerEndPoint> pendingEndPoints;
 
         // Host stores which remote machines existed before a particular machine connected
         internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
 
-        internal NetworkSession(ISessionBackend backend, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(ISessionBackend backend, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
-            this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, backend.HostEndPoint == null);
+            this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, isHost);
             this.hostMachine = this.localMachine.IsHost ? this.localMachine : null;
             this.publicInfo = new NetworkSessionPublicInfo();
             this.uniqueIdCount = 0;
@@ -263,7 +262,7 @@ namespace Microsoft.Xna.Framework.Net
             if (this.localMachine.IsHost)
             {
                 // Initialize empty pending end point list so that the host is approved automatically
-                this.pendingEndPoints = new List<IPEndPoint>();
+                this.pendingEndPoints = new List<IPeerEndPoint>();
             }
 
             this.Backend = backend;
@@ -615,10 +614,7 @@ namespace Microsoft.Xna.Framework.Net
 
         bool IBackendListener.AllowConnect
         {
-            get
-            {
-                return IsHost && OpenPublicGamerSlots > 0;
-            }
+            get { return !IsHost || OpenPublicGamerSlots > 0; }
         }
 
         bool IBackendListener.RegisterWithMasterServer
@@ -916,9 +912,20 @@ namespace Microsoft.Xna.Framework.Net
             messageQueue.Add(msg);
         }
 
+        void IBackendListener.IntroducedAsClient(IPeerEndPoint targetEndPoint)
+        {
+            if (IsHost || IsFullyConnected || pendingEndPoints == null)
+            {
+                return;
+            }
+
+            Backend.Connect(targetEndPoint);
+        }
+
         void IBackendListener.PeerConnected(IPeer peer)
         {
-            bool senderIsHost = !IsHost && peer.EndPoint == Backend.HostEndPoint;
+            // The first connection is always the (initial) host
+            bool senderIsHost = !IsHost && hostMachine == null;
 
             // Create a pending network machine
             NetworkMachine senderMachine = new NetworkMachine(this, peer, false, senderIsHost);
@@ -944,6 +951,12 @@ namespace Microsoft.Xna.Framework.Net
                 pendingPeerConnections.Add(senderMachine, requestedConnections);
 
                 InternalMessages.ConnectToAllRequest.Create(requestedConnections, senderMachine);
+
+                // Introduce machines to each other
+                foreach (NetworkMachine existingMachine in requestedConnections)
+                {
+                    Backend.Introduce(senderMachine.peer, existingMachine.peer);
+                }
             }
         }
 
@@ -1004,7 +1017,7 @@ namespace Microsoft.Xna.Framework.Net
 
             bool done = true;
 
-            foreach (IPEndPoint endPoint in pendingEndPoints)
+            foreach (IPeerEndPoint endPoint in pendingEndPoints)
             {
                 if (!(Backend.IsConnectedToEndPoint(endPoint) && (Backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
                 {
@@ -1014,6 +1027,8 @@ namespace Microsoft.Xna.Framework.Net
 
             if (done)
             {
+                pendingEndPoints = null;
+
                 InternalMessages.FullyConnected.Create(null);
 
                 foreach (SignedInGamer pendingGamer in pendingSignedInGamers)

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Net.Backend;
 
@@ -46,16 +45,11 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             int requestedConnectionCount = msg.ReadInt();
-            CurrentMachine.Session.pendingEndPoints = new List<IPEndPoint>(requestedConnectionCount);
+            CurrentMachine.Session.pendingEndPoints = new List<IPeerEndPoint>(requestedConnectionCount);
             for (int i = 0; i < requestedConnectionCount; i++)
             {
-                IPEndPoint endPoint = msg.ReadIPEndPoint();
+                IPeerEndPoint endPoint = msg.ReadPeerEndPoint();
                 CurrentMachine.Session.pendingEndPoints.Add(endPoint);
-
-                if (!CurrentMachine.Session.Backend.IsConnectedToEndPoint(endPoint))
-                {
-                    CurrentMachine.Session.Backend.Connect(endPoint);
-                }
             }
         }
     }

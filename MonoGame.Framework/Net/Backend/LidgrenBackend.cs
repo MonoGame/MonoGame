@@ -7,6 +7,50 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
+    internal class LidgrenEndPoint : IPeerEndPoint
+    {
+        public IPEndPoint endPoint;
+
+        public LidgrenEndPoint(IPEndPoint endPoint)
+        {
+            this.endPoint = endPoint;
+        }
+
+        public override bool Equals(object obj)
+        {
+            LidgrenEndPoint otherLidgren = obj as LidgrenEndPoint;
+
+            if (otherLidgren == null)
+            {
+                return false;
+            }
+
+            return endPoint.Equals(otherLidgren.endPoint);
+        }
+
+        public override int GetHashCode()
+        {
+            return endPoint.GetHashCode();
+        }
+
+        public bool Equals(IPeerEndPoint other)
+        {
+            LidgrenEndPoint otherLidgren = other as LidgrenEndPoint;
+
+            if (otherLidgren == null)
+            {
+                return false;
+            }
+
+            return endPoint.Equals(otherLidgren.endPoint);
+        }
+
+        public override string ToString()
+        {
+            return endPoint.ToString();
+        }
+    }
+
     internal interface ILidgrenPeer : IPeer
     {
         long Id { get; }
@@ -15,14 +59,20 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     internal class RemotePeer : ILidgrenPeer
     {
         internal NetConnection connection;
+        internal IPEndPoint internalEP;
+        internal IPEndPoint externalEP;
 
-        public RemotePeer(NetConnection connection)
+        public RemotePeer(NetConnection connection, IPEndPoint internalEP)
         {
             this.connection = connection;
+            this.internalEP = internalEP;
+            this.externalEP = connection.RemoteEndPoint;
+
+            this.EndPoint = new LidgrenEndPoint(connection.RemoteEndPoint);
         }
 
+        public IPeerEndPoint EndPoint { get; }
         public long Id { get { return connection.RemoteUniqueIdentifier; } }
-        public IPEndPoint EndPoint { get { return connection.RemoteEndPoint; } }
         public TimeSpan RoundtripTime { get { return TimeSpan.FromSeconds(connection.AverageRoundtripTime); } }
         public object Tag { get; set; }
 
@@ -35,6 +85,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     internal class LocalPeer : ILidgrenPeer
     {
         internal NetPeer peer;
+        internal IPEndPoint internalEP;
 
         public LocalPeer(NetPeer peer)
         {
@@ -42,11 +93,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             IPAddress address;
             NetUtility.GetMyAddress(out address);
-            this.EndPoint = new IPEndPoint(address, peer.Port);
+            this.internalEP = new IPEndPoint(address, peer.Port);
+
+            this.EndPoint = new LidgrenEndPoint(this.internalEP);
         }
 
+        public IPeerEndPoint EndPoint { get; }
         public long Id { get { return peer.UniqueIdentifier; } }
-        public IPEndPoint EndPoint { get; }
         public TimeSpan RoundtripTime { get { return TimeSpan.Zero; } }
         public object Tag { get; set; }
 
@@ -59,6 +112,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     internal class LidgrenBackend : ISessionBackend
     {
         private LocalPeer localPeer;
+        private IPEndPoint initialConnectEndPoint;
+
         private IList<RemotePeer> remotePeers;
         private List<NetConnection> reportedConnections;
         
@@ -70,9 +125,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private int lastReceivedBytes;
         private int lastSentBytes;
 
-        public LidgrenBackend(NetPeer peer, IPEndPoint hostEndPoint)
+        public LidgrenBackend(NetPeer peer, IPEndPoint initialConnectEndPoint)
         {
             this.localPeer = new LocalPeer(peer);
+            this.initialConnectEndPoint = initialConnectEndPoint;
+
             this.remotePeers = new List<RemotePeer>();
             this.reportedConnections = new List<NetConnection>();
             
@@ -84,12 +141,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             this.lastReceivedBytes = 0;
             this.lastSentBytes = 0;
 
-            this.HostEndPoint = hostEndPoint;
             this.HasShutdown = false;
             this.LocalPeer = localPeer;
         }
-
-        public IPEndPoint HostEndPoint { get; }
+        
         public bool HasShutdown { get; private set; }
         public IBackendListener Listener { get; set; }
         public IPeer LocalPeer { get; }
@@ -127,22 +182,44 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return null;
         }
 
-        public void Connect(IPEndPoint endPoint)
+        public void Introduce(IPeer client, IPeer target)
         {
-            if (localPeer.peer.GetConnection(endPoint) == null)
+            RemotePeer remoteClient = client as RemotePeer;
+            RemotePeer remoteTarget = target as RemotePeer;
+
+            if (remoteClient == null || remoteTarget == null)
             {
-                localPeer.peer.Connect(endPoint);
+                return;
+            }
+
+            localPeer.peer.Introduce(remoteTarget.internalEP, remoteTarget.externalEP, remoteClient.internalEP, remoteClient.externalEP, string.Empty);
+        }
+
+        public void Connect(IPeerEndPoint endPoint)
+        {
+            LidgrenEndPoint ep = endPoint as LidgrenEndPoint;
+
+            if (localPeer.peer.GetConnection(ep.endPoint) == null)
+            {
+                NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
+                hailMsg.Write(localPeer.internalEP);
+
+                localPeer.peer.Connect(ep.endPoint, hailMsg);
             }
         }
 
-        public IPeer FindRemotePeerByEndPoint(IPEndPoint endPoint)
+        public IPeer FindRemotePeerByEndPoint(IPeerEndPoint endPoint)
         {
-            return localPeer.peer.GetConnection(endPoint).Tag as RemotePeer;
+            LidgrenEndPoint ep = endPoint as LidgrenEndPoint;
+
+            return localPeer.peer.GetConnection(ep.endPoint).Tag as RemotePeer;
         }
 
-        public bool IsConnectedToEndPoint(IPEndPoint endPoint)
+        public bool IsConnectedToEndPoint(IPeerEndPoint endPoint)
         {
-            return localPeer.peer.GetConnection(endPoint) != null;
+            LidgrenEndPoint ep = endPoint as LidgrenEndPoint;
+
+            return localPeer.peer.GetConnection(ep.endPoint) != null;
         }
 
         private NetDeliveryMethod ToDeliveryMethod(SendDataOptions options)
@@ -246,27 +323,28 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     // Discovery
                     case NetIncomingMessageType.DiscoveryRequest:
-                        if (HostEndPoint != null)
+                        if (initialConnectEndPoint == null)
                         {
-                            break;
+                            Debug.WriteLine("Discovery request received");
+
+                            OutgoingMessage responseMsg = outgoingMessagePool.Get();
+                            Listener.SessionPublicInfo.Pack(responseMsg);
+
+                            NetOutgoingMessage response = localPeer.peer.CreateMessage();
+                            response.Write(responseMsg.Buffer);
+                            localPeer.peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
+
+                            outgoingMessagePool.Recycle(responseMsg);
                         }
-
-                        Debug.WriteLine("Discovery request received");
-
-                        OutgoingMessage responseMsg = outgoingMessagePool.Get();
-                        Listener.SessionPublicInfo.Pack(responseMsg);
-                        
-                        NetOutgoingMessage response = localPeer.peer.CreateMessage();
-                        response.Write(responseMsg.Buffer);
-                        localPeer.peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
-
-                        outgoingMessagePool.Recycle(responseMsg);
                         break;
                     // Connection approval
                     case NetIncomingMessageType.ConnectionApproval:
                         if (Listener.AllowConnect)
                         {
-                            msg.SenderConnection.Approve();
+                            NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
+                            hailMsg.Write(localPeer.internalEP);
+
+                            msg.SenderConnection.Approve(hailMsg);
 
                             Debug.WriteLine("Connection approved");
                         }
@@ -279,15 +357,18 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         break;
                     // Nat introduction
                     case NetIncomingMessageType.NatIntroductionSuccess:
-                        if (HostEndPoint != null)
-                        {
-                            Debug.WriteLine("Nat introduction was successful, connecting to host...");
+                        Debug.WriteLine("Nat introduction successful");
 
-                            Connect(HostEndPoint);
+                        if (localPeer.peer.ConnectionsCount == 0 && initialConnectEndPoint != null && msg.SenderEndPoint.Equals(initialConnectEndPoint))
+                        {
+                            // Initial connection introduced by master server
+                            Debug.WriteLine("Connecting to initial end point...");
+
+                            Connect(new LidgrenEndPoint(initialConnectEndPoint));
                         }
                         else
                         {
-                            Debug.WriteLine("Nat introduction was successful, awaiting connection from client ...");
+                            Listener.IntroducedAsClient(new LidgrenEndPoint(msg.SenderEndPoint));
                         }
                         break;
                     // Peer state changes
@@ -299,10 +380,12 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                         NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
                         Debug.WriteLine("Status now: " + status + " - Reason: " + msg.ReadString());
-
+                        
                         if (status == NetConnectionStatus.Connected)
                         {
-                            RemotePeer remotePeer = new RemotePeer(msg.SenderConnection);
+                            IPEndPoint internalIPEndPoint = msg.SenderConnection.RemoteHailMessage.ReadIPEndPoint();
+
+                            RemotePeer remotePeer = new RemotePeer(msg.SenderConnection, internalIPEndPoint);
                             msg.SenderConnection.Tag = remotePeer;
                             remotePeers.Add(remotePeer);
                             reportedConnections.Add(msg.SenderConnection);

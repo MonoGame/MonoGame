@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Net.Backend;
@@ -8,9 +7,9 @@ namespace Microsoft.Xna.Framework.Net
 {
     public sealed class AvailableNetworkSession
     {
-        internal AvailableNetworkSession(IPEndPoint remoteEndPoint, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionType sessionType, int currentGamerCount, string hostGamertag, int openPrivateGamerSlots, int openPublicGamerSlots, NetworkSessionProperties sessionProperties)
+        internal AvailableNetworkSession(IPeerEndPoint endPoint, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionType sessionType, int currentGamerCount, string hostGamertag, int openPrivateGamerSlots, int openPublicGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            this.RemoteEndPoint = remoteEndPoint;
+            this.EndPoint = endPoint;
             this.LocalGamers = localGamers;
             this.MaxGamers = maxGamers;
             this.PrivateGamerSlots = privateGamerSlots;
@@ -23,7 +22,7 @@ namespace Microsoft.Xna.Framework.Net
             this.SessionProperties = sessionProperties;
         }
 
-        internal IPEndPoint RemoteEndPoint { get; }
+        internal IPeerEndPoint EndPoint { get; }
         internal IEnumerable<SignedInGamer> LocalGamers { get; }
         internal int MaxGamers { get; }
         internal int PrivateGamerSlots { get; }

@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         }
     }
 
-    public class LidgrenMasterServer : IMasterServer
+    public class LidgrenMasterServer
     {
         private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     if (messageType == MasterServerMessageType.RegisterHost)
                     {
                         long hostId = msg.ReadLong();
-                        IPEndPoint internalEndPoint = msg.ReadIPEndPoint();
+                        IPEndPoint internalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
                         IPEndPoint externalEndPoint = rawMsg.SenderEndPoint;
                         NetworkSessionPublicInfo publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         {
                             OutgoingMessage response = new OutgoingMessage();
                             response.Write(elem.Key);
-                            response.Write(elem.Value.externalEndPoint);
+                            response.Write(new LidgrenEndPoint(elem.Value.externalEndPoint));
                             elem.Value.publicInfo.Pack(response);
 
                             response.Buffer.Position = 0;
@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     }
                     else if (messageType == MasterServerMessageType.RequestIntroduction)
                     {
-                        IPEndPoint senderInternalEndPoint = msg.ReadIPEndPoint();
+                        IPEndPoint senderInternalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
                         long hostId = msg.ReadLong();
 
                         if (hosts.ContainsKey(hostId))
