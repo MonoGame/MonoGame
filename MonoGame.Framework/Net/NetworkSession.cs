@@ -50,7 +50,11 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return AsyncCreateCaller.BeginInvoke(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties, callback, asyncState);
             }
-            catch { throw; }
+            catch
+            {
+                AsyncCreateCaller = null;
+                throw;
+            }
         }
 
         public static IAsyncResult BeginCreate(NetworkSessionType sessionType, int maxLocalGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, AsyncCallback callback, Object asyncState)
@@ -84,7 +88,11 @@ namespace Microsoft.Xna.Framework.Net
                 AsyncCreateCaller = null;
                 return Session;
             }
-            catch { throw; }
+            catch
+            {
+                AsyncCreateCaller = null;
+                throw;
+            }
         }
 
         public static IAsyncResult BeginFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties, AsyncCallback callback, Object asyncState)
@@ -108,7 +116,11 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return AsyncFindCaller.BeginInvoke(sessionType, localGamers, searchProperties, callback, asyncState);
             }
-            catch { throw; }
+            catch
+            {
+                AsyncFindCaller = null;
+                throw;
+            }
         }
 
         public static IAsyncResult BeginFind(NetworkSessionType sessionType, int maxLocalGamers, NetworkSessionProperties searchProperties, AsyncCallback callback, Object asyncState)
@@ -136,7 +148,11 @@ namespace Microsoft.Xna.Framework.Net
                 AsyncFindCaller = null;
                 return availableSessions;
             }
-            catch { throw; }
+            catch
+            {
+                AsyncFindCaller = null;
+                throw;
+            }
         }
 
         public static IAsyncResult BeginJoin(AvailableNetworkSession availableSession, AsyncCallback callback, Object asyncState)
@@ -156,7 +172,11 @@ namespace Microsoft.Xna.Framework.Net
             {
                 return AsyncJoinCaller.BeginInvoke(availableSession, callback, asyncState);
             }
-            catch { throw; }
+            catch
+            {
+                AsyncJoinCaller = null;
+                throw;
+            }
         }
 
         public static NetworkSession EndJoin(IAsyncResult result)
@@ -167,7 +187,11 @@ namespace Microsoft.Xna.Framework.Net
                 AsyncJoinCaller = null;
                 return Session;
             }
-            catch { throw; }
+            catch
+            {
+                AsyncJoinCaller = null;
+                throw;
+            }
         }
 
         // Synchronous session creation

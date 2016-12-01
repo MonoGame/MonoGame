@@ -203,7 +203,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
                 hailMsg.Write(localPeer.internalEP);
-
                 localPeer.peer.Connect(ep.endPoint, hailMsg);
             }
         }
@@ -343,7 +342,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         {
                             NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
                             hailMsg.Write(localPeer.internalEP);
-
                             msg.SenderConnection.Approve(hailMsg);
 
                             Debug.WriteLine("Connection approved");
