@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 for (var i = 0; i < ArraySize; i++)
                 {
                     var renderTargetViewDescription = new RenderTargetViewDescription();
-                    if (MultiSampleCount > 1)
+                    if (GetTextureSampleDescription().Count > 1)
                     {
                         renderTargetViewDescription.Dimension = RenderTargetViewDimension.Texture2DMultisampledArray;
                         renderTargetViewDescription.Texture2DMSArray.ArraySize = 1;
@@ -56,13 +56,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (DepthStencilFormat == DepthFormat.None)
                 return;
 
-            // Setup the multisampling description.
-            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if (MultiSampleCount > 1)
-            {
-                multisampleDesc.Count = MultiSampleCount;
-                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
+            // The depth stencil view's multisampling configuration must strictly
+            // match the texture's multisampling configuration.  Ignore whatever parameters
+            // were provided and use the texture's configuration so that things are
+            // guarenteed to work.
+            var multisampleDesc = GetTextureSampleDescription();
 
             // Create a descriptor for the depth/stencil buffer.
             // Allocate a 2-D surface as the depth/stencil buffer.
@@ -83,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     new DepthStencilViewDescription()
                     {
                         Format = SharpDXHelper.ToFormat(DepthStencilFormat),
-                        Dimension = DepthStencilViewDimension.Texture2D
+                        Dimension = GetTextureSampleDescription().Count > 1 ? DepthStencilViewDimension.Texture2DMultisampled : DepthStencilViewDimension.Texture2D
                     });
             }
         }

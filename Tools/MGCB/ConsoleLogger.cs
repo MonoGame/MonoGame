@@ -30,7 +30,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     warning += "(" + contentIdentity.FragmentIdentifier + ")";
                 warning += ": ";
             }
-            warning += string.Format(message, messageArgs);
+            
+            if (messageArgs != null && messageArgs.Length != 0)
+                warning += string.Format(message, messageArgs);
+            else if (!string.IsNullOrEmpty(message))
+                warning += message;
+
             Console.WriteLine(warning);
         }
     }

@@ -55,8 +55,6 @@ Set the target platform for this build. It must be a member of the TargetPlatfor
 * MacOSX
 * WindowsStoreApp
 * NativeClient
-* Ouya
-* PlayStationMobile
 * PlayStation4
 * WindowsPhone8
 * RaspberryPi

@@ -31,14 +31,8 @@ namespace MonoGame.Tools.Pipeline
             while (enums.MoveNext())
             {
                 var ret = new ImageListItem();
-                ret.Text = enums.Current.Label;
+                ret.Text = enums.Current.Label + " (" + Path.GetExtension(enums.Current.TemplateFile) + ")";
                 ret.Tag = enums.Current;
-                
-                try
-                {
-                    ret.Image = new Bitmap(new Bitmap(Path.Combine(Path.GetDirectoryName(enums.Current.TemplateFile), enums.Current.Icon)), 16, 16);
-                }
-                catch { }
 
                 list1.Items.Add(ret);
             }

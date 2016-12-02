@@ -17,13 +17,13 @@ namespace MonoGame.Tools.Pipeline
         public Command cmdBuild, cmdRebuild, cmdClean, cmdCancelBuild;
         public CheckCommand cmdDebugMode;
         public Command cmdHelp, cmdAbout;
-        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdRebuildItem;
+        public Command cmdOpenItem, cmdOpenItemWith, cmdOpenItemLocation, cmdCopyAssetPath, cmdRebuildItem;
 
         MenuBar menubar;
         ToolBar toolbar;
-        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuPads, menuBuild, menuHelp;
+        ButtonMenuItem menuFile, menuRecent, menuEdit, menuAdd, menuView, menuBuild, menuHelp;
         ToolItem toolBuild, toolRebuild, toolClean, toolCancelBuild;
-        MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmRebuildItem, cmExclude, cmRename, cmDelete;
+        MenuItem cmOpenItem, cmOpenItemWith, cmOpenItemLocation, cmCopyAssetPath, cmRebuildItem, cmExclude, cmRename, cmDelete;
         ButtonMenuItem cmAdd;
 
         ProjectControl projectControl;
@@ -102,6 +102,7 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItem.Executed += CmdOpenItem_Executed;
             cmdOpenItemWith.Executed += CmdOpenItemWith_Executed;
             cmdOpenItemLocation.Executed += CmdOpenItemLocation_Executed;
+            cmdCopyAssetPath.Executed += CmdCopyAssetPath_Executed;
             cmdRebuildItem.Executed += CmdRebuildItem_Executed;
         }
 
@@ -110,17 +111,20 @@ namespace MonoGame.Tools.Pipeline
             // File Commands
 
             cmdNew = new Command();
-            cmdNew.Shortcut = Application.Instance.CommonModifier | Keys.N;
-            cmdNew.ToolTip = "New";
             cmdNew.MenuText = "New...";
+            cmdNew.ToolTip = "New";
+            cmdNew.Image = Global.GetEtoIcon("Commands.New.png");
+            cmdNew.Shortcut = Application.Instance.CommonModifier | Keys.N;
 
             cmdOpen = new Command();
             cmdOpen.MenuText = "Open...";
             cmdOpen.ToolTip = "Open";
+            cmdOpen.Image = Global.GetEtoIcon("Commands.Open.png");
             cmdOpen.Shortcut = Application.Instance.CommonModifier | Keys.O;
 
             cmdClose = new Command();
             cmdClose.MenuText = "Close";
+            cmdClose.Image = Global.GetEtoIcon("Commands.Close.png");
 
             cmdImport = new Command();
             cmdImport.MenuText = "Import";
@@ -128,10 +132,12 @@ namespace MonoGame.Tools.Pipeline
             cmdSave = new Command();
             cmdSave.MenuText = "Save...";
             cmdSave.ToolTip = "Save";
+            cmdSave.Image = Global.GetEtoIcon("Commands.Save.png");
             cmdSave.Shortcut = Application.Instance.CommonModifier | Keys.S;
 
             cmdSaveAs = new Command();
             cmdSaveAs.MenuText = "Save As";
+            cmdSaveAs.Image = Global.GetEtoIcon("Commands.SaveAs.png");
 
             cmdExit = new Command();
             cmdExit.MenuText = "Exit";
@@ -142,11 +148,13 @@ namespace MonoGame.Tools.Pipeline
             cmdUndo = new Command();
             cmdUndo.MenuText = "Undo";
             cmdUndo.ToolTip = "Undo";
+            cmdUndo.Image = Global.GetEtoIcon("Commands.Undo.png");
             cmdUndo.Shortcut = Application.Instance.CommonModifier | Keys.Z;
 
             cmdRedo = new Command();
             cmdRedo.MenuText = "Redo";
             cmdRedo.ToolTip = "Redo";
+            cmdRedo.Image = Global.GetEtoIcon("Commands.Redo.png");
             cmdRedo.Shortcut = Application.Instance.CommonModifier | Keys.Y;
 
             cmdAdd = new Command();
@@ -157,9 +165,11 @@ namespace MonoGame.Tools.Pipeline
 
             cmdRename = new Command();
             cmdRename.MenuText = "Rename";
+            cmdRename.Image = Global.GetEtoIcon("Commands.Rename.png");
 
             cmdDelete = new Command();
             cmdDelete.MenuText = "Delete";
+            cmdDelete.Image = Global.GetEtoIcon("Commands.Delete.png");
             cmdDelete.Shortcut = Keys.Delete;
 
             // Add Submenu
@@ -167,37 +177,45 @@ namespace MonoGame.Tools.Pipeline
             cmdNewItem = new Command();
             cmdNewItem.MenuText = "New Item...";
             cmdNewItem.ToolTip = "New Item";
+            cmdNewItem.Image = Global.GetEtoIcon("Commands.NewItem.png");
 
             cmdNewFolder = new Command();
             cmdNewFolder.MenuText = "New Folder...";
             cmdNewFolder.ToolTip = "New Folder";
+            cmdNewFolder.Image = Global.GetEtoIcon("Commands.NewFolder.png");
 
             cmdExistingItem = new Command();
             cmdExistingItem.MenuText = "Existing Item...";
             cmdExistingItem.ToolTip = "Add Existing Item";
+            cmdExistingItem.Image = Global.GetEtoIcon("Commands.ExistingItem.png");
 
             cmdExistingFolder = new Command();
             cmdExistingFolder.MenuText = "Existing Folder...";
             cmdExistingFolder.ToolTip = "Add Existing Folder";
+            cmdExistingFolder.Image = Global.GetEtoIcon("Commands.ExistingFolder.png");
 
             // Build Commands
 
             cmdBuild = new Command();
             cmdBuild.MenuText = "Build";
             cmdBuild.ToolTip = "Build";
+            cmdBuild.Image = Global.GetEtoIcon("Commands.Build.png");
             cmdBuild.Shortcut = Keys.F6;
 
             cmdRebuild = new Command();
             cmdRebuild.MenuText = "Rebuild";
             cmdRebuild.ToolTip = "Rebuild";
+            cmdRebuild.Image = Global.GetEtoIcon("Commands.Rebuild.png");
 
             cmdClean = new Command();
             cmdClean.MenuText = "Clean";
             cmdClean.ToolTip = "Clean";
+            cmdClean.Image = Global.GetEtoIcon("Commands.Clean.png");
 
             cmdCancelBuild = new Command();
             cmdCancelBuild.MenuText = "Cancel Build";
             cmdCancelBuild.ToolTip = "Cancel Build";
+            cmdCancelBuild.Image = Global.GetEtoIcon("Commands.CancelBuild.png");
 
             cmdDebugMode = new CheckCommand();
             cmdDebugMode.MenuText = "Debug Mode";
@@ -207,6 +225,7 @@ namespace MonoGame.Tools.Pipeline
             cmdHelp = new Command();
             cmdHelp.MenuText = "View Help";
             cmdHelp.Shortcut = Keys.F1;
+            cmdHelp.Image = Global.GetEtoIcon("Commands.Help.png");
 
             cmdAbout = new Command();
             cmdAbout.MenuText = "About";
@@ -215,6 +234,7 @@ namespace MonoGame.Tools.Pipeline
 
             cmdOpenItem = new Command();
             cmdOpenItem.MenuText = "Open";
+            cmdOpenItem.Image = Global.GetEtoIcon("Commands.OpenItem.png");
 
             cmdOpenItemWith = new Command();
             cmdOpenItemWith.MenuText = "Open With";
@@ -222,48 +242,17 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItemLocation = new Command();
             cmdOpenItemLocation.MenuText = "Open Containing Directory";
 
+            cmdCopyAssetPath = new Command();
+            cmdCopyAssetPath.MenuText = "Copy Asset Path";
+
             cmdRebuildItem = new Command();
+            cmdRebuildItem.Image = Global.GetEtoIcon("Commands.Rebuild.png");
             cmdRebuildItem.MenuText = "Rebuild";
-
-            ReloadIcons();
-        }
-
-        public void ReloadIcons()
-        {
-            Global.SetIcon(cmdNew);
-            Global.SetIcon(cmdOpen);
-            Global.SetIcon(cmdClose);
-            Global.SetIcon(cmdImport);
-            Global.SetIcon(cmdSave);
-            Global.SetIcon(cmdSaveAs);
-            Global.SetIcon(cmdExit);
-            Global.SetIcon(cmdUndo);
-            Global.SetIcon(cmdRedo);
-            Global.SetIcon(cmdAdd);
-            Global.SetIcon(cmdExclude);
-            Global.SetIcon(cmdRename);
-            Global.SetIcon(cmdDelete);
-            Global.SetIcon(cmdNewItem);
-            Global.SetIcon(cmdNewFolder);
-            Global.SetIcon(cmdExistingItem);
-            Global.SetIcon(cmdExistingFolder);
-            Global.SetIcon(cmdBuild);
-            Global.SetIcon(cmdRebuild);
-            Global.SetIcon(cmdClean);
-            Global.SetIcon(cmdCancelBuild);
-            Global.SetIcon(cmdDebugMode);
-            Global.SetIcon(cmdHelp);
-            Global.SetIcon(cmdAbout);
-            Global.SetIcon(cmdOpenItem);
-            Global.SetIcon(cmdOpenItemWith);
-            Global.SetIcon(cmdOpenItemLocation);
-            Global.SetIcon(cmdRebuildItem);
         }
 
         private void InitalizeMenu()
         {
-            Menu = menubar = new MenuBar();
-            Menu.Style = "MenuBar";
+            menubar = new MenuBar();
 
             menuFile = new ButtonMenuItem();
             menuFile.Text = "File";
@@ -280,7 +269,7 @@ namespace MonoGame.Tools.Pipeline
             menuFile.Items.Add(new SeparatorMenuItem());
             menuFile.Items.Add(cmdSave);
             menuFile.Items.Add(cmdSaveAs);
-            Menu.Items.Add(menuFile);
+            menubar.Items.Add(menuFile);
 
             menuEdit = new ButtonMenuItem();
             menuEdit.Text = "Edit";
@@ -301,13 +290,13 @@ namespace MonoGame.Tools.Pipeline
             menuEdit.Items.Add(new SeparatorMenuItem());
             menuEdit.Items.Add(cmdRename);
             menuEdit.Items.Add(cmdDelete);
-            Menu.Items.Add(menuEdit);
+            menubar.Items.Add(menuEdit);
 
-            //Pads Commands
+            // View Commands
 
-            menuPads = new ButtonMenuItem();
-            menuPads.Text = "Pads";
-            Menu.Items.Add(menuPads);
+            menuView = new ButtonMenuItem();
+            menuView.Text = "View";
+            menubar.Items.Add(menuView);
 
             menuBuild = new ButtonMenuItem();
             menuBuild.Text = "Build";
@@ -317,15 +306,18 @@ namespace MonoGame.Tools.Pipeline
             menuBuild.Items.Add(cmdCancelBuild);
             menuBuild.Items.Add(new SeparatorMenuItem());
             menuBuild.Items.Add(cmdDebugMode);
-            Menu.Items.Add(menuBuild);
+            menubar.Items.Add(menuBuild);
 
             menuHelp = new ButtonMenuItem();
             menuHelp.Text = "Help";
             menuHelp.Items.Add(cmdHelp);
-            Menu.Items.Add(menuHelp);
+            menubar.Items.Add(menuHelp);
 
-            Menu.QuitItem = cmdExit;
-            Menu.AboutItem = cmdAbout;
+            menubar.QuitItem = cmdExit;
+            menubar.AboutItem = cmdAbout;
+
+            Menu = menubar;
+            Menu.Style = "MenuBar";
         }
 
         private void InitalizeContextMenu()
@@ -341,6 +333,7 @@ namespace MonoGame.Tools.Pipeline
             cmAdd.Items.Add(cmdExistingFolder.CreateMenuItem());
 
             cmOpenItemLocation = cmdOpenItemLocation.CreateMenuItem();
+            cmCopyAssetPath = cmdCopyAssetPath.CreateMenuItem();
             cmRebuildItem = cmdRebuildItem.CreateMenuItem();
             cmExclude = cmdExclude.CreateMenuItem();
             cmRename = cmdRename.CreateMenuItem();
@@ -371,7 +364,7 @@ namespace MonoGame.Tools.Pipeline
             ToolBar.Items.Add(toolBuild);
             ToolBar.Items.Add(toolRebuild);
             ToolBar.Items.Add(toolClean);
-            ToolBar.Items.Add(new SeparatorToolItem());
+            toolbar.Items.Add(toolCancelBuild);
         }
     }
 }

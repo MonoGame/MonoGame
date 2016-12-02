@@ -21,7 +21,8 @@ namespace MonoGame.Tools.Pipeline
         public string StartupProject;
         public Microsoft.Xna.Framework.Point Size;
         public int HSeparator, VSeparator;
-        public bool Maximized, FilterOutput, AutoScrollBuildOutput, DebugMode, PropertyGroupSort;
+        public bool Maximized, DebugMode, PropertyGroupSort;
+        public bool FilterOutput, FilterShowSkipped, FilterShowSuccessful, FilterShowCleaned, AutoScrollBuildOutput;
 
         static PipelineSettings()
         {
@@ -34,6 +35,9 @@ namespace MonoGame.Tools.Pipeline
 
             PropertyGroupSort = true;
             FilterOutput = true;
+            FilterShowSkipped = true;
+            FilterShowSuccessful = true;
+            FilterShowCleaned = true;
             AutoScrollBuildOutput = true;
 
             try

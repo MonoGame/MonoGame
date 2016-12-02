@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Input
                 packetNumber = xistate.PacketNumber;
                 gamepad = xistate.Gamepad;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 

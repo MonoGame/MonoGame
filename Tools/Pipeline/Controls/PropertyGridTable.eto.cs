@@ -14,10 +14,10 @@ namespace MonoGame.Tools.Pipeline
 
         private void InitializeComponent()
         {
-            BackgroundColor = PropInfo.BackColor;
+            BackgroundColor = DrawInfo.BackColor;
 
             pixel1 = new PixelLayout();
-            pixel1.BackgroundColor = PropInfo.BackColor;
+            pixel1.BackgroundColor = DrawInfo.BackColor;
 
             drawable = new Drawable();
             drawable.Height = 100;

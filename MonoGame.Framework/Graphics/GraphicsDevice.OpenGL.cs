@@ -319,8 +319,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _lastTextureActive = -1;
 
-            // Force reseting states
-            this.BlendState.PlatformApplyState(this, true);
+            // Force resetting states
+            this.PlatformApplyBlend(true);
             this.DepthStencilState.PlatformApplyState(this, true);
             this.RasterizerState.PlatformApplyState(this, true);
 
@@ -882,6 +882,26 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.EnsureUIThread();
         }
 
+        private void PlatformApplyBlend(bool force = false)
+        {
+            _actualBlendState.PlatformApplyState(this, force);
+            ApplyBlendFactor(force);
+        }
+
+        private void ApplyBlendFactor(bool force)
+        {
+            if (force || BlendFactor != _lastBlendState.BlendFactor)
+            {
+                GL.BlendColor(
+                    this.BlendFactor.R/255.0f,
+                    this.BlendFactor.G/255.0f,
+                    this.BlendFactor.B/255.0f,
+                    this.BlendFactor.A/255.0f);
+                GraphicsExtensions.CheckGLError();
+                _lastBlendState.BlendFactor = this.BlendFactor;
+            }
+        }
+
         internal void PlatformApplyState(bool applyShaders)
         {
             if ( _scissorRectangleDirty )
@@ -1120,10 +1140,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
            return GraphicsProfile.HiDef;
         }
-
+        
         private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
         {
             return new Rectangle(x, y, width, height);
+        }
+        
+        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+        {
+            presentationParameters.MultiSampleCount = 4;
+            quality = 0;
+        }
     }
 }
 }

@@ -53,7 +53,7 @@ namespace MonoGame.Tools.Pipeline
                             else
                                 File.Delete(_con.GetFullPath(item.OriginalPath));
                         }
-                        catch (FileNotFoundException ex)
+                        catch (FileNotFoundException)
                         {
                             // No error needed in case file is not found
                         }

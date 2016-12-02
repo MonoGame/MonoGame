@@ -274,13 +274,45 @@ namespace MonoGame.Tools.Pipeline
 
             Style.Add<DropDownHandler>("OverrideSize", h =>
             {
-                var cell = (h.Control.Child as Gtk.ComboBox).Cells[0] as Gtk.CellRendererText;
+                var cell = (h.Control.Child as Gtk.CellView).Cells[0] as Gtk.CellRendererText;
                 cell.Ellipsize = Pango.EllipsizeMode.End;
             });
 
             Style.Add<TextBoxHandler>("OverrideSize", h =>
             {
                 h.Control.WidthChars = 0;
+            });
+
+            Style.Add<ScrollableHandler>("BuildOutput", h =>
+            {
+                var child = ((((h.Control.Child as Gtk.Viewport).Child as Gtk.VBox).Children[0] as Gtk.HBox).Children[0] as Gtk.Alignment).Child;
+                var ok = false;
+
+                h.Control.SizeAllocated += delegate
+                {
+                    // Set Width of the Drawable
+                    var al = child.Allocation;
+                    al.Width = h.Control.AllocatedWidth - 2;
+                    if (BuildOutput.ReqWidth > al.Width)
+                        al.Width = BuildOutput.ReqWidth;
+                    child.SetAllocation(al);
+
+                    if (PipelineSettings.Default.AutoScrollBuildOutput)
+                    {
+                        // Scroll to bottom
+                        if (BuildOutput.Count == -1)
+                            ok = false;
+
+                        if (!ok)
+                        {
+                            var adj = h.Control.Vadjustment;
+                            adj.Value = adj.Upper - adj.PageSize;
+
+                            if (adj.Upper >= BuildOutput.Count && BuildOutput.Count != -1)
+                                ok = true;
+                        }
+                    }
+                };
             });
         }
     }

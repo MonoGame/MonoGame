@@ -4,10 +4,10 @@ The MonoGame Pipeline Tool (Pipeline.exe) is the front-end GUI editor for MonoGa
 <img src="images/pipeline.png"/>
 </p>
 
-The Pipeline Tool is still relatively new to MonoGame, but it already has the following features:
+The Pipeline Tool has the following features:
 
   * Create, open, and save MGCB projects.
-  * Import existing .contentproj.
+  * Import existing XNA .contentproj.
   * Tree view showing content of project.
   * Property grid for editing content settings.
   * Full undo/redo support.
@@ -17,7 +17,7 @@ The Pipeline Tool is still relatively new to MonoGame, but it already has the fo
   * Support for custom importers/processors/writers.
   * Template format for adding new custom content types.
 
-Currently the Pipeline Tool is only available on Windows and is part of the SDK installation.  The Mac and Linux versions are in development and should be available soon.
+The Pipeline Tool is included in the SDK installation.
 
 [Read detailed documentation](using_pipeline_tool.md)
 

@@ -231,7 +231,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if DEBUG
             var debugLevel = SharpDX.Direct2D1.DebugLevel.Information;
-#else 
+#else
             var debugLevel = SharpDX.Direct2D1.DebugLevel.None; 
 #endif
             // Dispose previous references.
@@ -565,6 +565,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #endif
+
+#if WINDOWS_STOREAPP || WINDOWS_UAP || WINDOWS_PHONE
+
+        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+        {
+            quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
+        }
+
+#endif
 #if WINDOWS
 
         /// <summary>
@@ -647,6 +656,40 @@ namespace Microsoft.Xna.Framework.Graphics
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
         }
+        
+        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+        {
+            var format = presentationParameters.BackBufferFormat == SurfaceFormat.Color ?
+                               SharpDX.DXGI.Format.B8G8R8A8_UNorm :
+                               SharpDXHelper.ToFormat(presentationParameters.BackBufferFormat);
+
+            // Check that the multisample count specified by the game is valid.
+            var msc = PresentationParameters.MultiSampleCount;
+            if (!((msc != 0) && ((msc & (msc - 1)) == 0)))
+            {
+                throw new ApplicationException(
+                    "The specified multisample count is not a power of 2 (it must be " +
+                    "a value such as 0, 1, 2, 4, 8, 16, 32, etc.).");
+            }
+
+            // Find the maximum supported level starting with the game's requested multisampling level
+            // and halving each time until reaching 0 (meaning no multisample support).
+            var qualityLevels = 0;
+            var maxLevel = msc;
+            while (maxLevel > 0)
+            {
+                qualityLevels = _d3dDevice.CheckMultisampleQualityLevels(format, maxLevel);
+                if (qualityLevels > 0)
+                    break;
+                maxLevel /= 2;
+            }
+
+            // Correct the MSAA level if it is too high.
+            if (presentationParameters.MultiSampleCount > maxLevel)
+                presentationParameters.MultiSampleCount = maxLevel;
+
+            quality = qualityLevels - 1;
+        }
 
         internal void SetHardwareFullscreen()
         {
@@ -699,25 +742,11 @@ namespace Microsoft.Xna.Framework.Graphics
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (PresentationParameters.MultiSampleCount > 1)
             {
-                //Find the maximum supported level coming down from 32, 16, 8, 4, 2, 1, 0
-                var qualityLevels = 0;
-                var maxLevel = 32;
-                while (maxLevel > 0)
-                {
-                    qualityLevels = _d3dDevice.CheckMultisampleQualityLevels(format, maxLevel);
-                    if (qualityLevels > 0)
-                        break;
-                    maxLevel /= 2;
-                }
-
-                // Correct the MSAA level if it is too high.
-                if (PresentationParameters.MultiSampleCount > maxLevel)
-                    PresentationParameters.MultiSampleCount = maxLevel;
-
+                int quality;
+                PlatformSetMultiSamplingToMaximum(PresentationParameters, out quality);
+                
                 multisampleDesc.Count = PresentationParameters.MultiSampleCount;
-                // Get the quality level for the selected multisample count, which may be
-                // lower than the maximum found above.
-                multisampleDesc.Quality = _d3dDevice.CheckMultisampleQualityLevels(format, PresentationParameters.MultiSampleCount) - 1;
+                multisampleDesc.Quality = quality;
             }
 
             int vSyncFrameLatency = PresentationParameters.PresentationInterval.GetFrameLatency();
@@ -958,7 +987,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // WINDOWS_STOREAPP
         }
-
+        
         public void PlatformPresent()
         {
 #if WINDOWS_STOREAPP || WINDOWS_UAP
@@ -1172,6 +1201,35 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_d3dContext != null, "The d3d context is null!");
         }
 
+        private void PlatformApplyBlend()
+        {
+            if (_blendFactorDirty || _blendStateDirty)
+            {
+                var state = _actualBlendState.GetDxState(this);
+                var factor = GetBlendFactor();
+                _d3dContext.OutputMerger.SetBlendState(state, factor);
+
+                _blendFactorDirty = false;
+                _blendStateDirty = false;
+            }
+        }
+
+#if WINDOWS_UAP
+        private SharpDX.Mathematics.Interop.RawColor4 GetBlendFactor()
+        {
+			return new SharpDX.Mathematics.Interop.RawColor4(
+					BlendFactor.R / 255.0f,
+					BlendFactor.G / 255.0f,
+					BlendFactor.B / 255.0f,
+					BlendFactor.A / 255.0f);
+        }
+#else
+        private Color4 GetBlendFactor()
+        {
+			return BlendFactor.ToColor4();
+        }
+#endif
+
         internal void PlatformApplyState(bool applyShaders)
         {
             // NOTE: This code assumes _d3dContext has been locked by the caller.
@@ -1308,8 +1366,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             DynamicIndexBuffer buffer;
 
-            var indexType = typeof(T);
-            var indexSize = Marshal.SizeOf(indexType);
+            var indexSize = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
 
             var requiredIndexCount = Math.Max(indexCount, 6000);
