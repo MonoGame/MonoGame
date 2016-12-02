@@ -6,11 +6,15 @@ using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using SharpDX.Direct3D;
+using SharpDX.DXGI;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     partial class GraphicsAdapter
     {
+        SharpDX.DXGI.Adapter1 _adapter;
+
         private static void PlatformInitializeAdapters(out ReadOnlyCollection<GraphicsAdapter> adapters)
         {
             var factory = new SharpDX.DXGI.Factory1();
@@ -32,8 +36,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     monitor.Dispose();
                 }
-
-                device.Dispose();
             }
 
             factory.Dispose();
@@ -51,6 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private static GraphicsAdapter CreateAdapter(SharpDX.DXGI.Adapter1 device, SharpDX.DXGI.Output monitor)
         {            
             var adapter = new GraphicsAdapter();
+            adapter._adapter = device;
 
             adapter.DeviceName = monitor.Description.DeviceName.TrimEnd(new char[] {'\0'});
             adapter.Description = device.Description1.Description.TrimEnd(new char[] {'\0'});
@@ -110,6 +113,22 @@ namespace Microsoft.Xna.Framework.Graphics
             adapter._supportedDisplayModes = new DisplayModeCollection(modes);
 
             return adapter;
+        }
+
+        protected bool PlatformIsProfileSupported(GraphicsProfile graphicsProfile)
+        {
+            if(UseReferenceDevice)
+                return true;
+
+            switch(graphicsProfile)
+            {
+                case GraphicsProfile.Reach:
+                    return SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_9_1);
+                case GraphicsProfile.HiDef:
+                    return SharpDX.Direct3D11.Device.IsSupportedFeatureLevel(_adapter, FeatureLevel.Level_10_0);
+                default:
+                    throw new InvalidOperationException();
+            }
         }
 
         bool PlatformQueryBackBufferFormat(
