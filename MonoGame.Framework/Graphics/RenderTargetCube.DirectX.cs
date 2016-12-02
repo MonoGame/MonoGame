@@ -15,17 +15,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
-            // Fallbacks for formats that may not be supported for render targets
-            var formatSupport = graphicsDevice._d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(preferredFormat));
-            if (((long)formatSupport & (long)FormatSupport.RenderTarget) == 0)
-                _format = SurfaceFormat.Color;
-            if (preferredDepthFormat != DepthFormat.None)
-            {
-                formatSupport = graphicsDevice._d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(preferredDepthFormat));
-                if (((long)formatSupport & (long)FormatSupport.DepthStencil) == 0)
-                    DepthStencilFormat = DepthFormat.Depth24Stencil8;
-            }
-
             // Create one render target view per cube map face.
             _renderTargetViews = new RenderTargetView[6];
             for (int i = 0; i < _renderTargetViews.Length; i++)

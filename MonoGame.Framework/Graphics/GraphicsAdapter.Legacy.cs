@@ -382,5 +382,53 @@ namespace Microsoft.Xna.Framework.Graphics
         private const int HORZRES = 8;
         private const int VERTRES = 10;
 #endif
+
+        public bool QueryBackBufferFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            bool result = true;
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+
+            // Set to 0, 1, 2 or 4 multisamples
+            if (multiSampleCount < 0)
+            {
+                selectedMultiSampleCount = 0;
+                result = false;
+            }
+            else if (multiSampleCount == 3)
+            {
+                selectedMultiSampleCount = 2;
+                result = false;
+            }
+            else if (multiSampleCount > 4)
+            {
+                selectedMultiSampleCount = 4;
+                result = false;
+            }
+            else
+                selectedMultiSampleCount = multiSampleCount;
+
+            return result;
+        }
+
+        public bool QueryRenderTargetFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            // Until they differ, just re-use QueryBackBufferFormat()
+            return QueryBackBufferFormat(graphicsProfile, format, depthFormat, multiSampleCount, out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
+        }
     }
 }

@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -109,6 +110,84 @@ namespace Microsoft.Xna.Framework.Graphics
             adapter._supportedDisplayModes = new DisplayModeCollection(modes);
 
             return adapter;
+        }
+
+        bool PlatformQueryBackBufferFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+            selectedMultiSampleCount = multiSampleCount;
+
+            SharpDX.DXGI.Adapter adapter;
+            adapter.Outputs[0].
+
+            // Fallbacks for formats that may not be supported for back buffers
+            var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(format));
+            if (((long)formatSupport & (long)FormatSupport.Display) == 0)
+                selectedFormat = SurfaceFormat.Color;
+            if (depthFormat != DepthFormat.None)
+            {
+                formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(depthFormat));
+                if (((long)formatSupport & (long)FormatSupport.DepthStencil) == 0)
+                    selectedDepthFormat = DepthFormat.Depth24Stencil8;
+            }
+
+            return true;
+        }
+
+        bool PlatformQueryRenderTargetFormat(
+            GraphicsProfile graphicsProfile,
+            SurfaceFormat format,
+            DepthFormat depthFormat,
+            int multiSampleCount,
+            out SurfaceFormat selectedFormat,
+            out DepthFormat selectedDepthFormat,
+            out int selectedMultiSampleCount)
+        {
+            bool result = true;
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+            selectedMultiSampleCount = multiSampleCount;
+
+            if (multiSampleCount > 0)
+            {
+                // Fallbacks for formats that may not be supported for render targets
+                var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(format));
+                if (((long)formatSupport & (long)FormatSupport.RenderTarget) == 0)
+                {
+                    selectedFormat = SurfaceFormat.Color;
+                    result = false;
+                }
+            }
+            else
+            {
+                // Fallbacks for formats that may not be supported for render targets
+                var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(format));
+                if (((long)formatSupport & (long)FormatSupport.MultisampleRenderTarget) == 0)
+                {
+                    selectedFormat = SurfaceFormat.Color;
+                    result = false;
+                }
+            }
+
+            if (depthFormat != DepthFormat.None)
+            {
+                var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(depthFormat));
+                if (((long)formatSupport & (long)FormatSupport.DepthStencil) == 0)
+                {
+                    selectedDepthFormat = DepthFormat.Depth24Stencil8;
+                    result = false;
+                }
+            }
+
+            return result;
         }
     }
 }
