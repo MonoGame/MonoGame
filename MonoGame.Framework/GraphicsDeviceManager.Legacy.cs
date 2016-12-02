@@ -65,6 +65,10 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
+#if ANDROID || IOS
+            _preferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+#endif
+
             GraphicsProfile = GraphicsDevice.GetHighestSupportedGraphicsProfile(null);
 
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
@@ -377,7 +381,7 @@ namespace Microsoft.Xna.Framework
 #endif // WINDOWS || WINRT
 
 
-#if MONOMAC || DESKTOPGL
+#if MONOMAC || DESKTOPGL || IOS
             presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
 #endif
 
