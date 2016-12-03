@@ -466,7 +466,56 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="color">A color mask.</param>
 		public void Draw (Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
 		{
-			Draw (texture, position, sourceRectangle, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+			CheckValid(texture);
+            
+			var item = _batcher.CreateBatchItem();
+			item.Texture = texture;
+            
+            // set SortKey based on SpriteSortMode.
+            switch (_sortMode)
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = 0;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = 0;
+                    break;
+            }
+
+            Vector2 size;
+
+            if (sourceRectangle.HasValue)
+            {
+                _tempRect = sourceRectangle.Value;                   
+                size = new Vector2(_tempRect.Width, _tempRect.Height);
+                _texCoordTL.X = _tempRect.X / (float)texture.Width;
+                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
+                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+            }
+            else
+            {
+                size = new Vector2(texture.width, texture.height);
+                _texCoordTL = Vector2.Zero;
+                _texCoordBR = Vector2.One;
+            }
+
+            item.Set(position.X,
+                     position.Y,
+                     size.X,
+                     size.Y,
+                     color,
+                     _texCoordTL,
+                     _texCoordBR,
+                     0);
+
+            FlushIfNeeded();
 		}
 
         /// <summary>
@@ -478,7 +527,52 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="color">A color mask.</param>
 		public void Draw (Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
 		{
-			Draw (texture, destinationRectangle, sourceRectangle, color, 0, Vector2.Zero, SpriteEffects.None, 0f);
+            CheckValid(texture);
+            
+			var item = _batcher.CreateBatchItem();
+			item.Texture = texture;
+            
+            // set SortKey based on SpriteSortMode.
+            switch (_sortMode)
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = 0;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = 0;
+                    break;
+            }
+            
+            if (sourceRectangle.HasValue)
+            {
+                _tempRect = sourceRectangle.Value;
+                _texCoordTL.X = _tempRect.X / (float)texture.Width;
+                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
+                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+            }
+            else
+            {
+                _texCoordTL = Vector2.Zero;
+                _texCoordBR = Vector2.One;
+            }
+
+            item.Set(destinationRectangle.X,
+                     destinationRectangle.Y,
+                     destinationRectangle.Width,
+                     destinationRectangle.Height,
+                     color,
+                     _texCoordTL,
+                     _texCoordBR,
+                     0);
+            
+            FlushIfNeeded();
 		}
 
         /// <summary>
