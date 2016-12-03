@@ -489,7 +489,38 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="color">A color mask.</param>
 		public void Draw (Texture2D texture, Vector2 position, Color color)
 		{
-			Draw (texture, position, null, color);
+			CheckValid(texture);
+            
+			var item = _batcher.CreateBatchItem();
+			item.Texture = texture;
+            
+            // set SortKey based on SpriteSortMode.
+            switch (_sortMode)
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = 0;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = 0;
+                    break;
+            }
+            
+            item.Set(position.X,
+                     position.Y,
+                     texture.Width,
+                     texture.Height,
+                     color,
+                     Vector2.Zero,
+                     Vector2.One,
+                     0);
+
+            FlushIfNeeded();
 		}
 
         /// <summary>
@@ -500,7 +531,38 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="color">A color mask.</param>
         public void Draw(Texture2D texture, Rectangle destinationRectangle, Color color)
 		{
-            Draw(texture, destinationRectangle, null, color);
+            CheckValid(texture);
+            
+			var item = _batcher.CreateBatchItem();
+			item.Texture = texture;
+            
+            // set SortKey based on SpriteSortMode.
+            switch (_sortMode)
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = 0;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = 0;
+                    break;
+            }
+            
+            item.Set(destinationRectangle.X,
+                     destinationRectangle.Y,
+                     destinationRectangle.Width,
+                     destinationRectangle.Height,
+                     color,
+                     Vector2.Zero,
+                     Vector2.One,
+                     0);
+            
+            FlushIfNeeded();
 		}
 
         /// <summary>
