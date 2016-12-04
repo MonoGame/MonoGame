@@ -249,11 +249,9 @@ namespace Microsoft.Xna.Framework.Net
         internal int maxGamers;
         internal int privateGamerSlots;
 
-        internal IList<SignedInGamer> pendingSignedInGamers;
-        internal ICollection<IPeerEndPoint> pendingEndPoints;
-
-        // Host stores which remote machines existed before a particular machine connected
-        internal Dictionary<NetworkMachine, ICollection<NetworkMachine>> pendingPeerConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
+        internal IList<SignedInGamer> pendingSignedInGamers; // Must be a list since order is important
+        internal ISet<IPeerEndPoint> allowlist;
+        internal ISet<IPeerEndPoint> pendingEndPoints;
 
         internal NetworkSession(ISessionBackend backend, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
@@ -282,11 +280,13 @@ namespace Microsoft.Xna.Framework.Net
                 }
             }
 
+            this.allowlist = new HashSet<IPeerEndPoint>();
             this.pendingEndPoints = null;
+
             if (this.localMachine.IsHost)
             {
                 // Initialize empty pending end point list so that the host is approved automatically
-                this.pendingEndPoints = new List<IPeerEndPoint>();
+                this.pendingEndPoints = new HashSet<IPeerEndPoint>();
             }
 
             this.Backend = backend;
@@ -636,11 +636,6 @@ namespace Microsoft.Xna.Framework.Net
 
         internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - allGamers.Count; } }
 
-        bool IBackendListener.AllowConnect
-        {
-            get { return !IsHost || OpenPublicGamerSlots > 0; }
-        }
-
         bool IBackendListener.RegisterWithMasterServer
         {
             get { return IsHost && localMachine.IsFullyConnected && (SessionType == NetworkSessionType.PlayerMatch || SessionType == NetworkSessionType.Ranked); }
@@ -936,6 +931,28 @@ namespace Microsoft.Xna.Framework.Net
             messageQueue.Add(msg);
         }
 
+        bool IBackendListener.AllowConnectionFrom(IPeerEndPoint endPoint)
+        {
+            if (IsHost)
+            {
+                return OpenPublicGamerSlots > 0;
+            }
+            else
+            {
+                if (allowlist.Contains(endPoint))
+                {
+                    Debug.WriteLine("Connection from client in allowlist, allowing...");
+                    allowlist.Remove(endPoint);
+                    return true;
+                }
+                else
+                {
+                    Debug.WriteLine("Connection from client not in allowlist, denying...");
+                    return false;
+                }
+            }
+        }
+
         void IBackendListener.IntroducedAsClient(IPeerEndPoint targetEndPoint)
         {
             if (IsHost || IsFullyConnected || pendingEndPoints == null)
@@ -943,7 +960,16 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            Backend.Connect(targetEndPoint);
+            if (allowlist.Contains(targetEndPoint))
+            {
+                Debug.WriteLine("Introduced to target in allowlist, connecting...");
+                allowlist.Remove(targetEndPoint);
+                Backend.Connect(targetEndPoint);
+            }
+            else
+            {
+                Debug.WriteLine("Introduced to target not in allowlist, doing nothing.");
+            }
         }
 
         void IBackendListener.PeerConnected(IPeer peer)
@@ -952,34 +978,49 @@ namespace Microsoft.Xna.Framework.Net
             bool senderIsHost = !IsHost && hostMachine == null;
 
             // Create a pending network machine
-            NetworkMachine senderMachine = new NetworkMachine(this, peer, false, senderIsHost);
-            AddMachine(senderMachine);
+            NetworkMachine newMachine = new NetworkMachine(this, peer, false, senderIsHost);
+            AddMachine(newMachine);
 
             if (senderIsHost)
             {
-                hostMachine = senderMachine;
+                hostMachine = newMachine;
             }
 
             if (localMachine.IsFullyConnected)
             {
-                InternalMessages.FullyConnected.Create(senderMachine);
+                InternalMessages.FullyConnected.Create(newMachine);
             }
 
-            InternalMessages.ConnectionAcknowledged.Create(senderMachine);
+            InternalMessages.ConnectionAcknowledged.Create(newMachine);
 
             if (IsHost)
             {
                 // Save snapshot of current connections and send them to the new peer
-                ICollection<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
-                requestedConnections.Remove(senderMachine);
-                pendingPeerConnections.Add(senderMachine, requestedConnections);
+                ISet<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
+                requestedConnections.Remove(newMachine);
 
-                InternalMessages.ConnectToAllRequest.Create(requestedConnections, senderMachine);
+                newMachine.hostPendingConnections = requestedConnections;
+                
+                InternalMessages.ConnectToAllRequest.Create(requestedConnections, newMachine);
 
                 // Introduce machines to each other
+                if (newMachine.hostPendingAllowlistInsertions == null)
+                {
+                    newMachine.hostPendingAllowlistInsertions = new HashSet<IPeerEndPoint>();
+                }
+
                 foreach (NetworkMachine existingMachine in requestedConnections)
                 {
-                    Backend.Introduce(senderMachine.peer, existingMachine.peer);
+                    newMachine.hostPendingAllowlistInsertions.Add(existingMachine.peer.EndPoint);
+                    InternalMessages.AllowEndPointRequest.Create(existingMachine.peer.EndPoint, newMachine);
+
+                    if (existingMachine.hostPendingAllowlistInsertions == null)
+                    {
+                        existingMachine.hostPendingAllowlistInsertions = new HashSet<IPeerEndPoint>();
+                    }
+
+                    existingMachine.hostPendingAllowlistInsertions.Add(newMachine.peer.EndPoint);
+                    InternalMessages.AllowEndPointRequest.Create(newMachine.peer.EndPoint, existingMachine);
                 }
             }
         }
@@ -993,17 +1034,18 @@ namespace Microsoft.Xna.Framework.Net
             if (IsHost)
             {
                 // Update pending peers
-                pendingPeerConnections.Remove(disconnectedMachine);
-
-                foreach (var pendingPair in pendingPeerConnections)
+                foreach (NetworkMachine pendingMachine in RemoteMachines)
                 {
-                    NetworkMachine pendingMachine = pendingPair.Key;
-
-                    if (pendingPair.Value.Contains(disconnectedMachine))
+                    if (pendingMachine.IsFullyConnected)
                     {
-                        pendingPair.Value.Remove(disconnectedMachine);
+                        continue;
+                    }
 
-                        InternalMessages.ConnectToAllRequest.Create(pendingPair.Value, pendingMachine);
+                    if (pendingMachine.hostPendingConnections.Contains(disconnectedMachine))
+                    {
+                        pendingMachine.hostPendingConnections.Remove(disconnectedMachine);
+
+                        InternalMessages.ConnectToAllRequest.Create(pendingMachine.hostPendingConnections, pendingMachine);
                     }
                 }
             }

@@ -11,10 +11,22 @@ namespace Microsoft.Xna.Framework.Net
         internal IPeer peer;
         private IList<LocalNetworkGamer> localGamers;
         private IList<NetworkGamer> gamers;
-        private bool beingRemoved;
+        private bool beingRemovedThisFrame;
+
+        internal ISet<NetworkMachine> hostPendingConnections;
+        internal ISet<IPeerEndPoint> hostPendingAllowlistInsertions;
 
         internal NetworkMachine(NetworkSession session, IPeer peer, bool isLocal, bool isHost)
         {
+            this.peer = peer;
+            this.peer.Tag = this;
+            this.localGamers = isLocal ? new List<LocalNetworkGamer>() : null;
+            this.gamers = new List<NetworkGamer>();
+            this.beingRemovedThisFrame = false;
+
+            this.hostPendingConnections = null;
+            this.hostPendingAllowlistInsertions = null;
+
             this.Session = session;
             this.HasLeftSession = false;
             this.IsFullyConnected = false;
@@ -22,14 +34,7 @@ namespace Microsoft.Xna.Framework.Net
             this.HasAcknowledgedLocalMachine = false;
             this.IsLocal = isLocal;
             this.IsHost = isHost;
-
-            this.peer = peer;
-            this.peer.Tag = this;
-            this.localGamers = this.IsLocal ? new List<LocalNetworkGamer>() : null;
-            this.gamers = new List<NetworkGamer>();
-            this.beingRemoved = false;
-
-            this.LocalGamers = this.IsLocal ? new GamerCollection<LocalNetworkGamer>(localGamers) : null;
+            this.LocalGamers = isLocal ? new GamerCollection<LocalNetworkGamer>(localGamers) : null;
             this.Gamers = new GamerCollection<NetworkGamer>(gamers);
         }
 
@@ -115,11 +120,11 @@ namespace Microsoft.Xna.Framework.Net
             }
             else
             {
-                if (!beingRemoved)
+                if (!beingRemovedThisFrame)
                 {
                     Session.InternalMessages.RemoveMachine.Create(this, null);
 
-                    beingRemoved = true;
+                    beingRemovedThisFrame = true;
                 }
             }
         }

@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             
             if (CurrentMachine.IsHost && !senderMachine.IsLocal)
             {
-                CurrentMachine.Session.pendingPeerConnections.Remove(senderMachine);
+                senderMachine.hostPendingConnections = null;
             }
         }
     }

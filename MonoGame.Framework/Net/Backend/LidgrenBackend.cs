@@ -338,19 +338,15 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         break;
                     // Connection approval
                     case NetIncomingMessageType.ConnectionApproval:
-                        if (Listener.AllowConnect)
+                        if (Listener.AllowConnectionFrom(new LidgrenEndPoint(msg.SenderEndPoint)))
                         {
                             NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
                             hailMsg.Write(localPeer.internalEP);
                             msg.SenderConnection.Approve(hailMsg);
-
-                            Debug.WriteLine("Connection approved");
                         }
                         else
                         {
                             msg.SenderConnection.Deny("Connection denied");
-
-                            Debug.WriteLine("Connection denied");
                         }
                         break;
                     // Nat introduction

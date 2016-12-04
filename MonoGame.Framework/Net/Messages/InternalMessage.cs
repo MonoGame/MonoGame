@@ -4,6 +4,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal enum InternalMessageIndex
     {
+        AllowEndPointRequest,
+        AllowEndPointResponse,
         ConnectionAcknowledged,
         ConnectToAllRequest,
         FullyConnected,
@@ -22,6 +24,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
     internal class InternalMessages
     {
+        public AllowEndPointRequest AllowEndPointRequest = new AllowEndPointRequest();
+        public AllowEndPointResponse AllowEndPointResponse = new AllowEndPointResponse();
         public ConnectionAcknowledged ConnectionAcknowledged = new ConnectionAcknowledged();
         public ConnectToAllRequest ConnectToAllRequest = new ConnectToAllRequest();
         public FullyConnected FullyConnected = new FullyConnected();
@@ -43,6 +47,8 @@ namespace Microsoft.Xna.Framework.Net.Messages
         {
             FromIndex = new InternalMessage[]
             {
+                AllowEndPointRequest,
+                AllowEndPointResponse,
                 ConnectionAcknowledged,
                 ConnectToAllRequest,
                 FullyConnected,

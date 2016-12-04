@@ -6,18 +6,18 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class ConnectToAllRequest : InternalMessage
     {
-        public void Create(ICollection<NetworkMachine> requestedConnections, NetworkMachine recipient)
+        public void Create(ISet<NetworkMachine> machinesToConnectTo, NetworkMachine recipient)
         {
-            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
-            msg.Write((byte)InternalMessageIndex.ConnectToAllRequest);
-
             if (!CurrentMachine.IsHost)
             {
                 throw new NetworkException("Only host can send ConnectToAllRequest");
             }
 
-            msg.Write((int)requestedConnections.Count);
-            foreach (NetworkMachine machine in requestedConnections)
+            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            msg.Write((byte)InternalMessageIndex.ConnectToAllRequest);
+
+            msg.Write((int)machinesToConnectTo.Count);
+            foreach (NetworkMachine machine in machinesToConnectTo)
             {
                 msg.Write(machine.peer.EndPoint);
             }
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             }
 
             int requestedConnectionCount = msg.ReadInt();
-            CurrentMachine.Session.pendingEndPoints = new List<IPeerEndPoint>(requestedConnectionCount);
+            CurrentMachine.Session.pendingEndPoints = new HashSet<IPeerEndPoint>();
             for (int i = 0; i < requestedConnectionCount; i++)
             {
                 IPeerEndPoint endPoint = msg.ReadPeerEndPoint();
