@@ -398,10 +398,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                _texCoordTL.X = 0f;
-                _texCoordTL.Y = 0f;
-                _texCoordBR.X = 1f;
-                _texCoordBR.Y = 1f;
+                _texCoordTL = Vector2.Zero;
+                _texCoordBR = Vector2.One;
             }
             
 			if ((effect & SpriteEffects.FlipVertically) != 0) {
