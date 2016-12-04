@@ -9,7 +9,7 @@ My fork of MonoGame implements the Net namespace in order to compile networked g
 * ~~Numerous small bug fixes~~
 * ~~IPEndPoint abstraction~~
 * ~~Only connect to end points provided by the host~~
-* Clean up host specific state and responsability of internal messages vs Session/NetworkMachine
+* Clean up host specific state and clean up responsability of internal messages vs Session/NetworkMachine
 
 ### Future work
 * Host migration
