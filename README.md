@@ -6,8 +6,10 @@ My fork of MonoGame implements the Net namespace in order to compile networked g
 
 ### TODO
 * ~~Master server and NAT introduction for PlayerMatch/Ranked support (can only handle Local and SystemLink/LAN atm)~~
-* Numerous small bug fixes
-* IPEndPoint abstraction
+* ~~Numerous small bug fixes~~
+* ~~IPEndPoint abstraction~~
+* ~~Only connect to end points provided by the host~~
+* Clean up host specific state and responsability of internal messages vs Session/NetworkMachine
 
 ### Future work
 * Host migration
