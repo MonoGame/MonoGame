@@ -132,13 +132,19 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            CompositionTarget.Rendering += (o, a) =>
-            {
-				UAPGameWindow.Instance.Tick();
-                GamePad.Back = false;
-            };
+            CoreWindow.GetForCurrentThread().Dispatcher.RunIdleAsync(OnRenderFrame);
         }
         
+        private void OnRenderFrame(IdleDispatchedHandlerArgs e)
+        {                
+            UAPGameWindow.Instance.Tick();
+            GamePad.Back = false;
+
+            // Request next frame
+            if (!UAPGameWindow.Instance.IsExiting)
+                CoreWindow.GetForCurrentThread().Dispatcher.RunIdleAsync(OnRenderFrame);
+        }
+
         public override void Exit()
         {
             if (!UAPGameWindow.Instance.IsExiting)
