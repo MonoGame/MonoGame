@@ -364,24 +364,6 @@ namespace MonoGame.Framework
                 UpdateWindows();
                 Game.Tick();
             }
-
-            // We need to remove the WM_QUIT message in the message 
-            // pump as it will keep us from restarting on this 
-            // same thread.
-            //
-            // This is critical for some NUnit runners which
-            // typically will run all the tests on the same
-            // process/thread.
-
-            var msg = new NativeMessage();
-            do
-            {
-                if (msg.msg == WM_QUIT)
-                    break;
-
-                Thread.Sleep(100);
-            } 
-            while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
         }
 
         internal void UpdateWindows()
