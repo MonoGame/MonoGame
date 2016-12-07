@@ -90,11 +90,6 @@
     <source>..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll</source>
   </group>
 
-  <!-- Windows Phone 8 -->
-  <group api="wp8|Windows Phone 8">    
-    <source>..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll</source>
-  </group>
-
   <!-- Web -->
   <group api="web|Web">    
     <source>..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.dll</source>
