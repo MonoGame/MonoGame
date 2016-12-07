@@ -33,6 +33,8 @@ namespace Microsoft.Xna.Framework
         private InputEvents _windowEvents;
 
         #region Internal Properties
+        
+        internal CoreWindow CoreWindow { get { return _coreWindow; } }
 
         internal Game Game { get; set; }
 
