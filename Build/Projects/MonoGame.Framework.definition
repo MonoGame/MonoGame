@@ -720,7 +720,7 @@
     <Compile Include="Graphics\Shader\ConstantBuffer.DirectX.cs">
       <Services>DirectXGraphics</Services>
     </Compile>
-    <Compile Include="Graphics\Shader\ConstantBuffer.GLFX.cs">
+    <Compile Include="Graphics\Shader\ConstantBuffer.OpenGL.cs">
       <Services>OpenGLGraphics</Services>
     </Compile>
     <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">

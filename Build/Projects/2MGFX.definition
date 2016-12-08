@@ -214,7 +214,9 @@
 
     <!-- The core mgfx generation classes -->
     <Compile Include="ConstantBufferData.cs" />
-    <Compile Include="ConstantBufferData.mojo.cs" />
+    <Compile Include="ConstantBufferData.mojo.cs">
+      <Services>MojoShader</Services>
+    </Compile>
     <Compile Include="ConstantBufferData.sharpdx.cs">
       <Services>HLSL</Services>
     </Compile>
@@ -241,9 +243,15 @@
     <Compile Include="VsInputVariableInfo.cs" />
     <Compile Include="ShaderInfo.cs" />
     <Compile Include="ShaderProfile.cs" />
-    <Compile Include="ShaderProfile.OpenGL.cs" />
-    <Compile Include="ShaderProfile.DirectX.cs" />
-    <Compile Include="ShaderProfile.GLFX.cs" />
+    <Compile Include="ShaderProfile.OpenGL.cs">
+      <Services>MojoShader</Services>
+    </Compile>
+    <Compile Include="ShaderProfile.DirectX.cs">
+      <Services>HLSL</Services>
+    </Compile>
+    <Compile Include="ShaderProfile.GLFX.cs">
+      <Services>GLFX</Services>
+    </Compile>
     <Compile Include="ShaderResult.cs" />
     <Compile Include="SourceShaderLanguage.cs" />
     <Compile Include="TechniqueInfo.cs" />
