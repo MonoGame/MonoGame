@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using GLSLOptimizerSharp;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -70,7 +71,7 @@ namespace TwoMGFX
                 errorsAndWarnings += e.Message + '\n';
             }
             // non vertex shaders can't have any "attribute" input variables
-            if (shaderType != ShaderType.Vertex)
+            if (shaderStage != ShaderStage.Vertex)
                 WhitespaceNodes(ref text, shaderInfo.VsInputVariables.Where(v => v.Value.AttributeSyntax).Select(v => v.Value.Node));
 
             // note that this modifies the position of characters so any modification based
@@ -86,7 +87,7 @@ namespace TwoMGFX
             // then optimize it
             var input = builder.ToString();
             const OptimizationOptions options = OptimizationOptions.SkipPreprocessor;
-            var result = optimizer.Optimize(shaderType, input, options);
+            var result = optimizer.Optimize(shaderStage.ToShaderType(), input, options);
 
             optimizer.Dispose();
 
@@ -101,6 +102,7 @@ namespace TwoMGFX
             // TODO add result to dictionary hashed on shader name and version
             var bytes = Encoding.ASCII.GetBytes(shaderByteCode);
             var data = new ShaderData(isVertexShader, effect.Shaders.Count, bytes);
+            data.ShaderCode = bytes;
 
             data._attributes = new ShaderData.Attribute[result.Inputs.Count];
 
@@ -116,8 +118,26 @@ namespace TwoMGFX
                 };
             }
 
-            data._samplers = new ShaderData.Sampler[0];
+            data._samplers = new ShaderData.Sampler[result.Textures.Count];
+            for(var i = 0; i < result.Textures.Count; i++)
+            {
+                var tex = result.Textures[i];
+                var sampler = shaderInfo.SamplerStates[tex.Name];
+                data._samplers[i] = new ShaderData.Sampler
+                {
+                    //sampler mapping to parameter is unknown atm
+                    parameter = -1,
+                    samplerName = tex.Name,
+                    parameterName = sampler.Name,
 
+                    textureSlot = i,
+                    samplerSlot = i,
+                    type = tex.Type.ToSamplerType()
+                };
+            }
+            // TODO somehow optimize parameters into 'constant buffers'
+            // older GLSL does not have uniform buffers so we'd have to something else. Maybe the
+            // optimization MojoShader does -> gather all floats, bools and ints in large arrays
             data._cbuffers = new int[1];
 
             effect.Shaders.Add(data);
@@ -180,6 +200,38 @@ namespace TwoMGFX
                 return true;
 
             return false;
+        }
+
+    }
+
+    public static partial class ConversionExtensions
+    {
+        internal static SamplerType ToSamplerType(this BasicType basicType)
+        {
+            switch (basicType)
+            {
+                case BasicType.Tex2D:
+                    return SamplerType.Sampler2D;
+                case BasicType.Tex3D:
+                    return SamplerType.SamplerVolume;
+                case BasicType.TexCube:
+                    return SamplerType.SamplerCube;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(basicType), basicType, null);
+            }
+        }
+
+        internal static ShaderType ToShaderType(this ShaderStage stage)
+        {
+            switch (stage)
+            {
+                case ShaderStage.Vertex:
+                    return ShaderType.Vertex;
+                case ShaderStage.Pixel:
+                    return ShaderType.Pixel;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(stage), stage, null);
+            }
         }
     }
 }

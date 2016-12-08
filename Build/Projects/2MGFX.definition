@@ -25,15 +25,31 @@
       <Platform Name="Linux">LINUX</Platform>
     </CustomDefinitions>
 
-    <Uses Name="DirectX">
-      <Platforms>Windows</Platforms>
-    </Uses>
   </Properties>
 
-  <Services>
-    <Service Name="DirectX">
-      <AddDefine>DirectX;</AddDefine>
+  <Dependencies>
+    <Uses Name="HLSL">
       <Platforms>Windows</Platforms>
+    </Uses>
+    <Uses Name="MojoShader">
+      <Platforms>Windows</Platforms>
+    </Uses>
+    <Uses Name="GLFX">
+      <Platforms>Windows,Linux</Platforms>
+    </Uses>
+  </Dependencies>
+
+  <Services>
+    <Service Name="HLSL">
+      <AddDefine>HLSL;</AddDefine>
+      <Platforms>Windows</Platforms>
+    </Service>
+    <Service Name="MojoShader">
+      <Platforms>Windows</Platforms>
+      <Requires>HLSL</Requires>
+    </Service>
+    <Service Name="GLFX">
+      <Platforms>Windows,Linux</Platforms>
     </Service>
   </Services>
 
@@ -80,6 +96,12 @@
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\GraphicsResource.cs">
       <Link>MonoGame.Framework\GraphicsResource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Shader\SamplerType.cs">
+      <Link>MonoGame.Framework\SamplerType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Shader\ShaderStage.cs">
+      <Link>MonoGame.Framework\ShaderStage.cs</Link>
     </Compile>
     <Compile Include="..\..\MonoGame.Framework\Graphics\States\Blend.cs">
       <Link>MonoGame.Framework\Blend.cs</Link>
@@ -194,22 +216,24 @@
     <Compile Include="ConstantBufferData.cs" />
     <Compile Include="ConstantBufferData.mojo.cs" />
     <Compile Include="ConstantBufferData.sharpdx.cs">
-      <Services>DirectX</Services>
+      <Services>HLSL</Services>
     </Compile>
     <Compile Include="ConstantBufferData.writer.cs" />
     <Compile Include="EffectObject.cs" />
     <Compile Include="EffectObject.hlsl.cs">
-      <Services>DirectX</Services>
+      <Services>HLSL</Services>
     </Compile>
     <Compile Include="EffectObject.pssl.cs" />
     <Compile Include="EffectObject.writer.cs" />    
     <Compile Include="IEffectCompilerOutput.cs" />
     <Compile Include="ShaderCompilerException.cs" />
     <Compile Include="ShaderData.cs" />
-    <Compile Include="ShaderData.mojo.cs" />
+    <Compile Include="ShaderData.mojo.cs">
+      <Services>MojoShader</Services>
+    </Compile>
     <Compile Include="ShaderData.pssl.cs" />
     <Compile Include="ShaderData.sharpdx.cs">
-      <Services>DirectX</Services>
+      <Services>HLSL</Services>
     </Compile>
     <Compile Include="ShaderData.writer.cs" />
     <Compile Include="PassInfo.cs" />
@@ -226,8 +250,12 @@
     <Compile Include="TextureFilterType.cs" />
 
     <!-- The HLSL to GLSL conversion utility -->
-    <Compile Include="MarshalHelper.cs" />
-    <Compile Include="MojoShader.cs" />
+    <Compile Include="MarshalHelper.cs">
+      <Services>MojoShader</Services>
+    </Compile>
+    <Compile Include="MojoShader.cs">
+      <Services>MojoShader</Services>
+    </Compile>
 
     <!-- The MGFX parser -->
     <None Include="MGFX.tpg" />

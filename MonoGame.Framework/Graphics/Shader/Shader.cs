@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -10,14 +9,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
     // TODO: We should convert the types below 
     // into the start of a Shader reflection API.
-
-    internal enum SamplerType
-    {
-        Sampler2D = 0,
-        SamplerCube = 1,
-        SamplerVolume = 2,
-        Sampler1D = 3,
-    }
 
     internal struct SamplerInfo
     {

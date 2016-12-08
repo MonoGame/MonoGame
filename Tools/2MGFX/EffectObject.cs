@@ -754,19 +754,19 @@ namespace TwoMGFX
 
                         switch (sampler.type)
                         {
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                            case SamplerType.Sampler1D:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURE1D;
                                 break;
 
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                            case SamplerType.Sampler2D:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURE2D;
                                 break;
 
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                            case SamplerType.SamplerVolume:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURE3D;
                                 break;
 
-                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                            case SamplerType.SamplerCube:
                                 param.type = D3DXPARAMETER_TYPE.TEXTURECUBE;
                                 break;
                         }

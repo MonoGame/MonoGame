@@ -726,6 +726,7 @@
     <Compile Include="Graphics\Shader\ConstantBuffer.Web.cs">
       <Services>WebGraphics</Services>
     </Compile>
+    <Compile Include="Graphics\Shader\SamplerType.cs" />
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\Shader.DirectX.cs">
       <Services>DirectXGraphics</Services>

@@ -123,7 +123,7 @@ namespace TwoMGFX
 
                     textureSlot = samplers[i].index,
                     samplerSlot = samplers[i].index,
-                    type = samplers[i].type,
+                    type = samplers[i].type.ToSamplerType(),
                 };
 
                 SamplerStateInfo state;
@@ -221,4 +221,24 @@ namespace TwoMGFX
             }
         }
 	}
+
+    public static partial class ConversionExtensions
+    {
+        internal static SamplerType ToSamplerType(this MojoShader.MOJOSHADER_samplerType type)
+        {
+            switch (type)
+            {
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                    return SamplerType.Sampler2D;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                    return SamplerType.SamplerCube;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                    return SamplerType.SamplerVolume;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                    return SamplerType.Sampler1D;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+    }
 }
