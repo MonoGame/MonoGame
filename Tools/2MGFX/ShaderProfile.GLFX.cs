@@ -228,7 +228,7 @@ namespace TwoMGFX
                 case ShaderStage.Vertex:
                     return ShaderType.Vertex;
                 case ShaderStage.Pixel:
-                    return ShaderType.Pixel;
+                    return ShaderType.Fragment;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stage), stage, null);
             }
