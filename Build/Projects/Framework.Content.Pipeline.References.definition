@@ -3,6 +3,9 @@
 
   <Platform Type="Linux">
     <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
+    <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
     <Binary
@@ -40,6 +43,9 @@
 
 
   <Platform Type="MacOS">
+    <Binary
+      Name="CppNet"
+      Path="ThirdParty/Dependencies/CppNet/CppNet.dll" />
     <Binary
       Name="AssimpNet"
       Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
