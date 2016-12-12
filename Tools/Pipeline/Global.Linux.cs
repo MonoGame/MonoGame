@@ -39,7 +39,7 @@ namespace MonoGame.Tools.Pipeline
             Linux = true;
             _theme = IconTheme.Default;
 
-            var iconMissing = _theme.LoadIcon("error", 16, 0);
+            var iconMissing = _theme.LoadIcon("dialog-error", 16, 0);
             var file = _theme.LoadIcon("text-x-generic", 16, 0);
             var fileMissing = file.Copy();
             iconMissing.Composite(fileMissing, 8, 8, 8, 8, 8, 8, 0.5, 0.5, Gdk.InterpType.Tiles, 255);
@@ -178,25 +178,27 @@ namespace MonoGame.Tools.Pipeline
                         break;
                     case "Commands.Clean.png":
                         iconInfo = _theme.LookupIcon("edit-clear-all", 16, 0);
+                        if (iconInfo == null)
+                            iconInfo = _theme.LookupIcon("edit-clear", 16, 0);
                         break;
                     case "Commands.CancelBuild.png":
                         iconInfo = _theme.LookupIcon("process-stop", 16, 0);
                         break;
                     case "Commands.Help.png":
-                        iconInfo = _theme.LookupIcon("help", 16, 0);
+                        iconInfo = _theme.LookupIcon("system-help", 16, 0);
                         break;
-
+                        
                     case "Build.Information.png":
-                        iconInfo = _theme.LookupIcon("info", 16, 0);
+                        iconInfo = _theme.LookupIcon("dialog-information", 16, 0);
                         break;
                     case "Build.Fail.png":
-                        iconInfo = _theme.LookupIcon("error", 16, 0);
+                        iconInfo = _theme.LookupIcon("dialog-error", 16, 0);
                         break;
                     case "Build.Processing.png":
                         iconInfo = _theme.LookupIcon("preferences-system-time", 16, 0);
                         break;
                     case "Build.Skip.png":
-                        iconInfo = _theme.LookupIcon("gtk-yes", 16, 0);
+                        iconInfo = _theme.LookupIcon("emblem-default", 16, 0);
                         break;
                     case "Build.Start.png":
                         iconInfo = _theme.LookupIcon("system-run", 16, 0);
@@ -208,7 +210,7 @@ namespace MonoGame.Tools.Pipeline
                         iconInfo = _theme.LookupIcon("system-run", 16, 0);
                         break;
                     case "Build.Succeed.png":
-                        iconInfo = _theme.LookupIcon("gtk-yes", 16, 0);
+                        iconInfo = _theme.LookupIcon("emblem-default", 16, 0);
                         break;
                 }
 
