@@ -247,6 +247,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             s = s.Trim();
 
             var split = s.Split (':');
+            if (split.Length < 2)
+                return String.Empty;
+
             //check font family, fontconfig might return a fallback
             if (split [1].Contains (",")) { //this file defines multiple family names
                 var families = split [1].Split (',');
