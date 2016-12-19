@@ -80,4 +80,11 @@ namespace Microsoft.Xna.Framework.Net.Backend
         AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
         NetworkSession Join(AvailableNetworkSession availableSession);
     }
+
+    internal interface IMasterServer
+    {
+        void Start(string appId);
+        void Update();
+        void Shutdown();
+    }
 }

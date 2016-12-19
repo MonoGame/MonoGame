@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         }
     }
 
-    public class LidgrenMasterServer
+    public class LidgrenMasterServer : IMasterServer
     {
         private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
