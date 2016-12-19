@@ -444,23 +444,41 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             if (elapsedTime >= NetworkSessionSettings.MasterServerRegistrationInterval)
             {
-                IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+                RegisterWithMasterServer();
 
-                OutgoingMessage msg = outgoingMessagePool.Get();
-                msg.Write((byte)MasterServerMessageType.RegisterHost);
-                msg.Write(localPeer.Id);
-                msg.Write(localPeer.EndPoint);
-                Listener.SessionPublicInfo.Pack(msg);
-
-                NetOutgoingMessage request = localPeer.peer.CreateMessage();
-                request.Write(msg.Buffer);
-                localPeer.peer.SendUnconnectedMessage(request, masterServerEndPoint);
-
-                outgoingMessagePool.Recycle(msg);
                 lastMasterServerRegistration = currentTime;
-
-                Debug.WriteLine("Registering with master server (Id: " + localPeer.Id + ", IPEndPoint: " + localPeer.EndPoint + ")");
             }
+        }
+
+        protected void RegisterWithMasterServer()
+        {
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+
+            OutgoingMessage msg = outgoingMessagePool.Get();
+            msg.Write((byte)MasterServerMessageType.RegisterHost);
+            msg.Write(localPeer.Id);
+            msg.Write(localPeer.EndPoint);
+            Listener.SessionPublicInfo.Pack(msg);
+
+            NetOutgoingMessage request = localPeer.peer.CreateMessage();
+            request.Write(msg.Buffer);
+            localPeer.peer.SendUnconnectedMessage(request, masterServerEndPoint);
+
+            outgoingMessagePool.Recycle(msg);
+
+            Debug.WriteLine("Registering with master server (Id: " + localPeer.Id + ", IPEndPoint: " + localPeer.EndPoint + ")");
+        }
+
+        protected void UnregisterWithMasterServer()
+        {
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+
+            NetOutgoingMessage msg = localPeer.peer.CreateMessage();
+            msg.Write((byte)MasterServerMessageType.UnregisterHost);
+            msg.Write(localPeer.Id);
+            localPeer.peer.SendUnconnectedMessage(msg, masterServerEndPoint);
+
+            Debug.WriteLine("Unregistering with master server (Id: " + localPeer.Id + ")");
         }
 
         protected void UpdateStatistics()
@@ -483,7 +501,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public void Shutdown(string byeMessage)
         {
+            if (HasShutdown)
+            {
+                return;
+            }
+
             HasShutdown = true;
+
+            UnregisterWithMasterServer();
 
             localPeer.Disconnect(byeMessage);
         }

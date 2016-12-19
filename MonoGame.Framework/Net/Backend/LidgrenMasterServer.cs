@@ -10,6 +10,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     internal enum MasterServerMessageType
     {
         RegisterHost,
+        UnregisterHost,
         RequestHosts,
         RequestIntroduction
     };
@@ -126,6 +127,30 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         hosts[hostId] = new HostData(hostId, internalEndPoint, externalEndPoint, publicInfo);
 
                         Console.WriteLine("Host updated. " + hosts[hostId]);
+                    }
+                    else if (messageType == MasterServerMessageType.UnregisterHost)
+                    {
+                        long hostId = msg.ReadLong();
+
+                        if (hosts.ContainsKey(hostId))
+                        {
+                            HostData hostData = hosts[hostId];
+
+                            if (rawMsg.SenderEndPoint.Equals(hostData.externalEndPoint))
+                            {
+                                hosts.Remove(hostId);
+
+                                Console.WriteLine("Host unregistered. " + hostData);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Unregister requested but not from host in question.");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unregister requested but host was not found.");
+                        }
                     }
                     else if (messageType == MasterServerMessageType.RequestHosts)
                     {
