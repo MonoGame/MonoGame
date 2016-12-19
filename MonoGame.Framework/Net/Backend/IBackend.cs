@@ -68,10 +68,8 @@ namespace Microsoft.Xna.Framework.Net.Backend
         void Connect(IPeerEndPoint endPoint);
         bool IsConnectedToEndPoint(IPeerEndPoint endPoint);
         IPeer FindRemotePeerByEndPoint(IPeerEndPoint endPoint);
-        
         IOutgoingMessage GetMessage(IPeer recipient, SendDataOptions options, int channel);
         void SendMessage(IOutgoingMessage message);
-
         void Update();
         void Shutdown(string byeMessage);
     }

@@ -318,109 +318,109 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             NetIncomingMessage msg;
             while ((msg = localPeer.peer.ReadMessage()) != null)
             {
-                switch (msg.MessageType)
+                if (msg.MessageType == NetIncomingMessageType.DiscoveryRequest)
                 {
-                    // Discovery
-                    case NetIncomingMessageType.DiscoveryRequest:
-                        if (initialConnectEndPoint == null)
+                    if (initialConnectEndPoint == null)
+                    {
+                        Debug.WriteLine("Discovery request received");
+
+                        OutgoingMessage responseMsg = outgoingMessagePool.Get();
+                        Listener.SessionPublicInfo.Pack(responseMsg);
+
+                        NetOutgoingMessage response = localPeer.peer.CreateMessage();
+                        response.Write(responseMsg.Buffer);
+                        localPeer.peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
+
+                        outgoingMessagePool.Recycle(responseMsg);
+                    }
+                }
+                else if (msg.MessageType == NetIncomingMessageType.ConnectionApproval)
+                {
+                    if (Listener.AllowConnectionFrom(new LidgrenEndPoint(msg.SenderEndPoint)))
+                    {
+                        NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
+                        hailMsg.Write(localPeer.internalEP);
+                        msg.SenderConnection.Approve(hailMsg);
+                    }
+                    else
+                    {
+                        msg.SenderConnection.Deny("Connection denied");
+                    }
+                }
+                else if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess)
+                {
+                    Debug.WriteLine("Nat introduction successful");
+
+                    if (localPeer.peer.ConnectionsCount == 0 && initialConnectEndPoint != null && msg.SenderEndPoint.Equals(initialConnectEndPoint))
+                    {
+                        // Initial connection introduced by master server
+                        Debug.WriteLine("Connecting to initial end point...");
+
+                        Connect(new LidgrenEndPoint(initialConnectEndPoint));
+                    }
+                    else
+                    {
+                        Listener.IntroducedAsClient(new LidgrenEndPoint(msg.SenderEndPoint));
+                    }
+                }
+                else if (msg.MessageType == NetIncomingMessageType.StatusChanged)
+                {
+                    if (msg.SenderConnection == null)
+                    {
+                        throw new NetworkException("Sender connection is null");
+                    }
+
+                    NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
+                    Debug.WriteLine("Status now: " + status + " - Reason: " + msg.ReadString());
+
+                    if (status == NetConnectionStatus.Connected)
+                    {
+                        IPEndPoint internalIPEndPoint = msg.SenderConnection.RemoteHailMessage.ReadIPEndPoint();
+
+                        RemotePeer remotePeer = new RemotePeer(msg.SenderConnection, internalIPEndPoint);
+                        msg.SenderConnection.Tag = remotePeer;
+                        remotePeers.Add(remotePeer);
+                        reportedConnections.Add(msg.SenderConnection);
+
+                        Listener.PeerConnected(remotePeer);
+                    }
+                    else if (status == NetConnectionStatus.Disconnected)
+                    {
+                        RemotePeer disconnectedPeer = msg.SenderConnection.Tag as RemotePeer;
+
+                        if (disconnectedPeer != null) // If not, host responded to connect then peer disconnected
                         {
-                            Debug.WriteLine("Discovery request received");
-
-                            OutgoingMessage responseMsg = outgoingMessagePool.Get();
-                            Listener.SessionPublicInfo.Pack(responseMsg);
-
-                            NetOutgoingMessage response = localPeer.peer.CreateMessage();
-                            response.Write(responseMsg.Buffer);
-                            localPeer.peer.SendDiscoveryResponse(response, msg.SenderEndPoint);
-
-                            outgoingMessagePool.Recycle(responseMsg);
-                        }
-                        break;
-                    // Connection approval
-                    case NetIncomingMessageType.ConnectionApproval:
-                        if (Listener.AllowConnectionFrom(new LidgrenEndPoint(msg.SenderEndPoint)))
-                        {
-                            NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
-                            hailMsg.Write(localPeer.internalEP);
-                            msg.SenderConnection.Approve(hailMsg);
-                        }
-                        else
-                        {
-                            msg.SenderConnection.Deny("Connection denied");
-                        }
-                        break;
-                    // Nat introduction
-                    case NetIncomingMessageType.NatIntroductionSuccess:
-                        Debug.WriteLine("Nat introduction successful");
-
-                        if (localPeer.peer.ConnectionsCount == 0 && initialConnectEndPoint != null && msg.SenderEndPoint.Equals(initialConnectEndPoint))
-                        {
-                            // Initial connection introduced by master server
-                            Debug.WriteLine("Connecting to initial end point...");
-
-                            Connect(new LidgrenEndPoint(initialConnectEndPoint));
-                        }
-                        else
-                        {
-                            Listener.IntroducedAsClient(new LidgrenEndPoint(msg.SenderEndPoint));
-                        }
-                        break;
-                    // Peer state changes
-                    case NetIncomingMessageType.StatusChanged:
-                        if (msg.SenderConnection == null)
-                        {
-                            throw new NetworkException("Sender connection is null");
-                        }
-
-                        NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
-                        Debug.WriteLine("Status now: " + status + " - Reason: " + msg.ReadString());
-                        
-                        if (status == NetConnectionStatus.Connected)
-                        {
-                            IPEndPoint internalIPEndPoint = msg.SenderConnection.RemoteHailMessage.ReadIPEndPoint();
-
-                            RemotePeer remotePeer = new RemotePeer(msg.SenderConnection, internalIPEndPoint);
-                            msg.SenderConnection.Tag = remotePeer;
-                            remotePeers.Add(remotePeer);
-                            reportedConnections.Add(msg.SenderConnection);
-
-                            Listener.PeerConnected(remotePeer);
-                        }
-                        else if (status == NetConnectionStatus.Disconnected)
-                        {
-                            RemotePeer disconnectedPeer = msg.SenderConnection.Tag as RemotePeer;
-
-                            if (disconnectedPeer == null)
-                            {
-                                // Host responded to connect, then peer disconnected
-                                break;
-                            }
-
                             remotePeers.Remove(disconnectedPeer);
                             reportedConnections.Remove(msg.SenderConnection);
 
                             Listener.PeerDisconnected(disconnectedPeer);
                         }
-                        break;
-                    // Internal messages
-                    case NetIncomingMessageType.Data:
-                        if (msg.SenderConnection == null)
-                        {
-                            throw new NetworkException("Sender connection is null");
-                        }
+                    }
+                }
+                else if (msg.MessageType == NetIncomingMessageType.Data)
+                {
+                    if (msg.SenderConnection == null)
+                    {
+                        throw new NetworkException("Sender connection is null");
+                    }
 
-                        InvokeReceive(msg, msg.SenderConnection.Tag as RemotePeer);
-                        break;
+                    InvokeReceive(msg, msg.SenderConnection.Tag as RemotePeer);
+                }
+                else
+                {
                     // Error checking
-                    case NetIncomingMessageType.VerboseDebugMessage:
-                    case NetIncomingMessageType.DebugMessage:
-                    case NetIncomingMessageType.WarningMessage:
-                    case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine("Lidgren: " + msg.ReadString());
-                        break;
-                    default:
-                        Debug.WriteLine("Unhandled type: " + msg.MessageType);
-                        break;
+                    switch (msg.MessageType)
+                    {
+                        case NetIncomingMessageType.VerboseDebugMessage:
+                        case NetIncomingMessageType.DebugMessage:
+                        case NetIncomingMessageType.WarningMessage:
+                        case NetIncomingMessageType.ErrorMessage:
+                            Debug.WriteLine("Lidgren: " + msg.ReadString());
+                            break;
+                        default:
+                            Debug.WriteLine("Unhandled type: " + msg.MessageType);
+                            break;
+                    }
                 }
 
                 localPeer.peer.Recycle(msg);
@@ -452,6 +452,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         protected void RegisterWithMasterServer()
         {
+            if (!Listener.RegisterWithMasterServer)
+            {
+                return;
+            }
+
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
             OutgoingMessage msg = outgoingMessagePool.Get();
@@ -471,6 +476,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         protected void UnregisterWithMasterServer()
         {
+            if (!Listener.RegisterWithMasterServer)
+            {
+                return;
+            }
+
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
             NetOutgoingMessage msg = localPeer.peer.CreateMessage();

@@ -111,7 +111,6 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 if (rawMsg.MessageType == NetIncomingMessageType.UnconnectedData)
                 {
-                    // First byte is message type
                     IncomingMessage msg = new IncomingMessage();
                     msg.Buffer = rawMsg;
 
@@ -189,19 +188,21 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                         }
                     }
                 }
-
-                // Error checking
-                switch (rawMsg.MessageType)
+                else
                 {
-                    case NetIncomingMessageType.VerboseDebugMessage:
-                    case NetIncomingMessageType.DebugMessage:
-                    case NetIncomingMessageType.WarningMessage:
-                    case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine("Lidgren: " + rawMsg.ReadString());
-                        break;
-                    default:
-                        Debug.WriteLine("Unhandled type: " + rawMsg.MessageType);
-                        break;
+                    // Error checking
+                    switch (rawMsg.MessageType)
+                    {
+                        case NetIncomingMessageType.VerboseDebugMessage:
+                        case NetIncomingMessageType.DebugMessage:
+                        case NetIncomingMessageType.WarningMessage:
+                        case NetIncomingMessageType.ErrorMessage:
+                            Debug.WriteLine("Lidgren: " + rawMsg.ReadString());
+                            break;
+                        default:
+                            Debug.WriteLine("Unhandled type: " + rawMsg.MessageType);
+                            break;
+                    }
                 }
 
                 server.Recycle(rawMsg);
