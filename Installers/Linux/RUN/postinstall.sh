@@ -9,15 +9,15 @@ echodep()
 	do
 		line="$line."
 	done
+	
+	echo -ne "$line"
     
 	if eval "$2"
 	then
-		line="$line\e[32m[Found]\e[0m"
+		echo -e "\e[32m[Found]\e[0m"
 	else
-		line="$line\e[31m[Not Found]\e[0m"
+		echo -e "\e[31m[Not Found]\e[0m"
 	fi
-	
-	echo -e "$line"
 }
 
 # Check installation priviledge
@@ -29,13 +29,32 @@ fi
 DIR=$(pwd)
 IDIR="/usr/lib/mono/xbuild/MonoGame/v3.0"
 
+# Find MonoDevelop
+MDTOOL="?????"
+
+if type "monodevelop" > /dev/null 2>&1
+then
+	if eval "monodevelop --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
+	then
+		MDTOOL="mdtool"
+	fi
+fi
+
+if type "monodevelop-stable" > /dev/null 2>&1
+then
+	if eval "monodevelop-stable --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
+	then
+		MDTOOL="mdtool-stable"
+	fi
+fi
+
 # Show dependency list
 echo "Dependencies:"
 echodep "mono-runtime" "type 'mono' > /dev/null 2>&1"
 echodep "gtk-sharp3" "type 'gacutil' > /dev/null 2>&1 && gacutil /l gtk-sharp | grep -q 3.0.0.0"
 echo ""
 echo "Optional Dependencies:"
-echodep "MonoDevelop 6" "monodevelop --help | grep 'MonoDevelop 6' > /dev/null 2>&1"
+echodep "MonoDevelop 6" "$MDTOOL > /dev/null 2>&1"
 echodep "Rider" "type 'rider' > /dev/null 2>&1"
 echodep "referenceassemblies-pcl / mono-pcl" "test -d /usr/lib/mono/xbuild/Microsoft/Portable"
 echodep "ttf-mscorefonts-installer / mscore-fonts" "fc-list | grep -q Arial"
@@ -96,10 +115,10 @@ then
 fi
 
 # MonoDevelop addin
-if monodevelop --help | grep 'MonoDevelop 6' > /dev/null 2>&1
+if [ "$MONODEVELOP" != "?????" ]
 then
 	echo "Installing MonoDevelop Addin..."
-	sudo -H -u $SUDO_USER bash -c "mdtool setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
+	sudo -H -u $SUDO_USER bash -c "$MDTOOL setup install -y $DIR/Main/MonoDevelop.MonoGame.mpack  > /dev/null"
 fi
 
 # Monogame Pipeline terminal commands
