@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
 {
     internal class ConnectToAllRequest : InternalMessage
     {
-        public void Create(ISet<NetworkMachine> machinesToConnectTo, NetworkMachine recipient)
+        public void Create(ICollection<NetworkMachine> machinesToConnectTo, NetworkMachine recipient)
         {
             if (!CurrentMachine.IsHost)
             {

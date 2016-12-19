@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Net
                 sessionProperties = new NetworkSessionProperties();
             }
 
-            AsyncCreateCaller = new AsyncCreate(NetworkSessionCreator.Instance.Create);
+            AsyncCreateCaller = new AsyncCreate(NetworkSessionImplementation.SessionCreator.Create);
 
             try
             {
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Net
                 searchProperties = new NetworkSessionProperties();
             }
 
-            AsyncFindCaller = new AsyncFind(NetworkSessionCreator.Instance.Find);
+            AsyncFindCaller = new AsyncFind(NetworkSessionImplementation.SessionCreator.Find);
 
             try
             {
@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework.Net
                 throw new ArgumentNullException("availableSession");
             }
 
-            AsyncJoinCaller = new AsyncJoin(NetworkSessionCreator.Instance.Join);
+            AsyncJoinCaller = new AsyncJoin(NetworkSessionImplementation.SessionCreator.Join);
 
             try
             {
@@ -252,6 +252,8 @@ namespace Microsoft.Xna.Framework.Net
         internal IList<SignedInGamer> pendingSignedInGamers; // Must be a list since order is important
         internal ISet<IPeerEndPoint> allowlist;
         internal ISet<IPeerEndPoint> pendingEndPoints;
+        internal IDictionary<NetworkMachine, ICollection<NetworkMachine>> hostPendingConnections;
+        internal IDictionary<NetworkMachine, ICollection<IPeerEndPoint>> hostPendingAllowlistInsertions;
 
         internal NetworkSession(ISessionBackend backend, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
@@ -287,6 +289,9 @@ namespace Microsoft.Xna.Framework.Net
             {
                 // Initialize empty pending end point list so that the host is approved automatically
                 this.pendingEndPoints = new HashSet<IPeerEndPoint>();
+
+                this.hostPendingConnections = new Dictionary<NetworkMachine, ICollection<NetworkMachine>>();
+                this.hostPendingAllowlistInsertions = new Dictionary<NetworkMachine, ICollection<IPeerEndPoint>>();
             }
 
             this.Backend = backend;
@@ -344,12 +349,17 @@ namespace Microsoft.Xna.Framework.Net
                     throw new InvalidOperationException("Only the host can perform this action");
                 }
 
-                if (allowHostMigration != value)
+                if (value == true)
+                {
+                    throw new NotImplementedException("Host migration is not yet implemented");
+                }
+
+                /*if (allowHostMigration != value)
                 {
                     allowHostMigration = value;
 
                     InternalMessages.SessionStateChanged.Create(null);
-                }
+                }*/
             }
         }
 
@@ -935,7 +945,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             if (IsHost)
             {
-                return OpenPublicGamerSlots > 0;
+                return (allowJoinInProgress || SessionState == NetworkSessionState.Lobby) && OpenPublicGamerSlots > 0;
             }
             else
             {
@@ -999,27 +1009,24 @@ namespace Microsoft.Xna.Framework.Net
                 ISet<NetworkMachine> requestedConnections = new HashSet<NetworkMachine>(RemoteMachines);
                 requestedConnections.Remove(newMachine);
 
-                newMachine.hostPendingConnections = requestedConnections;
+                hostPendingConnections.Add(newMachine, requestedConnections);
                 
                 InternalMessages.ConnectToAllRequest.Create(requestedConnections, newMachine);
 
                 // Introduce machines to each other
-                if (newMachine.hostPendingAllowlistInsertions == null)
-                {
-                    newMachine.hostPendingAllowlistInsertions = new HashSet<IPeerEndPoint>();
-                }
+                hostPendingAllowlistInsertions.Add(newMachine, new HashSet<IPeerEndPoint>());
 
                 foreach (NetworkMachine existingMachine in requestedConnections)
                 {
-                    newMachine.hostPendingAllowlistInsertions.Add(existingMachine.peer.EndPoint);
+                    hostPendingAllowlistInsertions[newMachine].Add(existingMachine.peer.EndPoint);
                     InternalMessages.AllowEndPointRequest.Create(existingMachine.peer.EndPoint, newMachine);
 
-                    if (existingMachine.hostPendingAllowlistInsertions == null)
+                    if (!hostPendingAllowlistInsertions.ContainsKey(existingMachine))
                     {
-                        existingMachine.hostPendingAllowlistInsertions = new HashSet<IPeerEndPoint>();
+                        hostPendingAllowlistInsertions.Add(existingMachine, new HashSet<IPeerEndPoint>());
                     }
 
-                    existingMachine.hostPendingAllowlistInsertions.Add(newMachine.peer.EndPoint);
+                    hostPendingAllowlistInsertions[existingMachine].Add(newMachine.peer.EndPoint);
                     InternalMessages.AllowEndPointRequest.Create(newMachine.peer.EndPoint, existingMachine);
                 }
             }
@@ -1041,11 +1048,11 @@ namespace Microsoft.Xna.Framework.Net
                         continue;
                     }
 
-                    if (pendingMachine.hostPendingConnections.Contains(disconnectedMachine))
+                    if (hostPendingConnections[pendingMachine].Contains(disconnectedMachine))
                     {
-                        pendingMachine.hostPendingConnections.Remove(disconnectedMachine);
+                        hostPendingConnections[pendingMachine].Remove(disconnectedMachine);
 
-                        InternalMessages.ConnectToAllRequest.Create(pendingMachine.hostPendingConnections, pendingMachine);
+                        InternalMessages.ConnectToAllRequest.Create(hostPendingConnections[pendingMachine], pendingMachine);
                     }
                 }
             }

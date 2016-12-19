@@ -22,23 +22,30 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 return;
             }
 
-            IPeerEndPoint endPoint = msg.ReadPeerEndPoint();
+            IPeerEndPoint allowedEndPoint = msg.ReadPeerEndPoint();
+            IPeer allowedPeer = CurrentMachine.Session.Backend.FindRemotePeerByEndPoint(allowedEndPoint);
 
-            senderMachine.hostPendingAllowlistInsertions.Remove(endPoint);
-
-            // Should we introduce the peers?
-            IPeer remotePeer = CurrentMachine.Session.Backend.FindRemotePeerByEndPoint(endPoint);
-
-            if (remotePeer == null)
+            if (allowedPeer == null)
             {
                 // TODO: SuspiciousUnexpectedMessage
                 Debug.Assert(false);
                 return;
             }
 
-            NetworkMachine allowedMachine = remotePeer.Tag as NetworkMachine;
+            NetworkMachine allowedMachine = allowedPeer.Tag as NetworkMachine;
 
-            if (!allowedMachine.hostPendingAllowlistInsertions.Contains(senderMachine.peer.EndPoint))
+            // Should we introduce the peers?
+            if (!CurrentMachine.Session.hostPendingAllowlistInsertions.ContainsKey(senderMachine) ||
+                !CurrentMachine.Session.hostPendingAllowlistInsertions.ContainsKey(allowedMachine))
+            {
+                // TODO: SuspiciousUnexpectedMessage
+                Debug.Assert(false);
+                return;
+            }
+
+            CurrentMachine.Session.hostPendingAllowlistInsertions[senderMachine].Remove(allowedEndPoint);
+
+            if (!CurrentMachine.Session.hostPendingAllowlistInsertions[allowedMachine].Contains(senderMachine.peer.EndPoint))
             {
                 CurrentMachine.Session.Backend.Introduce(senderMachine.peer, allowedMachine.peer);
             }

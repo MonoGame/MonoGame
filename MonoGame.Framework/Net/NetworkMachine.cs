@@ -13,9 +13,6 @@ namespace Microsoft.Xna.Framework.Net
         private IList<NetworkGamer> gamers;
         private bool beingRemovedThisFrame;
 
-        internal ISet<NetworkMachine> hostPendingConnections;
-        internal ISet<IPeerEndPoint> hostPendingAllowlistInsertions;
-
         internal NetworkMachine(NetworkSession session, IPeer peer, bool isLocal, bool isHost)
         {
             this.peer = peer;
@@ -23,9 +20,6 @@ namespace Microsoft.Xna.Framework.Net
             this.localGamers = isLocal ? new List<LocalNetworkGamer>() : null;
             this.gamers = new List<NetworkGamer>();
             this.beingRemovedThisFrame = false;
-
-            this.hostPendingConnections = null;
-            this.hostPendingAllowlistInsertions = null;
 
             this.Session = session;
             this.HasLeftSession = false;

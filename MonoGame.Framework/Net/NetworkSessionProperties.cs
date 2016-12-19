@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Lidgren.Network;
 using Microsoft.Xna.Framework.Net.Backend;
-using System.IO;
 
 namespace Microsoft.Xna.Framework.Net
 {

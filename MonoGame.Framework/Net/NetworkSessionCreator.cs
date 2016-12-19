@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework.Net.Backend.Lidgren;
 
 namespace Microsoft.Xna.Framework.Net
 {
-    internal class NetworkSessionCreator
+    internal class NetworkSessionImplementation
     {
         // This is where the backend implementation is defined
-        public static ISessionCreator Instance = new LidgrenSessionCreator();
+        public static ISessionCreator SessionCreator = new LidgrenSessionCreator();
     }
 }
