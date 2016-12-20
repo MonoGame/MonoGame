@@ -371,7 +371,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     }
 
                     NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
-                    Debug.WriteLine("Status now: " + status + " - Reason: " + msg.ReadString());
+                    Debug.WriteLine("Status now: " + status + " (Reason: " + msg.ReadString() + ")");
 
                     if (status == NetConnectionStatus.Connected)
                     {
@@ -460,6 +460,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
             OutgoingMessage msg = outgoingMessagePool.Get();
+            msg.Write(localPeer.peer.Configuration.AppIdentifier);
             msg.Write((byte)MasterServerMessageType.RegisterHost);
             msg.Write(localPeer.Id);
             msg.Write(localPeer.EndPoint);
@@ -484,6 +485,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
             NetOutgoingMessage msg = localPeer.peer.CreateMessage();
+            msg.Write(localPeer.peer.Configuration.AppIdentifier);
             msg.Write((byte)MasterServerMessageType.UnregisterHost);
             msg.Write(localPeer.Id);
             localPeer.peer.SendUnconnectedMessage(msg, masterServerEndPoint);

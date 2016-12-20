@@ -46,9 +46,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private IDictionary<long, HostData> hosts = new Dictionary<long, HostData>();
         private DateTime lastReportedStatus = DateTime.MinValue;
 
-        public void Start(string appId)
+        public void Start(string gameAppId)
         {
-            NetPeerConfiguration config = new NetPeerConfiguration(appId);
+            NetPeerConfiguration config = new NetPeerConfiguration(gameAppId);
             config.AcceptIncomingConnections = false;
             config.Port = NetworkSessionSettings.MasterServerPort;
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             server = new NetPeer(config);
             server.Start();
 
-            Console.WriteLine("Master server with app id " + appId + " started on port " + config.Port + ".");
+            Console.WriteLine("Master server with game app id " + gameAppId + " started on port " + config.Port + ".");
         }
 
         protected IList<long> hostsToRemove = new List<long>();
@@ -99,93 +99,20 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
-        public void Update()
+        protected void ReceiveMessages()
         {
-            if (server == null || server.Status == NetPeerStatus.NotRunning)
-            {
-                return;
-            }
-
             NetIncomingMessage rawMsg;
             while ((rawMsg = server.ReadMessage()) != null)
             {
                 if (rawMsg.MessageType == NetIncomingMessageType.UnconnectedData)
                 {
-                    IncomingMessage msg = new IncomingMessage();
-                    msg.Buffer = rawMsg;
-
-                    MasterServerMessageType messageType = (MasterServerMessageType)msg.ReadByte();
-
-                    if (messageType == MasterServerMessageType.RegisterHost)
+                    try
                     {
-                        long hostId = msg.ReadLong();
-                        IPEndPoint internalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
-                        IPEndPoint externalEndPoint = rawMsg.SenderEndPoint;
-                        NetworkSessionPublicInfo publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
-
-                        hosts[hostId] = new HostData(hostId, internalEndPoint, externalEndPoint, publicInfo);
-
-                        Console.WriteLine("Host updated. " + hosts[hostId]);
+                        HandleMessage(rawMsg);
                     }
-                    else if (messageType == MasterServerMessageType.UnregisterHost)
+                    catch (NetException e)
                     {
-                        long hostId = msg.ReadLong();
-
-                        if (hosts.ContainsKey(hostId))
-                        {
-                            HostData hostData = hosts[hostId];
-
-                            if (rawMsg.SenderEndPoint.Equals(hostData.externalEndPoint))
-                            {
-                                hosts.Remove(hostId);
-
-                                Console.WriteLine("Host unregistered. " + hostData);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Unregister requested but not from host in question.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Unregister requested but host was not found.");
-                        }
-                    }
-                    else if (messageType == MasterServerMessageType.RequestHosts)
-                    {
-                        foreach (var elem in hosts)
-                        {
-                            OutgoingMessage response = new OutgoingMessage();
-                            response.Write(elem.Key);
-                            response.Write(new LidgrenEndPoint(elem.Value.externalEndPoint));
-                            elem.Value.publicInfo.Pack(response);
-
-                            response.Buffer.Position = 0;
-
-                            NetOutgoingMessage rawResponse = server.CreateMessage();
-                            rawResponse.Write(response.Buffer);
-                            server.SendUnconnectedMessage(rawResponse, rawMsg.SenderEndPoint);
-                        }
-
-                        Console.WriteLine("List of " + hosts.Count + " hosts sent to " + rawMsg.SenderEndPoint + ".");
-                    }
-                    else if (messageType == MasterServerMessageType.RequestIntroduction)
-                    {
-                        IPEndPoint senderInternalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
-                        long hostId = msg.ReadLong();
-
-                        if (hosts.ContainsKey(hostId))
-                        {
-                            HostData hostData = hosts[hostId];
-
-                            server.Introduce(hostData.internalEndPoint, hostData.externalEndPoint, senderInternalEndPoint, rawMsg.SenderEndPoint, string.Empty);
-
-                            Console.WriteLine("Introduced host " + hostData + " and client [InternalEP: " + senderInternalEndPoint + ", ExternalEP: " + rawMsg.SenderEndPoint + "].");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Introduction requested but host was not found.");
-                        }
+                        Console.WriteLine("Encountered malformed message from " + rawMsg.SenderEndPoint + ". Lidgren reports '" + e.Message + "'.");
                     }
                 }
                 else
@@ -207,6 +134,104 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                 server.Recycle(rawMsg);
             }
+        }
+
+        protected void HandleMessage(NetIncomingMessage rawMsg)
+        {
+            IncomingMessage msg = new IncomingMessage();
+            msg.Buffer = rawMsg;
+
+            string senderGameAppId = msg.ReadString();
+
+            if (senderGameAppId != server.Configuration.AppIdentifier)
+            {
+                Console.WriteLine("Received message with incorrect game app id from " + rawMsg.SenderEndPoint + ".");
+                return;
+            }
+
+            MasterServerMessageType messageType = (MasterServerMessageType)msg.ReadByte();
+
+            if (messageType == MasterServerMessageType.RegisterHost)
+            {
+                long hostId = msg.ReadLong();
+                IPEndPoint internalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
+                IPEndPoint externalEndPoint = rawMsg.SenderEndPoint;
+                NetworkSessionPublicInfo publicInfo = NetworkSessionPublicInfo.FromMessage(msg);
+
+                hosts[hostId] = new HostData(hostId, internalEndPoint, externalEndPoint, publicInfo);
+
+                Console.WriteLine("Host updated. " + hosts[hostId]);
+            }
+            else if (messageType == MasterServerMessageType.UnregisterHost)
+            {
+                long hostId = msg.ReadLong();
+
+                if (hosts.ContainsKey(hostId))
+                {
+                    HostData hostData = hosts[hostId];
+
+                    if (rawMsg.SenderEndPoint.Equals(hostData.externalEndPoint))
+                    {
+                        hosts.Remove(hostId);
+
+                        Console.WriteLine("Host unregistered. " + hostData);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unregister requested but not from host in question.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Unregister requested but host was not found.");
+                }
+            }
+            else if (messageType == MasterServerMessageType.RequestHosts)
+            {
+                foreach (var elem in hosts)
+                {
+                    OutgoingMessage response = new OutgoingMessage();
+                    response.Write(elem.Key);
+                    response.Write(new LidgrenEndPoint(elem.Value.externalEndPoint));
+                    elem.Value.publicInfo.Pack(response);
+
+                    response.Buffer.Position = 0;
+
+                    NetOutgoingMessage rawResponse = server.CreateMessage();
+                    rawResponse.Write(response.Buffer);
+                    server.SendUnconnectedMessage(rawResponse, rawMsg.SenderEndPoint);
+                }
+
+                Console.WriteLine("List of " + hosts.Count + " hosts sent to " + rawMsg.SenderEndPoint + ".");
+            }
+            else if (messageType == MasterServerMessageType.RequestIntroduction)
+            {
+                IPEndPoint senderInternalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
+                long hostId = msg.ReadLong();
+
+                if (hosts.ContainsKey(hostId))
+                {
+                    HostData hostData = hosts[hostId];
+
+                    server.Introduce(hostData.internalEndPoint, hostData.externalEndPoint, senderInternalEndPoint, rawMsg.SenderEndPoint, string.Empty);
+
+                    Console.WriteLine("Introduced host " + hostData + " and client [InternalEP: " + senderInternalEndPoint + ", ExternalEP: " + rawMsg.SenderEndPoint + "].");
+                }
+                else
+                {
+                    Console.WriteLine("Introduction requested but host was not found.");
+                }
+            }
+        }
+
+        public void Update()
+        {
+            if (server == null || server.Status == NetPeerStatus.NotRunning)
+            {
+                return;
+            }
+
+            ReceiveMessages();
 
             TrimHosts();
 

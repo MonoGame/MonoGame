@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
-            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.AppId);
+            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = NetworkSessionSettings.Port;
             config.AcceptIncomingConnections = true;
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         {
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
-            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.AppId);
+            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
             config.AcceptIncomingConnections = false;
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
@@ -114,6 +114,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 Debug.WriteLine("Sending discovery request to master server...");
 
                 NetOutgoingMessage request = discoverPeer.CreateMessage();
+                request.Write(discoverPeer.Configuration.AppIdentifier);
                 request.Write((byte)MasterServerMessageType.RequestHosts);
                 discoverPeer.SendUnconnectedMessage(request, masterServerEndPoint);
             }
@@ -179,7 +180,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         {
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
-            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.AppId);
+            NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
             config.AcceptIncomingConnections = true;
             config.EnableMessageType(NetIncomingMessageType.VerboseDebugMessage);
@@ -214,6 +215,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 NetUtility.GetMyAddress(out address);
 
                 NetOutgoingMessage msg = peer.CreateMessage();
+                msg.Write(peer.Configuration.AppIdentifier);
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);
                 msg.Write(new IPEndPoint(address, peer.Port));
                 msg.Write((long)availableSession.Tag);

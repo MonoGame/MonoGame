@@ -12,9 +12,9 @@ namespace Microsoft.Xna.Framework.Net
     {
         private IMasterServer server = NetworkSessionImplementation.MasterServer;
 
-        public void Start(string appId)
+        public void Start(string gameAppId)
         {
-            server.Start(appId);
+            server.Start(gameAppId);
         }
 
         public void Update()
