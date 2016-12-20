@@ -401,6 +401,16 @@ namespace Microsoft.Xna.Framework.Graphics
         private const int VERTRES = 10;
 #endif
 
+        static int NextLowestPowerOf2(int x)
+        {
+            x = x | (x >> 1);
+            x = x | (x >> 2);
+            x = x | (x >> 4);
+            x = x | (x >> 8);
+            x = x | (x >> 16);
+            return x - (x >> 1);
+        }
+
         public bool QueryBackBufferFormat(
             GraphicsProfile graphicsProfile,
             SurfaceFormat format,
@@ -410,30 +420,28 @@ namespace Microsoft.Xna.Framework.Graphics
             out DepthFormat selectedDepthFormat,
             out int selectedMultiSampleCount)
         {
-            bool result = true;
             selectedFormat = format;
             selectedDepthFormat = depthFormat;
 
-            // Set to 0, 1, 2 or 4 multisamples
-            if (multiSampleCount < 0)
+            // Back buffer support for Color, Rgba1010102 and Bgr565 only
+            switch (format)
             {
-                selectedMultiSampleCount = 0;
-                result = false;
-            }
-            else if (multiSampleCount == 3)
-            {
-                selectedMultiSampleCount = 2;
-                result = false;
-            }
-            else if (multiSampleCount > 4)
-            {
-                selectedMultiSampleCount = 4;
-                result = false;
-            }
-            else
-                selectedMultiSampleCount = multiSampleCount;
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Rgba1010102:
+                case SurfaceFormat.Bgr565:
+                    break;
 
-            return result;
+                default:
+                    selectedFormat = SurfaceFormat.Color;
+                    break;
+            }
+
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
         }
 
         public bool QueryRenderTargetFormat(
@@ -445,8 +453,15 @@ namespace Microsoft.Xna.Framework.Graphics
             out DepthFormat selectedDepthFormat,
             out int selectedMultiSampleCount)
         {
-            // Until they differ, just re-use QueryBackBufferFormat()
-            return QueryBackBufferFormat(graphicsProfile, format, depthFormat, multiSampleCount, out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
+            selectedFormat = format;
+            selectedDepthFormat = depthFormat;
+
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
         }
     }
 }

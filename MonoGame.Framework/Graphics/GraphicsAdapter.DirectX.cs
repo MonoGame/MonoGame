@@ -131,6 +131,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        static int NextLowestPowerOf2(int x)
+        {
+            x = x | (x >> 1);
+            x = x | (x >> 2);
+            x = x | (x >> 4);
+            x = x | (x >> 8);
+            x = x | (x >> 16);
+            return x - (x >> 1);
+        }
+
         bool PlatformQueryBackBufferFormat(
             GraphicsProfile graphicsProfile,
             SurfaceFormat format,
@@ -142,23 +152,30 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             selectedFormat = format;
             selectedDepthFormat = depthFormat;
-            selectedMultiSampleCount = multiSampleCount;
 
-            SharpDX.DXGI.Adapter adapter;
-            adapter.Outputs[0].
-
-            // Fallbacks for formats that may not be supported for back buffers
-            var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(format));
-            if (((long)formatSupport & (long)FormatSupport.Display) == 0)
-                selectedFormat = SurfaceFormat.Color;
-            if (depthFormat != DepthFormat.None)
+            // 16-bit formats are not supported for displays
+            // https://msdn.microsoft.com/en-us/library/windows/desktop/ff471325(v=vs.85).aspx
+            switch (format)
             {
-                formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(depthFormat));
-                if (((long)formatSupport & (long)FormatSupport.DepthStencil) == 0)
-                    selectedDepthFormat = DepthFormat.Depth24Stencil8;
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Rgba1010102:
+                    break;
+
+                default:
+                    selectedFormat = SurfaceFormat.Color;
+                    break;
             }
 
-            return true;
+            // Direct3D 11 does not support a 24-bit only depth buffer. It has the D24S8 format.
+            if (depthFormat == DepthFormat.Depth24)
+                selectedDepthFormat = DepthFormat.Depth24Stencil8;
+
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
         }
 
         bool PlatformQueryRenderTargetFormat(
@@ -170,43 +187,30 @@ namespace Microsoft.Xna.Framework.Graphics
             out DepthFormat selectedDepthFormat,
             out int selectedMultiSampleCount)
         {
-            bool result = true;
             selectedFormat = format;
             selectedDepthFormat = depthFormat;
-            selectedMultiSampleCount = multiSampleCount;
 
-            if (multiSampleCount > 0)
+            // 16-bit formats are not supported until DXGI 1.2 (Direct3D 11.1)
+            // https://msdn.microsoft.com/en-us/library/windows/desktop/ff471325(v=vs.85).aspx
+            switch (format)
             {
-                // Fallbacks for formats that may not be supported for render targets
-                var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(format));
-                if (((long)formatSupport & (long)FormatSupport.RenderTarget) == 0)
-                {
+                case SurfaceFormat.Bgr565:
+                case SurfaceFormat.Bgra4444:
+                case SurfaceFormat.Bgra5551:
                     selectedFormat = SurfaceFormat.Color;
-                    result = false;
-                }
-            }
-            else
-            {
-                // Fallbacks for formats that may not be supported for render targets
-                var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(format));
-                if (((long)formatSupport & (long)FormatSupport.MultisampleRenderTarget) == 0)
-                {
-                    selectedFormat = SurfaceFormat.Color;
-                    result = false;
-                }
+                    break;
             }
 
-            if (depthFormat != DepthFormat.None)
-            {
-                var formatSupport = _d3dDevice.CheckFormatSupport(SharpDXHelper.ToFormat(depthFormat));
-                if (((long)formatSupport & (long)FormatSupport.DepthStencil) == 0)
-                {
-                    selectedDepthFormat = DepthFormat.Depth24Stencil8;
-                    result = false;
-                }
-            }
+            // Direct3D 11 does not support a 24-bit only depth buffer. It has the D24S8 format.
+            if (depthFormat == DepthFormat.Depth24)
+                selectedDepthFormat = DepthFormat.Depth24Stencil8;
 
-            return result;
+            // Set to a power of two less than or equal to 8
+            selectedMultiSampleCount = NextLowestPowerOf2(multiSampleCount);
+            if (selectedMultiSampleCount > 8)
+                selectedMultiSampleCount = 8;
+
+            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
         }
     }
 }
