@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsPhone81,WindowsUniversal,Web,tvOS,PSVita,XBoxOne">
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
     for backwards compatibility with existing users of MonoGame, and are not
@@ -16,7 +16,6 @@
   	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
   	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
   	<Platform Name="WindowsGL">6D75E618-19CA-4C51-9546-F10965FBC0B8</Platform>
-  	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
     <Platform Name="WindowsPhone81">6522B7E9-25A5-4250-B164-42CC2C4ECCAD</Platform>
     <Platform Name="WindowsUniversal">09C41A48-7BF3-4A46-9EB8-CE95B4C27CA9</Platform>
   </ProjectGuids>
@@ -46,7 +45,6 @@
       <Platform Name="WindowsGL">TRACE;WINDOWS;DESKTOPGL;SUPPORTS_EFX</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
-      <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
       <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
       <Platform Name="WindowsUniversal">TRACE;NETFX_CORE;WINDOWS_UAP;WINRT;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
@@ -71,7 +69,7 @@
       <Platforms>iOS,WindowsGL,Android,tvOS</Platforms>
     </Uses>
     <Uses Name="DirectXGraphics">
-      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Uses>
     <Uses Name="WebGraphics">
       <Platforms>Web</Platforms>
@@ -111,7 +109,7 @@
       <Requires>OpenALAudio,_GLCompatible</Requires>
     </Service>
     <Service Name="DirectXGraphics">
-      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
       <Conflicts>ANGLEGraphics,OpenGLGraphics,WebGraphics</Conflicts>
       <Requires>XAudioAudio</Requires>
     </Service>
@@ -127,7 +125,7 @@
       <Conflicts>XAudioAudio,WebAudio</Conflicts>
     </Service>
     <Service Name="XAudioAudio">
-      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
       <Conflicts>OpenALAudio,WebAudio</Conflicts>
     </Service>
     <Service Name="WebAudio">
@@ -176,7 +174,7 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.WindowsPhone.cs">
-        <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+        <Platforms>WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.WindowsStore.cs">
         <Platforms>Windows8</Platforms>
@@ -299,7 +297,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,Windows8,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GamePlatform.Mobile.cs">
-      <Platforms>Android,iOS,WindowsPhone,WindowsPhone81,Web,tvOS</Platforms>
+      <Platforms>Android,iOS,WindowsPhone81,Web,tvOS</Platforms>
     </Compile>
     <Compile Include="GameRunBehavior.cs" />
     <Compile Include="GameServiceContainer.cs" />
@@ -308,7 +306,7 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="GameTimerEventArgs.cs">
-      <Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="GameWindow.cs">
@@ -341,7 +339,7 @@
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Threading.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,WindowsPhone,tvOS</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
     <Compile Include="TitleContainer.Android.cs">
@@ -355,9 +353,6 @@
     </Compile>
     <Compile Include="TitleContainer.WinRT.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
-    </Compile>
-    <Compile Include="TitleContainer.WP.cs">
-      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
@@ -509,13 +504,13 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Content\ContentReaders\Texture3DReader.cs">
-      <Platforms>Angle,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Angle,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureCubeReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal,tvOS</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
@@ -527,7 +522,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs"/>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Angle,Linux,WindowsGL,WindowsPhone,Web,tvOS</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerCollectionItemNameAttribute.cs" />
@@ -550,10 +545,10 @@
     <Compile Include="Graphics\DeviceNotResetException.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
     <Compile Include="GraphicsDeviceManager.cs">
-		<Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal,Web</Platforms>
+		<Platforms>Windows,Windows8,WindowsPhone81,WindowsUniversal,Web</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.WinRT.cs">
-		<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+		<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="GraphicsDeviceManager.Legacy.cs">
 		<Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS</Platforms>
@@ -631,7 +626,7 @@
     <Compile Include="Graphics\IGraphicsContext.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\ImageEx.cs">
-      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\IWindowInfo.cs" />
@@ -934,7 +929,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.Android.cs">
       <Platforms>Android</Platforms>
@@ -973,7 +968,7 @@
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\JoystickState.cs" />
     <Compile Include="Input\Joystick.Default.cs">
-      <Platforms>Angle,Android,MacOS,Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
+      <Platforms>Angle,Android,MacOS,Windows8,Windows,WindowsPhone81,WindowsUniversal,iOS,tvOS</Platforms>
     </Compile>
     <Compile Include="Input\Joystick.SDL.cs">
       <Platforms>Linux,WindowsGL</Platforms>
@@ -994,16 +989,13 @@
 		<Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.cs">
-      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.IOS.cs">
       <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="Input\KeyboardInput.WP.cs">
-      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Input\KeyboardInput.WinRT.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
@@ -1012,16 +1004,13 @@
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MessageBox.cs">
-      <Platforms>Android,iOS,Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Android,iOS,Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.IOS.cs">
       <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="Input\MessageBox.WP.cs">
-      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Input\MessageBox.WinRT.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
@@ -1056,7 +1045,7 @@
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
     <Compile Include="Input\Touch\TouchQueue.cs">
-			<Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+			<Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
 	</Compile>
 
     <Page Include="Themes\generic.xaml">
@@ -1072,7 +1061,7 @@
     <Compile Include="Media\Genre.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaLibrary.Default.cs">
-      <ExcludePlatforms>iOS,Windows8,WindowsPhone,Android,WindowsPhone81,WindowsUniversal</ExcludePlatforms>
+      <ExcludePlatforms>iOS,Windows8,Android,WindowsPhone81,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\MediaLibrary.Android.cs">
       <Platforms>Android</Platforms>
@@ -1083,9 +1072,6 @@
     <Compile Include="Media\MediaLibrary.WinRT.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
-    <Compile Include="Media\MediaLibrary.WP.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="Media\MediaManagerState.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -1095,9 +1081,6 @@
     </Compile>
     <Compile Include="Media\MediaPlayer.WMS.cs">
       <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Media\MediaPlayer.WP.cs">
-      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.Default.cs">
       <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Web,tvOS</Platforms>
@@ -1128,15 +1111,12 @@
     <Compile Include="Media\Song.WMS.cs">
         <Platforms>Windows</Platforms>
     </Compile>
-    <Compile Include="Media\Song.WP.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="Media\Song.WinRT.cs">
       <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Angle,Linux,WindowsGL,WindowsPhone,Web,tvOS</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -1151,7 +1131,7 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Angle,Linux,WindowsGL,WindowsPhone,Web,tvOS</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,WindowsGL,Web,tvOS</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -1373,10 +1353,10 @@
       <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Windows8\MetroHelper.cs">
-      <Platforms>Windows8,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows8,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Windows8\SharpDXHelper.cs">
-      <Platforms>Windows8,Windows,WindowsPhone,WindowsPhone81,WindowsUniversal</Platforms>
+      <Platforms>Windows8,Windows,WindowsPhone81,WindowsUniversal</Platforms>
     </Compile>
     <Compile Include="Windows8\XamlGame.cs">
       <Platforms>Windows8,WindowsPhone81</Platforms>
@@ -1409,26 +1389,6 @@
       <Platforms>Windows</Platforms>
     </Compile>
 
-
-	<!-- Windows Phone Platform -->
-    <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="WindowsPhone\DrawingSurfaceUpdateHandler.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="WindowsPhone\SurfaceUpdateHandler.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="WindowsPhone\WPGamePlatform.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="WindowsPhone\WPGameWindow.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="WindowsPhone\XamlGame.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
 
     <!-- Web Platform -->
     <Compile Include="Web\WebGamePlatform.cs">
