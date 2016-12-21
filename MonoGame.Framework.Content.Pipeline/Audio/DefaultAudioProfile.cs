@@ -278,14 +278,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             try
             {
                 string ffmpegCodecName, ffmpegMuxerName;
-                int format;
+                //int format;
                 switch (formatType)
                 {
                     case ConversionFormat.Adpcm:
                         // ADPCM Microsoft 
                         ffmpegCodecName = "adpcm_ms";
                         ffmpegMuxerName = "wav";
-                        format = 0x0002; /* WAVE_FORMAT_ADPCM */
+                        //format = 0x0002; /* WAVE_FORMAT_ADPCM */
                         break;
                     case ConversionFormat.Pcm:
                         // XNA seems to preserve the bit size of the input
@@ -297,13 +297,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         else
                             ffmpegCodecName = "pcm_s16le";
                         ffmpegMuxerName = "wav";
-                        format = 0x0001; /* WAVE_FORMAT_PCM */
+                        //format = 0x0001; /* WAVE_FORMAT_PCM */
                         break;
                     case ConversionFormat.WindowsMedia:
                         // Windows Media Audio 2
                         ffmpegCodecName = "wmav2";
                         ffmpegMuxerName = "asf";
-                        format = 0x0161; /* WAVE_FORMAT_WMAUDIO2 */
+                        //format = 0x0161; /* WAVE_FORMAT_WMAUDIO2 */
                         break;
                     case ConversionFormat.Xma:
                         throw new NotSupportedException(
@@ -312,20 +312,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         // ADPCM IMA WAV
                         ffmpegCodecName = "adpcm_ima_wav";
                         ffmpegMuxerName = "wav";
-                        format = 0x0011; /* WAVE_FORMAT_IMA_ADPCM */
+                        //format = 0x0011; /* WAVE_FORMAT_IMA_ADPCM */
                         break;
                     case ConversionFormat.Aac:
                         // AAC (Advanced Audio Coding)
                         // Requires -strict experimental
                         ffmpegCodecName = "aac";
                         ffmpegMuxerName = "ipod";
-                        format = 0x0000; /* WAVE_FORMAT_UNKNOWN */
+                        //format = 0x0000; /* WAVE_FORMAT_UNKNOWN */
                         break;
                     case ConversionFormat.Vorbis:
                         // Vorbis
                         ffmpegCodecName = "libvorbis";
                         ffmpegMuxerName = "ogg";
-                        format = 0x0000; /* WAVE_FORMAT_UNKNOWN */
+                        //format = 0x0000; /* WAVE_FORMAT_UNKNOWN */
                         break;
                     default:
                         // Unknown format
