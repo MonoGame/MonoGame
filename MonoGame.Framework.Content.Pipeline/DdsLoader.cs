@@ -161,6 +161,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         rbSwap = pixelFormat.dwBBitMask == 0x1F;
                         return SurfaceFormat.Bgr565;
                     }
+                    else if (pixelFormat.dwRgbBitCount == 32)
+                    {
+                        rbSwap = pixelFormat.dwBBitMask == 0xFF;
+                        return SurfaceFormat.Color;
+                    }
                     throw new ContentLoadException("Unsupported RGB pixel format");
                 }
             }
@@ -343,6 +348,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                                     break;
                             }
                         }
+                        if ((format == SurfaceFormat.Color) && header.ddspf.dwFlags.HasFlag(Ddpf.Rgb) && !header.ddspf.dwFlags.HasFlag(Ddpf.AlphaPixels))
+                        {
+                            // Fill alpha with opaque
+                            ByteFillAlpha(bytes);
+                        }
                         content.SetPixelData(bytes);
                         mipMaps.Add(content);
                         w = MathHelper.Max(1, w / 2);
@@ -353,6 +363,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             return output;
+        }
+
+        static void ByteFillAlpha(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i += 4)
+            {
+                bytes[i + 3] = 255;
+            }
         }
 
         static void ByteSwapColor(byte[] bytes)
