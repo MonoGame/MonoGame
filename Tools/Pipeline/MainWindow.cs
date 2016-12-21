@@ -12,8 +12,10 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Form, IView
     {
+#pragma warning disable 649
         public EventHandler<EventArgs> RecentChanged;
         public EventHandler<EventArgs> TitleChanged;
+#pragma warning restore 649
         public const string TitleBase = "MonoGame Pipeline Tool";
         public static MainWindow Instance;
 

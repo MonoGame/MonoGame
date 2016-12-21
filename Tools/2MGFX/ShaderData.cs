@@ -29,7 +29,9 @@ namespace TwoMGFX
             public string name;
             public VertexElementUsage usage;
 			public int index;
+#pragma warning disable 649
             public int location;
+#pragma warning restore 649
         }
 
 		/// <summary>
