@@ -111,6 +111,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             adapter._supportedDisplayModes = new DisplayModeCollection(modes);
 
+            if (adapter._currentDisplayMode == null) //(i.e. desktop mode wasn't found in the available modes)
+                adapter._currentDisplayMode = new DisplayMode(desktopWidth, desktopHeight, SurfaceFormat.Color);
+
             return adapter;
         }
 
