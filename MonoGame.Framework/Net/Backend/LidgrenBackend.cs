@@ -122,7 +122,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     internal class LidgrenBackend : ISessionBackend
     {
         private LocalPeer localPeer;
-        private IPEndPoint initialConnectEndPoint;
+        private bool initialConnectionPerformed;
+        private string initialConnectionToken;
 
         private IList<RemotePeer> remotePeers;
         private List<NetConnection> reportedConnections;
@@ -135,10 +136,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private int lastReceivedBytes;
         private int lastSentBytes;
 
-        public LidgrenBackend(NetPeer peer, IPEndPoint initialConnectEndPoint)
+        public LidgrenBackend(NetPeer peer, string initialConnectionToken)
         {
             this.localPeer = new LocalPeer(peer);
-            this.initialConnectEndPoint = initialConnectEndPoint;
+            this.initialConnectionPerformed = false;
+            this.initialConnectionToken = initialConnectionToken;
 
             this.remotePeers = new List<RemotePeer>();
             this.reportedConnections = new List<NetConnection>();
@@ -221,6 +223,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             if (localPeer.peer.GetConnection(ep.endPoint) == null)
             {
+                Debug.WriteLine("WOW ACTUALLY CONNECTING!");
                 NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
                 hailMsg.Write(localPeer.IPEndPoint);
                 localPeer.peer.Connect(ep.endPoint, hailMsg);
@@ -340,7 +343,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 if (msg.MessageType == NetIncomingMessageType.DiscoveryRequest)
                 {
-                    if (initialConnectEndPoint == null)
+                    if (Listener.IsDiscoverableAsHost)
                     {
                         Debug.WriteLine("Discovery request received");
 
@@ -356,7 +359,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 }
                 else if (msg.MessageType == NetIncomingMessageType.ConnectionApproval)
                 {
-                    if (Listener.AllowConnectionFrom(new LidgrenEndPoint(msg.SenderEndPoint)))
+                    if (Listener.AllowConnectionFromClient(new LidgrenEndPoint(msg.SenderEndPoint)))
                     {
                         NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
                         hailMsg.Write(localPeer.IPEndPoint);
@@ -369,19 +372,23 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 }
                 else if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess)
                 {
+                    string providedToken = msg.ReadString();
                     Debug.WriteLine("Nat introduction successful received from " + msg.SenderEndPoint);
 
-                    if (localPeer.peer.ConnectionsCount == 0 && initialConnectEndPoint != null)
-                    {
-                        // TODO: Check senderEndPoint against initialConnectEndPoint OR its local counterpart!
-                        // Initial connection introduced by master server
-                        Debug.WriteLine("Connecting to initial end point...");
+                    LidgrenEndPoint ep = new LidgrenEndPoint(msg.SenderEndPoint);
 
-                        Connect(new LidgrenEndPoint(msg.SenderEndPoint));
+                    if (initialConnectionPerformed == false && providedToken.Equals(initialConnectionToken, StringComparison.Ordinal))
+                    {
+                        initialConnectionPerformed = true;
+
+                        // Initial connection introduced by master server
+                        Debug.WriteLine("Connecting to initial peer...");
+
+                        Connect(ep);
                     }
                     else
                     {
-                        Listener.IntroducedAsClient(new LidgrenEndPoint(msg.SenderEndPoint));
+                        Listener.IntroducedAsClient(ep, providedToken);
                     }
                 }
                 else if (msg.MessageType == NetIncomingMessageType.StatusChanged)
@@ -455,7 +462,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         protected void UpdateMasterServerRegistration()
         {
-            if (!Listener.RegisterWithMasterServer)
+            if (!Listener.IsDiscoverableAsHost)
             {
                 return;
             }
@@ -473,7 +480,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         protected void RegisterWithMasterServer()
         {
-            if (!Listener.RegisterWithMasterServer)
+            if (!Listener.IsDiscoverableAsHost)
             {
                 return;
             }
@@ -499,7 +506,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         protected void UnregisterWithMasterServer()
         {
-            if (!Listener.RegisterWithMasterServer)
+            if (!Listener.IsDiscoverableAsHost)
             {
                 return;
             }

@@ -204,7 +204,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             AvailableNetworkSession aS = availableSession;
 
-            LidgrenBackend backend = new LidgrenBackend(peer, (aS.EndPoint as LidgrenEndPoint).endPoint);
+            string initialConnectionToken = Guid.NewGuid().ToString();
+            LidgrenBackend backend = new LidgrenBackend(peer, initialConnectionToken);
 
             if (aS.SessionType == NetworkSessionType.SystemLink)
             {
@@ -216,8 +217,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 NetOutgoingMessage msg = peer.CreateMessage();
                 msg.Write(peer.Configuration.AppIdentifier);
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);
+                msg.Write((long)availableSession.Tag); // id
                 msg.Write((backend.LocalPeer as LocalPeer).IPEndPoint);
-                msg.Write((long)availableSession.Tag);
+                msg.Write(initialConnectionToken);
                 peer.SendUnconnectedMessage(msg, masterServerEndPoint);
             }
             else

@@ -199,14 +199,17 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (messageType == MasterServerMessageType.RequestIntroduction)
             {
-                IPEndPoint senderInternalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
                 long hostId = msg.ReadLong();
 
                 if (hosts.ContainsKey(hostId))
                 {
+                    IPEndPoint senderInternalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
+                    IPEndPoint senderExternalEndPoint = rawMsg.SenderEndPoint;
+                    string senderInitialConnectionToken = msg.ReadString();
+
                     HostData hostData = hosts[hostId];
 
-                    server.Introduce(hostData.internalEndPoint, hostData.externalEndPoint, senderInternalEndPoint, rawMsg.SenderEndPoint, string.Empty);
+                    server.Introduce(hostData.internalEndPoint, hostData.externalEndPoint, senderInternalEndPoint, senderExternalEndPoint, senderInitialConnectionToken);
 
                     Console.WriteLine("Introduced host " + hostData + " and client [InternalEP: " + senderInternalEndPoint + ", ExternalEP: " + rawMsg.SenderEndPoint + "].");
                 }
