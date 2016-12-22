@@ -24,11 +24,10 @@ namespace Microsoft.Xna.Framework.Input
             {
                 return PlatformGetHandle();
             }
-#pragma warning disable RECS0029 // Warns about property or indexer setters and event adders or removers that do not use the value parameter
             set
-#pragma warning restore RECS0029 // Warns about property or indexer setters and event adders or removers that do not use the value parameter
             {
                 // only for XNA compatibility, yet
+                IntPtr temp = value;
             }
         }
 
