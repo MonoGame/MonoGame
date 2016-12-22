@@ -11,9 +11,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
     internal class LidgrenSessionCreator : ISessionCreator
     {
-        private const int DiscoveryTime = 1000;
+        private const int DiscoveryTime = 2000;
         private const int FullyConnectedPollingTime = 50;
-        private const int FullyConnectedTimeOut = 1000;
+        private const int FullyConnectedTimeOut = 2000;
 
         private static bool WaitUntilFullyConnected(NetworkSession session)
         {
@@ -81,7 +81,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
-            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
 
             NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
@@ -178,7 +179,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public NetworkSession Join(AvailableNetworkSession availableSession)
         {
-            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
 
             NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
@@ -211,13 +213,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             else if (aS.SessionType == NetworkSessionType.PlayerMatch || aS.SessionType == NetworkSessionType.Ranked)
             {
                 // Note: Actual connect call is handled by backend once nat introduction is successful
-                IPAddress address;
-                NetUtility.GetMyAddress(out address);
-
                 NetOutgoingMessage msg = peer.CreateMessage();
                 msg.Write(peer.Configuration.AppIdentifier);
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);
-                msg.Write(new IPEndPoint(address, peer.Port));
+                msg.Write((backend.LocalPeer as LocalPeer).IPEndPoint);
                 msg.Write((long)availableSession.Tag);
                 peer.SendUnconnectedMessage(msg, masterServerEndPoint);
             }

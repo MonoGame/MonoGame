@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Net
                     throw new InvalidOperationException("Should only be called from within a MonoGame Game instance. For the master server, manually specify the GUID of the game to relay.");
                 }
 
+                // Get guid
                 if (Id == string.Empty)
                 {
                     var assembly = System.Reflection.Assembly.GetAssembly(Game.Instance.GetType());
@@ -28,6 +29,12 @@ namespace Microsoft.Xna.Framework.Net
                             Id = ((System.Runtime.InteropServices.GuidAttribute)guidObjs[0]).Value;
                         }
                     }
+                }
+
+                // No guid?
+                if (Id == string.Empty)
+                {
+                    Id = "MonoGameApp";
                 }
 
                 return Id;

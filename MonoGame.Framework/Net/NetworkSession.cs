@@ -194,6 +194,21 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
+        public static IAsyncResult BeginJoinInvited(IEnumerable<SignedInGamer> localGamers, AsyncCallback callback, Object asyncState)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IAsyncResult BeginJoinInvited(int maxLocalGamers, AsyncCallback callback, Object asyncState)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static NetworkSession EndJoinInvited(IAsyncResult result)
+        {
+            throw new NotImplementedException();
+        }
+
         // Synchronous session creation
         public static NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
@@ -230,7 +245,19 @@ namespace Microsoft.Xna.Framework.Net
             try { return EndJoin(BeginJoin(availableSession, null, null)); }
             catch { throw; }
         }
-        
+
+        public static NetworkSession JoinInvited(IEnumerable<SignedInGamer> localGamers)
+        {
+            try { return EndJoinInvited(BeginJoinInvited(localGamers, null, null)); }
+            catch { throw; }
+        }
+
+        public static NetworkSession JoinInvited(int maxLocalGamers)
+        {
+            try { return EndJoinInvited(BeginJoinInvited(maxLocalGamers, null, null)); }
+            catch { throw; }
+        }
+
         private NetworkMachine localMachine;
         private NetworkMachine hostMachine;
         private NetworkSessionPublicInfo publicInfo;

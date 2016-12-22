@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
                 hosts[hostId] = new HostData(hostId, internalEndPoint, externalEndPoint, publicInfo);
 
-                Console.WriteLine("Host updated. " + hosts[hostId]);
+                Console.WriteLine("Host registered/updated. " + hosts[hostId]);
             }
             else if (messageType == MasterServerMessageType.UnregisterHost)
             {
@@ -170,20 +170,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     HostData hostData = hosts[hostId];
 
-                    if (rawMsg.SenderEndPoint.Equals(hostData.externalEndPoint))
-                    {
-                        hosts.Remove(hostId);
+                    hosts.Remove(hostId);
 
-                        Console.WriteLine("Host unregistered. " + hostData);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Unregister requested but not from host in question.");
-                    }
+                    Console.WriteLine("Host unregistered. " + hostData);
                 }
                 else
                 {
-                    Console.WriteLine("Unregister requested but host was not found.");
+                    Console.WriteLine("Unregister requested from " + rawMsg.SenderEndPoint + " but host was not found.");
                 }
             }
             else if (messageType == MasterServerMessageType.RequestHosts)

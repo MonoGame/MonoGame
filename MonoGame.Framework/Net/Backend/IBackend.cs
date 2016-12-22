@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
     internal interface IMasterServer
     {
-        void Start(string gameAppId);
+        void Start(string appId);
         void Update();
         void Shutdown();
     }

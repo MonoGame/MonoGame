@@ -85,20 +85,30 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
     internal class LocalPeer : ILidgrenPeer
     {
         internal NetPeer peer;
-        internal IPEndPoint internalEP;
 
         public LocalPeer(NetPeer peer)
         {
             this.peer = peer;
-
-            IPAddress address;
-            NetUtility.GetMyAddress(out address);
-            this.internalEP = new IPEndPoint(address, peer.Port);
-
-            this.EndPoint = new LidgrenEndPoint(this.internalEP);
         }
 
-        public IPeerEndPoint EndPoint { get; }
+        internal IPEndPoint IPEndPoint
+        {
+            get
+            {
+                IPAddress mask;
+                IPAddress address = NetUtility.GetMyAddress(out mask);
+                return new IPEndPoint(address, peer.Port);
+            }
+        }
+
+        public IPeerEndPoint EndPoint
+        {
+            get
+            {
+                return new LidgrenEndPoint(IPEndPoint);
+            }
+        }
+
         public long Id { get { return peer.UniqueIdentifier; } }
         public TimeSpan RoundtripTime { get { return TimeSpan.Zero; } }
         public object Tag { get; set; }
@@ -151,14 +161,24 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public TimeSpan SimulatedLatency
         {
+#if DEBUG
             get { return TimeSpan.FromSeconds(localPeer.peer.Configuration.SimulatedRandomLatency); }
             set { localPeer.peer.Configuration.SimulatedRandomLatency = (float)value.TotalSeconds; }
+#else
+            get { return TimeSpan.Zero; }
+            set { }
+#endif
         }
 
         public float SimulatedPacketLoss
         {
+#if DEBUG
             get { return localPeer.peer.Configuration.SimulatedLoss; }
             set { localPeer.peer.Configuration.SimulatedLoss = value; }
+#else
+            get { return 0.0f; }
+            set { }
+#endif
         }
 
         public int BytesPerSecondReceived { get; set; }
@@ -202,7 +222,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             if (localPeer.peer.GetConnection(ep.endPoint) == null)
             {
                 NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
-                hailMsg.Write(localPeer.internalEP);
+                hailMsg.Write(localPeer.IPEndPoint);
                 localPeer.peer.Connect(ep.endPoint, hailMsg);
             }
         }
@@ -339,7 +359,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     if (Listener.AllowConnectionFrom(new LidgrenEndPoint(msg.SenderEndPoint)))
                     {
                         NetOutgoingMessage hailMsg = localPeer.peer.CreateMessage();
-                        hailMsg.Write(localPeer.internalEP);
+                        hailMsg.Write(localPeer.IPEndPoint);
                         msg.SenderConnection.Approve(hailMsg);
                     }
                     else
@@ -349,14 +369,15 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 }
                 else if (msg.MessageType == NetIncomingMessageType.NatIntroductionSuccess)
                 {
-                    Debug.WriteLine("Nat introduction successful");
+                    Debug.WriteLine("Nat introduction successful received from " + msg.SenderEndPoint);
 
-                    if (localPeer.peer.ConnectionsCount == 0 && initialConnectEndPoint != null && msg.SenderEndPoint.Equals(initialConnectEndPoint))
+                    if (localPeer.peer.ConnectionsCount == 0 && initialConnectEndPoint != null)
                     {
+                        // TODO: Check senderEndPoint against initialConnectEndPoint OR its local counterpart!
                         // Initial connection introduced by master server
                         Debug.WriteLine("Connecting to initial end point...");
 
-                        Connect(new LidgrenEndPoint(initialConnectEndPoint));
+                        Connect(new LidgrenEndPoint(msg.SenderEndPoint));
                     }
                     else
                     {
@@ -457,7 +478,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 return;
             }
 
-            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
 
             OutgoingMessage msg = outgoingMessagePool.Get();
             msg.Write(localPeer.peer.Configuration.AppIdentifier);
@@ -482,7 +504,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 return;
             }
 
-            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
 
             NetOutgoingMessage msg = localPeer.peer.CreateMessage();
             msg.Write(localPeer.peer.Configuration.AppIdentifier);
