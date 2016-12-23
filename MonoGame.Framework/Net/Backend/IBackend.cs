@@ -36,11 +36,12 @@ namespace Microsoft.Xna.Framework.Net.Backend
 
     internal interface IBackendListener
     {
-        bool IsDiscoverableAsHost { get; }
+        bool IsDiscoverableLocally { get; }
+        bool IsDiscoverableOnline { get; }
         NetworkSessionPublicInfo SessionPublicInfo { get; }
 
         bool AllowConnectionFromClient(IPeerEndPoint endPoint);
-        void IntroducedAsClient(IPeerEndPoint targetEndPoint, string providedToken);
+        void IntroducedAsClient(IPeerEndPoint targetEndPoint);
         void PeerConnected(IPeer peer);
         void PeerDisconnected(IPeer peer);
         void ReceiveMessage(IIncomingMessage data, IPeer sender);

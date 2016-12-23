@@ -36,12 +36,12 @@ namespace Microsoft.Xna.Framework.Net
         internal int privateGamerSlots;
 
         internal IList<SignedInGamer> pendingSignedInGamers; // Must be a list since order is important
-        internal ISet<IPeerEndPoint> allowlist;
-        internal ISet<IPeerEndPoint> pendingEndPoints;
+        internal ICollection<IPeerEndPoint> allowlist;
+        internal ICollection<IPeerEndPoint> pendingEndPoints;
         internal IDictionary<NetworkMachine, ICollection<NetworkMachine>> hostPendingConnections;
         internal IDictionary<NetworkMachine, ICollection<IPeerEndPoint>> hostPendingAllowlistInsertions;
 
-        internal NetworkSession(ISessionBackend backend, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
+        internal NetworkSession(ISessionBackend backend, IEnumerable<IPeerEndPoint> initialAllowlist, bool isHost, int maxGamers, int privateGamerSlots, NetworkSessionType type, NetworkSessionProperties properties, IEnumerable<SignedInGamer> signedInGamers)
         {
             this.localMachine = new NetworkMachine(this, backend.LocalPeer, true, isHost);
             this.hostMachine = this.localMachine.IsHost ? this.localMachine : null;
@@ -73,6 +73,11 @@ namespace Microsoft.Xna.Framework.Net
             }
 
             this.allowlist = new HashSet<IPeerEndPoint>();
+            foreach (IPeerEndPoint endPoint in initialAllowlist)
+            {
+                this.allowlist.Add(endPoint);
+            }
+
             this.pendingEndPoints = null;
 
             if (this.localMachine.IsHost)
@@ -436,7 +441,12 @@ namespace Microsoft.Xna.Framework.Net
 
         internal int OpenPublicGamerSlots { get { return MaxGamers - PrivateGamerSlots - allGamers.Count; } }
 
-        bool IBackendListener.IsDiscoverableAsHost
+        bool IBackendListener.IsDiscoverableLocally
+        {
+            get { return IsHost && localMachine.IsFullyConnected && SessionType == NetworkSessionType.SystemLink; }
+        }
+
+        bool IBackendListener.IsDiscoverableOnline
         {
             get { return IsHost && localMachine.IsFullyConnected && (SessionType == NetworkSessionType.PlayerMatch || SessionType == NetworkSessionType.Ranked); }
         }
@@ -757,9 +767,9 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        void IBackendListener.IntroducedAsClient(IPeerEndPoint targetEndPoint, string providedToken)
+        void IBackendListener.IntroducedAsClient(IPeerEndPoint targetEndPoint)
         {
-            if (IsHost || IsFullyConnected || pendingEndPoints == null)
+            if (IsHost || IsFullyConnected)
             {
                 return;
             }

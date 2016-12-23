@@ -143,7 +143,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             string senderGameAppId = msg.ReadString();
 
-            if (senderGameAppId != server.Configuration.AppIdentifier)
+            if (!senderGameAppId.Equals(server.Configuration.AppIdentifier, StringComparison.Ordinal))
             {
                 Console.WriteLine("Received message with incorrect game app id from " + rawMsg.SenderEndPoint + ".");
                 return;
@@ -205,11 +205,10 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     IPEndPoint senderInternalEndPoint = (msg.ReadPeerEndPoint() as LidgrenEndPoint).endPoint;
                     IPEndPoint senderExternalEndPoint = rawMsg.SenderEndPoint;
-                    string senderInitialConnectionToken = msg.ReadString();
-
+                    
                     HostData hostData = hosts[hostId];
 
-                    server.Introduce(hostData.internalEndPoint, hostData.externalEndPoint, senderInternalEndPoint, senderExternalEndPoint, senderInitialConnectionToken);
+                    server.Introduce(hostData.internalEndPoint, hostData.externalEndPoint, senderInternalEndPoint, senderExternalEndPoint, string.Empty);
 
                     Console.WriteLine("Introduced host " + hostData + " and client [InternalEP: " + senderInternalEndPoint + ", ExternalEP: " + rawMsg.SenderEndPoint + "].");
                 }

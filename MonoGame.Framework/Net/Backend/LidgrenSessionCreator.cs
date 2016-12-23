@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             Debug.WriteLine("Peer started.");
 
-            NetworkSession session = new NetworkSession(new LidgrenBackend(peer, null), true, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+            NetworkSession session = new NetworkSession(new LidgrenBackend(peer), new IPeerEndPoint[0], true, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
 
             if (!WaitUntilFullyConnected(session))
             {
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         public AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            
+
             NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
             config.AcceptIncomingConnections = false;
@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         public NetworkSession Join(AvailableNetworkSession availableSession)
         {
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            
+
             NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
             config.AcceptIncomingConnections = true;
@@ -202,8 +202,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             AvailableNetworkSession aS = availableSession;
 
-            string initialConnectionToken = Guid.NewGuid().ToString();
-            LidgrenBackend backend = new LidgrenBackend(peer, initialConnectionToken);
+            LidgrenBackend backend = new LidgrenBackend(peer);
+            NetworkSession session = new NetworkSession(backend, new IPeerEndPoint[] { aS.EndPoint }, false, aS.MaxGamers, aS.PrivateGamerSlots, aS.SessionType, aS.SessionProperties, aS.LocalGamers);
 
             if (aS.SessionType == NetworkSessionType.SystemLink)
             {
@@ -217,15 +217,12 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);
                 msg.Write((long)availableSession.Tag); // id
                 msg.Write((backend.LocalPeer as LocalPeer).IPEndPoint);
-                msg.Write(initialConnectionToken);
                 peer.SendUnconnectedMessage(msg, masterServerEndPoint);
             }
             else
             {
                 throw new InvalidOperationException();
             }
-
-            NetworkSession session = new NetworkSession(backend, false, aS.MaxGamers, aS.PrivateGamerSlots, aS.SessionType, aS.SessionProperties, aS.LocalGamers);
 
             if (!WaitUntilFullyConnected(session))
             {
