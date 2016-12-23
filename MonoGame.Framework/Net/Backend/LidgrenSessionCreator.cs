@@ -81,9 +81,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
-            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
-
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            
             NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
             config.AcceptIncomingConnections = false;
@@ -179,9 +178,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public NetworkSession Join(AvailableNetworkSession availableSession)
         {
-            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
-
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            
             NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = 0;
             config.AcceptIncomingConnections = true;

@@ -485,8 +485,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 return;
             }
 
-            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
             OutgoingMessage msg = outgoingMessagePool.Get();
             msg.Write(localPeer.peer.Configuration.AppIdentifier);
@@ -511,9 +510,8 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 return;
             }
 
-            //IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
-            IPEndPoint masterServerEndPoint = new IPEndPoint(IPAddress.Parse(NetworkSessionSettings.MasterServerAddress), NetworkSessionSettings.MasterServerPort);
-
+            IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
+            
             NetOutgoingMessage msg = localPeer.peer.CreateMessage();
             msg.Write(localPeer.peer.Configuration.AppIdentifier);
             msg.Write((byte)MasterServerMessageType.UnregisterHost);
