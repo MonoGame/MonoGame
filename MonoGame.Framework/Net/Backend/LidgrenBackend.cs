@@ -336,7 +336,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 if (msg.MessageType == NetIncomingMessageType.DiscoveryRequest)
                 {
-                    if (Listener.IsDiscoverableOnline)
+                    if (Listener.IsDiscoverableLocally)
                     {
                         Debug.WriteLine("Discovery request received");
 

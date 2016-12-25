@@ -147,23 +147,25 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 else if (rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse)
                 {
                     IIncomingMessage msg = new IncomingMessage(rawMsg);
-                    NetworkSessionPublicInfo hostContents = NetworkSessionPublicInfo.FromMessage(msg);
+                    NetworkSessionPublicInfo hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
-                    AddAvailableNetworkSession(-1, new LidgrenEndPoint(rawMsg.SenderEndPoint), hostContents, localGamers, sessionType, searchProperties, availableSessions);
+                    AddAvailableNetworkSession(-1, new LidgrenEndPoint(rawMsg.SenderEndPoint), hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
                 }
-
-                // Error checking
-                switch (rawMsg.MessageType)
+                else
                 {
-                    case NetIncomingMessageType.VerboseDebugMessage:
-                    case NetIncomingMessageType.DebugMessage:
-                    case NetIncomingMessageType.WarningMessage:
-                    case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine("Lidgren: " + rawMsg.ReadString());
-                        break;
-                    default:
-                        Debug.WriteLine("Unhandled type: " + rawMsg.MessageType);
-                        break;
+                    // Error checking
+                    switch (rawMsg.MessageType)
+                    {
+                        case NetIncomingMessageType.VerboseDebugMessage:
+                        case NetIncomingMessageType.DebugMessage:
+                        case NetIncomingMessageType.WarningMessage:
+                        case NetIncomingMessageType.ErrorMessage:
+                            Debug.WriteLine("Lidgren: " + rawMsg.ReadString());
+                            break;
+                        default:
+                            Debug.WriteLine("Unhandled type: " + rawMsg.MessageType);
+                            break;
+                    }
                 }
 
                 discoverPeer.Recycle(rawMsg);
@@ -207,7 +209,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             if (aS.SessionType == NetworkSessionType.SystemLink)
             {
-                backend.Connect(aS.EndPoint);
+                (session as IBackendListener).IntroducedAsClient(aS.EndPoint);
             }
             else if (aS.SessionType == NetworkSessionType.PlayerMatch || aS.SessionType == NetworkSessionType.Ranked)
             {
