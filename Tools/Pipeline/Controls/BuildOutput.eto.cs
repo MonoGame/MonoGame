@@ -2,25 +2,42 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class BuildOutput : Panel
+    public partial class BuildOutput : Pad
     {
+        Panel panel;
         TextArea textArea;
-        TreeView treeView;
+        Scrollable scrollable1;
+        Drawable drawable;
 
         private void InitializeComponent()
         {
+            Title = "Build Output";
+
+            panel = new Panel();
+
             textArea = new TextArea();
             textArea.Wrap = false;
             textArea.ReadOnly = true;
 
-            treeView = new TreeView();
-            treeView.Style = "FilterView";
+            scrollable1 = new Scrollable();
+            scrollable1.BackgroundColor = DrawInfo.BackColor;
+            drawable = new Drawable();
+            scrollable1.Content = drawable;
 
-            Content = textArea;
+            panel.Content = textArea;
+            CreateContent(panel);
+
+            drawable.MouseDown += Drawable_MouseDown;
+            drawable.MouseMove += Drawable_MouseMove;
+            drawable.MouseLeave += Drawable_MouseLeave;
+            drawable.Paint += Drawable_Paint;
+            scrollable1.SizeChanged += Scrollable1_SizeChanged;
+            scrollable1.Scroll += Scrollable1_Scroll;
         }
     }
 }

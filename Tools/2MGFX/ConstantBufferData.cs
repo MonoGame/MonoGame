@@ -14,6 +14,15 @@ namespace TwoMGFX
 
         public List<EffectObject.d3dx_parameter> Parameters { get; private set; }
 
+        public ConstantBufferData(string name)
+        {
+            Name = name;
+
+            ParameterIndex = new List<int>();
+            ParameterOffset = new List<int>();
+            Parameters = new List<EffectObject.d3dx_parameter>();
+            Size = 0;
+        }
 
         public bool SameAs(ConstantBufferData other)
         {

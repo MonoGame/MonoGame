@@ -25,12 +25,6 @@
     <Reference Include="System.Xml" />
   </Platform>
 
-  <Platform Type="Ouya">
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-  </Platform>
-
   <Platform Type="Windows">
     <Reference Include="System" />
     <Reference Include="System.Core">

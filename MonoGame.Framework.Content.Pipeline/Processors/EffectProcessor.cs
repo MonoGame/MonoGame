@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 foreach (var outfile in shaderInfo.AdditionalOutputFiles)
                     context.AddOutputFile(outfile);
             }
-            catch (ShaderCompilerException ex)
+            catch (ShaderCompilerException)
             {
                 // This will log any warnings and errors and throw.
                 ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);

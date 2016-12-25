@@ -252,24 +252,23 @@ internal static class Sdl
             Close,
         }
 
-        [Flags]
-        public enum State
+        public static class State
         {
-            Fullscreen = 0x00000001,
-            OpenGL = 0x00000002,
-            Shown = 0x00000004,
-            Hidden = 0x00000008,
-            Borderless = 0x00000010,
-            Resizable = 0x00000020,
-            Minimized = 0x00000040,
-            Maximized = 0x00000080,
-            Grabbed = 0x00000100,
-            InputFocus = 0x00000200,
-            MouseFocus = 0x00000400,
-            FullscreenDesktop = 0x00001001,
-            Foreign = 0x00000800,
-            AllowHighDPI = 0x00002000,
-            MouseCapture = 0x00004000,
+            public const int Fullscreen = 0x00000001;
+            public const int OpenGL = 0x00000002;
+            public const int Shown = 0x00000004;
+            public const int Hidden = 0x00000008;
+            public const int Borderless = 0x00000010;
+            public const int Resizable = 0x00000020;
+            public const int Minimized = 0x00000040;
+            public const int Maximized = 0x00000080;
+            public const int Grabbed = 0x00000100;
+            public const int InputFocus = 0x00000200;
+            public const int MouseFocus = 0x00000400;
+            public const int FullscreenDesktop = 0x00001001;
+            public const int Foreign = 0x00000800;
+            public const int AllowHighDPI = 0x00002000;
+            public const int MouseCapture = 0x00004000;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -287,9 +286,9 @@ internal static class Sdl
         }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateWindow")]
-        private static extern IntPtr SDL_CreateWindow(string title, int x, int y, int w, int h, State flags);
+        private static extern IntPtr SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
 
-        public static IntPtr Create(string title, int x, int y, int w, int h, State flags)
+        public static IntPtr Create(string title, int x, int y, int w, int h, int flags)
         {
             return GetError(SDL_CreateWindow(title, x, y, w, h, flags));
         }
@@ -307,7 +306,7 @@ internal static class Sdl
         }
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowFlags")]
-        public static extern State GetWindowFlags(IntPtr window);
+        public static extern int GetWindowFlags(IntPtr window);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowIcon")]
         public static extern void SetIcon(IntPtr window, IntPtr icon);
@@ -322,9 +321,9 @@ internal static class Sdl
         public static extern void SetBordered(IntPtr window, int bordered);
 
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetWindowFullscreen")]
-        private static extern int SDL_SetWindowFullscreen(IntPtr window, State flags);
+        private static extern int SDL_SetWindowFullscreen(IntPtr window, int flags);
 
-        public static void SetFullscreen(IntPtr window, State flags)
+        public static void SetFullscreen(IntPtr window, int flags)
         {
             GetError(SDL_SetWindowFullscreen(window, flags));
         }

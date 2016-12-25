@@ -134,6 +134,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
         */
 
+        public bool IsProfileSupported(GraphicsProfile graphicsProfile)
+        {
+            return PlatformIsProfileSupported(graphicsProfile);
+        }
+
         public void Dispose()
         {
             // We don't keep any resources, so we have

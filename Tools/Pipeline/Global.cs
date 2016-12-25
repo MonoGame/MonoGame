@@ -3,34 +3,52 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Eto.Drawing;
-using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
     static partial class Global
     {
+        public static string NotAllowedCharacters
+        {
+            get
+            {
+                if (Unix)
+                    return Linux ? "/" : ":";
+
+                return "/?<>\\:*|\"";
+            }
+        }
+
         public static bool Linux { get; private set; }
         public static bool UseHeaderBar { get; private set; }
         public static bool Unix { get; private set; }
+
+        private static Dictionary<string, Image> _files;
+        private static Image _fileMissing, _folder, _folderMissing;
+
+        private static Dictionary<string, Xwt.Drawing.Image> _xwtFiles;
+        private static Xwt.Drawing.Image _xwtFileMissing, _xwtFolder, _xwtFolderMissing;
 
         static Global()
         {
             Unix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
 
+            _files = new Dictionary<string, Image>();
+            _files.Add(".", Bitmap.FromResource("TreeView.File.png"));
+            _fileMissing = Bitmap.FromResource("TreeView.FileMissing.png");
+            _folder = Bitmap.FromResource("TreeView.Folder.png");
+            _folderMissing = Bitmap.FromResource("TreeView.FolderMissing.png");
+
+            _xwtFiles = new Dictionary<string, Xwt.Drawing.Image>();
+            _xwtFiles.Add(".", Xwt.Drawing.Image.FromResource("TreeView.File.png"));
+            _xwtFileMissing = Xwt.Drawing.Image.FromResource("TreeView.FileMissing.png");
+            _xwtFolder = Xwt.Drawing.Image.FromResource("TreeView.Folder.png");
+            _xwtFolderMissing = Xwt.Drawing.Image.FromResource("TreeView.FolderMissing.png");
+
             PlatformInit();
-        }
-
-        public static string NotAllowedCharacters
-        {
-            get
-            {
-                if (Global.Unix)
-                    return Global.Linux ? "/" : ":";
-
-                return "/?<>\\:*|\"";
-            }
         }
 
         public static bool CheckString(string s)
@@ -56,78 +74,86 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public static Image GetDirectoryIcon(bool exists)
+        public static Image GetEtoDirectoryIcon(bool exists)
         {
-            try
-            {
-                return PlatformGetDirectoryIcon(exists);
-            }
-            catch { }
-
-            return exists ? Bitmap.FromResource("TreeView.Folder.png") : Bitmap.FromResource("TreeView.FolderMissing.png");
+            return exists ? _folder : _folderMissing;
         }
 
-        public static Image GetFileIcon(string path, bool exists)
+        public static Image GetEtoFileIcon(string path, bool exists)
         {
+            if (!exists)
+                return _fileMissing;
+            
+            var ext = Path.GetExtension(path);
+            if (_files.ContainsKey(ext))
+                return _files[ext];
+
+            Image icon;
+
             try
             {
-                return PlatformGetFileIcon(path, exists);
+                icon = ToEtoImage(PlatformGetFileIcon(path));
             }
-            catch { }
+            catch
+            {
+                icon = _files["."];
+            }
 
-            return exists ? Bitmap.FromResource("TreeView.File.png") : Bitmap.FromResource("TreeView.FileMissing.png");
+            _files.Add(ext, icon);
+            return icon;
         }
 
-        public static void SetIcon(Command cmd)
+        public static Xwt.Drawing.Image GetXwtDirectoryIcon(bool exists)
         {
-            if (PlatformSetIcon(cmd))
-                return;
+            return exists ? _xwtFolder : _xwtFolderMissing;
+        }
 
-            switch (cmd.MenuText)
+        public static Xwt.Drawing.Image GetXwtFileIcon(string path, bool exists)
+        {
+            if (!exists)
+                return _xwtFileMissing;
+
+            var ext = Path.GetExtension(path);
+            if (_xwtFiles.ContainsKey(ext))
+                return _xwtFiles[ext];
+
+            Xwt.Drawing.Image icon;
+
+            try
             {
-                case "New...":
-                    cmd.Image = Icon.FromResource("Toolbar.New.png");
-                    break;
-                case "Open...":
-                    cmd.Image = Icon.FromResource("Toolbar.Open.png");
-                    break;
-                case "Save...":
-                    cmd.Image = Icon.FromResource("Toolbar.Save.png");
-                    break;
-                case "Undo":
-                    cmd.Image = Icon.FromResource("Toolbar.Undo.png");
-                    break;
-                case "Redo":
-                    cmd.Image = Icon.FromResource("Toolbar.Redo.png");
-                    break;
-                case "New Item...":
-                    cmd.Image = Icon.FromResource("Toolbar.NewItem.png");
-                    break;
-                case "New Folder...":
-                    cmd.Image = Icon.FromResource("Toolbar.NewFolder.png");
-                    break;
-                case "Existing Item...":
-                    cmd.Image = Icon.FromResource("Toolbar.ExistingItem.png");
-                    break;
-                case "Existing Folder...":
-                    cmd.Image = Icon.FromResource("Toolbar.ExistingFolder.png");
-                    break;
-                case "Build":
-                    cmd.Image = Icon.FromResource("Toolbar.Build.png");
-                    break;
-                case "Rebuild":
-                    cmd.Image = Icon.FromResource("Toolbar.Rebuild.png");
-                    break;
-                case "Cancel Build":
-                    cmd.Image = Icon.FromResource("Toolbar.CancelBuild.png");
-                    break;
-                case "Clean":
-                    cmd.Image = Icon.FromResource("Toolbar.Clean.png");
-                    break;
-                case "Filter Output":
-                    cmd.Image = Icon.FromResource("Toolbar.FilterOutput.png");
-                    break;
+                icon = ToXwtImage(PlatformGetFileIcon(path));
             }
+            catch
+            {
+                icon = _xwtFiles["."];
+            }
+
+            _xwtFiles.Add(ext, icon);
+            return icon;
+        }
+
+        public static Image GetEtoIcon(string resource)
+        {
+#if LINUX
+            var nativeicon = PlatformGetIcon(resource);
+
+            if (nativeicon != null)
+                return ToEtoImage(nativeicon);
+#endif
+
+            return Icon.FromResource(resource);
+        }
+
+        public static Xwt.Drawing.Image GetXwtIcon(string resource)
+        {
+#if LINUX
+            var nativeicon = PlatformGetIcon(resource);
+
+            if (nativeicon != null)
+                return ToXwtImage(nativeicon);
+#endif
+            
+            return Xwt.Drawing.Image.FromResource(resource);
         }
     }
 }

@@ -146,6 +146,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="effect">The custom effect to apply to the drawn geometry</param>
         public unsafe void DrawBatch(SpriteSortMode sortMode, Effect effect)
 		{
+            if (effect != null && effect.IsDisposed)
+                throw new ObjectDisposedException("effect");
+
 			// nothing to do
             if (_batchItemCount == 0)
 				return;
@@ -167,7 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             unchecked
             {
-                _device._graphicsMetrics._spriteCount += (ulong)batchCount;
+                _device._graphicsMetrics._spriteCount += batchCount;
             }
 
             // Iterate through the batches, doing short.MaxValue sets of vertices only.

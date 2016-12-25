@@ -271,7 +271,7 @@ namespace MonoGame.Tools.Pipeline
                 PipelineSettings.Default.Save();
                 View.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 View.ShowError("Open Project", "Failed to open project!");
                 return;
@@ -422,10 +422,6 @@ namespace MonoGame.Tools.Pipeline
                         items.Add(subitem);
             }
 
-            // Make sure we save first!
-            if (!AskSaveProject())
-                return;
-
             // Create a unique file within the same folder as
             // the normal project to store this incremental build.
             var uniqueName = Guid.NewGuid().ToString();
@@ -454,9 +450,8 @@ namespace MonoGame.Tools.Pipeline
         {
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
-            // Make sure we save first!
-            if (!AskSaveProject())
-                return;
+            if (ProjectDirty)
+                SaveProject(false);
 
             View.OutputClear();
 
@@ -964,6 +959,19 @@ namespace MonoGame.Tools.Pipeline
             return null;
         }
 
+        public void CopyAssetPath()
+        {
+            var item = SelectedItem as ContentItem;
+            if (item != null)
+            {
+                var path = item.OriginalPath;
+                path = path.Remove(path.Length - Path.GetExtension(path).Length);
+                path = path.Replace('\\', '/');
+
+                View.SetClipboard(path);
+            }
+        }
+
         #region Undo, Redo
 
         private readonly ActionStack _actionStack;
@@ -1119,6 +1127,7 @@ namespace MonoGame.Tools.Pipeline
             info.OpenItem = exists && oneselected && SelectedItem is ContentItem;
             info.OpenItemWith = exists && oneselected && !(SelectedItem is DirectoryItem);
             info.OpenItemLocation = exists && oneselected;
+            info.CopyAssetPath = exists && oneselected && SelectedItem is ContentItem;
             info.Add = (exists && oneselected && !(SelectedItem is ContentItem)) || !somethingselected && ProjectOpen;
             info.Exclude = somethingselected && !SelectedItems.Contains(_project);
             info.Rename = exists && oneselected;

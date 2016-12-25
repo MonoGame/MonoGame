@@ -46,21 +46,14 @@ namespace Microsoft.Xna.Framework
             Sdl.Minor = sversion.Minor;
             Sdl.Patch = sversion.Patch;
 
-            try
-            {
-                // HACK: The current development version of SDL
-                // returns 2.0.4, to check SDL version we simply
-                // need to try and execute a function that's only
-                // available in the newer version of it.
-                Sdl.Window.SetResizable(IntPtr.Zero, false);
-                Sdl.Patch = 5;
-            }
-            catch { }
-
             var version = 100 * Sdl.Major + 10 * Sdl.Minor + Sdl.Patch;
 
             if (version <= 204)
                 Debug.WriteLine ("Please use SDL 2.0.5 or higher.");
+
+            // Needed so VS can debug the project on Windows
+            if (version >= 205 && CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
+                Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
 
             Sdl.Init((int)(
                 Sdl.InitFlags.Video |
@@ -71,6 +64,7 @@ namespace Microsoft.Xna.Framework
 
             Sdl.DisableScreenSaver();
 
+            GamePad.InitDatabase();
             Window = _view = new SdlGameWindow(_game);
 
             try
@@ -85,8 +79,7 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize ()
         {
-            GamePad.InitDatabase();
-            _view.CreateWindow();
+            _view.InitGraphics();
             SdlRunLoop();
 
             base.BeforeInitialize ();

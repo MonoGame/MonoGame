@@ -375,6 +375,24 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public bool IsProfileSupported(GraphicsProfile graphicsProfile)
+        {
+            if(UseReferenceDevice)
+                return true;
+
+            switch(graphicsProfile)
+            {
+                case GraphicsProfile.Reach:
+                    return true;
+                case GraphicsProfile.HiDef:
+                    bool result = true;
+                    // TODO: check adapter capabilities...
+                    return result;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
 #if WINDOWS && !OPENGL
         [System.Runtime.InteropServices.DllImport("gdi32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true, ExactSpelling = true)]
         public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);

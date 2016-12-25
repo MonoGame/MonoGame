@@ -31,9 +31,10 @@ namespace Microsoft.Xna.Framework.Graphics
         internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
             if (graphicsDevice == null)
-            {
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
-            }
+            if (size <= 0)
+                throw new ArgumentOutOfRangeException("size","Cube size must be greater than zero");
+
             this.GraphicsDevice = graphicsDevice;
 			this.size = size;
             this._format = format;
@@ -68,8 +69,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null) 
                 throw new ArgumentNullException("data");
 
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {

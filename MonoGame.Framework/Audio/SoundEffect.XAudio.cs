@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework.Audio
             var format = BitConverter.ToInt16(header, 0);
             var channels = BitConverter.ToInt16(header, 2);
             var sampleRate = BitConverter.ToInt32(header, 4);
-            var blockAlignment = BitConverter.ToInt32(header, 12);
+            var blockAlignment = BitConverter.ToInt16(header, 12);
 
             WaveFormat waveFormat;
             if (format == 1)

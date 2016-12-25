@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
+using MapFlags = SharpDX.Direct3D11.MapFlags;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -58,11 +59,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
 
-        private void PlatformSetData<T>(int level,
+	    private void PlatformSetData<T>(int level,
                                      int left, int top, int right, int bottom, int front, int back,
                                      T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             try
             {

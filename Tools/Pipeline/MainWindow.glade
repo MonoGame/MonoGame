@@ -18,7 +18,7 @@
   <object class="GtkImage" id="build_image">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="icon_name">emblem-system-symbolic</property>
+    <property name="icon_name">applications-system-symbolic</property>
   </object>
   <object class="GtkImage" id="rebuild_image">
     <property name="visible">True</property>
@@ -28,17 +28,12 @@
   <object class="GtkImage" id="cancel_image">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="icon_name">media-playback-stop-symbolic</property>
+    <property name="icon_name">process-stop-symbolic</property>
   </object>
   <object class="GtkImage" id="new_image">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">document-new-symbolic</property>
-  </object>
-  <object class="GtkImage" id="filteroutput_image">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">format-indent-more-symbolic</property>
   </object>
   <object class="GtkImage" id="menu_image">
     <property name="visible">True</property>
@@ -124,20 +119,6 @@
       <packing>
         <property name="pack_type">end</property>
         <property name="position">2</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkToggleButton" id="filteroutput_button">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="receives_default">False</property>
-        <property name="tooltip_text" translatable="yes">Filter Output</property>
-        <property name="valign">center</property>
-        <property name="image">filteroutput_image</property>
-      </object>
-      <packing>
-        <property name="pack_type">end</property>
-        <property name="position">3</property>
       </packing>
     </child>
     <child>

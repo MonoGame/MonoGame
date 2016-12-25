@@ -16,6 +16,13 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         static void Main(string[] args)
         {
+#if WINDOWS
+            Xwt.Application.Initialize(Xwt.ToolkitType.Wpf);
+#elif LINUX
+            Xwt.Application.Initialize(Xwt.ToolkitType.Gtk3);
+#else
+            Xwt.Application.Initialize(Xwt.ToolkitType.Gtk);
+#endif
             var platform = Platform.Detect;
 
             var app = new Application(platform);

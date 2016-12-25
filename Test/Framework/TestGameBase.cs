@@ -166,7 +166,7 @@ namespace MonoGame.Tests {
 			SafeRaise (UnloadContentWith);
 		}
 
-		public new void Run (Predicate<FrameInfo> until = null)
+		public void Run (Predicate<FrameInfo> until = null)
 		{
 			if (until != null)
 				ExitCondition = until;

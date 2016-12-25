@@ -2,69 +2,175 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Eto.Drawing;
-using Eto.Forms;
+using System.Linq;
+using Xwt;
+using Xwt.Drawing;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class ProjectControl : TreeView
+    public partial class ProjectControl
     {
-        private Icon _iconRoot;
-        private TreeItem _treeBase, _treeRoot;
+        private readonly DataField<Image> _dataImage;
+        private readonly DataField<string> _dataText;
+        private readonly DataField<IProjectItem> _dataTag;
+        private readonly TreeStore _treeStore;
+
+        private Image _iconRoot;
+        private TreeNavigator _treeRoot;
         private bool _rootExists;
-        private ContextMenu _contextMenu;
+
+        private Eto.Forms.ContextMenu _contextMenu;
+        private bool _showContextMenu;
 
         public ProjectControl()
         {
             InitializeComponent();
 
-            _iconRoot = Icon.FromResource("TreeView.Root.png");
+            _iconRoot = Image.FromResource("TreeView.Root.png");
 
-            DataStore = _treeBase = new TreeItem();
-            Expanded += TreeView1_SaveExpanded;
-            Collapsed += TreeView1_SaveExpanded;
+            _dataImage = new DataField<Image>();
+            _dataText = new DataField<string>();
+            _dataTag = new DataField<IProjectItem>();
 
-            Init();
+            _treeStore = new TreeStore(_dataImage, _dataText, _dataTag);
+
+            TreeView.DataSource = _treeStore;
+            TreeView.Columns.Add("", _dataImage, _dataText);
+
+#if LINUX
+            (Xwt.Toolkit.CurrentEngine.GetNativeWidget(TreeView) as Gtk.ScrolledWindow).Child.ButtonPressEvent += Styles.TreeView_ButtonPressEvent;
+#endif
+
+            TreeView.ButtonReleased += Handle_ButtonReleased;
+            TreeView.SelectionChanged += ProjectControl_SelectionChanged;
+
+            TreeView.SetDragDropTarget(TransferDataType.Text, TransferDataType.Uri);
+            TreeView.DragOver += TreeView_DragOver;
+            TreeView.DragDrop += TreeView_DragDrop;
         }
 
-        private void TreeView1_SaveExpanded(object sender, TreeViewItemEventArgs e)
+        private void TreeView_DragOver(object sender, DragOverEventArgs e)
         {
-            // This fixes a bug with Eto Froms
-            e.Item.Expanded = e.Item.Expanded;
+            if (!PipelineController.Instance.ProjectOpen)
+                return;
+            
+            e.AllowedAction = DragDropAction.Copy;
+
+            RowDropPosition rowpos;
+            TreePosition pos;
+
+            if (TreeView.GetDropTargetRow(e.Position.X, e.Position.Y, out rowpos, out pos))
+                if (rowpos == RowDropPosition.Into && _treeStore.GetNavigatorAt(pos).GetValue(_dataTag) is ContentItem)
+                    e.AllowedAction = DragDropAction.None;
         }
 
-        public void SetContextMenu(ContextMenu contextMenu)
+        private void TreeView_DragDrop(object sender, DragEventArgs e)
+        {
+            var initialDirectory = PipelineController.Instance.ProjectLocation;
+            var folders = new List<string>();
+            var files = new List<string>();
+            RowDropPosition rowpos;
+            TreePosition pos;
+
+            foreach (var u in e.Data.Uris)
+            {
+                if (Directory.Exists(u.LocalPath))
+                    folders.Add(u.LocalPath);
+                else
+                    files.Add(u.LocalPath);
+            }
+
+            if (TreeView.GetDropTargetRow(e.Position.X, e.Position.Y, out rowpos, out pos))
+            {
+                var item = _treeStore.GetNavigatorAt(pos).GetValue(_dataTag);
+
+                if (!(item is DirectoryItem && rowpos == RowDropPosition.Into))
+                {
+                    var nav = _treeStore.GetNavigatorAt(pos);
+                    if (nav.MoveToParent())
+                        item = nav.GetValue(_dataTag);
+                }
+
+                if (!(item is PipelineProject))
+                    initialDirectory = Path.Combine(initialDirectory, item.OriginalPath);
+            }
+
+            PipelineController.Instance.DragDrop(initialDirectory, folders.ToArray(), files.ToArray());
+            e.Success = true;
+        }
+
+        private void Handle_ButtonReleased(object sender, ButtonEventArgs e)
+        {
+            if (e.Button == PointerButton.Right)
+            {
+#if WINDOWS
+                var crow = TreeView.GetRowAtPosition(e.X, e.Y);
+
+                if (crow == null)
+                    return;
+
+                if (!TreeView.SelectedRows.ToList().Contains(crow))
+                {
+                    TreeView.UnselectAll();
+                    TreeView.SelectRow(crow);
+                    TreeView.FocusedRow = crow;
+                }
+#endif
+
+                if (_showContextMenu && _contextMenu.Items.Count > 0)
+                    _contextMenu.Show(TreeView.ToEto());
+            }
+        }
+
+        private void ProjectControl_SelectionChanged(object sender, System.EventArgs e)
+        {
+            var items = new List<IProjectItem>();
+
+            foreach (var row in TreeView.SelectedRows)
+                items.Add(_treeStore.GetNavigatorAt(row).GetValue(_dataTag) as IProjectItem);
+
+            PipelineController.Instance.SelectionChanged(items);
+        }
+
+        public void SetContextMenu(Eto.Forms.ContextMenu contextMenu)
         {
             _contextMenu = contextMenu;
+        }
+
+        public void ExpandBase()
+        {
+            if (_rootExists)
+                TreeView.ExpandRow(_treeRoot.CurrentPosition, false);
         }
 
         public void SetRoot(IProjectItem item)
         {
             if (item == null)
             {
-                DataStore = _treeBase = new TreeItem();
+                _treeStore.Clear();
                 _rootExists = false;
-                ContextMenu = null;
+
+                _showContextMenu = false;
+                PipelineController.Instance.SelectionChanged(new List<IProjectItem>());
+
                 return;
             }
 
             if (!_rootExists)
             {
-                _treeRoot = new TreeItem();
-                _treeBase.Children.Add(_treeRoot);
+                _treeRoot = _treeStore.AddNode();
 
                 _rootExists = true;
             }
 
-            _treeRoot.Image = _iconRoot;
-            _treeRoot.Text = item.Name;
-            _treeRoot.Tag = item;
-            _treeRoot.Expanded = true;
+            _treeRoot.SetValue(_dataImage, _iconRoot);
+            _treeRoot.SetValue(_dataText, item.Name);
+            _treeRoot.SetValue(_dataTag, item);
 
-            RefreshItem(_treeRoot);
-            ContextMenu = _contextMenu;
+            _showContextMenu = true;
         }
 
         public void AddItem(IProjectItem citem)
@@ -72,7 +178,7 @@ namespace MonoGame.Tools.Pipeline
             AddItem(_treeRoot, citem, citem.OriginalPath, "");
         }
 
-        public void AddItem(TreeItem root, IProjectItem citem, string path, string currentPath)
+        public void AddItem(TreeNavigator root, IProjectItem citem, string path, string currentPath)
         {
             var split = path.Split('/');
             var item = GetorAddItem(root, split.Length > 1 ? new DirectoryItem(split[0], currentPath) { Exists = citem.Exists } : citem);
@@ -83,27 +189,19 @@ namespace MonoGame.Tools.Pipeline
 
         public void RemoveItem(IProjectItem item)
         {
-            TreeItem titem;
+            TreeNavigator titem;
             if (FindItem(_treeRoot, item.OriginalPath, out titem))
-            {
-                var parrent = titem.Parent as TreeItem;
-                parrent.Children.Remove(titem);
-                RefreshItem(parrent);
-            }
+                titem.Remove();
         }
 
         public void UpdateItem(IProjectItem item)
         {
-            TreeItem titem;
+            TreeNavigator titem;
             if (FindItem(_treeRoot, item.OriginalPath, out titem))
             {
-                var parrent = titem.Parent as TreeItem;
-                var selected = GetSelected();
-
                 if (item.ExpandToThis)
                 {
-                    parrent.Expanded = true;
-                    RefreshItem(parrent);
+                    TreeView.ExpandToRow(titem.CurrentPosition);
                     item.ExpandToThis = false;
                 }
 
@@ -111,45 +209,44 @@ namespace MonoGame.Tools.Pipeline
 
                 if (item.SelectThis)
                 {
-                    SelectedItem = titem;
+                    TreeView.SelectRow(titem.CurrentPosition);
                     item.SelectThis = false;
                 }
-                else
-                    SetSelected(selected);
             }
         }
 
-        public void SetExists(TreeItem titem, bool exists)
+        public void SetExists(TreeNavigator titem, bool exists)
         {
-            var item = titem.Tag as IProjectItem;
+            var item = titem.GetValue(_dataTag) as IProjectItem;
 
             if (item is PipelineProject)
                 return;
 
             if (item is DirectoryItem)
             {
-                bool fex = exists;
+                var fex = exists;
+                var nav = titem.Clone();
 
-                var enumerator = titem.Children.GetEnumerator();
-
-                while (enumerator.MoveNext())
+                if (nav.MoveToChild())
                 {
-                    var citem = enumerator.Current as TreeItem;
-                    if (!(citem.Tag as IProjectItem).Exists)
-                        fex = false;
+                    do
+                    {
+                        if (!(titem.GetValue(_dataTag) as IProjectItem).Exists)
+                            fex = false;
+                    }
+                    while (nav.MoveNext());
                 }
 
-                titem.Image = Global.GetDirectoryIcon(fex);
+                titem.SetValue(_dataImage, Global.GetXwtDirectoryIcon(fex));
             }
             else
-                titem.Image = Global.GetFileIcon(PipelineController.Instance.GetFullPath(item.OriginalPath), exists);
+                titem.SetValue(_dataImage, Global.GetXwtFileIcon(PipelineController.Instance.GetFullPath(item.OriginalPath), exists));
 
-            var parrent = titem.Parent as TreeItem;
-            RefreshItem(parrent);
-            SetExists(parrent, exists);
+            if (titem.MoveToParent())
+                SetExists(titem, exists);
         }
 
-        private bool FindItem(TreeItem root, string path, out TreeItem item)
+        private bool FindItem(TreeNavigator root, string path, out TreeNavigator item)
         {
             var split = path.Split('/');
 
@@ -164,70 +261,76 @@ namespace MonoGame.Tools.Pipeline
             return false;
         }
 
-        private bool GetItem(TreeItem root, string text, out TreeItem item)
+        private bool GetItem(TreeNavigator root, string text, out TreeNavigator item)
         {
-            var enumerator = root.Children.GetEnumerator();
+            var nav = root.Clone();
 
-            while (enumerator.MoveNext())
+            if (nav.MoveToChild())
             {
-                var citem = enumerator.Current as TreeItem;
-
-                if (citem.Text == text)
+                do
                 {
-                    item = citem;
-                    return true;
+                    if (nav.GetValue(_dataText) == text)
+                    {
+                        item = nav;
+                        return true;
+                    }
                 }
+                while (nav.MoveNext());
             }
 
             item = _treeRoot;
             return false;
         }
 
-        private TreeItem GetorAddItem(TreeItem root, IProjectItem item)
+        private TreeNavigator GetorAddItem(TreeNavigator root, IProjectItem item)
         {
-            var enumerator = root.Children.GetEnumerator();
+            var nav = root.Clone();
             var folder = item is DirectoryItem;
+            TreePosition pos = null;
+            TreePosition child = null;
 
-            var items = new List<string>();
-            int pos = 0;
-
-            while (enumerator.MoveNext())
+            if (nav.MoveToChild())
             {
-                var citem = enumerator.Current as TreeItem;
+                child = nav.CurrentPosition;
 
-                if (citem.Text == item.Name)
-                    return citem;
+                do
+                {
+                    if (nav.GetValue(_dataText).ToString() == item.Name)
+                        return nav;
 
-                if (folder)
-                {
-                    if (citem.Tag is DirectoryItem)
-                        items.Add(citem.Text);
+                    if (nav.GetValue(_dataTag) is DirectoryItem)
+                    {
+                        if (folder && string.Compare(nav.GetValue(_dataText), item.Name) < 0 || !folder)
+                            pos = nav.CurrentPosition;
+                    }
+                    else if(!folder && nav.GetValue(_dataTag) is ContentItem)
+                    {
+                        if (string.Compare(nav.GetValue(_dataText), item.Name) < 0)
+                            pos = nav.CurrentPosition;
+                    }
                 }
-                else
-                {
-                    if (citem.Tag is DirectoryItem)
-                        pos++;
-                    else
-                        items.Add(citem.Text);
-                }
+                while (nav.MoveNext());
             }
 
-            items.Add(item.Name);
-            items.Sort();
-            pos += items.IndexOf(item.Name);
+            TreeNavigator ret;
 
-            var ret = new TreeItem();
+            if (pos == null)
+            {
+                if (child == null)
+                    ret = _treeStore.AddNode(root.CurrentPosition);
+                else
+                    ret = _treeStore.InsertNodeBefore(child);
+            }
+            else
+                ret = _treeStore.InsertNodeAfter(pos);
 
             if(item is DirectoryItem)
-                ret.Image = Global.GetDirectoryIcon(item.Exists);
+                ret.SetValue(_dataImage, Global.GetXwtDirectoryIcon(item.Exists));
             else
-                ret.Image = Global.GetFileIcon(PipelineController.Instance.GetFullPath(item.OriginalPath), item.Exists);
+                ret.SetValue(_dataImage, Global.GetXwtFileIcon(PipelineController.Instance.GetFullPath(item.OriginalPath), item.Exists));
 
-            ret.Text = item.Name;
-            ret.Tag = item;
-
-            root.Children.Insert(pos, ret);
-            RefreshItem(root);
+            ret.SetValue(_dataText, item.Name);
+            ret.SetValue(_dataTag, item);
 
             return ret;
         }

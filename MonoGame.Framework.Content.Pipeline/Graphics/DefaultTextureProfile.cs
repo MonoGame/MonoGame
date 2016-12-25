@@ -19,7 +19,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone ||
                     platform == TargetPlatform.WindowsPhone8 ||
                     platform == TargetPlatform.WindowsStoreApp ||
                     platform == TargetPlatform.iOS;
@@ -109,7 +108,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool sharpAlpha)
+        protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool generateMipmaps, bool isSpriteFont)
         {
             format = GetTextureFormatForPlatform(format, context.TargetPlatform);
 
@@ -127,7 +126,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
 
                 case TextureProcessorOutputFormat.DxtCompressed:
-                    GraphicsUtil.CompressDxt(context.TargetProfile, content, generateMipmaps, sharpAlpha);
+                    GraphicsUtil.CompressDxt(context.TargetProfile, content, generateMipmaps, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.Etc1Compressed:
@@ -135,7 +134,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    GraphicsUtil.CompressPvrtc(content, generateMipmaps);
+                    GraphicsUtil.CompressPvrtc(content, generateMipmaps, isSpriteFont);
                     break;
             }
         }

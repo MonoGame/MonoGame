@@ -31,7 +31,7 @@ Here are a few simple rules and suggestions to remember when contributing to Mon
 * **PLEASE** be sure to write simple and descriptive commit messages.
 * **DO NOT** surprise us with new APIs or big new features. Open an issue to discuss your ideas first.
 * **DO NOT** reorder type members as it makes it difficult to compare code changes in a PR.
-* **DO** try to follow our [coding style](https://github.com/mono/MonoGame/wiki/Coding-Guidelines) for new code.
+* **DO** try to follow our [coding style](CODESTYLE.md) for new code.
 * **DO** give priority to the existing style of the file you're changing.
 * **DO** try to add to our [unit tests](Test) when adding new features or fixing bugs.
 * **DO NOT** send PRs for code style changes or make code changes just for the sake of style.

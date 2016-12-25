@@ -45,17 +45,6 @@
     <Reference Include="System.Core" />
   </Platform>
 
-  <Platform Type="Ouya">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="mscorlib" />
-    <Reference Include="OpenTK-1.0" />
-    <Reference Include="System.Core" />
-    <Binary
-      Name="Ouya.Console.Api"
-      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
-  </Platform>
-
   <Platform Type="Windows">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
@@ -144,33 +133,6 @@
     </Service>
   </Platform>
 
-  <Platform Type="WindowsPhone">
-    <Reference Include="System" />
-    <Reference Include="System.Runtime.Serialization" />
-	
-    <Binary
-      Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.dll" />
-    <Binary
-      Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.Direct3D11.dll" />
-    <Binary
-      Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.DXGI.dll" />
-    <Binary
-      Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.MediaFoundation.dll" />
-    <Binary
-      Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
-    <Reference Include="Microsoft.Xna.Framework">
-      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
-    </Reference>
-    <Reference Include="Microsoft.Xna.Framework.GamerServices">
-      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
-    </Reference>
-  </Platform>
-  
   <Platform Type="WindowsPhone81">
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />

@@ -1,61 +1,61 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
-	internal static class ReflectionHelpers
-	{
-		public static bool IsValueType(Type targetType)
-		{
-			if (targetType == null)
-			{
-				throw new NullReferenceException("Must supply the targetType parameter");
-			}
+    internal static partial class ReflectionHelpers
+    {
+        public static bool IsValueType(Type targetType)
+        {
+            if (targetType == null)
+            {
+                throw new NullReferenceException("Must supply the targetType parameter");
+            }
 #if WINRT
-			return targetType.GetTypeInfo().IsValueType;
+            return targetType.GetTypeInfo().IsValueType;
 #else
-			return targetType.IsValueType;
+            return targetType.IsValueType;
 #endif
-		}
+        }
 
-		public static Type GetBaseType(Type targetType)
-		{
-			if (targetType == null)
-			{
-				throw new NullReferenceException("Must supply the targetType parameter");
-			}
+        public static Type GetBaseType(Type targetType)
+        {
+            if (targetType == null)
+            {
+                throw new NullReferenceException("Must supply the targetType parameter");
+            }
 #if WINRT
-			var type = targetType.GetTypeInfo().BaseType;
+            var type = targetType.GetTypeInfo().BaseType;
 #else
-			var type = targetType.BaseType;
+            var type = targetType.BaseType;
 #endif
-			return type;
-		}
+            return type;
+        }
 
         /// <summary>
         /// Returns true if the given type represents a non-object type that is not abstract.
         /// </summary>
-		public static bool IsConcreteClass(Type t)
-		{
-			if (t == null)
-			{
-				throw new NullReferenceException("Must supply the t (type) parameter");
-			}
+        public static bool IsConcreteClass(Type t)
+        {
+            if (t == null)
+            {
+                throw new NullReferenceException("Must supply the t (type) parameter");
+            }
 
             if (t == typeof(object))
                 return false;
 #if WINRT
-			var ti = t.GetTypeInfo();
-			if (ti.IsClass && !ti.IsAbstract)
-				return true;
+            var ti = t.GetTypeInfo();
+            if (ti.IsClass && !ti.IsAbstract)
+                return true;
 #else
-			if (t.IsClass && !t.IsAbstract)
-				return true;
+            if (t.IsClass && !t.IsAbstract)
+                return true;
 #endif
-			return false;
-		}
+            return false;
+        }
 
         public static MethodInfo GetPropertyGetMethod(PropertyInfo property)
         {
@@ -85,17 +85,17 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
         }
 
-		public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
-		{
-			if (member == null)
-				throw new NullReferenceException("Must supply the member parameter");
+        public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
+        {
+            if (member == null)
+                throw new NullReferenceException("Must supply the member parameter");
 
 #if WINRT
-			return member.GetCustomAttribute(typeof(T)) as T;
+            return member.GetCustomAttribute(typeof(T)) as T;
 #else
             return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
-		}
+        }
 
         /// <summary>
         /// Returns true if the get method of the given property exist and are public.
@@ -110,6 +110,7 @@ namespace Microsoft.Xna.Framework.Utilities
             }
 
             var getMethod = GetPropertyGetMethod(property);
+
             if (getMethod == null || !getMethod.IsPublic)
                 return false;
 
@@ -119,15 +120,15 @@ namespace Microsoft.Xna.Framework.Utilities
         /// <summary>
         /// Returns true if the given type can be assigned the given value
         /// </summary>
-		public static bool IsAssignableFrom(Type type, object value)
-		{
-			if (type == null)
-				throw new ArgumentNullException("type");
-			if (value == null)
-				throw new ArgumentNullException("value");
+        public static bool IsAssignableFrom(Type type, object value)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+            if (value == null)
+                throw new ArgumentNullException("value");
 
             return IsAssignableFromType(type, value.GetType());
-		}
+        }
 
         /// <summary>
         /// Returns true if the given type can be assigned a value with the given object type
@@ -147,6 +148,5 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
             return false;
         }
-
-	}
+    }
 }

@@ -12,11 +12,15 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainWindow : Form, IView
     {
+#pragma warning disable 649
         public EventHandler<EventArgs> RecentChanged;
         public EventHandler<EventArgs> TitleChanged;
+#pragma warning restore 649
         public const string TitleBase = "MonoGame Pipeline Tool";
         public static MainWindow Instance;
 
+        private List<Pad> _pads;
+        private Clipboard _clipboard;
         private ContextMenu _contextMenu;
         private FileDialogFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
         private string[] monoLocations = {
@@ -27,9 +31,27 @@ namespace MonoGame.Tools.Pipeline
 
         public MainWindow()
         {
+            _pads = new List<Pad>();
+            _clipboard = new Clipboard();
+
             InitializeComponent();
 
             Instance = this;
+
+            // Fill in Pad menu
+            foreach (var pad in _pads)
+            {
+                if (pad.Commands.Count > 0)
+                {
+                    var menu = new ButtonMenuItem();
+                    menu.Text = pad.Title;
+
+                    foreach (var com in pad.Commands)
+                        menu.Items.Add(com.CreateMenuItem());
+
+                    menuView.Items.Add(menu);
+                }
+            }
 
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
@@ -42,30 +64,30 @@ namespace MonoGame.Tools.Pipeline
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = !PipelineController.Instance.Exit();
-            base.OnClosing(e);
-        }
 
-        public override void Close()
-        {
-            Application.Instance.Quit();
-            base.Close();
+            if (!e.Cancel)
+                Xwt.Application.Exit();
+
+            base.OnClosing(e);
         }
 
         public void ShowContextMenu()
         {
             if (PipelineController.Instance.ProjectOpen)
-                _contextMenu.Show(projectControl);
+                _contextMenu.Show(projectControl.TreeView.ToEto());
         }
 
         #region IView implements
 
         public void Attach(IController controller)
         {
-            cmdFilterOutput.Checked = PipelineSettings.Default.FilterOutput;
-            CmdFilterOutput_Executed(this, EventArgs.Empty);
+            PipelineController.Instance.OnProjectLoaded += () => projectControl.ExpandBase();
 
             cmdDebugMode.Checked = PipelineSettings.Default.DebugMode;
             CmdDebugMode_Executed(this, EventArgs.Empty);
+
+            foreach (var control in _pads)
+                control.LoadSettings();
 
             Style = "MainWindow";
         }
@@ -79,9 +101,9 @@ namespace MonoGame.Tools.Pipeline
         {
             var result = MessageBox.Show(this, "Do you want to save the project first?", "Save Project", MessageBoxButtons.YesNoCancel, MessageBoxType.Question);
 
-            if (result == Eto.Forms.DialogResult.Yes)
+            if (result == DialogResult.Yes)
                 return AskResult.Yes;
-            if (result == Eto.Forms.DialogResult.No)
+            if (result == DialogResult.No)
                 return AskResult.No;
 
             return AskResult.Cancel;
@@ -167,7 +189,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void EndTreeUpdate()
         {
-            projectControl.RefreshData();
+            
         }
 
         public void UpdateProperties()
@@ -177,7 +199,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void OutputAppend(string text)
         {
-            Application.Instance.Invoke(() => buildOutput.WriteLine(text));
+            Application.Instance.AsyncInvoke(() => buildOutput.WriteLine(text));
         }
 
         public void OutputClear()
@@ -188,13 +210,13 @@ namespace MonoGame.Tools.Pipeline
         public bool ShowDeleteDialog(List<IProjectItem> items)
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
-            return dialog.Run(this) == Eto.Forms.DialogResult.Ok;
+            return dialog.Run(this) == DialogResult.Ok;
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
         {
             var dialog = new EditDialog(title, text, oldname, file);
-            var result = dialog.Run(this) == Eto.Forms.DialogResult.Ok;
+            var result = dialog.Run(this) == DialogResult.Ok;
 
             newname = dialog.Text;
 
@@ -363,26 +385,8 @@ namespace MonoGame.Tools.Pipeline
             cmdOpenItem.Enabled = info.OpenItem;
             cmdOpenItemWith.Enabled = info.OpenItemWith;
             cmdOpenItemLocation.Enabled = info.OpenItemLocation;
+            cmdCopyAssetPath.Enabled = info.CopyAssetPath;
             cmdRebuildItem.Enabled = info.RebuildItem;
-
-            // ToolBar
-
-            if (info.Build && toolbar.Items.Contains(toolCancelBuild))
-            {
-                toolbar.Items.Remove(toolCancelBuild);
-
-                toolbar.Items.Insert(12, toolBuild);
-                toolbar.Items.Insert(13, toolRebuild);
-                toolbar.Items.Insert(14, toolClean);
-            }
-            else if (info.Cancel && toolbar.Items.Contains(toolBuild))
-            {
-                toolbar.Items.Remove(toolBuild);
-                toolbar.Items.Remove(toolRebuild);
-                toolbar.Items.Remove(toolClean);
-
-                toolbar.Items.Insert(12, toolCancelBuild);
-            }
 
             // Visibility of menu items can't be changed so 
             // we need to recreate the context menu each time.
@@ -397,6 +401,7 @@ namespace MonoGame.Tools.Pipeline
             AddContextMenu(cmAdd, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmOpenItemLocation, ref sep);
+            AddContextMenu(cmCopyAssetPath, ref sep);
             AddContextMenu(cmRebuildItem, ref sep);
             AddSeparator(ref sep);
             AddContextMenu(cmExclude, ref sep);
@@ -460,6 +465,12 @@ namespace MonoGame.Tools.Pipeline
                 clearItem.Click += (sender, e) => PipelineController.Instance.ClearRecentList();
                 menuRecent.Items.Add(clearItem);
             }
+        }
+
+        public void SetClipboard(string text)
+        {
+            _clipboard.Clear();
+            _clipboard.Text = text;
         }
 
         #endregion
@@ -572,12 +583,6 @@ namespace MonoGame.Tools.Pipeline
             PipelineController.Instance.LaunchDebugger = cmdDebugMode.Checked;
         }
 
-        private void CmdFilterOutput_Executed(object sender, EventArgs e)
-        {
-            PipelineSettings.Default.FilterOutput = cmdFilterOutput.Checked;
-            buildOutput.Filtered = cmdFilterOutput.Checked;
-        }
-
         private void CmdHelp_Executed(object sender, EventArgs e)
         {
             Process.Start("http://www.monogame.net/documentation/?page=Pipeline");
@@ -605,6 +610,11 @@ namespace MonoGame.Tools.Pipeline
         {
             if (PipelineController.Instance.SelectedItem != null)
                 Process.Start(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location));
+        }
+
+        private void CmdCopyAssetPath_Executed(object sender, EventArgs e)
+        {
+            PipelineController.Instance.CopyAssetPath();
         }
 
         private void CmdRebuildItem_Executed(object sender, EventArgs e)

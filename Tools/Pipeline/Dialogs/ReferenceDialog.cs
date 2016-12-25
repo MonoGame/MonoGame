@@ -73,6 +73,12 @@ namespace MonoGame.Tools.Pipeline
             buttonRemove.Enabled = grid1.SelectedItems.ToList().Count > 0;
         }
 
+        private void Grid1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Keys.Delete)
+                ButtonRemove_Click(sender, e);
+        }
+
         private void ButtonAdd_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog();
@@ -89,8 +95,8 @@ namespace MonoGame.Tools.Pipeline
 
         private void ButtonRemove_Click(object sender, EventArgs e)
         {
-            var selectedItems = grid1.SelectedItems;
-
+            var selectedItems = grid1.SelectedItems.ToArray();
+            
             foreach (var item in selectedItems)
                 _dataStore.Remove(item as RefItem);
         }

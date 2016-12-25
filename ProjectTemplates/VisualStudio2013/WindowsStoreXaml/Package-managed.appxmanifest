@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
 
   <Identity Name="$guid9$"
             Publisher="$XmlEscapedPublisherDistinguishedName$"
@@ -24,16 +24,20 @@
     <Application Id="App"
         Executable="$targetnametoken$.exe"
         EntryPoint="$safeprojectname$.App">
-        <VisualElements
-            DisplayName="$projectname$"
-            Logo="Assets\Logo.png"
-            SmallLogo="Assets\SmallLogo.png"
-            Description="$projectname$"
-            ForegroundText="light"
-            BackgroundColor="#464646">
-            <DefaultTile ShowName="allLogos" />
-            <SplashScreen Image="Assets\SplashScreen.png" />
-        </VisualElements>
+        <m2:VisualElements 
+		  DisplayName="$safeprojectname$"
+		  Description="$safeprojectname$"
+		  BackgroundColor="#464646"
+		  ForegroundText="light"
+		  Square150x150Logo="Assets\Logo.png"
+		  Square30x30Logo="Assets\SmallLogo.png">
+          <m2:DefaultTile>
+            <m2:ShowNameOnTiles>
+              <m2:ShowOn Tile="square150x150Logo" />
+            </m2:ShowNameOnTiles>
+          </m2:DefaultTile>
+          <m2:SplashScreen Image="Assets\SplashScreen.png" />
+        </m2:VisualElements>
     </Application>
   </Applications>
   <Capabilities>

@@ -11,8 +11,6 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private readonly DspParameter[] _parameters = new DspParameter[22];
 
-        private bool _dirty;
-
         public ReverbSettings(BinaryReader reader)
         {
             _parameters[0] = new DspParameter(reader); // ReflectionsDelayMs

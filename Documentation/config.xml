@@ -90,11 +90,6 @@
     <source>..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll</source>
   </group>
 
-  <!-- Windows Phone 8 -->
-  <group api="wp8|Windows Phone 8">    
-    <source>..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll</source>
-  </group>
-
   <!-- Web -->
   <group api="web|Web">    
     <source>..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.dll</source>
@@ -111,13 +106,6 @@
   <!--
   <group api="android|Android">    
     <source>..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.dll</source>
-  </group>
-  -->
-
-  <!-- Ouya -->
-  <!--
-  <group api="ouya|OUYA">    
-    <source>..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.dll</source>
   </group>
   -->
 

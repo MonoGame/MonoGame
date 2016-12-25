@@ -4,6 +4,8 @@
   <Platform Type="Linux">
     <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
     <Binary Name="Eto.Gtk3" Path="ThirdParty\Dependencies\Eto\Eto.Gtk3.dll" />
+    <Binary Name="Xwt" Path="ThirdParty\Dependencies\xwt\Xwt.dll" />
+    <Binary Name="Xwt.Gtk3" Path="ThirdParty\Dependencies\xwt\Xwt.Gtk3.dll" />
       
     <Binary
       Name="gtk-sharp"
@@ -42,6 +44,8 @@
   <Platform Type="MacOS">
     <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
     <Binary Name="Eto.Gtk2" Path="ThirdParty\Dependencies\Eto\Eto.Gtk2.dll" />
+    <Binary Name="Xwt" Path="ThirdParty\Dependencies\xwt\Xwt.dll" />
+    <Binary Name="Xwt.Gtk2" Path="ThirdParty\Dependencies\xwt\Xwt.Gtk2.dll" />
     
     <Reference Include="atk-sharp"/>
     <Reference Include="gdk-sharp"/>
@@ -56,6 +60,8 @@
   <Platform Type="Windows">
     <Binary Name="Eto.Forms" Path="ThirdParty\Dependencies\Eto\Eto.dll" />
     <Binary Name="Eto.Wpf" Path="ThirdParty\Dependencies\Eto\Eto.Wpf.dll" />
+    <Binary Name="Xwt" Path="ThirdParty\Dependencies\xwt\Xwt.dll" />
+    <Binary Name="Xwt.WPF" Path="ThirdParty\Dependencies\xwt\Xwt.WPF.dll" />
     
     <Reference Include="System.Deployment" />
     <Reference Include="System.Xaml" />

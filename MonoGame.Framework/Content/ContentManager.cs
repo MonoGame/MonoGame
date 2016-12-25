@@ -37,7 +37,6 @@ namespace Microsoft.Xna.Framework.Content
         {
             'w', // Windows (DirectX)
             'x', // Xbox360
-            'm', // WindowsPhone
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
@@ -61,7 +60,6 @@ namespace Microsoft.Xna.Framework.Content
             'p', // PlayStationMobile
             'g', // Windows (OpenGL)
             'l', // Linux
-            'u', // Ouya
         };
 
 

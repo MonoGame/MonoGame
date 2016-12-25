@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Utilities.Png;
+using SharpDX.DXGI;
 
 #if WINDOWS_PHONE
 using System.Threading;
@@ -27,6 +28,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _renderTarget;
         private bool _mipmap;
+
+        private SampleDescription _sampleDescription;
+
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             _shared = shared;
@@ -37,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
@@ -121,6 +125,9 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
+            // Save sampling description.
+            _sampleDescription = desc.SampleDescription;
+
             var d3dContext = GraphicsDevice._d3dContext;
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
             {
@@ -160,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             // We need to copy each row separatly and skip trailing zeros.
                             stream.Seek(0, SeekOrigin.Begin);
 
-                            int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                            int elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;
@@ -315,7 +322,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 #if !WINDOWS_PHONE
 
-        [CLSCompliant(false)]
         static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
 
@@ -399,7 +405,15 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_shared)
                 desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
 
+            // Save sampling description.
+            _sampleDescription = desc.SampleDescription;
+
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
+
+        internal SampleDescription GetTextureSampleDescription()
+        {
+            return _sampleDescription;
         }
 
         private void PlatformReload(Stream textureStream)
