@@ -323,13 +323,15 @@ namespace Microsoft.Xna.Framework.GamerServices
 			
 		}
 	}
-	
-	public class SignedOutEventArgs : EventArgs
-	{
-		public SignedOutEventArgs (SignedInGamer gamer )
-		{
-			
-		}
-	}
+
+    public class SignedOutEventArgs : EventArgs
+    {
+        public SignedOutEventArgs(SignedInGamer gamer)
+        {
+            this.Gamer = gamer;
+        }
+
+        public SignedInGamer Gamer { get; }
+    }
 }
 
