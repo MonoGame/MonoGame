@@ -420,8 +420,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         destinationRectangle.Z,
                         destinationRectangle.W,
                         color,
-                        ref _texCoordTL,
-                        ref _texCoordBR,
+                        _texCoordTL,
+                        _texCoordBR,
                         depth);
             }
             else
@@ -435,8 +435,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         sin,
                         cos,
                         color,
-                        ref _texCoordTL,
-                        ref _texCoordBR,
+                        _texCoordTL,
+                        _texCoordBR,
                         depth);
             }
 
