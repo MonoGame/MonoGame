@@ -32,8 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTL.Position.Y = y;
             vertexTL.Position.Z = depth;
             vertexTL.Color = color;
-            vertexTL.TextureCoordinate.X = texCoordTL.X;
-            vertexTL.TextureCoordinate.Y = texCoordTL.Y;
+            vertexTL.TextureCoordinate = texCoordTL;
 
             vertexTR.Position.X = x +w*cos;
             vertexTR.Position.Y = y +w*sin;
@@ -53,8 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexBR.Position.Y = y +w*sin+h*cos;
             vertexBR.Position.Z = depth;
             vertexBR.Color = color;
-            vertexBR.TextureCoordinate.X = texCoordBR.X;
-            vertexBR.TextureCoordinate.Y = texCoordBR.Y;
+            vertexBR.TextureCoordinate = texCoordBR;
 		}
 
         public void Set(float x, float y, float w, float h, Color color, ref Vector2 texCoordTL, ref Vector2 texCoordBR, float depth)
@@ -63,8 +61,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexTL.Position.Y = y;
             vertexTL.Position.Z = depth;
             vertexTL.Color = color;
-            vertexTL.TextureCoordinate.X = texCoordTL.X;
-            vertexTL.TextureCoordinate.Y = texCoordTL.Y;
+            vertexTL.TextureCoordinate = texCoordTL;
 
             vertexTR.Position.X = x + w;
             vertexTR.Position.Y = y;
@@ -84,8 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexBR.Position.Y = y + h;
             vertexBR.Position.Z = depth;
             vertexBR.Color = color;
-            vertexBR.TextureCoordinate.X = texCoordBR.X;
-            vertexBR.TextureCoordinate.Y = texCoordBR.Y;
+            vertexBR.TextureCoordinate = texCoordBR;
         }
 
         #region Implement IComparable
