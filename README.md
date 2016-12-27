@@ -14,8 +14,8 @@ The master server is responsible for introducing (ie. finding the endpoint and p
 The session state is synchronized across all peers. Each signed in gamer that enters a game gets its own unique id that is synchronized across all peers. Incoming messages from unknown gamers are delayed until the gamer in question joins the game on the local machine, which is important because user messages do not need to be ordered and may arrive before the internal gamer join message.
 
 Overall, there are 2 caveats of the implementation that users must be aware of:
-* A peer cannot be behind the same router as the master server since the master server must know the external ip of the peer
-* A peer cannot be behind the same router as the host since the host must know the external ip of the peer
+* A peer cannot be behind the same router as the master server since the master server must know the external endpoint of the peer
+* A peer cannot be behind the same router as the host since the host must know the external endpoint of the peer
 
 In practice, the only problem is that gamers behind the same router will not be able to connect to each other if any of them are designated the host.
 
