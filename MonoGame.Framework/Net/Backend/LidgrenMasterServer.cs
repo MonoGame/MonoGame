@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         }
     }
 
-    public class LidgrenMasterServer : IMasterServer
+    internal class LidgrenMasterServer : MasterServer
     {
         private static readonly TimeSpan ReportStatusInterval = TimeSpan.FromSeconds(60.0);
 
@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         private IDictionary<long, HostData> hosts = new Dictionary<long, HostData>();
         private DateTime lastReportedStatus = DateTime.MinValue;
 
-        public void Start(string gameAppId)
+        public override void Start(string gameAppId)
         {
             NetPeerConfiguration config = new NetPeerConfiguration(gameAppId);
             config.AcceptIncomingConnections = false;
@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         protected void HandleMessage(NetIncomingMessage rawMsg)
         {
-            IncomingMessage msg = new IncomingMessage();
+            LidgrenIncomingMessage msg = new LidgrenIncomingMessage();
             msg.Buffer = rawMsg;
 
             string senderGameAppId = msg.ReadString();
@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             {
                 foreach (var elem in hosts)
                 {
-                    OutgoingMessage response = new OutgoingMessage();
+                    LidgrenOutgoingMessage response = new LidgrenOutgoingMessage();
                     response.Write(elem.Key);
                     response.Write(new LidgrenEndPoint(elem.Value.externalEndPoint));
                     elem.Value.publicInfo.Pack(response);
@@ -219,7 +219,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
-        public void Update()
+        public override void Update()
         {
             if (server == null || server.Status == NetPeerStatus.NotRunning)
             {
@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             ReportStatus();
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             if (server == null || server.Status == NetPeerStatus.NotRunning || server.Status == NetPeerStatus.ShutdownRequested)
             {

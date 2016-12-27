@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("UserMessage from not fully connected peer");
             }
 
-            IOutgoingMessage msg = Backend.GetMessage(recipient?.Machine.peer, options, 0);
+            OutgoingMessage msg = Backend.GetMessage(recipient?.Machine.peer, options, 0);
             msg.Write((byte)InternalMessageIndex.UserMessage);
 
             bool sendToAll = recipient == null;
@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!CurrentMachine.IsFullyConnected || !senderMachine.IsFullyConnected)
             {

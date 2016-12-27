@@ -2,79 +2,83 @@
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
-    internal class OutgoingMessage : IOutgoingMessage, IResetable
+    internal class LidgrenOutgoingMessage : Backend.OutgoingMessage, IResetable
     {
-        public OutgoingMessage()
+        internal Peer recipient;
+        internal SendDataOptions options;
+        internal int channel;
+
+        public LidgrenOutgoingMessage()
         {
             this.Buffer = new NetBuffer();
         }
 
         internal NetBuffer Buffer { get; private set; }
-        public IPeer Recipient { get; internal set; }
-        public SendDataOptions Options { get; internal set; }
-        public int Channel { get; internal set; }
+        public override Peer Recipient { get { return recipient; } }
+        public override SendDataOptions Options { get { return options; } }
+        public override int Channel { get { return channel; } }
 
         public void Reset()
         {
             Buffer.LengthBits = 0;
             Buffer.Position = 0;
-            Recipient = null;
-            Options = SendDataOptions.None;
-            Channel = 0;
+            recipient = null;
+            options = SendDataOptions.None;
+            channel = 0;
         }
 
-        public void Write(string value)
+        public override void Write(string value)
         {
             Buffer.Write(value);
         }
 
-        public void Write(byte[] value)
+        public override void Write(byte[] value)
         {
             Buffer.Write(value);
         }
 
-        public void Write(int value)
+        public override void Write(int value)
         {
             Buffer.Write(value);
         }
 
-        public void Write(long value)
+        public override void Write(long value)
         {
             Buffer.Write(value);
         }
 
-        public void Write(bool value)
+        public override void Write(bool value)
         {
             Buffer.Write(value);
         }
 
-        public void Write(byte value)
+        public override void Write(byte value)
         {
             Buffer.Write(value);
         }
 
-        public void Write(IPeerEndPoint value)
+        public override void Write(PeerEndPoint value)
         {
             LidgrenEndPoint ep = value as LidgrenEndPoint;
 
             Buffer.Write(ep.endPoint);
         }
 
-        public void Write(IPeer value)
+        public override void Write(Peer value)
         {
             Buffer.Write((value as ILidgrenPeer).Id);
         }
     }
 
-    internal class IncomingMessage : IIncomingMessage, IResetable
+    internal class LidgrenIncomingMessage : Backend.IncomingMessage, IResetable
     {
         internal LidgrenBackend Backend { get; set; }
         internal NetBuffer Buffer { get; set; }
 
-        public IncomingMessage()
+        public LidgrenIncomingMessage()
         { }
 
-        public IncomingMessage(NetBuffer buffer)
+        public LidgrenIncomingMessage(NetBuffer buffer)
         {
             this.Buffer = buffer;
         }
@@ -85,42 +89,42 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             Buffer = null;
         }
 
-        public bool ReadBoolean()
+        public override bool ReadBoolean()
         {
             return Buffer.ReadBoolean();
         }
 
-        public byte ReadByte()
+        public override byte ReadByte()
         {
             return Buffer.ReadByte();
         }
 
-        public void ReadBytes(byte[] into, int offset, int length)
+        public override void ReadBytes(byte[] into, int offset, int length)
         {
             Buffer.ReadBytes(into, offset, length);
         }
 
-        public int ReadInt()
+        public override int ReadInt()
         {
             return Buffer.ReadInt32();
         }
 
-        public long ReadLong()
+        public override long ReadLong()
         {
             return Buffer.ReadInt64();
         }
 
-        public IPeerEndPoint ReadPeerEndPoint()
+        public override PeerEndPoint ReadPeerEndPoint()
         {
             return new LidgrenEndPoint(Buffer.ReadIPEndPoint());
         }
 
-        public IPeer ReadPeer()
+        public override Peer ReadPeer()
         {
             return Backend.FindPeerById(Buffer.ReadInt64());
         }
 
-        public string ReadString()
+        public override string ReadString()
         {
             return Buffer.ReadString();
         }

@@ -7,12 +7,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Create(NetworkMachine recipient)
         {
-            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GamerIdRequest);
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!CurrentMachine.IsHost || !senderMachine.IsFullyConnected)
             {

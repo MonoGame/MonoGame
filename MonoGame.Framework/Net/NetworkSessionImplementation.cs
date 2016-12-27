@@ -6,10 +6,10 @@ namespace Microsoft.Xna.Framework.Net
     internal class NetworkSessionImplementation
     {
         // This is where the backend implementation is defined
-        private static ISessionCreator SessionCreatorInstance;
-        private static IMasterServer MasterServerInstance;
+        private static SessionCreator SessionCreatorInstance;
+        private static MasterServer MasterServerInstance;
 
-        internal static ISessionCreator SessionCreator
+        internal static SessionCreator SessionCreator
         {
             get
             {
@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal static IMasterServer MasterServer
+        internal static MasterServer MasterServer
         {
             get
             {

@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
     {
         public void Create(LocalNetworkGamer localGamer, bool sendNames, bool sendFlags, NetworkMachine recipient)
         {
-            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GamerStateChanged);
 
             msg.Write(localGamer.Id);
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
         {
             if (senderMachine.IsLocal)
             {

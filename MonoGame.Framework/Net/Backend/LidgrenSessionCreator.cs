@@ -9,7 +9,7 @@ using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
-    internal class LidgrenSessionCreator : ISessionCreator
+    internal class LidgrenSessionCreator : SessionCreator
     {
         private const int DiscoveryTime = 2000;
         private const int FullyConnectedPollingTime = 50;
@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return true;
         }
 
-        public NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
+        public override NetworkSession Create(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties)
         {
             NetPeerConfiguration config = new NetPeerConfiguration(NetworkSessionSettings.GameAppId);
             config.Port = NetworkSessionSettings.Port;
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
             Debug.WriteLine("Peer started.");
 
-            NetworkSession session = new NetworkSession(new LidgrenBackend(peer), new IPeerEndPoint[0], true, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
+            NetworkSession session = new NetworkSession(new LidgrenBackend(peer), new PeerEndPoint[0], true, maxGamers, privateGamerSlots, sessionType, sessionProperties, localGamers);
 
             if (!WaitUntilFullyConnected(session))
             {
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return session;
         }
 
-        private static void AddAvailableNetworkSession(long id, IPeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
+        private void AddAvailableNetworkSession(long id, PeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
         {
             if (searchType == publicInfo.sessionType && searchProperties.SearchMatch(publicInfo.sessionProperties))
             {
@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
         }
 
-        public AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
+        public override AvailableNetworkSessionCollection Find(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties)
         {
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
@@ -136,9 +136,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     if (rawMsg.SenderEndPoint.Equals(masterServerEndPoint))
                     {
-                        IIncomingMessage msg = new IncomingMessage(rawMsg);
+                        Backend.IncomingMessage msg = new LidgrenIncomingMessage(rawMsg);
                         long hostId = msg.ReadLong();
-                        IPeerEndPoint hostEndPoint = msg.ReadPeerEndPoint();
+                        PeerEndPoint hostEndPoint = msg.ReadPeerEndPoint();
                         NetworkSessionPublicInfo hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
                         AddAvailableNetworkSession(hostId, hostEndPoint, hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 }
                 else if (rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse)
                 {
-                    IIncomingMessage msg = new IncomingMessage(rawMsg);
+                    Backend.IncomingMessage msg = new LidgrenIncomingMessage(rawMsg);
                     NetworkSessionPublicInfo hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
                     AddAvailableNetworkSession(-1, new LidgrenEndPoint(rawMsg.SenderEndPoint), hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return new AvailableNetworkSessionCollection(availableSessions);
         }
 
-        public NetworkSession Join(AvailableNetworkSession availableSession)
+        public override NetworkSession Join(AvailableNetworkSession availableSession)
         {
             IPEndPoint masterServerEndPoint = NetUtility.Resolve(NetworkSessionSettings.MasterServerAddress, NetworkSessionSettings.MasterServerPort);
 
@@ -205,11 +205,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             AvailableNetworkSession aS = availableSession;
 
             LidgrenBackend backend = new LidgrenBackend(peer);
-            NetworkSession session = new NetworkSession(backend, new IPeerEndPoint[] { aS.EndPoint }, false, aS.MaxGamers, aS.PrivateGamerSlots, aS.SessionType, aS.SessionProperties, aS.LocalGamers);
+            NetworkSession session = new NetworkSession(backend, new PeerEndPoint[] { aS.EndPoint }, false, aS.MaxGamers, aS.PrivateGamerSlots, aS.SessionType, aS.SessionProperties, aS.LocalGamers);
 
             if (aS.SessionType == NetworkSessionType.SystemLink)
             {
-                (session as IBackendListener).IntroducedAsClient(aS.EndPoint);
+                (session as ISessionBackendListener).IntroducedAsClient(aS.EndPoint);
             }
             else if (aS.SessionType == NetworkSessionType.PlayerMatch || aS.SessionType == NetworkSessionType.Ranked)
             {

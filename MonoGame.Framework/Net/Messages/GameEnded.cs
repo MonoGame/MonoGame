@@ -15,12 +15,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
             // Queue reset ready first
             CurrentMachine.Session.InternalMessages.ResetReady.Create();
 
-            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GameEnded);
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {

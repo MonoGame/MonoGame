@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void Pack(IOutgoingMessage msg)
+        internal void Pack(OutgoingMessage msg)
         {
             msg.Write(list.Count);
 
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        internal void Unpack(IIncomingMessage msg)
+        internal void Unpack(IncomingMessage msg)
         {
             int remoteCount = msg.ReadInt();
             if (remoteCount != list.Count)

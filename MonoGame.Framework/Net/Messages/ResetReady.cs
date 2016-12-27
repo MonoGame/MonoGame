@@ -12,12 +12,12 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send ResetReady");
             }
 
-            IOutgoingMessage msg = Backend.GetMessage(null, SendDataOptions.ReliableInOrder, 1);
+            OutgoingMessage msg = Backend.GetMessage(null, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.ResetReady);
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {

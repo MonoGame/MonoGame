@@ -8,12 +8,12 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class NetworkMachine
     {
-        internal IPeer peer;
+        internal Peer peer;
         private IList<LocalNetworkGamer> localGamers;
         private IList<NetworkGamer> gamers;
         private bool beingRemovedThisFrame;
 
-        internal NetworkMachine(NetworkSession session, IPeer peer, bool isLocal, bool isHost)
+        internal NetworkMachine(NetworkSession session, Peer peer, bool isLocal, bool isHost)
         {
             this.peer = peer;
             this.peer.Tag = this;

@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
                 throw new NetworkException("Only host can send GamerIdResponse");
             }
 
-            IOutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
+            OutgoingMessage msg = Backend.GetMessage(recipient?.peer, SendDataOptions.ReliableInOrder, 1);
             msg.Write((byte)InternalMessageIndex.GamerIdResponse);
 
             byte id;
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Net.Messages
             Queue.Place(msg);
         }
 
-        public override void Receive(IIncomingMessage msg, NetworkMachine senderMachine)
+        public override void Receive(IncomingMessage msg, NetworkMachine senderMachine)
         {
             if (!senderMachine.IsHost)
             {

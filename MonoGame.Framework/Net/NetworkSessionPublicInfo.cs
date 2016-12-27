@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Net
         internal int openPrivateGamerSlots;
         internal int openPublicGamerSlots;
 
-        internal static NetworkSessionPublicInfo FromMessage(IIncomingMessage msg)
+        internal static NetworkSessionPublicInfo FromMessage(IncomingMessage msg)
         {
             NetworkSessionPublicInfo publicInfo = new NetworkSessionPublicInfo();
 
@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Net
             this.openPublicGamerSlots = openPublicGamerSlots;
         }
 
-        internal void Pack(IOutgoingMessage msg)
+        internal void Pack(OutgoingMessage msg)
         {
             msg.Write((byte)sessionType);
             sessionProperties.Pack(msg);
@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Net
             msg.Write(openPublicGamerSlots);
         }
 
-        internal void Unpack(IIncomingMessage msg)
+        internal void Unpack(IncomingMessage msg)
         {
             if (sessionProperties == null)
             {

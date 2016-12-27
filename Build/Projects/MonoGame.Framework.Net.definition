@@ -248,7 +248,7 @@
     <Compile Include="Net\Backend\GenericPool.cs">
       <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
-    <Compile Include="Net\Backend\IBackend.cs">
+    <Compile Include="Net\Backend\Backend.cs">
       <ExcludePlatforms>WindowsPhone81,Windows8,WindowsUniversal</ExcludePlatforms>
     </Compile>
     <Compile Include="Net\Backend\LidgrenBackend.cs">

@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Net
     internal delegate AvailableNetworkSessionCollection AsyncFind(NetworkSessionType sessionType, IEnumerable<SignedInGamer> localGamers, NetworkSessionProperties searchProperties);
     internal delegate NetworkSession AsyncJoin(AvailableNetworkSession availableSession);
 
-    public sealed partial class NetworkSession : IBackendListener, IDisposable, IMessageQueue
+    public sealed partial class NetworkSession : ISessionBackendListener, IDisposable, IMessageQueue
     {
         private static NetworkSession Session;
         private static AsyncCreate AsyncCreateCaller;
