@@ -9,9 +9,11 @@ Since a user can choose to use any network topology for their game, the internal
 
 The peer that starts a game using the NetworkSession.Create() method becomes the host of the game. The host of the game broadcasts its existence to the master server (if NetworkSessionType is PlayerMatch or Ranked as opposed to Local or SystemLink) and responds to discovery requests. Any peer that connects to a host using the NetworkSession.Join() method becomes an ordinary peer. In the future, host migration could make it possible for ordinary peers to become hosts, but it is not implemented yet.
 
-The master server is responsible for introducing (ie. finding the endpoint and performing NAT punchthrough) a peer to a host of an online game. Once connected to a host, the peer is introduced to the other peers already in the game by the host. Peers only allow introductions/connections from other peers whose endpoints are specified in an allowlist and only allow changes to the allowlist from the host. Once fully connected, the signed in gamers of the peer are able to join. This procedure ensures that the peers in a game are fully connected to each other in order to support true a peer-to-peer topology.
+The master server is responsible for introducing (ie. finding the endpoint and performing NAT punchthrough) a peer to a host of an online game. Once connected to a host, the peer is introduced to the other peers already in the game by the host. Peers only allow introductions/connections from other peers whose endpoints are specified in an allowlist and only allow changes to the allowlist from the host. Once fully connected, the signed in gamers of the peer are able to join. This procedure ensures that all peers in a game are fully connected to each other in order to support a true peer-to-peer topology.
 
-There are 2 caveats of this setup that users must be aware of:
+The session state is synchronized across all peers. Each signed in gamer that enters a game gets its own unique id that is synchronized across all peers. Incoming messages from unknown gamers are delayed until the gamer in question joins the game on the local machine, which is important because user messages do not need to be ordered and may arrive before the internal gamer join message.
+
+Overall, there are 2 caveats of the implementation that users must be aware of:
 * A peer cannot be behind the same router as the master server since the master server must know the external ip of the peer
 * A peer cannot be behind the same router as the host since the host must know the external ip of the peer
 
