@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Net
 {
@@ -45,9 +46,14 @@ namespace Microsoft.Xna.Framework.Net
 
         public Packet GetAndFillWith(byte[] source)
         {
-            Packet packet = Get(source.Length);
+            return GetAndFillWith(source, 0, source.Length);
+        }
 
-            source.CopyTo(packet.data, 0);
+        public Packet GetAndFillWith(byte[] source, int offset, int count)
+        {
+            Packet packet = Get(count);
+            
+            Array.Copy(source, offset, packet.data, 0, count);
 
             return packet;
         }
