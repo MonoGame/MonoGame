@@ -101,9 +101,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     modes.Add(mode);
 
-                    if (mode.Width == desktopWidth && mode.Height == desktopHeight && mode.Format == SurfaceFormat.Color)
+                    if (adapter._currentDisplayMode == null)
                     {
-                        if (adapter._currentDisplayMode == null)
+                        if (mode.Width == desktopWidth && mode.Height == desktopHeight && mode.Format == SurfaceFormat.Color)
                             adapter._currentDisplayMode = mode;
                     }
                 }
