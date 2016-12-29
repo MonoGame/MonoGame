@@ -227,8 +227,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 loopLength = (int)Math.Floor(sampleRate * durationInSeconds);
         }
 
-        internal static byte[] StripRiffWaveHeader(byte[] data)
+        internal static byte[] StripRiffWaveHeader(byte[] data, out AudioFormat audioFormat)
         {
+            audioFormat = null;
+
             using (var reader = new BinaryReader(new MemoryStream(data)))
             {
                 var signature = new string(reader.ReadChars(4));
@@ -247,7 +249,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     var chunkSignature = new string(reader.ReadChars(4));
                     if (chunkSignature.ToLowerInvariant() == "data")
                         break;
-                    reader.BaseStream.Seek(reader.ReadInt32(), SeekOrigin.Current);
+                    if (chunkSignature.ToLowerInvariant() == "fmt ")
+                    {
+                        int fmtLength = reader.ReadInt32();
+                        short formatTag = reader.ReadInt16();
+                        short channels = reader.ReadInt16();
+                        int sampleRate = reader.ReadInt32();
+                        int avgBytesPerSec = reader.ReadInt32();
+                        short blockAlign = reader.ReadInt16();
+                        short bitsPerSample = reader.ReadInt16();
+                        audioFormat = new AudioFormat(avgBytesPerSec, bitsPerSample, blockAlign, channels, formatTag, sampleRate);
+
+                        fmtLength -= 2 + 2 + 4 + 4 + 2 + 2;
+                        if (fmtLength < 0)
+                            throw new InvalidOperationException("riff wave header has unexpected format");
+                        reader.BaseStream.Seek(fmtLength, SeekOrigin.Current);
+                    }
+                    else
+                    {
+                        reader.BaseStream.Seek(reader.ReadInt32(), SeekOrigin.Current);
+                    }
                 }
 
                 var dataSize = reader.ReadInt32();
@@ -377,7 +398,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 int loopStart, loopLength;
                 ProbeFormat(temporaryOutput, out audioFileType, out audioFormat, out duration, out loopStart, out loopLength);
 
-                content.SetData(StripRiffWaveHeader(rawData), audioFormat, duration, loopStart, loopLength);
+                AudioFormat riffAudioFormat;
+                byte[] data = StripRiffWaveHeader(rawData, out riffAudioFormat);
+
+                // deal with adpcm
+                if (audioFormat.Format == 2)
+                {
+                    // riff contains correct blockAlign
+                    audioFormat = riffAudioFormat;
+
+                    // fix loopLength -> has to be multiple of sample per block
+                    // see https://msdn.microsoft.com/de-de/library/windows/desktop/ee415711(v=vs.85).aspx
+                    ushort samplesPerBlock = (ushort)(audioFormat.BlockAlign * 2 / audioFormat.ChannelCount - 12); // from https://github.com/sharpdx/SharpDX/blob/master/Source/SharpDX/Multimedia/WaveFormatAdpcm.cs
+                    loopLength = (int)(audioFormat.SampleRate * duration.TotalSeconds);
+                    int remainder = loopLength % samplesPerBlock;
+                    loopLength += samplesPerBlock - remainder;
+                }
+
+                content.SetData(data, audioFormat, duration, loopStart, loopLength);
             }
             finally
             {
