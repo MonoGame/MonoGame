@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
+using System.Runtime.InteropServices;
 #if MONOMAC && PLATFORM_MACOS_LEGACY
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.All;
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
 #if OPENGL && (MONOMAC || DESKTOPGL)
             if (glFormat == (PixelFormat) GLPixelFormat.CompressedTextureFormats)
@@ -92,50 +92,54 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();
 
-            if (rect.HasValue)
-            {
-                var temp = new T[this.size * this.size];
-                GL.GetTexImage(target, level, this.glFormat, this.glType, temp);
-                GraphicsExtensions.CheckGLError();
-                int z = 0, w = 0;
+            var temp = new T[this.size * this.size];
+            GL.GetTexImage(target, level, this.glFormat, this.glType, temp);
+            GraphicsExtensions.CheckGLError();
+            int z = 0, w = 0;
 
-                for (int y = rect.Value.Y; y < rect.Value.Y + rect.Value.Height; ++y)
-                {
-                    for (int x = rect.Value.X; x < rect.Value.X + rect.Value.Width; ++x)
-                    {
-                        data[startIndex + z * rect.Value.Width + w] = temp[y * size + x];
-                        ++w;
-                    }
-                    ++z;
-                    w = 0;
-                }
-            }
-            else
+            for (var y = rect.Y; y < rect.Y + rect.Height; ++y)
             {
-                GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
-                GraphicsExtensions.CheckGLError();
+                for (var x = rect.X; x < rect.X + rect.Width; ++x)
+                {
+                    data[startIndex + z*rect.Width + w] = temp[y*size + x];
+                    ++w;
+                }
+                ++z;
+                w = 0;
             }
 #else
             throw new NotImplementedException();
 #endif
         }
 
-        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
+        private void PlatformSetData<T>(CubeMapFace face, int level, Rectangle rect, T[] data, int startIndex, int elementCount)
         {
             Threading.BlockOnUIThread(() =>
             {
-                GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
-                GraphicsExtensions.CheckGLError();
-
-                TextureTarget target = GetGLCubeFace(face);
-                if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
+                var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                // Use try..finally to make sure dataHandle is freed in case of an error
+                try
                 {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
+                    var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startIndex*elementSizeInByte);
+                    GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
                     GraphicsExtensions.CheckGLError();
+
+                    var target = GetGLCubeFace(face);
+                    if (glFormat == (PixelFormat) GLPixelFormat.CompressedTextureFormats)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        GL.TexSubImage2D(target, level, rect.X, rect.Y, rect.Width, rect.Height, glFormat, glType,
+                            dataPtr);
+                        GraphicsExtensions.CheckGLError();
+                    }
+                }
+                finally
+                {
+                    dataHandle.Free();
                 }
             });
         }

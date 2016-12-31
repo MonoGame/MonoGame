@@ -52,14 +52,16 @@ namespace Microsoft.Xna.Framework.Graphics
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, description);
         }
 
-        private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformGetData<T>(CubeMapFace cubeMapFace, int level, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            var levelSize = Math.Max(size >> level, 1);
             // Create a temp staging resource for copying the data.
             // 
             // TODO: Like in Texture2D, we should probably be pooling these staging resources
             // and not creating a new one each time.
             //
+            var min = _format.IsCompressedFormat() ? 4 : 1;
+            var levelSize = Math.Max(size >> level, min);
+
             var desc = new Texture2DDescription
             {
                 Width = levelSize,
@@ -80,22 +82,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (d3dContext)
                 {
                     // Copy the data from the GPU to the staging texture.
-                    int subresourceIndex = CalculateSubresourceIndex(cubeMapFace, level);
-                    int elementsInRow;
-                    int rows;
-                    if (rect.HasValue)
-                    {
-                        elementsInRow = rect.Value.Width;
-                        rows = rect.Value.Height;
-                        var region = new ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1);
-                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, stagingTex, 0);
-                    }
-                    else
-                    {
-                        elementsInRow = levelSize;
-                        rows = levelSize;
-                        d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, null, stagingTex, 0);
-                    }
+                    var subresourceIndex = CalculateSubresourceIndex(cubeMapFace, level);
+                    var elementsInRow = rect.Width;
+                    var rows = rect.Height;
+                    var region = new ResourceRegion(rect.Left, rect.Top, 0, rect.Right, rect.Bottom, 1);
+                    d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, stagingTex, 0);
 
                     // Copy the data to the array.
                     DataStream stream = null;
@@ -104,6 +95,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
 
                         var elementSize = _format.GetSize();
+                        if (_format.IsCompressedFormat())
+                        {
+                            // for 4x4 block compression formats an element is one block, so elementsInRow
+                            // and number of rows are 1/4 of number of pixels in width and height of the rectangle
+                            elementsInRow /= 4;
+                            rows /= 4;
+                        }
                         var rowSize = elementSize * elementsInRow;
                         if (rowSize == databox.RowPitch)
                             stream.ReadRange(data, startIndex, elementCount);
@@ -113,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             // We need to copy each row separatly and skip trailing zeros.
                             stream.Seek(startIndex, SeekOrigin.Begin);
 
-                            int elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+                            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;
@@ -135,25 +133,36 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
+        private void PlatformSetData<T>(CubeMapFace face, int level, Rectangle rect, T[] data, int startIndex, int elementCount)
         {
-                var box = new DataBox(dataPtr, GetPitch(width), 0);
+            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            // Use try..finally to make sure dataHandle is freed in case of an error
+            try
+            {
+                var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startIndex*elementSizeInByte);
+                var box = new DataBox(dataPtr, GetPitch(rect.Width), 0);
 
-                int subresourceIndex = CalculateSubresourceIndex(face, level);
+                var subresourceIndex = CalculateSubresourceIndex(face, level);
 
                 var region = new ResourceRegion
                 {
-                    Top = yOffset,
+                    Top = rect.Top,
                     Front = 0,
                     Back = 1,
-                    Bottom = yOffset + height,
-                    Left = xOffset,
-                    Right = xOffset + width
+                    Bottom = rect.Bottom,
+                    Left = rect.Left,
+                    Right = rect.Right
                 };
 
-            var d3dContext = GraphicsDevice._d3dContext;
-            lock (d3dContext)
-                d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
+                var d3dContext = GraphicsDevice._d3dContext;
+                lock (d3dContext)
+                    d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
         }
 
 	    private int CalculateSubresourceIndex(CubeMapFace face, int level)

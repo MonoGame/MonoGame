@@ -153,8 +153,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
             if (data.Length < startIndex + elementCount)
                 throw new ArgumentException("The data array is too small.");
-            if (elementCount * tSize != width * height * depth * fSize)
-                throw new ArgumentException("elementCount is too large or too small.", "elementCount");
+
+            var dataByteSize = width*height*depth*fSize;
+            if (elementCount * tSize != dataByteSize)
+                throw new ArgumentException(string.Format("elementCount is not the right size, " +
+                                            "elementCount * sizeof(T) is {0}, but data size is {1}.",
+                                            elementCount * tSize, dataByteSize), "elementCount");
         }
 	}
 }

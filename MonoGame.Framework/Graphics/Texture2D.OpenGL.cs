@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             Threading.BlockOnUIThread(() =>
             {
@@ -135,47 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 try
                 {
                     var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                    int x, y, w, h;
-                    if (rect.HasValue)
-                    {
-                        x = rect.Value.X;
-                        y = rect.Value.Y;
-                        w = rect.Value.Width;
-                        h = rect.Value.Height;
-                    }
-                    else
-                    {
-                        x = 0;
-                        y = 0;
-                        w = Math.Max(width >> level, 1);
-                        h = Math.Max(height >> level, 1);
-
-                        // For DXT textures the width and height of each level is a multiple of 4.
-                        // OpenGL only: The last two mip levels require the width and height to be 
-                        // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
-                        // a 4x4 block. 
-                        // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                        if (_format == SurfaceFormat.Dxt1
-                            || _format == SurfaceFormat.Dxt1a
-                            || _format == SurfaceFormat.Dxt3
-                            || _format == SurfaceFormat.Dxt5
-                            || _format == SurfaceFormat.RgbaAtcExplicitAlpha
-                            || _format == SurfaceFormat.RgbaAtcInterpolatedAlpha
-                            || _format == SurfaceFormat.RgbPvrtc2Bpp
-                            || _format == SurfaceFormat.RgbPvrtc4Bpp
-                            || _format == SurfaceFormat.RgbaPvrtc2Bpp
-                            || _format == SurfaceFormat.RgbaPvrtc4Bpp
-                            || _format == SurfaceFormat.RgbEtc1
-                            )
-                        {
-                                if (w > 4)
-                                    w = (w + 3) & ~3;
-                                if (h > 4)
-                                    h = (h + 3) & ~3;
-                        }
-                    }
-
+                    var dataPtr = (IntPtr) (dataHandle.AddrOfPinnedObject().ToInt64() + startIndex*elementSizeInByte);
                     // Store the current bound texture.
                     var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
@@ -185,35 +145,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     GraphicsExtensions.CheckGLError();
                     if (glFormat == (PixelFormat)GLPixelFormat.CompressedTextureFormats)
                     {
-                        if (rect.HasValue)
-                        {
-                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, w, h, glFormat, elementCount - startBytes, dataPtr);
-                            GraphicsExtensions.CheckGLError();
-                        }
-                        else
-                        {
-                            GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, elementCount - startBytes, dataPtr);
-                            GraphicsExtensions.CheckGLError();
-                        }
+                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y,
+                            rect.Width, rect.Height, glFormat, elementCount - startBytes, dataPtr);
+                        GraphicsExtensions.CheckGLError();
                     }
                     else
                     {
                         // Set pixel alignment to match texel size in bytes
-                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, GraphicsExtensions.GetSize(this.Format));
-                        if (rect.HasValue)
-                        {
-                            GL.TexSubImage2D(TextureTarget.Texture2D, level,
-                                            x, y, w, h,
-                                            glFormat, glType, dataPtr);
-                            GraphicsExtensions.CheckGLError();
-                        }
-                        else
-                        {
-                            GL.TexImage2D(TextureTarget.Texture2D, level,
-                                glInternalFormat,
-                                w, h, 0, glFormat, glType, dataPtr);
-                            GraphicsExtensions.CheckGLError();
-                        }
+                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, Format.GetSize());
+                        GL.TexSubImage2D(TextureTarget.Texture2D, level, rect.X, rect.Y,
+                            rect.Width, rect.Height, glFormat, glType, dataPtr);
+                        GraphicsExtensions.CheckGLError();
+
                         // Return to default pixel alignment
                         GL.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
                     }

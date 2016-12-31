@@ -136,8 +136,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount"></param>
         public void SetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            ValidateParams(level, arraySlice, ref rect, data, startIndex, elementCount);
-            PlatformSetData(level, arraySlice, rect, data, startIndex, elementCount);
+            Rectangle checkedRect;
+            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out checkedRect);
+            PlatformSetData(level, arraySlice, checkedRect, data, startIndex, elementCount);
         }
         /// <summary>
         /// Changes the pixels of the texture
@@ -188,8 +189,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of pixels to read</param>
         public void GetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-            ValidateParams(level, arraySlice, ref rect, data, startIndex, elementCount);
-            PlatformGetData(level, arraySlice, rect, data, startIndex, elementCount);
+            Rectangle checkedRect;
+            ValidateParams(level, arraySlice, rect, data, startIndex, elementCount, out checkedRect);
+            PlatformGetData(level, arraySlice, checkedRect, data, startIndex, elementCount);
         }
         /// <summary>
         /// Retrieves the contents of the texture
@@ -294,10 +296,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void ValidateParams<T>(int level, int arraySlice, ref Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, T[] data,
+            int startIndex, int elementCount, out Rectangle checkedRect) where T : struct
         {
             var textureBounds = new Rectangle(0, 0, Math.Max(width >> level, 1), Math.Max(height >> level, 1));
-            var checkedRect = rect.HasValue ? rect.Value : textureBounds;
+            checkedRect = rect.HasValue ? rect.Value : textureBounds;
             if (level < 0 || level >= LevelCount)
                 throw new ArgumentException("level must be smaller than the number of levels in this texture.");
             if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
@@ -321,19 +324,26 @@ namespace Microsoft.Xna.Framework.Graphics
             if (Format.IsCompressedFormat())
             {
                 // round x and y down to next multiple of four; width and height up to next multiple of four
-                if (rect.HasValue)
-                {
-                    rect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3, 
-                        (checkedRect.Width + 3) & ~0x3, (checkedRect.Height + 3) & ~0x3);
-                }
-                dataByteSize = Math.Max(checkedRect.Width, 4) * Math.Max(checkedRect.Height, 4) * fSize / 16;
+                checkedRect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3,
+#if OPENGL
+                    // OpenGL only: The last two mip levels require the width and height to be
+                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
+                    // a 4x4 block.
+                    checkedRect.Width > 4 ? (checkedRect.Width + 3) & ~0x3 : checkedRect.Width,
+                    checkedRect.Height > 4 ? (checkedRect.Height + 3) & ~0x3 : checkedRect.Height);
+#else
+                    (checkedRect.Width + 3) & ~0x3, (checkedRect.Height + 3) & ~0x3);
+#endif
+                dataByteSize = checkedRect.Width * checkedRect.Height * fSize / 16;
             }
             else
             {
                 dataByteSize = checkedRect.Width * checkedRect.Height * fSize;
             }
             if (elementCount * tSize != dataByteSize)
-                throw new ArgumentException("elementCount is too large or too small.", "elementCount");
+                throw new ArgumentException(string.Format("elementCount is not the right size, " +
+                                            "elementCount * sizeof(T) is {0}, but data size is {1}.",
+                                            elementCount * tSize, dataByteSize), "elementCount");
         }
 	}
 }

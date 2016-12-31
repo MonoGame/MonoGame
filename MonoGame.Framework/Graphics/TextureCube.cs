@@ -63,8 +63,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    public void GetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
 	    {
-            ValidateParams(level, ref rect, data, startIndex, elementCount);
-	        PlatformGetData(cubeMapFace, level, rect, data, startIndex, elementCount);
+            Rectangle checkedRect;
+            ValidateParams(level, rect, data, startIndex, elementCount, out checkedRect);
+	        PlatformGetData(cubeMapFace, level, checkedRect, data, startIndex, elementCount);
 	    }
 
 		public void SetData<T> (CubeMapFace face, T[] data) where T : struct
@@ -80,67 +81,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
         public void SetData<T>(CubeMapFace face, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
-		{
-            ValidateParams(level, ref rect, data, startIndex, elementCount);
-
-            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
-            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            // Use try..finally to make sure dataHandle is freed in case of an error
-            try
-            {
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-
-                int xOffset, yOffset, width, height;
-                if (rect.HasValue)
-                {
-                    xOffset = rect.Value.X;
-                    yOffset = rect.Value.Y;
-                    width = rect.Value.Width;
-                    height = rect.Value.Height;
-                }
-                else
-                {
-                    xOffset = 0;
-                    yOffset = 0;
-                    width = Math.Max(1, this.size >> level);
-                    height = Math.Max(1, this.size >> level);
-
-                    // For DXT textures the width and height of each level is a multiple of 4.
-                    // OpenGL only: The last two mip levels require the width and height to be 
-                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
-                    // a 4x4 block. 
-                    // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                    if (_format == SurfaceFormat.Dxt1 ||
-                        _format == SurfaceFormat.Dxt1SRgb ||
-                        _format == SurfaceFormat.Dxt1a ||
-                        _format == SurfaceFormat.Dxt3 ||
-                        _format == SurfaceFormat.Dxt3SRgb ||
-                        _format == SurfaceFormat.Dxt5 ||
-                        _format == SurfaceFormat.Dxt5SRgb)
-                    {
-#if DIRECTX
-                        width = (width + 3) & ~3;
-                        height = (height + 3) & ~3;
-#else
-                        if (width > 4)
-                            width = (width + 3) & ~3;
-                        if (height > 4)
-                            height = (height + 3) & ~3;
-#endif
-                    }
-                }
-                PlatformSetData<T>(face, level, dataPtr, xOffset, yOffset, width, height);
-            }
-            finally
-            {
-                dataHandle.Free();
-            }
+        {
+            Rectangle checkedRect;
+            ValidateParams(level, rect, data, startIndex, elementCount, out checkedRect);
+            PlatformSetData(face, level, checkedRect, data, startIndex, elementCount);
 		}
 
-        private void ValidateParams<T>(int level, ref Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        private void ValidateParams<T>(int level, Rectangle? rect, T[] data, int startIndex,
+            int elementCount, out Rectangle checkedRect) where T : struct
         {
             var textureBounds = new Rectangle(0, 0, Math.Max(Size >> level, 1), Math.Max(Size >> level, 1));
-            var checkedRect = rect.HasValue ? rect.Value : textureBounds;
+            checkedRect = rect.HasValue ? rect.Value : textureBounds;
             if (level < 0 || level >= LevelCount)
                 throw new ArgumentException("level must be smaller than the number of levels in this texture.");
             if (!textureBounds.Contains(checkedRect))
@@ -160,11 +111,16 @@ namespace Microsoft.Xna.Framework.Graphics
             if (Format.IsCompressedFormat())
             {
                 // round x and y down to next multiple of four; width and height up to next multiple of four
-                if (rect.HasValue)
-                {
-                    rect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3, 
-                        (checkedRect.Width + 3) & ~0x3, (checkedRect.Height + 3) & ~0x3);
-                }
+                checkedRect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3,
+#if OPENGL
+                    // OpenGL only: The last two mip levels require the width and height to be
+                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
+                    // a 4x4 block.
+                    checkedRect.Width > 4 ? (checkedRect.Width + 3) & ~0x3 : checkedRect.Width,
+                    checkedRect.Height > 4 ? (checkedRect.Height + 3) & ~0x3 : checkedRect.Height);
+#else
+                    (checkedRect.Width + 3) & ~0x3, (checkedRect.Height + 3) & ~0x3);
+#endif
                 dataByteSize = Math.Max(checkedRect.Width, 4) * Math.Max(checkedRect.Height, 4) * fSize / 16;
             }
             else
@@ -172,7 +128,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataByteSize = checkedRect.Width * checkedRect.Height * fSize;
             }
             if (elementCount * tSize != dataByteSize)
-                throw new ArgumentException("elementCount is too large or too small.", "elementCount");
+                throw new ArgumentException(string.Format("elementCount is not the right size, " +
+                                            "elementCount * sizeof(T) is {0}, but data size is {1}.",
+                                            elementCount * tSize, dataByteSize), "elementCount");
         }
 	}
 }
