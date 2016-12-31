@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
             Texture2D toReturn = null;
-            BitmapDecoder decoder;
+            SharpDX.WIC.BitmapDecoder decoder;
 
             using (var bitmap = LoadBitmap(stream, out decoder))
             using (decoder)
@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
 #if WINDOWS_STOREAPP || WINDOWS_UAP
-            SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
+            SaveAsImage(Windows.Graphics.Imaging.BitmapEncoder.JpegEncoderId, stream, width, height);
 #endif
 #if WINDOWS_PHONE
 
@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var memstream = new InMemoryRandomAccessStream();
 
                 // Write the png.
-                var encoder = await BitmapEncoder.CreateAsync(encoderId, memstream);
+                var encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(encoderId, memstream);
                 encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, (uint)width, (uint)height, 96, 96, pixelData);
                 await encoder.FlushAsync();
 
@@ -320,14 +320,14 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         static ImagingFactory imgfactory;
-        private static BitmapSource LoadBitmap(Stream stream, out BitmapDecoder decoder)
+        private static BitmapSource LoadBitmap(Stream stream, out SharpDX.WIC.BitmapDecoder decoder)
         {
             if (imgfactory == null)
             {
                 imgfactory = new ImagingFactory();
             }
 
-            decoder = new BitmapDecoder(
+            decoder = new SharpDX.WIC.BitmapDecoder(
                 imgfactory,
                 stream,
                 DecodeOptions.CacheOnDemand
