@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	public sealed class SpriteFont 
     {
-		static class Errors 
+		internal static class Errors 
         {
 			public const string TextContainsUnresolvableCharacters =
 				"Text contains characters that cannot be resolved by this SpriteFont.";
@@ -22,6 +22,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		private readonly Dictionary<char, Glyph> _glyphs;
 		
 		private readonly Texture2D _texture;
+        
+		internal Dictionary<char, Glyph> Glyphs { get { return _glyphs; } }
 
 		class CharComparer: IEqualityComparer<char>
 		{
@@ -136,7 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return size;
 		}
 
-		private void MeasureString(ref CharacterSource text, out Vector2 size)
+		internal void MeasureString(ref CharacterSource text, out Vector2 size)
 		{
 			if (text.Length == 0)
             {
