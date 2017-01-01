@@ -843,14 +843,40 @@ namespace Microsoft.Xna.Framework.Graphics
                 p.Y += currentGlyph.Cropping.Y;
                 p += position;
 
-                var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width,
-                                            currentGlyph.BoundsInTexture.Height);
+                var item = _batcher.CreateBatchItem();
+                item.Texture = spriteFont.Texture;
+            
+                // set SortKey based on SpriteSortMode.
+                switch (_sortMode)
+                {
+                    // Comparison of Texture objects.
+                    case SpriteSortMode.Texture:
+                        item.SortKey = spriteFont.Texture.SortingKey;
+                        break;
+                    // Comparison of Depth
+                    case SpriteSortMode.FrontToBack:
+                        item.SortKey = 0;
+                        break;
+                    // Comparison of Depth in reverse
+                    case SpriteSortMode.BackToFront:
+                        item.SortKey = 0;
+                        break;
+                }
+            
+                _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
+                _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
+                _texCoordBR.X = (currentGlyph.BoundsInTexture.X + currentGlyph.BoundsInTexture.Width) / (float)spriteFont.Texture.Width;
+                _texCoordBR.Y = (currentGlyph.BoundsInTexture.Y + currentGlyph.BoundsInTexture.Height) / (float)spriteFont.Texture.Height;
 
-				DrawInternal(
-                    spriteFont.Texture, destRect, currentGlyph.BoundsInTexture,
-					color, 0f, Vector2.Zero, SpriteEffects.None, 0f, false);
-
+                item.Set(p.X,
+                         p.Y,
+                         currentGlyph.BoundsInTexture.Width,
+                         currentGlyph.BoundsInTexture.Height,
+                         color,
+                         _texCoordTL,
+                         _texCoordBR,
+                         0);
+                
                 offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
 			}
 
@@ -960,14 +986,40 @@ namespace Microsoft.Xna.Framework.Graphics
                 p.X += currentGlyph.Cropping.X;                
                 p.Y += currentGlyph.Cropping.Y;
                 p += position;
+                
+                var item = _batcher.CreateBatchItem();
+                item.Texture = spriteFont.Texture;
+            
+                // set SortKey based on SpriteSortMode.
+                switch (_sortMode)
+                {
+                    // Comparison of Texture objects.
+                    case SpriteSortMode.Texture:
+                        item.SortKey = spriteFont.Texture.SortingKey;
+                        break;
+                    // Comparison of Depth
+                    case SpriteSortMode.FrontToBack:
+                        item.SortKey = 0;
+                        break;
+                    // Comparison of Depth in reverse
+                    case SpriteSortMode.BackToFront:
+                        item.SortKey = 0;
+                        break;
+                }
+            
+                _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
+                _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
+                _texCoordBR.X = (currentGlyph.BoundsInTexture.X + currentGlyph.BoundsInTexture.Width) / (float)spriteFont.Texture.Width;
+                _texCoordBR.Y = (currentGlyph.BoundsInTexture.Y + currentGlyph.BoundsInTexture.Height) / (float)spriteFont.Texture.Height;
 
-                var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width,
-                                            currentGlyph.BoundsInTexture.Height);
-
-				DrawInternal(
-                    spriteFont.Texture, destRect, currentGlyph.BoundsInTexture,
-					color, 0f, Vector2.Zero, SpriteEffects.None, 0f, false);
+                item.Set(p.X,
+                         p.Y,
+                         currentGlyph.BoundsInTexture.Width,
+                         currentGlyph.BoundsInTexture.Height,
+                         color,
+                         _texCoordTL,
+                         _texCoordBR,
+                         0);
 
                 offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
 			}
