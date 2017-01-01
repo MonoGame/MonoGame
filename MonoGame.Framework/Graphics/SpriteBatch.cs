@@ -795,59 +795,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
 		{
             CheckValid(spriteFont, text);
-
-            var source = new SpriteFont.CharacterSource(text);
-            SpriteBatch spriteBatch = this;
-            SpriteFont.CharacterSource text2 = source;
-            float rotation = 0;
-            Vector2 origin = Vector2.Zero;
-            Vector2 scale=Vector2.One;
-            SpriteEffects effect=SpriteEffects.None;
-            float depth = 0;
             
-            var flipAdjustment = Vector2.Zero;
-
-            var flippedVert = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            var flippedHorz = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
-
-            if (flippedVert || flippedHorz)
-            {
-                Vector2 size;
-                spriteFont.MeasureString(ref text2, out size);
-
-                if (flippedHorz)
-                {
-                    origin.X *= -1;
-                    flipAdjustment.X = -size.X;
-                }
-
-                if (flippedVert)
-                {
-                    origin.Y *= -1;
-                    flipAdjustment.Y = spriteFont.LineSpacing - size.Y;
-                }
-            }
-            
-            Matrix transformation = Matrix.Identity;
-            if (rotation == 0)
-            {
-                transformation.M11 = (flippedHorz ? -scale.X : scale.X);
-                transformation.M22 = (flippedVert ? -scale.Y : scale.Y);
-                transformation.M41 = ((flipAdjustment.X - origin.X) * transformation.M11) + position.X;
-                transformation.M42 = ((flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y;
-            }
-            else
-            {
-                var cos = (float)Math.Cos(rotation);
-                var sin = (float)Math.Sin(rotation);
-                transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
-                transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
-                transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
-                transformation.M22 = (flippedVert ? -scale.Y : scale.Y) * cos;
-                transformation.M41 = (((flipAdjustment.X - origin.X) * transformation.M11) + (flipAdjustment.Y - origin.Y) * transformation.M21) + position.X;
-                transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y; 
-            }
-
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
@@ -857,9 +805,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
-			for (var i = 0; i < text2.Length; ++i)
+			for (var i = 0; i < text.Length; ++i)
             {
-                var c = text2[i];
+                var c = text[i];
 
                 if (c == '\r')
                     continue;
@@ -890,31 +838,24 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset.X += spriteFont.Spacing + currentGlyph.LeftSideBearing;
                 }
 
-                var p = offset;
-
-				if (flippedHorz)
-                    p.X += currentGlyph.BoundsInTexture.Width;
-                p.X += currentGlyph.Cropping.X;
-
-				if (flippedVert)
-                    p.Y += currentGlyph.BoundsInTexture.Height - spriteFont.LineSpacing;
+                var p = offset;                
+                p.X += currentGlyph.Cropping.X;                
                 p.Y += currentGlyph.Cropping.Y;
-
-				Vector2.Transform(ref p, ref transformation, out p);
+                p += position;
 
                 var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width * scale.X,
-                                            currentGlyph.BoundsInTexture.Height * scale.Y);
+                                            currentGlyph.BoundsInTexture.Width,
+                                            currentGlyph.BoundsInTexture.Height);
 
-				spriteBatch.DrawInternal(
+				DrawInternal(
                     spriteFont.Texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effect, depth, false);
+					color, 0f, Vector2.Zero, SpriteEffects.None, 0f, false);
 
                 offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
 			}
 
 			// We need to flush if we're using Immediate sort mode.
-			spriteBatch.FlushIfNeeded();
+			FlushIfNeeded();
 		}
 
         /// <summary>
@@ -972,59 +913,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
 		{
             CheckValid(spriteFont, text);
-
-            var source = new SpriteFont.CharacterSource(text);
-            SpriteBatch spriteBatch = this;
-            SpriteFont.CharacterSource text2 = source;
-            float rotation = 0;
-            Vector2 origin = Vector2.Zero;
-            Vector2 scale=Vector2.One;
-            SpriteEffects effect=SpriteEffects.None;
-            float depth = 0;
             
-            var flipAdjustment = Vector2.Zero;
-
-            var flippedVert = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            var flippedHorz = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
-
-            if (flippedVert || flippedHorz)
-            {
-                Vector2 size;
-                spriteFont.MeasureString(ref text2, out size);
-
-                if (flippedHorz)
-                {
-                    origin.X *= -1;
-                    flipAdjustment.X = -size.X;
-                }
-
-                if (flippedVert)
-                {
-                    origin.Y *= -1;
-                    flipAdjustment.Y = spriteFont.LineSpacing - size.Y;
-                }
-            }
-            
-            Matrix transformation = Matrix.Identity;
-            if (rotation == 0)
-            {
-                transformation.M11 = (flippedHorz ? -scale.X : scale.X);
-                transformation.M22 = (flippedVert ? -scale.Y : scale.Y);
-                transformation.M41 = ((flipAdjustment.X - origin.X) * transformation.M11) + position.X;
-                transformation.M42 = ((flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y;
-            }
-            else
-            {
-                var cos = (float)Math.Cos(rotation);
-                var sin = (float)Math.Sin(rotation);
-                transformation.M11 = (flippedHorz ? -scale.X : scale.X) * cos;
-                transformation.M12 = (flippedHorz ? -scale.X : scale.X) * sin;
-                transformation.M21 = (flippedVert ? -scale.Y : scale.Y) * (-sin);
-                transformation.M22 = (flippedVert ? -scale.Y : scale.Y) * cos;
-                transformation.M41 = (((flipAdjustment.X - origin.X) * transformation.M11) + (flipAdjustment.Y - origin.Y) * transformation.M21) + position.X;
-                transformation.M42 = (((flipAdjustment.X - origin.X) * transformation.M12) + (flipAdjustment.Y - origin.Y) * transformation.M22) + position.Y; 
-            }
-
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
@@ -1034,9 +923,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var offset = Vector2.Zero;
             var firstGlyphOfLine = true;
 
-			for (var i = 0; i < text2.Length; ++i)
+			for (var i = 0; i < text.Length; ++i)
             {
-                var c = text2[i];
+                var c = text[i];
 
                 if (c == '\r')
                     continue;
@@ -1067,31 +956,24 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset.X += spriteFont.Spacing + currentGlyph.LeftSideBearing;
                 }
 
-                var p = offset;
-
-				if (flippedHorz)
-                    p.X += currentGlyph.BoundsInTexture.Width;
-                p.X += currentGlyph.Cropping.X;
-
-				if (flippedVert)
-                    p.Y += currentGlyph.BoundsInTexture.Height - spriteFont.LineSpacing;
+                var p = offset;                
+                p.X += currentGlyph.Cropping.X;                
                 p.Y += currentGlyph.Cropping.Y;
-
-				Vector2.Transform(ref p, ref transformation, out p);
+                p += position;
 
                 var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width * scale.X,
-                                            currentGlyph.BoundsInTexture.Height * scale.Y);
+                                            currentGlyph.BoundsInTexture.Width,
+                                            currentGlyph.BoundsInTexture.Height);
 
-				spriteBatch.DrawInternal(
+				DrawInternal(
                     spriteFont.Texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effect, depth, false);
+					color, 0f, Vector2.Zero, SpriteEffects.None, 0f, false);
 
                 offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
 			}
 
 			// We need to flush if we're using Immediate sort mode.
-			spriteBatch.FlushIfNeeded();
+			FlushIfNeeded();
 		}
 
         /// <summary>
