@@ -61,7 +61,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread(() =>
                 {
-                    this.GraphicsDevice.PlatformDeleteRenderTarget(this);
+                    if (GraphicsDevice != null)
+                        this.GraphicsDevice.PlatformDeleteRenderTarget(this);
                 });
             }
 
