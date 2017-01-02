@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
 
             //Find the matching touch
-            for (var i = 0; i < state.Count; i++)
+            for (var i = state.Count - 1; i >= 0; i--)
             {
                 var existingTouch = state[i];
 
