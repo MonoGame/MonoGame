@@ -17,6 +17,7 @@
     <NativeBinary Path="ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" />
     <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\glsl_optimizer.dll" />
   </Platform>
+
   <Platform Type="Linux">
     <Binary
       Name="CppNet"
@@ -27,6 +28,7 @@
     <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\GLSLOptimizerSharp.dll.config" />
     <NativeBinary Path="ThirdParty\Dependencies\GLSLOptimizerSharp\libglsl_optimizer.so" />
   </Platform>
+
   <Platform Type="MacOS">
     <Binary
       Name="CppNet"
