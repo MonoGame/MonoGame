@@ -217,7 +217,7 @@ namespace TwoMGFX
                 case BasicType.TexCube:
                     return SamplerType.SamplerCube;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(basicType), basicType, null);
+                    throw new ArgumentOutOfRangeException("basicType", basicType, null);
             }
         }
 
@@ -230,7 +230,7 @@ namespace TwoMGFX
                 case ShaderStage.Pixel:
                     return ShaderType.Fragment;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(stage), stage, null);
+                    throw new ArgumentOutOfRangeException("stage", stage, null);
             }
         }
     }

@@ -237,7 +237,7 @@ namespace TwoMGFX
                 case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
                     return SamplerType.Sampler1D;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    throw new ArgumentOutOfRangeException("type", type, null);
             }
         }
     }
