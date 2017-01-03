@@ -1155,9 +1155,6 @@ namespace TwoMGFX
 
         protected virtual object EvalFunction_Header(ParseTree tree, params object[] paramlist)
         {
-            // TODO allow declaration seperate of implementation
-            // if (this.GetValue(tree, TokenType.OpeningBracket, 0) == null) return null;
-
             // only add parameterless functions since we want this to match with shader stage entry points
         	if (this.GetValue(tree, TokenType.GlslParam, 0) != null) return null;
         	var shaderInfo = paramlist[0] as ShaderInfo;
