@@ -42,7 +42,7 @@ namespace TwoMGFX
             return tree;
         }
 
-        private void ParseStart(ParseNode parent)
+        private void ParseStart(ParseNode parent) // NonTerminalSymbol: Start
         {
             Token tok;
             ParseNode n;
@@ -55,18 +55,19 @@ namespace TwoMGFX
             else
                 expected = new[] {TokenType.Code, TokenType.Technique, TokenType.Sampler, TokenType.Void, TokenType.GlslIn};
 
-            tok = scanner.LookAhead(expected);
+             // Concat Rule
+            tok = scanner.LookAhead(expected); // ZeroOrMore Rule
             while (tok.Type == TokenType.Code
                 || tok.Type == TokenType.Technique
                 || tok.Type == TokenType.Sampler
                 || tok.Type == TokenType.Void
                 || tok.Type == TokenType.GlslIn)
             {
-                tok = scanner.LookAhead(expected);
+                tok = scanner.LookAhead(expected); // Choice Rule
                 switch (tok.Type)
-                {
+                { // Choice Rule
                     case TokenType.Code:
-                        tok = scanner.Scan(TokenType.Code);
+                        tok = scanner.Scan(TokenType.Code); // Terminal Rule: Code
                         n = node.CreateNode(tok, tok.ToString() );
                         node.Token.UpdateRange(tok);
                         node.Nodes.Add(n);
@@ -76,26 +77,26 @@ namespace TwoMGFX
                         }
                         break;
                     case TokenType.Technique:
-                        ParseTechnique_Declaration(node);
+                        ParseTechnique_Declaration(node); // NonTerminal Rule: Technique_Declaration
                         break;
                     case TokenType.Sampler:
-                        ParseSampler_Declaration(node);
+                        ParseSampler_Declaration(node); // NonTerminal Rule: Sampler_Declaration
                         break;
                     case TokenType.Void:
-                        ParseFunction_Header(node);
+                        ParseFunction_Header(node); // NonTerminal Rule: Function_Header
                         break;
                     case TokenType.GlslIn:
-                        ParseSemantic_Variable(node);
+                        ParseSemantic_Variable(node); // NonTerminal Rule: Semantic_Variable
                         break;
                     default:
                         tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Code, Technique, Sampler, Void, or GlslIn.", 0x0002, tok));
                         break;
-                }
-                tok = scanner.LookAhead(expected);
+                } // Choice Rule
+            tok = scanner.LookAhead(expected); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.Scan(TokenType.EndOfFile);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.EndOfFile); // Terminal Rule: EndOfFile
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -105,9 +106,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Start
 
-        private void ParseTechnique_Declaration(ParseNode parent)
+        private void ParseTechnique_Declaration(ParseNode parent) // NonTerminalSymbol: Technique_Declaration
         {
             Token tok;
             ParseNode n;
@@ -115,8 +116,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Technique);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Technique); // Terminal Rule: Technique
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -125,11 +126,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Identifier); // Option Rule
             if (tok.Type == TokenType.Identifier)
             {
-                tok = scanner.Scan(TokenType.Identifier);
+                tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -139,8 +140,8 @@ namespace TwoMGFX
                 }
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenBracket); // Terminal Rule: OpenBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -149,14 +150,14 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            do {
-                ParsePass_Declaration(node);
-                tok = scanner.LookAhead(TokenType.Pass);
-            } while (tok.Type == TokenType.Pass);
+             // Concat Rule
+            do { // OneOrMore Rule
+                ParsePass_Declaration(node); // NonTerminal Rule: Pass_Declaration
+                tok = scanner.LookAhead(TokenType.Pass); // OneOrMore Rule
+            } while (tok.Type == TokenType.Pass); // OneOrMore Rule
 
-            
-            tok = scanner.Scan(TokenType.CloseBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseBracket); // Terminal Rule: CloseBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -166,16 +167,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Technique_Declaration
 
-        private void ParseFillMode_Solid(ParseNode parent)
+        private void ParseFillMode_Solid(ParseNode parent) // NonTerminalSymbol: FillMode_Solid
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.FillMode_Solid), "FillMode_Solid");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Solid);
+            tok = scanner.Scan(TokenType.Solid); // Terminal Rule: Solid
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -185,16 +186,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: FillMode_Solid
 
-        private void ParseFillMode_WireFrame(ParseNode parent)
+        private void ParseFillMode_WireFrame(ParseNode parent) // NonTerminalSymbol: FillMode_WireFrame
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.FillMode_WireFrame), "FillMode_WireFrame");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.WireFrame);
+            tok = scanner.Scan(TokenType.WireFrame); // Terminal Rule: WireFrame
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -204,40 +205,40 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: FillMode_WireFrame
 
-        private void ParseFillModes(ParseNode parent)
+        private void ParseFillModes(ParseNode parent) // NonTerminalSymbol: FillModes
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.FillModes), "FillModes");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Solid, TokenType.WireFrame);
+            tok = scanner.LookAhead(TokenType.Solid, TokenType.WireFrame); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Solid:
-                    ParseFillMode_Solid(node);
+                    ParseFillMode_Solid(node); // NonTerminal Rule: FillMode_Solid
                     break;
                 case TokenType.WireFrame:
-                    ParseFillMode_WireFrame(node);
+                    ParseFillMode_WireFrame(node); // NonTerminal Rule: FillMode_WireFrame
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Solid or WireFrame.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: FillModes
 
-        private void ParseCullMode_None(ParseNode parent)
+        private void ParseCullMode_None(ParseNode parent) // NonTerminalSymbol: CullMode_None
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CullMode_None), "CullMode_None");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.None);
+            tok = scanner.Scan(TokenType.None); // Terminal Rule: None
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -247,16 +248,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CullMode_None
 
-        private void ParseCullMode_Cw(ParseNode parent)
+        private void ParseCullMode_Cw(ParseNode parent) // NonTerminalSymbol: CullMode_Cw
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CullMode_Cw), "CullMode_Cw");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Cw);
+            tok = scanner.Scan(TokenType.Cw); // Terminal Rule: Cw
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -266,16 +267,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CullMode_Cw
 
-        private void ParseCullMode_Ccw(ParseNode parent)
+        private void ParseCullMode_Ccw(ParseNode parent) // NonTerminalSymbol: CullMode_Ccw
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CullMode_Ccw), "CullMode_Ccw");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Ccw);
+            tok = scanner.Scan(TokenType.Ccw); // Terminal Rule: Ccw
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -285,43 +286,43 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CullMode_Ccw
 
-        private void ParseCullModes(ParseNode parent)
+        private void ParseCullModes(ParseNode parent) // NonTerminalSymbol: CullModes
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CullModes), "CullModes");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.None, TokenType.Cw, TokenType.Ccw);
+            tok = scanner.LookAhead(TokenType.None, TokenType.Cw, TokenType.Ccw); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.None:
-                    ParseCullMode_None(node);
+                    ParseCullMode_None(node); // NonTerminal Rule: CullMode_None
                     break;
                 case TokenType.Cw:
-                    ParseCullMode_Cw(node);
+                    ParseCullMode_Cw(node); // NonTerminal Rule: CullMode_Cw
                     break;
                 case TokenType.Ccw:
-                    ParseCullMode_Ccw(node);
+                    ParseCullMode_Ccw(node); // NonTerminal Rule: CullMode_Ccw
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected None, Cw, or Ccw.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CullModes
 
-        private void ParseColors_None(ParseNode parent)
+        private void ParseColors_None(ParseNode parent) // NonTerminalSymbol: Colors_None
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_None), "Colors_None");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.None);
+            tok = scanner.Scan(TokenType.None); // Terminal Rule: None
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -331,16 +332,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors_None
 
-        private void ParseColors_Red(ParseNode parent)
+        private void ParseColors_Red(ParseNode parent) // NonTerminalSymbol: Colors_Red
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Red), "Colors_Red");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Red);
+            tok = scanner.Scan(TokenType.Red); // Terminal Rule: Red
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -350,16 +351,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors_Red
 
-        private void ParseColors_Green(ParseNode parent)
+        private void ParseColors_Green(ParseNode parent) // NonTerminalSymbol: Colors_Green
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Green), "Colors_Green");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Green);
+            tok = scanner.Scan(TokenType.Green); // Terminal Rule: Green
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -369,16 +370,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors_Green
 
-        private void ParseColors_Blue(ParseNode parent)
+        private void ParseColors_Blue(ParseNode parent) // NonTerminalSymbol: Colors_Blue
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Blue), "Colors_Blue");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Blue);
+            tok = scanner.Scan(TokenType.Blue); // Terminal Rule: Blue
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -388,16 +389,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors_Blue
 
-        private void ParseColors_Alpha(ParseNode parent)
+        private void ParseColors_Alpha(ParseNode parent) // NonTerminalSymbol: Colors_Alpha
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Alpha), "Colors_Alpha");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Alpha);
+            tok = scanner.Scan(TokenType.Alpha); // Terminal Rule: Alpha
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -407,16 +408,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors_Alpha
 
-        private void ParseColors_All(ParseNode parent)
+        private void ParseColors_All(ParseNode parent) // NonTerminalSymbol: Colors_All
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_All), "Colors_All");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.All);
+            tok = scanner.Scan(TokenType.All); // Terminal Rule: All
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -426,16 +427,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors_All
 
-        private void ParseColors_Boolean(ParseNode parent)
+        private void ParseColors_Boolean(ParseNode parent) // NonTerminalSymbol: Colors_Boolean
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Boolean), "Colors_Boolean");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Boolean);
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -445,48 +446,48 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors_Boolean
 
-        private void ParseColors(ParseNode parent)
+        private void ParseColors(ParseNode parent) // NonTerminalSymbol: Colors
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors), "Colors");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Red, TokenType.Green, TokenType.Blue, TokenType.Alpha, TokenType.None, TokenType.All, TokenType.Boolean);
+            tok = scanner.LookAhead(TokenType.Red, TokenType.Green, TokenType.Blue, TokenType.Alpha, TokenType.None, TokenType.All, TokenType.Boolean); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Red:
-                    ParseColors_Red(node);
+                    ParseColors_Red(node); // NonTerminal Rule: Colors_Red
                     break;
                 case TokenType.Green:
-                    ParseColors_Green(node);
+                    ParseColors_Green(node); // NonTerminal Rule: Colors_Green
                     break;
                 case TokenType.Blue:
-                    ParseColors_Blue(node);
+                    ParseColors_Blue(node); // NonTerminal Rule: Colors_Blue
                     break;
                 case TokenType.Alpha:
-                    ParseColors_Alpha(node);
+                    ParseColors_Alpha(node); // NonTerminal Rule: Colors_Alpha
                     break;
                 case TokenType.None:
-                    ParseColors_None(node);
+                    ParseColors_None(node); // NonTerminal Rule: Colors_None
                     break;
                 case TokenType.All:
-                    ParseColors_All(node);
+                    ParseColors_All(node); // NonTerminal Rule: Colors_All
                     break;
                 case TokenType.Boolean:
-                    ParseColors_Boolean(node);
+                    ParseColors_Boolean(node); // NonTerminal Rule: Colors_Boolean
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Red, Green, Blue, Alpha, None, All, or Boolean.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Colors
 
-        private void ParseColorsMasks(ParseNode parent)
+        private void ParseColorsMasks(ParseNode parent) // NonTerminalSymbol: ColorsMasks
         {
             Token tok;
             ParseNode n;
@@ -494,16 +495,16 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            ParseColors(node);
+             // Concat Rule
+            ParseColors(node); // NonTerminal Rule: Colors
 
-            
-            tok = scanner.LookAhead(TokenType.Or);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Or); // Option Rule
             if (tok.Type == TokenType.Or)
             {
 
-                
-                tok = scanner.Scan(TokenType.Or);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Or); // Terminal Rule: Or
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -512,17 +513,17 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                ParseColors(node);
+                 // Concat Rule
+                ParseColors(node); // NonTerminal Rule: Colors
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Or);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Or); // Option Rule
             if (tok.Type == TokenType.Or)
             {
 
-                
-                tok = scanner.Scan(TokenType.Or);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Or); // Terminal Rule: Or
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -531,17 +532,17 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                ParseColors(node);
+                 // Concat Rule
+                ParseColors(node); // NonTerminal Rule: Colors
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Or);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Or); // Option Rule
             if (tok.Type == TokenType.Or)
             {
 
-                
-                tok = scanner.Scan(TokenType.Or);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Or); // Terminal Rule: Or
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -550,21 +551,21 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                ParseColors(node);
+                 // Concat Rule
+                ParseColors(node); // NonTerminal Rule: Colors
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: ColorsMasks
 
-        private void ParseBlend_Zero(ParseNode parent)
+        private void ParseBlend_Zero(ParseNode parent) // NonTerminalSymbol: Blend_Zero
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_Zero), "Blend_Zero");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Zero);
+            tok = scanner.Scan(TokenType.Zero); // Terminal Rule: Zero
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -574,16 +575,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_Zero
 
-        private void ParseBlend_One(ParseNode parent)
+        private void ParseBlend_One(ParseNode parent) // NonTerminalSymbol: Blend_One
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_One), "Blend_One");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.One);
+            tok = scanner.Scan(TokenType.One); // Terminal Rule: One
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -593,16 +594,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_One
 
-        private void ParseBlend_SrcColor(ParseNode parent)
+        private void ParseBlend_SrcColor(ParseNode parent) // NonTerminalSymbol: Blend_SrcColor
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_SrcColor), "Blend_SrcColor");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.SrcColor);
+            tok = scanner.Scan(TokenType.SrcColor); // Terminal Rule: SrcColor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -612,16 +613,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_SrcColor
 
-        private void ParseBlend_InvSrcColor(ParseNode parent)
+        private void ParseBlend_InvSrcColor(ParseNode parent) // NonTerminalSymbol: Blend_InvSrcColor
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_InvSrcColor), "Blend_InvSrcColor");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.InvSrcColor);
+            tok = scanner.Scan(TokenType.InvSrcColor); // Terminal Rule: InvSrcColor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -631,16 +632,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_InvSrcColor
 
-        private void ParseBlend_SrcAlpha(ParseNode parent)
+        private void ParseBlend_SrcAlpha(ParseNode parent) // NonTerminalSymbol: Blend_SrcAlpha
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_SrcAlpha), "Blend_SrcAlpha");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.SrcAlpha);
+            tok = scanner.Scan(TokenType.SrcAlpha); // Terminal Rule: SrcAlpha
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -650,16 +651,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_SrcAlpha
 
-        private void ParseBlend_InvSrcAlpha(ParseNode parent)
+        private void ParseBlend_InvSrcAlpha(ParseNode parent) // NonTerminalSymbol: Blend_InvSrcAlpha
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_InvSrcAlpha), "Blend_InvSrcAlpha");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.InvSrcAlpha);
+            tok = scanner.Scan(TokenType.InvSrcAlpha); // Terminal Rule: InvSrcAlpha
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -669,16 +670,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_InvSrcAlpha
 
-        private void ParseBlend_DestAlpha(ParseNode parent)
+        private void ParseBlend_DestAlpha(ParseNode parent) // NonTerminalSymbol: Blend_DestAlpha
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_DestAlpha), "Blend_DestAlpha");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.DestAlpha);
+            tok = scanner.Scan(TokenType.DestAlpha); // Terminal Rule: DestAlpha
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -688,16 +689,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_DestAlpha
 
-        private void ParseBlend_InvDestAlpha(ParseNode parent)
+        private void ParseBlend_InvDestAlpha(ParseNode parent) // NonTerminalSymbol: Blend_InvDestAlpha
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_InvDestAlpha), "Blend_InvDestAlpha");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.InvDestAlpha);
+            tok = scanner.Scan(TokenType.InvDestAlpha); // Terminal Rule: InvDestAlpha
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -707,16 +708,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_InvDestAlpha
 
-        private void ParseBlend_DestColor(ParseNode parent)
+        private void ParseBlend_DestColor(ParseNode parent) // NonTerminalSymbol: Blend_DestColor
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_DestColor), "Blend_DestColor");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.DestColor);
+            tok = scanner.Scan(TokenType.DestColor); // Terminal Rule: DestColor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -726,16 +727,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_DestColor
 
-        private void ParseBlend_InvDestColor(ParseNode parent)
+        private void ParseBlend_InvDestColor(ParseNode parent) // NonTerminalSymbol: Blend_InvDestColor
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_InvDestColor), "Blend_InvDestColor");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.InvDestColor);
+            tok = scanner.Scan(TokenType.InvDestColor); // Terminal Rule: InvDestColor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -745,16 +746,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_InvDestColor
 
-        private void ParseBlend_SrcAlphaSat(ParseNode parent)
+        private void ParseBlend_SrcAlphaSat(ParseNode parent) // NonTerminalSymbol: Blend_SrcAlphaSat
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_SrcAlphaSat), "Blend_SrcAlphaSat");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.SrcAlphaSat);
+            tok = scanner.Scan(TokenType.SrcAlphaSat); // Terminal Rule: SrcAlphaSat
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -764,16 +765,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_SrcAlphaSat
 
-        private void ParseBlend_BlendFactor(ParseNode parent)
+        private void ParseBlend_BlendFactor(ParseNode parent) // NonTerminalSymbol: Blend_BlendFactor
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_BlendFactor), "Blend_BlendFactor");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.BlendFactor);
+            tok = scanner.Scan(TokenType.BlendFactor); // Terminal Rule: BlendFactor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -783,16 +784,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_BlendFactor
 
-        private void ParseBlend_InvBlendFactor(ParseNode parent)
+        private void ParseBlend_InvBlendFactor(ParseNode parent) // NonTerminalSymbol: Blend_InvBlendFactor
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blend_InvBlendFactor), "Blend_InvBlendFactor");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.InvBlendFactor);
+            tok = scanner.Scan(TokenType.InvBlendFactor); // Terminal Rule: InvBlendFactor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -802,73 +803,73 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blend_InvBlendFactor
 
-        private void ParseBlends(ParseNode parent)
+        private void ParseBlends(ParseNode parent) // NonTerminalSymbol: Blends
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Blends), "Blends");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Zero, TokenType.One, TokenType.SrcColor, TokenType.InvSrcColor, TokenType.SrcAlpha, TokenType.InvSrcAlpha, TokenType.DestAlpha, TokenType.InvDestAlpha, TokenType.DestColor, TokenType.InvDestColor, TokenType.SrcAlphaSat, TokenType.BlendFactor, TokenType.InvBlendFactor);
+            tok = scanner.LookAhead(TokenType.Zero, TokenType.One, TokenType.SrcColor, TokenType.InvSrcColor, TokenType.SrcAlpha, TokenType.InvSrcAlpha, TokenType.DestAlpha, TokenType.InvDestAlpha, TokenType.DestColor, TokenType.InvDestColor, TokenType.SrcAlphaSat, TokenType.BlendFactor, TokenType.InvBlendFactor); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Zero:
-                    ParseBlend_Zero(node);
+                    ParseBlend_Zero(node); // NonTerminal Rule: Blend_Zero
                     break;
                 case TokenType.One:
-                    ParseBlend_One(node);
+                    ParseBlend_One(node); // NonTerminal Rule: Blend_One
                     break;
                 case TokenType.SrcColor:
-                    ParseBlend_SrcColor(node);
+                    ParseBlend_SrcColor(node); // NonTerminal Rule: Blend_SrcColor
                     break;
                 case TokenType.InvSrcColor:
-                    ParseBlend_InvSrcColor(node);
+                    ParseBlend_InvSrcColor(node); // NonTerminal Rule: Blend_InvSrcColor
                     break;
                 case TokenType.SrcAlpha:
-                    ParseBlend_SrcAlpha(node);
+                    ParseBlend_SrcAlpha(node); // NonTerminal Rule: Blend_SrcAlpha
                     break;
                 case TokenType.InvSrcAlpha:
-                    ParseBlend_InvSrcAlpha(node);
+                    ParseBlend_InvSrcAlpha(node); // NonTerminal Rule: Blend_InvSrcAlpha
                     break;
                 case TokenType.DestAlpha:
-                    ParseBlend_DestAlpha(node);
+                    ParseBlend_DestAlpha(node); // NonTerminal Rule: Blend_DestAlpha
                     break;
                 case TokenType.InvDestAlpha:
-                    ParseBlend_InvDestAlpha(node);
+                    ParseBlend_InvDestAlpha(node); // NonTerminal Rule: Blend_InvDestAlpha
                     break;
                 case TokenType.DestColor:
-                    ParseBlend_DestColor(node);
+                    ParseBlend_DestColor(node); // NonTerminal Rule: Blend_DestColor
                     break;
                 case TokenType.InvDestColor:
-                    ParseBlend_InvDestColor(node);
+                    ParseBlend_InvDestColor(node); // NonTerminal Rule: Blend_InvDestColor
                     break;
                 case TokenType.SrcAlphaSat:
-                    ParseBlend_SrcAlphaSat(node);
+                    ParseBlend_SrcAlphaSat(node); // NonTerminal Rule: Blend_SrcAlphaSat
                     break;
                 case TokenType.BlendFactor:
-                    ParseBlend_BlendFactor(node);
+                    ParseBlend_BlendFactor(node); // NonTerminal Rule: Blend_BlendFactor
                     break;
                 case TokenType.InvBlendFactor:
-                    ParseBlend_InvBlendFactor(node);
+                    ParseBlend_InvBlendFactor(node); // NonTerminal Rule: Blend_InvBlendFactor
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Zero, One, SrcColor, InvSrcColor, SrcAlpha, InvSrcAlpha, DestAlpha, InvDestAlpha, DestColor, InvDestColor, SrcAlphaSat, BlendFactor, or InvBlendFactor.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Blends
 
-        private void ParseBlendOp_Add(ParseNode parent)
+        private void ParseBlendOp_Add(ParseNode parent) // NonTerminalSymbol: BlendOp_Add
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.BlendOp_Add), "BlendOp_Add");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Add);
+            tok = scanner.Scan(TokenType.Add); // Terminal Rule: Add
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -878,16 +879,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: BlendOp_Add
 
-        private void ParseBlendOp_Subtract(ParseNode parent)
+        private void ParseBlendOp_Subtract(ParseNode parent) // NonTerminalSymbol: BlendOp_Subtract
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.BlendOp_Subtract), "BlendOp_Subtract");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Subtract);
+            tok = scanner.Scan(TokenType.Subtract); // Terminal Rule: Subtract
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -897,16 +898,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: BlendOp_Subtract
 
-        private void ParseBlendOp_RevSubtract(ParseNode parent)
+        private void ParseBlendOp_RevSubtract(ParseNode parent) // NonTerminalSymbol: BlendOp_RevSubtract
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.BlendOp_RevSubtract), "BlendOp_RevSubtract");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.RevSubtract);
+            tok = scanner.Scan(TokenType.RevSubtract); // Terminal Rule: RevSubtract
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -916,16 +917,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: BlendOp_RevSubtract
 
-        private void ParseBlendOp_Min(ParseNode parent)
+        private void ParseBlendOp_Min(ParseNode parent) // NonTerminalSymbol: BlendOp_Min
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.BlendOp_Min), "BlendOp_Min");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Min);
+            tok = scanner.Scan(TokenType.Min); // Terminal Rule: Min
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -935,16 +936,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: BlendOp_Min
 
-        private void ParseBlendOp_Max(ParseNode parent)
+        private void ParseBlendOp_Max(ParseNode parent) // NonTerminalSymbol: BlendOp_Max
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.BlendOp_Max), "BlendOp_Max");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Max);
+            tok = scanner.Scan(TokenType.Max); // Terminal Rule: Max
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -954,49 +955,49 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: BlendOp_Max
 
-        private void ParseBlendOps(ParseNode parent)
+        private void ParseBlendOps(ParseNode parent) // NonTerminalSymbol: BlendOps
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.BlendOps), "BlendOps");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Add, TokenType.Subtract, TokenType.RevSubtract, TokenType.Min, TokenType.Max);
+            tok = scanner.LookAhead(TokenType.Add, TokenType.Subtract, TokenType.RevSubtract, TokenType.Min, TokenType.Max); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Add:
-                    ParseBlendOp_Add(node);
+                    ParseBlendOp_Add(node); // NonTerminal Rule: BlendOp_Add
                     break;
                 case TokenType.Subtract:
-                    ParseBlendOp_Subtract(node);
+                    ParseBlendOp_Subtract(node); // NonTerminal Rule: BlendOp_Subtract
                     break;
                 case TokenType.RevSubtract:
-                    ParseBlendOp_RevSubtract(node);
+                    ParseBlendOp_RevSubtract(node); // NonTerminal Rule: BlendOp_RevSubtract
                     break;
                 case TokenType.Min:
-                    ParseBlendOp_Min(node);
+                    ParseBlendOp_Min(node); // NonTerminal Rule: BlendOp_Min
                     break;
                 case TokenType.Max:
-                    ParseBlendOp_Max(node);
+                    ParseBlendOp_Max(node); // NonTerminal Rule: BlendOp_Max
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Add, Subtract, RevSubtract, Min, or Max.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: BlendOps
 
-        private void ParseCmpFunc_Never(ParseNode parent)
+        private void ParseCmpFunc_Never(ParseNode parent) // NonTerminalSymbol: CmpFunc_Never
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_Never), "CmpFunc_Never");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Never);
+            tok = scanner.Scan(TokenType.Never); // Terminal Rule: Never
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1006,16 +1007,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_Never
 
-        private void ParseCmpFunc_Less(ParseNode parent)
+        private void ParseCmpFunc_Less(ParseNode parent) // NonTerminalSymbol: CmpFunc_Less
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_Less), "CmpFunc_Less");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Less);
+            tok = scanner.Scan(TokenType.Less); // Terminal Rule: Less
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1025,16 +1026,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_Less
 
-        private void ParseCmpFunc_Equal(ParseNode parent)
+        private void ParseCmpFunc_Equal(ParseNode parent) // NonTerminalSymbol: CmpFunc_Equal
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_Equal), "CmpFunc_Equal");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Equal);
+            tok = scanner.Scan(TokenType.Equal); // Terminal Rule: Equal
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1044,16 +1045,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_Equal
 
-        private void ParseCmpFunc_LessEqual(ParseNode parent)
+        private void ParseCmpFunc_LessEqual(ParseNode parent) // NonTerminalSymbol: CmpFunc_LessEqual
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_LessEqual), "CmpFunc_LessEqual");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.LessEqual);
+            tok = scanner.Scan(TokenType.LessEqual); // Terminal Rule: LessEqual
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1063,16 +1064,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_LessEqual
 
-        private void ParseCmpFunc_Greater(ParseNode parent)
+        private void ParseCmpFunc_Greater(ParseNode parent) // NonTerminalSymbol: CmpFunc_Greater
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_Greater), "CmpFunc_Greater");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Greater);
+            tok = scanner.Scan(TokenType.Greater); // Terminal Rule: Greater
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1082,16 +1083,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_Greater
 
-        private void ParseCmpFunc_NotEqual(ParseNode parent)
+        private void ParseCmpFunc_NotEqual(ParseNode parent) // NonTerminalSymbol: CmpFunc_NotEqual
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_NotEqual), "CmpFunc_NotEqual");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.NotEqual);
+            tok = scanner.Scan(TokenType.NotEqual); // Terminal Rule: NotEqual
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1101,16 +1102,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_NotEqual
 
-        private void ParseCmpFunc_GreaterEqual(ParseNode parent)
+        private void ParseCmpFunc_GreaterEqual(ParseNode parent) // NonTerminalSymbol: CmpFunc_GreaterEqual
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_GreaterEqual), "CmpFunc_GreaterEqual");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.GreaterEqual);
+            tok = scanner.Scan(TokenType.GreaterEqual); // Terminal Rule: GreaterEqual
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1120,16 +1121,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_GreaterEqual
 
-        private void ParseCmpFunc_Always(ParseNode parent)
+        private void ParseCmpFunc_Always(ParseNode parent) // NonTerminalSymbol: CmpFunc_Always
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc_Always), "CmpFunc_Always");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Always);
+            tok = scanner.Scan(TokenType.Always); // Terminal Rule: Always
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1139,58 +1140,58 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc_Always
 
-        private void ParseCmpFunc(ParseNode parent)
+        private void ParseCmpFunc(ParseNode parent) // NonTerminalSymbol: CmpFunc
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.CmpFunc), "CmpFunc");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Never, TokenType.Less, TokenType.Equal, TokenType.LessEqual, TokenType.Greater, TokenType.NotEqual, TokenType.GreaterEqual, TokenType.Always);
+            tok = scanner.LookAhead(TokenType.Never, TokenType.Less, TokenType.Equal, TokenType.LessEqual, TokenType.Greater, TokenType.NotEqual, TokenType.GreaterEqual, TokenType.Always); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Never:
-                    ParseCmpFunc_Never(node);
+                    ParseCmpFunc_Never(node); // NonTerminal Rule: CmpFunc_Never
                     break;
                 case TokenType.Less:
-                    ParseCmpFunc_Less(node);
+                    ParseCmpFunc_Less(node); // NonTerminal Rule: CmpFunc_Less
                     break;
                 case TokenType.Equal:
-                    ParseCmpFunc_Equal(node);
+                    ParseCmpFunc_Equal(node); // NonTerminal Rule: CmpFunc_Equal
                     break;
                 case TokenType.LessEqual:
-                    ParseCmpFunc_LessEqual(node);
+                    ParseCmpFunc_LessEqual(node); // NonTerminal Rule: CmpFunc_LessEqual
                     break;
                 case TokenType.Greater:
-                    ParseCmpFunc_Greater(node);
+                    ParseCmpFunc_Greater(node); // NonTerminal Rule: CmpFunc_Greater
                     break;
                 case TokenType.NotEqual:
-                    ParseCmpFunc_NotEqual(node);
+                    ParseCmpFunc_NotEqual(node); // NonTerminal Rule: CmpFunc_NotEqual
                     break;
                 case TokenType.GreaterEqual:
-                    ParseCmpFunc_GreaterEqual(node);
+                    ParseCmpFunc_GreaterEqual(node); // NonTerminal Rule: CmpFunc_GreaterEqual
                     break;
                 case TokenType.Always:
-                    ParseCmpFunc_Always(node);
+                    ParseCmpFunc_Always(node); // NonTerminal Rule: CmpFunc_Always
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Never, Less, Equal, LessEqual, Greater, NotEqual, GreaterEqual, or Always.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: CmpFunc
 
-        private void ParseStencilOp_Keep(ParseNode parent)
+        private void ParseStencilOp_Keep(ParseNode parent) // NonTerminalSymbol: StencilOp_Keep
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_Keep), "StencilOp_Keep");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Keep);
+            tok = scanner.Scan(TokenType.Keep); // Terminal Rule: Keep
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1200,16 +1201,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_Keep
 
-        private void ParseStencilOp_Zero(ParseNode parent)
+        private void ParseStencilOp_Zero(ParseNode parent) // NonTerminalSymbol: StencilOp_Zero
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_Zero), "StencilOp_Zero");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Zero);
+            tok = scanner.Scan(TokenType.Zero); // Terminal Rule: Zero
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1219,16 +1220,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_Zero
 
-        private void ParseStencilOp_Replace(ParseNode parent)
+        private void ParseStencilOp_Replace(ParseNode parent) // NonTerminalSymbol: StencilOp_Replace
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_Replace), "StencilOp_Replace");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Replace);
+            tok = scanner.Scan(TokenType.Replace); // Terminal Rule: Replace
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1238,16 +1239,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_Replace
 
-        private void ParseStencilOp_IncrSat(ParseNode parent)
+        private void ParseStencilOp_IncrSat(ParseNode parent) // NonTerminalSymbol: StencilOp_IncrSat
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_IncrSat), "StencilOp_IncrSat");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.IncrSat);
+            tok = scanner.Scan(TokenType.IncrSat); // Terminal Rule: IncrSat
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1257,16 +1258,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_IncrSat
 
-        private void ParseStencilOp_DecrSat(ParseNode parent)
+        private void ParseStencilOp_DecrSat(ParseNode parent) // NonTerminalSymbol: StencilOp_DecrSat
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_DecrSat), "StencilOp_DecrSat");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.DecrSat);
+            tok = scanner.Scan(TokenType.DecrSat); // Terminal Rule: DecrSat
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1276,16 +1277,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_DecrSat
 
-        private void ParseStencilOp_Invert(ParseNode parent)
+        private void ParseStencilOp_Invert(ParseNode parent) // NonTerminalSymbol: StencilOp_Invert
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_Invert), "StencilOp_Invert");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Invert);
+            tok = scanner.Scan(TokenType.Invert); // Terminal Rule: Invert
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1295,16 +1296,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_Invert
 
-        private void ParseStencilOp_Incr(ParseNode parent)
+        private void ParseStencilOp_Incr(ParseNode parent) // NonTerminalSymbol: StencilOp_Incr
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_Incr), "StencilOp_Incr");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Incr);
+            tok = scanner.Scan(TokenType.Incr); // Terminal Rule: Incr
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1314,16 +1315,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_Incr
 
-        private void ParseStencilOp_Decr(ParseNode parent)
+        private void ParseStencilOp_Decr(ParseNode parent) // NonTerminalSymbol: StencilOp_Decr
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp_Decr), "StencilOp_Decr");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Decr);
+            tok = scanner.Scan(TokenType.Decr); // Terminal Rule: Decr
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1333,51 +1334,51 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp_Decr
 
-        private void ParseStencilOp(ParseNode parent)
+        private void ParseStencilOp(ParseNode parent) // NonTerminalSymbol: StencilOp
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.StencilOp), "StencilOp");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Keep, TokenType.Zero, TokenType.Replace, TokenType.IncrSat, TokenType.DecrSat, TokenType.Invert, TokenType.Incr, TokenType.Decr);
+            tok = scanner.LookAhead(TokenType.Keep, TokenType.Zero, TokenType.Replace, TokenType.IncrSat, TokenType.DecrSat, TokenType.Invert, TokenType.Incr, TokenType.Decr); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Keep:
-                    ParseStencilOp_Keep(node);
+                    ParseStencilOp_Keep(node); // NonTerminal Rule: StencilOp_Keep
                     break;
                 case TokenType.Zero:
-                    ParseStencilOp_Zero(node);
+                    ParseStencilOp_Zero(node); // NonTerminal Rule: StencilOp_Zero
                     break;
                 case TokenType.Replace:
-                    ParseStencilOp_Replace(node);
+                    ParseStencilOp_Replace(node); // NonTerminal Rule: StencilOp_Replace
                     break;
                 case TokenType.IncrSat:
-                    ParseStencilOp_IncrSat(node);
+                    ParseStencilOp_IncrSat(node); // NonTerminal Rule: StencilOp_IncrSat
                     break;
                 case TokenType.DecrSat:
-                    ParseStencilOp_DecrSat(node);
+                    ParseStencilOp_DecrSat(node); // NonTerminal Rule: StencilOp_DecrSat
                     break;
                 case TokenType.Invert:
-                    ParseStencilOp_Invert(node);
+                    ParseStencilOp_Invert(node); // NonTerminal Rule: StencilOp_Invert
                     break;
                 case TokenType.Incr:
-                    ParseStencilOp_Incr(node);
+                    ParseStencilOp_Incr(node); // NonTerminal Rule: StencilOp_Incr
                     break;
                 case TokenType.Decr:
-                    ParseStencilOp_Decr(node);
+                    ParseStencilOp_Decr(node); // NonTerminal Rule: StencilOp_Decr
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Keep, Zero, Replace, IncrSat, DecrSat, Invert, Incr, or Decr.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: StencilOp
 
-        private void ParseRender_State_CullMode(ParseNode parent)
+        private void ParseRender_State_CullMode(ParseNode parent) // NonTerminalSymbol: Render_State_CullMode
         {
             Token tok;
             ParseNode n;
@@ -1385,8 +1386,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.CullMode);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CullMode); // Terminal Rule: CullMode
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1395,8 +1396,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1405,11 +1406,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseCullModes(node);
+             // Concat Rule
+            ParseCullModes(node); // NonTerminal Rule: CullModes
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1419,9 +1420,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_CullMode
 
-        private void ParseRender_State_FillMode(ParseNode parent)
+        private void ParseRender_State_FillMode(ParseNode parent) // NonTerminalSymbol: Render_State_FillMode
         {
             Token tok;
             ParseNode n;
@@ -1429,8 +1430,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.FillMode);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.FillMode); // Terminal Rule: FillMode
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1439,8 +1440,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1449,11 +1450,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseFillModes(node);
+             // Concat Rule
+            ParseFillModes(node); // NonTerminal Rule: FillModes
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1463,9 +1464,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_FillMode
 
-        private void ParseRender_State_AlphaBlendEnable(ParseNode parent)
+        private void ParseRender_State_AlphaBlendEnable(ParseNode parent) // NonTerminalSymbol: Render_State_AlphaBlendEnable
         {
             Token tok;
             ParseNode n;
@@ -1473,8 +1474,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.AlphaBlendEnable);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.AlphaBlendEnable); // Terminal Rule: AlphaBlendEnable
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1483,8 +1484,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1493,8 +1494,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Boolean);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1503,8 +1504,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1514,9 +1515,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_AlphaBlendEnable
 
-        private void ParseRender_State_SrcBlend(ParseNode parent)
+        private void ParseRender_State_SrcBlend(ParseNode parent) // NonTerminalSymbol: Render_State_SrcBlend
         {
             Token tok;
             ParseNode n;
@@ -1524,8 +1525,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.SrcBlend);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.SrcBlend); // Terminal Rule: SrcBlend
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1534,8 +1535,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1544,11 +1545,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseBlends(node);
+             // Concat Rule
+            ParseBlends(node); // NonTerminal Rule: Blends
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1558,9 +1559,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_SrcBlend
 
-        private void ParseRender_State_DestBlend(ParseNode parent)
+        private void ParseRender_State_DestBlend(ParseNode parent) // NonTerminalSymbol: Render_State_DestBlend
         {
             Token tok;
             ParseNode n;
@@ -1568,8 +1569,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.DestBlend);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.DestBlend); // Terminal Rule: DestBlend
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1578,8 +1579,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1588,11 +1589,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseBlends(node);
+             // Concat Rule
+            ParseBlends(node); // NonTerminal Rule: Blends
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1602,9 +1603,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_DestBlend
 
-        private void ParseRender_State_BlendOp(ParseNode parent)
+        private void ParseRender_State_BlendOp(ParseNode parent) // NonTerminalSymbol: Render_State_BlendOp
         {
             Token tok;
             ParseNode n;
@@ -1612,8 +1613,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.BlendOp);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.BlendOp); // Terminal Rule: BlendOp
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1622,8 +1623,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1632,11 +1633,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseBlendOps(node);
+             // Concat Rule
+            ParseBlendOps(node); // NonTerminal Rule: BlendOps
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1646,9 +1647,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_BlendOp
 
-        private void ParseRender_State_ColorWriteEnable(ParseNode parent)
+        private void ParseRender_State_ColorWriteEnable(ParseNode parent) // NonTerminalSymbol: Render_State_ColorWriteEnable
         {
             Token tok;
             ParseNode n;
@@ -1656,8 +1657,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.ColorWriteEnable);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ColorWriteEnable); // Terminal Rule: ColorWriteEnable
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1666,8 +1667,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1676,11 +1677,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseColorsMasks(node);
+             // Concat Rule
+            ParseColorsMasks(node); // NonTerminal Rule: ColorsMasks
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1690,9 +1691,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_ColorWriteEnable
 
-        private void ParseRender_State_DepthBias(ParseNode parent)
+        private void ParseRender_State_DepthBias(ParseNode parent) // NonTerminalSymbol: Render_State_DepthBias
         {
             Token tok;
             ParseNode n;
@@ -1700,8 +1701,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.DepthBias);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.DepthBias); // Terminal Rule: DepthBias
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1710,8 +1711,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1720,8 +1721,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1730,8 +1731,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1741,9 +1742,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_DepthBias
 
-        private void ParseRender_State_SlopeScaleDepthBias(ParseNode parent)
+        private void ParseRender_State_SlopeScaleDepthBias(ParseNode parent) // NonTerminalSymbol: Render_State_SlopeScaleDepthBias
         {
             Token tok;
             ParseNode n;
@@ -1751,8 +1752,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.SlopeScaleDepthBias);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.SlopeScaleDepthBias); // Terminal Rule: SlopeScaleDepthBias
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1761,8 +1762,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1771,8 +1772,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1781,8 +1782,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1792,9 +1793,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_SlopeScaleDepthBias
 
-        private void ParseRender_State_ZEnable(ParseNode parent)
+        private void ParseRender_State_ZEnable(ParseNode parent) // NonTerminalSymbol: Render_State_ZEnable
         {
             Token tok;
             ParseNode n;
@@ -1802,8 +1803,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.ZEnable);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ZEnable); // Terminal Rule: ZEnable
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1812,8 +1813,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1822,8 +1823,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Boolean);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1832,8 +1833,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1843,9 +1844,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_ZEnable
 
-        private void ParseRender_State_ZWriteEnable(ParseNode parent)
+        private void ParseRender_State_ZWriteEnable(ParseNode parent) // NonTerminalSymbol: Render_State_ZWriteEnable
         {
             Token tok;
             ParseNode n;
@@ -1853,8 +1854,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.ZWriteEnable);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ZWriteEnable); // Terminal Rule: ZWriteEnable
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1863,8 +1864,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1873,8 +1874,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Boolean);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1883,8 +1884,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1894,9 +1895,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_ZWriteEnable
 
-        private void ParseRender_State_ZFunc(ParseNode parent)
+        private void ParseRender_State_ZFunc(ParseNode parent) // NonTerminalSymbol: Render_State_ZFunc
         {
             Token tok;
             ParseNode n;
@@ -1904,8 +1905,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.ZFunc);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ZFunc); // Terminal Rule: ZFunc
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1914,8 +1915,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1924,11 +1925,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseCmpFunc(node);
+             // Concat Rule
+            ParseCmpFunc(node); // NonTerminal Rule: CmpFunc
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1938,9 +1939,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_ZFunc
 
-        private void ParseRender_State_MultiSampleAntiAlias(ParseNode parent)
+        private void ParseRender_State_MultiSampleAntiAlias(ParseNode parent) // NonTerminalSymbol: Render_State_MultiSampleAntiAlias
         {
             Token tok;
             ParseNode n;
@@ -1948,8 +1949,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.MultiSampleAntiAlias);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.MultiSampleAntiAlias); // Terminal Rule: MultiSampleAntiAlias
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1958,8 +1959,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1968,8 +1969,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Boolean);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1978,8 +1979,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -1989,9 +1990,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_MultiSampleAntiAlias
 
-        private void ParseRender_State_ScissorTestEnable(ParseNode parent)
+        private void ParseRender_State_ScissorTestEnable(ParseNode parent) // NonTerminalSymbol: Render_State_ScissorTestEnable
         {
             Token tok;
             ParseNode n;
@@ -1999,8 +2000,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.ScissorTestEnable);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ScissorTestEnable); // Terminal Rule: ScissorTestEnable
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2009,8 +2010,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2019,8 +2020,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Boolean);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2029,8 +2030,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2040,9 +2041,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_ScissorTestEnable
 
-        private void ParseRender_State_StencilEnable(ParseNode parent)
+        private void ParseRender_State_StencilEnable(ParseNode parent) // NonTerminalSymbol: Render_State_StencilEnable
         {
             Token tok;
             ParseNode n;
@@ -2050,8 +2051,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilEnable);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilEnable); // Terminal Rule: StencilEnable
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2060,8 +2061,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2070,8 +2071,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Boolean);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2080,8 +2081,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2091,9 +2092,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilEnable
 
-        private void ParseRender_State_StencilFail(ParseNode parent)
+        private void ParseRender_State_StencilFail(ParseNode parent) // NonTerminalSymbol: Render_State_StencilFail
         {
             Token tok;
             ParseNode n;
@@ -2101,8 +2102,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilFail);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilFail); // Terminal Rule: StencilFail
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2111,8 +2112,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2121,11 +2122,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseStencilOp(node);
+             // Concat Rule
+            ParseStencilOp(node); // NonTerminal Rule: StencilOp
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2135,9 +2136,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilFail
 
-        private void ParseRender_State_StencilFunc(ParseNode parent)
+        private void ParseRender_State_StencilFunc(ParseNode parent) // NonTerminalSymbol: Render_State_StencilFunc
         {
             Token tok;
             ParseNode n;
@@ -2145,8 +2146,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilFunc);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilFunc); // Terminal Rule: StencilFunc
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2155,8 +2156,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2165,11 +2166,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseCmpFunc(node);
+             // Concat Rule
+            ParseCmpFunc(node); // NonTerminal Rule: CmpFunc
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2179,9 +2180,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilFunc
 
-        private void ParseRender_State_StencilMask(ParseNode parent)
+        private void ParseRender_State_StencilMask(ParseNode parent) // NonTerminalSymbol: Render_State_StencilMask
         {
             Token tok;
             ParseNode n;
@@ -2189,8 +2190,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilMask);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilMask); // Terminal Rule: StencilMask
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2199,8 +2200,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2209,8 +2210,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2219,8 +2220,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2230,9 +2231,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilMask
 
-        private void ParseRender_State_StencilPass(ParseNode parent)
+        private void ParseRender_State_StencilPass(ParseNode parent) // NonTerminalSymbol: Render_State_StencilPass
         {
             Token tok;
             ParseNode n;
@@ -2240,8 +2241,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilPass);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilPass); // Terminal Rule: StencilPass
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2250,8 +2251,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2260,11 +2261,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseStencilOp(node);
+             // Concat Rule
+            ParseStencilOp(node); // NonTerminal Rule: StencilOp
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2274,9 +2275,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilPass
 
-        private void ParseRender_State_StencilRef(ParseNode parent)
+        private void ParseRender_State_StencilRef(ParseNode parent) // NonTerminalSymbol: Render_State_StencilRef
         {
             Token tok;
             ParseNode n;
@@ -2284,8 +2285,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilRef);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilRef); // Terminal Rule: StencilRef
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2294,8 +2295,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2304,8 +2305,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2314,8 +2315,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2325,9 +2326,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilRef
 
-        private void ParseRender_State_StencilWriteMask(ParseNode parent)
+        private void ParseRender_State_StencilWriteMask(ParseNode parent) // NonTerminalSymbol: Render_State_StencilWriteMask
         {
             Token tok;
             ParseNode n;
@@ -2335,8 +2336,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilWriteMask);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilWriteMask); // Terminal Rule: StencilWriteMask
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2345,8 +2346,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2355,8 +2356,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2365,8 +2366,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2376,9 +2377,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilWriteMask
 
-        private void ParseRender_State_StencilZFail(ParseNode parent)
+        private void ParseRender_State_StencilZFail(ParseNode parent) // NonTerminalSymbol: Render_State_StencilZFail
         {
             Token tok;
             ParseNode n;
@@ -2386,8 +2387,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.StencilZFail);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.StencilZFail); // Terminal Rule: StencilZFail
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2396,8 +2397,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2406,11 +2407,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseStencilOp(node);
+             // Concat Rule
+            ParseStencilOp(node); // NonTerminal Rule: StencilOp
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2420,93 +2421,93 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_StencilZFail
 
-        private void ParseRender_State_Expression(ParseNode parent)
+        private void ParseRender_State_Expression(ParseNode parent) // NonTerminalSymbol: Render_State_Expression
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Render_State_Expression), "Render_State_Expression");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail);
+            tok = scanner.LookAhead(TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.CullMode:
-                    ParseRender_State_CullMode(node);
+                    ParseRender_State_CullMode(node); // NonTerminal Rule: Render_State_CullMode
                     break;
                 case TokenType.FillMode:
-                    ParseRender_State_FillMode(node);
+                    ParseRender_State_FillMode(node); // NonTerminal Rule: Render_State_FillMode
                     break;
                 case TokenType.AlphaBlendEnable:
-                    ParseRender_State_AlphaBlendEnable(node);
+                    ParseRender_State_AlphaBlendEnable(node); // NonTerminal Rule: Render_State_AlphaBlendEnable
                     break;
                 case TokenType.SrcBlend:
-                    ParseRender_State_SrcBlend(node);
+                    ParseRender_State_SrcBlend(node); // NonTerminal Rule: Render_State_SrcBlend
                     break;
                 case TokenType.DestBlend:
-                    ParseRender_State_DestBlend(node);
+                    ParseRender_State_DestBlend(node); // NonTerminal Rule: Render_State_DestBlend
                     break;
                 case TokenType.BlendOp:
-                    ParseRender_State_BlendOp(node);
+                    ParseRender_State_BlendOp(node); // NonTerminal Rule: Render_State_BlendOp
                     break;
                 case TokenType.ColorWriteEnable:
-                    ParseRender_State_ColorWriteEnable(node);
+                    ParseRender_State_ColorWriteEnable(node); // NonTerminal Rule: Render_State_ColorWriteEnable
                     break;
                 case TokenType.DepthBias:
-                    ParseRender_State_DepthBias(node);
+                    ParseRender_State_DepthBias(node); // NonTerminal Rule: Render_State_DepthBias
                     break;
                 case TokenType.SlopeScaleDepthBias:
-                    ParseRender_State_SlopeScaleDepthBias(node);
+                    ParseRender_State_SlopeScaleDepthBias(node); // NonTerminal Rule: Render_State_SlopeScaleDepthBias
                     break;
                 case TokenType.ZEnable:
-                    ParseRender_State_ZEnable(node);
+                    ParseRender_State_ZEnable(node); // NonTerminal Rule: Render_State_ZEnable
                     break;
                 case TokenType.ZWriteEnable:
-                    ParseRender_State_ZWriteEnable(node);
+                    ParseRender_State_ZWriteEnable(node); // NonTerminal Rule: Render_State_ZWriteEnable
                     break;
                 case TokenType.ZFunc:
-                    ParseRender_State_ZFunc(node);
+                    ParseRender_State_ZFunc(node); // NonTerminal Rule: Render_State_ZFunc
                     break;
                 case TokenType.MultiSampleAntiAlias:
-                    ParseRender_State_MultiSampleAntiAlias(node);
+                    ParseRender_State_MultiSampleAntiAlias(node); // NonTerminal Rule: Render_State_MultiSampleAntiAlias
                     break;
                 case TokenType.ScissorTestEnable:
-                    ParseRender_State_ScissorTestEnable(node);
+                    ParseRender_State_ScissorTestEnable(node); // NonTerminal Rule: Render_State_ScissorTestEnable
                     break;
                 case TokenType.StencilEnable:
-                    ParseRender_State_StencilEnable(node);
+                    ParseRender_State_StencilEnable(node); // NonTerminal Rule: Render_State_StencilEnable
                     break;
                 case TokenType.StencilFail:
-                    ParseRender_State_StencilFail(node);
+                    ParseRender_State_StencilFail(node); // NonTerminal Rule: Render_State_StencilFail
                     break;
                 case TokenType.StencilFunc:
-                    ParseRender_State_StencilFunc(node);
+                    ParseRender_State_StencilFunc(node); // NonTerminal Rule: Render_State_StencilFunc
                     break;
                 case TokenType.StencilMask:
-                    ParseRender_State_StencilMask(node);
+                    ParseRender_State_StencilMask(node); // NonTerminal Rule: Render_State_StencilMask
                     break;
                 case TokenType.StencilPass:
-                    ParseRender_State_StencilPass(node);
+                    ParseRender_State_StencilPass(node); // NonTerminal Rule: Render_State_StencilPass
                     break;
                 case TokenType.StencilRef:
-                    ParseRender_State_StencilRef(node);
+                    ParseRender_State_StencilRef(node); // NonTerminal Rule: Render_State_StencilRef
                     break;
                 case TokenType.StencilWriteMask:
-                    ParseRender_State_StencilWriteMask(node);
+                    ParseRender_State_StencilWriteMask(node); // NonTerminal Rule: Render_State_StencilWriteMask
                     break;
                 case TokenType.StencilZFail:
-                    ParseRender_State_StencilZFail(node);
+                    ParseRender_State_StencilZFail(node); // NonTerminal Rule: Render_State_StencilZFail
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected CullMode, FillMode, AlphaBlendEnable, SrcBlend, DestBlend, BlendOp, ColorWriteEnable, DepthBias, SlopeScaleDepthBias, ZEnable, ZWriteEnable, ZFunc, MultiSampleAntiAlias, ScissorTestEnable, StencilEnable, StencilFail, StencilFunc, StencilMask, StencilPass, StencilRef, StencilWriteMask, or StencilZFail.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_Expression
 
-        private void ParsePass_Declaration(ParseNode parent)
+        private void ParsePass_Declaration(ParseNode parent) // NonTerminalSymbol: Pass_Declaration
         {
             Token tok;
             ParseNode n;
@@ -2514,8 +2515,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Pass);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Pass); // Terminal Rule: Pass
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2524,11 +2525,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Identifier); // Option Rule
             if (tok.Type == TokenType.Identifier)
             {
-                tok = scanner.Scan(TokenType.Identifier);
+                tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -2538,8 +2539,8 @@ namespace TwoMGFX
                 }
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenBracket); // Terminal Rule: OpenBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2548,8 +2549,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail); // ZeroOrMore Rule
             while (tok.Type == TokenType.VertexShader
                 || tok.Type == TokenType.PixelShader
                 || tok.Type == TokenType.CullMode
@@ -2575,14 +2576,14 @@ namespace TwoMGFX
                 || tok.Type == TokenType.StencilWriteMask
                 || tok.Type == TokenType.StencilZFail)
             {
-                tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail);
+                tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail); // Choice Rule
                 switch (tok.Type)
-                {
+                { // Choice Rule
                     case TokenType.VertexShader:
-                        ParseVertexShader_Pass_Expression(node);
+                        ParseVertexShader_Pass_Expression(node); // NonTerminal Rule: VertexShader_Pass_Expression
                         break;
                     case TokenType.PixelShader:
-                        ParsePixelShader_Pass_Expression(node);
+                        ParsePixelShader_Pass_Expression(node); // NonTerminal Rule: PixelShader_Pass_Expression
                         break;
                     case TokenType.CullMode:
                     case TokenType.FillMode:
@@ -2606,17 +2607,17 @@ namespace TwoMGFX
                     case TokenType.StencilRef:
                     case TokenType.StencilWriteMask:
                     case TokenType.StencilZFail:
-                        ParseRender_State_Expression(node);
+                        ParseRender_State_Expression(node); // NonTerminal Rule: Render_State_Expression
                         break;
                     default:
                         tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected VertexShader, PixelShader, CullMode, FillMode, AlphaBlendEnable, SrcBlend, DestBlend, BlendOp, ColorWriteEnable, DepthBias, SlopeScaleDepthBias, ZEnable, ZWriteEnable, ZFunc, MultiSampleAntiAlias, ScissorTestEnable, StencilEnable, StencilFail, StencilFunc, StencilMask, StencilPass, StencilRef, StencilWriteMask, or StencilZFail.", 0x0002, tok));
                         break;
-                }
-            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail);
+                } // Choice Rule
+            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.ZFunc, TokenType.MultiSampleAntiAlias, TokenType.ScissorTestEnable, TokenType.StencilEnable, TokenType.StencilFail, TokenType.StencilFunc, TokenType.StencilMask, TokenType.StencilPass, TokenType.StencilRef, TokenType.StencilWriteMask, TokenType.StencilZFail); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseBracket); // Terminal Rule: CloseBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2626,9 +2627,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Pass_Declaration
 
-        private void ParseVertexShader_Pass_Expression(ParseNode parent)
+        private void ParseVertexShader_Pass_Expression(ParseNode parent) // NonTerminalSymbol: VertexShader_Pass_Expression
         {
             Token tok;
             ParseNode n;
@@ -2636,8 +2637,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.VertexShader);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.VertexShader); // Terminal Rule: VertexShader
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2646,8 +2647,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2656,8 +2657,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Compile);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Compile); // Terminal Rule: Compile
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2666,8 +2667,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.ShaderModel);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ShaderModel); // Terminal Rule: ShaderModel
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2676,8 +2677,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2686,8 +2687,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2696,8 +2697,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2706,8 +2707,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2717,9 +2718,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: VertexShader_Pass_Expression
 
-        private void ParsePixelShader_Pass_Expression(ParseNode parent)
+        private void ParsePixelShader_Pass_Expression(ParseNode parent) // NonTerminalSymbol: PixelShader_Pass_Expression
         {
             Token tok;
             ParseNode n;
@@ -2727,8 +2728,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.PixelShader);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.PixelShader); // Terminal Rule: PixelShader
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2737,8 +2738,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2747,8 +2748,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Compile);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Compile); // Terminal Rule: Compile
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2757,8 +2758,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.ShaderModel);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ShaderModel); // Terminal Rule: ShaderModel
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2767,8 +2768,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2777,8 +2778,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2787,8 +2788,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2797,8 +2798,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2808,16 +2809,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: PixelShader_Pass_Expression
 
-        private void ParseAddressMode_Clamp(ParseNode parent)
+        private void ParseAddressMode_Clamp(ParseNode parent) // NonTerminalSymbol: AddressMode_Clamp
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddressMode_Clamp), "AddressMode_Clamp");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Clamp);
+            tok = scanner.Scan(TokenType.Clamp); // Terminal Rule: Clamp
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2827,16 +2828,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: AddressMode_Clamp
 
-        private void ParseAddressMode_Wrap(ParseNode parent)
+        private void ParseAddressMode_Wrap(ParseNode parent) // NonTerminalSymbol: AddressMode_Wrap
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddressMode_Wrap), "AddressMode_Wrap");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Wrap);
+            tok = scanner.Scan(TokenType.Wrap); // Terminal Rule: Wrap
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2846,16 +2847,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: AddressMode_Wrap
 
-        private void ParseAddressMode_Mirror(ParseNode parent)
+        private void ParseAddressMode_Mirror(ParseNode parent) // NonTerminalSymbol: AddressMode_Mirror
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddressMode_Mirror), "AddressMode_Mirror");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Mirror);
+            tok = scanner.Scan(TokenType.Mirror); // Terminal Rule: Mirror
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2865,16 +2866,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: AddressMode_Mirror
 
-        private void ParseAddressMode_Border(ParseNode parent)
+        private void ParseAddressMode_Border(ParseNode parent) // NonTerminalSymbol: AddressMode_Border
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddressMode_Border), "AddressMode_Border");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Border);
+            tok = scanner.Scan(TokenType.Border); // Terminal Rule: Border
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2884,46 +2885,46 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: AddressMode_Border
 
-        private void ParseAddressMode(ParseNode parent)
+        private void ParseAddressMode(ParseNode parent) // NonTerminalSymbol: AddressMode
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.AddressMode), "AddressMode");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Clamp, TokenType.Wrap, TokenType.Mirror, TokenType.Border);
+            tok = scanner.LookAhead(TokenType.Clamp, TokenType.Wrap, TokenType.Mirror, TokenType.Border); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Clamp:
-                    ParseAddressMode_Clamp(node);
+                    ParseAddressMode_Clamp(node); // NonTerminal Rule: AddressMode_Clamp
                     break;
                 case TokenType.Wrap:
-                    ParseAddressMode_Wrap(node);
+                    ParseAddressMode_Wrap(node); // NonTerminal Rule: AddressMode_Wrap
                     break;
                 case TokenType.Mirror:
-                    ParseAddressMode_Mirror(node);
+                    ParseAddressMode_Mirror(node); // NonTerminal Rule: AddressMode_Mirror
                     break;
                 case TokenType.Border:
-                    ParseAddressMode_Border(node);
+                    ParseAddressMode_Border(node); // NonTerminal Rule: AddressMode_Border
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Clamp, Wrap, Mirror, or Border.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: AddressMode
 
-        private void ParseTextureFilter_None(ParseNode parent)
+        private void ParseTextureFilter_None(ParseNode parent) // NonTerminalSymbol: TextureFilter_None
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.TextureFilter_None), "TextureFilter_None");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.None);
+            tok = scanner.Scan(TokenType.None); // Terminal Rule: None
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2933,16 +2934,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: TextureFilter_None
 
-        private void ParseTextureFilter_Linear(ParseNode parent)
+        private void ParseTextureFilter_Linear(ParseNode parent) // NonTerminalSymbol: TextureFilter_Linear
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.TextureFilter_Linear), "TextureFilter_Linear");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Linear);
+            tok = scanner.Scan(TokenType.Linear); // Terminal Rule: Linear
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2952,16 +2953,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: TextureFilter_Linear
 
-        private void ParseTextureFilter_Point(ParseNode parent)
+        private void ParseTextureFilter_Point(ParseNode parent) // NonTerminalSymbol: TextureFilter_Point
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.TextureFilter_Point), "TextureFilter_Point");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Point);
+            tok = scanner.Scan(TokenType.Point); // Terminal Rule: Point
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2971,16 +2972,16 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: TextureFilter_Point
 
-        private void ParseTextureFilter_Anisotropic(ParseNode parent)
+        private void ParseTextureFilter_Anisotropic(ParseNode parent) // NonTerminalSymbol: TextureFilter_Anisotropic
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.TextureFilter_Anisotropic), "TextureFilter_Anisotropic");
             parent.Nodes.Add(node);
 
-            tok = scanner.Scan(TokenType.Anisotropic);
+            tok = scanner.Scan(TokenType.Anisotropic); // Terminal Rule: Anisotropic
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -2990,39 +2991,39 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: TextureFilter_Anisotropic
 
-        private void ParseTextureFilter(ParseNode parent)
+        private void ParseTextureFilter(ParseNode parent) // NonTerminalSymbol: TextureFilter
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.TextureFilter), "TextureFilter");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.None, TokenType.Linear, TokenType.Point, TokenType.Anisotropic);
+            tok = scanner.LookAhead(TokenType.None, TokenType.Linear, TokenType.Point, TokenType.Anisotropic); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.None:
-                    ParseTextureFilter_None(node);
+                    ParseTextureFilter_None(node); // NonTerminal Rule: TextureFilter_None
                     break;
                 case TokenType.Linear:
-                    ParseTextureFilter_Linear(node);
+                    ParseTextureFilter_Linear(node); // NonTerminal Rule: TextureFilter_Linear
                     break;
                 case TokenType.Point:
-                    ParseTextureFilter_Point(node);
+                    ParseTextureFilter_Point(node); // NonTerminal Rule: TextureFilter_Point
                     break;
                 case TokenType.Anisotropic:
-                    ParseTextureFilter_Anisotropic(node);
+                    ParseTextureFilter_Anisotropic(node); // NonTerminal Rule: TextureFilter_Anisotropic
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected None, Linear, Point, or Anisotropic.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: TextureFilter
 
-        private void ParseSampler_State_Texture(ParseNode parent)
+        private void ParseSampler_State_Texture(ParseNode parent) // NonTerminalSymbol: Sampler_State_Texture
         {
             Token tok;
             ParseNode n;
@@ -3030,8 +3031,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Texture);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Texture); // Terminal Rule: Texture
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3040,8 +3041,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3050,12 +3051,12 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.LessThan:
-                    tok = scanner.Scan(TokenType.LessThan);
+                    tok = scanner.Scan(TokenType.LessThan); // Terminal Rule: LessThan
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -3065,7 +3066,7 @@ namespace TwoMGFX
                     }
                     break;
                 case TokenType.OpenParenthesis:
-                    tok = scanner.Scan(TokenType.OpenParenthesis);
+                    tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -3077,10 +3078,10 @@ namespace TwoMGFX
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected LessThan or OpenParenthesis.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3089,12 +3090,12 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.GreaterThan, TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.GreaterThan, TokenType.CloseParenthesis); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.GreaterThan:
-                    tok = scanner.Scan(TokenType.GreaterThan);
+                    tok = scanner.Scan(TokenType.GreaterThan); // Terminal Rule: GreaterThan
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -3104,7 +3105,7 @@ namespace TwoMGFX
                     }
                     break;
                 case TokenType.CloseParenthesis:
-                    tok = scanner.Scan(TokenType.CloseParenthesis);
+                    tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -3116,10 +3117,10 @@ namespace TwoMGFX
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected GreaterThan or CloseParenthesis.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3129,9 +3130,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_Texture
 
-        private void ParseSampler_State_MinFilter(ParseNode parent)
+        private void ParseSampler_State_MinFilter(ParseNode parent) // NonTerminalSymbol: Sampler_State_MinFilter
         {
             Token tok;
             ParseNode n;
@@ -3139,8 +3140,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.MinFilter);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.MinFilter); // Terminal Rule: MinFilter
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3149,8 +3150,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3159,11 +3160,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseTextureFilter(node);
+             // Concat Rule
+            ParseTextureFilter(node); // NonTerminal Rule: TextureFilter
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3173,9 +3174,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_MinFilter
 
-        private void ParseSampler_State_MagFilter(ParseNode parent)
+        private void ParseSampler_State_MagFilter(ParseNode parent) // NonTerminalSymbol: Sampler_State_MagFilter
         {
             Token tok;
             ParseNode n;
@@ -3183,8 +3184,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.MagFilter);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.MagFilter); // Terminal Rule: MagFilter
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3193,8 +3194,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3203,11 +3204,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseTextureFilter(node);
+             // Concat Rule
+            ParseTextureFilter(node); // NonTerminal Rule: TextureFilter
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3217,9 +3218,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_MagFilter
 
-        private void ParseSampler_State_MipFilter(ParseNode parent)
+        private void ParseSampler_State_MipFilter(ParseNode parent) // NonTerminalSymbol: Sampler_State_MipFilter
         {
             Token tok;
             ParseNode n;
@@ -3227,8 +3228,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.MipFilter);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.MipFilter); // Terminal Rule: MipFilter
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3237,8 +3238,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3247,11 +3248,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseTextureFilter(node);
+             // Concat Rule
+            ParseTextureFilter(node); // NonTerminal Rule: TextureFilter
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3261,9 +3262,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_MipFilter
 
-        private void ParseSampler_State_Filter(ParseNode parent)
+        private void ParseSampler_State_Filter(ParseNode parent) // NonTerminalSymbol: Sampler_State_Filter
         {
             Token tok;
             ParseNode n;
@@ -3271,8 +3272,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Filter);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Filter); // Terminal Rule: Filter
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3281,8 +3282,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3291,11 +3292,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseTextureFilter(node);
+             // Concat Rule
+            ParseTextureFilter(node); // NonTerminal Rule: TextureFilter
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3305,9 +3306,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_Filter
 
-        private void ParseSampler_State_AddressU(ParseNode parent)
+        private void ParseSampler_State_AddressU(ParseNode parent) // NonTerminalSymbol: Sampler_State_AddressU
         {
             Token tok;
             ParseNode n;
@@ -3315,8 +3316,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.AddressU);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.AddressU); // Terminal Rule: AddressU
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3325,8 +3326,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3335,11 +3336,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseAddressMode(node);
+             // Concat Rule
+            ParseAddressMode(node); // NonTerminal Rule: AddressMode
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3349,9 +3350,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_AddressU
 
-        private void ParseSampler_State_AddressV(ParseNode parent)
+        private void ParseSampler_State_AddressV(ParseNode parent) // NonTerminalSymbol: Sampler_State_AddressV
         {
             Token tok;
             ParseNode n;
@@ -3359,8 +3360,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.AddressV);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.AddressV); // Terminal Rule: AddressV
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3369,8 +3370,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3379,11 +3380,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseAddressMode(node);
+             // Concat Rule
+            ParseAddressMode(node); // NonTerminal Rule: AddressMode
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3393,9 +3394,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_AddressV
 
-        private void ParseSampler_State_AddressW(ParseNode parent)
+        private void ParseSampler_State_AddressW(ParseNode parent) // NonTerminalSymbol: Sampler_State_AddressW
         {
             Token tok;
             ParseNode n;
@@ -3403,8 +3404,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.AddressW);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.AddressW); // Terminal Rule: AddressW
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3413,8 +3414,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3423,11 +3424,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            ParseAddressMode(node);
+             // Concat Rule
+            ParseAddressMode(node); // NonTerminal Rule: AddressMode
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3437,9 +3438,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_AddressW
 
-        private void ParseSampler_State_BorderColor(ParseNode parent)
+        private void ParseSampler_State_BorderColor(ParseNode parent) // NonTerminalSymbol: Sampler_State_BorderColor
         {
             Token tok;
             ParseNode n;
@@ -3447,8 +3448,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.BorderColor);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.BorderColor); // Terminal Rule: BorderColor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3457,8 +3458,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3467,8 +3468,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.HexColor);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.HexColor); // Terminal Rule: HexColor
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3477,8 +3478,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3488,9 +3489,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_BorderColor
 
-        private void ParseSampler_State_MaxMipLevel(ParseNode parent)
+        private void ParseSampler_State_MaxMipLevel(ParseNode parent) // NonTerminalSymbol: Sampler_State_MaxMipLevel
         {
             Token tok;
             ParseNode n;
@@ -3498,8 +3499,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.MaxMipLevel);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.MaxMipLevel); // Terminal Rule: MaxMipLevel
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3508,8 +3509,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3518,8 +3519,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3528,8 +3529,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3539,9 +3540,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_MaxMipLevel
 
-        private void ParseSampler_State_MaxAnisotropy(ParseNode parent)
+        private void ParseSampler_State_MaxAnisotropy(ParseNode parent) // NonTerminalSymbol: Sampler_State_MaxAnisotropy
         {
             Token tok;
             ParseNode n;
@@ -3549,8 +3550,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.MaxAnisotropy);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.MaxAnisotropy); // Terminal Rule: MaxAnisotropy
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3559,8 +3560,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3569,8 +3570,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3579,8 +3580,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3590,9 +3591,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_MaxAnisotropy
 
-        private void ParseSampler_State_MipLodBias(ParseNode parent)
+        private void ParseSampler_State_MipLodBias(ParseNode parent) // NonTerminalSymbol: Sampler_State_MipLodBias
         {
             Token tok;
             ParseNode n;
@@ -3600,8 +3601,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.MipLodBias);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.MipLodBias); // Terminal Rule: MipLodBias
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3610,8 +3611,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3620,8 +3621,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Number);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3630,8 +3631,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3641,63 +3642,63 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_MipLodBias
 
-        private void ParseSampler_State_Expression(ParseNode parent)
+        private void ParseSampler_State_Expression(ParseNode parent) // NonTerminalSymbol: Sampler_State_Expression
         {
             Token tok;
             ParseNode n;
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Sampler_State_Expression), "Sampler_State_Expression");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias);
+            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Texture:
-                    ParseSampler_State_Texture(node);
+                    ParseSampler_State_Texture(node); // NonTerminal Rule: Sampler_State_Texture
                     break;
                 case TokenType.MinFilter:
-                    ParseSampler_State_MinFilter(node);
+                    ParseSampler_State_MinFilter(node); // NonTerminal Rule: Sampler_State_MinFilter
                     break;
                 case TokenType.MagFilter:
-                    ParseSampler_State_MagFilter(node);
+                    ParseSampler_State_MagFilter(node); // NonTerminal Rule: Sampler_State_MagFilter
                     break;
                 case TokenType.MipFilter:
-                    ParseSampler_State_MipFilter(node);
+                    ParseSampler_State_MipFilter(node); // NonTerminal Rule: Sampler_State_MipFilter
                     break;
                 case TokenType.Filter:
-                    ParseSampler_State_Filter(node);
+                    ParseSampler_State_Filter(node); // NonTerminal Rule: Sampler_State_Filter
                     break;
                 case TokenType.AddressU:
-                    ParseSampler_State_AddressU(node);
+                    ParseSampler_State_AddressU(node); // NonTerminal Rule: Sampler_State_AddressU
                     break;
                 case TokenType.AddressV:
-                    ParseSampler_State_AddressV(node);
+                    ParseSampler_State_AddressV(node); // NonTerminal Rule: Sampler_State_AddressV
                     break;
                 case TokenType.AddressW:
-                    ParseSampler_State_AddressW(node);
+                    ParseSampler_State_AddressW(node); // NonTerminal Rule: Sampler_State_AddressW
                     break;
                 case TokenType.BorderColor:
-                    ParseSampler_State_BorderColor(node);
+                    ParseSampler_State_BorderColor(node); // NonTerminal Rule: Sampler_State_BorderColor
                     break;
                 case TokenType.MaxMipLevel:
-                    ParseSampler_State_MaxMipLevel(node);
+                    ParseSampler_State_MaxMipLevel(node); // NonTerminal Rule: Sampler_State_MaxMipLevel
                     break;
                 case TokenType.MaxAnisotropy:
-                    ParseSampler_State_MaxAnisotropy(node);
+                    ParseSampler_State_MaxAnisotropy(node); // NonTerminal Rule: Sampler_State_MaxAnisotropy
                     break;
                 case TokenType.MipLodBias:
-                    ParseSampler_State_MipLodBias(node);
+                    ParseSampler_State_MipLodBias(node); // NonTerminal Rule: Sampler_State_MipLodBias
                     break;
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Texture, MinFilter, MagFilter, MipFilter, Filter, AddressU, AddressV, AddressW, BorderColor, MaxMipLevel, MaxAnisotropy, or MipLodBias.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_Expression
 
-        private void ParseSampler_Register_Expression(ParseNode parent)
+        private void ParseSampler_Register_Expression(ParseNode parent) // NonTerminalSymbol: Sampler_Register_Expression
         {
             Token tok;
             ParseNode n;
@@ -3705,8 +3706,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Colon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Colon); // Terminal Rule: Colon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3715,8 +3716,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Register);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Register); // Terminal Rule: Register
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3725,8 +3726,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3735,8 +3736,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3745,13 +3746,13 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Comma);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Comma); // Option Rule
             if (tok.Type == TokenType.Comma)
             {
 
-                
-                tok = scanner.Scan(TokenType.Comma);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Comma); // Terminal Rule: Comma
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -3760,8 +3761,8 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.Scan(TokenType.Identifier);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -3770,13 +3771,13 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.LookAhead(TokenType.OpenSquareBracket);
+                 // Concat Rule
+                tok = scanner.LookAhead(TokenType.OpenSquareBracket); // Option Rule
                 if (tok.Type == TokenType.OpenSquareBracket)
                 {
 
-                    
-                    tok = scanner.Scan(TokenType.OpenSquareBracket);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.OpenSquareBracket); // Terminal Rule: OpenSquareBracket
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -3785,8 +3786,8 @@ namespace TwoMGFX
                         return;
                     }
 
-                    
-                    tok = scanner.Scan(TokenType.Number);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -3795,8 +3796,8 @@ namespace TwoMGFX
                         return;
                     }
 
-                    
-                    tok = scanner.Scan(TokenType.CloseSquareBracket);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.CloseSquareBracket); // Terminal Rule: CloseSquareBracket
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -3807,8 +3808,8 @@ namespace TwoMGFX
                 }
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3818,9 +3819,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_Register_Expression
 
-        private void ParseSampler_Declaration_States(ParseNode parent)
+        private void ParseSampler_Declaration_States(ParseNode parent) // NonTerminalSymbol: Sampler_Declaration_States
         {
             Token tok;
             ParseNode n;
@@ -3828,13 +3829,13 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.LookAhead(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Equals); // Option Rule
             if (tok.Type == TokenType.Equals)
             {
 
-                
-                tok = scanner.Scan(TokenType.Equals);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -3843,8 +3844,8 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.Scan(TokenType.SamplerState);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.SamplerState); // Terminal Rule: SamplerState
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -3854,8 +3855,8 @@ namespace TwoMGFX
                 }
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenBracket); // Terminal Rule: OpenBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3864,8 +3865,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // ZeroOrMore Rule
             while (tok.Type == TokenType.Texture
                 || tok.Type == TokenType.MinFilter
                 || tok.Type == TokenType.MagFilter
@@ -3879,12 +3880,12 @@ namespace TwoMGFX
                 || tok.Type == TokenType.MaxAnisotropy
                 || tok.Type == TokenType.MipLodBias)
             {
-                ParseSampler_State_Expression(node);
-            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias);
+                ParseSampler_State_Expression(node); // NonTerminal Rule: Sampler_State_Expression
+            tok = scanner.LookAhead(TokenType.Texture, TokenType.MinFilter, TokenType.MagFilter, TokenType.MipFilter, TokenType.Filter, TokenType.AddressU, TokenType.AddressV, TokenType.AddressW, TokenType.BorderColor, TokenType.MaxMipLevel, TokenType.MaxAnisotropy, TokenType.MipLodBias); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseBracket); // Terminal Rule: CloseBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3894,9 +3895,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_Declaration_States
 
-        private void ParseSampler_Declaration(ParseNode parent)
+        private void ParseSampler_Declaration(ParseNode parent) // NonTerminalSymbol: Sampler_Declaration
         {
             Token tok;
             ParseNode n;
@@ -3904,8 +3905,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Sampler);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Sampler); // Terminal Rule: Sampler
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3914,8 +3915,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -3924,20 +3925,20 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Colon);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Colon); // ZeroOrMore Rule
             while (tok.Type == TokenType.Colon)
             {
-                ParseSampler_Register_Expression(node);
-            tok = scanner.LookAhead(TokenType.Colon);
+                ParseSampler_Register_Expression(node); // NonTerminal Rule: Sampler_Register_Expression
+            tok = scanner.LookAhead(TokenType.Colon); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Equals, TokenType.OpenBracket);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Equals, TokenType.OpenBracket); // Option Rule
             if (tok.Type == TokenType.Equals
                 || tok.Type == TokenType.OpenBracket)
             {
-                ParseSampler_Declaration_States(node);
+                ParseSampler_Declaration_States(node); // NonTerminal Rule: Sampler_Declaration_States
             }
 
              // Concat Rule
@@ -3980,9 +3981,9 @@ namespace TwoMGFX
             } // Choice Rule
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_Declaration
 
-        private void ParseSemantic_Variable(ParseNode parent)
+        private void ParseSemantic_Variable(ParseNode parent) // NonTerminalSymbol: Semantic_Variable
         {
             Token tok;
             ParseNode n;
@@ -3990,8 +3991,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.GlslIn);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.GlslIn); // Terminal Rule: GlslIn
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4000,8 +4001,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4010,8 +4011,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4020,15 +4021,15 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Colon);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Colon); // Option Rule
             if (tok.Type == TokenType.Colon)
             {
-                ParseSemantic(node);
+                ParseSemantic(node); // NonTerminal Rule: Semantic
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4038,9 +4039,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Semantic_Variable
 
-        private void ParseSemantic(ParseNode parent)
+        private void ParseSemantic(ParseNode parent) // NonTerminalSymbol: Semantic
         {
             Token tok;
             ParseNode n;
@@ -4048,8 +4049,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Colon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Colon); // Terminal Rule: Colon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4058,8 +4059,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4069,9 +4070,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Semantic
 
-        private void ParseGlslParam(ParseNode parent)
+        private void ParseGlslParam(ParseNode parent) // NonTerminalSymbol: GlslParam
         {
             Token tok;
             ParseNode n;
@@ -4079,8 +4080,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4089,8 +4090,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4099,11 +4100,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Identifier); // Option Rule
             if (tok.Type == TokenType.Identifier)
             {
-                tok = scanner.Scan(TokenType.Identifier);
+                tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -4114,9 +4115,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: GlslParam
 
-        private void ParseFunction_Header(ParseNode parent)
+        private void ParseFunction_Header(ParseNode parent) // NonTerminalSymbol: Function_Header
         {
             Token tok;
             ParseNode n;
@@ -4124,8 +4125,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Void);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Void); // Terminal Rule: Void
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4134,8 +4135,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4144,8 +4145,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4154,20 +4155,20 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Identifier); // Option Rule
             if (tok.Type == TokenType.Identifier)
             {
-                ParseGlslParam(node);
+                ParseGlslParam(node); // NonTerminal Rule: GlslParam
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Comma);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Comma); // ZeroOrMore Rule
             while (tok.Type == TokenType.Comma)
             {
 
-                
-                tok = scanner.Scan(TokenType.Comma);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Comma); // Terminal Rule: Comma
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -4176,13 +4177,13 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                ParseGlslParam(node);
-            tok = scanner.LookAhead(TokenType.Comma);
+                 // Concat Rule
+                ParseGlslParam(node); // NonTerminal Rule: GlslParam
+            tok = scanner.LookAhead(TokenType.Comma); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -4192,7 +4193,7 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Function_Header
 
 
     }
