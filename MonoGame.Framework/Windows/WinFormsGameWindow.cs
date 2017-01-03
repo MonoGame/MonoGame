@@ -120,6 +120,21 @@ namespace MonoGame.Framework
             }
         }
 
+        public override bool IsCursorLocked
+        {
+
+            get { return cursorLocked; }
+            set 
+            { 
+                cursorLocked = value;
+                if (cursorLocked)
+                    _form.Clip = _form.RectangleToScreen(_form.ClientRectangle);
+                else
+                    _form.Clip = System.Drawing.Rectangle.Empty;
+
+            }
+
+        }
         #endregion
 
         internal WinFormsGameWindow(WinFormsGamePlatform platform)
@@ -275,6 +290,10 @@ namespace MonoGame.Framework
                 _isMouseHidden = true;
                 Cursor.Hide();
             }
+
+            if (IsCursorLocked)
+                _form.Clip = _form.RectangleToScreen(_form.ClientRectangle);
+
         }
 
         private void OnMouseLeave(object sender, EventArgs e)

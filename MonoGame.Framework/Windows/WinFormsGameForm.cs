@@ -47,6 +47,11 @@ namespace Microsoft.Xna.Framework.Windows
             _window = window;
         }
 
+        internal System.Drawing.Rectangle Clip {
+            get { return Cursor.Clip; }
+            set{ Cursor.Clip = value; }
+        }
+
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
         protected override void WndProc(ref Message m)
         {
