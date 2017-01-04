@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // discussion and explanation in https://github.com/MonoGame/MonoGame/issues/4826
                 int depthMul;
-                switch (device.PresentationParameters.DepthStencilFormat)
+                switch (device.ActiveDepthFormat)
                 {
                     case DepthFormat.None:
                         depthMul = 0;
