@@ -1024,14 +1024,69 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				Vector2.Transform(ref p, ref transformation, out p);
 
-                var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width * scale.X,
-                                            currentGlyph.BoundsInTexture.Height * scale.Y);
+			    var item = _batcher.CreateBatchItem();               
+			    item.Texture = spriteFont.Texture;
 
-				DrawInternal(
-                    spriteFont.Texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effects, layerDepth, false);
+                // set SortKey based on SpriteSortMode.
+                switch ( _sortMode )
+                {
+                    // Comparison of Texture objects.
+                    case SpriteSortMode.Texture:
+                        item.SortKey = spriteFont.Texture.SortingKey;
+                        break;
+                    // Comparison of Depth
+                    case SpriteSortMode.FrontToBack:
+                        item.SortKey = layerDepth;
+                        break;
+                    // Comparison of Depth in reverse
+                    case SpriteSortMode.BackToFront:
+                        item.SortKey = -layerDepth;
+                        break;
+                }
+                
+                _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
+                _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
+                _texCoordBR.X = (currentGlyph.BoundsInTexture.X + currentGlyph.BoundsInTexture.Width) / (float)spriteFont.Texture.Width;
+                _texCoordBR.Y = (currentGlyph.BoundsInTexture.Y + currentGlyph.BoundsInTexture.Height) / (float)spriteFont.Texture.Height;
+                            
+			    if ((effects & SpriteEffects.FlipVertically) != 0) {
+                    var temp = _texCoordBR.Y;
+				    _texCoordBR.Y = _texCoordTL.Y;
+				    _texCoordTL.Y = temp;
+			    }
+			    if ((effects & SpriteEffects.FlipHorizontally) != 0) {
+                    var temp = _texCoordBR.X;
+				    _texCoordBR.X = _texCoordTL.X;
+				    _texCoordTL.X = temp;
+			    }
 
+		        if (rotation == 0f)
+		        {
+                    item.Set(p.X,
+                            p.Y,
+                            currentGlyph.BoundsInTexture.Width * scale.X,
+                            currentGlyph.BoundsInTexture.Height * scale.Y,
+                            color,
+                            _texCoordTL,
+                            _texCoordBR,
+                            layerDepth);
+                }
+                else
+		        {
+                    item.Set(p.X,
+                            p.Y,
+                            0,
+                            0,
+                            currentGlyph.BoundsInTexture.Width * scale.X,
+                            currentGlyph.BoundsInTexture.Height * scale.Y,
+                            (float)Math.Sin(rotation),
+                            (float)Math.Cos(rotation),
+                            color,
+                            _texCoordTL,
+                            _texCoordBR,
+                            layerDepth);
+                }
+                
                 offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
 			}
 
@@ -1276,14 +1331,69 @@ namespace Microsoft.Xna.Framework.Graphics
                 p.Y += currentGlyph.Cropping.Y;
 
 				Vector2.Transform(ref p, ref transformation, out p);
+                
+			    var item = _batcher.CreateBatchItem();               
+			    item.Texture = spriteFont.Texture;
 
-                var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width * scale.X,
-                                            currentGlyph.BoundsInTexture.Height * scale.Y);
+                // set SortKey based on SpriteSortMode.
+                switch ( _sortMode )
+                {
+                    // Comparison of Texture objects.
+                    case SpriteSortMode.Texture:
+                        item.SortKey = spriteFont.Texture.SortingKey;
+                        break;
+                    // Comparison of Depth
+                    case SpriteSortMode.FrontToBack:
+                        item.SortKey = layerDepth;
+                        break;
+                    // Comparison of Depth in reverse
+                    case SpriteSortMode.BackToFront:
+                        item.SortKey = -layerDepth;
+                        break;
+                }
+                
+                _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
+                _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
+                _texCoordBR.X = (currentGlyph.BoundsInTexture.X + currentGlyph.BoundsInTexture.Width) / (float)spriteFont.Texture.Width;
+                _texCoordBR.Y = (currentGlyph.BoundsInTexture.Y + currentGlyph.BoundsInTexture.Height) / (float)spriteFont.Texture.Height;
+                            
+			    if ((effects & SpriteEffects.FlipVertically) != 0) {
+                    var temp = _texCoordBR.Y;
+				    _texCoordBR.Y = _texCoordTL.Y;
+				    _texCoordTL.Y = temp;
+			    }
+			    if ((effects & SpriteEffects.FlipHorizontally) != 0) {
+                    var temp = _texCoordBR.X;
+				    _texCoordBR.X = _texCoordTL.X;
+				    _texCoordTL.X = temp;
+			    }
 
-				DrawInternal(
-                    spriteFont.Texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effects, layerDepth, false);
+		        if (rotation == 0f)
+		        {
+                    item.Set(p.X,
+                            p.Y,
+                            currentGlyph.BoundsInTexture.Width * scale.X,
+                            currentGlyph.BoundsInTexture.Height * scale.Y,
+                            color,
+                            _texCoordTL,
+                            _texCoordBR,
+                            layerDepth);
+                }
+                else
+		        {
+                    item.Set(p.X,
+                            p.Y,
+                            0,
+                            0,
+                            currentGlyph.BoundsInTexture.Width * scale.X,
+                            currentGlyph.BoundsInTexture.Height * scale.Y,
+                            (float)Math.Sin(rotation),
+                            (float)Math.Cos(rotation),
+                            color,
+                            _texCoordTL,
+                            _texCoordBR,
+                            layerDepth);
+                }
 
                 offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
 			}
