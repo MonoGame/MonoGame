@@ -13,6 +13,53 @@ namespace MonoGame.Tests.Graphics
     [TestFixture]
     internal class RasterizerStateTest : GraphicsDeviceTestFixtureBase
     {
+        [TestCase(-1f)]
+        [TestCase(1f)]
+        [TestCase(-0.0004f)]
+        public void DepthBiasVisualTest(float depthBias)
+        {
+            var effect = new BasicEffect(gd)
+            {
+                VertexColorEnabled = true,
+                World = Matrix.Identity,
+                View = Matrix.Identity,
+                Projection = Matrix.Identity,
+            };
+            RasterizerState rs;
+            var data = new VertexPositionColor[3];
+            var step = depthBias / 4;
+
+            PrepareFrameCapture();
+            for (var i = 0; i < 4; i++)
+            {
+                var r = i * MathHelper.PiOver2;
+                var bias = i * step;
+                var c = new Color(new Vector3(i / 4f));
+
+                rs = new RasterizerState();
+                rs.DepthBias = bias;
+
+                var rot = Matrix.CreateRotationZ(-r);
+                var v1 = Vector3.Transform(new Vector3(-0.5f, 0f, 0f), rot);
+                var v2 = Vector3.Transform(new Vector3(0.2f, 0.9f, 0f), rot);
+                var v3 = Vector3.Transform(new Vector3(0.2f, -0.9f, 0f), rot);
+
+                data[0] = new VertexPositionColor(v1, c);
+                data[1] = new VertexPositionColor(v2, c);
+                data[2] = new VertexPositionColor(v3, c);
+
+                effect.CurrentTechnique.Passes[0].Apply();
+                gd.RasterizerState = rs;
+                gd.DrawUserPrimitives(PrimitiveType.TriangleList, data, 0, 1, VertexPositionColor.VertexDeclaration);
+
+                rs.Dispose();
+            }
+
+            CheckFrames();
+
+            effect.Dispose();
+        }
+
         [Test]
         public void ShouldNotBeAbleToSetNullRasterizerState()
         {

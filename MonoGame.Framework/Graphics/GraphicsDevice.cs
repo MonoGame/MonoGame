@@ -159,6 +159,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal DepthFormat ActiveDepthFormat
+        {
+            get
+            {
+                return IsRenderTargetBound
+                    ? _currentRenderTargetBindings[0].DepthFormat
+                    : PresentationParameters.DepthStencilFormat;
+            }
+        }
+
         public GraphicsAdapter Adapter
         {
             get;
