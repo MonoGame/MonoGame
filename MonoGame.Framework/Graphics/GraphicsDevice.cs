@@ -543,6 +543,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
+            // We cannot present with a RT set on the device.
+            if (_currentRenderTargetCount != 0)
+                throw new InvalidOperationException("Cannot call Present when a render target is active.");
+
             _graphicsMetrics = new GraphicsMetrics();
             PlatformPresent();
         }

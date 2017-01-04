@@ -599,5 +599,26 @@ namespace MonoGame.Tests.Graphics
 
             samplerState.Dispose();
         }
+
+        [Test]
+        public void PresentInvalidOperationException()
+        {
+            // This should work else it means we had
+            // some bad state to start this test!
+            gd.Present();
+
+            // You can't call present with a RT set.
+            var rt = new RenderTarget2D(gd, 100, 100);
+            gd.SetRenderTarget(rt);
+            Assert.Throws<InvalidOperationException>(() => gd.Present());
+
+            // Set the default RT and present works again.
+            gd.SetRenderTarget(null);
+            gd.Present();
+
+            // Cleanup.
+            rt.Dispose();
+        }
+
     }
 }
