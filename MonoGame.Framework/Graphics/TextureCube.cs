@@ -111,17 +111,19 @@ namespace Microsoft.Xna.Framework.Graphics
             if (Format.IsCompressedFormat())
             {
                 // round x and y down to next multiple of four; width and height up to next multiple of four
+                var roundedWidth = (checkedRect.Width + 3) & ~0x3;
+                var roundedHeight = (checkedRect.Height + 3) & ~0x3;
                 checkedRect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3,
 #if OPENGL
                     // OpenGL only: The last two mip levels require the width and height to be
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
                     // a 4x4 block.
-                    checkedRect.Width > 4 ? (checkedRect.Width + 3) & ~0x3 : checkedRect.Width,
-                    checkedRect.Height > 4 ? (checkedRect.Height + 3) & ~0x3 : checkedRect.Height);
+                    checkedRect.Width > 4 ? roundedWidth : checkedRect.Width,
+                    checkedRect.Height > 4 ? roundedHeight : checkedRect.Height);
 #else
-                    (checkedRect.Width + 3) & ~0x3, (checkedRect.Height + 3) & ~0x3);
+                    roundedWidth, roundedHeight);
 #endif
-                dataByteSize = Math.Max(checkedRect.Width, 4) * Math.Max(checkedRect.Height, 4) * fSize / 16;
+                dataByteSize = roundedWidth * roundedHeight * fSize / 16;
             }
             else
             {
