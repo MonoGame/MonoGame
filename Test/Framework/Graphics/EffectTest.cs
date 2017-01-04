@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tests.ContentPipeline;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
@@ -99,6 +100,38 @@ namespace MonoGame.Tests.Graphics
 
             texture.Dispose();
             effect.Dispose();
+        }
+
+        [Test]
+        public void EffectPassShouldNotSetNullTextures()
+        {
+            var effect = AssetTestUtility.CompileEffect(gd, "SamplerRegistersEffect.fx");
+            var t0 = new Texture2D(gd, 1, 1);
+            var t1 = new Texture2D(gd, 1, 1);
+
+            gd.Textures[0] = t0;
+            gd.Textures[1] = t1;
+            Assert.AreSame(t0, gd.Textures[0]);
+            Assert.AreSame(t1, gd.Textures[1]);
+
+            effect.CurrentTechnique = effect.Techniques["Both"];
+            effect.CurrentTechnique.Passes[0].Apply();
+            Assert.AreSame(t0, gd.Textures[0]);
+            Assert.AreSame(t1, gd.Textures[1]);
+
+            effect.CurrentTechnique = effect.Techniques["Zero"];
+            effect.CurrentTechnique.Passes[0].Apply();
+            Assert.AreSame(t0, gd.Textures[0]);
+            Assert.AreSame(t1, gd.Textures[1]);
+
+            effect.CurrentTechnique = effect.Techniques["One"];
+            effect.CurrentTechnique.Passes[0].Apply();
+            Assert.AreSame(t0, gd.Textures[0]);
+            Assert.AreSame(t1, gd.Textures[1]);
+
+            effect.Dispose();
+            t0.Dispose();
+            t1.Dispose();
         }
     }
 }
