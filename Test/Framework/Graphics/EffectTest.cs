@@ -14,19 +14,19 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void EffectPassShouldSetTexture()
         {
-            var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            game.GraphicsDevice.Textures[0] = null;
+            var texture = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
+            gd.Textures[0] = null;
 
-            var effect = new BasicEffect(game.GraphicsDevice);
+            var effect = new BasicEffect(gd);
             effect.TextureEnabled = true;
             effect.Texture = texture;
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.Null);
+            Assert.That(gd.Textures[0], Is.Null);
 
             var effectPass = effect.CurrentTechnique.Passes[0];
             effectPass.Apply();
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(gd.Textures[0], Is.SameAs(texture));
 
             texture.Dispose();
             effect.Dispose();
@@ -35,26 +35,26 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void EffectPassShouldSetTextureOnSubsequentCalls()
         {
-            var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            game.GraphicsDevice.Textures[0] = null;
+            var texture = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
+            gd.Textures[0] = null;
 
-            var effect = new BasicEffect(game.GraphicsDevice);
+            var effect = new BasicEffect(gd);
             effect.TextureEnabled = true;
             effect.Texture = texture;
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.Null);
+            Assert.That(gd.Textures[0], Is.Null);
 
             var effectPass = effect.CurrentTechnique.Passes[0];
             effectPass.Apply();
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(gd.Textures[0], Is.SameAs(texture));
 
-            game.GraphicsDevice.Textures[0] = null;
+            gd.Textures[0] = null;
 
             effectPass = effect.CurrentTechnique.Passes[0];
             effectPass.Apply();
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(gd.Textures[0], Is.SameAs(texture));
 
             texture.Dispose();
             effect.Dispose();
@@ -63,19 +63,19 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void EffectPassShouldSetTextureEvenIfNull()
         {
-            var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            game.GraphicsDevice.Textures[0] = texture;
+            var texture = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
+            gd.Textures[0] = texture;
 
-            var effect = new BasicEffect(game.GraphicsDevice);
+            var effect = new BasicEffect(gd);
             effect.TextureEnabled = true;
             effect.Texture = null;
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(gd.Textures[0], Is.SameAs(texture));
 
             var effectPass = effect.CurrentTechnique.Passes[0];
             effectPass.Apply();
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.Null);
+            Assert.That(gd.Textures[0], Is.Null);
 
             texture.Dispose();
             effect.Dispose();
@@ -84,18 +84,18 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void EffectPassShouldOverrideTextureIfNotExplicitlySet()
         {
-            var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            game.GraphicsDevice.Textures[0] = texture;
+            var texture = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
+            gd.Textures[0] = texture;
 
-            var effect = new BasicEffect(game.GraphicsDevice);
+            var effect = new BasicEffect(gd);
             effect.TextureEnabled = true;
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.SameAs(texture));
+            Assert.That(gd.Textures[0], Is.SameAs(texture));
 
             var effectPass = effect.CurrentTechnique.Passes[0];
             effectPass.Apply();
 
-            Assert.That(game.GraphicsDevice.Textures[0], Is.Null);
+            Assert.That(gd.Textures[0], Is.Null);
 
             texture.Dispose();
             effect.Dispose();
