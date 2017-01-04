@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public SamplerState state;
 
         // TODO: This should be moved to EffectPass.
-        public int parameter;
+        public byte parameter;
     }
 
     internal struct VertexAttribute
