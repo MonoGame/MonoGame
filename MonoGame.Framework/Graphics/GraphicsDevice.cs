@@ -665,7 +665,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if(value > GetHighestSupportedGraphicsProfile(this))
                     throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
                 _graphicsProfile = value;
-                GraphicsCapabilities.Initialize(this);
+                GraphicsCapabilities.PlatformInitialize(this);
             }
         }
 
