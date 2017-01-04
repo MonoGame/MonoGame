@@ -101,15 +101,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     modes.Add(mode);
 
-                    if (mode.Width == desktopWidth && mode.Height == desktopHeight && mode.Format == SurfaceFormat.Color)
+                    if (adapter._currentDisplayMode == null)
                     {
-                        if (adapter._currentDisplayMode == null)
+                        if (mode.Width == desktopWidth && mode.Height == desktopHeight && mode.Format == SurfaceFormat.Color)
                             adapter._currentDisplayMode = mode;
                     }
                 }
             }
 
             adapter._supportedDisplayModes = new DisplayModeCollection(modes);
+
+            if (adapter._currentDisplayMode == null) //(i.e. desktop mode wasn't found in the available modes)
+                adapter._currentDisplayMode = new DisplayMode(desktopWidth, desktopHeight, SurfaceFormat.Color);
 
             return adapter;
         }
