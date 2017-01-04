@@ -405,19 +405,82 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
-            DrawInternal(texture,
-			      new Vector4(destinationRectangle.X,
-			                  destinationRectangle.Y,
-			                  destinationRectangle.Width,
-			                  destinationRectangle.Height),
-			      sourceRectangle,
-			      color,
-			      rotation,
-			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width != 0) ? sourceRectangle.Value.Width : texture.Width)),
-                        			origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height)),
-			      effects,
-                  layerDepth,
-			      true);
+            origin.X = origin.X * ((float)destinationRectangle.Width   / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width  != 0) ? sourceRectangle.Value.Width  : texture.Width));
+            origin.Y = origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height);
+			
+			var item = _batcher.CreateBatchItem();
+			item.Texture = texture;
+
+            // set SortKey based on SpriteSortMode.
+            switch ( _sortMode )
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = layerDepth;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = -layerDepth;
+                    break;
+            }
+
+			if (sourceRectangle.HasValue)
+            {
+				_tempRect = sourceRectangle.Value;
+                _texCoordTL.X = _tempRect.X / (float)texture.Width;
+                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
+                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+            }
+            else
+            {
+                _texCoordTL = Vector2.Zero;
+                _texCoordBR = Vector2.One;
+            }
+            
+			if ((effects & SpriteEffects.FlipVertically) != 0) {
+                var temp = _texCoordBR.Y;
+				_texCoordBR.Y = _texCoordTL.Y;
+				_texCoordTL.Y = temp;
+			}
+			if ((effects & SpriteEffects.FlipHorizontally) != 0) {
+                var temp = _texCoordBR.X;
+				_texCoordBR.X = _texCoordTL.X;
+				_texCoordTL.X = temp;
+			}
+
+		    if (rotation == 0f)
+		    {
+                item.Set(destinationRectangle.X - origin.X,
+                        destinationRectangle.Y - origin.Y,
+                        destinationRectangle.Width,
+                        destinationRectangle.Height,
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        layerDepth);
+            }
+            else
+		    {
+                item.Set(destinationRectangle.X,
+                        destinationRectangle.Y,
+                        -origin.X,
+                        -origin.Y,
+                        destinationRectangle.Width,
+                        destinationRectangle.Height,
+                        (float)Math.Sin(rotation),
+                        (float)Math.Cos(rotation),
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        layerDepth);
+            }
+
+			FlushIfNeeded();
 		}
 
 		internal void DrawInternal (Texture2D texture,
