@@ -258,23 +258,86 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
-            var w = texture.Width * scale.X;
-            var h = texture.Height * scale.Y;
-			if (sourceRectangle.HasValue)
-            {
-				w = sourceRectangle.Value.Width*scale.X;
-				h = sourceRectangle.Value.Height*scale.Y;
-			}
+            var item = _batcher.CreateBatchItem();
+            item.Texture = texture;
 
-            DrawInternal(texture,
-				new Vector4(position.X, position.Y, w, h),
-				sourceRectangle,
-				color,
-				rotation,
-				origin * scale,
-				effects,
-                layerDepth,
-				true);
+            // set SortKey based on SpriteSortMode.
+            switch ( _sortMode )
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = layerDepth;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = -layerDepth;
+                    break;
+            }
+                        
+            origin = origin * scale;
+            
+            float w, h;
+            if (sourceRectangle.HasValue)
+            {
+				_tempRect = sourceRectangle.Value;
+				w = _tempRect.Width * scale.X;
+				h = _tempRect.Height * scale.Y;
+                _texCoordTL.X = _tempRect.X / (float)texture.Width;
+                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
+                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+            }
+            else
+            {
+                w = texture.Width * scale.X;
+                h = texture.Height * scale.Y;
+                _texCoordTL = Vector2.Zero;
+                _texCoordBR = Vector2.One;
+            }
+            
+            if ((effects & SpriteEffects.FlipVertically) != 0) {
+                var temp = _texCoordBR.Y;
+				_texCoordBR.Y = _texCoordTL.Y;
+				_texCoordTL.Y = temp;
+            }
+            if ((effects & SpriteEffects.FlipHorizontally) != 0) {
+                var temp = _texCoordBR.X;
+				_texCoordBR.X = _texCoordTL.X;
+				_texCoordTL.X = temp;
+            }
+            
+            if (rotation == 0f)
+            {
+                item.Set(position.X - origin.X,
+                        position.Y - origin.Y,
+                        w,
+                        h,
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        layerDepth);
+            }
+            else
+            {
+                item.Set(position.X,
+                        position.Y,
+                        -origin.X,
+                        -origin.Y,
+                        w,
+                        h,
+                        (float)Math.Sin(rotation),
+                        (float)Math.Cos(rotation),
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        layerDepth);
+            }
+            
+            FlushIfNeeded();
 		}
 
         /// <summary>
