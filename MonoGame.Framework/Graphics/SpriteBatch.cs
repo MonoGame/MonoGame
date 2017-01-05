@@ -362,25 +362,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				SpriteEffects effects,
                 float layerDepth)
 		{
-            CheckValid(texture);
-
-            var w = texture.Width * scale;
-            var h = texture.Height * scale;
-            if (sourceRectangle.HasValue)
-            {
-                w = sourceRectangle.Value.Width * scale;
-                h = sourceRectangle.Value.Height * scale;
-            }
-
-            DrawInternal(texture,
-                new Vector4(position.X, position.Y, w, h),
-				sourceRectangle,
-				color,
-				rotation,
-				origin * scale,
-				effects,
-                layerDepth,
-				true);
+            var scaleVec = new Vector2(scale, scale);
+            Draw(texture, position, sourceRectangle, color, rotation, origin, scaleVec, effects, layerDepth);
 		}
 
         /// <summary>
@@ -482,98 +465,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			FlushIfNeeded();
 		}
-
-		internal void DrawInternal (Texture2D texture,
-			Vector4 destinationRectangle,
-			Rectangle? sourceRectangle,
-			Color color,
-			float rotation,
-			Vector2 origin,
-			SpriteEffects effect,
-			float depth,
-			bool autoFlush)
-		{
-			var item = _batcher.CreateBatchItem();
-
-			item.Texture = texture;
-
-            // set SortKey based on SpriteSortMode.
-            switch ( _sortMode )
-            {
-                // Comparison of Texture objects.
-                case SpriteSortMode.Texture:
-                    item.SortKey = texture.SortingKey;
-                    break;
-                // Comparison of Depth
-                case SpriteSortMode.FrontToBack:
-                    item.SortKey = depth;
-                    break;
-                // Comparison of Depth in reverse
-                case SpriteSortMode.BackToFront:
-                    item.SortKey = -depth;
-                    break;
-            }
-
-			if (sourceRectangle.HasValue)
-            {
-				_tempRect = sourceRectangle.Value;
-                _texCoordTL.X = _tempRect.X / (float)texture.Width;
-                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
-            }
-            else
-            {
-                _texCoordTL.X = 0f;
-                _texCoordTL.Y = 0f;
-                _texCoordBR.X = 1f;
-                _texCoordBR.Y = 1f;
-            }
-            
-			if ((effect & SpriteEffects.FlipVertically) != 0) {
-                var temp = _texCoordBR.Y;
-				_texCoordBR.Y = _texCoordTL.Y;
-				_texCoordTL.Y = temp;
-			}
-			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
-                var temp = _texCoordBR.X;
-				_texCoordBR.X = _texCoordTL.X;
-				_texCoordTL.X = temp;
-			}
-
-		    if (rotation == 0f)
-		    {
-                item.Set(destinationRectangle.X - origin.X,
-                        destinationRectangle.Y - origin.Y,
-                        destinationRectangle.Z,
-                        destinationRectangle.W,
-                        color,
-                        _texCoordTL,
-                        _texCoordBR,
-                        depth);
-            }
-            else
-		    {
-                item.Set(destinationRectangle.X,
-                        destinationRectangle.Y,
-                        -origin.X,
-                        -origin.Y,
-                        destinationRectangle.Z,
-                        destinationRectangle.W,
-                        (float)Math.Sin(rotation),
-                        (float)Math.Cos(rotation),
-                        color,
-                        _texCoordTL,
-                        _texCoordBR,
-                        depth);
-            }
-
-			if (autoFlush)
-			{
-				FlushIfNeeded();
-			}
-		}
-
+        
 		// Mark the end of a draw operation for Immediate SpriteSortMode.
 		internal void FlushIfNeeded()
 		{
@@ -900,11 +792,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteFont spriteFont, string text, Vector2 position, Color color,
             float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
 		{
-            CheckValid(spriteFont, text);
-
 			var scaleVec = new Vector2(scale, scale);
-            var source = new SpriteFont.CharacterSource(text);
-            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, layerDepth);
+            DrawString(spriteFont, text, position, color, rotation, origin, scaleVec, effects, layerDepth);
 		}
 
         /// <summary>
@@ -1210,11 +1099,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color,
             float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
 		{
-            CheckValid(spriteFont, text);
-
 			var scaleVec = new Vector2 (scale, scale);
-            var source = new SpriteFont.CharacterSource(text);
-            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, layerDepth);
+            DrawString(spriteFont, text, position, color, rotation, origin, scaleVec, effects, layerDepth);
 		}
 
         /// <summary>
