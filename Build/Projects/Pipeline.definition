@@ -146,10 +146,6 @@
     </Compile>
 	
     <!-- GUI Dialogs -->
-	<Compile Include="Dialogs\AboutDialog.cs" />
-	<Compile Include="Dialogs\AboutDialog.eto.cs">
-      <DependentUpon>AboutDialog.cs</DependentUpon>
-    </Compile>
 	<Compile Include="Dialogs\AddItemDialog.cs" />
 	<Compile Include="Dialogs\AddItemDialog.eto.cs">
       <DependentUpon>AddItemDialog.cs</DependentUpon>
@@ -186,6 +182,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Icons\Settings.png">
       <LogicalName>Icons.Settings.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <LogicalName>LICENSE.txt</LogicalName>
     </EmbeddedResource>
 	
 	<!--- The resources for treeview -->

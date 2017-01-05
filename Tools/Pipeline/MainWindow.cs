@@ -7,6 +7,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Eto.Forms;
+using Eto.Drawing;
+using System.Reflection;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -22,7 +24,7 @@ namespace MonoGame.Tools.Pipeline
         private List<Pad> _pads;
         private Clipboard _clipboard;
         private ContextMenu _contextMenu;
-        private FileDialogFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
+        private FileFilter _mgcbFileFilter, _allFileFilter, _xnaFileFilter;
         private string[] monoLocations = {
             "/usr/bin/mono",
             "/usr/local/bin/mono",
@@ -56,9 +58,9 @@ namespace MonoGame.Tools.Pipeline
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
 
-            _mgcbFileFilter = new FileDialogFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
-            _allFileFilter = new FileDialogFilter("All Files (*.*)", new[] { ".*" });
-            _xnaFileFilter = new FileDialogFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
+            _mgcbFileFilter = new FileFilter("MonoGame Content Build Project (*.mgcb)", new[] { ".mgcb" });
+            _allFileFilter = new FileFilter("All Files (*.*)", new[] { ".*" });
+            _xnaFileFilter = new FileFilter("XNA Content Projects (*.contentproj)", new[] { ".contentproj" });
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -591,7 +593,15 @@ namespace MonoGame.Tools.Pipeline
         private void CmdAbout_Executed(object sender, EventArgs e)
         {
             var adialog = new AboutDialog();
-            adialog.Run(this);
+            adialog.Logo = Bitmap.FromResource("Icons.monogame.png");
+            adialog.WebsiteLabel = "MonoGame Website";
+            adialog.Website = new Uri("http://www.monogame.net/");
+
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LICENSE.txt"))
+                using (var reader = new StreamReader(stream))
+                    adialog.License = reader.ReadToEnd();
+
+            adialog.ShowDialog(this);
         }
 
         private void CmdOpenItem_Executed(object sender, EventArgs e)
@@ -603,7 +613,18 @@ namespace MonoGame.Tools.Pipeline
         private void CmdOpenItemWith_Executed(object sender, EventArgs e)
         {
             if (PipelineController.Instance.SelectedItem != null)
-                Global.ShowOpenWithDialog(PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath));
+            {
+                try
+                {
+                    var filepath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.OriginalPath);
+                    var dialog = new OpenWithDialog(filepath);
+                    dialog.ShowDialog(this);
+                }
+                catch
+                {
+                    ShowError("Error", "An error occured while trying to launch an open with dialog.");
+                }
+            }
         }
 
         private void CmdOpenItemLocation_Executed(object sender, EventArgs e)
