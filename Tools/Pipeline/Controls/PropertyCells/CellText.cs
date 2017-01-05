@@ -23,8 +23,9 @@ namespace MonoGame.Tools.Pipeline
 
             editText.Focus();
             editText.CaretIndex = editText.Text.Length;
-
-            OnKill += delegate {
+            
+            OnKill += delegate
+            {
                 OnKill = null;
 
                 if (_eventHandler == null)
@@ -33,7 +34,6 @@ namespace MonoGame.Tools.Pipeline
                 _eventHandler(editText.Text, EventArgs.Empty);
             };
 
-            editText.EnabledChanged += (sender, e) => OnKill.Invoke();
             editText.KeyDown += (sender, e) =>
             {
                 if (e.Key == Keys.Enter)
