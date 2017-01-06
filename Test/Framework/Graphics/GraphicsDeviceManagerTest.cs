@@ -320,14 +320,16 @@ namespace MonoGame.Tests.Graphics
             game.Dispose();
 
         }
+    }
+
+    internal class GraphicsDeviceManagerVisualTest : GraphicsDeviceTestFixtureBase
+    {
+
 
         [TestCase(false)]
         [TestCase(true)]
         public void MSAAEnabled(bool enabled)
         {
-            // TODO create reference image and check against XNA
-            var game = new TestGameBase();
-            var gdm = new GraphicsDeviceManager(game);
             gdm.PreferMultiSampling = enabled;
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
 
@@ -345,16 +347,16 @@ namespace MonoGame.Tests.Graphics
             };
 
             // then create a GraphicsDevice
-            ((IGraphicsDeviceManager) game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
-            var gd = game.GraphicsDevice;
+            gdm.ApplyChanges();
+            gd = game.GraphicsDevice;
 
-            var tex = new Texture2D(game.GraphicsDevice, 1, 1);
+            var tex = new Texture2D(gd, 1, 1);
             tex.SetData(new[] { Color.White.PackedValue });
-            var spriteBatch = new SpriteBatch(game.GraphicsDevice);
+            var spriteBatch = new SpriteBatch(gd);
 
             if (enabled)
             {
-                var pp = game.GraphicsDevice.PresentationParameters;
+                var pp = gd.PresentationParameters;
                 Assert.Less(0, pp.MultiSampleCount);
                 Assert.AreNotEqual(1024, pp.MultiSampleCount);
             }
@@ -406,7 +408,6 @@ namespace MonoGame.Tests.Graphics
 
             tex.Dispose();
             spriteBatch.Dispose();
-            game.Dispose();
         }
     }
 }
