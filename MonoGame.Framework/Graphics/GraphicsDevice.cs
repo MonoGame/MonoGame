@@ -212,10 +212,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("presentationParameters");
             Adapter = adapter;
             PresentationParameters = presentationParameters;
+            _graphicsProfile = graphicsProfile;
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
-            _graphicsProfile = graphicsProfile;
             Initialize();
         }
 
