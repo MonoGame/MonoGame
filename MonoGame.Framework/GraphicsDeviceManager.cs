@@ -210,18 +210,25 @@ namespace Microsoft.Xna.Framework
 
                 if (gdi.PresentationParameters == null || gdi.Adapter == null)
                     throw new NullReferenceException("Members should not be set to null in PreparingDeviceSettingsEventArgs");
-                
-                // Round down MultiSampleCount to the nearest power of two
-                // hack from http://stackoverflow.com/a/2681094
-                var msc = gdi.PresentationParameters.MultiSampleCount;
-                msc = msc | (msc >> 1);
-                msc = msc | (msc >> 2);
-                msc = msc | (msc >> 4);
-                // and clamp it to what the device can handle
-                if (msc > GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount)
-                    msc = GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount;
 
-                gdi.PresentationParameters.MultiSampleCount = msc - (msc >> 1);
+                if (gdi.PresentationParameters.MultiSampleCount > 0)
+                {
+                    // Round down MultiSampleCount to the nearest power of two
+                    // hack from http://stackoverflow.com/a/2681094
+                    var msc = gdi.PresentationParameters.MultiSampleCount;
+                    msc = msc | (msc >> 1);
+                    msc = msc | (msc >> 2);
+                    msc = msc | (msc >> 4);
+
+                    if (GraphicsDevice != null)
+                    {
+                        // and clamp it to what the device can handle
+                        if (msc > GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount)
+                            msc = GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount;
+                    }
+
+                    gdi.PresentationParameters.MultiSampleCount = msc - (msc >> 1);
+                }
             }
 
             return gdi;
