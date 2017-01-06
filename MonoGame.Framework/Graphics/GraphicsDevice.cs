@@ -13,7 +13,6 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice : IDisposable
     {
         private Viewport _viewport;
-        private GraphicsProfile _graphicsProfile;
 
         private bool _isDisposed;
 
@@ -216,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities();
             GraphicsCapabilities.Initialize(this);
-            GraphicsProfile = graphicsProfile;
+            _graphicsProfile = graphicsProfile;
             Initialize();
         }
 
@@ -676,22 +675,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private readonly GraphicsProfile _graphicsProfile;
         public GraphicsProfile GraphicsProfile
         {
-            get
-            {
-                return _graphicsProfile;
-            }
-            internal set
-            {
-                //Check if Profile is supported.
-                //TODO: [DirectX] Recreate the Device using the new
-                //      feature level each time the Profile changes.
-                if(value > GetHighestSupportedGraphicsProfile(this))
-                    throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
-                _graphicsProfile = value;
-                GraphicsCapabilities.Initialize(this);
-            }
+            get { return _graphicsProfile; }
         }
 
         public Rectangle ScissorRectangle
