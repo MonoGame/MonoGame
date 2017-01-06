@@ -184,7 +184,8 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
-            GraphicsCapabilities = new GraphicsCapabilities(this);
+            GraphicsCapabilities = new GraphicsCapabilities();
+            GraphicsCapabilities.Initialize(this);
             Initialize();
         }
 
@@ -213,7 +214,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Adapter = adapter;
             PresentationParameters = presentationParameters;
             Setup();
-            GraphicsCapabilities = new GraphicsCapabilities(this);
+            GraphicsCapabilities = new GraphicsCapabilities();
+            GraphicsCapabilities.Initialize(this);
             GraphicsProfile = graphicsProfile;
             Initialize();
         }
@@ -688,7 +690,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if(value > GetHighestSupportedGraphicsProfile(this))
                     throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
                 _graphicsProfile = value;
-                GraphicsCapabilities.PlatformInitialize(this);
+                GraphicsCapabilities.Initialize(this);
             }
         }
 

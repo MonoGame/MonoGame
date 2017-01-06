@@ -14,9 +14,9 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     internal partial class GraphicsCapabilities
     {
-        public GraphicsCapabilities(GraphicsDevice graphicsDevice)
+        internal void Initialize(GraphicsDevice device)
         {
-            PlatformInitialize(graphicsDevice);
+            PlatformInitialize(device);
         }
 
         // For figuring out some capabilities we need native resources for querying
