@@ -130,6 +130,9 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice = new GraphicsDevice(gdi);
             _shouldApplyChanges = false;
 
+            // update the touchpanel display size when the graphicsdevice is reset
+            _graphicsDevice.DeviceReset += UpdateTouchPanel;
+
             OnDeviceCreated(EventArgs.Empty);
         }
 
@@ -296,9 +299,7 @@ namespace Microsoft.Xna.Framework
         {
             // If the device hasn't been created then create it now.
             if (_graphicsDevice == null)
-            {
                 CreateDevice();
-            }
 
             if (!_shouldApplyChanges)
                 return;
@@ -327,16 +328,6 @@ namespace Microsoft.Xna.Framework
             _game.Platform.OnPresentationChanged();
 
             _shouldApplyChanges = false;
-
-            // Set the new display size on the touch panel.
-            //
-            // TODO: In XNA this seems to be done as part of the 
-            // GraphicsDevice.DeviceReset event... we need to get 
-            // those working.
-            //
-            TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
-            TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
-            TouchPanel.DisplayOrientation = _graphicsDevice.PresentationParameters.DisplayOrientation;
         }
 
         private void DisposeGraphicsDevice()
@@ -369,6 +360,13 @@ namespace Microsoft.Xna.Framework
             PlatformInitialize(presentationParameters);
 
             _initialized = true;
+        }
+
+        private void UpdateTouchPanel(object sender, EventArgs eventArgs)
+        {
+            TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
+            TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+            TouchPanel.DisplayOrientation = _graphicsDevice.PresentationParameters.DisplayOrientation;
         }
 
         /// <summary>
