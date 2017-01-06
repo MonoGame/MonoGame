@@ -325,6 +325,18 @@ namespace MonoGame.Tests.Graphics
     internal class GraphicsDeviceManagerVisualTest : GraphicsDeviceTestFixtureBase
     {
 
+        [Test]
+        public void ClientSizeChangedOnDeviceReset()
+        {
+            var count = 0;
+            game.Window.ClientSizeChanged += (sender, args) =>
+            {
+                count++;
+            };
+            gdm.GraphicsProfile = GraphicsProfile.HiDef;
+            gdm.ApplyChanges();
+            Assert.AreEqual(0, count);
+        }
 
         [TestCase(false)]
         [TestCase(true)]
