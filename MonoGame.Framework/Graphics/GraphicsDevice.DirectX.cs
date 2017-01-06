@@ -655,7 +655,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private int GetMultiSamplingQuality(Format format, int multiSampleCount)
         {
-            return _d3dDevice.CheckMultisampleQualityLevels(format, multiSampleCount);
+            return _d3dDevice.CheckMultisampleQualityLevels(format, multiSampleCount) - 1;
         }
 
         internal void SetHardwareFullscreen()
