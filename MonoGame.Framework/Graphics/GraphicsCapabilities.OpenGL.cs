@@ -95,5 +95,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             SupportsVertexTextures = false; // For now, until we implement vertex textures in OpenGL.
         }
+
+        private void PlatformInitializeAfterResources(GraphicsDevice device)
+        {
+            
+        }
     }
 }

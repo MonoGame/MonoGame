@@ -186,6 +186,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities(this);
             Initialize();
+            GraphicsCapabilities.InitializeAfterResources(this);
         }
 
         /// <summary>

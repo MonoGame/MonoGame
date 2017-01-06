@@ -22,5 +22,27 @@ namespace Microsoft.Xna.Framework.Graphics
             SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
             SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
         }
+
+        private void PlatformInitializeAfterResources(GraphicsDevice device)
+        {
+            MaxMultiSampleCount = GetMaxMultiSampleCount(device);
+        }
+
+        private int GetMaxMultiSampleCount(GraphicsDevice device)
+        {
+            var format = SharpDXHelper.ToFormat(device.PresentationParameters.BackBufferFormat);
+            // Find the maximum supported level starting with the game's requested multisampling level
+            // and halving each time until reaching 0 (meaning no multisample support).
+            var qualityLevels = 0;
+            var maxLevel = MultiSampleCountLimit;
+            while (maxLevel > 0)
+            {
+                qualityLevels = device._d3dDevice.CheckMultisampleQualityLevels(format, maxLevel);
+                if (qualityLevels > 0)
+                    break;
+                maxLevel /= 2;
+            }
+            return maxLevel;
+        }
     }
 }

@@ -565,7 +565,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINDOWS_STOREAPP || WINDOWS_UAP || WINDOWS_PHONE
 
-        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+        private void SetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
         {
             quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
         }
@@ -652,8 +652,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
         }
-        
-        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+
+        private void SetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
         {
             var format = presentationParameters.BackBufferFormat == SurfaceFormat.Color ?
                                SharpDX.DXGI.Format.B8G8R8A8_UNorm :
@@ -661,7 +661,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Check that the multisample count specified by the game is valid.
             var msc = PresentationParameters.MultiSampleCount;
-            if (!((msc != 0) && ((msc & (msc - 1)) == 0)))
+            if (msc != 0 && (msc & (msc - 1)) != 0)
             {
                 throw new ApplicationException(
                     "The specified multisample count is not a power of 2 (it must be " +
@@ -739,7 +739,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (PresentationParameters.MultiSampleCount > 1)
             {
                 int quality;
-                PlatformSetMultiSamplingToMaximum(PresentationParameters, out quality);
+                SetMultiSamplingToMaximum(PresentationParameters, out quality);
                 
                 multisampleDesc.Count = PresentationParameters.MultiSampleCount;
                 multisampleDesc.Quality = quality;

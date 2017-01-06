@@ -207,6 +207,14 @@ namespace Microsoft.Xna.Framework
 
                 if (gdi.PresentationParameters == null || gdi.Adapter == null)
                     throw new NullReferenceException("Members should not be set to null in PreparingDeviceSettingsEventArgs");
+                
+                // Round down MultiSampleCount to the nearest power of two
+                // hack from http://stackoverflow.com/a/2681094
+                var msc = gdi.PresentationParameters.MultiSampleCount;
+                msc = msc | (msc >> 1);
+                msc = msc | (msc >> 2);
+                msc = msc | (msc >> 4);
+                gdi.PresentationParameters.MultiSampleCount = msc - (msc >> 1);
             }
 
             return gdi;
@@ -264,18 +272,12 @@ namespace Microsoft.Xna.Framework
 
             if (_preferMultiSampling)
             {
-                if (_graphicsDevice == null)
-                {
-                    // We can't determine the multisampling level by calling PlatformSetMultiSamplingToMaximum yet.
-                    // Once the device initializes, it will call CreateSizeDependentResources which will perform
-                    // a call to PlatformSetMultiSamplingToMaximum.
-                    presentationParameters.MultiSampleCount = 32;
-                }
-                else
-                {
-                    int quality;
-                    _graphicsDevice.PlatformSetMultiSamplingToMaximum(presentationParameters, out quality);
-                }
+                // always initialize MultiSampleCount to the maximum, if users want to overwrite
+                // this they have to respond to the PreparingDeviceSettingsEvent and modify
+                // args.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount
+                presentationParameters.MultiSampleCount = GraphicsDevice != null
+                    ? GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount
+                    : 32;
             }
             else
             {

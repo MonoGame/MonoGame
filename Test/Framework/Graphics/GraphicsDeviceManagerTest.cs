@@ -338,6 +338,23 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, count);
         }
 
+        [Test]
+        public void MultiSampleCountRoundsDown()
+        {
+            gdm.PreferMultiSampling = true;
+
+            gdm.PreparingDeviceSettings += (sender, args) =>
+            {
+                var pp = args.GraphicsDeviceInformation.PresentationParameters;
+                pp.MultiSampleCount = 3;
+            };
+
+            gdm.ApplyChanges();
+
+            Assert.AreEqual(2, gd.PresentationParameters.MultiSampleCount);
+
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void MSAAEnabled(bool enabled)
@@ -360,7 +377,6 @@ namespace MonoGame.Tests.Graphics
 
             // then create a GraphicsDevice
             gdm.ApplyChanges();
-            gd = game.GraphicsDevice;
 
             var tex = new Texture2D(gd, 1, 1);
             tex.SetData(new[] { Color.White.PackedValue });

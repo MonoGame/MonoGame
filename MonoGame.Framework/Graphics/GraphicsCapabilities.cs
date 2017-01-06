@@ -19,6 +19,12 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformInitialize(graphicsDevice);
         }
 
+        // For figuring out some capabilities we need native resources for querying
+        internal void InitializeAfterResources(GraphicsDevice device)
+        {
+            PlatformInitializeAfterResources(device);
+        }
+
         /// <summary>
         /// Whether the device fully supports non power-of-two textures, including
         /// mip maps and wrap modes other than CLAMP_TO_EDGE
@@ -75,5 +81,9 @@ namespace Microsoft.Xna.Framework.Graphics
         internal bool SupportsDepthClamp { get; private set; }
 
         internal bool SupportsVertexTextures { get; private set; }
+
+        // The highest possible MSCount
+        private const int MultiSampleCountLimit = 32;
+        internal int MaxMultiSampleCount;
     }
 }
