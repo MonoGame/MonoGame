@@ -87,56 +87,40 @@ namespace MonoGame.Framework
 
         public override void EnterFullScreen()
         {
-            if (_alreadyInFullScreenMode)
-                return;
-
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
                 Game.GraphicsDevice.SetHardwareFullscreen();
-            }
             else
-            {
                 _window.IsBorderless = true;
-            }
 
             _window._form.WindowState = FormWindowState.Maximized;
 
-            _alreadyInWindowedMode = false;
-            _alreadyInFullScreenMode = true;
+            InFullScreenMode = true;
         }
 
         public override void ExitFullScreen()
         {
-            if (_alreadyInWindowedMode)
-               return;
-
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
                 Game.GraphicsDevice.SetHardwareFullscreen();
-            }
             else
-            {
                 _window.IsBorderless = false;
-            }
 
             _window._form.WindowState = FormWindowState.Normal;
 
-            _alreadyInWindowedMode = true;
-            _alreadyInFullScreenMode = false;
+            InFullScreenMode = false;
         }
 
         internal override void OnPresentationChanged()
         {
-            if (Game.GraphicsDevice.PresentationParameters.IsFullScreen)
+            if (Game.GraphicsDevice.PresentationParameters.IsFullScreen && !InFullScreenMode)
             {
                 EnterFullScreen();
+                _window.OnClientSizeChanged();
             }
-            else
+            else if (!Game.GraphicsDevice.PresentationParameters.IsFullScreen && InFullScreenMode)
             {
                 ExitFullScreen();
                 _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
+                _window.OnClientSizeChanged();
             }
         }
 
