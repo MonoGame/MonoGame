@@ -565,8 +565,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 DeviceResetting(this, EventArgs.Empty);
 
             // Update the back buffer.
-            CreateSizeDependentResources();
-            ApplyRenderTargets(null);
+            OnPresentationChanged();
 
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);

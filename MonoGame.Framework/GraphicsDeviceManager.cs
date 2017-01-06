@@ -323,8 +323,7 @@ namespace Microsoft.Xna.Framework
 
             ResetGraphicsDevice(gdi.PresentationParameters);
 
-            // Update the graphics device and then the platform window.
-            _graphicsDevice.OnPresentationChanged();
+            // Update the platform window.
             _game.Platform.OnPresentationChanged();
 
             _shouldApplyChanges = false;
