@@ -217,6 +217,10 @@ namespace Microsoft.Xna.Framework
                 msc = msc | (msc >> 1);
                 msc = msc | (msc >> 2);
                 msc = msc | (msc >> 4);
+                // and clamp it to what the device can handle
+                if (msc > GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount)
+                    msc = GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount;
+
                 gdi.PresentationParameters.MultiSampleCount = msc - (msc >> 1);
             }
 
