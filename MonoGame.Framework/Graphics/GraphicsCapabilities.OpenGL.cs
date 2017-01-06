@@ -1,5 +1,31 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#if OPENGL
+#if MONOMAC
+#if PLATFORM_MACOS_LEGACY
+using MonoMac.OpenGL;
+using GetParamName = MonoMac.OpenGL.All;
+using GetPName = MonoMac.OpenGL.GetPName;
+#else
+using OpenTK.Graphics.OpenGL;
+using GetParamName = OpenTK.Graphics.OpenGL.All;
+using GetPName = OpenTK.Graphics.OpenGL.GetPName;
+#endif
+#elif GLES
+using OpenTK.Graphics.ES20;
+using GetParamName = OpenTK.Graphics.ES20.All;
+using GetPName = OpenTK.Graphics.ES20.GetPName;
+#else
+using OpenGL;
+using GetParamName = OpenGL.GetPName;
+#endif
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
+
     internal partial class GraphicsCapabilities
     {
         /// <summary>
