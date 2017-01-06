@@ -55,9 +55,14 @@ namespace MonoGame.Tests.Graphics
                 Assert.GreaterOrEqual(adapter.SupportedDisplayModes.Count(), 1);
                 Assert.AreEqual(1, adapter.SupportedDisplayModes.Count(m => Equals(m, adapter.CurrentDisplayMode)));
 
-                // Seems like XNA treats aspect ratios above 16:10 as wide screen.
+                // Seems like XNA treats aspect ratios above 16:10 as wide screen. A 1680x1050 display (exactly 16:10) was considered not to be wide screen.
+                // MonoGame considers ratios equal or greater than 16:10 to be wide screen.
                 const float minWideScreenAspect = 16.0f / 10.0f;
+#if XNA
+                var isWidescreen = adapter.CurrentDisplayMode.AspectRatio > minWideScreenAspect;
+#else
                 var isWidescreen = adapter.CurrentDisplayMode.AspectRatio >= minWideScreenAspect;
+#endif
                 Assert.AreEqual(isWidescreen, adapter.IsWideScreen); 
 
                 foreach (var mode in adapter.SupportedDisplayModes)

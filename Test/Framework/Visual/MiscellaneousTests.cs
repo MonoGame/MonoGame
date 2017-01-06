@@ -82,6 +82,9 @@ namespace MonoGame.Tests.Visual {
 	class MiscellaneousTests : VisualTestFixtureBase
     {
 		[Test]
+#if XNA
+        [Ignore]
+#endif
 		public void DrawOrder_falls_back_to_order_of_addition_to_Game ()
 		{
 			Game.PreDrawWith += (sender, e) => {
