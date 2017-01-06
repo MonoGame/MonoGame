@@ -134,7 +134,7 @@ namespace MonoGame.Framework
 
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;
-            _form.StartPosition = FormStartPosition.CenterScreen;           
+            _form.StartPosition = FormStartPosition.Manual;
 
             // Capture mouse events.
             _form.MouseWheel += OnMouseScroll;
@@ -199,20 +199,6 @@ namespace MonoGame.Framework
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
-#if (WINDOWS && DIRECTX)
-            if (Game.GraphicsDevice != null)
-            {
-                if (Game.graphicsDeviceManager.HardwareModeSwitch)
-                {
-                    if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
-                   {
-                       Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
-                       Game.GraphicsDevice.CreateSizeDependentResources();
-                       Game.GraphicsDevice.ApplyRenderTargets(null);
-                   }
-                }
-          }
-#endif
             _platform.IsActive = true;
             Keyboard.SetActive(true);
         }
@@ -292,9 +278,9 @@ namespace MonoGame.Framework
         }
 
         internal void Initialize(int width, int height)
-        {            
+        {
             _form.ClientSize = new Size(width, height);
-            _form.Show();
+            _form.CenterOnPrimaryMonitor();
         }
 
         private void OnResizeEnd(object sender, EventArgs eventArgs)

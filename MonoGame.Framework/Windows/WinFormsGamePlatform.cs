@@ -45,11 +45,11 @@ namespace MonoGame.Framework
 
         public override void BeforeInitialize()
         {
-            var gdm = Game.graphicsDeviceManager;
-
-            _window.Initialize(gdm.PreferredBackBufferWidth, gdm.PreferredBackBufferHeight);
-
             base.BeforeInitialize();
+
+            var gdm = Game.graphicsDeviceManager;
+            var pp = Game.GraphicsDevice.PresentationParameters;
+            _window.Initialize(pp.BackBufferWidth, pp.BackBufferHeight);
 
             if (gdm.IsFullScreen)
                 EnterFullScreen();
