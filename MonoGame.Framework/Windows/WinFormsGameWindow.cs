@@ -95,8 +95,8 @@ namespace MonoGame.Framework
 
         public override XnaPoint Position
         {
-            get { return new XnaPoint(_form.DesktopLocation.X, _form.DesktopLocation.Y); }
-            set { _form.DesktopLocation = new Point(value.X, value.Y); }
+            get { return new XnaPoint(_form.Location.X, _form.Location.Y); }
+            set { _form.Location = new Point(value.X, value.Y); }
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
