@@ -40,7 +40,7 @@ namespace MonoGame.Framework
         #region Internal Properties
 
         internal Game Game { get; private set; }
-        internal bool AreClientSizeChangedEventsIgnored;
+        internal bool UserResized { get; private set; }
 
         #endregion
 
@@ -280,11 +280,11 @@ namespace MonoGame.Framework
         internal void Initialize(int width, int height)
         {
             _form.ClientSize = new Size(width, height);
-            _form.CenterOnPrimaryMonitor();
         }
 
         private void OnResizeEnd(object sender, EventArgs eventArgs)
         {
+            UserResized = true;
             if (Game.Window == this)
             {
                 var manager = Game.graphicsDeviceManager;
@@ -316,6 +316,13 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
+            // XNA runs one Update even before showing the window
+            Game.DoUpdate(new GameTime());
+
+            // center now in case the user changed the window size
+            // in the first update call
+            _form.CenterOnPrimaryMonitor();
+
             // https://bugzilla.novell.com/show_bug.cgi?id=487896
             // Since there's existing bug from implementation with mono WinForms since 09'
             // Application.Idle is not working as intended
@@ -356,6 +363,11 @@ namespace MonoGame.Framework
                 Thread.Sleep(100);
             } 
             while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
+        }
+
+        public void CenterForm()
+        {
+            _form.CenterOnPrimaryMonitor();
         }
 
         internal void UpdateWindows()

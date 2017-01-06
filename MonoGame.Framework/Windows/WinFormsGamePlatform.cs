@@ -111,6 +111,12 @@ namespace MonoGame.Framework
 
         internal override void OnPresentationChanged()
         {
+            var pp = Game.GraphicsDevice.PresentationParameters;
+            _window.ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
+
+            if (!_window.UserResized)
+                _window.CenterForm();
+
             if (Game.GraphicsDevice.PresentationParameters.IsFullScreen && !InFullScreenMode)
             {
                 EnterFullScreen();
@@ -119,7 +125,6 @@ namespace MonoGame.Framework
             else if (!Game.GraphicsDevice.PresentationParameters.IsFullScreen && InFullScreenMode)
             {
                 ExitFullScreen();
-                _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
                 _window.OnClientSizeChanged();
             }
         }
