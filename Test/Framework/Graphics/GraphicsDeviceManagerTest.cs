@@ -322,8 +322,28 @@ namespace MonoGame.Tests.Graphics
         }
     }
 
-    internal class GraphicsDeviceManagerVisualTest : GraphicsDeviceTestFixtureBase
+    internal class GraphicsDeviceManagerFixtureTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
+        public void ResettingDeviceTriggersGdmEvents()
+        {
+            var resetCount = 0;
+            var resettingCount = 0;
+            gdm.DeviceReset += (sender, args) =>
+            {
+                resetCount++;
+            };
+
+            gdm.DeviceResetting += (sender, args) =>
+            {
+                resettingCount++;
+            };
+
+            gd.Reset();
+
+            Assert.AreEqual(1, resetCount);
+            Assert.AreEqual(1, resettingCount);
+        }
 
         [Test]
         public void ClientSizeChangedOnDeviceReset()
@@ -335,6 +355,16 @@ namespace MonoGame.Tests.Graphics
             };
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
             gdm.ApplyChanges();
+            Assert.AreEqual(0, count);
+
+            gdm.PreferredBackBufferWidth = 100;
+            gdm.ApplyChanges();
+            Assert.AreEqual(0, count);
+
+            // changing the profile will trigger a device reset
+            gdm.GraphicsProfile = GraphicsProfile.Reach;
+            gdm.ApplyChanges();
+            // not even that will trigger the event
             Assert.AreEqual(0, count);
         }
 

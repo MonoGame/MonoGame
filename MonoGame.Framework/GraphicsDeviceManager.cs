@@ -130,6 +130,10 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice = new GraphicsDevice(gdi);
             _shouldApplyChanges = false;
 
+            // hook up reset events
+            GraphicsDevice.DeviceReset     += (sender, args) => OnDeviceReset(args);
+            GraphicsDevice.DeviceResetting += (sender, args) => OnDeviceResetting(args);
+
             // update the touchpanel display size when the graphicsdevice is reset
             _graphicsDevice.DeviceReset += UpdateTouchPanel;
 
@@ -323,7 +327,7 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-            ResetGraphicsDevice(gdi.PresentationParameters);
+            GraphicsDevice.Reset(gdi.PresentationParameters);
 
             // Update the platform window.
             _game.Platform.OnPresentationChanged();
@@ -339,13 +343,6 @@ namespace Microsoft.Xna.Framework
                 DeviceDisposing(this, EventArgs.Empty);
 
             _graphicsDevice = null;
-        }
-
-        private void ResetGraphicsDevice(PresentationParameters pp)
-        {
-            OnDeviceResetting(EventArgs.Empty);
-            GraphicsDevice.Reset(pp);
-            OnDeviceReset(EventArgs.Empty);
         }
 
         partial void PlatformInitialize(PresentationParameters presentationParameters);

@@ -47,8 +47,6 @@ namespace MonoGame.Framework
         {
             var gdm = Game.graphicsDeviceManager;
 
-            _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is initialised
-
             _window.Initialize(gdm.PreferredBackBufferWidth, gdm.PreferredBackBufferHeight);
 
             base.BeforeInitialize();
@@ -57,8 +55,6 @@ namespace MonoGame.Framework
                 EnterFullScreen();
             else
                 ExitFullScreen();
-
-            _window.EnableClientSizeChangedEvent(true); // Re-enable (and trigger) ClientSizeChanged event
         }
 
         public override void RunLoop()
@@ -133,8 +129,6 @@ namespace MonoGame.Framework
 
         internal override void OnPresentationChanged()
         {
-            _window.EnableClientSizeChangedEvent(false); // Disable ClientSizeChanged event while the window is resized
-
             if (Game.GraphicsDevice.PresentationParameters.IsFullScreen)
             {
                 EnterFullScreen();
@@ -144,8 +138,6 @@ namespace MonoGame.Framework
                 ExitFullScreen();
                 _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
             }
-
-            _window.EnableClientSizeChangedEvent(true); // Re-enable (and trigger) ClientSizeChanged event
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

@@ -37,11 +37,10 @@ namespace MonoGame.Framework
 
         private bool _isMouseInBounds;
 
-        private bool _areClientSizeChangedEventsIgnored;
-
         #region Internal Properties
 
         internal Game Game { get; private set; }
+        internal bool AreClientSizeChangedEventsIgnored;
 
         #endregion
 
@@ -144,7 +143,7 @@ namespace MonoGame.Framework
 
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
-            _form.ClientSizeChanged += OnClientSizeChanged;
+            _form.ResizeEnd += OnResizeEnd;
 
             _form.KeyPress += OnKeyPress;
 
@@ -298,35 +297,24 @@ namespace MonoGame.Framework
             _form.Show();
         }
 
-        internal void EnableClientSizeChangedEvent(bool isEnabled)
+        private void OnResizeEnd(object sender, EventArgs eventArgs)
         {
-            _areClientSizeChangedEventsIgnored = !isEnabled;
-            if (isEnabled)
-                OnClientSizeChanged(this, EventArgs.Empty);
-        }
-
-        private void OnClientSizeChanged(object sender, EventArgs eventArgs)
-        {
-            if (_areClientSizeChangedEventsIgnored)
-                return;
-
             if (Game.Window == this)
             {
                 var manager = Game.graphicsDeviceManager;
                 if (manager.GraphicsDevice == null)
                     return;
 
-                // Only resize the backbuffer in windowed mode. In fullscreen mode, it gets stretched to fit the window.
-                // Also skip resizing the backbuffer when the window is minimized.
-                if (!manager.IsFullScreen && (_form.WindowState != FormWindowState.Minimized))
-                {
-                    // Set the default new back buffer size and viewport, but this
-                    // can be overloaded by the two events below.
-                    var newSize = _form.ClientSize;
-                    manager.GraphicsDevice.PresentationParameters.BackBufferWidth = newSize.Width;
-                    manager.GraphicsDevice.PresentationParameters.BackBufferHeight = newSize.Height;
-                    manager.GraphicsDevice.OnPresentationChanged();
-                }
+                var newSize = _form.ClientSize;
+                if (newSize.Width == manager.PreferredBackBufferWidth
+                    && newSize.Height == manager.PreferredBackBufferHeight)
+                    return;
+
+                // Set the default new back buffer size and viewport, but this
+                // can be overloaded by the two events below.
+                manager.PreferredBackBufferWidth = newSize.Width;
+                manager.PreferredBackBufferHeight = newSize.Height;
+                manager.ApplyChanges();
             }
 
             // Set the new view state which will trigger the 

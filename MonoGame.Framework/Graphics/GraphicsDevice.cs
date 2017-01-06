@@ -186,7 +186,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Setup();
             GraphicsCapabilities = new GraphicsCapabilities(this);
             Initialize();
-            GraphicsCapabilities.InitializeAfterResources(this);
         }
 
         /// <summary>
@@ -274,6 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Initialize()
         {
             PlatformInitialize();
+            GraphicsCapabilities.InitializeAfterResources(this);
 
             // Force set the default render states.
             _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
