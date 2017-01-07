@@ -264,14 +264,8 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (_graphicsDeviceService == null)
-                {
-                    _graphicsDeviceService = (IGraphicsDeviceService)
-                        Services.GetService(typeof(IGraphicsDeviceService));
-
-                    if (_graphicsDeviceService == null)
-                        throw new InvalidOperationException("No Graphics Device Service");
-                }
+                if (GraphicsDeviceService == null)
+                    return null;
                 return _graphicsDeviceService.GraphicsDevice;
             }
         }
@@ -350,7 +344,8 @@ namespace Microsoft.Xna.Framework
             if (!Platform.BeforeRun())
                 return;
 
-            if (!_initialized) {
+            if (!_initialized)
+            {
                 DoInitialize ();
                 _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
@@ -452,7 +447,7 @@ namespace Microsoft.Xna.Framework
                 var stepCount = 0;
 
                 // Perform as many full fixed length time steps as we can.
-                while (_accumulatedElapsedTime >= TargetElapsedTime)
+                while (_accumulatedElapsedTime >= TargetElapsedTime && !_shouldExit)
                 {
                     _gameTime.TotalGameTime += TargetElapsedTime;
                     _accumulatedElapsedTime -= TargetElapsedTime;
@@ -677,6 +672,9 @@ namespace Microsoft.Xna.Framework
         internal void DoInitialize()
         {
             AssertNotDisposed();
+            if (GraphicsDevice == null && graphicsDeviceManager != null)
+                _graphicsDeviceManager.CreateDevice();
+
             Platform.BeforeInitialize();
             Initialize();
 
@@ -706,11 +704,21 @@ namespace Microsoft.Xna.Framework
                 {
                     _graphicsDeviceManager = (IGraphicsDeviceManager)
                         Services.GetService(typeof(IGraphicsDeviceManager));
-
-                    if (_graphicsDeviceManager == null)
-                        throw new InvalidOperationException ("No Graphics Device Manager");
                 }
                 return (GraphicsDeviceManager)_graphicsDeviceManager;
+            }
+        }
+
+        private IGraphicsDeviceService GraphicsDeviceService
+        {
+            get
+            {
+                if (_graphicsDeviceService == null)
+                {
+                    _graphicsDeviceService = (IGraphicsDeviceService)
+                        Services.GetService(typeof(IGraphicsDeviceService));
+                }
+                return _graphicsDeviceService;
             }
         }
 

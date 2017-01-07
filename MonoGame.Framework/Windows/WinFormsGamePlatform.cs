@@ -49,11 +49,18 @@ namespace MonoGame.Framework
             base.BeforeInitialize();
 
             var gdm = Game.graphicsDeviceManager;
-            var pp = Game.GraphicsDevice.PresentationParameters;
-            _window.Initialize(pp.BackBufferWidth, pp.BackBufferHeight);
+            if (gdm == null)
+            {
+                _window.Initialize(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
+            }
+            else
+            {
+                var pp = Game.GraphicsDevice.PresentationParameters;
+                _window.Initialize(pp.BackBufferWidth, pp.BackBufferHeight);
 
-            if (gdm.IsFullScreen)
-                EnterFullScreen();
+                if (gdm.IsFullScreen)
+                    EnterFullScreen();
+            }
         }
 
         public override void RunLoop()

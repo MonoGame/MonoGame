@@ -724,7 +724,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                         PresentationParameters.BackBufferWidth,
                                         PresentationParameters.BackBufferHeight,
                                         format,
-                                        SwapChainFlags.None);
+                                        SwapChainFlags.AllowModeSwitch);
 
                 // Update Vsync setting.
                 using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())

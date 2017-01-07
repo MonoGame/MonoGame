@@ -137,11 +137,6 @@ namespace Microsoft.Xna.Framework
         public virtual void BeforeInitialize()
         {
             IsActive = true;
-            if (this.Game.GraphicsDevice == null) 
-            {
-                var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
-                graphicsDeviceManager.CreateDevice();
-            }
         }
 
         /// <summary>
