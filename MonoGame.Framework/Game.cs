@@ -264,8 +264,14 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (GraphicsDeviceService == null)
-                    return null;
+                if (_graphicsDeviceService == null)
+                {
+                    _graphicsDeviceService = (IGraphicsDeviceService)
+                        Services.GetService(typeof(IGraphicsDeviceService));
+
+                    if (_graphicsDeviceService == null)
+                        throw new InvalidOperationException("No Graphics Device Service");
+                }
                 return _graphicsDeviceService.GraphicsDevice;
             }
         }
@@ -706,19 +712,6 @@ namespace Microsoft.Xna.Framework
                         Services.GetService(typeof(IGraphicsDeviceManager));
                 }
                 return (GraphicsDeviceManager)_graphicsDeviceManager;
-            }
-        }
-
-        private IGraphicsDeviceService GraphicsDeviceService
-        {
-            get
-            {
-                if (_graphicsDeviceService == null)
-                {
-                    _graphicsDeviceService = (IGraphicsDeviceService)
-                        Services.GetService(typeof(IGraphicsDeviceService));
-                }
-                return _graphicsDeviceService;
             }
         }
 
