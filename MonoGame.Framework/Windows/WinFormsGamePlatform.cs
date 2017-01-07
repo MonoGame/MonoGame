@@ -16,13 +16,14 @@ namespace MonoGame.Framework
         //internal static string LaunchParameters;
 
         private WinFormsGameWindow _window;
+        private System.Drawing.Point _locationBeforeFullscreen;
 
         public WinFormsGamePlatform(Game game)
             : base(game)
         {
             _window = new WinFormsGameWindow(this);
 
-            Mouse.Window = _window._form;
+            Mouse.Window = _window.Form;
 
             Window = _window;
         }
@@ -53,8 +54,6 @@ namespace MonoGame.Framework
 
             if (gdm.IsFullScreen)
                 EnterFullScreen();
-            else
-                ExitFullScreen();
         }
 
         public override void RunLoop()
@@ -87,12 +86,14 @@ namespace MonoGame.Framework
 
         public override void EnterFullScreen()
         {
+            // store the location of the window so we can restore it later
+            _locationBeforeFullscreen = _window.Form.Location;
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
                 Game.GraphicsDevice.SetHardwareFullscreen();
             else
                 _window.IsBorderless = true;
 
-            _window._form.WindowState = FormWindowState.Maximized;
+            _window.Form.WindowState = FormWindowState.Maximized;
 
             InFullScreenMode = true;
         }
@@ -104,7 +105,8 @@ namespace MonoGame.Framework
             else
                 _window.IsBorderless = false;
 
-            _window._form.WindowState = FormWindowState.Normal;
+            _window.Form.WindowState = FormWindowState.Normal;
+            _window.Form.Location = _locationBeforeFullscreen;
 
             InFullScreenMode = false;
         }
@@ -113,9 +115,6 @@ namespace MonoGame.Framework
         {
             var pp = Game.GraphicsDevice.PresentationParameters;
             _window.ChangeClientSize(new Size(pp.BackBufferWidth, pp.BackBufferHeight));
-
-            if (!_window.UserResized)
-                _window.CenterForm();
 
             if (Game.GraphicsDevice.PresentationParameters.IsFullScreen && !InFullScreenMode)
             {
@@ -127,6 +126,9 @@ namespace MonoGame.Framework
                 ExitFullScreen();
                 _window.OnClientSizeChanged();
             }
+
+            if (!_window.UserResized)
+                _window.CenterForm();
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
