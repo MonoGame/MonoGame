@@ -24,24 +24,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         Vector4 IVector4Converter<byte>.ToVector4(byte value)
         {
             var f = (float)value / (float)byte.MaxValue;
-            return new Vector4(1f, 1f, 1f, f);
+            return new Vector4(f, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<short>.ToVector4(short value)
         {
             var f = (float)value / (float)short.MaxValue;
-            return new Vector4(1f, 1f, 1f, f);
+            return new Vector4(f, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<int>.ToVector4(int value)
         {
             var f = (float)value / (float)int.MaxValue;
-            return new Vector4(1f, 1f, 1f, f);
+            return new Vector4(f, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<float>.ToVector4(float value)
         {
-            return new Vector4(1f, 1f, 1f, value);
+            return new Vector4(value, 0f, 0f, 1f);
         }
 
         Vector4 IVector4Converter<Color>.ToVector4(Color value)
@@ -56,22 +56,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
 
         byte IVector4Converter<byte>.FromVector4(Vector4 value)
         {
-            return (byte)(value.W * (float)byte.MaxValue);
+            return (byte)(value.X * (float)byte.MaxValue);
         }
 
         short IVector4Converter<short>.FromVector4(Vector4 value)
         {
-            return (short)(value.W * (float)short.MaxValue);
+            return (short)(value.X * (float)short.MaxValue);
         }
 
         int IVector4Converter<int>.FromVector4(Vector4 value)
         {
-            return (int)(value.W * (float)int.MaxValue);
+            return (int)(value.X * (float)int.MaxValue);
         }
 
         float IVector4Converter<float>.FromVector4(Vector4 value)
         {
-            return value.W;
+            return value.X;
         }
 
         Color IVector4Converter<Color>.FromVector4(Vector4 value)

@@ -59,6 +59,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		static BitmapContent CopyGlyphsToOutput(List<ArrangedGlyph> glyphs, int width, int height)
 		{
             var output = new PixelBitmapContent<Color>(width, height);
+            // Fill the output with non-premultiplied black
+            output.ReplaceColor(Color.Transparent, Color.Black);
 
 			foreach (var glyph in glyphs)
 			{

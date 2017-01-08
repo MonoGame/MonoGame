@@ -715,8 +715,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 multisampleDesc.Quality = quality;
             }
 
-            int vSyncFrameLatency = PresentationParameters.PresentationInterval.GetFrameLatency();
-
             // If the swap chain already exists... update it.
             if (_swapChain != null)
             {
@@ -725,17 +723,6 @@ namespace Microsoft.Xna.Framework.Graphics
                                         PresentationParameters.BackBufferHeight,
                                         format,
                                         SwapChainFlags.AllowModeSwitch);
-
-                // Update Vsync setting.
-                using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
-                {
-                    // If VSync is disabled, Ensure that DXGI does not queue more than one frame at a time. This 
-                    // both reduces latency and ensures that the application will only render 
-                    // after each VSync, minimizing power consumption.
-                    // Setting latency to 0 (PresentInterval.Immediate) will result in the hardware default.
-                    // (normally 3) 
-                    dxgiDevice.MaximumFrameLatency = vSyncFrameLatency;
-                }
             }
 
             // Otherwise, create a new swap chain.
@@ -774,12 +761,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
                     dxgiFactory.MakeWindowAssociation(PresentationParameters.DeviceWindowHandle, WindowAssociationFlags.IgnoreAll);
-                    // If VSync is disabled, Ensure that DXGI does not queue more than one frame at a time. This 
-                    // both reduces latency and ensures that the application will only render 
-                    // after each VSync, minimizing power consumption.
-                    // Setting latency to 0 (PresentInterval.Immediate) will result in the hardware default.
-                    // (normally 3) 
-                    dxgiDevice.MaximumFrameLatency = vSyncFrameLatency;
+                    // To reduce latency, ensure that DXGI does not queue more than one frame at a time.
+                    // Docs: https://msdn.microsoft.com/en-us/library/windows/desktop/ff471334(v=vs.85).aspx
+                    dxgiDevice.MaximumFrameLatency = 1;
                 }
             }
 
@@ -972,7 +956,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             try
             {
-                var syncInterval = PresentationParameters.PresentationInterval.GetFrameLatency();
+                var syncInterval = PresentationParameters.PresentationInterval.GetSyncInterval();
 
                 // The first argument instructs DXGI to block n VSyncs before presenting.
                 lock (_d3dContext)
