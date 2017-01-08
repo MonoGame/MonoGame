@@ -544,20 +544,31 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
-        /// <param name="rotation">A rotation of this string.</param>
-        /// <param name="origin">Center of the rotation. 0,0 by default.</param>
-        /// <param name="scale">A scaling of this string.</param>
-        /// <param name="effects">Modificators for drawing. Can be combined.</param>
-        /// <param name="layerDepth">A depth of the layer of this string.</param>
-		public void DrawString (
-			SpriteFont spriteFont, string text, Vector2 position, Color color,
-            float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
-		{
+        /// <param name="rotation">An optional rotation of this string. 0 by default</param>
+        /// <param name="origin">An optional center of rotation. Uses <see cref="Vector2.Zero"/> if null.</param>
+        /// <param name="scale">An optional scale vector of this string. Uses <see cref="Vector2.One"/> if null.</param>
+        /// <param name="effects">An optional modificators for drawing. Can be combined. Uses <see cref="SpriteEffects.None"/> by default.</param>
+        /// <param name="layerDepth">An optional depth of the layer of this string. 0 by default.</param>
+		public void DrawString(
+            SpriteFont spriteFont, string text, Vector2 position, Color color,
+            float rotation = 0f, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0f)
+        {
             CheckValid(spriteFont, text);
 
             var source = new SpriteFont.CharacterSource(text);
-            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effects, layerDepth);
-		}
+
+            // Assign default values to null parameters here, as they are not compile-time constants
+            if (!origin.HasValue)
+            {
+                origin = Vector2.Zero;
+            }
+            if (!scale.HasValue)
+            {
+                scale = Vector2.One;
+            }
+
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin.Value, scale.Value, effects, layerDepth);
+        }
 
         /// <summary>
         /// Submit a text string of sprites for drawing in the current batch.
