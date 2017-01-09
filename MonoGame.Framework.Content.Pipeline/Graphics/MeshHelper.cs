@@ -398,6 +398,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     {
                         UpdatePositionIndices(mesh, i, j);
                         mesh.Positions.RemoveAt(i);
+                        break;
                     }
                 }
             }
@@ -430,6 +431,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     }
 
                     verts.RemoveAt(i);
+                    break;
                 }
             }
         }
