@@ -221,6 +221,7 @@ namespace MonoGame.Tests.Graphics
             game.Dispose();
         }
 
+        [Test]
         public void ApplyChangesReturnsWhenNoSetterCalled()
         {
             var game = new TestGameBase();
