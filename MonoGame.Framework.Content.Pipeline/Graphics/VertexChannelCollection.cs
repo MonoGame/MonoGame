@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="name">Name of the new channel.</param>
         /// <param name="channelData">Initial data for the new channel. If null, the channel is filled with the default value for that type.</param>
         /// <returns>The newly added vertex channel.</returns>
-        public VertexChannel<ElementType> Add<ElementType>(string name, IEnumerable<ElementType> channelData)
+        public VertexChannel<ElementType> Add<ElementType>(string name, IEnumerable<ElementType> channelData) where ElementType : struct
         {
             return Insert(channels.Count, name, channelData);
         }
@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <typeparam name="TargetType">Type of the target format. Can be one of the following: Single, Vector2, Vector3, Vector4, IPackedVector</typeparam>
         /// <param name="index">Index of the channel to be converted.</param>
         /// <returns>New channel in the specified format.</returns>
-        public VertexChannel<TargetType> ConvertChannelContent<TargetType>(int index)
+        public VertexChannel<TargetType> ConvertChannelContent<TargetType>(int index) where TargetType : struct
         {
             if (index < 0 || index >= channels.Count)
                 throw new ArgumentOutOfRangeException("index");
@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <typeparam name="TargetType">Type of the target format. Can be one of the following: Single, Vector2, Vector3, Vector4, IPackedVector</typeparam>
         /// <param name="name">Name of the channel to be converted.</param>
         /// <returns>New channel in the specified format.</returns>
-        public VertexChannel<TargetType> ConvertChannelContent<TargetType>(string name)
+        public VertexChannel<TargetType> ConvertChannelContent<TargetType>(string name) where TargetType : struct
         {
             var index = IndexOf(name);
             if (index < 0)
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <typeparam name="T">Type of a vertex channel.</typeparam>
         /// <param name="index">Index of a vertex channel.</param>
         /// <returns>The vertex channel.</returns>
-        public VertexChannel<T> Get<T>(int index)
+        public VertexChannel<T> Get<T>(int index) where T : struct
         {
             if (index < 0 || index >= channels.Count)
                 throw new ArgumentOutOfRangeException("index");
@@ -209,7 +209,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <typeparam name="T">Type of the vertex channel.</typeparam>
         /// <param name="name">Name of a vertex channel.</param>
         /// <returns>The vertex channel.</returns>
-        public VertexChannel<T> Get<T>(string name)
+        public VertexChannel<T> Get<T>(string name) where T : struct
         {
             var index = IndexOf(name);
             if (index < 0)
@@ -258,7 +258,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="name">Name of the new channel.</param>
         /// <param name="channelData">The new channel.</param>
         /// <returns>The inserted vertex channel.</returns>
-        public VertexChannel<ElementType> Insert<ElementType>(int index, string name, IEnumerable<ElementType> channelData)
+        public VertexChannel<ElementType> Insert<ElementType>(int index, string name, IEnumerable<ElementType> channelData) where ElementType : struct
         {
             if ((index < 0) || (index > channels.Count))
                 throw new ArgumentOutOfRangeException("index");
