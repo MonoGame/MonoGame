@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Xna.Framework.Utilities;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Utilities;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -1318,15 +1319,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (data == null)
                 throw new ArgumentNullException("data");
-            if (startIndex < 0 || startIndex >= data.Length)
-                throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
-            if (data.Length < startIndex + elementCount)
-                throw new ArgumentException("The data array is too small.");
-
-            var tSize = Marshal.SizeOf(typeof(T));
-            var fSize = PresentationParameters.BackBufferFormat.GetSize();
-            if (tSize > fSize || fSize % tSize != 0)
-                throw new ArgumentException("Type T is of an invalid size for the format of the back buffer.", "T");
 
             Rectangle rectangle;
             if (rect.HasValue)
@@ -1336,7 +1328,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var width = PresentationParameters.BackBufferWidth;
                 var height = PresentationParameters.BackBufferHeight;
 
-                if (rectangle.X < 0 || rectangle.Y < 0 || rectangle.Width < 0 || rectangle.Height < 0 ||
+                if (rectangle.X < 0 || rectangle.Y < 0 || rectangle.Width <= 0 || rectangle.Height <= 0 ||
                     rectangle.Right > width || rectangle.Top > height)
                     throw new ArgumentException("Rectangle must fit in BackBuffer dimensions");
             }
@@ -1344,8 +1336,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 rectangle = new Rectangle(0, 0, PresentationParameters.BackBufferWidth,
                     PresentationParameters.BackBufferHeight);
 
-            if (elementCount * tSize != rectangle.Width * rectangle.Height * fSize)
-                throw new ArgumentException("elementCount is too large or too small.", "elementCount");
+            var tSize = ReflectionHelpers.SizeOf<T>.Get();
+            var fSize = PresentationParameters.BackBufferFormat.GetSize();
+            if (tSize > fSize || fSize % tSize != 0)
+                throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");
+            if (startIndex < 0 || startIndex >= data.Length)
+                throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
+            if (data.Length < startIndex + elementCount)
+                throw new ArgumentException("The data array is too small.");
+            var dataByteSize = rectangle.Width * rectangle.Height * fSize;
+            if (elementCount * tSize != dataByteSize)
+                throw new ArgumentException(string.Format("elementCount is not the right size, " +
+                                            "elementCount * sizeof(T) is {0}, but data size is {1} bytes.",
+                                            elementCount * tSize, dataByteSize), "elementCount");
 
             PlatformGetBackBufferData(rectangle, data, startIndex, elementCount);
         }
