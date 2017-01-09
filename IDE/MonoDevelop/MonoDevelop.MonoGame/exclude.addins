@@ -1,10 +1,10 @@
 ﻿<Addins>
 	<Exclude>Assimp64.dll</Exclude>
-    <Exclude>nvtt.dll</Exclude>
+	<Exclude>nvtt.dll</Exclude>
 	<Exclude>freetype6.dll</Exclude>
-	<Exlcude>pvrtc.dll</Exlcude>
-	<Exlcude>templates/libs/x86/SDL2.dll</Exlcude>
-	<Exlcude>templates/libs/x64/SDL2.dll</Exlcude>
+	<Exclude>pvrtc.dll</Exlcude>
+	<Exclude>templates/libs/x86/SDL2.dll</Exlcude>
+	<Exclude>templates/libs/x64/SDL2.dll</Exlcude>
 	<Exclude>templates/libs/x86/soft_oal.dll</Exclude>
 	<Exclude>templates/libs/x64/soft_oal.dll</Exclude>
 	<!--
