@@ -944,6 +944,12 @@
 	<Content Include="Assets\Textures\LogoOnly_64px.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px-R8G8B8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="Assets\Textures\LogoOnly_64px-X8R8G8B8.dds">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 	<Content Include="Assets\Textures\LogoOnly_64px-mipmaps.dds">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
