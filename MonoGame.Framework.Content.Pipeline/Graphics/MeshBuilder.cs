@@ -64,7 +64,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Adds a vertex into the index collection.
         /// </summary>
-        /// <param name="indexIntoVertexCollection">Index of the inserted vertex, in the collection. This corresponds to the value returned by <see cref="CreatePosition"/>.</param>
+        /// <param name="indexIntoVertexCollection">Index of the inserted vertex, in the collection.
+        /// This corresponds to the value returned by <see cref="CreatePosition(float,float,float)"/>.</param>
         public void AddTriangleVertex(int indexIntoVertexCollection)
         {
             if (_finishedMesh)
