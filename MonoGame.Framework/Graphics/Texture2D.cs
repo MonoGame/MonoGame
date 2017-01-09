@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -300,18 +301,18 @@ namespace Microsoft.Xna.Framework.Graphics
             int startIndex, int elementCount, out Rectangle checkedRect) where T : struct
         {
             var textureBounds = new Rectangle(0, 0, Math.Max(width >> level, 1), Math.Max(height >> level, 1));
-            checkedRect = rect.HasValue ? rect.Value : textureBounds;
+            checkedRect = rect ?? textureBounds;
             if (level < 0 || level >= LevelCount)
                 throw new ArgumentException("level must be smaller than the number of levels in this texture.");
             if (arraySlice > 0 && !GraphicsDevice.GraphicsCapabilities.SupportsTextureArrays)
                 throw new ArgumentException("Texture arrays are not supported on this graphics device", "arraySlice");
             if (arraySlice < 0 || arraySlice >= ArraySize)
                 throw new ArgumentException("arraySlice must be smaller than the ArraySize of this texture and larger than 0.");
-            if (!textureBounds.Contains(checkedRect))
+            if (!textureBounds.Contains(checkedRect) || checkedRect.Width <= 0 || checkedRect.Height <= 0)
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
             if (data == null)
                 throw new ArgumentNullException("data");
-            var tSize = Marshal.SizeOf(typeof(T));
+            var tSize = ReflectionHelpers.SizeOf<T>.Get();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
                 throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");

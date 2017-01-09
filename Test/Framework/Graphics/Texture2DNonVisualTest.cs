@@ -467,6 +467,23 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        public void GetDataNegativeOrZeroRectWidthAndHeightThrows()
+        {
+            using (var t = new Texture2D(gd, 10, 10))
+            {
+                var data = new Color[4];
+                var data2 = new Color[0];
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5,  2, -2), data, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, -2,  2), data, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, -2, -2), data, 0, 4));
+
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, 0, 2), data2, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, 2, 0), data2, 0, 4));
+                Assert.Throws<ArgumentException>(() => t.GetData(0, new Rectangle(5, 5, 0, 0), data2, 0, 4));
+            }
+        }
+
+        [Test]
         public void GetAndSetDataDxtCompressed()
         {
             var t = content.Load<Texture2D>(Paths.Texture ("random_16px_dxt"));

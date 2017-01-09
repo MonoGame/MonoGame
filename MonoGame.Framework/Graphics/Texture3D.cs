@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -135,17 +136,16 @@ namespace Microsoft.Xna.Framework.Graphics
             var height = bottom - top;
             var depth = back - front;
 
-            if (left < 0 || top < 0 || back < 0 || right > texWidth || bottom > texHeight || front > texDepth)
+            if (left <= 0 || top <= 0 || back <= 0 || right > texWidth || bottom > texHeight || front > texDepth)
                 throw new ArgumentException("area must remain inside texture bounds");
             // Disallow negative box size
             if (left >= right || top >= bottom || front >= back)
                 throw new ArgumentException("Neither box size nor box position can be negative");
-
             if (level < 0 || level >= LevelCount)
                 throw new ArgumentException("level must be smaller than the number of levels in this texture.");
             if (data == null)
                 throw new ArgumentNullException("data");
-            var tSize = Marshal.SizeOf(typeof(T));
+            var tSize = ReflectionHelpers.SizeOf<T>.Get();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
                 throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");

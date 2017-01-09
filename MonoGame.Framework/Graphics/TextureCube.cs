@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -91,14 +92,14 @@ namespace Microsoft.Xna.Framework.Graphics
             int elementCount, out Rectangle checkedRect) where T : struct
         {
             var textureBounds = new Rectangle(0, 0, Math.Max(Size >> level, 1), Math.Max(Size >> level, 1));
-            checkedRect = rect.HasValue ? rect.Value : textureBounds;
+            checkedRect = rect ?? textureBounds;
             if (level < 0 || level >= LevelCount)
                 throw new ArgumentException("level must be smaller than the number of levels in this texture.");
-            if (!textureBounds.Contains(checkedRect))
+            if (!textureBounds.Contains(checkedRect) || checkedRect.Width <= 0 || checkedRect.Height <= 0)
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
             if (data == null)
                 throw new ArgumentNullException("data");
-            var tSize = Marshal.SizeOf(typeof(T));
+            var tSize = ReflectionHelpers.SizeOf<T>.Get();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
                 throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");
