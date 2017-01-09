@@ -6,9 +6,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public sealed class MeshBuilder
     {
         private readonly MeshContent _meshContent;
+
+        private MaterialContent _currentMaterial;
+        private OpaqueDataDictionary _currentOpaqueData;
+        private bool _geometryDirty;
         private GeometryContent _currentGeometryContent;
 
-        private bool _finishedAddingPositions = false;
+        private readonly List<VertexChannel> _vertexChannels;
+        private readonly List<object> _vertexChannelData;
+
+        private bool _finishedCreation;
+        private bool _finishedMesh;
 
         /// <summary>
         /// Gets or sets the current value for position merging of the mesh.
@@ -45,6 +53,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             _meshContent = new MeshContent();
             _meshContent.Transform = Matrix.Identity;
+            _vertexChannels = new List<VertexChannel>();
+            _vertexChannelData = new List<object>();
+            _currentGeometryContent = new GeometryContent();
+            _currentOpaqueData = new OpaqueDataDictionary();
+            _geometryDirty = true;
             Name = name;
         }
 
@@ -54,23 +67,59 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="indexIntoVertexCollection">Index of the inserted vertex, in the collection. This corresponds to the value returned by <see cref="CreatePosition"/>.</param>
         public void AddTriangleVertex(int indexIntoVertexCollection)
         {
-            _finishedAddingPositions = true;
+            if (_finishedMesh)
+                throw new InvalidOperationException( "This MeshBuilder can no longer be used because FinishMesh has been called.");
 
-            if (_currentGeometryContent == null)
+            _finishedCreation = true;
+
+            if (_geometryDirty)
+            {
                 _currentGeometryContent = new GeometryContent();
+                _currentGeometryContent.Material = _currentMaterial;
+                foreach (var kvp in _currentOpaqueData)
+                    _currentGeometryContent.OpaqueData.Add(kvp.Key, kvp.Value);
 
-            //Add the vertex to the mesh and then add the vertex position to the indices list
-            int pos = _currentGeometryContent.Vertices.Add(indexIntoVertexCollection);
+                // we have to copy our vertex channels to the new geometry
+                foreach (var channel in _vertexChannels)
+                {
+                    _currentGeometryContent.Vertices.Channels.Add(channel.Name, channel.ElementType, null);
+                }
+                _meshContent.Geometry.Add(_currentGeometryContent);
+                _geometryDirty = false;
+
+            }
+            // Add the vertex to the mesh and then add the vertex position to the indices list
+            var pos = _currentGeometryContent.Vertices.Add(indexIntoVertexCollection);
+
+            // Then add the data for the other channels
+            for (var i = 0; i < _vertexChannels.Count; i++)
+            {
+                var channel = _currentGeometryContent.Vertices.Channels[i];
+                var data = _vertexChannelData[i];
+                if (data == null)
+                    throw new InvalidOperationException(string.Format("Missing vertex channel data for channel {0}", channel.Name));
+
+                channel.Items.Add(data);
+            }
+
             _currentGeometryContent.Indices.Add(pos);
         }
 
 
         public int CreateVertexChannel<T>(string usage)
         {
-            if(_currentGeometryContent == null)
-                _currentGeometryContent = new GeometryContent();
+            if (_finishedMesh)
+                throw new InvalidOperationException("This MeshBuilder can no longer be used because FinishMesh has been called.");
+            if (_finishedCreation)
+                throw new InvalidOperationException("Functions starting with 'Create' must be called before calling AddTriangleVertex");
+
+            var channel = new VertexChannel<T>(usage);
+            _vertexChannels.Add(channel);
+            _vertexChannelData.Add(default(T));
+
             _currentGeometryContent.Vertices.Channels.Add<T>(usage, null);
-            return _currentGeometryContent.Vertices.Channels.Count - 1;
+
+            return _vertexChannels.Count - 1;
         }
 
         /// <summary>
@@ -92,8 +141,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Index of the vertex being inserted.</returns>
         public int CreatePosition(Vector3 pos)
         {
-            if (_finishedAddingPositions)
-                throw new InvalidOperationException("Cannot add postions after calling AddTriangleVertex");
+            if (_finishedMesh)
+                throw new InvalidOperationException( "This MeshBuilder can no longer be used because FinishMesh has been called.");
+            if (_finishedCreation)
+                throw new InvalidOperationException("Functions starting with 'Create' must be called before calling AddTriangleVertex");
 
             _meshContent.Positions.Add(pos);
             return _meshContent.Positions.Count - 1;
@@ -105,43 +156,60 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Resultant mesh.</returns>
         public MeshContent FinishMesh()
         {
+            if (_finishedMesh)
+                return _meshContent;
+
             if (MergeDuplicatePositions)
                 MeshHelper.MergeDuplicatePositions(_meshContent, MergePositionTolerance);
 
-            //TODO: requires implementation
-            //MeshHelper.MergeDuplicateVertices(_meshContent);
+            MeshHelper.MergeDuplicateVertices(_meshContent);
 
             MeshHelper.CalculateNormals(_meshContent, false);
-
             if (SwapWindingOrder)
                 MeshHelper.SwapWindingOrder(_meshContent);
 
+            _finishedMesh = true;
             return _meshContent;
-
-            //TODO: The related MeshBuilder object can no longer be used after this function is called.
         }
 
         /// <summary>
-        /// Specifies the material used by the current mesh.
+        /// Sets the material for the next triangles.
         /// </summary>
-        /// <remarks>Sets the material used by the triangle being defined next. This material, in conjunction with SetOpaqueData, determines the GeometryContent object containing the next triangle. MeshBuilder maintains the material value for all future triangles. Therefore, if multiple triangles share the same material, you need only one call to SetMaterial.</remarks>
-        /// <param name="material">The material to be used by the mesh.</param>
+        /// <param name="material">Material for the next triangles.</param>
+        /// <remarks>
+        /// Sets the material for the triangles being defined next. This material
+        /// and the opaque data dictionary, set with <see cref="SetOpaqueData"/>
+        /// define the <see cref="GeometryContent"/>  object containing the next
+        /// triangles. When you set a new material or opaque data dictionary the
+        /// triangles you add afterwards will belong to a new
+        /// <see cref="GeometryContent"/> object.
+        /// </remarks>
         public void SetMaterial(MaterialContent material)
         {
-            _currentGeometryContent = new GeometryContent();
-            _meshContent.Geometry.Add(_currentGeometryContent);
-            _currentGeometryContent.Material = material;
+            if (_currentMaterial == material)
+                return;
+
+            _currentMaterial = material;
+            _geometryDirty = true;
         }
 
         /// <summary>
-        /// Initializes the opaque data for a specific mesh object.
+        /// Sets the opaque data for the next triangles.
         /// </summary>
-        /// <param name="opaqueData">Opaque data to be applied to the GeometryContent object of the next triangle.</param>
+        /// <param name="opaqueData">Opaque data dictionary for the next triangles.</param>
+        /// <remarks>
+        /// Sets the opaque data dictionary for the triangles being defined next. This dictionary
+        /// and the material, set with <see cref="SetMaterial"/>, define the <see cref="GeometryContent"/>
+        /// object containing the next triangles. When you set a new material or opaque data dictionary
+        /// the triangles you add afterwards will belong to a new <see cref="GeometryContent"/> object.
+        /// </remarks>
         public void SetOpaqueData(OpaqueDataDictionary opaqueData)
         {
-            _currentGeometryContent = new GeometryContent();
-            _meshContent.Geometry.Add(_currentGeometryContent);
-            _currentGeometryContent.OpaqueData.Add("default", opaqueData);
+            if (_currentOpaqueData == opaqueData)
+                return;
+
+            _currentOpaqueData = opaqueData;
+            _geometryDirty = true;
         }
 
         /// <summary>
@@ -149,13 +217,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="vertexDataIndex">Index of the vertex data channel being set. This should match the index returned by CreateVertexChannel.</param>
         /// <param name="channelData">New data values for the vertex data. The data type being set must match the data type for the vertex channel specified by vertexDataIndex.</param>
-        public void SetVertexChannelData(int vertexDataIndex, Object channelData)
+        public void SetVertexChannelData(int vertexDataIndex, object channelData)
         {
             if (_currentGeometryContent.Vertices.Channels[vertexDataIndex].ElementType != channelData.GetType())
-                throw new InvalidOperationException(string.Format("Chanel {0} data has a different type from input. Expected: {1}. Actual {2}",
+                throw new InvalidOperationException(string.Format("Channel {0} data has a different type from input. Expected: {1}. Actual: {2}",
                     vertexDataIndex, _currentGeometryContent.Vertices.Channels[vertexDataIndex].ElementType, channelData.GetType()));
 
-            _currentGeometryContent.Vertices.Channels[vertexDataIndex].Items.Add(channelData);
+            _vertexChannelData[vertexDataIndex] = channelData;
         }
 
         /// <summary>
