@@ -535,7 +535,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var scaleVec = new Vector2(scale, scale);
             var source = new SpriteFont.CharacterSource(text);
             spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, layerDepth);
-		}
+        }
 
         /// <summary>
         /// Submit a text string of sprites for drawing in the current batch.
@@ -544,7 +544,30 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
-        /// <param name="rotation">An optional rotation of this string. 0 by default</param>
+        /// <param name="rotation">Rotation of this string.</param>
+        /// <param name="origin">Center of rotation. Uses <see cref="Vector2.Zero"/> if null.</param>
+        /// <param name="scale">Scale vector of this string. Uses <see cref="Vector2.One"/> if null.</param>
+        /// <param name="effects">Modificators for drawing. Can be combined. Uses <see cref="SpriteEffects.None"/> by default.</param>
+        /// <param name="layerDepth">A depth of the layer of this string.</param>
+		public void DrawString(
+            SpriteFont spriteFont, string text, Vector2 position, Color color,
+            float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
+        {
+            CheckValid(spriteFont, text);
+
+            var source = new SpriteFont.CharacterSource(text);
+            
+            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effects, layerDepth);
+        }
+
+        /// <summary>
+        /// Submit a text string of sprites for drawing in the current batch.
+        /// </summary>
+        /// <param name="spriteFont">A font.</param>
+        /// <param name="text">The text which will be drawn.</param>
+        /// <param name="position">The drawing location on screen.</param>
+        /// <param name="color">A color mask.</param>
+        /// <param name="rotation">An optional rotation of this string. 0 by default.</param>
         /// <param name="origin">An optional center of rotation. Uses <see cref="Vector2.Zero"/> if null.</param>
         /// <param name="scale">An optional scale vector of this string. Uses <see cref="Vector2.One"/> if null.</param>
         /// <param name="effects">An optional modificators for drawing. Can be combined. Uses <see cref="SpriteEffects.None"/> by default.</param>
