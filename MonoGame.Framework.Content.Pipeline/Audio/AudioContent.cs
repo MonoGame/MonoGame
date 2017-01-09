@@ -137,7 +137,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                         fs.Read(rawData, 0, rawData.Length);
                     }
 
-                    var stripped = DefaultAudioProfile.StripRiffWaveHeader(rawData);
+                    AudioFormat riffAudioFormat;
+                    var stripped = DefaultAudioProfile.StripRiffWaveHeader(rawData, out riffAudioFormat);
+
+                    if (riffAudioFormat != null)
+                    {
+                        if (_format.BlockAlign != riffAudioFormat.BlockAlign)
+                            throw new InvalidOperationException("Calcualted block align does not match RIFF " + _format.BlockAlign + " : " + riffAudioFormat.BlockAlign);
+                        if (_format.ChannelCount != riffAudioFormat.ChannelCount || _format.Format != riffAudioFormat.Format
+                            || _format.SampleRate != riffAudioFormat.SampleRate || _format.AverageBytesPerSecond != riffAudioFormat.AverageBytesPerSecond)
+                            throw new InvalidOperationException("Probed audio format does not match RIFF");
+                    }
+
                     _data = Array.AsReadOnly(stripped);
                 }
             }

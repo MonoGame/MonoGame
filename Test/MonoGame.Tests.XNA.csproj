@@ -399,6 +399,15 @@
     <Content Include="Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_False_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-0.0004f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_-1.0f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\RasterizerState\DepthBiasVisualTest_1.0f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\ReferenceImages\RasterizerState\VisualTestCullMode_CullClockwiseFace_.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
