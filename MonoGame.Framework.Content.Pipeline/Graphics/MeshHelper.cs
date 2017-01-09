@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -373,16 +374,73 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return results;
         }
 
+        /// <summary>
+        /// Merge any positions in the <see cref="PositionCollection"/> of the
+        /// specified mesh that are at a distance less than the specified tolerance
+        /// from each other.
+        /// </summary>
+        /// <param name="mesh">Mesh to be processed.</param>
+        /// <param name="tolerance">Tolerance value that determines how close 
+        /// positions must be to each other to be merged.</param>
+        /// <remarks>
+        /// This method will also update the <see cref="VertexContent.PositionIndices"/>
+        /// in the <see cref="GeometryContent"/> of the specified mesh.
+        /// </remarks>
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
         {
-            throw new NotImplementedException();
+            for (var i = mesh.Positions.Count - 1; i >= 1; i--)
+            {
+                var pi = mesh.Positions[i];
+                for (var j = i - 1; j >= 0; j--)
+                {
+                    var pj = mesh.Positions[j];
+                    if (Vector3.Distance(pi, pj) <= tolerance)
+                    {
+                        UpdatePositionIndices(mesh, i, j);
+                        mesh.Positions.RemoveAt(i);
+                    }
+                }
+            }
         }
 
+        /// <summary>
+        /// Merge vertices with the same <see cref="VertexContent.PositionIndices"/> and
+        /// <see cref="VertexChannel"/> data within the specified
+        /// <see cref="GeometryContent"/>.
+        /// </summary>
+        /// <param name="geometry">Geometry to be processed.</param>
         public static void MergeDuplicateVertices(GeometryContent geometry)
         {
-            throw new NotImplementedException();
+            var verts = geometry.Vertices;
+            for (var i = verts.VertexCount - 1; i >= 1; i--)
+            {
+                for (var j = i - 1; j >= 0; j--)
+                {
+                    if (verts.PositionIndices[i] != verts.PositionIndices[j])
+                        continue;
+
+                    if (verts.Channels.Any(channel => channel[i] != channel[j]))
+                        continue;
+
+                    // vertices are equal, so let's merge them
+                    for (var index = 0; index < geometry.Indices.Count; index++)
+                    {
+                        if (geometry.Indices[index] == i)
+                            geometry.Indices[index] = j;
+                    }
+
+                    verts.RemoveAt(i);
+                }
+            }
         }
 
+        /// <summary>
+        /// Merge vertices with the same <see cref="VertexContent.PositionIndices"/> and
+        /// <see cref="VertexChannel"/> data within the <see cref="MeshContent.Geometry"/>
+        /// of this mesh. If you want to merge positions too, call 
+        /// <see cref="MergeDuplicatePositions"/> on your mesh before this function.
+        /// </summary>
+        /// <param name="mesh">Mesh to be processed</param>
         public static void MergeDuplicateVertices(MeshContent mesh)
         {
             foreach (var geom in mesh.Geometry)
@@ -436,7 +494,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (transform == Matrix.Identity)
                 return;
 
-            Matrix inverseTransform = Matrix.Invert(transform);
+            var inverseTransform = Matrix.Invert(transform);
 
             var work = new Stack<NodeContent>();
             work.Push(scene);
@@ -483,5 +541,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             float d = Vector3.Dot(xform.Right, Vector3.Cross(xform.Forward, xform.Up));
             return d < 0.0f;
         }
+
+        #region Private helper functions
+
+        private static void UpdatePositionIndices(MeshContent mesh, int from, int to)
+        {
+            foreach (var geom in mesh.Geometry)
+            {
+                for (var i = 0; i < geom.Vertices.PositionIndices.Count; i++)
+                {
+                    var index = geom.Vertices.PositionIndices[i];
+                    if (index == from)
+                        geom.Vertices.PositionIndices[i] = to;
+                }
+            }
+        }
+
+        #endregion
     }
 }
