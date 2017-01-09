@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// Provides methods and properties for maintaining a vertex channel.
     /// This is a generic implementation of VertexChannel and, therefore, can handle strongly typed content data.
     /// </summary>
-    public sealed class VertexChannel<T> : VertexChannel, IList<T> where T : struct
+    public sealed class VertexChannel<T> : VertexChannel, IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable
     {
         List<T> items;
 
