@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tests.ContentPipeline
 {
-    class MeshBuilderTests
+    internal class MeshBuilderTests
     {
         private readonly BasicMaterialContent material1 = new BasicMaterialContent
         {
@@ -26,30 +28,36 @@ namespace MonoGame.Tests.ContentPipeline
             VertexColorEnabled = true,
         };
 
-        private MeshContent CreateBasicMesh()
+        private static MeshContent CreateBasicMesh(MaterialContent material)
         {
-            MeshBuilder builder = MeshBuilder.StartMesh("Mesh1");
+            var builder = MeshBuilder.StartMesh("Mesh1");
+            builder.SetMaterial(material);
+            CreatePositions(builder);
+            AddVertices(builder);
+            return builder.FinishMesh();
+        }
 
+        private static void CreatePositions(MeshBuilder builder)
+        {
             builder.CreatePosition(new Vector3(0, 0, 0));
             builder.CreatePosition(new Vector3(1, 0, 0));
             builder.CreatePosition(new Vector3(1, 1, 1));
+        }
 
-            builder.SetMaterial(material1);
-
+        private static void AddVertices(MeshBuilder builder)
+        {
             builder.AddTriangleVertex(0);
             builder.AddTriangleVertex(1);
             builder.AddTriangleVertex(2);
-
-            return builder.FinishMesh();
         }
 
         private MeshContent CreateTwoMaterialsMesh()
         {
-            MeshBuilder builder = MeshBuilder.StartMesh("Mesh2");
+            var builder = MeshBuilder.StartMesh("Mesh2");
 
-            int firstPos = builder.CreatePosition(new Vector3(0, 0, 0));
-            int secondPos =  builder.CreatePosition(new Vector3(1, 0, 0));
-            int thirdPos = builder.CreatePosition(new Vector3(1, 1, 1));
+            var firstPos = builder.CreatePosition(new Vector3(0, 0, 0));
+            var secondPos =  builder.CreatePosition(new Vector3(1, 0, 0));
+            var thirdPos = builder.CreatePosition(new Vector3(1, 1, 1));
 
             builder.SetMaterial(material1);
 
@@ -69,7 +77,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BasicMeshBuilderTest()
         {
-            var output = CreateBasicMesh();
+            var output = CreateBasicMesh(material1);
 
             Assert.NotNull(output);
             Assert.NotNull(output.Geometry);
@@ -88,6 +96,10 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(0, output.Geometry[0].Vertices.PositionIndices[0]);
             Assert.AreEqual(1, output.Geometry[0].Vertices.PositionIndices[1]);
             Assert.AreEqual(2, output.Geometry[0].Vertices.PositionIndices[2]);
+
+            Assert.AreEqual(new Vector3(0, 0, 0), output.Geometry[0].Vertices.Positions[0]);
+            Assert.AreEqual(new Vector3(1, 0, 0), output.Geometry[0].Vertices.Positions[1]);
+            Assert.AreEqual(new Vector3(1, 1, 1), output.Geometry[0].Vertices.Positions[2]);
 
             //Check if normals are generated
             Assert.NotNull(output.Geometry[0].Vertices.Channels[VertexChannelNames.Normal(0)]);
@@ -113,31 +125,262 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(0, output.Geometry[0].Indices[0]);
             Assert.AreEqual(1, output.Geometry[0].Indices[1]);
             Assert.AreEqual(2, output.Geometry[0].Indices[2]);
-
-            Assert.AreEqual(material1, output.Geometry[0].Material);
+            Assert.AreSame(material1, output.Geometry[0].Material);
 
             Assert.AreEqual(0, output.Geometry[1].Indices[0]);
             Assert.AreEqual(1, output.Geometry[1].Indices[1]);
             Assert.AreEqual(2, output.Geometry[1].Indices[2]);
-            Assert.AreEqual(material2, output.Geometry[1].Material);
+            Assert.AreSame(material2, output.Geometry[1].Material);
 
             Assert.AreEqual(3, output.Positions.Count);
             Assert.AreEqual("Mesh2", output.Name);
         }
 
         [Test]
-        public void ThrowsInvalidOperationExceptionMeshBuilderTest()
+        public void CannotCallCreateMethodsAfterAddingVertex()
         {
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                MeshBuilder builder = MeshBuilder.StartMesh("Mesh1");
+            var builder = MeshBuilder.StartMesh("Mesh1");
+            builder.CreatePosition(new Vector3(0, 0, 0));
+            builder.AddTriangleVertex(0);
+            Assert.Throws<InvalidOperationException>(
+                () => builder.CreatePosition(new Vector3(1, 2, 3)));
+            Assert.Throws<InvalidOperationException>(
+                () => builder.CreateVertexChannel<Vector2>(VertexChannelNames.TextureCoordinate(0)));
+        }
 
-                builder.CreatePosition(new Vector3(0, 0, 0));
+        [Test]
+        public void TestDefaultPropertyValues()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            Assert.IsFalse(mb.MergeDuplicatePositions);
+            Assert.IsFalse(mb.SwapWindingOrder);
+            Assert.AreEqual(0f, mb.MergePositionTolerance);
+        }
 
-                builder.AddTriangleVertex(0);
+        [Test]
+        public void CreateMeshWithoutMaterial()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
 
-                builder.CreatePosition(new Vector3(0, 0, 0));
-            });
+            CreatePositions(mb);
+            AddVertices(mb);
+
+            var mesh = mb.FinishMesh();
+            Assert.AreEqual(1, mesh.Geometry.Count);
+            var geom = mesh.Geometry[0];
+            Assert.IsNull(geom.Material);
+        }
+
+        [Test]
+        public void CreateEmptyMesh()
+        {
+            const string name = "Test";
+            var mb = MeshBuilder.StartMesh(name);
+            var mesh = mb.FinishMesh();
+            Assert.AreEqual(name, mesh.Name);
+            Assert.IsEmpty(mesh.Positions);
+            Assert.IsEmpty(mesh.Geometry);
+            Assert.IsEmpty(mesh.Animations);
+            Assert.IsEmpty(mesh.Children);
+            Assert.IsEmpty(mesh.OpaqueData);
+            Assert.AreEqual(Matrix.Identity, mesh.AbsoluteTransform);
+            Assert.AreEqual(Matrix.Identity, mesh.Transform);
+            Assert.IsNull(mesh.Parent);
+            Assert.IsNull(mesh.Identity);
+        }
+
+        [Test]
+        public void SetMaterialDoesNotClearChannels()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            var mat = new BasicMaterialContent();
+
+            mb.CreateVertexChannel<Vector2>(VertexChannelNames.TextureCoordinate(0));
+            mb.SetMaterial(mat);
+            Assert.DoesNotThrow(() => mb.SetVertexChannelData(0, Vector2.Zero));
+        }
+
+        [Test]
+        public void SetMaterialOrOpaqueDataCreatesNewGeometry()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            CreatePositions(mb);
+            AddVertices(mb);
+
+            var d1 = new OpaqueDataDictionary {{"Name", "Data1"}};
+            mb.SetOpaqueData(d1);
+            AddVertices(mb);
+            
+            mb.SetMaterial(material1);
+            AddVertices(mb);
+
+            var d2 = new OpaqueDataDictionary {{"Name", "Data2"}};
+            mb.SetOpaqueData(d2);
+            AddVertices(mb);
+
+            mb.SetMaterial(material2);
+            AddVertices(mb);
+
+            // this one won't get added because we don't add any vertices anymore
+            var d3 = new OpaqueDataDictionary {{"Name", "Data3"}};
+            mb.SetOpaqueData(d3);
+
+            var mesh = mb.FinishMesh();
+            Assert.AreEqual(5, mesh.Geometry.Count);
+
+            Assert.IsNull(mesh.Geometry[0].Material);
+            Assert.IsEmpty(mesh.Geometry[0].OpaqueData);
+
+            Assert.IsNull(mesh.Geometry[1].Material);
+            Assert.AreEqual(d1, mesh.Geometry[1].OpaqueData);
+            Assert.AreNotSame(d1, mesh.Geometry[1].OpaqueData);
+
+            Assert.AreSame(material1, mesh.Geometry[2].Material);
+            Assert.AreEqual(d1, mesh.Geometry[2].OpaqueData);
+            Assert.AreNotSame(d1, mesh.Geometry[2].OpaqueData);
+
+            Assert.AreSame(material1, mesh.Geometry[3].Material);
+            Assert.AreEqual(d2, mesh.Geometry[3].OpaqueData);
+            Assert.AreNotSame(d2, mesh.Geometry[3].OpaqueData);
+
+            Assert.AreSame(material2, mesh.Geometry[4].Material);
+            Assert.AreEqual(d2, mesh.Geometry[4].OpaqueData);
+            Assert.AreNotSame(d2, mesh.Geometry[4].OpaqueData);
+        }
+
+        [Test]
+        public void DuplicateGeometryIsOnlyAddedOnce()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            CreatePositions(mb);
+
+            mb.SetMaterial(material1);
+            var d1 = new OpaqueDataDictionary {{"Name", "Data1"}};
+            mb.SetOpaqueData(d1);
+            AddVertices(mb);
+
+            mb.SetMaterial(material1);
+            mb.SetOpaqueData(d1);
+            AddVertices(mb);
+
+            var mesh = mb.FinishMesh();
+            Assert.AreEqual(1, mesh.Geometry.Count);
+            Assert.AreSame(material1, mesh.Geometry[0].Material);
+        }
+
+        [Test]
+        public void EmptyGeometryIsNotAdded()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            CreatePositions(mb);
+
+            var d2 = new OpaqueDataDictionary {{"Name", "Data2"}};
+            mb.SetOpaqueData(d2);
+            var d1 = new OpaqueDataDictionary {{"Name", "Data1"}};
+            mb.SetOpaqueData(d1);
+            mb.SetMaterial(material1);
+            AddVertices(mb);
+
+            var mesh = mb.FinishMesh();
+            Assert.AreEqual(1, mesh.Geometry.Count);
+            Assert.AreEqual(d1, mesh.Geometry[0].OpaqueData);
+            Assert.AreEqual(material1, mesh.Geometry[0].Material);
+        }
+
+        [Test]
+        public void SetChannelData()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            mb.SetMaterial(material1);
+
+            var channelIndex = mb.CreateVertexChannel<Vector2>(VertexChannelNames.TextureCoordinate(0));
+            var p1 = mb.CreatePosition(0f, 0f, 0f);
+            var p2 = mb.CreatePosition(1f, 0f, 0f);
+            var p3 = mb.CreatePosition(0f, 1f, 0f);
+            var t1 = Vector2.Zero;
+            var t2 = Vector2.UnitX;
+            var t3 = Vector2.UnitY;
+
+            // this should be overwritten by the next call
+            mb.SetVertexChannelData(channelIndex, t3);
+            mb.SetVertexChannelData(channelIndex, t1);
+
+            // setting the material here should not reset the channel data
+            mb.SetMaterial(material2);
+
+            mb.AddTriangleVertex(p1);
+            mb.SetVertexChannelData(channelIndex, t2);
+            mb.AddTriangleVertex(p2);
+            mb.SetVertexChannelData(channelIndex, t3);
+            mb.AddTriangleVertex(p3);
+
+            var mesh = mb.FinishMesh();
+            var geom = mesh.Geometry[0];
+            var texChannel = geom.Vertices.Channels[channelIndex];
+            Assert.AreEqual(t1, texChannel[0]);
+            Assert.AreEqual(t2, texChannel[1]);
+            Assert.AreEqual(t3, texChannel[2]);
+        }
+
+        // XNA sets the default value for the channel data for a value type channel
+        // and to null for a reference type. This will cause a NullReferenceException when you try 
+        // to finish the mesh. MonoGame only allows value types.
+        [Test]
+        public void MissingChannelData()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            mb.SetMaterial(material1);
+
+            var channelIndex = mb.CreateVertexChannel<Vector2>(VertexChannelNames.TextureCoordinate(0));
+            var p1 = mb.CreatePosition(0f, 0f, 0f);
+            var p2 = mb.CreatePosition(1f, 0f, 0f);
+            var p3 = mb.CreatePosition(0f, 1f, 0f);
+
+            mb.AddTriangleVertex(p1);
+            mb.AddTriangleVertex(p2);
+            mb.AddTriangleVertex(p3);
+
+            var mesh = mb.FinishMesh();
+            Assert.AreEqual(default(Vector2), mesh.Geometry[0].Vertices.Channels[channelIndex][0]);
+            Assert.AreEqual(default(Vector2), mesh.Geometry[0].Vertices.Channels[channelIndex][1]);
+            Assert.AreEqual(default(Vector2), mesh.Geometry[0].Vertices.Channels[channelIndex][2]);
+        }
+
+        [Test]
+        public void OnlyUseOnce()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            var mat = new BasicMaterialContent();
+
+            mb.CreateVertexChannel<Vector2>(VertexChannelNames.TextureCoordinate(0));
+            mb.CreatePosition(0f, 0f, 0f);
+
+            var mesh = mb.FinishMesh();
+            Assert.DoesNotThrow(() => mb.SetMaterial(mat));
+            Assert.DoesNotThrow(() => mb.SetVertexChannelData(0, Vector2.Zero));
+            Assert.AreSame(mesh, mb.FinishMesh());
+
+            Assert.Throws<InvalidOperationException>(() => mb.CreatePosition(1f, 2f, 3f));
+            Assert.Throws<InvalidOperationException>(() => mb.AddTriangleVertex(0));
+            Assert.Throws<InvalidOperationException>(() => mb.CreateVertexChannel<Vector2>(VertexChannelNames.TextureCoordinate(1)));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void DoNotMergePositionsUntilFinish(bool value)
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            mb.SetMaterial(material1);
+            mb.MergePositionTolerance = 5f;
+
+            var i = mb.CreatePosition(new Vector3(0f, 0f, 0f));
+            // this should be out of range.
+            Assert.AreNotEqual(i, mb.CreatePosition(new Vector3(4f, 4f, 4f)));
+            Assert.AreNotEqual(i, mb.CreatePosition(new Vector3(-1f, -1f, -1f)));
+
+            mb.MergeDuplicatePositions = value;
+            var mesh = mb.FinishMesh();
+            Assert.AreEqual(value ? 2 : 3, mesh.Positions.Count);
         }
     }
 }
