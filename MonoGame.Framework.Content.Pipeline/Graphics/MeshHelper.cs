@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 
@@ -413,25 +414,44 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void MergeDuplicateVertices(GeometryContent geometry)
         {
             var verts = geometry.Vertices;
-            for (var i = verts.VertexCount - 1; i >= 1; i--)
+            var hashMap = new Dictionary<int, List<VertexData>>();
+
+            var indices = new IndexUpdateList(geometry.Indices);
+
+    outer:  for (var i = verts.VertexCount - 1; i >= 1; i--)
             {
-                for (var j = i - 1; j >= 0; j--)
+                var idata = new VertexData
                 {
-                    if (verts.PositionIndices[i] != verts.PositionIndices[j])
-                        continue;
+                    Index = geometry.Indices[i],
+                    PositionIndex = verts.PositionIndices[i],
+                    ChannelData = new object[verts.Channels.Count]
+                };
+                
+                for (var channel = 0; channel < verts.Channels.Count; channel++)
+                    idata.ChannelData[channel] = verts.Channels[channel][i];
 
-                    if (verts.Channels.Any(channel => channel[i] != channel[j]))
-                        continue;
+                var hash = idata.ComputeHash();
 
-                    // vertices are equal, so let's merge them
-                    for (var index = 0; index < geometry.Indices.Count; index++)
+                List<VertexData> candidates;
+                if (hashMap.TryGetValue(hash, out candidates))
+                {
+                    foreach (var c in candidates)
                     {
-                        if (geometry.Indices[index] == i)
-                            geometry.Indices[index] = j;
-                    }
+                        if (!idata.ContentEquals(c))
+                            continue;
 
-                    verts.RemoveAt(i);
-                    break;
+                        // Match! Update the corresponding indices and remove the vertex
+                        indices.Update(i, c.Index);
+                        verts.RemoveAt(i);
+                        goto outer;
+                    }
+                    // no match, add the vertex to the list
+                    candidates.Add(idata);
+                }
+                else
+                {
+                    // no vertices with the same hash yet, create a new list for the data
+                    hashMap.Add(hash, new List<VertexData> { idata });
                 }
             }
         }
@@ -544,7 +564,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return d < 0.0f;
         }
 
-        #region Private helper functions
+        #region Private helpers
 
         private static void UpdatePositionIndices(MeshContent mesh, int from, int to)
         {
@@ -556,6 +576,106 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     if (index == from)
                         geom.Vertices.PositionIndices[i] = to;
                 }
+            }
+        }
+
+        private class VertexData
+        {
+            public int Index;
+            public int PositionIndex;
+            public object[] ChannelData;
+
+            // Compute a hash based on PositionIndex and ChannelData
+            public int ComputeHash()
+            {
+                var hash = PositionIndex;
+                foreach (var channel in ChannelData)
+                    hash ^= channel.GetHashCode();
+
+                return hash;
+            }
+
+            // Check equality on PositionIndex and ChannelData
+            public bool ContentEquals(VertexData other)
+            {
+                if (PositionIndex != other.PositionIndex)
+                    return false;
+
+                if (ChannelData.Length != other.ChannelData.Length)
+                    return false;
+
+                for (var i = 0; i < ChannelData.Length; i++)
+                {
+                    if (ChannelData[i] != other.ChannelData[i])
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        private struct IndirectValue : IComparable<IndirectValue>
+        {
+            public int Position;
+            public int Value;
+
+            public int CompareTo(IndirectValue other)
+            {
+                return Value - other.Value;
+            }
+        }
+
+        // takes an IndexCollection and can efficiently update index values
+        private class IndexUpdateList
+        {
+            private readonly IndexCollection _collectionToUpdate;
+            private readonly List<IndirectValue> _indirectValues;
+            private readonly Dictionary<int, List<int>> _startPositions;
+
+            // create the list, presort the values and compute the start positions of each value
+            public IndexUpdateList(IndexCollection collectionToUpdate)
+            {
+                _collectionToUpdate = collectionToUpdate;
+                _indirectValues = new List<IndirectValue>(_collectionToUpdate.Count);
+                _startPositions = new Dictionary<int, List<int>>();
+                Initialize();
+            }
+
+            private void Initialize()
+            {
+                for (var i = 0; i < _collectionToUpdate.Count; i++)
+                {
+                    var indirectValue = new IndirectValue
+                    {
+                        Position = i,
+                        Value = _collectionToUpdate[i]
+                    };
+                    _indirectValues.Add(indirectValue);
+                }
+
+                _indirectValues.Sort();
+
+                var currentValue = -1;
+                for (var pos = 0; pos < _indirectValues.Count; pos++)
+                {
+                    var v = _indirectValues[pos].Value;
+                    if (currentValue != v)
+                    {
+                        _startPositions.Add(currentValue, new List<int>{ pos });
+                        currentValue = v;
+                    }
+                }
+            }
+
+            public void Update(int from, int to)
+            {
+                foreach (var startPos in _startPositions[from])
+                {
+                    for (var pos = startPos; _indirectValues[pos].Value == from; pos++)
+                        _collectionToUpdate[_indirectValues[pos].Position] = to;
+                }
+
+                _startPositions[from].Add(to);
             }
         }
 
