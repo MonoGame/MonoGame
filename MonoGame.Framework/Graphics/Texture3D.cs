@@ -136,8 +136,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var height = bottom - top;
             var depth = back - front;
 
-            if (left <= 0 || top <= 0 || back <= 0 || right > texWidth || bottom > texHeight || front > texDepth)
-                throw new ArgumentException("area must remain inside texture bounds");
+            if (left < 0 || top < 0 || back < 0 || right > texWidth || bottom > texHeight || front > texDepth)
+                throw new ArgumentException("Area must remain inside texture bounds");
             // Disallow negative box size
             if (left >= right || top >= bottom || front >= back)
                 throw new ArgumentException("Neither box size nor box position can be negative");
