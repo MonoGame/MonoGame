@@ -892,26 +892,21 @@ namespace Microsoft.Xna.Framework.Net
                 return;
             }
 
-            bool done = true;
-
             foreach (PeerEndPoint endPoint in pendingEndPoints)
             {
-                if (!(Backend.IsConnectedToEndPoint(endPoint) && (Backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine))
+                if (!Backend.IsConnectedToEndPoint(endPoint) || !(Backend.FindRemotePeerByEndPoint(endPoint).Tag as NetworkMachine).HasAcknowledgedLocalMachine)
                 {
-                    done = false;
+                    return;
                 }
             }
 
-            if (done)
+            pendingEndPoints = null;
+
+            InternalMessages.FullyConnected.Create(null);
+
+            foreach (SignedInGamer pendingGamer in pendingSignedInGamers)
             {
-                pendingEndPoints = null;
-
-                InternalMessages.FullyConnected.Create(null);
-
-                foreach (SignedInGamer pendingGamer in pendingSignedInGamers)
-                {
-                    InternalMessages.GamerIdRequest.Create(HostMachine);
-                }
+                InternalMessages.GamerIdRequest.Create(HostMachine);
             }
         }
 

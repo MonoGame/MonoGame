@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             }
             else if (aS.SessionType == NetworkSessionType.PlayerMatch || aS.SessionType == NetworkSessionType.Ranked)
             {
-                // Note: Actual connect call is handled by backend once nat introduction is successful
+                // Note: Actual connect call is handled by NetworkSession once nat introduction is successful
                 NetOutgoingMessage msg = peer.CreateMessage();
                 msg.Write(peer.Configuration.AppIdentifier);
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);

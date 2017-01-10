@@ -395,7 +395,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                     {
                         RemotePeer disconnectedPeer = msg.SenderConnection.Tag as RemotePeer;
 
-                        if (disconnectedPeer != null) // If not, host responded to connect then peer disconnected
+                        if (disconnectedPeer != null) // If null, host responded to connect then peer disconnected
                         {
                             remotePeers.Remove(disconnectedPeer);
                             reportedConnections.Remove(msg.SenderConnection);
