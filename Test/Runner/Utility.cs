@@ -47,6 +47,44 @@ namespace MonoGame.Tests {
         }
     }
 
+    public class ByteComparer : IEqualityComparer<byte>
+    {
+        static public ByteComparer Equal = new ByteComparer();
+
+        private ByteComparer()
+        {
+        }
+
+        public bool Equals(byte x, byte y)
+        {
+            return x == y;
+        }
+
+        public int GetHashCode(byte obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ColorComparer : IEqualityComparer<Color>
+    {
+        static public ColorComparer Equal = new ColorComparer();
+
+        private ColorComparer()
+        {
+        }
+
+        public bool Equals(Color x, Color y)
+        {
+            return x == y;
+        }
+
+        public int GetHashCode(Color obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class FloatComparer : IEqualityComparer<float>
     {
         static public FloatComparer Epsilon = new FloatComparer(0.000001f);

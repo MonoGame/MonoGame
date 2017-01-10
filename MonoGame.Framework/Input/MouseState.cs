@@ -139,9 +139,8 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         public Point Position
         {
-            get{return new Point(_x,_y);}   
+            get { return new Point(_x, _y); }   
         }
-
         /// <summary>
         /// Gets state of the left mouse button.
         /// </summary>
@@ -189,7 +188,7 @@ namespace Microsoft.Xna.Framework.Input
 			get {
                 return _xButton1;
 			}
-            set {
+            internal set {
                 _xButton1 = value;
             }
 		}
@@ -201,7 +200,7 @@ namespace Microsoft.Xna.Framework.Input
 			get {
                 return _xButton2;
 			}
-            set {
+            internal set {
                 _xButton2 = value;
             }
 		}

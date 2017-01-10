@@ -159,6 +159,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal DepthFormat ActiveDepthFormat
+        {
+            get
+            {
+                return IsRenderTargetBound
+                    ? _currentRenderTargetBindings[0].DepthFormat
+                    : PresentationParameters.DepthStencilFormat;
+            }
+        }
+
         public GraphicsAdapter Adapter
         {
             get;
@@ -543,6 +553,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
+            // We cannot present with a RT set on the device.
+            if (_currentRenderTargetCount != 0)
+                throw new InvalidOperationException("Cannot call Present when a render target is active.");
+
             _graphicsMetrics = new GraphicsMetrics();
             PlatformPresent();
         }
@@ -661,7 +675,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if(value > GetHighestSupportedGraphicsProfile(this))
                     throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
                 _graphicsProfile = value;
-                GraphicsCapabilities.Initialize(this);
+                GraphicsCapabilities.PlatformInitialize(this);
             }
         }
 

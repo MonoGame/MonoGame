@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// The color used as blend factor when alpha blending.
         /// </summary>
         /// <remarks>
-        /// <see cref="GraphicsDevice.BlendFactor"/> is set to this value when this <see cref="BlendState"/>
+        /// <see cref="P:Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendFactor"/> is set to this value when this <see cref="BlendState"/>
         /// is bound to a GraphicsDevice.
         /// </remarks>
 	    public Color BlendFactor

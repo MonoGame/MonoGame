@@ -603,6 +603,9 @@
       <Platforms>Android,Angle,iOS,Linux,MacOS,WindowsGL,tvOS,Web</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.Default.cs">
+      <Services>ANGLEGraphics,OpenGLGraphics,DirectXGraphics,WebGraphics</Services>
+    </Compile>
     <Compile Include="Graphics\GraphicsContext.SDL.cs">
       <Platforms>WindowsGL,Linux</Platforms>
     </Compile>
