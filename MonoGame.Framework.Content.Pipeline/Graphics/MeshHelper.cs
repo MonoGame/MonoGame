@@ -43,11 +43,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </remarks>
         public static void CalculateNormals(GeometryContent geom, bool overwriteExistingNormals)
         {
+            VertexChannel<Vector3> channel;
             // Look for an existing normals channel.
             if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal()))
             {
                 // We don't have existing normals, so add a new channel.
-                geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
+                channel = geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
             }
             else
             {
@@ -55,9 +56,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // normals then we're done here.
                 if (!overwriteExistingNormals)
                     return;
+
+                channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
             }
 
-            var channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
             var positionIndices = geom.Vertices.PositionIndices;
             Debug.Assert(positionIndices.Count == channel.Count, "The position and channel sizes were different!");
 
@@ -389,6 +391,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </remarks>
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
         {
+            if (mesh == null)
+                throw new ArgumentNullException("mesh");
+
             // TODO Improve performance with spatial partitioning scheme
             var indexLists = new List<IndexUpdateList>();
             foreach (var geom in mesh.Geometry)
@@ -412,6 +417,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     }
                 }
             }
+
+            foreach (var list in indexLists)
+                list.Pack(mesh.Positions.Count);
         }
 
         /// <summary>
@@ -422,25 +430,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="geometry">Geometry to be processed.</param>
         public static void MergeDuplicateVertices(GeometryContent geometry)
         {
+            if (geometry == null)
+                throw new ArgumentNullException("geometry");
+
             var verts = geometry.Vertices;
             var hashMap = new Dictionary<int, List<VertexData>>();
 
             var indices = new IndexUpdateList(geometry.Indices);
+            var vIndex = 0;
 
-            for (var i = verts.VertexCount - 1; i >= 0; i--)
+            for (var i = 0; i < geometry.Indices.Count; i++)
             {
-                var iindex = geometry.Indices[i];
-                var idata = new VertexData
+                var iIndex = geometry.Indices[i];
+                var iData = new VertexData
                 {
-                    Index = iindex,
-                    PositionIndex = verts.PositionIndices[i],
+                    Index = iIndex,
+                    PositionIndex = verts.PositionIndices[vIndex],
                     ChannelData = new object[verts.Channels.Count]
                 };
                 
                 for (var channel = 0; channel < verts.Channels.Count; channel++)
-                    idata.ChannelData[channel] = verts.Channels[channel][i];
+                    iData.ChannelData[channel] = verts.Channels[channel][vIndex];
 
-                var hash = idata.ComputeHash();
+                var hash = iData.ComputeHash();
 
                 List<VertexData> candidates;
                 if (hashMap.TryGetValue(hash, out candidates))
@@ -448,23 +460,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
                     {
                         var c = candidates[candidateIndex];
-                        if (!idata.ContentEquals(c))
+                        if (!iData.ContentEquals(c))
                             continue;
 
                         // Match! Update the corresponding indices and remove the vertex
-                        indices.Update(c.Index, iindex);
-                        verts.RemoveAt(i);
-                        candidates.RemoveAt(candidateIndex);
-                        break;
+                        indices.Update(iIndex, c.Index);
+                        verts.RemoveAt(vIndex);
+                        goto nextOuterLoop;
                     }
-                    candidates.Add(idata);
+                    candidates.Add(iData);
                 }
                 else
                 {
                     // no vertices with the same hash yet, create a new list for the data
-                    hashMap.Add(hash, new List<VertexData> { idata });
+                    hashMap.Add(hash, new List<VertexData> { iData });
                 }
+                vIndex++;
+                nextOuterLoop: ;
             }
+
+            // update the indices because of the vertices we removed
+            indices.Pack(verts.VertexCount);
         }
 
         /// <summary>
@@ -476,6 +492,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="mesh">Mesh to be processed</param>
         public static void MergeDuplicateVertices(MeshContent mesh)
         {
+            if (mesh == null)
+                throw new ArgumentNullException("mesh");
             foreach (var geom in mesh.Geometry)
                 MergeDuplicateVertices(geom);
         }
@@ -653,6 +671,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             private readonly IList<int> _collectionToUpdate;
             private readonly List<int> _indexPositions;
             private readonly Dictionary<int, List<int>> _startPositions;
+            private readonly IndexToValueComparer _comparer;
 
             // create the list, presort the values and compute the start positions of each value
             public IndexUpdateList(IList<int> collectionToUpdate)
@@ -660,6 +679,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 _collectionToUpdate = collectionToUpdate;
                 _indexPositions = new List<int>(_collectionToUpdate.Count);
                 _startPositions = new Dictionary<int, List<int>>();
+                _comparer = new IndexToValueComparer(_collectionToUpdate);
                 Initialize();
             }
 
@@ -668,8 +688,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 for (var i = 0; i < _collectionToUpdate.Count; i++)
                     _indexPositions.Add(i);
 
-                var comparer = new IndexToValueComparer(_collectionToUpdate);
-                _indexPositions.Sort(comparer);
+                _indexPositions.Sort(_comparer);
 
                 var currentValue = -1;
                 for (var pos = 0; pos < _indexPositions.Count; pos++)
@@ -685,6 +704,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             public void Update(int from, int to)
             {
+                if (from == to)
+                    return;
+
                 foreach (var startPos in _startPositions[from])
                 {
                     for (var pos = startPos; pos < _indexPositions.Count && _collectionToUpdate[_indexPositions[pos]] == from; pos++)
@@ -693,6 +715,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 _startPositions[to].AddRange(_startPositions[from]);
                 _startPositions.Remove(from);
+            }
+
+            // Pack all indices together starting from zero
+            // E.g. [5, 5, 3, 5, 21, 3] -> [1, 1, 0, 1, 2, 0]
+            public void Pack(int distinctValues)
+            {
+                if (_collectionToUpdate.Count == 0)
+                    return;
+
+                _indexPositions.Sort(_comparer);
+
+                var lastValue = _collectionToUpdate[_indexPositions[_indexPositions.Count - 1]];
+                var newIndex = distinctValues - 1;
+                for (var i = _indexPositions.Count - 1; i >= 0; i--)
+                {
+                    var indexPos = _indexPositions[i];
+                    var thisValue = _collectionToUpdate[indexPos];
+                    if (thisValue != lastValue)
+                    {
+                        newIndex--;
+                        lastValue = thisValue;
+                    }
+
+                    _collectionToUpdate[indexPos] = newIndex;
+                }
             }
 
             private class IndexToValueComparer : Comparer<int>

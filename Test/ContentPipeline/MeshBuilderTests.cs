@@ -414,8 +414,8 @@ namespace MonoGame.Tests.ContentPipeline
             CreatePositions(mb);
 
             var channel = mb.CreateVertexChannel<float>(VertexChannelNames.TextureCoordinate(0));
-            object[] channelData1 = { 0f, 1f, 2f };
-            object[] channelData2 = { 3f, 4f, 5f };
+            object[] channelData1 = { 10f, 11f, 12f };
+            object[] channelData2 = { 20f, 21f, 22f };
 
             var currentChannelData = channelData1;
 
