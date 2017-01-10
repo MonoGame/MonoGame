@@ -651,14 +651,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private class IndexUpdateList
         {
             private readonly IList<int> _collectionToUpdate;
-            private readonly List<IndirectValue> _indirectValues;
+            private readonly List<int> _indexPositions;
             private readonly Dictionary<int, List<int>> _startPositions;
 
             // create the list, presort the values and compute the start positions of each value
             public IndexUpdateList(IList<int> collectionToUpdate)
             {
                 _collectionToUpdate = collectionToUpdate;
-                _indirectValues = new List<IndirectValue>(_collectionToUpdate.Count);
+                _indexPositions = new List<int>(_collectionToUpdate.Count);
                 _startPositions = new Dictionary<int, List<int>>();
                 Initialize();
             }
@@ -666,17 +666,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             private void Initialize()
             {
                 for (var i = 0; i < _collectionToUpdate.Count; i++)
-                {
-                    var indirectValue = new IndirectValue(i, _collectionToUpdate[i]);
-                    _indirectValues.Add(indirectValue);
-                }
+                    _indexPositions.Add(i);
 
-                _indirectValues.Sort();
+                var comparer = new IndexToValueComparer(_collectionToUpdate);
+                _indexPositions.Sort(comparer);
 
                 var currentValue = -1;
-                for (var pos = 0; pos < _indirectValues.Count; pos++)
+                for (var pos = 0; pos < _indexPositions.Count; pos++)
                 {
-                    var v = _indirectValues[pos].Value;
+                    var v = _collectionToUpdate[_indexPositions[pos]];
                     if (currentValue != v)
                     {
                         currentValue = v;
@@ -689,15 +687,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 foreach (var startPos in _startPositions[from])
                 {
-                    for (var pos = startPos; pos < _indirectValues.Count && _indirectValues[pos].Value == from; pos++)
-                    {
-                        _collectionToUpdate[_indirectValues[pos].Position] = to;
-                        _indirectValues[pos] = new IndirectValue(_indirectValues[pos].Position, to);
-                    }
+                    for (var pos = startPos; pos < _indexPositions.Count && _collectionToUpdate[_indexPositions[pos]] == from; pos++)
+                        _collectionToUpdate[_indexPositions[pos]] = to;
                 }
 
                 _startPositions[to].AddRange(_startPositions[from]);
                 _startPositions.Remove(from);
+            }
+
+            private class IndexToValueComparer : Comparer<int>
+            {
+                private readonly IList<int> _values;
+
+                public IndexToValueComparer(IList<int> values)
+                {
+                    _values = values;
+                }
+
+                public override int Compare(int x, int y)
+                {
+                    return _values[x] - _values[y];
+                }
             }
 
         }
