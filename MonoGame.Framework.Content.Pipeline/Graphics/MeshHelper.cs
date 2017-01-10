@@ -390,6 +390,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
         {
             // TODO Improve performance with spatial partitioning scheme
+            var indexLists = new List<IndexUpdateList>();
+            foreach (var geom in mesh.Geometry)
+            {
+                var list = new IndexUpdateList(geom.Vertices.PositionIndices);
+                indexLists.Add(list);
+            }
+
             for (var i = mesh.Positions.Count - 1; i >= 1; i--)
             {
                 var pi = mesh.Positions[i];
@@ -398,7 +405,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     var pj = mesh.Positions[j];
                     if (Vector3.Distance(pi, pj) <= tolerance)
                     {
-                        UpdatePositionIndices(mesh, i, j);
+                        foreach (var list in indexLists)
+                            list.Update(i, j);
                         mesh.Positions.RemoveAt(i);
                         break;
                     }
@@ -569,19 +577,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         #region Private helpers
 
-        private static void UpdatePositionIndices(MeshContent mesh, int from, int to)
-        {
-            foreach (var geom in mesh.Geometry)
-            {
-                for (var i = 0; i < geom.Vertices.PositionIndices.Count; i++)
-                {
-                    var index = geom.Vertices.PositionIndices[i];
-                    if (index == from)
-                        geom.Vertices.PositionIndices[i] = to;
-                }
-            }
-        }
-
         private class VertexData
         {
             public int Index;
@@ -642,12 +637,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         // takes an IndexCollection and can efficiently update index values
         private class IndexUpdateList
         {
-            private readonly IndexCollection _collectionToUpdate;
+            private readonly IList<int> _collectionToUpdate;
             private readonly List<IndirectValue> _indirectValues;
             private readonly Dictionary<int, List<int>> _startPositions;
 
             // create the list, presort the values and compute the start positions of each value
-            public IndexUpdateList(IndexCollection collectionToUpdate)
+            public IndexUpdateList(IList<int> collectionToUpdate)
             {
                 _collectionToUpdate = collectionToUpdate;
                 _indirectValues = new List<IndirectValue>(_collectionToUpdate.Count);
