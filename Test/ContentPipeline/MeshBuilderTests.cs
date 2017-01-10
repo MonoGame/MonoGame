@@ -12,6 +12,13 @@ namespace MonoGame.Tests.ContentPipeline
 {
     internal class MeshBuilderTests
     {
+        [Test]
+        public void NodeContentInitializesTransformToIdentity()
+        {
+            var nodeContent = new NodeContent();
+            Assert.AreEqual(Matrix.Identity, nodeContent.Transform);
+        }
+
         private readonly BasicMaterialContent material1 = new BasicMaterialContent
         {
             Name = "Material1",

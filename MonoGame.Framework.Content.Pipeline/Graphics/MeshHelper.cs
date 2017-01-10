@@ -389,6 +389,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </remarks>
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
         {
+            // TODO Improve performance with spatial partitioning scheme
             for (var i = mesh.Positions.Count - 1; i >= 1; i--)
             {
                 var pi = mesh.Positions[i];
