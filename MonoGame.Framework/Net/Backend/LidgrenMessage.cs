@@ -1,8 +1,10 @@
-﻿using Lidgren.Network;
+﻿using System;
+using System.Net;
+using Lidgren.Network;
 
 namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 {
-    internal class LidgrenOutgoingMessage : Backend.OutgoingMessage, IResetable
+    internal class LidgrenOutgoingMessage : OutgoingMessage, IResetable
     {
         internal Peer recipient;
         internal SendDataOptions options;
@@ -61,16 +63,21 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         {
             LidgrenEndPoint ep = value as LidgrenEndPoint;
 
-            Buffer.Write(ep.endPoint);
+            Buffer.Write(ep.peerGuid.ToString());
         }
 
         public override void Write(Peer value)
         {
             Buffer.Write((value as ILidgrenPeer).Id);
         }
+
+        internal void Write(IPEndPoint value)
+        {
+            Buffer.Write(value);
+        }
     }
 
-    internal class LidgrenIncomingMessage : Backend.IncomingMessage, IResetable
+    internal class LidgrenIncomingMessage : IncomingMessage, IResetable
     {
         internal LidgrenBackend Backend { get; set; }
         internal NetBuffer Buffer { get; set; }
@@ -116,7 +123,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override PeerEndPoint ReadPeerEndPoint()
         {
-            return new LidgrenEndPoint(Buffer.ReadIPEndPoint());
+            Guid guid = Guid.Parse(Buffer.ReadString());
+
+            return new LidgrenEndPoint(guid);
         }
 
         public override Peer ReadPeer()
@@ -127,6 +136,11 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         public override string ReadString()
         {
             return Buffer.ReadString();
+        }
+
+        internal IPEndPoint ReadIPEndPoint()
+        {
+            return Buffer.ReadIPEndPoint();
         }
     }
 }

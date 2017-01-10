@@ -67,13 +67,13 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             return session;
         }
 
-        private void AddAvailableNetworkSession(long id, PeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
+        private void AddAvailableNetworkSession(IPEndPoint localIPEndPoint, PeerEndPoint endPoint, NetworkSessionPublicInfo publicInfo, IEnumerable<SignedInGamer> localGamers, NetworkSessionType searchType, NetworkSessionProperties searchProperties, IList<AvailableNetworkSession> availableSessions)
         {
             if (searchType == publicInfo.sessionType && searchProperties.SearchMatch(publicInfo.sessionProperties))
             {
                 AvailableNetworkSession availableSession = new AvailableNetworkSession(endPoint, localGamers, publicInfo.maxGamers, publicInfo.privateGamerSlots, publicInfo.sessionType, publicInfo.currentGamerCount, publicInfo.hostGamertag, publicInfo.openPrivateGamerSlots, publicInfo.openPublicGamerSlots, publicInfo.sessionProperties);
 
-                availableSession.Tag = id;
+                availableSession.Tag = localIPEndPoint;
 
                 availableSessions.Add(availableSession);
             }
@@ -136,20 +136,20 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 {
                     if (rawMsg.SenderEndPoint.Equals(masterServerEndPoint))
                     {
-                        Backend.IncomingMessage msg = new LidgrenIncomingMessage(rawMsg);
-                        long hostId = msg.ReadLong();
-                        PeerEndPoint hostEndPoint = msg.ReadPeerEndPoint();
+                        IncomingMessage msg = new LidgrenIncomingMessage(rawMsg);
+                        Guid hostGuid = Guid.Parse(msg.ReadString());
                         NetworkSessionPublicInfo hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
-                        AddAvailableNetworkSession(hostId, hostEndPoint, hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
+                        AddAvailableNetworkSession(null, new LidgrenEndPoint(hostGuid), hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
                     }
                 }
                 else if (rawMsg.MessageType == NetIncomingMessageType.DiscoveryResponse)
                 {
-                    Backend.IncomingMessage msg = new LidgrenIncomingMessage(rawMsg);
+                    IncomingMessage msg = new LidgrenIncomingMessage(rawMsg);
+                    Guid hostGuid = Guid.Parse(msg.ReadString());
                     NetworkSessionPublicInfo hostPublicInfo = NetworkSessionPublicInfo.FromMessage(msg);
 
-                    AddAvailableNetworkSession(-1, new LidgrenEndPoint(rawMsg.SenderEndPoint), hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
+                    AddAvailableNetworkSession(rawMsg.SenderEndPoint, new LidgrenEndPoint(hostGuid), hostPublicInfo, localGamers, sessionType, searchProperties, availableSessions);
                 }
                 else
                 {
@@ -205,11 +205,14 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
             AvailableNetworkSession aS = availableSession;
 
             LidgrenBackend backend = new LidgrenBackend(peer);
-            NetworkSession session = new NetworkSession(backend, new PeerEndPoint[] { aS.EndPoint }, false, aS.MaxGamers, aS.PrivateGamerSlots, aS.SessionType, aS.SessionProperties, aS.LocalGamers);
+            NetworkSession session = new NetworkSession(backend, new PeerEndPoint[] { aS.HostEndPoint }, false, aS.MaxGamers, aS.PrivateGamerSlots, aS.SessionType, aS.SessionProperties, aS.LocalGamers);
 
             if (aS.SessionType == NetworkSessionType.SystemLink)
             {
-                (session as ISessionBackendListener).IntroducedAsClient(aS.EndPoint);
+                if ((session as ISessionBackendListener).AllowConnectWhenIntroducedAsClient(aS.HostEndPoint))
+                {
+                    (backend.LocalPeer as LocalPeer).Connect((IPEndPoint)aS.Tag);
+                }
             }
             else if (aS.SessionType == NetworkSessionType.PlayerMatch || aS.SessionType == NetworkSessionType.Ranked)
             {
@@ -217,7 +220,7 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
                 NetOutgoingMessage msg = peer.CreateMessage();
                 msg.Write(peer.Configuration.AppIdentifier);
                 msg.Write((byte)MasterServerMessageType.RequestIntroduction);
-                msg.Write((long)availableSession.Tag); // id
+                msg.Write((availableSession.HostEndPoint as LidgrenEndPoint).peerGuid.ToString());
                 msg.Write((backend.LocalPeer as LocalPeer).IPEndPoint);
                 peer.SendUnconnectedMessage(msg, masterServerEndPoint);
             }

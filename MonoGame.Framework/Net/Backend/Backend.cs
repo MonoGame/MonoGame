@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         NetworkSessionPublicInfo SessionPublicInfo { get; }
 
         bool AllowConnectionFromClient(PeerEndPoint endPoint);
-        void IntroducedAsClient(PeerEndPoint targetEndPoint);
+        bool AllowConnectWhenIntroducedAsClient(PeerEndPoint targetEndPoint);
         void PeerConnected(Peer peer);
         void PeerDisconnected(Peer peer);
         void ReceiveMessage(IncomingMessage data, Peer sender);
@@ -70,7 +70,6 @@ namespace Microsoft.Xna.Framework.Net.Backend
         public abstract int BytesPerSecondSent { get; set; }
 
         public abstract void Introduce(Peer client, Peer target);
-        public abstract void Connect(PeerEndPoint endPoint);
         public abstract bool IsConnectedToEndPoint(PeerEndPoint endPoint);
         public abstract Peer FindRemotePeerByEndPoint(PeerEndPoint endPoint);
         public abstract OutgoingMessage GetMessage(Peer recipient, SendDataOptions options, int channel);

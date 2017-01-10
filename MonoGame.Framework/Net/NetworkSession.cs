@@ -757,7 +757,6 @@ namespace Microsoft.Xna.Framework.Net
             if (allowlist.Contains(endPoint))
             {
                 Debug.WriteLine("Connection from client in allowlist, allowing...");
-                allowlist.Remove(endPoint);
                 return true;
             }
             else
@@ -767,22 +766,22 @@ namespace Microsoft.Xna.Framework.Net
             }
         }
 
-        void ISessionBackendListener.IntroducedAsClient(PeerEndPoint targetEndPoint)
+        bool ISessionBackendListener.AllowConnectWhenIntroducedAsClient(PeerEndPoint targetEndPoint)
         {
             if (IsHost || IsFullyConnected)
             {
-                return;
+                return false;
             }
 
             if (allowlist.Contains(targetEndPoint))
             {
                 Debug.WriteLine("Introduced to target in allowlist, connecting...");
-                allowlist.Remove(targetEndPoint);
-                Backend.Connect(targetEndPoint);
+                return true;
             }
             else
             {
                 Debug.WriteLine("Introduced to target not in allowlist, doing nothing.");
+                return false;
             }
         }
 

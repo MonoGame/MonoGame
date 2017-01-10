@@ -47,7 +47,9 @@ namespace Microsoft.Xna.Framework.Net.Messages
 
             if (!CurrentMachine.Session.hostPendingAllowlistInsertions[allowedMachine].Contains(senderMachine.peer.EndPoint))
             {
+                // Introduce both ways in order to support multiple players behind the same router
                 CurrentMachine.Session.Backend.Introduce(senderMachine.peer, allowedMachine.peer);
+                CurrentMachine.Session.Backend.Introduce(allowedMachine.peer, senderMachine.peer);
             }
         }
     }
