@@ -577,6 +577,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         #region Private helpers
 
+        private static void UpdatePositionIndices(MeshContent mesh, int from, int to)
+        {
+            foreach (var geom in mesh.Geometry)
+            {
+                for (var i = 0; i < geom.Vertices.PositionIndices.Count; i++)
+                {
+                    var index = geom.Vertices.PositionIndices[i];
+                    if (index == from)
+                        geom.Vertices.PositionIndices[i] = to;
+                }
+            }
+        }
+
         private class VertexData
         {
             public int Index;
@@ -674,7 +687,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             public void Update(int from, int to)
             {
-                foreach (var startPos in _startPositions[_indirectValues[from].Position])
+                foreach (var startPos in _startPositions[from])
                 {
                     for (var pos = startPos; pos < _indirectValues.Count && _indirectValues[pos].Value == from; pos++)
                     {
