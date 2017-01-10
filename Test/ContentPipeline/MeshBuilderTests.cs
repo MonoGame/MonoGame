@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework;
@@ -56,6 +57,16 @@ namespace MonoGame.Tests.ContentPipeline
             builder.AddTriangleVertex(0);
             builder.AddTriangleVertex(1);
             builder.AddTriangleVertex(2);
+        }
+
+        private static void AddVertices(MeshBuilder builder, int channelIndex, object[] channelData, int indexOffset = 0)
+        {
+            builder.SetVertexChannelData(channelIndex, channelData[0]);
+            builder.AddTriangleVertex(0 + indexOffset);
+            builder.SetVertexChannelData(channelIndex, channelData[1]);
+            builder.AddTriangleVertex(1 + indexOffset);
+            builder.SetVertexChannelData(channelIndex, channelData[2]);
+            builder.AddTriangleVertex(2 + indexOffset);
         }
 
         private MeshContent CreateTwoMaterialsMesh()
@@ -388,6 +399,45 @@ namespace MonoGame.Tests.ContentPipeline
             mb.MergeDuplicatePositions = value;
             var mesh = mb.FinishMesh();
             Assert.AreEqual(value ? 2 : 3, mesh.Positions.Count);
+        }
+
+        [Test]
+        public void MergeVertices()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+            mb.MergeDuplicatePositions = true;
+            mb.MergePositionTolerance = 0.2f;
+            mb.SetMaterial(material1);
+
+            // add positions twice, they should get merged too
+            CreatePositions(mb);
+            CreatePositions(mb);
+
+            var channel = mb.CreateVertexChannel<float>(VertexChannelNames.TextureCoordinate(0));
+            object[] channelData1 = { 0f, 1f, 2f };
+            object[] channelData2 = { 3f, 4f, 5f };
+
+            var currentChannelData = channelData1;
+
+            const int iterations = 10;
+            for (var i = 0; i < iterations; i++)
+            {
+                if (currentChannelData == channelData1)
+                {
+                    currentChannelData = channelData2;
+                    AddVertices(mb, channel, currentChannelData);
+                }
+                else
+                {
+                    currentChannelData = channelData1;
+                    AddVertices(mb, channel, currentChannelData, 3);
+                }
+            }
+
+            var mesh = mb.FinishMesh();
+            var geom = mesh.Geometry[0];
+            Assert.AreEqual(3 * iterations, geom.Indices.Count);
+            Assert.AreEqual(6, geom.Vertices.VertexCount);
         }
     }
 }

@@ -419,11 +419,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             var indices = new IndexUpdateList(geometry.Indices);
 
-    outer:  for (var i = verts.VertexCount - 1; i >= 1; i--)
+            for (var i = verts.VertexCount - 1; i >= 0; i--)
             {
+                var iindex = geometry.Indices[i];
                 var idata = new VertexData
                 {
-                    Index = geometry.Indices[i],
+                    Index = iindex,
                     PositionIndex = verts.PositionIndices[i],
                     ChannelData = new object[verts.Channels.Count]
                 };
@@ -436,17 +437,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 List<VertexData> candidates;
                 if (hashMap.TryGetValue(hash, out candidates))
                 {
-                    foreach (var c in candidates)
+                    for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
                     {
+                        var c = candidates[candidateIndex];
                         if (!idata.ContentEquals(c))
                             continue;
 
                         // Match! Update the corresponding indices and remove the vertex
-                        indices.Update(i, c.Index);
+                        indices.Update(c.Index, iindex);
                         verts.RemoveAt(i);
-                        goto outer;
+                        candidates.RemoveAt(candidateIndex);
+                        break;
                     }
-                    // no match, add the vertex to the list
                     candidates.Add(idata);
                 }
                 else
@@ -607,7 +609,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 for (var i = 0; i < ChannelData.Length; i++)
                 {
-                    if (ChannelData[i] != other.ChannelData[i])
+                        if (!Equals(ChannelData[i], other.ChannelData[i]))
                         return false;
                 }
 
@@ -617,12 +619,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         private struct IndirectValue : IComparable<IndirectValue>
         {
-            public int Position;
-            public int Value;
+            public readonly int Position;
+            public readonly int Value;
+
+            public IndirectValue(int position, int value)
+            {
+                Position = position;
+                Value = value;
+            }
 
             public int CompareTo(IndirectValue other)
             {
                 return Value - other.Value;
+            }
+
+            public override string ToString()
+            {
+                return string.Format("{0} {1}", Position, Value);
             }
         }
 
@@ -646,11 +659,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 for (var i = 0; i < _collectionToUpdate.Count; i++)
                 {
-                    var indirectValue = new IndirectValue
-                    {
-                        Position = i,
-                        Value = _collectionToUpdate[i]
-                    };
+                    var indirectValue = new IndirectValue(i, _collectionToUpdate[i]);
                     _indirectValues.Add(indirectValue);
                 }
 
@@ -662,22 +671,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     var v = _indirectValues[pos].Value;
                     if (currentValue != v)
                     {
-                        _startPositions.Add(currentValue, new List<int>{ pos });
                         currentValue = v;
+                        _startPositions.Add(currentValue, new List<int>{ pos });
                     }
                 }
             }
 
             public void Update(int from, int to)
             {
-                foreach (var startPos in _startPositions[from])
+                foreach (var startPos in _startPositions[_indirectValues[from].Position])
                 {
-                    for (var pos = startPos; _indirectValues[pos].Value == from; pos++)
+                    for (var pos = startPos; pos < _indirectValues.Count && _indirectValues[pos].Value == from; pos++)
+                    {
                         _collectionToUpdate[_indirectValues[pos].Position] = to;
+                        _indirectValues[pos] = new IndirectValue(_indirectValues[pos].Position, to);
+                    }
                 }
 
-                _startPositions[from].Add(to);
+                _startPositions[to].AddRange(_startPositions[from]);
+                _startPositions.Remove(from);
             }
+
         }
 
         #endregion
