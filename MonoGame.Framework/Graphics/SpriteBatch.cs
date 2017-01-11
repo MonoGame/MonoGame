@@ -799,7 +799,25 @@ namespace Microsoft.Xna.Framework.Graphics
             float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
 		{
             CheckValid(spriteFont, text);
-                        
+            
+            float sortKey = 0;
+            // set SortKey based on SpriteSortMode.
+            switch (_sortMode)
+            {
+                    // Comparison of Texture objects.
+                    case SpriteSortMode.Texture:
+                        sortKey = spriteFont.Texture.SortingKey;
+                        break;
+                    // Comparison of Depth
+                    case SpriteSortMode.FrontToBack:
+                        sortKey = layerDepth;
+                        break;
+                    // Comparison of Depth in reverse
+                    case SpriteSortMode.BackToFront:
+                        sortKey = -layerDepth;
+                        break;
+            }
+
             var flipAdjustment = Vector2.Zero;
 
             var flippedVert = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
@@ -902,23 +920,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			    var item = _batcher.CreateBatchItem();               
 			    item.Texture = spriteFont.Texture;
-
-                // set SortKey based on SpriteSortMode.
-                switch ( _sortMode )
-                {
-                    // Comparison of Texture objects.
-                    case SpriteSortMode.Texture:
-                        item.SortKey = spriteFont.Texture.SortingKey;
-                        break;
-                    // Comparison of Depth
-                    case SpriteSortMode.FrontToBack:
-                        item.SortKey = layerDepth;
-                        break;
-                    // Comparison of Depth in reverse
-                    case SpriteSortMode.BackToFront:
-                        item.SortKey = -layerDepth;
-                        break;
-                }
+                item.SortKey = sortKey;
                 
                 _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
                 _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
@@ -1092,7 +1094,25 @@ namespace Microsoft.Xna.Framework.Graphics
             float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
 		{
             CheckValid(spriteFont, text);
-                        
+            
+            float sortKey = 0;
+            // set SortKey based on SpriteSortMode.
+            switch (_sortMode)
+            {
+                    // Comparison of Texture objects.
+                    case SpriteSortMode.Texture:
+                        sortKey = spriteFont.Texture.SortingKey;
+                        break;
+                    // Comparison of Depth
+                    case SpriteSortMode.FrontToBack:
+                        sortKey = layerDepth;
+                        break;
+                    // Comparison of Depth in reverse
+                    case SpriteSortMode.BackToFront:
+                        sortKey = -layerDepth;
+                        break;
+            }
+
             var flipAdjustment = Vector2.Zero;
 
             var flippedVert = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
@@ -1194,23 +1214,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 
 			    var item = _batcher.CreateBatchItem();               
 			    item.Texture = spriteFont.Texture;
-
-                // set SortKey based on SpriteSortMode.
-                switch ( _sortMode )
-                {
-                    // Comparison of Texture objects.
-                    case SpriteSortMode.Texture:
-                        item.SortKey = spriteFont.Texture.SortingKey;
-                        break;
-                    // Comparison of Depth
-                    case SpriteSortMode.FrontToBack:
-                        item.SortKey = layerDepth;
-                        break;
-                    // Comparison of Depth in reverse
-                    case SpriteSortMode.BackToFront:
-                        item.SortKey = -layerDepth;
-                        break;
-                }
+                item.SortKey = sortKey;
                 
                 _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
                 _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
