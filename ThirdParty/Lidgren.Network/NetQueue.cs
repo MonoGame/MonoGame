@@ -22,6 +22,10 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading;
 
+//
+// Comment for Linux Mono users: reports of library thread hangs on EnterReadLock() suggests switching to plain lock() works better
+//
+
 namespace Lidgren.Network
 {
 	/// <summary>
@@ -52,12 +56,29 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Gets the number of items in the queue
 		/// </summary>
-		public int Count { get { return m_size; } }
+		public int Count {
+			get
+			{
+				m_lock.EnterReadLock();
+				int count = m_size;
+				m_lock.ExitReadLock();
+				return count;
+			}
+		}
 
 		/// <summary>
 		/// Gets the current capacity for the queue
 		/// </summary>
-		public int Capacity { get { return m_items.Length; } }
+		public int Capacity
+		{
+			get
+			{
+				m_lock.EnterReadLock();
+				int capacity = m_items.Length;
+				m_lock.ExitReadLock();
+				return capacity;
+			}
+		}
 
 		/// <summary>
 		/// NetQueue constructor

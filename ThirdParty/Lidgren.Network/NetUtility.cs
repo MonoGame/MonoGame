@@ -16,16 +16,14 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#if !__ANDROID__ && !IOS && !UNITY_WEBPLAYER && !UNITY_ANDROID && !UNITY_IPHONE
-#define IS_FULL_NET_AVAILABLE
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+using NetAddress = System.Net.IPAddress;
 #endif
 
 using System;
 using System.Net;
-
-#if IS_FULL_NET_AVAILABLE
-using System.Net.NetworkInformation;
-#endif
 
 using System.Net.Sockets;
 using System.Text;
@@ -38,24 +36,26 @@ namespace Lidgren.Network
 	/// <summary>
 	/// Utility methods
 	/// </summary>
-	public static class NetUtility
+	public static partial class NetUtility
 	{
+		private static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
+
 		/// <summary>
 		/// Resolve endpoint callback
 		/// </summary>
-		public delegate void ResolveEndPointCallback(IPEndPoint endPoint);
+		public delegate void ResolveEndPointCallback(NetEndPoint endPoint);
 
 		/// <summary>
 		/// Resolve address callback
 		/// </summary>
-		public delegate void ResolveAddressCallback(IPAddress adr);
+		public delegate void ResolveAddressCallback(NetAddress adr);
 
 		/// <summary>
 		/// Get IPv4 endpoint from notation (xxx.xxx.xxx.xxx) or hostname and port number (asynchronous version)
 		/// </summary>
 		public static void ResolveAsync(string ipOrHost, int port, ResolveEndPointCallback callback)
 		{
-			ResolveAsync(ipOrHost, delegate(IPAddress adr)
+			ResolveAsync(ipOrHost, delegate(NetAddress adr)
 			{
 				if (adr == null)
 				{
@@ -63,7 +63,7 @@ namespace Lidgren.Network
 				}
 				else
 				{
-					callback(new IPEndPoint(adr, port));
+					callback(new NetEndPoint(adr, port));
 				}
 			});
 		}
@@ -71,10 +71,18 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Get IPv4 endpoint from notation (xxx.xxx.xxx.xxx) or hostname and port number
 		/// </summary>
-		public static IPEndPoint Resolve(string ipOrHost, int port)
+		public static NetEndPoint Resolve(string ipOrHost, int port)
 		{
-			IPAddress adr = Resolve(ipOrHost);
-			return new IPEndPoint(adr, port);
+			var adr = Resolve(ipOrHost);
+			return adr == null ? null : new NetEndPoint(adr, port);
+		}
+
+		private static IPAddress s_broadcastAddress;
+		public static IPAddress GetCachedBroadcastAddress()
+		{
+			if (s_broadcastAddress == null)
+				s_broadcastAddress = GetBroadcastAddress();
+			return s_broadcastAddress;
 		}
 
 		/// <summary>
@@ -87,8 +95,8 @@ namespace Lidgren.Network
 
 			ipOrHost = ipOrHost.Trim();
 
-			IPAddress ipAddress = null;
-			if (IPAddress.TryParse(ipOrHost, out ipAddress))
+			NetAddress ipAddress = null;
+			if (NetAddress.TryParse(ipOrHost, out ipAddress))
 			{
 				if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
 				{
@@ -129,7 +137,7 @@ namespace Lidgren.Network
 					}
 
 					// check each entry for a valid IP address
-					foreach (IPAddress ipCurrent in entry.AddressList)
+					foreach (var ipCurrent in entry.AddressList)
 					{
 						if (ipCurrent.AddressFamily == AddressFamily.InterNetwork)
 						{
@@ -158,15 +166,15 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Get IPv4 address from notation (xxx.xxx.xxx.xxx) or hostname
 		/// </summary>
-		public static IPAddress Resolve(string ipOrHost)
+		public static NetAddress Resolve(string ipOrHost)
 		{
 			if (string.IsNullOrEmpty(ipOrHost))
 				throw new ArgumentException("Supplied string must not be empty", "ipOrHost");
 
 			ipOrHost = ipOrHost.Trim();
 
-			IPAddress ipAddress = null;
-			if (IPAddress.TryParse(ipOrHost, out ipAddress))
+			NetAddress ipAddress = null;
+			if (NetAddress.TryParse(ipOrHost, out ipAddress))
 			{
 				if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
 					return ipAddress;
@@ -200,56 +208,6 @@ namespace Lidgren.Network
 			}
 		}
 
-#if IS_FULL_NET_AVAILABLE
-
-		private static NetworkInterface GetNetworkInterface()
-		{
-			IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
-			if (computerProperties == null)
-				return null;
-
-			NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-			if (nics == null || nics.Length < 1)
-				return null;
-
-			NetworkInterface best = null;
-			foreach (NetworkInterface adapter in nics)
-			{
-				if (adapter.NetworkInterfaceType == NetworkInterfaceType.Loopback || adapter.NetworkInterfaceType == NetworkInterfaceType.Unknown)
-					continue;
-				if (!adapter.Supports(NetworkInterfaceComponent.IPv4))
-					continue;
-				if (best == null)
-					best = adapter;
-				if (adapter.OperationalStatus != OperationalStatus.Up)
-					continue;
-
-				// make sure this adapter has any ipv4 addresses
-				IPInterfaceProperties properties = adapter.GetIPProperties();
-				foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
-				{
-					if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
-					{
-						// Yes it does, return this network interface.
-						return adapter;
-					}
-				}
-			}
-			return best;
-		}
-
-		/// <summary>
-		/// Returns the physical (MAC) address for the first usable network interface
-		/// </summary>
-		public static PhysicalAddress GetMacAddress()
-		{
-			NetworkInterface ni = GetNetworkInterface();
-			if (ni == null)
-				return null;
-			return ni.GetPhysicalAddress();
-		}
-#endif
-
 		/// <summary>
 		/// Create a hex string from an Int64 value
 		/// </summary>
@@ -282,123 +240,11 @@ namespace Lidgren.Network
 			}
 			return new string(c);
 		}
-		
-		/// <summary>
-		/// Gets the local broadcast address
-		/// </summary>
-		public static IPAddress GetBroadcastAddress()
-		{
-#if __ANDROID__
-			try{
-			Android.Net.Wifi.WifiManager wifi = (Android.Net.Wifi.WifiManager)Android.App.Application.Context.GetSystemService(Android.App.Activity.WifiService);
-			if (wifi.IsWifiEnabled)
-			{
-				var dhcp = wifi.DhcpInfo;
-					
-				int broadcast = (dhcp.IpAddress & dhcp.Netmask) | ~dhcp.Netmask;
-	    		byte[] quads = new byte[4];
-	    		for (int k = 0; k < 4; k++)
-				{
-	      			quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
-				}
-				return new IPAddress(quads);
-			}
-			}
-			catch // Catch Access Denied Errors
-			{
-				return IPAddress.Broadcast;
-			}
-#endif		
-#if IS_FULL_NET_AVAILABLE
-			try
-			{
-				NetworkInterface ni = GetNetworkInterface();
-				if (ni == null)
-				{
-					return null;
-				}
 	
-				IPInterfaceProperties properties = ni.GetIPProperties();
-				foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
-				{
-					if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
-					{
-						var mask = unicastAddress.IPv4Mask;
-						byte[] ipAdressBytes = unicastAddress.Address.GetAddressBytes();
-				        byte[] subnetMaskBytes = mask.GetAddressBytes();
-				
-				        if (ipAdressBytes.Length != subnetMaskBytes.Length)
-				            throw new ArgumentException("Lengths of IP address and subnet mask do not match.");
-				
-				        byte[] broadcastAddress = new byte[ipAdressBytes.Length];
-				        for (int i = 0; i < broadcastAddress.Length; i++)
-				        {
-				            broadcastAddress[i] = (byte)(ipAdressBytes[i] | (subnetMaskBytes[i] ^ 255));
-				        }
-				        return new IPAddress(broadcastAddress);				
-					}
-				}
-			}
-			catch // Catch any errors 
-			{
-			    return IPAddress.Broadcast;
-			}
-#endif		
-			return IPAddress.Broadcast;
-		}
-
 		/// <summary>
-		/// Gets my local IPv4 address (not necessarily external) and subnet mask
+		/// Returns true if the endpoint supplied is on the same subnet as this host
 		/// </summary>
-		public static IPAddress GetMyAddress(out IPAddress mask)
-		{
-			mask = null;
-#if __ANDROID__
-			try
-			{
-				Android.Net.Wifi.WifiManager wifi = (Android.Net.Wifi.WifiManager)Android.App.Application.Context.GetSystemService(Android.App.Activity.WifiService);
-				if (!wifi.IsWifiEnabled) return null;
-				var dhcp = wifi.DhcpInfo;
-					
-				int addr = dhcp.IpAddress;
-	    		byte[] quads = new byte[4];
-	    		for (int k = 0; k < 4; k++)
-				{
-	      			quads[k] = (byte) ((addr >> k * 8) & 0xFF);
-				}			
-				return new IPAddress(quads);
-			}
-			catch // Catch Access Denied errors
-			{
-				return null;
-			}
-				
-#endif			
-#if IS_FULL_NET_AVAILABLE
-			NetworkInterface ni = GetNetworkInterface();
-			if (ni == null)
-			{
-				mask = null;
-				return null;
-			}
-
-			IPInterfaceProperties properties = ni.GetIPProperties();
-			foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
-			{
-				if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
-				{
-					mask = unicastAddress.IPv4Mask;
-					return unicastAddress.Address;
-				}
-			}
-#endif
-			return null;
-		}
-
-		/// <summary>
-		/// Returns true if the IPEndPoint supplied is on the same subnet as this host
-		/// </summary>
-		public static bool IsLocal(IPEndPoint endPoint)
+		public static bool IsLocal(NetEndPoint endPoint)
 		{
 			if (endPoint == null)
 				return false;
@@ -408,10 +254,10 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Returns true if the IPAddress supplied is on the same subnet as this host
 		/// </summary>
-		public static bool IsLocal(IPAddress remote)
+		public static bool IsLocal(NetAddress remote)
 		{
-			IPAddress mask;
-			IPAddress local = GetMyAddress(out mask);
+			NetAddress mask;
+			var local = GetMyAddress(out mask);
 
 			if (mask == null)
 				return false;
@@ -429,6 +275,18 @@ namespace Lidgren.Network
 		/// </summary>
 		[CLSCompliant(false)]
 		public static int BitsToHoldUInt(uint value)
+		{
+			int bits = 1;
+			while ((value >>= 1) != 0)
+				bits++;
+			return bits;
+		}
+
+		/// <summary>
+		/// Returns how many bits are necessary to hold a certain number
+		/// </summary>
+		[CLSCompliant(false)]
+		public static int BitsToHoldUInt64(ulong value)
 		{
 			int bits = 1;
 			while ((value >>= 1) != 0)
@@ -602,31 +460,10 @@ namespace Lidgren.Network
 			return bdr.ToString();
 		}
 
-		/// <summary>
-		/// Create a SHA1 digest from a string
-		/// </summary>
-		public static byte[] CreateSHA1Hash(string key)
+		public static byte[] ComputeSHAHash(byte[] bytes)
 		{
-			using (var sha = new SHA1CryptoServiceProvider())
-				return sha.ComputeHash(Encoding.UTF8.GetBytes(key));
-		}
-
-		/// <summary>
-		/// Create a SHA1 digest from a byte buffer
-		/// </summary>
-		public static byte[] CreateSHA1Hash(byte[] data)
-		{
-			using (var sha = new SHA1CryptoServiceProvider())
-				return sha.ComputeHash(data);
-		}
-
-		/// <summary>
-		/// Create a SHA1 digest from a byte buffer
-		/// </summary>
-		public static byte[] CreateSHA1Hash(byte[] data, int offset, int count)
-		{
-			using (var sha = new SHA1CryptoServiceProvider())
-				return sha.ComputeHash(data, offset, count);
+			// this is defined in the platform specific files
+			return ComputeSHAHash(bytes, 0, bytes.Length);
 		}
 	}
 }

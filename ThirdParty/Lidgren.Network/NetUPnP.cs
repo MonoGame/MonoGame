@@ -5,6 +5,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
+
 namespace Lidgren.Network
 {
 	/// <summary>
@@ -40,7 +44,7 @@ namespace Lidgren.Network
 		private NetPeer m_peer;
 		private ManualResetEvent m_discoveryComplete = new ManualResetEvent(false);
 
-		internal float m_discoveryResponseDeadline;
+		internal double m_discoveryResponseDeadline;
 
 		private UPnPStatus m_status;
 
@@ -55,7 +59,7 @@ namespace Lidgren.Network
 		public NetUPnP(NetPeer peer)
 		{
 			m_peer = peer;
-			m_discoveryResponseDeadline = float.MinValue;
+			m_discoveryResponseDeadline = double.MinValue;
 		}
 
 		internal void Discover(NetPeer peer)
@@ -67,21 +71,24 @@ namespace Lidgren.Network
 "MAN:\"ssdp:discover\"\r\n" +
 "MX:3\r\n\r\n";
 
+			m_discoveryResponseDeadline = NetTime.Now + 6.0; // arbitrarily chosen number, router gets 6 seconds to respond
 			m_status = UPnPStatus.Discovering;
 
 			byte[] arr = System.Text.Encoding.UTF8.GetBytes(str);
 
 			m_peer.LogDebug("Attempting UPnP discovery");
 			peer.Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-			peer.RawSend(arr, 0, arr.Length, new IPEndPoint(IPAddress.Broadcast, 1900));
+			peer.RawSend(arr, 0, arr.Length, new NetEndPoint(NetUtility.GetBroadcastAddress(), 1900));
 			peer.Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
-
-			// allow some extra time for router to respond
-			// System.Threading.Thread.Sleep(50);
-
-			m_discoveryResponseDeadline = (float)NetTime.Now + 6.0f; // arbitrarily chosen number, router gets 6 seconds to respond
-			m_status = UPnPStatus.Discovering;
 		}
+
+	    internal void CheckForDiscoveryTimeout()
+	    {
+	        if ((m_status != UPnPStatus.Discovering) || (NetTime.Now < m_discoveryResponseDeadline))
+                return;
+	        m_peer.LogDebug("UPnP discovery timed out");
+	        m_status = UPnPStatus.NotAvailable;
+	    }
 
 		internal void ExtractServiceUrl(string resp)
 		{
@@ -90,7 +97,9 @@ namespace Lidgren.Network
 			{
 #endif
 			XmlDocument desc = new XmlDocument();
-			desc.Load(WebRequest.Create(resp).GetResponse().GetResponseStream());
+			using (var response = WebRequest.Create(resp).GetResponse())
+				desc.Load(response.GetResponseStream());
+
 			XmlNamespaceManager nsMgr = new XmlNamespaceManager(desc.NameTable);
 			nsMgr.AddNamespace("tns", "urn:schemas-upnp-org:device-1-0");
 			XmlNode typen = desc.SelectSingleNode("//tns:device/tns:deviceType/text()", nsMgr);
@@ -182,7 +191,7 @@ namespace Lidgren.Network
 					"AddPortMapping");
 
 				m_peer.LogDebug("Sent UPnP port forward request");
-				System.Threading.Thread.Sleep(50);
+				NetUtility.Sleep(50);
 			}
 			catch (Exception ex)
 			{
@@ -256,11 +265,12 @@ namespace Lidgren.Network
 			r.ContentType = "text/xml; charset=\"utf-8\"";
 			r.ContentLength = b.Length;
 			r.GetRequestStream().Write(b, 0, b.Length);
-			XmlDocument resp = new XmlDocument();
-			WebResponse wres = r.GetResponse();
-			Stream ress = wres.GetResponseStream();
-			resp.Load(ress);
-			return resp;
+			using (WebResponse wres = r.GetResponse()) {
+				XmlDocument resp = new XmlDocument();
+				Stream ress = wres.GetResponseStream();
+				resp.Load(ress);
+				return resp;
+			}
 		}
 	}
 }

@@ -25,6 +25,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
 
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
+
 namespace Lidgren.Network
 {
 	public partial class NetPeer
@@ -37,10 +41,10 @@ namespace Lidgren.Network
 		{
 			public byte[] Data;
 			public double DelayedUntil;
-			public IPEndPoint Target;
+			public NetEndPoint Target;
 		}
 
-		internal void SendPacket(int numBytes, IPEndPoint target, int numMessages, out bool connectionReset)
+		internal void SendPacket(int numBytes, NetEndPoint target, int numMessages, out bool connectionReset)
 		{
 			connectionReset = false;
 
@@ -128,13 +132,16 @@ namespace Lidgren.Network
 			catch { }
 		}
 
-		internal bool ActuallySendPacket(byte[] data, int numBytes, IPEndPoint target, out bool connectionReset)
+		internal bool ActuallySendPacket(byte[] data, int numBytes, NetEndPoint target, out bool connectionReset)
 		{
 			connectionReset = false;
+			IPAddress ba = default(IPAddress);
 			try
 			{
+				ba = NetUtility.GetCachedBroadcastAddress();
+
 				// TODO: refactor this check outta here
-				if (target.Address == IPAddress.Broadcast)
+				if (target.Address == ba)
 				{
 					// Some networks do not allow 
 					// a global broadcast so we use the BroadcastAddress from the configuration
@@ -171,13 +178,13 @@ namespace Lidgren.Network
 			}
 			finally
 			{
-				if (target.Address == IPAddress.Broadcast)
+				if (target.Address == ba)
 					m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
 			}
 			return true;
 		}
 
-		internal bool SendMTUPacket(int numBytes, IPEndPoint target)
+		internal bool SendMTUPacket(int numBytes, NetEndPoint target)
 		{
 			try
 			{
@@ -213,7 +220,7 @@ namespace Lidgren.Network
 			return true;
 		}
 #else
-		internal bool SendMTUPacket(int numBytes, IPEndPoint target)
+		internal bool SendMTUPacket(int numBytes, NetEndPoint target)
 		{
 			try
 			{
@@ -250,16 +257,18 @@ namespace Lidgren.Network
 		//
 		// Release - just send the packet straight away
 		//
-		internal void SendPacket(int numBytes, IPEndPoint target, int numMessages, out bool connectionReset)
+		internal void SendPacket(int numBytes, NetEndPoint target, int numMessages, out bool connectionReset)
 		{
 #if USE_RELEASE_STATISTICS
 			m_statistics.PacketSent(numBytes, numMessages);
 #endif
 			connectionReset = false;
+			IPAddress ba = default(IPAddress);
 			try
 			{
 				// TODO: refactor this check outta here
-				if (target.Address == IPAddress.Broadcast)
+				ba = NetUtility.GetCachedBroadcastAddress();
+				if (target.Address == ba)
 					m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
 
 				int bytesSent = m_socket.SendTo(m_sendBuffer, 0, numBytes, SocketFlags.None, target);
@@ -288,7 +297,7 @@ namespace Lidgren.Network
 			}
 			finally
 			{
-				if (target.Address == IPAddress.Broadcast)
+				if (target.Address == ba)
 					m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
 			}
 			return;

@@ -102,6 +102,16 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
+		/// Writes a byte at a given offset in the buffer
+		/// </summary>
+		public void WriteAt(Int32 offset, byte source) {
+			int newBitLength = Math.Max(m_bitLength, offset + 8);
+			EnsureBufferSize(newBitLength);
+			NetBitWriter.WriteByte((byte) source, 8, m_data, offset);
+			m_bitLength = newBitLength;
+		}
+
+		/// <summary>
 		/// Writes a signed byte
 		/// </summary>
 		[CLSCompliant(false)]
@@ -585,6 +595,23 @@ namespace Lidgren.Network
 
 			return numBits;
 		}
+		
+	        /// <summary>
+	        /// Writes an integer with the least amount of bits need for the specified range
+	        /// Returns number of bits written
+	        /// </summary>
+	        public int WriteRangedInteger(long min, long max, long value)
+	        {
+	            NetException.Assert(value >= min && value <= max, "Value not within min/max range!");
+	
+	            ulong range = (ulong)(max - min);
+	            int numBits = NetUtility.BitsToHoldUInt64(range);
+	
+	            ulong rvalue = (ulong)(value - min);
+	            Write(rvalue, numBits);
+	
+	            return numBits;
+	        }
 
 		/// <summary>
 		/// Write a string

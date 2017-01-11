@@ -17,8 +17,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-#define IS_STOPWATCH_AVAILABLE
-
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,25 +27,8 @@ namespace Lidgren.Network
 	/// <summary>
 	/// Time service
 	/// </summary>
-	public static class NetTime
+	public static partial class NetTime
 	{
-#if IS_STOPWATCH_AVAILABLE
-		private static readonly long s_timeInitialized = Stopwatch.GetTimestamp();
-		private static readonly double s_dInvFreq = 1.0 / (double)Stopwatch.Frequency;
-
-		/// <summary>
-		/// Get number of seconds since the application started
-		/// </summary>
-		public static double Now { get { return (double)(Stopwatch.GetTimestamp() - s_timeInitialized) * s_dInvFreq; } }
-#else
-		private static readonly uint s_timeInitialized = (uint)Environment.TickCount;
-
-		/// <summary>
-		/// Get number of seconds since the application started
-		/// </summary>
-		public static double Now { get { return (double)((uint)Environment.TickCount - s_timeInitialized) / 1000.0; } }
-#endif
-
 		/// <summary>
 		/// Given seconds it will output a human friendly readable string (milliseconds if less than 60 seconds)
 		/// </summary>

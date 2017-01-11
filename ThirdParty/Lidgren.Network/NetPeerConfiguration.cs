@@ -53,10 +53,12 @@ namespace Lidgren.Network
 		internal int m_defaultOutgoingMessageCapacity;
 		internal float m_pingInterval;
 		internal bool m_useMessageRecycling;
+		internal int m_recycledCacheMaxCount;
 		internal float m_connectionTimeout;
 		internal bool m_enableUPnP;
 		internal bool m_autoFlushSendQueue;
 		private NetUnreliableSizeBehaviour m_unreliableSizeBehaviour;
+		internal bool m_suppressUnreliableUnorderedAcks;
 
 		internal NetIncomingMessageType m_disabledTypes;
 		internal int m_port;
@@ -107,9 +109,11 @@ namespace Lidgren.Network
 			m_pingInterval = 4.0f;
 			m_connectionTimeout = 25.0f;
 			m_useMessageRecycling = true;
+			m_recycledCacheMaxCount = 64;
 			m_resendHandshakeInterval = 3.0f;
 			m_maximumHandshakeAttempts = 5;
 			m_autoFlushSendQueue = true;
+			m_suppressUnreliableUnorderedAcks = false;
 
 			m_maximumTransmissionUnit = kDefaultMTU;
 			m_autoExpandMTU = false;
@@ -259,6 +263,20 @@ namespace Lidgren.Network
 		}
 
 		/// <summary>
+		/// Gets or sets the maximum number of incoming/outgoing messages to keep in the recycle cache.
+		/// </summary>
+		public int RecycledCacheMaxCount
+		{
+			get { return m_recycledCacheMaxCount; }
+			set
+			{
+				if (m_isLocked)
+					throw new NetException(c_isLockedMessage);
+				m_recycledCacheMaxCount = value;
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets the number of seconds timeout will be postponed on a successful ping/pong
 		/// </summary>
 		public float ConnectionTimeout
@@ -293,6 +311,20 @@ namespace Lidgren.Network
 		{
 			get { return m_autoFlushSendQueue; }
 			set { m_autoFlushSendQueue = value; }
+		}
+
+		/// <summary>
+		/// If true, will not send acks for unreliable unordered messages. This will save bandwidth, but disable flow control and duplicate detection for this type of messages.
+		/// </summary>
+		public bool SuppressUnreliableUnorderedAcks
+		{
+			get { return m_suppressUnreliableUnorderedAcks; }
+			set
+			{
+				if (m_isLocked)
+					throw new NetException(c_isLockedMessage);
+				m_suppressUnreliableUnorderedAcks = value;
+			}
 		}
 
 		/// <summary>

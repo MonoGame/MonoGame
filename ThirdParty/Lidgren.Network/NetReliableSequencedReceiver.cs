@@ -42,6 +42,7 @@ namespace Lidgren.Network
 
 			if (relate < 0)
 			{
+				m_connection.m_statistics.MessageDropped();
 				m_peer.LogVerbose("Received message #" + message.m_sequenceNumber + " DROPPING LATE or DUPE");
 				return;
 			}
@@ -50,6 +51,7 @@ namespace Lidgren.Network
 			if (relate > m_windowSize)
 			{
 				// too early message!
+				m_connection.m_statistics.MessageDropped();
 				m_peer.LogDebug("Received " + message + " TOO EARLY! Expected " + m_windowStart);
 				return;
 			}

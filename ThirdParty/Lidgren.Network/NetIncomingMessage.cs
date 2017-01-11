@@ -20,6 +20,10 @@ using System;
 using System.Net;
 using System.Diagnostics;
 
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
+
 namespace Lidgren.Network
 {
 	/// <summary>
@@ -29,7 +33,7 @@ namespace Lidgren.Network
 	public sealed class NetIncomingMessage : NetBuffer
 	{
 		internal NetIncomingMessageType m_incomingMessageType;
-		internal IPEndPoint m_senderEndPoint;
+		internal NetEndPoint m_senderEndPoint;
 		internal NetConnection m_senderConnection;
 		internal int m_sequenceNumber;
 		internal NetMessageType m_receivedMessageType;
@@ -52,9 +56,9 @@ namespace Lidgren.Network
 		public int SequenceChannel { get { return (int)m_receivedMessageType - (int)NetUtility.GetDeliveryMethod(m_receivedMessageType); } }
 
 		/// <summary>
-		/// IPEndPoint of sender, if any
+		/// endpoint of sender, if any
 		/// </summary>
-		public IPEndPoint SenderEndPoint { get { return m_senderEndPoint; } }
+		public NetEndPoint SenderEndPoint { get { return m_senderEndPoint; } }
 
 		/// <summary>
 		/// NetConnection of sender, if any

@@ -67,6 +67,8 @@ namespace Lidgren.Network
 				foreach (NetConnection recipient in recipients)
 				{
 					var res = recipient.EnqueueMessage(chunk, method, sequenceChannel);
+					if (res == NetSendResult.Dropped)
+						Interlocked.Decrement(ref chunk.m_recyclingCount);
 					if ((int)res > (int)retval)
 						retval = res; // return "worst" result
 				}

@@ -2334,4 +2334,19 @@ namespace Lidgren.Network
 			return ((word >> (n % 32)) & 1) > 0;
 		}
 	}
+	
+#if WINDOWS_RUNTIME
+	internal sealed class Stack
+	{
+		private System.Collections.Generic.List<object> m_list = new System.Collections.Generic.List<object>();
+		public int Count { get { return m_list.Count; } }
+		public void Push(object item) { m_list.Add(item); }
+		public object Pop()
+		{
+			var item = m_list[m_list.Count - 1];
+			m_list.RemoveAt(m_list.Count - 1);
+			return item;
+		}
+	}
+#endif
 }

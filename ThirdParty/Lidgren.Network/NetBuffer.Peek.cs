@@ -237,7 +237,7 @@ namespace Lidgren.Network
 			else
 			{
 				retval = NetBitWriter.ReadUInt32(m_data, 32, m_readPosition);
-				retval |= NetBitWriter.ReadUInt32(m_data, numberOfBits - 32, m_readPosition) << 32;
+				retval |= (UInt64)NetBitWriter.ReadUInt32(m_data, numberOfBits - 32, m_readPosition + 32) << 32;
 			}
 			return retval;
 		}

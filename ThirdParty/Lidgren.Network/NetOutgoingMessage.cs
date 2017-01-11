@@ -30,6 +30,13 @@ namespace Lidgren.Network
 	{
 		internal NetMessageType m_messageType;
 		internal bool m_isSent;
+
+		// Recycling count is:
+		// * incremented for each recipient on send
+		// * incremented, when reliable, in SenderChannel.ExecuteSend()
+		// * decremented (both reliable and unreliable) in NetConnection.QueueSendMessage()
+		// * decremented, when reliable, in SenderChannel.DestoreMessage()
+		// ... when it reaches zero it can be recycled
 		internal int m_recyclingCount;
 
 		internal int m_fragmentGroup;             // which group of fragments ths belongs to
@@ -46,7 +53,7 @@ namespace Lidgren.Network
 			m_messageType = NetMessageType.LibraryError;
 			m_bitLength = 0;
 			m_isSent = false;
-			m_recyclingCount = 0;
+			NetException.Assert(m_recyclingCount == 0);
 			m_fragmentGroup = 0;
 		}
 

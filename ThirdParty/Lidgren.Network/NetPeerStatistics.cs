@@ -105,34 +105,28 @@ namespace Lidgren.Network
 		/// <summary>
 		/// Gets the number of bytes in the recycled pool
 		/// </summary>
-		public int BytesInRecyclePool { get { return m_peer.m_storagePoolBytes; } }
+		public int BytesInRecyclePool
+		{
+			get
+			{
+				lock (m_peer.m_storagePool)
+					return m_peer.m_storagePoolBytes;
+			}
+		}
 
-#if USE_RELEASE_STATISTICS
-		internal void PacketSent(int numBytes, int numMessages)
-		{
-			m_sentPackets++;
-			m_sentBytes += numBytes;
-			m_sentMessages += numMessages;
-		}
-#else
+#if !USE_RELEASE_STATISTICS
 		[Conditional("DEBUG")]
-		internal void PacketSent(int numBytes, int numMessages)
-		{
-			m_sentPackets++;
-			m_sentBytes += numBytes;
-			m_sentMessages += numMessages;
-		}
 #endif
-
-#if USE_RELEASE_STATISTICS
-		internal void PacketReceived(int numBytes, int numMessages)
+		internal void PacketSent(int numBytes, int numMessages)
 		{
-			m_receivedPackets++;
-			m_receivedBytes += numBytes;
-			m_receivedMessages += numMessages;
+			m_sentPackets++;
+			m_sentBytes += numBytes;
+			m_sentMessages += numMessages;
 		}
-#else
+
+#if !USE_RELEASE_STATISTICS
 		[Conditional("DEBUG")]
+#endif
 		internal void PacketReceived(int numBytes, int numMessages, int numFragments)
 		{
 			m_receivedPackets++;
@@ -140,7 +134,6 @@ namespace Lidgren.Network
 			m_receivedMessages += numMessages;
 			m_receivedFragments += numFragments;
 		}
-#endif
 
 		/// <summary>
 		/// Returns a string that represents this object
@@ -157,7 +150,8 @@ namespace Lidgren.Network
 			bdr.AppendLine("Received (n/a) bytes in (n/a) messages in (n/a) packets");
 #endif
 			bdr.AppendLine("Storage allocated " + m_bytesAllocated + " bytes");
-			bdr.AppendLine("Recycled pool " + m_peer.m_storagePoolBytes + " bytes");
+			if (m_peer.m_storagePool != null)
+				bdr.AppendLine("Recycled pool " + m_peer.m_storagePoolBytes + " bytes (" + m_peer.m_storageSlotsUsedCount + " entries)");
 			return bdr.ToString();
 		}
 	}

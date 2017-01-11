@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
 
 namespace Lidgren.Network
 {
@@ -12,7 +17,7 @@ namespace Lidgren.Network
 		internal string m_disconnectMessage;
 		internal bool m_connectionInitiator;
 		internal NetIncomingMessage m_remoteHailMessage;
-		internal float m_lastHandshakeSendTime;
+		internal double m_lastHandshakeSendTime;
 		internal int m_handshakeAttempts;
 
 		/// <summary>
@@ -21,7 +26,7 @@ namespace Lidgren.Network
 		public NetIncomingMessage RemoteHailMessage { get { return m_remoteHailMessage; } }
 
 		// heartbeat called when connection still is in m_handshakes of NetPeer
-		internal void UnconnectedHeartbeat(float now)
+		internal void UnconnectedHeartbeat(double now)
 		{
 			m_peer.VerifyNetworkThread();
 
@@ -124,7 +129,7 @@ namespace Lidgren.Network
 			m_handshakeAttempts = 0;
 		}
 
-		internal void SendConnect(float now)
+		internal void SendConnect(double now)
 		{
 			m_peer.VerifyNetworkThread();
 
@@ -135,7 +140,7 @@ namespace Lidgren.Network
 			om.m_messageType = NetMessageType.Connect;
 			om.Write(m_peerConfiguration.AppIdentifier);
 			om.Write(m_peer.m_uniqueIdentifier);
-			om.Write(now);
+			om.Write((float)now);
 
 			WriteLocalHail(om);
 			
@@ -150,7 +155,7 @@ namespace Lidgren.Network
 			SetStatus(NetConnectionStatus.InitiatedConnect, "Locally requested connect");
 		}
 
-		internal void SendConnectResponse(float now, bool onLibraryThread)
+		internal void SendConnectResponse(double now, bool onLibraryThread)
 		{
 			if (onLibraryThread)
 				m_peer.VerifyNetworkThread();
@@ -159,14 +164,14 @@ namespace Lidgren.Network
 			om.m_messageType = NetMessageType.ConnectResponse;
 			om.Write(m_peerConfiguration.AppIdentifier);
 			om.Write(m_peer.m_uniqueIdentifier);
-			om.Write(now);
-
+			om.Write((float)now);
+			Interlocked.Increment(ref om.m_recyclingCount);
 			WriteLocalHail(om);
 
 			if (onLibraryThread)
 				m_peer.SendLibrary(om, m_remoteEndPoint);
 			else
-				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<System.Net.IPEndPoint, NetOutgoingMessage>(m_remoteEndPoint, om));
+				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<NetEndPoint, NetOutgoingMessage>(m_remoteEndPoint, om));
 
 			m_lastHandshakeSendTime = now;
 			m_handshakeAttempts++;
@@ -184,10 +189,11 @@ namespace Lidgren.Network
 
 			NetOutgoingMessage om = m_peer.CreateMessage(reason);
 			om.m_messageType = NetMessageType.Disconnect;
+			Interlocked.Increment(ref om.m_recyclingCount);
 			if (onLibraryThread)
 				m_peer.SendLibrary(om, m_remoteEndPoint);
 			else
-				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<System.Net.IPEndPoint, NetOutgoingMessage>(m_remoteEndPoint, om));
+				m_peer.m_unsentUnconnectedMessages.Enqueue(new NetTuple<NetEndPoint, NetOutgoingMessage>(m_remoteEndPoint, om));
 		}
 
 		private void WriteLocalHail(NetOutgoingMessage om)
@@ -231,7 +237,7 @@ namespace Lidgren.Network
 
 			m_localHailMessage = null;
 			m_handshakeAttempts = 0;
-			SendConnectResponse((float)NetTime.Now, false);
+			SendConnectResponse(NetTime.Now, false);
 		}
 
 		/// <summary>
@@ -248,7 +254,7 @@ namespace Lidgren.Network
 
 			m_localHailMessage = localHail;
 			m_handshakeAttempts = 0;
-			SendConnectResponse((float)NetTime.Now, false);
+			SendConnectResponse(NetTime.Now, false);
 		}
 
 		/// <summary>
