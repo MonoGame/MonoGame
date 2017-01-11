@@ -63,12 +63,12 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
         {
             LidgrenEndPoint ep = value as LidgrenEndPoint;
 
-            Buffer.Write(ep.peerGuid.ToString());
+            Buffer.Write(ep.ToString());
         }
 
         public override void Write(Peer value)
         {
-            Buffer.Write((value as ILidgrenPeer).Id);
+            Buffer.Write((value as LidgrenPeer).SessionId);
         }
 
         internal void Write(IPEndPoint value)
@@ -123,9 +123,9 @@ namespace Microsoft.Xna.Framework.Net.Backend.Lidgren
 
         public override PeerEndPoint ReadPeerEndPoint()
         {
-            Guid guid = Guid.Parse(Buffer.ReadString());
+            LidgrenEndPoint ep = LidgrenEndPoint.Parse(Buffer.ReadString());
 
-            return new LidgrenEndPoint(guid);
+            return ep;
         }
 
         public override Peer ReadPeer()

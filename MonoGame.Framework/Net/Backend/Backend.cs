@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Net.Backend
         NetworkSessionPublicInfo SessionPublicInfo { get; }
 
         bool AllowConnectionFromClient(PeerEndPoint endPoint);
-        bool AllowConnectWhenIntroducedAsClient(PeerEndPoint targetEndPoint);
+        bool ConnectAsClientWhenIntroducedToTarget(PeerEndPoint targetEndPoint);
         void PeerConnected(Peer peer);
         void PeerDisconnected(Peer peer);
         void ReceiveMessage(IncomingMessage data, Peer sender);
