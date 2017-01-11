@@ -74,9 +74,9 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     class Texture2DTest : GraphicsDeviceTestFixtureBase
     {
+
 #if !XNA
         [TestCase(SurfaceFormat.Color, false)]
         [TestCase(SurfaceFormat.Color, true)]

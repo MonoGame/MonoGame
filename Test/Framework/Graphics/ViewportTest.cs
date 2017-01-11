@@ -4,10 +4,12 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics {
-	class ViewportTest : GraphicsDeviceTestFixtureBase {
+	class ViewportTest : GraphicsDeviceTestFixtureBase
+    {
 		[Test]
 		public void Affects_draw_origin ()
 		{
+            CaptureRegion = new Rectangle(0, 0, 150, 150);
             PrepareFrameCapture();
 
             var spriteBatch = new SpriteBatch (gd);
@@ -46,7 +48,8 @@ namespace MonoGame.Tests.Graphics {
 
 		[Test]
 		public void Clips_SpriteBatch_draws ()
-		{
+        {
+            CaptureRegion = new Rectangle(0, 0, 150, 150);
             PrepareFrameCapture();
 
             var spriteBatch = new SpriteBatch (gd);

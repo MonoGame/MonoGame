@@ -72,7 +72,6 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     class Texture3DTest : GraphicsDeviceTestFixtureBase
     {
     }

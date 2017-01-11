@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Security.Cryptography;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.ContentPipeline;
@@ -70,8 +71,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void VisualTestAddressModes()
         {
-            PrepareFrameCapture();
-
             var addressModes = new[]
             {
                 TextureAddressMode.Border,
@@ -80,10 +79,15 @@ namespace MonoGame.Tests.Graphics
                 TextureAddressMode.Wrap
             };
 
-
             var spriteBatch = new SpriteBatch(gd);
 
             var texture = content.Load<Texture2D>(Paths.Texture("MonoGameIcon"));
+
+            var size = new Vector2(texture.Width * 2, texture.Height * 2);
+            var padding = new Vector2(10, 10);
+
+            CaptureRegion = new Rectangle(0, 0, (int) (4 * size.X + padding.X * 2), (int) (size.Y + padding.Y * 2));
+            PrepareFrameCapture();
 
             var samplerStates = new SamplerState[addressModes.Length];
             for (var i = 0; i < addressModes.Length; i++)
@@ -95,15 +99,13 @@ namespace MonoGame.Tests.Graphics
                     BorderColor = Color.Purple
                 };
 
-            var size = new Vector2(texture.Width * 2, texture.Height * 2);
-            var offset = new Vector2(10, 10);
 
             gd.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
             for (var i = 0; i < addressModes.Length; i++)
             {
                 var x = i % 4;
-                var pos = offset + new Vector2(x * size.X, 0);
+                var pos = padding + new Vector2(x * size.X, 0);
                 spriteBatch.Begin(SpriteSortMode.Deferred, samplerState: samplerStates[i]);
                 spriteBatch.Draw(texture, 
                     new Rectangle((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y),
@@ -125,8 +127,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void VisualTestComparisonFunction()
         {
-            PrepareFrameCapture();
-
             var compares = new[]
             {
                 CompareFunction.Always,
@@ -150,6 +150,12 @@ namespace MonoGame.Tests.Graphics
                 textureData[x] = x / (float) texture.Width;
             texture.SetData(textureData);
 
+            var size = new Vector2(100, 100);
+            var padding = new Vector2(10, 10);
+
+            CaptureRegion = new Rectangle(0, 0, (int) (size.X * 4 + padding.X * 2), (int) (size.Y * 2 + padding.Y * 2));
+            PrepareFrameCapture();
+
             var samplerStates = new SamplerState[compares.Length];
             for (var i = 0; i < compares.Length; i++)
                 samplerStates[i] = new SamplerState
@@ -164,8 +170,6 @@ namespace MonoGame.Tests.Graphics
             var customEffect = AssetTestUtility.CompileEffect(gd, 
                 "CustomSpriteBatchEffectComparisonSampler.fx");
 
-            var size = new Vector2(100, 100);
-            var offset = new Vector2(10, 10);
 
             gd.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
@@ -173,7 +177,7 @@ namespace MonoGame.Tests.Graphics
             {
                 var x = i % 4;
                 var y = (i > 3) ? 1 : 0;
-                var pos = offset + new Vector2(x * size.X, y * size.Y);
+                var pos = padding + new Vector2(x * size.X, y * size.Y);
 
                 spriteBatch.Begin(SpriteSortMode.Deferred, samplerState: samplerStates[i], effect: customEffect);
                 spriteBatch.Draw(texture, 

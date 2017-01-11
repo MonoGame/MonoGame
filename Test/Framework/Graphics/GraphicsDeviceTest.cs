@@ -140,7 +140,7 @@ namespace MonoGame.Tests.Graphics
 				Color.Indigo,
 				Color.Violet
 			};
-
+            
             PrepareFrameCapture(colors.Length);
 
 		    foreach (var color in colors)

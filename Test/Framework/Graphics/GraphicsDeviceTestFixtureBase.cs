@@ -154,6 +154,8 @@ namespace MonoGame.Tests.Graphics
         protected bool ExactNumberSubmits;
         protected Color ClearColor;
 
+        protected Rectangle? CaptureRegion;
+
         #endregion
 
         #region SetUp and TearDown
@@ -178,6 +180,7 @@ namespace MonoGame.Tests.Graphics
             WriteDiffs = WriteSettings.WhenFailed;
             ExactNumberSubmits = false;
             ClearColor = Color.CornflowerBlue;
+            CaptureRegion = null;
 
             Paths.SetStandardWorkingDirectory();
         }
@@ -238,8 +241,11 @@ namespace MonoGame.Tests.Graphics
                 throw new Exception("PrepareFrameCapture should only be called once.");
             _framePrepared = true;
             _totalFramesExpected = expected;
+
+            var rect = CaptureRegion ?? new Rectangle(0, 0, gd.Viewport.Width, gd.Viewport.Height);
+
 			_captureRenderTarget = new RenderTarget2D(
-				gd, gd.Viewport.Width, gd.Viewport.Height,
+				gd, rect.Width, rect.Height,
 				false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
             _submittedFrames = new List<FramePixelData>();
 
