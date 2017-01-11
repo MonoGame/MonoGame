@@ -571,9 +571,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
-
-            if (DeviceLost != null)
-                DeviceLost(this, EventArgs.Empty);
         }
 
         public void Reset(PresentationParameters presentationParameters)
