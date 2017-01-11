@@ -757,6 +757,7 @@ namespace Microsoft.Xna.Framework.Net
             if (allowlist.Contains(endPoint))
             {
                 Debug.WriteLine("Connection from client in allowlist, allowing...");
+                allowlist.Remove(endPoint);
                 return true;
             }
             else
@@ -776,6 +777,7 @@ namespace Microsoft.Xna.Framework.Net
             if (allowlist.Contains(targetEndPoint))
             {
                 Debug.WriteLine("Introduced to target in allowlist, connecting...");
+                allowlist.Remove(targetEndPoint);
                 return true;
             }
             else
