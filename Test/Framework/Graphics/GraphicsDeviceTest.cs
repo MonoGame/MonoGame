@@ -429,6 +429,9 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void DrawUserPrimitivesParameterValidation()
         {
+            // we need a clean graphics device to not have shaders bound
+            HardReset();
+
             var vertexDataNonEmpty = new[]
             {
                 new VertexPositionColorTexture(Vector3.Zero, Color.White, Vector2.Zero),
@@ -478,6 +481,9 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void DrawUserIndexedPrimitivesParameterValidation()
         {
+            // we need a clean graphics device to not have shaders bound
+            HardReset();
+
             var vertexDataNonEmpty = new[]
             {
                 new VertexPositionColorTexture(Vector3.Zero, Color.White, Vector2.Zero),

@@ -75,23 +75,5 @@ namespace MonoGame.Tests.Graphics
     [TestFixture]
     class Texture3DTest : GraphicsDeviceTestFixtureBase
     {
-        [TestCase(1, 1, 1)]
-        [TestCase(8, 8, 8)]
-        [TestCase(31, 7, 13)]
-        public void ShouldSetAndGetData(int width, int height, int depth)
-        {
-            var dataSize = width * height * depth;
-            var texture3D = new Texture3D(gd, width, height, depth, false, SurfaceFormat.Color);
-            var savedData = new Color[dataSize];
-            for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index, index, index);
-            texture3D.SetData(savedData);
-
-            var readData = new Color[dataSize];
-            texture3D.GetData(readData);
-
-            Assert.AreEqual(savedData, readData);
-
-            texture3D.Dispose();
-        }
     }
 }
