@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="MonoGame.Tests.ContentPipeline.Dictionaries">
+  <Asset Type="Dictionaries">
     <TestDictionary>
       <Item>
         <Key>23</Key>

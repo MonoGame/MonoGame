@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="GetterOnlyProperties">
+    <IntList>1 2 3</IntList>
+    <IntStringDictionary>
+      <Item>
+        <Key>1</Key>
+        <Value>Foo</Value>
+      </Item>
+      <Item>
+        <Key>5</Key>
+        <Value>Bar</Value>
+      </Item>
+    </IntStringDictionary>
+    <CustomClass>
+      <A>42</A>
+    </CustomClass>
+  </Asset>
+</XnaContent>

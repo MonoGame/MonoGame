@@ -7,6 +7,7 @@ namespace Lidgren.Network
 		public int NumSent;
 		public float LastSent;
 		public NetOutgoingMessage Message;
+		public int SequenceNumber;
 
 		public void Reset()
 		{

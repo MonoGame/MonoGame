@@ -1,13 +1,17 @@
-﻿#define CHECK_ARGS
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#define CHECK_ARGS
 #define CHECK_EOF
 //#define LOCAL_SHADOW
 
 using System;
 using System.IO;
 
-namespace Lz4
+namespace Microsoft.Xna.Framework.Utilities
 {
-	public class Lz4DecoderStream : Stream
+	internal class Lz4DecoderStream : Stream
 	{
 		public Lz4DecoderStream()
 		{

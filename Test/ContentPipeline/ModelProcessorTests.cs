@@ -14,88 +14,6 @@ namespace MonoGame.Tests.ContentPipeline
 {
     class ModelProcessorTests
     {
-        class ProcessorContext : ContentProcessorContext
-        {
-            private readonly TargetPlatform _targetPlatform;
-            private readonly string _outputFilename;
-
-            public ProcessorContext(TargetPlatform targetPlatform,
-                                        string outputFilename)
-            {
-                _targetPlatform = targetPlatform;
-                _outputFilename = outputFilename;
-            }
-
-            public override string BuildConfiguration
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override string IntermediateDirectory
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override ContentBuildLogger Logger
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override string OutputDirectory
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override string OutputFilename
-            {
-                get { return _outputFilename; }
-            }
-
-            public override OpaqueDataDictionary Parameters
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override TargetPlatform TargetPlatform
-            {
-                get { return _targetPlatform; }
-            }
-
-            public override GraphicsProfile TargetProfile
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override void AddDependency(string filename)
-            {
-            }
-
-            public override void AddOutputFile(string filename)
-            {
-            }
-
-            public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName)
-            {
-                return default(TOutput);
-            }
-
-            public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override TOutput Convert<TInput, TOutput>(TInput input, string processorName, OpaqueDataDictionary processorParameters)
-            {
-                // MaterialProcessor essentially transforms its
-                // input and returns it... not a copy.  So this
-                // seems like a reasonable shortcut for testing.
-                if (typeof(TOutput) == typeof(MaterialContent) && typeof(TInput).IsAssignableFrom(typeof(MaterialContent)))
-                    return (TOutput)((object)input);
-
-                throw new NotImplementedException();
-            }
-        }
-
         private NodeContent CreateBasicMesh()
         {
             var input = new NodeContent
@@ -163,7 +81,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var input = CreateBasicMesh();
 
-            var processorContext = new ProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            var processorContext = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
             var processor = new ModelProcessor
             {
                 RotationX = 10, 
@@ -294,6 +212,74 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.IsNotNull(material.VertexColorEnabled);
                 Assert.IsFalse(material.VertexColorEnabled.Value);
             }
+        }
+
+        [Test]
+        public void DefaultEffectTest()
+        {
+            NodeContent input;
+            {
+                input = new NodeContent();
+
+                var mesh = new MeshContent()
+                {
+                    Name = "Mesh1"
+                };
+                mesh.Positions.Add(new Vector3(0, 0, 0));
+                mesh.Positions.Add(new Vector3(1, 0, 0));
+                mesh.Positions.Add(new Vector3(1, 1, 1));
+
+                var geom = new GeometryContent();
+                geom.Vertices.Add(0);
+                geom.Vertices.Add(1);
+                geom.Vertices.Add(2);
+                geom.Indices.Add(0);
+                geom.Indices.Add(1);
+                geom.Indices.Add(2);
+
+                geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(0), new[]
+                {
+                    new Vector2(0,0),
+                    new Vector2(1,0),
+                    new Vector2(1,1),
+                });
+
+                var wieghts = new BoneWeightCollection();
+                wieghts.Add(new BoneWeight("bone1", 0.5f));
+                geom.Vertices.Channels.Add(VertexChannelNames.Weights(0), new[]
+                {
+                    wieghts, 
+                    wieghts, 
+                    wieghts
+                });
+
+                mesh.Geometry.Add(geom);
+                input.Children.Add(mesh);
+
+                var bone1 = new BoneContent { Name = "bone1", Transform = Matrix.CreateTranslation(0,1,0) };
+                input.Children.Add(bone1);
+
+                var anim = new AnimationContent()
+                {
+                    Name = "anim1",
+                    Duration = TimeSpan.Zero
+                };
+                input.Animations.Add(anim.Name, anim);
+            }
+
+            var processorContext = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            var processor = new ModelProcessor
+            {
+                DefaultEffect = MaterialProcessorDefaultEffect.SkinnedEffect,                
+            };
+
+            var output = processor.Process(input, processorContext);
+
+            // TODO: Not sure why, but XNA always returns a BasicMaterialContent 
+            // even when we specify SkinnedEffect as the default.  We need to fix
+            // the test first before we can enable the assert here.
+
+            //Assert.IsInstanceOf(typeof(SkinnedMaterialContent), output.Meshes[0].MeshParts[0].Material);
         }
     }
 }

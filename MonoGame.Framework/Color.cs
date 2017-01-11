@@ -114,6 +114,7 @@ namespace Microsoft.Xna.Framework
             MintCream = new Color(0xfffafff5);
             MistyRose = new Color(0xffe1e4ff);
             Moccasin = new Color(0xffb5e4ff);
+            MonoGameOrange = new Color(0xff003ce7);
             NavajoWhite = new Color(0xffaddeff);
             Navy = new Color(0xff800000);
             OldLace = new Color(0xffe6f5fd);
@@ -173,8 +174,8 @@ namespace Microsoft.Xna.Framework
 			//_packedValue = (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16);
         }
 
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+        /// <summary>
+        /// Constructs an RGBA color from the XYZW unit length components of a vector.
         /// </summary>
         /// <param name="color">A <see cref="Vector4"/> representing color.</param>
         public Color(Vector4 color)
@@ -187,8 +188,8 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(color.W * 255, Byte.MinValue, Byte.MaxValue);
         }
 
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+        /// <summary>
+        /// Constructs an RGBA color from the XYZ unit length components of a vector. Alpha value will be opaque.
         /// </summary>
         /// <param name="color">A <see cref="Vector3"/> representing color.</param>
         public Color(Vector3 color)
@@ -200,12 +201,12 @@ namespace Microsoft.Xna.Framework
             B = (byte)MathHelper.Clamp(color.Z * 255, Byte.MinValue, Byte.MaxValue);
             A = 255;
         }
-	
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+
+        /// <summary>
+        /// Constructs an RGBA color from a <see cref="Color"/> and an alpha value.
         /// </summary>
         /// <param name="color">A <see cref="Color"/> for RGB values of new <see cref="Color"/> instance.</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="alpha">The alpha component value from 0 to 255.</param>
         public Color(Color color, int alpha)
         {
             _packedValue = 0;
@@ -215,12 +216,12 @@ namespace Microsoft.Xna.Framework
             B = color.B;
             A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
         }
-	
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+
+        /// <summary>
+        /// Constructs an RGBA color from color and alpha value.
         /// </summary>
         /// <param name="color">A <see cref="Color"/> for RGB values of new <see cref="Color"/> instance.</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="alpha">Alpha component value from 0.0f to 1.0f.</param>
         public Color(Color color, float alpha)
         {
             _packedValue = 0;
@@ -230,13 +231,13 @@ namespace Microsoft.Xna.Framework
             B = color.B;
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
-	
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+
+        /// <summary>
+        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
         public Color(float r, float g, float b)
         {
             _packedValue = 0;
@@ -246,13 +247,13 @@ namespace Microsoft.Xna.Framework
             B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
             A = 255;
         }
-	
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+
+        /// <summary>
+        /// Constructs an RGBA color from scalars which representing red, green and blue values. Alpha value will be opaque.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
         public Color(int r, int g, int b)
         {
             _packedValue = 0;
@@ -262,13 +263,13 @@ namespace Microsoft.Xna.Framework
             A = (byte)255;
         }
 
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+        /// <summary>
+        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        /// <param name="alpha">Alpha component value from 0 to 255.</param>
         public Color(int r, int g, int b, int alpha)
         {
             _packedValue = 0;
@@ -277,14 +278,14 @@ namespace Microsoft.Xna.Framework
             B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
             A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
         }
-	
-	/// <summary>
-        /// Creates a new instance of <see cref="Color"/> struct.
+
+        /// <summary>
+        /// Constructs an RGBA color from scalars which representing red, green, blue and alpha values.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value</param>
-        /// <param name="alpha">Alpha component value.</param>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="alpha">Alpha component value from 0.0f to 1.0f.</param>
         public Color(float r, float g, float b, float alpha)
         {
             _packedValue = 0;
@@ -296,7 +297,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the blue component of <see cref="Color"/>.
+        /// Gets or sets the blue component.
         /// </summary>
         [DataMember]
         public byte B
@@ -315,7 +316,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the green component of <see cref="Color"/>.
+        /// Gets or sets the green component.
         /// </summary>
         [DataMember]
         public byte G
@@ -334,7 +335,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the red component of <see cref="Color"/>.
+        /// Gets or sets the red component.
         /// </summary>
         [DataMember]
         public byte R
@@ -353,7 +354,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the alpha component of <see cref="Color"/>.
+        /// Gets or sets the alpha component.
         /// </summary>
         [DataMember]
         public byte A
@@ -1280,6 +1281,15 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// MonoGame orange theme color (R:231,G:60,B:0,A:255).
+        /// </summary>
+        public static Color MonoGameOrange
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// NavajoWhite color (R:255,G:222,B:173,A:255).
         /// </summary>
         public static Color NavajoWhite
@@ -1732,19 +1742,19 @@ namespace Microsoft.Xna.Framework
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
-    /// <summary>
-    /// Gets a three-component <see cref="Vector3"/> representation for this object.
-    /// </summary>
-    /// <returns>A three-component <see cref="Vector3"/> representation for this object.</returns>
+        /// <summary>
+        /// Gets a <see cref="Vector3"/> representation for this object.
+        /// </summary>
+        /// <returns>A <see cref="Vector3"/> representation for this object.</returns>
         public Vector3 ToVector3()
         {
             return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
         }
 
         /// <summary>
-        /// Gets a four-component <see cref="Vector4"/> representation for this object.
+        /// Gets a <see cref="Vector4"/> representation for this object.
         /// </summary>
-        /// <returns>A four-component <see cref="Vector4"/> representation for this object.</returns>
+        /// <returns>A <see cref="Vector4"/> representation for this object.</returns>
         public Vector4 ToVector4()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);

@@ -99,6 +99,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     if (args.Length == 0)
                         continue;
 
+                    if (!kvp.Value.IsGenericTypeDefinition)
+                        continue;
+
                     if (!args[0].IsGenericType)
                         continue;
 
@@ -113,8 +116,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
                 try
                 {
-                    var concreteType = type.GetGenericArguments();
-                    result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
+                    if (chosen == null)
+                        result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type));
+                    else
+                    {
+                        var concreteType = type.GetGenericArguments();
+                        result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
+                    }
 
                     // save it for next time.
                     typeWriterMap.Add(contentTypeWriterType, result.GetType());

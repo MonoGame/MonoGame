@@ -1,29 +1,6 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -113,25 +90,13 @@ namespace Microsoft.Xna.Framework.Content
             if (sharedResourceCount <= 0)
                 return;
 
-            object[] sharedResources = new object[sharedResourceCount];
-            for (int i = 0; i < sharedResourceCount; ++i)
-            {
-                int index = Read7BitEncodedInt();
-                if (index > 0)
-                {
-                    ContentTypeReader contentReader = typeReaders[index - 1];
-                    sharedResources[i] = ReadObject<object>(contentReader);
-                }
-                else
-                {
-                    sharedResources[i] = null;
-                }
-            }
+            var sharedResources = new object[sharedResourceCount];
+            for (var i = 0; i < sharedResourceCount; ++i)
+                sharedResources[i] = InnerReadObject<object>(null);
+
             // Fixup shared resources by calling each registered action
-            foreach (KeyValuePair<int, Action<object>> fixup in sharedResourceFixups)
-            {
+            foreach (var fixup in sharedResourceFixups)
                 fixup.Value(sharedResources[fixup.Key]);
-            }
         }
 
         public T ReadExternalReference<T>()
@@ -182,35 +147,32 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>()
         {
-            int typeReaderIndex = Read7BitEncodedInt();
-        
-            if (typeReaderIndex == 0) 
-                return default(T);
-                            
-            var result = (T)typeReaders[typeReaderIndex - 1].Read(this, default(T));
-
-            RecordDisposable(result);
-
-            return result;
+            return ReadObject(default(T));
         }
 
         public T ReadObject<T>(ContentTypeReader typeReader)
         {
-            var result = (T)typeReader.Read(this, default(T));
-            
+            var result = (T)typeReader.Read(this, default(T));            
             RecordDisposable(result);
-
             return result;
         }
 
         public T ReadObject<T>(T existingInstance)
         {
-            int typeReaderIndex = Read7BitEncodedInt();
+            return InnerReadObject(existingInstance);
+        }
 
+        private T InnerReadObject<T>(T existingInstance)
+        {
+            var typeReaderIndex = Read7BitEncodedInt();
             if (typeReaderIndex == 0)
-                return default(T);
+                return existingInstance;
 
-            var result = (T)typeReaders[typeReaderIndex - 1].Read(this, existingInstance);
+            if (typeReaderIndex > typeReaders.Length)
+                throw new ContentLoadException("Incorrect type reader index found!");
+
+            var typeReader = typeReaders[typeReaderIndex - 1];
+            var result = (T)typeReader.Read(this, existingInstance);
 
             RecordDisposable(result);
 
@@ -220,7 +182,7 @@ namespace Microsoft.Xna.Framework.Content
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
             if (!ReflectionHelpers.IsValueType(typeReader.TargetType))
-                return (T)ReadObject<object>();
+                return ReadObject(existingInstance);
 
             var result = (T)typeReader.Read(this, existingInstance);
 

@@ -3,6 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
+using System.Threading;
+#if WINRT
+using System.Threading.Tasks;
+#endif
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
@@ -65,7 +70,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                if (_currentVideo == null || _state == MediaState.Stopped)
+                if (_currentVideo == null || State == MediaState.Stopped)
                     return TimeSpan.Zero;
 
                 return PlatformGetPlayPosition();
@@ -75,7 +80,16 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets the media playback state, MediaState.
         /// </summary>
-        public MediaState State { get { return _state; } }
+        public MediaState State
+        { 
+            get
+            {
+                // Give the platform code a chance to update 
+                // the playback state before we return the result.
+                PlatformGetState(ref _state);
+                return _state;
+            }
+        }
 
         /// <summary>
         /// Gets the Video that is currently playing.
@@ -116,12 +130,40 @@ namespace Microsoft.Xna.Framework.Media
         /// Retrieves a Texture2D containing the current frame of video being played.
         /// </summary>
         /// <returns>The current frame of video.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if no video is set on the player</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the platform was unable to get a texture in a reasonable amount of time. Often the platform specific media code is running
+        /// in a different thread or process. Note: This may be a change from XNA behaviour</exception>
         public Texture2D GetTexture()
         {
             if (_currentVideo == null)
-                return null;
+                throw new InvalidOperationException("Operation is not valid due to the current state of the object");
 
-            return PlatformGetTexture();
+            //XNA never returns a null texture
+            const int retries = 5;
+            const int sleepTimeFactor = 50;
+            Texture2D texture=null;
+
+            for (int i = 0; i < retries; i++)
+            {
+                texture = PlatformGetTexture();
+                if (texture != null)
+                {
+                    break;
+                }
+                var sleepTime = i*sleepTimeFactor;
+                Debug.WriteLine("PlatformGetTexture returned null ({0}) sleeping for {1} ms", i + 1, sleepTime);
+#if WINRT
+                Task.Delay(sleepTime).Wait();
+#else
+                Thread.Sleep(sleepTime); //Sleep for longer and longer times
+#endif
+            }
+            if (texture == null)
+            {
+                throw new InvalidOperationException("Platform returned a null texture");
+            }
+
+            return texture;
         }
 
         /// <summary>
@@ -148,14 +190,16 @@ namespace Microsoft.Xna.Framework.Media
 
             if (_currentVideo == video)
             {
+                var state = State;
+							
                 // No work to do if we're already
                 // playing this video.
-                if (_state == MediaState.Playing)
+                if (state == MediaState.Playing)
                     return;
 
                 // If we try to Play the same video
                 // from a paused state, just resume it instead.
-                if (_state == MediaState.Paused)
+                if (state == MediaState.Paused)
                 {
                     PlatformResume();
                     return;
@@ -167,6 +211,31 @@ namespace Microsoft.Xna.Framework.Media
             PlatformPlay();
 
             _state = MediaState.Playing;
+
+            // XNA doesn't return until the video is playing
+            const int retries = 5;
+            const int sleepTimeFactor = 50;
+
+            for (int i = 0; i < retries; i++)
+            {
+                if (State == MediaState.Playing )
+                {
+                    break;
+                }
+                var sleepTime = i*sleepTimeFactor;
+                Debug.WriteLine("State != MediaState.Playing ({0}) sleeping for {1} ms", i + 1, sleepTime);
+#if WINRT
+                Task.Delay(sleepTime).Wait();
+#else
+                Thread.Sleep(sleepTime); //Sleep for longer and longer times
+#endif
+            }
+            if (State != MediaState.Playing )
+            {
+                //We timed out - attempt to stop to fix any bad state
+                Stop();
+                throw new InvalidOperationException("cannot start video"); 
+            }
         }
 
         /// <summary>
@@ -177,11 +246,13 @@ namespace Microsoft.Xna.Framework.Media
             if (_currentVideo == null)
                 return;
 
+            var state = State;
+
             // No work to do if we're already playing
-            if (_state == MediaState.Playing)
+            if (state == MediaState.Playing)
                 return;
 
-            if (_state == MediaState.Stopped)
+            if (state == MediaState.Stopped)
             {
                 PlatformPlay();
                 return;

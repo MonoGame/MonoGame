@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 #elif IOS
-using MonoTouch.UIKit;
+using UIKit;
 #elif ANDROID
 using Android.Views;
 #endif
@@ -19,6 +19,25 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class GraphicsAdapter : IDisposable
     {
+        /// <summary>
+        /// Defines the driver type for graphics adapter. Usable only on DirectX platforms for now.
+        /// </summary>
+        public enum DriverType
+        {
+            /// <summary>
+            /// Hardware device been used for rendering. Maximum speed and performance.
+            /// </summary>
+            Hardware,
+            /// <summary>
+            /// Emulates the hardware device on CPU. Slowly, only for testing.
+            /// </summary>
+            Reference,
+            /// <summary>
+            /// Useful when <see cref="DriverType.Hardware"/> acceleration does not work.
+            /// </summary>
+            FastSoftware
+        }
+       
         private static ReadOnlyCollection<GraphicsAdapter> _adapters;
 
         private DisplayModeCollection _supportedDisplayModes;
@@ -45,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Dispose()
         {
         }
-
+            
         public DisplayMode CurrentDisplayMode
         {
             get
@@ -110,14 +129,28 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Used to request creation of the reference graphics device.
+        /// Used to request creation of the reference graphics device, 
+        /// or the default hardware accelerated device (when set to false).
         /// </summary>
         /// <remarks>
         /// This only works on DirectX platforms where a reference graphics
         /// device is available and must be defined before the graphics device
-        /// is created.  It defaults to false.
+        /// is created. It defaults to false.
         /// </remarks>
-        public static bool UseReferenceDevice { get; set; }
+        public static bool UseReferenceDevice
+        {
+            get { return UseDriverType==DriverType.Reference; }
+            set { UseDriverType = value ? DriverType.Reference : DriverType.Hardware; }
+        }
+
+        /// <summary>
+        /// Used to request creation of a specific kind of driver.
+        /// </summary>
+        /// <remarks>
+        /// These values only work on DirectX platforms and must be defined before the graphics device
+        /// is created. <see cref="DriverType.Hardware"/> by default.
+        /// </remarks>
+        public static DriverType UseDriverType { get; set; }
 
         /*
 		public bool QueryRenderTargetFormat(

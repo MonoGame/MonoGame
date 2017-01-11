@@ -21,9 +21,9 @@ namespace Microsoft.Xna.Framework {
         /// <summary>
         /// Gets or sets a bool that enables usage of Alt+F4 for window closing on desktop platforms. Value is true by default.
         /// </summary>
-        public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } } 
+        public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } }
 
-#if WINDOWS && DIRECTX
+#if (WINDOWS && !WINRT) || LINUX
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || WINDOWS_UAP  || LINUX || ANGLE
 
         /// <summary>
 		/// Use this event to retrieve text for objects like textbox's.
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework {
 				ScreenDeviceNameChanged (this, EventArgs.Empty);
 		}
 
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || WINDOWS_UAP || LINUX || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
 			if (TextInput != null)

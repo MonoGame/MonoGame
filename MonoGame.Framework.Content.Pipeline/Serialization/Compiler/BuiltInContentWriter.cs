@@ -56,7 +56,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     readerClassName += "[";
                     readerClassName += argWriter.GetRuntimeType(targetPlatform);
                     readerClassName += "]";
-                    readerClassName += ", ";
+                    // Important: Do not add a space char after the comma because 
+                    // this will not work with Type.GetType in Xamarin.Android!
+                    readerClassName += ",";
                 }
                 readerClassName = readerClassName.TrimEnd(',', ' ');
                 readerClassName += "]";

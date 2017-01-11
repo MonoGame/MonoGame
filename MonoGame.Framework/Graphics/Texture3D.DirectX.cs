@@ -64,21 +64,26 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+            try
+            {
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
 
-            int rowPitch = GetPitch(width);
-            int slicePitch = rowPitch * height; // For 3D texture: Size of 2D image.
-            var box = new DataBox(dataPtr, rowPitch, slicePitch);
+                int rowPitch = GetPitch(width);
+                int slicePitch = rowPitch * height; // For 3D texture: Size of 2D image.
+                var box = new DataBox(dataPtr, rowPitch, slicePitch);
 
-            int subresourceIndex = level;
+                int subresourceIndex = level;
 
-            var region = new ResourceRegion(left, top, front, right, bottom, back);
+                var region = new ResourceRegion(left, top, front, right, bottom, back);
 
-            var d3dContext = GraphicsDevice._d3dContext;
-            lock (d3dContext)
-                d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
-
-            dataHandle.Free();
+                var d3dContext = GraphicsDevice._d3dContext;
+                lock (d3dContext)
+                    d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
         }
 
         private void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount)
@@ -112,26 +117,32 @@ namespace Microsoft.Xna.Framework.Graphics
                     d3dContext.CopySubresourceRegion(GetTexture(), level, new ResourceRegion(left, top, front, right, bottom, back), stagingTex, 0);
 
                     // Copy the data to the array.
-                    DataStream stream;
-                    var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
-
-                    // Some drivers may add pitch to rows or slices.
-                    // We need to copy each row separatly and skip trailing zeros.
-                    var currentIndex = startIndex;
-                    var elementSize = _format.GetSize();
-                    var elementsInRow = right - left;
-                    var rowsInSlice = bottom - top;
-                    for (var slice = front; slice < back; slice++)
+                    DataStream stream = null;
+                    try
                     {
-                        for (var row = top; row < bottom; row++)
+                        var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
+
+                        // Some drivers may add pitch to rows or slices.
+                        // We need to copy each row separatly and skip trailing zeros.
+                        var currentIndex = startIndex;
+                        var elementSize = _format.GetSize();
+                        var elementsInRow = right - left;
+                        var rowsInSlice = bottom - top;
+                        for (var slice = front; slice < back; slice++)
                         {
-                            stream.ReadRange(data, currentIndex, elementsInRow);
-                            stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
-                            currentIndex += elementsInRow;
+                            for (var row = top; row < bottom; row++)
+                            {
+                                stream.ReadRange(data, currentIndex, elementsInRow);
+                                stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
+                                currentIndex += elementsInRow;
+                            }
+                            stream.Seek(databox.SlicePitch - (databox.RowPitch * rowsInSlice), SeekOrigin.Current);
                         }
-                        stream.Seek(databox.SlicePitch - (databox.RowPitch * rowsInSlice), SeekOrigin.Current);
                     }
-                    stream.Dispose();
+                    finally
+                    {
+                        SharpDX.Utilities.Dispose(ref stream);
+                    }
                 }
             }
         }
