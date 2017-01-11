@@ -688,6 +688,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(spriteFont, text);
             
+            float sortKey = (_sortMode == SpriteSortMode.Texture) ? spriteFont.Texture.SortingKey : 0;
+
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
@@ -737,23 +739,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var item = _batcher.CreateBatchItem();
                 item.Texture = spriteFont.Texture;
-            
-                // set SortKey based on SpriteSortMode.
-                switch (_sortMode)
-                {
-                    // Comparison of Texture objects.
-                    case SpriteSortMode.Texture:
-                        item.SortKey = spriteFont.Texture.SortingKey;
-                        break;
-                    // Comparison of Depth
-                    case SpriteSortMode.FrontToBack:
-                        item.SortKey = 0;
-                        break;
-                    // Comparison of Depth in reverse
-                    case SpriteSortMode.BackToFront:
-                        item.SortKey = 0;
-                        break;
-                }
+                item.SortKey = sortKey;
             
                 _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
                 _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
@@ -995,6 +981,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(spriteFont, text);
             
+            float sortKey =  (_sortMode == SpriteSortMode.Texture) ? spriteFont.Texture.SortingKey : 0;
+
             // Get the default glyph here once.
             SpriteFont.Glyph? defaultGlyph = null;
             if (spriteFont.DefaultCharacter.HasValue)
@@ -1044,23 +1032,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 var item = _batcher.CreateBatchItem();
                 item.Texture = spriteFont.Texture;
-            
-                // set SortKey based on SpriteSortMode.
-                switch (_sortMode)
-                {
-                    // Comparison of Texture objects.
-                    case SpriteSortMode.Texture:
-                        item.SortKey = spriteFont.Texture.SortingKey;
-                        break;
-                    // Comparison of Depth
-                    case SpriteSortMode.FrontToBack:
-                        item.SortKey = 0;
-                        break;
-                    // Comparison of Depth in reverse
-                    case SpriteSortMode.BackToFront:
-                        item.SortKey = 0;
-                        break;
-                }
+                item.SortKey = sortKey;
             
                 _texCoordTL.X = currentGlyph.BoundsInTexture.X / (float)spriteFont.Texture.Width;
                 _texCoordTL.Y = currentGlyph.BoundsInTexture.Y / (float)spriteFont.Texture.Height;
