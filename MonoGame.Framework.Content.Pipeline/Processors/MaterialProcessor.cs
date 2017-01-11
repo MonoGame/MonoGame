@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(true)]
         [DisplayName("Resize to Power of Two")]
         [Description("If enabled, the texture is resized to the next largest power of two, maximizing compatibility. Many graphics cards do not support texture sizes that are not a power of two.")]
-        public virtual bool ResizeTexturesToPowerOfTwo { get; set; }
+        public virtual bool ResizeTexturesToPowerOfTwo { get { return resizeTexturesToPowerOfTwo; } set { resizeTexturesToPowerOfTwo = value; } }
 
         /// <summary>
 		/// Specifies the texture format of output materials. Materials can either be left unchanged from the source asset, converted to a corresponding Color, or compressed using the appropriate DxtCompressed format.
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Color")]
         [DisplayName("Texture Format")]
         [Description("Specifies the SurfaceFormat type of processed textures. Textures can either remain unchanged from the source asset, converted to the Color format, or DXT compressed.")]
-        public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
+        public virtual TextureProcessorOutputFormat TextureFormat { get { return textureFormat; } set { textureFormat = value; } }
 
         /// <summary>
         /// Initializes a new instance of the MaterialProcessor class.
@@ -128,8 +128,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             parameters.Add("ColorKeyColor", ColorKeyColor);
             parameters.Add("ColorKeyEnabled", ColorKeyEnabled);
             parameters.Add("GenerateMipmaps", GenerateMipmaps);
-            parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
-            parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
+            parameters.Add("PremultiplyAlpha", PremultiplyTextureAlpha);
+            parameters.Add("ResizeToPowerOfTwo", ResizeTexturesToPowerOfTwo);
             parameters.Add("TextureFormat", TextureFormat);
 
             return context.BuildAsset<TextureContent, TextureContent>(texture, "TextureProcessor", parameters, "TextureImporter", null);
@@ -144,6 +144,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If the MaterialContent is of type EffectMaterialContent, a build is requested for Effect, and validation will be performed on the OpaqueData to ensure that all parameters are valid input to SetValue or SetValueTranspose. If the MaterialContent is a BasicMaterialContent, no validation will be performed on OpaqueData. Process requests builds for all textures in Textures, unless the MaterialContent is of type BasicMaterialContent, in which case a build will only be requested for DiffuseColor. The textures in Textures will be ignored.</remarks>
         public override MaterialContent Process(MaterialContent input, ContentProcessorContext context)
         {
+            // Apply specified default effect.
+            if (input is BasicMaterialContent && DefaultEffect != MaterialProcessorDefaultEffect.BasicEffect)
+            {
+                var newMaterial = CreateDefaultMaterial(DefaultEffect);
+                
+                // Preserve material properties.
+                newMaterial.Name = input.Name;
+                newMaterial.Identity = input.Identity;
+                foreach (var item in input.OpaqueData)
+                    newMaterial.OpaqueData.Add(item.Key, item.Value);
+                foreach (var item in input.Textures)
+                    newMaterial.Textures.Add(item.Key, item.Value);
+                
+                input = newMaterial;
+            }
+
             // Docs say that if it's a basic effect, only build the diffuse texture.
             var basic = input as BasicMaterialContent;
             if (basic != null)
@@ -157,18 +173,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Build custom effects
             var effectMaterial = input as EffectMaterialContent;
-            if (effectMaterial != null)
+            if (effectMaterial != null && effectMaterial.CompiledEffect == null)
             {
+                if (effectMaterial.Effect == null)
+                    throw new PipelineException("EffectMaterialContent.Effect or EffectMaterialContent.CompiledEffect should be set for materials with a custom effect.");
                 effectMaterial.CompiledEffect = BuildEffect(effectMaterial.Effect, context);
                 // TODO: Docs say to validate OpaqueData for SetValue/SetValueTranspose
                 // Does that mean to match up with effect param names??
             }
 
             // Build all textures
-            foreach (var texture in input.Textures)
+            var keys = new List<string>(input.Textures.Keys);
+            foreach (string key in keys)
             {
-                var builtTexture = BuildTexture(texture.Value.Filename, texture.Value, context);
-                input.Textures[texture.Key] = builtTexture;
+                var texture = input.Textures[key];
+                var builtTexture = BuildTexture(texture.Filename, texture, context);
+                input.Textures[key] = builtTexture;
             }
 
             return input;

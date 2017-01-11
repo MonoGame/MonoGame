@@ -23,6 +23,14 @@ namespace Microsoft.Xna.Framework
             Window = _gameWindow;
 
             MediaLibrary.Context = Game.Activity;
+            try
+            {
+                OpenALSoundController soundControllerInstance = OpenALSoundController.GetInstance;
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+            }
         }
 
         protected override void Dispose(bool disposing)

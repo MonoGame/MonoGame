@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Media
 
             using (var musicCursor = Context.ContentResolver.Query(MediaStore.Audio.Media.ExternalContentUri, null, null, null, null))
             {
-                if (musicCursor != null && musicCursor.MoveToFirst())
+                if (musicCursor != null)
                 {
                     Dictionary<string, Artist> artists = new Dictionary<string, Artist>();
                     Dictionary<string, Album> albums = new Dictionary<string, Album>();
@@ -52,60 +52,64 @@ namespace Microsoft.Xna.Framework.Media
                         return;
                     }
 
-                    do
-                    {
-                        long durationProperty = musicCursor.GetLong(durationColumn);
-                        TimeSpan duration = TimeSpan.FromMilliseconds(durationProperty);
-
-                        // Exclude sound effects
-                        if (duration < MinimumSongDuration)
-                            continue;
-
-                        string albumNameProperty = albumNameColumn > -1 ? musicCursor.GetString(albumNameColumn) : "Unknown Album";
-                        string albumArtistProperty = albumArtistColumn > -1 ? musicCursor.GetString(albumArtistColumn) : "Unknown Artist";
-                        string genreProperty = genreColumn > -1 ? musicCursor.GetString(genreColumn) : "Unknown Genre";
-                        string artistProperty = artistColumn > -1 ? musicCursor.GetString(artistColumn) : "Unknown Artist";
-                        string titleProperty = musicCursor.GetString(titleColumn);
-
-                        long assetId = musicCursor.GetLong(assetIdColumn);
-                        var assetUri = ContentUris.WithAppendedId(MediaStore.Audio.Media.ExternalContentUri, assetId);
-                        long albumId = albumIdColumn > -1 ? musicCursor.GetInt(albumIdColumn) : -1;
-                        var albumArtUri = albumId > -1 ? ContentUris.WithAppendedId(Uri.Parse("content://media/external/audio/albumart"), albumId) : null;
-                        
-                        Artist artist;
-                        if (!artists.TryGetValue(artistProperty, out artist))
+                    for (musicCursor.MoveToFirst(); !musicCursor.IsAfterLast; musicCursor.MoveToNext())
+                        try
                         {
-                            artist = new Artist(artistProperty);
-                            artists.Add(artist.Name, artist);
-                        }
+                            long durationProperty = musicCursor.GetLong(durationColumn);
+                            TimeSpan duration = TimeSpan.FromMilliseconds(durationProperty);
 
-                        Artist albumArtist;
-                        if (!artists.TryGetValue(albumArtistProperty, out albumArtist))
+                            // Exclude sound effects
+                            if (duration < MinimumSongDuration)
+                                continue;
+
+                            string albumNameProperty = (albumNameColumn > -1 ? musicCursor.GetString(albumNameColumn) : null) ?? "Unknown Album";
+                            string albumArtistProperty = (albumArtistColumn > -1 ? musicCursor.GetString(albumArtistColumn) : null) ?? "Unknown Artist";
+                            string genreProperty = (genreColumn > -1 ? musicCursor.GetString(genreColumn) : null) ?? "Unknown Genre";
+                            string artistProperty = (artistColumn > -1 ? musicCursor.GetString(artistColumn) : null) ?? "Unknown Artist";
+                            string titleProperty = musicCursor.GetString(titleColumn);
+
+                            long assetId = musicCursor.GetLong(assetIdColumn);
+                            var assetUri = ContentUris.WithAppendedId(MediaStore.Audio.Media.ExternalContentUri, assetId);
+                            long albumId = albumIdColumn > -1 ? musicCursor.GetInt(albumIdColumn) : -1;
+                            var albumArtUri = albumId > -1 ? ContentUris.WithAppendedId(Uri.Parse("content://media/external/audio/albumart"), albumId) : null;
+
+                            Artist artist;
+                            if (!artists.TryGetValue(artistProperty, out artist))
+                            {
+                                artist = new Artist(artistProperty);
+                                artists.Add(artist.Name, artist);
+                            }
+
+                            Artist albumArtist;
+                            if (!artists.TryGetValue(albumArtistProperty, out albumArtist))
+                            {
+                                albumArtist = new Artist(albumArtistProperty);
+                                artists.Add(albumArtist.Name, albumArtist);
+                            }
+
+                            Genre genre;
+                            if (!genres.TryGetValue(genreProperty, out genre))
+                            {
+                                genre = new Genre(genreProperty);
+                                genres.Add(genre.Name, genre);
+                            }
+
+                            Album album;
+                            if (!albums.TryGetValue(albumNameProperty, out album))
+                            {
+                                album = new Album(new SongCollection(), albumNameProperty, albumArtist, genre, albumArtUri);
+                                albums.Add(album.Name, album);
+                                albumList.Add(album);
+                            }
+
+                            var song = new Song(album, artist, genre, titleProperty, duration, assetUri);
+                            song.Album.Songs.Add(song);
+                            songList.Add(song);
+                        }
+                        catch (Exception e)
                         {
-                            albumArtist = new Artist(albumArtistProperty);
-                            artists.Add(albumArtist.Name, albumArtist);
+                            Debug.WriteLine("MediaLibrary exception: " + e.Message);
                         }
-
-                        Genre genre;
-                        if (!genres.TryGetValue(genreProperty, out genre))
-                        {
-                            genre = new Genre(genreProperty);
-                            genres.Add(genre.Name, genre);
-                        }
-
-                        Album album;
-                        if (!albums.TryGetValue(albumNameProperty, out album))
-                        {
-                            album = new Album(new SongCollection(), albumNameProperty, albumArtist, genre, albumArtUri);
-                            albums.Add(album.Name, album);
-                            albumList.Add(album);
-                        }
-
-                        var song = new Song(album, artist, genre, titleProperty, duration, assetUri);
-                        song.Album.Songs.Add(song);
-                        songList.Add(song);
-
-                    } while (musicCursor.MoveToNext()); 
                 }
 
                 musicCursor.Close();

@@ -5,11 +5,13 @@
     <license file="LICENSE.html" mime-type="text/html"/>
     <pkg-ref id="com.monogame.pipeline"/>
     <pkg-ref id="com.monogame.xsaddin"/>
+    <pkg-ref id="com.monogame.framework"/>
     <options customize="never" require-scripts="false"/>
     <choices-outline>
         <line choice="default">
             <line choice="com.monogame.pipeline"/>
             <line choice="com.monogame.xsaddin"/>
+            <line choice="com.monogame.framework"/>
         </line>
     </choices-outline>
     <choice id="default"/>
@@ -21,4 +23,8 @@
         <pkg-ref id="com.monogame.xsaddin"/>
     </choice>
     <pkg-ref id="com.monogame.xsaddin" version="1" onConclusion="none">MonoGame.XamarinStudio.Addin.pkg</pkg-ref>
+    <choice id="com.monogame.framework" visible="false">
+        <pkg-ref id="com.monogame.framework"/>
+    </choice>
+    <pkg-ref id="com.monogame.framework" version="1" onConclusion="none">MonoGame.framework.pkg</pkg-ref>
 </installer-gui-script>

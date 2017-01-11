@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			if (graphicsDevice == null)
             {
-                throw new ArgumentNullException("graphicsDevice");
+                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
             }
 			this.GraphicsDevice = graphicsDevice;
 			this.IndexElementSize = indexElementSize;	
@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>The IndexElementSize enum value that matches the type</returns>
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
         {
-            switch (Marshal.SizeOf(type))
+            switch (Utilities.ReflectionHelpers.ManagedSizeOf(type))
             {
                 case 2:
                     return IndexElementSize.SixteenBits;

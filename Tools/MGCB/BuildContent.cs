@@ -49,6 +49,15 @@ namespace MGCB
         }
 
         [CommandLineParameter(
+            Name = "workingDir",
+            ValueName = "directoryPath",
+            Description = "The working directory where all source content is located.")]
+        public void SetWorkingDir(string path)
+        {
+            Directory.SetCurrentDirectory(path);
+        }
+
+        [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
             Description = "The directory where all content is written.")]
@@ -307,9 +316,23 @@ namespace MGCB
             skipCount = 0;
             successCount = 0;
 
-            foreach (var item in _copyItems)
+            // Before building the content, register all files to be built. (Necessary to
+            // correctly resolve external references.)
+            foreach (var c in _content)
             {
-                var word = item.Split(';');
+                try
+                {
+                    _manager.RegisterContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
+                }
+                catch
+                {
+                    // Ignore exception. Exception will be handled below.
+                }
+            }
+
+            foreach (var c in _copyItems)
+            {
+                var word = c.Split(';');
                 var srcPath = word[0];
                 var dstPath = word[1];
                 
@@ -324,12 +347,15 @@ namespace MGCB
                         successCount++;
                     else
                         skipCount++;
-                    
+
                     newContent.SourceFiles.Add(sourceFileAssetName);
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", srcPath, ex.Message);
+                    Console.Error.WriteLine("{0}: error: {1}", c, ex.Message);
+                    if (ex.InnerException != null)
+                        Console.Error.WriteLine(ex.InnerException.ToString());
+
                     ++errorCount;
                 }
             }
@@ -376,7 +402,14 @@ namespace MGCB
                 {
                     Console.Error.WriteLine("{0}: error: {1}", inputFilePath, ex.Message);
                     if (ex.InnerException != null)
-                        Console.Error.Write(ex.InnerException.ToString());
+                        Console.Error.WriteLine(ex.InnerException.ToString());
+                    ++errorCount;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine("{0}: error: {1}", inputFilePath, ex.Message);
+                    if (ex.InnerException != null)
+                        Console.Error.WriteLine(ex.InnerException.ToString());
                     ++errorCount;
                 }
             }

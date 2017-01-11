@@ -17,10 +17,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic)
 		{
-			if (graphicsDevice == null)
-                throw new ArgumentNullException("graphicsDevice");
-
-            this.GraphicsDevice = graphicsDevice;
+		    if (graphicsDevice == null)
+		    {
+		        throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
+		    }
+		    this.GraphicsDevice = graphicsDevice;
             this.VertexDeclaration = vertexDeclaration;
             this.VertexCount = vertexCount;
             this.BufferUsage = bufferUsage;
@@ -54,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
 
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
@@ -73,13 +74,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             this.GetData<T>(0, data, startIndex, elementCount, elementSizeInByte);
         }
 
         public void GetData<T>(T[] data) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var elementSizeInByte = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             this.GetData<T>(0, data, 0, data.Length, elementSizeInByte);
         }
 
@@ -145,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// must be within the <paramref name="data"/> array bounds.</param>
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
 		}
 		
@@ -158,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">Data array.</param>
         public void SetData<T>(T[] data) where T : struct
         {
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
         }
 
@@ -167,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
                 throw new ArgumentNullException("data");
 
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
+            var elementSizeInBytes = Utilities.ReflectionHelpers.SizeOf<T>.Get();
             var bufferSize = VertexCount * VertexDeclaration.VertexStride;
 
             if (vertexStride == 0)

@@ -11,13 +11,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
     {
         public override void LogMessage(string message, params object[] messageArgs)
         {
-			Console.WriteLine(message, messageArgs);
+			Console.WriteLine(IndentString + message, messageArgs);
         }
 
         public override void LogImportantMessage(string message, params object[] messageArgs)
         {
             // TODO: How do i make it high importance?
-            Console.WriteLine(message, messageArgs);
+            Console.WriteLine(IndentString + message, messageArgs);
         }
 
         public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
@@ -30,7 +30,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     warning += "(" + contentIdentity.FragmentIdentifier + ")";
                 warning += ": ";
             }
-            warning += string.Format(message, messageArgs);
+            
+            if (messageArgs != null && messageArgs.Length != 0)
+                warning += string.Format(message, messageArgs);
+            else if (!string.IsNullOrEmpty(message))
+                warning += message;
+
             Console.WriteLine(warning);
         }
     }

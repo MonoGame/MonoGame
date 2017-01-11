@@ -12,9 +12,11 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MonoGame.Tools.Pipeline
 {
     public class PipelineProject : IProjectItem
-    {        
+    {
+        [Browsable(false)]
         public string OriginalPath { get; set; }
 
+        [Browsable(false)]
         public List<ContentItem> ContentItems { get; private set; }                
 
         public string OutputDir { get; set; }
@@ -33,6 +35,7 @@ namespace MonoGame.Tools.Pipeline
 
         #region IPipelineItem
 
+        [Category("Common")]
         public string Name
         {
             get
@@ -44,6 +47,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        [Category("Common")]
         public string Location
         {
             get
@@ -57,10 +61,13 @@ namespace MonoGame.Tools.Pipeline
         }
 
         [Browsable(false)]
-        public string Icon { get; set; }
+        public bool Exists { get; set; }
 
         [Browsable(false)]
-        public bool Exists { get; set; }
+        public bool ExpandToThis { get; set; }
+
+        [Browsable(false)]
+        public bool SelectThis { get; set; }
 
         #endregion
 
@@ -70,6 +77,7 @@ namespace MonoGame.Tools.Pipeline
             References = new List<string>();
             OutputDir = "bin";
             IntermediateDir = "obj";
+            Exists = true;
         }
     }
 }

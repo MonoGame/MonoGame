@@ -77,7 +77,6 @@ using Foundation;
 using GameKit;
 using UIKit;
 using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.GamerServices
@@ -643,16 +642,6 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             //ShowMatchMaker(minPlayers, maxPlayers, null); // Setting playersToInvite to null causes the game to crash (tested on iOS 5+)
             ShowMatchMaker(minPlayers, maxPlayers, new string[] { });
-        }
-
-        public static IAsyncResult BeginShowStorageDeviceSelector(AsyncCallback callback, Object state)
-        {
-            return null;
-        }
-
-        public static StorageDevice EndShowStorageDeviceSelector(IAsyncResult result)
-        {
-            return null;
         }
     }
 }

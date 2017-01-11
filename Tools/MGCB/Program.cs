@@ -17,6 +17,12 @@ namespace MGCB
             // to avoid any out of order console output.
             Console.SetError(Console.Out);
 
+            if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
+            {
+                Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
+                return -1;
+            }
+
             var content = new BuildContent();
 
             // Parse the command line.
@@ -31,7 +37,13 @@ namespace MGCB
             
             // Launch debugger if requested.
             if (content.LaunchDebugger)
-                System.Diagnostics.Debugger.Launch();
+            {
+                try {
+                    System.Diagnostics.Debugger.Launch();
+                } catch (NotImplementedException) {
+                    // not implemented under Mono
+                }
+            }
 
             // Print a startup message.            
             var buildStarted = DateTime.Now;

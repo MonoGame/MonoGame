@@ -137,6 +137,16 @@ public class OptionalElements
 
     [ContentSerializer(Optional = true)]
     public string c = "c";
+
+    [ContentSerializer(Optional = true)]
+    public CullMode? d = null;
+
+    [ContentSerializer(Optional = true)]
+    public CullMode? e = CullMode.CullClockwiseFace;
+
+    public CullMode? f = CullMode.CullCounterClockwiseFace;
+
+    public CullMode g = CullMode.CullClockwiseFace;
 }
 #endregion
 
@@ -149,12 +159,37 @@ public class AllowNull
 #endregion
 
 #region Collections
+
+public enum CustomEnum
+{
+    Val1,
+    Val2
+}
+
+public class CustomItem
+{
+    public CustomEnum EnumVal;
+}
+
+public class CustomItemBase
+{
+    public double DoubleVal;
+    public Nullable<float> NullableFloatVal;
+}
+
+public class CustomItemInherited : CustomItemBase
+{
+    public char[] CharArrayVal;
+}
+
 public class Collections
 {
     public string[] StringArray;
     public List<string> StringList;
     public int[] IntArray;
     public Color[] ColorArray;
+    public List<CustomItem> CustomItemList;
+    public List<CustomItemInherited> CustomItemInheritedList;
 
     // Indexer - should be ignored by intermediate serializer.
     public Color this[int i]
@@ -428,13 +463,76 @@ class GenericTypes
 {
     public GenericClass<int> A;
     public GenericClass<float> B;
+    public GenericClass<GenericArg> C;
 }
 
 class GenericClass<T>
 {
     public T Value;
 }
+public class GenericArg
+{
+    public int Value;
+}
 #endregion
+
+#region ChildCollections
+public class ChildCollections
+{
+    private readonly ChildrenCollection _children;
+
+    [ContentSerializer]
+    public ChildrenCollection Children
+    {
+        get { return _children; }
+    }
+
+    public ChildCollections()
+    {
+        _children = new ChildrenCollection(this);
+    }
+}
+
+public class ChildrenCollection : ChildCollection<ChildCollections, ChildCollectionChild>
+{
+    public ChildrenCollection(ChildCollections parent) : base(parent)
+    {
+    }
+
+    protected override ChildCollections GetParent(ChildCollectionChild child)
+    {
+        return child.Parent;
+    }
+
+    protected override void SetParent(ChildCollectionChild child, ChildCollections parent)
+    {
+        child.Parent = parent;
+    }
+}
+
+public class ChildCollectionChild : ContentItem
+{
+    [ContentSerializerIgnore]
+    public ChildCollections Parent { get; set; }
+}
+#endregion
+
+#region Colors
+public class Colors
+{
+    public Color White { get; set; }
+    public Color Black { get; set; }
+    public Color Transparent { get; set; }
+    public Color Red { get; set; }
+    public Color Green { get; set; }
+    public Color Blue { get; set; }
+}
+#endregion
+
+class StructArrayNoElements
+{
+    public Vector2[] Vector2ArrayNoElements = new Vector2[] {};
+}
 
 namespace MonoGame.Tests.ContentPipeline
 {

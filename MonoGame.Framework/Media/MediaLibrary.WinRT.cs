@@ -22,7 +22,6 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformLoad(Action<int> progressCallback)
         {
-#if !WINDOWS_UAP
             Task.Run(async () =>
             {
                 if (musicFolder == null)
@@ -55,10 +54,11 @@ namespace Microsoft.Xna.Framework.Media
 
                 // Read cache
                 var cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(CacheFile, CreationCollisionOption.OpenIfExists);
-                using (var stream = new BinaryReader(await cacheFile.OpenStreamForReadAsync()))
+                using (var baseStream = await cacheFile.OpenStreamForReadAsync())
+                using (var stream = new BinaryReader(baseStream))
                     try
                     {
-                        for (; stream.BaseStream.Position < stream.BaseStream.Length; )
+                        for (; baseStream.Position < baseStream.Length; )
                         {
                             var entry = MusicProperties.Deserialize(stream);
                             cache.Add(entry.Path, entry);
@@ -140,7 +140,6 @@ namespace Microsoft.Xna.Framework.Media
                 albumCollection = new AlbumCollection(albumList);
                 songCollection = new SongCollection(songList);
             }).Wait();
-#endif
         }
 
         private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)

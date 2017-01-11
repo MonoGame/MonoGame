@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using NUnit.Framework;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -147,5 +148,76 @@ namespace MonoGame.Tests.ContentPipeline
                 for (var x = 0; x < outFace.Width; x++)
                     Assert.AreEqual(Color.Red, outFace.GetPixel(x, y));
         }
+
+#if !XNA
+        void CompressDefault<T>(TargetPlatform platform, Color color)
+        {
+            var context = new TestProcessorContext(platform, "dummy.xnb");
+
+            var processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = false,
+                PremultiplyAlpha = false,
+                ResizeToPowerOfTwo = false,
+                TextureFormat = TextureProcessorOutputFormat.Compressed
+            };
+
+            var face = new PixelBitmapContent<Color>(16, 16);
+            Fill(face, color);
+            var input = new Texture2DContent();
+            input.Faces[0] = face;
+
+            var output = processor.Process(input, context);
+
+            Assert.NotNull(output);
+            Assert.AreEqual(1, output.Faces.Count);
+            Assert.AreEqual(1, output.Faces[0].Count);
+
+            Assert.IsAssignableFrom<T>(output.Faces[0][0]);
+        }
+
+        [Test]
+        public void CompressDefaultWindowsOpaque()
+        {
+            CompressDefault<Dxt1BitmapContent>(TargetPlatform.Windows, Color.Red);
+        }
+
+        [Test]
+        public void CompressDefaultWindowsCutOut()
+        {
+            CompressDefault<Dxt3BitmapContent>(TargetPlatform.Windows, Color.Transparent);
+        }
+
+        [Test]
+        public void CompressDefaultWindowsAlpha()
+        {
+            CompressDefault<Dxt5BitmapContent>(TargetPlatform.Windows, Color.Red * 0.5f);
+        }
+
+        [Test]
+        public void CompressDefaultiOSOpaque()
+        {
+            CompressDefault<PvrtcRgb4BitmapContent>(TargetPlatform.iOS, Color.Red);
+        }
+
+        [Test]
+        public void CompressDefaultiOSAlpha()
+        {
+            CompressDefault<PvrtcRgba4BitmapContent>(TargetPlatform.iOS, Color.Red * 0.5f);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidOpaque()
+        {
+            CompressDefault<Etc1BitmapContent>(TargetPlatform.Android, Color.Red);
+        }
+
+        [Test]
+        public void CompressDefaultAndroidAlpha()
+        {
+            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f);
+        }
+#endif
     }
 }

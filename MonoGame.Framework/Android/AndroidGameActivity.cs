@@ -11,11 +11,7 @@ using Android.Views;
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
-#if OUYA
-    public class AndroidGameActivity : Ouya.Console.Api.OuyaActivity
-#else
     public class AndroidGameActivity : Activity
-#endif
     {
         internal Game Game { private get; set; }
 
@@ -90,6 +86,7 @@ namespace Microsoft.Xna.Framework
 		protected override void OnDestroy ()
 		{
             UnregisterReceiver(screenReceiver);
+            ScreenReceiver.ScreenLocked = false;
             _orientationListener = null;
             if (Game != null)
                 Game.Dispose();

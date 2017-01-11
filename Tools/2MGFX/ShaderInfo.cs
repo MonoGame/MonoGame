@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -17,6 +21,7 @@ namespace TwoMGFX
 		public bool Debug { get; private set; }
 
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
+
         public Dictionary<string, SamplerStateInfo> SamplerStates = new Dictionary<string, SamplerStateInfo>();
 
         public List<string> Dependencies { get; private set; }
@@ -34,21 +39,7 @@ namespace TwoMGFX
 			var macros = new Dictionary<string, string>();
 			macros.Add("MGFX", "1");
 
-			// Under the DX11 profile we pass a few more macros.
-			if (options.Profile == ShaderProfile.DirectX_11)
-			{
-				macros.Add("HLSL", "1");
-				macros.Add("SM4", "1");
-			}
-            else if (options.Profile == ShaderProfile.OpenGL)
-            {
-                macros.Add("GLSL", "1");
-                macros.Add("OPENGL", "1");
-            }
-            else if (options.Profile == ShaderProfile.PlayStation4)
-            {
-                throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
-            }
+			options.Profile.AddMacros(macros);
 
 			// If we're building shaders for debug set that flag too.
 			if (options.Debug)
@@ -81,9 +72,17 @@ namespace TwoMGFX
 
             // Evaluate the results of the parse tree.
             var result = tree.Eval() as ShaderInfo;
+
+            // Remove the samplers and techniques so that the shader compiler
+            // gets a clean file without any FX file syntax in it.
+            var cleanFile = newFile;
+            ParseTreeTools.WhitespaceNodes(TokenType.Technique_Declaration, tree.Nodes, ref cleanFile);
+            ParseTreeTools.WhitespaceNodes(TokenType.Sampler_Declaration_States, tree.Nodes, ref cleanFile);
+
+            // Setup the rest of the shader info.
             result.Dependencies = dependencies;
             result.FilePath = fullPath;
-            result.FileContent = newFile;
+            result.FileContent = cleanFile;
             if (!string.IsNullOrEmpty(options.OutputFile))
                 result.OutputFilePath = Path.GetFullPath(options.OutputFile);
             result.AdditionalOutputFiles = new List<string>();
@@ -102,24 +101,6 @@ namespace TwoMGFX
             // We must have at least one technique.
             if (result.Techniques.Count <= 0)
                 throw new Exception("The effect must contain at least one technique and pass!");
-
-            // Finally remove the techniques from the file.
-            //
-            // TODO: Do we really need to do this, or will the HLSL 
-            // compiler just ignore it as we compile shaders?
-            //
-			/*
-			var extra = 2;
-			var offset = 0;
-			foreach (var tech in result.Techniques)
-			{
-				// Remove the technique from the file.
-				newFile = newFile.Remove(tech.startPos + offset, tech.length + extra);
-				offset -= tech.length + extra;
-
-				techniques.Add(tech);
-			}
-			*/
 
 			result.Profile = options.Profile;
 			result.Debug = options.Debug;

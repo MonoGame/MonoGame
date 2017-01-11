@@ -2,7 +2,7 @@
 <Template>
 	<TemplateConfiguration>
 		<_Name>MonoGame Pipeline Library</_Name>
-		<_Category>C#/MonoGame</_Category>
+		<Category>monogame/library/pipeline</Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>
 		<_Description>Creates a MonoGame Pipeline Extenson so you can extend the Content Pipeline.</_Description>
@@ -13,7 +13,7 @@
 			<Open filename = "Importer1.cs"/>
 		</Actions>
 		
-		<Project name = "${ProjectName}" directory = "." type = "DotNet">
+		<Project name = "${ProjectName}" directory = ".">
 			<Options Target = "Library"/>
 			<Packages>
 				<Package id="MonoGame.Framework.Portable" version="3.2.99.1-Beta" targetFramework="portable-net45+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10"/>

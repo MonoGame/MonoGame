@@ -5,10 +5,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal partial class PipelineController
+    public partial class PipelineController
     {
         private class IncludeAction : IProjectAction
         {
@@ -47,16 +48,26 @@ namespace MonoGame.Tools.Pipeline
                 var parser = new PipelineProjectParser(_con, _con._project);
                 _con.View.BeginTreeUpdate();
 
-                _con.Selection.Clear(_con);
-
                 foreach(string f in _folder)
                     if(f != "")
-                        _con.View.AddTreeFolder(f);
+                        _con.View.AddTreeItem(new DirectoryItem(f));
 
                 for (var i = 0; i < _files.Length; i++ )
                 {
+                    bool skipduplicate = false;
+
+                    switch (Environment.OSVersion.Platform) 
+                    {
+                        case PlatformID.Win32NT:
+                        case PlatformID.Win32S:
+                        case PlatformID.Win32Windows:
+                        case PlatformID.WinCE:
+                            skipduplicate = true;
+                            break;
+                    }
+
                     var f = _files[i];
-                    if (!parser.AddContent(f, null, true))
+                    if (!parser.AddContent(f, null, skipduplicate))
                         continue;
 
                     var item = _con._project.ContentItems.Last();
@@ -66,7 +77,9 @@ namespace MonoGame.Tools.Pipeline
                     _files[i] = item.OriginalPath;
 
                     _con.View.AddTreeItem(item);
-                    _con.Selection.Add(item, _con);
+
+                    item.ExpandToThis = true;
+                    _con.View.UpdateTreeItem(item);
                 }
 
                 _con.View.EndTreeUpdate();
@@ -88,7 +101,6 @@ namespace MonoGame.Tools.Pipeline
                         {
                             _con.View.RemoveTreeItem(item);
                             _con._project.ContentItems.Remove(item);
-                            _con.Selection.Remove(item, _con);
                             break;
                         }
                     }
@@ -96,7 +108,7 @@ namespace MonoGame.Tools.Pipeline
 
                 foreach(string f in _folder)
                     if(f != "")
-                        _con.View.RemoveTreeFolder(f);
+                        _con.View.RemoveTreeItem(new DirectoryItem(f));
 
                 _con.View.EndTreeUpdate();
                 _con.ProjectDirty = true;
