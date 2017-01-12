@@ -490,21 +490,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Texture = texture;
             
             // set SortKey based on SpriteSortMode.
-            switch (_sortMode)
-            {
-                // Comparison of Texture objects.
-                case SpriteSortMode.Texture:
-                    item.SortKey = texture.SortingKey;
-                    break;
-                // Comparison of Depth
-                case SpriteSortMode.FrontToBack:
-                    item.SortKey = 0;
-                    break;
-                // Comparison of Depth in reverse
-                case SpriteSortMode.BackToFront:
-                    item.SortKey = 0;
-                    break;
-            }
+            item.SortKey = _sortMode == SpriteSortMode.Texture ? texture.SortingKey : 0;
 
             Vector2 size;
 
@@ -551,21 +537,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			item.Texture = texture;
             
             // set SortKey based on SpriteSortMode.
-            switch (_sortMode)
-            {
-                // Comparison of Texture objects.
-                case SpriteSortMode.Texture:
-                    item.SortKey = texture.SortingKey;
-                    break;
-                // Comparison of Depth
-                case SpriteSortMode.FrontToBack:
-                    item.SortKey = 0;
-                    break;
-                // Comparison of Depth in reverse
-                case SpriteSortMode.BackToFront:
-                    item.SortKey = 0;
-                    break;
-            }
+            item.SortKey = _sortMode == SpriteSortMode.Texture ? texture.SortingKey : 0;
             
             if (sourceRectangle.HasValue)
             {
