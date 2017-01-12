@@ -97,11 +97,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Initialization
 
-        static SoundEffect()
-        {
-            InitializeSoundEffect();
-        }
-
+        /// <summary>
+        /// Initializes XAudio.
+        /// </summary>
         internal static void InitializeSoundEffect()
         {
             try

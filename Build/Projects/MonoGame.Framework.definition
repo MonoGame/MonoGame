@@ -80,9 +80,6 @@
     <Uses Name="NVorbis">
       <Platforms>WindowsGL,Linux</Platforms>
     </Uses>
-    <Uses Name="_FrameworkDispatcherProvided">
-      <Platforms>Windows,WindowsGL,MacOS</Platforms>
-    </Uses>
     <Recommends Name="DirectXGraphics">
       <Platforms>Windows</Platforms>
     </Recommends>
@@ -143,9 +140,6 @@
     <Service Name="_XNADesignProvided">
       <AddDefine>XNADESIGNPROVIDED</AddDefine>
       <!-- Allows the Microsoft.Xna.Framework.Design framework to be present -->
-    </Service>
-    <Service Name="_FrameworkDispatcherProvided">
-      <!-- Allows the FrameworkDispatcher class to be present -->
     </Service>
 
   </Services>
@@ -284,9 +278,7 @@
     <Compile Include="CurveTangent.cs" />
     <Compile Include="DisplayOrientation.cs" />
     <Compile Include="DrawableGameComponent.cs" />
-    <Compile Include="FrameworkDispatcher.cs">
-      <Platforms>_FrameworkDispatcherProvided</Platforms>
-    </Compile>
+    <Compile Include="FrameworkDispatcher.cs" />
 	<Compile Include="FrameworkResources.cs" />
     <Compile Include="GameComponentCollection.cs" />
     <Compile Include="GameComponentCollectionEventArgs.cs" />
