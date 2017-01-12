@@ -139,7 +139,7 @@ namespace MonoGame.Tools.Pipeline
             cmdSaveAs.Image = Global.GetEtoIcon("Commands.SaveAs.png");
 
             cmdExit = new Command();
-            cmdExit.MenuText = (Global.Unix && !Global.Linux) ? "Quit" : "Exit";
+            cmdExit.MenuText = Global.Unix ? "Quit" : "Exit";
             cmdExit.Shortcut = Application.Instance.CommonModifier | Keys.Q;
 
             // Edit Commands

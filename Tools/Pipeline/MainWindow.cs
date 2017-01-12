@@ -532,7 +532,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdExit_Executed(object sender, EventArgs e)
         {
-            this.Close();
+            Application.Instance.Quit();
         }
 
         private void CmdUndo_Executed(object sender, EventArgs e)
