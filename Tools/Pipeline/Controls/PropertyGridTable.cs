@@ -137,6 +137,7 @@ namespace MonoGame.Tools.Pipeline
         private void Drawable_Paint(object sender, PaintEventArgs e)
         {
             var g = e.Graphics;
+            DrawInfo.SetPixelsPerPoint(g);
             var rec = new Rectangle(0, 0, drawable.Width - 1, DrawInfo.TextHeight + _spacing);
             var overGroup = false;
             string prevCategory = null;

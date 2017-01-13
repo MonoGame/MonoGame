@@ -139,7 +139,9 @@ namespace MonoGame.Tools.Pipeline
                 Connect(builder.GetObject("redo_button").Handle, MainWindow.Instance.cmdRedo);
                 Connect(builder.GetObject("close_button").Handle, MainWindow.Instance.cmdClose);
                 Connect(builder.GetObject("clean_button").Handle, MainWindow.Instance.cmdClean);
-                //Connect(builder.GetObject("filteroutput_button").Handle, MainWindow.Instance.cmdFilterOutput);
+                Connect(builder.GetObject("help_button").Handle, MainWindow.Instance.cmdHelp);
+                Connect(builder.GetObject("about_button").Handle, MainWindow.Instance.cmdAbout);
+                Connect(builder.GetObject("exit_button").Handle, MainWindow.Instance.cmdExit);
                 Connect(builder.GetObject("debugmode_button").Handle, MainWindow.Instance.cmdDebugMode);
 
                 MainWindow.Instance.cmdBuild.EnabledChanged += (sender, e) =>
@@ -270,12 +272,6 @@ namespace MonoGame.Tools.Pipeline
                      al.Width = parent.AllocatedWidth;
                      h.Control.SetAllocation(al);
                 };
-            });
-
-            Style.Add<DropDownHandler>("OverrideSize", h =>
-            {
-                var cell = (h.Control.Child as Gtk.CellView).Cells[0] as Gtk.CellRendererText;
-                cell.Ellipsize = Pango.EllipsizeMode.End;
             });
 
             Style.Add<TextBoxHandler>("OverrideSize", h =>

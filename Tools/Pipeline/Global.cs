@@ -62,18 +62,6 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
-        public static void ShowOpenWithDialog(string filePath)
-        {
-            try
-            {
-                PlatformShowOpenWithDialog(filePath);
-            }
-            catch
-            {
-                MainWindow.Instance.ShowError("Error", "The current platform does not have this dialog implemented.");
-            }
-        }
-
         public static Image GetEtoDirectoryIcon(bool exists)
         {
             return exists ? _folder : _folderMissing;

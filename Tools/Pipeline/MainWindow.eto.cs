@@ -49,6 +49,7 @@ namespace MonoGame.Tools.Pipeline
             splitterHorizontal.Position = 200;
 
             splitterVertical = new Splitter();
+            splitterVertical.Width = 150;
             splitterVertical.Orientation = Orientation.Vertical;
             splitterVertical.Position = 230;
             splitterVertical.FixedPanel = SplitterFixedPanel.None;

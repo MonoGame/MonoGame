@@ -6,6 +6,7 @@ namespace MonoGame.Tools.Pipeline
     {
         public static Eto.Forms.Control ToEto(this Xwt.Widget value)
         {
+#if WINDOWS || LINX
             var nativeWidget = Xwt.Toolkit.CurrentEngine.GetNativeWidget(value);
 
 #if WINDOWS
@@ -15,6 +16,9 @@ namespace MonoGame.Tools.Pipeline
 #endif
 
             return widget.ToEto();
+#else
+            return null;
+#endif
         }
     }
 }
