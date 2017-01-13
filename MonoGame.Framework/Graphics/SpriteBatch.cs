@@ -283,13 +283,13 @@ namespace Microsoft.Xna.Framework.Graphics
             float w, h;
             if (sourceRectangle.HasValue)
             {
-				_tempRect = sourceRectangle.Value;
-				w = _tempRect.Width * scale.X;
-				h = _tempRect.Height * scale.Y;
-                _texCoordTL.X = _tempRect.X / (float)texture.Width;
-                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+				var srcRect = sourceRectangle.Value;
+				w = srcRect.Width * scale.X;
+				h = srcRect.Height * scale.Y;
+                _texCoordTL.X = srcRect.X / (float)texture.Width;
+                _texCoordTL.Y = srcRect.Y / (float)texture.Height;
+                _texCoordBR.X = (srcRect.X + srcRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (srcRect.Y + srcRect.Height) / (float)texture.Height;
             }
             else
             {
@@ -413,11 +413,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (sourceRectangle.HasValue)
             {
-				_tempRect = sourceRectangle.Value;
-                _texCoordTL.X = _tempRect.X / (float)texture.Width;
-                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+				var srcRect = sourceRectangle.Value;
+                _texCoordTL.X = srcRect.X / (float)texture.Width;
+                _texCoordTL.Y = srcRect.Y / (float)texture.Height;
+                _texCoordBR.X = (srcRect.X + srcRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (srcRect.Y + srcRect.Height) / (float)texture.Height;
             }
             else
             {
@@ -496,12 +496,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (sourceRectangle.HasValue)
             {
-                _tempRect = sourceRectangle.Value;                   
-                size = new Vector2(_tempRect.Width, _tempRect.Height);
-                _texCoordTL.X = _tempRect.X / (float)texture.Width;
-                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+                var srcRect = sourceRectangle.Value;
+                size = new Vector2(srcRect.Width, srcRect.Height);
+                _texCoordTL.X = srcRect.X / (float)texture.Width;
+                _texCoordTL.Y = srcRect.Y / (float)texture.Height;
+                _texCoordBR.X = (srcRect.X + srcRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (srcRect.Y + srcRect.Height) / (float)texture.Height;
             }
             else
             {
@@ -541,11 +541,11 @@ namespace Microsoft.Xna.Framework.Graphics
             
             if (sourceRectangle.HasValue)
             {
-                _tempRect = sourceRectangle.Value;
-                _texCoordTL.X = _tempRect.X / (float)texture.Width;
-                _texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-                _texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-                _texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+                var srcRect = sourceRectangle.Value;
+                _texCoordTL.X = srcRect.X / (float)texture.Width;
+                _texCoordTL.Y = srcRect.Y / (float)texture.Height;
+                _texCoordBR.X = (srcRect.X + srcRect.Width) / (float)texture.Width;
+                _texCoordBR.Y = (srcRect.Y + srcRect.Height) / (float)texture.Height;
             }
             else
             {
