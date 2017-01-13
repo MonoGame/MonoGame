@@ -31,6 +31,8 @@ namespace MonoGame.Tools.Pipeline
             "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono"
         };
 
+        int setw = 0;
+
         public MainWindow()
         {
             _pads = new List<Pad>();
@@ -55,6 +57,18 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
+            #if MONOMAC
+            splitterVertical.PositionChanged += delegate {
+                setw++;
+                if (setw > 2)
+                {
+                    buildOutput.SetWidth();
+                    propertyGridControl.SetWidth();
+                    setw = 0;
+                }
+            };
+            #endif
+
             _contextMenu = new ContextMenu();
             projectControl.SetContextMenu(_contextMenu);
 
@@ -67,16 +81,12 @@ namespace MonoGame.Tools.Pipeline
         {
             e.Cancel = !PipelineController.Instance.Exit();
 
+#if WINDOWS || LINUX
             if (!e.Cancel)
                 Xwt.Application.Exit();
+#endif
 
             base.OnClosing(e);
-        }
-
-        public void ShowContextMenu()
-        {
-            if (PipelineController.Instance.ProjectOpen)
-                _contextMenu.Show(projectControl.TreeView.ToEto());
         }
 
         #region IView implements
@@ -119,13 +129,16 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _mgcbFileFilter;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
-            filePath = dialog.FileName;
+            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            {
+                filePath = dialog.FileName;
+                if (dialog.CurrentFilter == _mgcbFileFilter && !filePath.EndsWith(".mgcb"))
+                    filePath += ".mgcb";
+                
+                return true;
+            }
 
-            if (result && dialog.CurrentFilter == _mgcbFileFilter && !filePath.EndsWith(".mgcb"))
-                filePath += ".mgcb";
-
-            return result;
+            return false;
         }
 
         public bool AskOpenProject(out string projectFilePath)
@@ -135,10 +148,14 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _mgcbFileFilter;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
-            projectFilePath = dialog.FileName;
+            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            {
+                projectFilePath = dialog.FileName;
+                return true;
+            }
 
-            return result;
+            projectFilePath = "";
+            return false;
         }
 
         public bool AskImportProject(out string projectFilePath)
@@ -148,10 +165,14 @@ namespace MonoGame.Tools.Pipeline
             dialog.Filters.Add(_allFileFilter);
             dialog.CurrentFilter = _xnaFileFilter;
 
-            var result = dialog.ShowDialog(this) == DialogResult.Ok;
-            projectFilePath = dialog.FileName;
+            if (dialog.ShowDialog(this) == DialogResult.Ok)
+            {
+                projectFilePath = dialog.FileName;
+                return true;
+            }
 
-            return result;
+            projectFilePath = "";
+            return false;
         }
 
         public void ShowError(string title, string message)
@@ -511,7 +532,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdExit_Executed(object sender, EventArgs e)
         {
-            this.Close();
+            Application.Instance.Quit();
         }
 
         private void CmdUndo_Executed(object sender, EventArgs e)

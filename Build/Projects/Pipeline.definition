@@ -74,7 +74,6 @@
     
 	<!-- General Stuff -->
 	<Compile Include="Global.cs" />
-	<Compile Include="XwtUtil.cs" />
 	<Compile Include="MainWindow.cs" />
 	<Compile Include="MainWindow.eto.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
@@ -86,6 +85,9 @@
       <Platforms>Windows</Platforms>
     </Compile>
 	<Compile Include="Styles.Windows.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.xwt.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     
@@ -102,6 +104,9 @@
 	<Compile Include="Styles.Linux.cs">
       <Platforms>Linux</Platforms>
     </Compile>
+	<Compile Include="Controls\ProjectControl.xwt.cs">
+      <Platforms>Linux</Platforms>
+    </Compile>
     
     <!-- Native Mac -->
 	<Compile Include="Global.Mac.cs">
@@ -109,6 +114,9 @@
       <Platforms>MacOS</Platforms>
     </Compile>
 	<Compile Include="Styles.Mac.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+	<Compile Include="Controls\ProjectControl.eto.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
 	
@@ -131,10 +139,6 @@
 	<Compile Include="Controls\BuildOutput.cs" />
 	<Compile Include="Controls\BuildOutput.eto.cs">
       <DependentUpon>BuildOutput.cs</DependentUpon>
-    </Compile>
-	<Compile Include="Controls\ProjectControl.cs" />
-	<Compile Include="Controls\ProjectControl.xwt.cs">
-      <DependentUpon>ProjectControl.cs</DependentUpon>
     </Compile>
 	<Compile Include="Controls\PropertyGridControl.cs" />
 	<Compile Include="Controls\PropertyGridControl.eto.cs">
