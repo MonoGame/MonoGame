@@ -280,15 +280,31 @@ namespace MGCB
                                 previousContent.Platform != Platform ||
                                 previousContent.Profile != Profile;
 
-            // First clean previously built content.
-            foreach (var sourceFile in previousContent.SourceFiles)
+            // jcf: This looks super suspect to me.
+            //      Either we are doing an incremintal build, in which case this doesn't need to happen, because each item decides if it needs to 'clean' or not individually as it is built
+            //      Or, we aren't doing an incrimental build, in which case shouldn't someone have just called a separate Clean method before-hand, in which -all- previous content is cleaned irregardless of if they are present in the current build?            									
+			//      ALSO, note that this is not cleaning copy items!
+            foreach (var prev in previousContent.SourceFiles)
             {
+                var words = prev.Split(';');
+
+                // old format
+                if (words.Length < 2)
+                    continue;
+
+                // old format
+                var prevAbsOutputFilepath = words[1];
+                if (!Path.IsPathRooted(prevAbsOutputFilepath))
+                    continue;
+
                 bool inContent = false;
 
-                foreach (var content in _content)
+                foreach (var cur in _content)
                 {
-                    var sourceFileAssetName = string.Concat(content.SourceFile, ";", content.AssetName);
-                    if (sourceFileAssetName.Equals(sourceFile, StringComparison.InvariantCultureIgnoreCase))
+                    var absOutputFilepath = cur.AssetName;
+                    _manager.ResolveOutputFilepath(cur.SourceFile, ref absOutputFilepath, true);
+
+                    if (absOutputFilepath.Equals(prevAbsOutputFilepath, StringComparison.InvariantCultureIgnoreCase))
                     {
                         inContent = true;
                         break;
@@ -300,11 +316,39 @@ namespace MGCB
 
                 if (cleanRebuiltContent || cleanOldContent || targetChanged)
                 {
-                    var words = sourceFile.Split(';');                    
-                    var outputFilePath = words[1];                    
-                    _manager.CleanContent(outputFilePath);
+                    _manager.CleanContent(prevAbsOutputFilepath);
                 }
             }
+			
+			// alternate implementation idea....
+			
+			// If requested, do a full clean.
+            // The 'current' content and copy items are actually irrelevent for this case.
+            // Because we serialize all the build events that occured during each build
+            // so those are the items we want to clean. It doesn't matter what the 'current' items are
+            // until later when we go to build.
+            /*
+            if ((Clean || Rebuild) && !Incremental)
+            {
+                // jcf: we should have written out the absolute-output-file-path...
+                //      after all, we don't know what the previous build's output directory actually was...
+                foreach (var prev in previousContent.SourceFiles)
+                {
+                    var words = prev.Split(';');
+
+                    // old format
+                    if (words.Length < 2)
+                        continue;
+
+                    // old format
+                    var absOutputFilepath = words[1];
+                    if (!Path.IsPathRooted(absOutputFilepath))
+                        continue;
+
+                    _manager.CleanContent(absOutputFilepath);
+                }
+            }
+            */
 
             var newContent = new SourceFileCollection
             {
@@ -321,8 +365,8 @@ namespace MGCB
             foreach (var c in _content)
             {
                 try
-                {
-                    _manager.RegisterContent(c.SourceFile, null, c.Importer, c.Processor, c.ProcessorParams);
+                {   
+                    _manager.RegisterContent(c.SourceFile, c.AssetName, c.Importer, c.Processor, c.ProcessorParams);
                 }
                 catch
                 {
@@ -376,7 +420,7 @@ namespace MGCB
                                                          item.ProcessorParams,
                                                          out buildEvent);
 
-                    var sourceFileAssetName = string.Concat(inputFilePath, ";", outputFilePath);
+                    var sourceFileAssetName = string.Concat(buildEvent.SourceFile, ";", buildEvent.DestFile);
                     newContent.SourceFiles.Add(sourceFileAssetName);
 
                     if (wasBuilt)

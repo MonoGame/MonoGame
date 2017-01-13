@@ -474,13 +474,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {            
             if (string.IsNullOrEmpty(outputFilePath))
             {
-                outputFilePath = sourceFilePath;
-
                 var directory = PathHelper.GetRelativePath(ProjectDirectory,
                                                            Path.GetDirectoryName(sourceFilePath) +
                                                            Path.DirectorySeparatorChar);
 
-                outputFilePath = Path.Combine(OutputDirectory, directory, outputFilePath);
+                var file = Path.GetFileName(sourceFilePath);
+
+                outputFilePath = Path.Combine(OutputDirectory, directory, file);
             }
             else
             {                
